@@ -1,0 +1,35 @@
+& {
+$ErrorActionPreference = 'Continue'
+if ($PSVersionTable.PSVersion.Major -lt 7) { Write-Host '[RED] VQG boot needs PowerShell 7 (pwsh)' -ForegroundColor Red; return }
+try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch { }
+$env:PYTHONUTF8 = '1'
+$R = $env:VQG_REPO ?? (Join-Path $HOME 'OneDrive\Documents\movies-dataset')
+$VIA = $env:VQG_VIA ?? (Join-Path $R 'VeritasIntelligenceAnalytics')
+$P = 'VeritasIntelligenceAnalytics/functional modules/VQG'
+$want = [ordered]@{ 'VQG_AllInOne_v0104.py' = 'd2a5ca07fa4d29435584c111095a31951075ab585b51cc74b14b22ef48ca1d02'; 'VQG_AllInOne_v0105.py' = 'cc050f0fe42786f7113dbf0dd920d954feaf0b020e216456f336ce0d30801619' }
+$dst = Join-Path (Join-Path $HOME 'Downloads') 'VQG'
+New-Item -ItemType Directory -Force -Path $dst | Out-Null
+$t = Join-Path ([IO.Path]::GetTempPath()) ('vqg_' + (Get-Date -Format yyyyMMdd_HHmmss))
+New-Item -ItemType Directory -Force -Path $t | Out-Null
+$z = Join-Path $t 'vqg.zip'
+git -C $R archive --format=zip -o $z "FETCH_HEAD:$P" @($want.Keys) 2>&1 | Out-Null
+if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $z)) { Write-Host "[RED] VQG: git archive of $P failed (fetch first)" -ForegroundColor Red; return }
+$ProgressPreference = 'SilentlyContinue'; Expand-Archive -LiteralPath $z -DestinationPath $t -Force; $ProgressPreference = 'Continue'
+foreach ($f in $want.Keys) {
+  $code = [IO.File]::ReadAllText((Join-Path $t $f), [Text.Encoding]::UTF8) -replace "`r`n", "`n"
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes($code)
+  $sha = ([BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash($bytes)) -replace '-', '').ToLowerInvariant()
+  if ($sha -ne $want[$f]) { Write-Host "[RED] VQG: $f SHA-256 mismatch ($sha) - not run" -ForegroundColor Red; return }
+  [IO.File]::WriteAllBytes((Join-Path $dst $f), $bytes)
+}
+Write-Host "[GREEN] VQG v0105 + v0104 SHA-256 OK -> $dst" -ForegroundColor Green
+$cands = @($env:VQG_PY, (Join-Path $HOME 'envs\via_core\Scripts\python.exe'), (Join-Path $HOME 'envs\via_core_312\Scripts\python.exe'), (Join-Path $HOME 'envs\via_vdf_312\Scripts\python.exe'), 'C:\Python313\python.exe') + @((Get-Command python -ErrorAction SilentlyContinue | Where-Object Source -NotMatch 'WindowsApps').Source)
+$py = $null
+foreach ($c in $cands) { if ($c -and (Test-Path -LiteralPath $c)) { & $c -c "import duckdb, polars" 2>$null; if ($LASTEXITCODE -eq 0) { $py = $c; break } } }
+if (-not $py) { Write-Host '[RED] VQG: no Python with duckdb + polars (VQG does not pip) -> VCGC: via-install duckdb polars' -ForegroundColor Red; return }
+Write-Host "[GREEN] VQG Python $py (duckdb + polars)" -ForegroundColor Green
+& $py (Join-Path $dst 'VQG_AllInOne_v0105.py') closeout --via-root $VIA
+$rc = $LASTEXITCODE
+$rec = Join-Path $VIA 'VIA_Reports\vqg\VQG_Closeout_latest.json'
+Write-Host "[VQG] closeout rc $rc - receipt $rec (upload it to the AI)"
+}

@@ -164,3 +164,32 @@
 | VIA Agent OS | v0100 整合進 `supportive modules\agent_os`(自測 15 · 八 Skill 23 / 23)· 桌機一行啟動 · `.via\ssot.json` 不進倉 |
 | 他系統燈(只讀)| VCGC:交接閘 RED · 驗收 RED(待辦 217)· VDF:沒有自報收據(灰)· 自測 RED(DuckDB)· 見 vrn2_release_v0178/VRN2_Verification_v0178.md §3 |
 | 桌機要做 | 貼 `vrn2_release_v0178/VRN2_HandleAll_v0126.md` 開閘一行(自動整輪)· MQ-1560 `--confirm H-fd2ea35f`(操作員)· VIA Agent OS 一行(via_agent_os_v0100)|
+
+## 16. v0179 輪更新(2026-11-04 · 四系統收尾 · KPI)
+
+| 項目 | 現況 |
+|---|---|
+| VRN-2 | 桌機 v0178 = REVIEW(VRN-2 0 · 人工 1 · 資料源 3)· RoundAll v0135 / Handle-All v0127(套件 v0178 不動)· 正確性 KPI 達標(不符 0) |
+| 速度 KPI | 收據 2286.87 秒 · 管理器最慢「輸出冊」占 74% · 8 核 / 執行緒 7 / RAM 6.8 GB · ④b 2.29 倍 · 還不是最快(見 KPI §1)|
+| VDF | 自測經 VCGC rc 0(SUP_MDL753 v0113 · DuckDB 2.x)· 自報收尾收據仍灰(要桌機 ActivateVDF)|
+| VCGC | 串測 9 綠 1 黃 0 紅 · SSOT 全景 紅 → 黃(VRN_SystemManager v0261 對接口)· registry-sync / 編號 +28(遺失 0 · 改身分 0 · 重號 0)· 交接閘 紅(結構性)|
+| VIA Agent OS | v0100 · 自測 15 / 15 · Skill 23 / 23 |
+| 加速器 / 網路工具 | 都解到鎖冊最新(Celeritas v1141 · Aegis v1652);缺口照列(VRN-2 runtime VerbatimVerifier v0105 · VRN_ENG112 · ⑥e AllInOne_v039 不經網路工具)|
+| 桌機要做 | 開閘一行(vrn2_release_v0179/VRN2_HandleAll_v0127.md)· MQ-1560 `--confirm H-fd2ea35f`(操作員)· VDF 桌機 ActivateVDF(VDF 線)|
+
+## 17. 2026-11-04 五系統 · VQG 入列 · 併 main(另一工作階段的 VDF / VCGC 收尾不重做)
+
+| 項目 | 現況 |
+|---|---|
+| main 併入 | 另一工作階段 2026-11-04:交接閘 357 → 103 · ENG113 / 115 / 116 經網路工具 · 盤點冊 v0182 · 交接案 +4 —— 本線只併不重做;衝突 4 冊(只增 jsonl 取聯集 · 重生 JSON 由 VCGC 重生)· 稽核 遺失 0 · 改身分 0 · 重號 0 |
+| VQG(第五系統)| v0104 原檔 + v0105 薄尾 · 只讀 VDF 資料庫 · 不連網 · 交接案 vqg(收據 rc 0 標記見到)· VCGC-REQ183(子系統欄 VCGC · 題目 VQG)(PARTIAL)· 站 C-vqg · 編號 VIA-VQG-MDL001 / 002 · 桌機一行見 vqg_v0105 |
+| VIA Agent OS | v0102(引擎 1.0.2 hardened · 第 3 行加速器標記 · AST 相同)· 48 / 48 · 27 / 27 · 預檢離線 20 / 20 · 本倉只讀實跑 · 桌機一行見 via_agent_os_v0102 |
+| DeployLedger v0300 | 只測未啟用(47 / 48 · 1 = 容器系統 Python 重複套件 fail-closed)· 原包含桌機路徑不進倉 |
+| VRN-2 / VDF | 照 §16:VRN-2 REVIEW(MQ-1560 人工確認 · 兆豐 4 份分析師缺 · numba 顯示不一致)· VDF 自測綠 · 自報收據待桌機 |
+| SDD / 編號 | VQG 需求代碼依 X-REQ 規則歸 VCGC 中樞 = VCGC-REQ183(子系統欄 VCGC · 題目 VQG)· 編號 VIA-VCGC-REQ183 · audit 遺失 0 · 改身分 0 · 重號 0 · SDD YELLOW(無紅)· v0104 原檔登 frozen_sources |
+| 交接閘(收尾)| 105:REQ_CHANGED 57(黃)· CCWT 42(VRN 舊模組)· ACCEL_BRIDGE_MISSING 3(含 VQG v0104 原檔 · 橋在 v0105)· UNREGISTERED 1 · EVIDENCE_INVALID 1(vrn_logic_index)· STALE 1;numbering / chain / backup 三案重跑 true;`test --quick` 綠 9 黃 1 紅 0 · SSOT 全景無紅 |
+| 桌機四條貼回 → 一支程式 | Graphify 綠 3 黃 1(VCGC 固定估 6 GB 跳過)· VRN-2 confirm H-fd2ea35f 已記 DATA_GAP 結案 · VQG 紅(工作樹 VDF 冊 v0100 → via_01_vdf;分支 v0101 → via_database\vdf_database)· Agent OS selftest rc 2(symlink_to WinError 1314)→ `VIA_SettleAll_v0102.py`(看門狗 · 多家探根 · 自測分類 · VRN 只讀狀態)· 自測 23 / 23 · 一行見 VRN2_Handover_latest §14 |
+| 桌機 v0102 貼回 → v0103 | VQG 黃(算出來 · 351 日線檔 · 曆是推的)· Agent OS 黃(symlink 權限)· Graphify 三綠 + VCGC 吃 ≥ 3.2 GB 被殺 · VDF ui / VCGC 紅 = 工作樹 main 舊版(38 改動不合併)→ v0103:收據類改動自動 stash 合併放回 · 其他列檔名 · 分支尾版對照 · VCGC 輸出入報告 · 自測 25 / 25 · 一行見交接 §15 |
+| 桌機 v0103 貼回 → v0104 | 37 個非收據改動 = VRN 舊版橋塊注入 + VCGC 狀態冊 + VDF / U/I 產物 → v0104 逐檔分類(bridge / state / eol / receipt 自動合併 · other 才停)· ④⑤⑧⑨ 併行 · VCGC 事件冊入報告 · Graphify 1 worker · ⓫ L103 只讀盤點(容器 py 無橋 16 · 網路無橋 74 · ps1 無 Celeritas 162)· 自測 30 / 30 · 一行見交接 §16 |
+| 兩日全景收尾 | 11-05:VRN-2 結案(DATA_GAP)· VDF / VCGC 容器綠黃 · 桌機卡在工作樹(main · 落後 216 · other 28)· VQG 黃(設計)· Agent OS 黃(symlink)· Graphify 3/4(VCGC 要 ≥ 6 GB)· 非個股 v0300 缺三支模組(桌機也沒有)· 見 VIA_Closeout_Panorama_20261105.md · SettleAll v0105 |
+| 交接閘 | 本線併入後 171:多的是本線兩支薄尾(SUP_MDL753 v0113 · VRN_SystemManager v0261)讓 6 案相依變了 → 重跑 5 過 1 同前(vrn_logic_index 標記從未印出 · 豁免案)· `manager` 案 = 操作員 10-10 裁定「VRN 暫緩」待選 (a) 改釘尾版標記 / (b) 新尾版重鏈 ≤v0118 自測 —— 不代選 |

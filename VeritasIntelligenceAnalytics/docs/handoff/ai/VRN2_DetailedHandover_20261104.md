@@ -91,3 +91,13 @@
 | 華南投顧背景色花俏 · 表格字不好擷取 · WORD / TXT / IMAGE | 記為下一輪需求:目前主體只擷取 PDF(Word / TXT / 影像已收下但不擷取);華南 6143 的轉置表在 v0168 / v0259 已補第三讀法。要做「背景底色 / 網底干擾」要原檔:把出問題的華南 PDF 上傳,我先量是文字層還是影像層再決定(不猜)|
 | VDF / VCGC 驗收燈 | VCGC 交接閘 RED · 驗收 RED(待辦 217 · 發現 357)· VDF 沒有自報收據(灰)· 自測 RED(DuckDB 連線)· 詳見 VRN2_Verification_v0178.md §3 |
 | VIA Agent OS | 已整合 `supportive modules\agent_os\VIA_AgentOS_v0100.py` · 容器實跑自測 / 驗收全過 · 桌機一行在 `via_agent_os_v0100\VIA_AgentOS_v0100.md` |
+
+## 9. v0179 補充(2026-11-04 · 桌機 v0178 REVIEW 之後 · 四系統收尾)
+
+- **桌機 v0178 結果**:收據 rc 2 · 2286.87 秒 · 2 輪 · 收尾 REVIEW(VRN-2 0 · 人工 1 · 資料源 3)· VRN-2 側結案。
+- **檔案總管「Windows 找不到 …\last_error.txt」**:⑥e 那列的提示寫死指向 last_error.txt,但上一輪的檔在 ④ / ⑤ 會被改名成 last_error.before_<時間>.txt → RoundAll v0135 只在檔案真的在時才指它(附完整路徑)。
+- **`--confirm` 連提示字一起貼上**:v0135 只記 H-xxxxxxxx 代碼、其他字一行黃字忽略;收尾頁把指令單獨放一格(點一下選整行)。
+- **⑥ 收尾 KPI**(灰燈 · 不改結案判定):正確性 達標(不符 0):基本資料 708 / 711 · 待人工 3 · 四點 255 / 260 · 待人工 5 · 年度數據 11971 / 11971 · 原文核對 204 / 208 · 待人工 4;速度 收據 2287 秒(2 輪) · 最慢步驟 ⑦ 啟動 VRN-2 344 / ⑪ 獨立驗證(背景 ·  289 / ④ 加速器覆蓋 26 · 沒計時 1508 秒 · 管理器 326.5 秒 · 最慢 輸出冊 243 秒(74%) · CPU 8 核 · 執行緒上限 7 · 可用 RAM 6.8 GB · 忙 22% · 平行 3 路 · ④b 6 段 24 秒(依序 54 秒 · 2.3 倍) · CPU 用滿(執行緒上限 = 核數 − 1)。
+- **VRN 底座 v0261**:VCGC 的 SSOT 全景 managers 探針 / 主控台 vrn_system 段呼叫尾版 collect();v0231 起的鏈沒有 → AttributeError → 全景 RED。v0261 交給 v0109 對接口(只讀 · 七處 7 / 7)。
+- **SUP_MDL753 v0113**:DuckDB 2.0 `fetchone()` 留下未讀完結果 → 下一個操作 ResourceInUse;包一層連線 → VDF 自測轉綠。
+- **下一步**:開閘一行 → 收尾頁看 KPI 兩列;MQ-1560 看原圖後打 `--confirm H-fd2ea35f`;華南投顧報告(背景花)要原 PDF 上傳才能測 WORD / TXT / IMAGE 讀取。
