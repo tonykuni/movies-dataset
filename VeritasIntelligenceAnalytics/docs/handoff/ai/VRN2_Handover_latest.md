@@ -250,3 +250,33 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v010
 $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0109";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0109.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0109.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'C8C529A6DE27F758C3FCAD1159AFE697A8D3E634C765DD2E0C0A14AEE331FFD1'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
 ```
 
+
+## 22. VIA_SettleAll_v0110(2026-11-06 · ⑭ 模組矩陣:SYSTEM 燈 / FUNCTION / DESCRIPTION / MDL-ENG NAME + VCGC 編號 / CLS / FNC / LIBS / ERROR & AST / STATUS · 只讀 AST · STATUS 只從 ⑬ 自測 / VCGC 功能帳 / 入口步燈取)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0110";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0110.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0110.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'7CAAD8650A332FD7149CBFE05D30CF196355232E27F509A894967BEF149B674E'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
+容器實跑:508 模組尾版 · 🟢 361 🟡 9 🔴 10 ⚪ 128 · AST 錯 0 · 5 秒;文件 `VIA_SettleAll_v0110.md`。操作員上傳的 VIA_SystemIntegrationEngine v1.0 入倉在 `sie_v1_0_intake/`(只留證 · 不接線)。架構基線 B1–B5 對照:`VIA_Blueprint_B1B5_Mapping_20261106.md`。
+
+## 23. VIA_SettleAll_v0111(2026-11-06 · ⑭ VCGC 編號改查 MDL + ENG 兩本冊 → 508 列未登號 0 · 取代 §22 那行)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0111";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0111.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0111.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'D04B90BD5A302A9D28628EBEF21BD16C5B7A48EAE8A24A6DC73114355F95CD91'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
+## 24. VIA_SettleAll_v0112(2026-11-06 · 桌機 22:19 貼回:26 舊版 + 2 壞 JSON 已還原 · 剩 SM v0152 / v0153 被改 → 新類 frozen 備份後還原 HEAD · 未追蹤檔摘要 · 取代 §23 那行)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0112";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0112.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0112.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'322F1D0B1B23F4387F1921A8A553340195C49AF97E75FADD14C38D388B1DD587'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
+## 25. VIA_SettleAll_v0113(2026-11-06 · ⑮ VAP v0300 實測燈 · ⑫ VCGC 站表矩陣 319 站(類型 / 測試型 / 版本 / 編號 / 功能帳 / 耗時 / 時間)· 取代 §24 那行)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0113";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0113.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0113.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'B5B75B7B9DBFDE3A10CB4A70B193B337CD9C08174FE0A460C88A335A0F9852B0'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
+## 26. 雙橋 100%(2026-11-06 · VCGC 橋掃器 --apply:ALL/accel 1800/1800 · VDF/net 146/146 · PS 1009/1009;注 11 支 · 豁免名冊 v0115 +4;一行釘住件還原 bytes 不注)
+
+詳 `VIA_BridgeSweep_20261106.md`;審計矩陣 `VIA_Closeout_Audit_Matrix_20261106.md / .html`。桌機一行仍用 §25(v0113);桌機的 ③ 會把這 11 支當「bridge」類自動合併。

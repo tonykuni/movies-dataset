@@ -27,6 +27,20 @@ v0101(2026-10-29 桌機實跑貼回):桌機 ship 後 check 仍紅(v0248 / v0253 
 [VIA:AST-CLASS] 類別 = 工具(VRN-2 隨船 / 鏈盤點)· 入口 = 本檔(桌機一鍵 / CI check)
 """
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import argparse
 import ast

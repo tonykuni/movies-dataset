@@ -56,3 +56,10 @@ MCP 是雙向接點:Manus 接上本伺服器後能**讀** VCGC 的卡與收據;V
 | 角色 | **用戶端設定引擎**:哪個 AI 平台接哪幾個 MCP server(每平台最多 5 個)· 預覽 / 套用設定檔 · 真啟動探測 | **被接的伺服器**:把 VCGC 唯讀動詞與收據露成 MCP 工具 / 資源 |
 | 接法 | 在 Engine 的 MCP 目錄裡加一筆自訂 server:command `python` · args = 本檔 `--serve --root <倉根>`(即 `--client-config` 印出的那段)→ 平台(Claude Desktop / Manus …)就同時接上 VCGC | — |
 | 不重疊 | Engine 不露 VCGC 動詞;本檔不寫任何設定檔 | |
+
+## v0101(2026-11-06 · 操作員「MCP 功能完善化對接一切」· v0100 一字不動 · 薄尾 `CGC_MDL279_MCPServer_v0101.py`)
+
+- 資源 **11 → 27**:多 ⑫ 系統矩陣 · ⑭ 模組矩陣 · VCGC 站表矩陣 · ⑬ VDF 引擎矩陣(json / md)· SETTLE 報告 md · VCGC 測試狀態冊 · VCGC 功能帳 · Agent OS status / skills · VRN-2 RoundAll · VCGC 兩天新增功能整理 · 架構基線 B1–B5 對照 · VAP v0300 函式清冊(全部只讀 · 零寫入 · 零網路)。
+- 工具 **16 → 17**:`vcgc_mcp_doctor` = 主控台 v0192 的 `mcp doctor`(只讀偵測各 AI 平台設定)。
+- `--client-config` 的 command 指到 v0101。自測:v0100 的 12 項 + 本版 4 項全過。
+- Claude Desktop / Manus / Claude Code 設定:把 `python CGC_MDL279_MCPServer_v0101.py --client-config --root <倉根>` 印出的 JSON 貼進用戶端的 mcpServers。
