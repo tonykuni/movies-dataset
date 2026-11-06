@@ -258,3 +258,9 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v011
 ```
 
 容器實跑:508 模組尾版 · 🟢 361 🟡 9 🔴 10 ⚪ 128 · AST 錯 0 · 5 秒;文件 `VIA_SettleAll_v0110.md`。操作員上傳的 VIA_SystemIntegrationEngine v1.0 入倉在 `sie_v1_0_intake/`(只留證 · 不接線)。架構基線 B1–B5 對照:`VIA_Blueprint_B1B5_Mapping_20261106.md`。
+
+## 23. VIA_SettleAll_v0111(2026-11-06 · ⑭ VCGC 編號改查 MDL + ENG 兩本冊 → 508 列未登號 0 · 取代 §22 那行)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0111";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0111.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0111.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'D04B90BD5A302A9D28628EBEF21BD16C5B7A48EAE8A24A6DC73114355F95CD91'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```

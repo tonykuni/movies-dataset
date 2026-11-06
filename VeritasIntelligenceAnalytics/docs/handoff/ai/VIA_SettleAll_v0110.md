@@ -1,5 +1,7 @@
 # VIA_SettleAll v0110(操作員 2026-11-06「SYSTEM / FUNCTION / DESCRIPTION / MDL-ENG NAME / CLS / FNC / LIBS / ERROR & AST / STATUS · 逐步將多矩陣管理報告完善 · 先整理各系統矩陣第一欄三個燈號」)
 
+> **已被 v0111 取代**(一行請用 `VIA_SettleAll_v0111.md`;v0110 的 ⑭「未登號 144」是只查 MDL 冊的查漏,v0111 加讀 ENG 冊後 0)。
+
 v0109 一字不動。新增 **⑭ 模組矩陣**(在 ⑬ 之後 · ⑫ 之前):七個系統夾每個模組家族的**尾版**一列,只 `ast.parse`、不執行、不改檔。
 
 | 欄 | 來源(只讀)|
