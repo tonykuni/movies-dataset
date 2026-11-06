@@ -1,17 +1,17 @@
-# VQG → VAP 統一輸出契約(2026-11-06 · VQG v0106 export-vap × VAP v0302)
+# VQG → VAP 統一輸出契約(2026-11-06 · VQG v0107 export-vap × VAP v0302;v0106 留存 · 被 v0107 取代)
 
 操作員令:「實測輸出增量 PARQUET 維護資料庫後 · VQG 擷取自資料庫檔案夾整理全部 · 無論有無加工計算 · 統一輸出資料到其他應用如 VAP · 完成全部並收尾 · 確認各系統完全獨立交互支援」。
 
 ## 0. 一句話
 
-VDF 增量寫批次 parquet → VQG v0106 `export-vap` 只讀 VDF 庫夾 → 整理全部(目錄)+ 無加工(一票一表 SERIES)+ 有加工(一票一表 INDICATOR_RESULT)+ 連線證據(指紋)+ VAP config → VAP v0302 `--config` 一接就上(容器實測:4 張表 · 使用者流程 7/7 PASS · 雙軸圖有畫出來)。五系統各自獨立:VQG 不 import VAP · VAP 不 import VQG · 兩邊只靠檔案 + 契約(schema + SHA-256 指紋)對話。
+VDF 增量寫批次 parquet → VQG v0107 `export-vap` 只讀 VDF 庫夾 → 整理全部(目錄)+ 無加工(一票一表 SERIES)+ 有加工(一票一表 INDICATOR_RESULT)+ 連線證據(指紋)+ VAP config → VAP v0302 `--config` 一接就上(容器實測:4 張表 · 使用者流程 7/7 PASS · 雙軸圖有畫出來)。五系統各自獨立:VQG 不 import VAP · VAP 不 import VQG · 兩邊只靠檔案 + 契約(schema + SHA-256 指紋)對話。
 
 ## 1. 流向與邊界(不變)
 
 | 方向 | 誰寫 | 誰讀 | 邊界 |
 |---|---|---|---|
 | VDF → VQG | VDF 引擎(ENG054 等)寫 `<db_home>/output_hub/…/tw_daily_prices_<YYYYmmdd_HHMMSS>.parquet`(每輪一個新批次 · 增量) | VQG 只讀(`VDF_DataHome_SSOT` 尾版的 db_home 或 `$env:VQG_VDF_ROOT`) | VQG 不寫 VDF 的夾(跑前跑後核對檔案清單 + mtime · 收據 `vdf_root_untouched`)· 輸出夾不准在 VDF 庫裡(`OUTPUT_INSIDE_SOURCE_ROOT` rc 2) |
-| VQG → VAP | VQG v0106 `export-vap` 寫 `<VIA 根>/VIA_Reports/vqg/vap_export/vap_export_<戳>/` | VAP `--config <輸出夾>/VAP_AllInOne_v0300.config.json` 只讀 | VAP 正式輸入 = VQG(`formalInputAuthority: VQG`)· VDF 不直連 VAP(`vdf_connection_manifest.json` connections 空)· VAP 不補值不重算(`PRESERVE_VQG_OUTPUT_NO_VAP_REPAIR`) |
+| VQG → VAP | VQG v0107 `export-vap` 寫 `<VIA 根>/VIA_Reports/vqg/vap_export/vap_export_<戳>/` | VAP `--config <輸出夾>/VAP_AllInOne_v0300.config.json` 只讀 | VAP 正式輸入 = VQG(`formalInputAuthority: VQG`)· VDF 不直連 VAP(`vdf_connection_manifest.json` connections 空)· VAP 不補值不重算(`PRESERVE_VQG_OUTPUT_NO_VAP_REPAIR`) |
 | 技術指標 | VQG v0104 QuantGuard 公式(三解 · 驗證)· 政策 L50 不用 TA-Lib | — | `taLibPolicy: CALCULATE_ONLY_NO_FETCH` · `pricePolicy: ADJUSTED_PRICE_ONLY` |
 
 增量批次:同一張表多個時間戳批次(除權息後還原價重算 → 同日值不同),`--snapshots latest`(export-vap 預設)只取最新一份;被取代的檔列在 `vqg_vdf_catalog.json`(`superseded: true`)與收據。
@@ -23,7 +23,7 @@ VDF 增量寫批次 parquet → VQG v0106 `export-vap` 只讀 VDF 庫夾 → 整
 | `vqg_vdf_catalog.json` | 整理全部 | 所有人 | VDF 庫夾每一個 parquet 一列:路徑 · 大小 · 批次戳 · 認得的欄位 · 列數 · 票樣本 · SHA-256 · 是否被新批次取代 · 讀不了 |
 | `series/<票>.parquet` + `.csv` | 無加工 SERIES | VAP(一票一表) | v0105 `load_series` 原樣倒出:date · adj_close · volume · turnover…(全空的欄不列)· market · session_index · available_on · source_files · engine_version;x = date 不重複升冪 |
 | `vqg_series.parquet` + `.csv` | 無加工 SERIES | 其他應用 | 全部票長表(含 ticker 欄) |
-| `indicators/<票>.parquet` + `.csv` | 有加工 INDICATOR_RESULT | VAP(一票一表) | 最近 `--indicator-points`(預設 60)個交易日各跑一次 v0105 `run_local`;x = observation_date;欄 = `<指標>_<窗>_<解>`(例 `SMA_20_S1` · `RSI_14_S2` · `MACD_26_S3`)· 無效值留空 |
+| `indicators/<票>.parquet` + `.csv` | 有加工 INDICATOR_RESULT | VAP(一票一表) | 最近 `--indicator-points`(預設 60)個交易日各跑一次 v0105 `run_local`;x = observation_date;欄 = `<指標>_<窗>_<解>`(例 `SMA_20_S1` · `RSI_14_S2`)· 結構值展開 `<欄>_<分量>`(`MACD_26_S1_line` / `_signal` / `_histogram`)· 截止日照市場(台股 = 觀測日隔天 · 美股 = 當日)且不超過 `--as-of`(台股最後觀測日 = as-of 前一交易日 · 美股 = as-of 當日)· 無效值留空 |
 | `vqg_indicator_results.parquet` + `.csv` | 有加工 INDICATOR_RESULT | 其他應用 | as-of 當天快照 · 欄位 = v0104 FIELDS 23 欄(長表);`--out-dir` 下既有 `vqg_<uuid>/vqg_result.parquet`(v0104 `calc --export-dir`)一併合入去重 |
 | `vqg_connection_manifest.json` | 連線證據 | VAP | schema `VIA-VQG-VAP-CONNECTION-MANIFEST/1.0` · 每張 VAP 表一筆(見 §3) |
 | `vdf_connection_manifest.json` | 連線證據 | VAP | schema `VIA-VDF-VAP-CONNECTION-MANIFEST/1.0` · connections `[]`(VDF 不直連) |
@@ -38,7 +38,7 @@ VDF 增量寫批次 parquet → VQG v0106 `export-vap` 只讀 VDF 庫夾 → 整
 contractId   VQG-SERIES-v1 | VQG-INDICATOR-v1        sourceId   VQG-SERIES-<票> | VQG-INDICATOR-<票>(= config 來源 id)
 state        AUTHORIZED                               readOnly   true
 engine       PARQUET(= 來源 engine)                   sourceSystem VQG
-vqgVersion   v0106                                    formulaEngine v0104
+vqgVersion   v0107                                    formulaEngine v0104
 datasetType  SERIES | INDICATOR_RESULT                producerInputs ["VDF"]        ticker <票>
 limits       {maxInputRows 5000, maxOutputRows 100, maxWindow 252}(= v0104 上限 · VAP 只收 ≤ 這三個)
 xField       date | observation_date                  fieldSemantics {每個數值欄: stableId · subject · unit · dataType · frequency · role}
@@ -71,7 +71,7 @@ VAP 自己的既有狀況(不是這輪造成 · 內嵌 demo 也一樣 · 列給 
 | 步 | 結果 |
 |---|---|
 | VQG v0105 doctor | `DERIVE_READY` · 日線檔 2 · 多批次 1 張表 · 缺 session_index / available_on / market(VDF 線出了才嚴格綠) |
-| VQG v0106 selftest | 12/12 PASS(含 v0105 全部 · 零網路 · 只在沙盒寫) |
+| VQG v0107 selftest | 12/12 PASS(含 v0105 全部 · 零網路 · 只在沙盒寫 · 夾具含美股 NVDA) |
 | export-vap | 5.9 秒 · 4 張表(2 SERIES + 2 INDICATOR · 60 點)VAP 閘全過 · 長表 556 / 48 列 · 併入舊快照 2 夾 · 燈 YELLOW(曆是推的) |
 | VAP v0302 `--run-self-test` | PASS(內嵌 demo) |
 | VAP v0302 `--once-refresh --config` | 0 錯 · 4 表 · 全 `vqgVerified true` · x = date / observation_date |
@@ -82,21 +82,22 @@ VAP 自己的既有狀況(不是這輪造成 · 內嵌 demo 也一樣 · 列給 
 
 ```powershell
 $r="$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics"
-python "$r\functional modules\VQG\VQG_AllInOne_v0106.py" selftest
-python "$r\functional modules\VQG\VQG_AllInOne_v0106.py" export-vap                     # VDF 庫根照 VDF_DataHome_SSOT;沒有就 --root <庫根>;--max-tickers 0 = 全部
+python "$r\functional modules\VQG\VQG_AllInOne_v0107.py" selftest
+python "$r\functional modules\VQG\VQG_AllInOne_v0107.py" export-vap                     # VDF 庫根照 VDF_DataHome_SSOT;沒有就 --root <庫根>;--max-tickers 0 = 全部
 python "$r\functional modules\VAP\intake\allinone_v0300\VAP_AllInOne_v0302.py" --config "$r\VIA_Reports\vqg\vap_export\VAP_AllInOne_v0300.config.json"
 ```
 
 VAP 開在 http://127.0.0.1:8765(U/I 寫死這個埠 · 換埠 U/I 會 `ERR_CONNECTION_REFUSED`)。要嚴格綠:VDF 日線出 `session_index` / `available_on` / `market`;要更多票:`--max-tickers 0`(每票約 0.1–0.5 秒 × 指標點數)。
 
-## 8. SettleAll v0115 接上(⑧b · ⑰ · ⑯)
+## 8. SettleAll v0115 / v0116 接上(⑧b · ⑰ · ⑯)
 
-- ⑧b VQG→VAP 匯出:⑧ closeout 綠 / 黃且 VDF 家在 → 跑 v0106 `export-vap --max-tickers 3 --indicator-points 20` → 收據燈;容器沒 VDF 家 ⚪。
+- ⑧b VQG→VAP 匯出:⑧ closeout 綠 / 黃且 VDF 家在 → 跑 VQG 最新尾版(v0107)`export-vap --max-tickers 3 --indicator-points 20` → 收據燈;容器沒 VDF 家 ⚪(SettleAll v0116 起)。
 - ⑰ VQG→VAP 串接:拿 ⑧b 的 config 跑 VAP 尾版 `--once-refresh` → 表數 = 來源數且 0 錯且全 vqgVerified 🟢。
 - ⑯ 衝突偵測:跨系統 import · 同名不同內容(撞號)· 撞埠 · 工具鎖 · 鏡像夾 → `VIA_Reports/settle/VIA_Conflicts_latest.md`;⑫ 矩陣三列新增。
 
 ## 9. 獨立性與未決
 
-- VQG v0106 不 import VAP(自測 ② 驗)· VAP v0302 不 import VQG · SettleAll 只讀兩邊收據。
+- VQG v0107 不 import VAP(自測 ② 驗)· VAP v0302 不 import VQG · SettleAll 只讀兩邊收據。
+- Codex 在 #599 / #600 抓到 v0106 四項 → 照版本律出 **v0107**(v0106 一字不動留存 · SettleAll v0116 釘 v0107;自測 ⑦ ⑫ 驗):收據夾在 VDF 庫裡 → 連收據都不寫(rc 2);美股截止日 = 觀測日當天且觀測日不超過 as-of(不漏未來);MACD 等結構值展開成分量欄(原本全空);先濾掉截止日超過 as-of 的交易日再取最後 N 點(台股要 N 點就給 N 點)。
 - VAP 的 VDF 直連路徑(`def_vdf_evidence`)要求股票類帶 `taLibEvidence.engine == "TA-Lib"`,跟 VIA 政策 L50(不用 TA-Lib)相衝;本契約不走 VDF 直連(connections 空)所以不觸發 · 不改 VAP 這段(VAP 線自己決定)。
 - 曆嚴格綠要 VDF 線出欄位(G2 範圍 · 不代改)。

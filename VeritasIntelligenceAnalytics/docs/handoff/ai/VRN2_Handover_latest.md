@@ -296,9 +296,18 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v011
 ## 29. VIA_SettleAll_v0115(2026-11-06 · ⑧b VQG→VAP 匯出 · ⑰ 串接 · ⑯ 衝突偵測 · 取代 §27 那行)
 
 ```powershell
-$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0115";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0115.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0115.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'3E14F2B44E0B80F46BD065BAF5761CB9E1447BB41B1C33AB4AC036D7F4133C4A'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0115";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0115.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0115.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'20C97ED7261121F53DA08771B8695EFEEDE084D307FB4C320E94F3A3F4A191D5'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
 ```
 
 - 新步:⑧b(VDF 家在 → VQG v0106 `export-vap` → `VIA_Reports\vqg\vap_export\`)· ⑰(VAP 尾版 `--once-refresh --config` 串接燈)· ⑯(衝突偵測 → `VIA_Reports\settle\VIA_Conflicts_latest.md`);⑫ 矩陣多三列。
 - VQG→VAP 契約:`VIA_VQG_to_VAP_Contract_20261106.md`;Atlas / VAP U/I 視覺鎖定:`VIA_Atlas_VisualLock_20261106.md`。
 - VAP 開 U/I:`python "$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\functional modules\VAP\intake\allinone_v0300\VAP_AllInOne_v0302.py" --config "$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\vqg\vap_export\VAP_AllInOne_v0300.config.json"`(8765 埠 · 瀏覽器自開)。
+
+## 30. VIA_SettleAll_v0116(2026-11-06 · 釘 VQG v0107 · 取代 §29 那行;v0115 / VQG v0106 一字不動留存)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0116";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0116.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0116.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'0C7D300F91E08CC1D8A28F995C7C429A8FB8CEC9BD96537E894DBE5DDA0DD26A'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
+- 為什麼:Codex 在 PR #599 / #600 抓到 VQG v0106 四項缺陷;v0106 與 SettleAll v0115 已隨 #599 發布到 main → 照版本律不原地改,出 VQG v0107(修四項)與 SettleAll v0116(釘 v0107 · ⑧b 用最新尾版)。
+- VAP 開 U/I 指令同 §29(VAP v0302 不變);`export-vap` 改用 `VQG_AllInOne_v0107.py`。
