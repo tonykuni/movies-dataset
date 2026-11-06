@@ -280,3 +280,15 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v011
 ## 26. 雙橋 100%(2026-11-06 · VCGC 橋掃器 --apply:ALL/accel 1800/1800 · VDF/net 146/146 · PS 1009/1009;注 11 支 · 豁免名冊 v0115 +4;一行釘住件還原 bytes 不注)
 
 詳 `VIA_BridgeSweep_20261106.md`;審計矩陣 `VIA_Closeout_Audit_Matrix_20261106.md / .html`。桌機一行仍用 §25(v0113);桌機的 ③ 會把這 11 支當「bridge」類自動合併。
+
+## 27. VIA_SettleAll_v0114(2026-11-06 · 三張矩陣 HTML 手機可看 · 取代 §25 那行)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0114";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0114.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0114.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'594064C04294B4E21800D4D589461F9C0F729A9627C24DE962F06B1364B26085'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
+## 28. 操作員 2026-11-06 泛用授權(GENERAL AUTHORIZATION A1–A9 / G1–G7)入檔 + 桌機參數
+
+- 原文與 SHA-256:`VIA_AgentOS_CoworkOS_v1.1_GeneralAuthorization_20261106.md`;帳:`VIA_WorkflowLedger.jsonl`(只增)。
+- 桌機參數(不代改):VRN 測試樣本夾 `C:\測試樣本報告`;VDF 資料範圍 2022 ~ 現在。
+- 之後每份回報 CLOSEOUT 末尾加 `[ASSUMED]` 與 `[NEED_APPROVAL]`(僅 G1–G7)。
