@@ -1,8 +1,8 @@
 {
  "schema": "VIA.VCGC.FunctionInventory.v1",
  "version": "v0184",
- "batch": "Release Closure 2026-11-02",
- "ts": "2026-11-06 08:55:02 +0000",
+ "batch": "VIA_MCP_Engine 入 VCGC 2026-11-05",
+ "ts": "2026-11-05T10:40:00+00:00",
  "prior": "VIA_VCGC_FunctionInventory_SSOT_v0183.json",
  "req": "VCGC-REQ085",
  "why": "操作員令「VCGC所有功能盤點 … 用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程 後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」。本冊是 VCGC 全功能串測的站表正本:CGC_MDL224_TestAuto v0101 照冊跑站、照冊核盤點(樹上有冊上沒 = 新 · 冊上有樹上沒 = 缺);每一站都在容器乾淨工作樹實測過 rc 與秒數,沒有一站寫已追蹤檔。;+C-vdf_fetch_groups_v0100(VCGC-REQ150);+C-vdf_fetch_groups_v0101(VCGC-REQ151)",
@@ -4564,16 +4564,55 @@
    ]
   },
   {
-   "id": "E-mcp-server",
-   "name": "VCGC MCP 伺服器薄殼(stdio · 只讀)自測",
+   "id": "V-mcp",
+   "name": "MCP 設定引擎短卡(mcp;零寫入)",
    "argv": [
-    "run",
-    "CGC_MDL279_MCPServer",
-    "--selftest"
+    "mcp"
+   ],
+   "quick": true,
+   "timeout": 120,
+   "deps": [
+    "../VIA_MCP_Engine/VIA_MCP_Engine_v*.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+   ]
+  },
+  {
+   "id": "V-mcp-doctor",
+   "name": "MCP 設定引擎環境偵測(mcp doctor;只讀)",
+   "argv": [
+    "mcp",
+    "doctor"
    ],
    "timeout": 300,
    "deps": [
-    "supportive modules/registry/CGC_MDL279_MCPServer_v*.py"
+    "../VIA_MCP_Engine/VIA_MCP_Engine_v*.py"
+   ]
+  },
+  {
+   "id": "V-mcp-selftest",
+   "name": "MCP 設定引擎離線自測(mcp selftest;假 HOME · 假 GitHub · 不碰真設定)",
+   "argv": [
+    "mcp",
+    "selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "../VIA_MCP_Engine/VIA_MCP_Engine_v*.py",
+    "../VIA_MCP_Engine/VIA_MCP_Engine_v*.html"
+   ]
+  },
+  {
+   "id": "C-vcgc_console_v0192",
+   "name": "交接案 vcgc_console_v0192(VCGC v0192:新動詞 mcp → 倉根 VIA_MCP_Engine 尾版;無 VIA_FROM_VCGC 不放行 · 短卡零寫入 · 子指令下放 · 引擎離線自測 64/64(VCGC-REQ184))",
+   "argv": [
+    "run",
+    "CGC_MDL149_VeritasCentralGovernanceConsole_v0192",
+    "--selftest"
+   ],
+   "timeout": 1500,
+   "deps": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0192.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0191.py"
    ]
   }
  ],
@@ -4716,6 +4755,9 @@
    },
    "exec": {
     "station": "V-exec"
+   },
+   "mcp": {
+    "station": "V-mcp"
    }
   },
   "seat": {
@@ -5484,6 +5526,9 @@
    },
    "vqg": {
     "station": "C-vqg"
+   },
+   "vcgc_console_v0192": {
+    "station": "C-vcgc_console_v0192"
    }
   },
   "workflow": {
@@ -5852,5 +5897,5 @@
  "why_v0181": "v0180 已發布 → 出新版;+34 站與 coverage.case 35 筆(2026-10-28 併入 main 沒登站的交接案 · TestAuto ⑧ 紅的根因)。每站容器經 VCGC run 實跑:rc 0 · 交接案標記見到 · 寫已追蹤檔 0(VCGC 自己的教訓帳除外)。vdf_eng045_outputhub 要 pyarrow(容器補裝後 3/3 · 7/7);vdf_manager_frozen_sample 釘 v0158 單跑會讀尾冊 v0104 而紅 → 站改跑尾版管理器(前版鏈照 v0103 那一代驗 · v0158 6/6 標記見到);vrn_logic_index 會寫檔 → 豁免(理由在 coverage)。操作員 2026-11-02 Release Closure 令;其餘一字不動",
  "why_v0182": "v0181 已發布 → 出新版;+4 站與 coverage.case 4 筆:VDF / VCGC 收尾 2026-11-04 新登的交接覆蓋補測 cov_vdf_eng236 · cov_vdf_eng237 · cov_vdf_ssotsync · cov_cgc_numbergrant(沒登站 → CGC_MDL224_TestAuto ⑧ 紅)。四支尾版自測容器實跑 PASS(ENG236 12/12 · ENG237 12/12 · SSOTSync 12/12 · NumberGrant 9/9)· 寫已追蹤檔 0;其餘一字不動",
  "why_v0183": "v0182 已發布 → 出新版;+站 C-vqg 與 coverage.case.vqg(VCGC-REQ183(子系統欄 VCGC · 題目 VQG):VQG 獨立系統入列 · 交接案同名;argv 用檔路徑 · 家族 core);其餘一字不動(只增)",
- "why_v0184": "v0183 已發布 → 出新版;+站 E-mcp-server(CGC_MDL279_MCPServer v0100:VCGC 唯讀動詞與收據照 MCP stdio 露出 · 操作員 2026-11-06「透過 MCP 連結」· 自測用假主控台不碰 VCGC);其餘一字不動(只增)"
+ "why_v0184": "v0183(main:VQG C-vqg)已發布 → 出新版;本線原擬 v0183 與 main 撞號 → 讓位改登 v0184。+4 站 V-mcp · V-mcp-doctor · V-mcp-selftest · C-vcgc_console_v0192 與 coverage.verb.mcp · coverage.case.vcgc_console_v0192:CGC_MDL149 v0192 新動詞 mcp → 倉根 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py(多 AI 平台 MCP 設定引擎,每平台最多 5;VCGC-REQ184;v0101 = PR #591 併入 main 的無 probe 版,已發布不就地改)。三個 V 站只讀 / 乾跑;會寫設定檔的 apply 與會連網的 token 不設站,由引擎自測驗。容器實跑:v0192 --selftest 9/9 PASS(含引擎 64/64);其餘一字不動"
 }
