@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-11-06T21:14:45+00:00",
+  "updated_at": "2026-11-06T21:21:00+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -8068,6 +8068,61 @@
       "reason": "VIA_AgentOS_VCGC_QA_v0300.json · VIA_AgentOS_VCGC_README_v0300.md · VIA_SystemIntegrationEngine_v0300.py · VIA_Flow_Overview_Console.md 在桌機 Downloads,沒有上傳;兩個 ChatGPT 分享連結容器開不了(需登入 / JS)",
       "next": "操作員上傳四檔(+ 分享內容貼上)→ AI 導入整合新舊",
       "registered_at": "2026-11-06T20:55:58+00:00"
+    },
+    {
+      "id": "VCGC-REQ191:vdf-pinned-cases-repinned",
+      "requirement": "VCGC-REQ191",
+      "state": "PENDING",
+      "owner": "AI",
+      "case": "vdf_refill",
+      "receipt": "docs/handoff/evidence/vdf_refill.json",
+      "reason": "vdf_refill / vdf_manager_frozen_sample 改認 VDF_SystemManager 尾版(v0168 鏈印 v0130 / v0158 判決行)",
+      "next": "handoff test vdf_refill · vdf_manager_frozen_sample 實跑轉 VERIFIED",
+      "registered_at": "2026-11-06T21:21:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ191:vrn-provenance-repinned",
+      "requirement": "VCGC-REQ191",
+      "state": "PENDING",
+      "owner": "AI",
+      "case": "provenance",
+      "receipt": "docs/handoff/evidence/provenance.json",
+      "reason": "provenance 改認 VRN-2 SystemManager 尾版自測判決行(v0256 起 provenance --selftest 進本版自測)",
+      "next": "handoff test provenance 實跑轉 VERIFIED",
+      "registered_at": "2026-11-06T21:21:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ191:vrn-logic-book-rebuild",
+      "requirement": "VCGC-REQ191",
+      "state": "PENDING",
+      "owner": "AI(VRN-2)",
+      "case": "vrn_logic_index",
+      "receipt": "docs/handoff/evidence/vrn_logic_index.json",
+      "reason": "VRN 邏輯架構索引冊過期(updated_n 1)",
+      "next": "run via_vrn_logic_book build → handoff test vrn_logic_index",
+      "registered_at": "2026-11-06T21:21:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ191:vdf-mdl001-windows-path-on-linux",
+      "requirement": "VCGC-REQ191",
+      "state": "PENDING",
+      "owner": "VDF",
+      "case": null,
+      "receipt": null,
+      "reason": "SettleAll ④ VDF ui(VDF_SystemManager v0168)在容器把冊上的 Windows 絕對路徑當相對路徑用 → 在 functional modules/VDF/ 底下生出 `C:\\Users\\tonyk\\OneDrive\\...\\dict\\1-2-TWStockData/reports/vdf_mdl001_deployment_<時戳>.json`(已備份到容器 scratch 後移除;不入倉);桌機無此問題",
+      "next": "VDF 車道:MDL001 部署報告路徑在非 Windows 時改走 output_hub(只攤開 · VCGC 不代改)",
+      "registered_at": "2026-11-06T21:21:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ191:vrn-eng400-env",
+      "requirement": "VCGC-REQ191",
+      "state": "BLOCKED",
+      "owner": "操作員 / VRN-2",
+      "case": "cov_vrn_eng400",
+      "receipt": "docs/handoff/evidence/cov_vrn_eng400.json",
+      "reason": "ENG400 v0100 ⑩ 證據列 < 4:容器缺 fitz / PIL → ③–⑦ 跳過,引擎動作不足 4;桌機(fitz 在)應綠;ENG399 同因(pymupdf 缺 → 7/7)",
+      "next": "桌機重跑 cov_vrn_eng399 / cov_vrn_eng400;VRN-2 可出 ENG400 v0102(⑩ 門檻照實跑動作數)",
+      "registered_at": "2026-11-06T21:21:00+00:00"
     }
   ]
 }
