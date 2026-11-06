@@ -4,7 +4,7 @@
 
 ## 0. MCP
 
-之前:VCGC 沒有任何 MCP 程式碼。**現在:`CGC_MDL279_MCPServer_v0100`(stdio · JSON-RPC 2.0 · 協定 2025-06-18 · 只讀)**:16 個工具 = 唯讀動詞白名單經子行程跑主控台(閘與事件照走)· 11 份收據資源 · 寫冊 / 鎖 / 推送動詞一律拒 · 零網路 · 自測 12/12 · 盤點冊 v0184 站 `E-mcp-server`。用戶端設定與用法:`docs/handoff/ai/VCGC_MCP_v0100.md`。
+之前:VCGC 沒有任何 MCP 程式碼。**現在:`CGC_MDL279_MCPServer_v0100`(stdio · JSON-RPC 2.0 · 協定 2025-06-18 · 只讀)**:16 個工具 = 唯讀動詞白名單經子行程跑主控台(閘與事件照走)· 11 份收據資源 · 寫冊 / 鎖 / 推送動詞一律拒 · 零網路 · 自測 12/12 · 盤點冊 v0186 站 `E-mcp-server`。用戶端設定與用法:`docs/handoff/ai/VCGC_MCP_v0100.md`。
 
 ## 1. 省 Token 工具(token 席位 `CGC_MDL158_VIAPanoramaAuditRepair_v0117.py` · nlp 席位 `SUP_MDL866_VIAUnifiedNLPOrchestrator_v0106.py` · 啟用收據 2026-10-18 03:21:57)
 

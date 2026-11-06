@@ -10,7 +10,7 @@
 | VCGC | CGC_MDL149 v0191 主控台 · PS 操作台 | 盤點冊 v0184 · 需求冊 v0209 · 編號稽核 0/0/0 | 🟡 quick 綠 9 黃 1 紅 0 · full 跑中 · SDD 無紅 · 交接閘 105 既有項 | 🔴 主控台 rc 1 = 一本小 JSON 壞(SettleAll v0105 會指名)| REQ183(VQG)· E-mcp-server | 桌機修壞 JSON + 同步;交接閘歷史 CCWT 42 逐案補或裁 |
 | ├ Agent OS | VIA_AgentOS v0102(1.0.2 hardened)| 引擎 SHA 釘 | 🟢 48/48 | 🟡 47 + 1 symlink 權限(環境)· 儀表板出 | MDL1198 | Windows 開發人員模式(操作員)|
 | ├ Graphify | v0101 一行 · SettleAll ⑦ | graphifyy 0.9.100 | ⚪ 容器無隔離環境 | 🟡 VRN / VRN_Shared / VDF 綠 · VCGC 要 ≥ 6 GB 可用 | — | 關程式後單跑 VCGC 那張 |
-| └ MCP | CGC_MDL279 v0100(stdio 只讀)| v0100 | 🟢 自測 12/12 | ⚪ 待桌機同步後貼用戶端設定 | 盤點冊 v0184 站 E-mcp-server | 用戶端(Claude Desktop / Manus)接上後讀卡與收據 |
+| └ MCP | CGC_MDL279 v0100(stdio 只讀)| v0100 | 🟢 自測 12/12 | ⚪ 待桌機同步後貼用戶端設定 | 盤點冊 v0186 站 E-mcp-server | 用戶端(Claude Desktop / Manus)接上後讀卡與收據 |
 | VQG | VQG_AllInOne v0105(薄尾)+ v0104 原檔 | SHA 釘 | 🟢 自測 10 項 · 容器 GRAY(無 VDF 庫)| 🟡 三次 closeout rc 0 · 0050.TW 探針 · 曆是推的 | MDL001/002 · 案 vqg · REQ183 · 站 C-vqg | VDF 三欄 → GREEN(VDF 線)|
 | VAP(支援)| VAP_AllInOne v0101(操作員桌機檔 · 未上傳)| — | — | — | 盤點 I-* 站 | 要入倉請上傳 |
 

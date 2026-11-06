@@ -11,12 +11,13 @@
 | **不露** | 會寫冊 / 鎖 / 快照 / 推送 / 同意閘的動詞:checkpoint · tools activate · registry-sync --apply · go / enter · sync · install · backup(白名單外一律 isError);family 參數只收家族名(殼字元拒) |
 | 網路 | 零(stdio);不 import socket / http / urllib / requests(自測 ⑫ 查原始碼)|
 
-自測 12 / 12(假主控台 · 不碰 VCGC):initialize / ping / tools/list / tools/call(綠 · 黃 · 拒絕四種)/ chain 帶參數 / resources list+read(含沒有的收據)/ 未知方法 -32601 / stdio 串流(通知不回 · 壞 JSON -32700)/ client-config。盤點冊 v0184 +站 `E-mcp-server`。
+自測 12 / 12(假主控台 · 不碰 VCGC):initialize / ping / tools/list / tools/call(綠 · 黃 · 拒絕四種)/ chain 帶參數 / resources list+read(含沒有的收據)/ 未知方法 -32601 / stdio 串流(通知不回 · 壞 JSON -32700)/ client-config。盤點冊 v0186 +站 `E-mcp-server`(v0184 / v0185 是 main 另一工作階段的:P-mcp · V-mcp · V-mcp-doctor · V-mcp-selftest = VIA_MCP_Engine 的站)。
 
 ## 桌機怎麼接(Claude Desktop · Manus 或任何 MCP 用戶端)
 
 1. 桌機倉先同步到本分支(SettleAll v0105 一行 · 或 `git -C "C:\Users\tonyk\OneDrive\Documents\movies-dataset" fetch origin claude/optimistic-goodall-yhalc5` 後 checkout 該檔)。
-2. 先自測:`python "C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\supportive modulesegistry\CGC_MDL279_MCPServer_v0100.py" --selftest`
+2. 先自測:`python "C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\supportive modules
+egistry\CGC_MDL279_MCPServer_v0100.py" --selftest`
 3. 印設定:`python "…\CGC_MDL279_MCPServer_v0100.py" --client-config --root "C:\Users\tonyk\OneDrive\Documents\movies-dataset"`,或直接貼下面這段到用戶端的 MCP 設定(Claude Desktop:`%APPDATA%\Claude\claude_desktop_config.json`;Manus:它的 MCP / Connectors 設定頁,欄位同名):
 
 ```json
@@ -47,3 +48,11 @@
 - `manus.im/app/…`:要登入,容器讀不到。
 
 MCP 是雙向接點:Manus 接上本伺服器後能**讀** VCGC 的卡與收據;VCGC 這邊不會因此多出任何寫入路徑。
+
+## 與 main 的 VIA_MCP_Engine(v0102 · 2026-11-05 另一工作階段)分工
+
+| | VIA_MCP_Engine v0102(+ Invoke-VIA-MCP v0100 · 主控台 v0192 `mcp` 動詞)| CGC_MDL279_MCPServer v0100(本檔)|
+|---|---|---|
+| 角色 | **用戶端設定引擎**:哪個 AI 平台接哪幾個 MCP server(每平台最多 5 個)· 預覽 / 套用設定檔 · 真啟動探測 | **被接的伺服器**:把 VCGC 唯讀動詞與收據露成 MCP 工具 / 資源 |
+| 接法 | 在 Engine 的 MCP 目錄裡加一筆自訂 server:command `python` · args = 本檔 `--serve --root <倉根>`(即 `--client-config` 印出的那段)→ 平台(Claude Desktop / Manus …)就同時接上 VCGC | — |
+| 不重疊 | Engine 不露 VCGC 動詞;本檔不寫任何設定檔 | |
