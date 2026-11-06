@@ -28,17 +28,17 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 648 · import 0 · 提及 105 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 648 · import 0 · 提及 106 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL183_CeleritasPolicyGate_v0105.py(家族 core)
+  [via-vcgc run] [流程] 政策過 · CGC_MDL183_CeleritasPolicyGate_v0106.py(家族 core)
 === Celeritas 產出契約閘 v0101(批715 · 執法 L102)· 自測(沙盒 · 零網路 · 唯讀)===
-  [OK] ① 掃描面的排除清單**問正典**(L77),不自己列一張。**負控**:正典問不到要誠實 NODATA —— 硬掃出來的分母是假的,比不掃還糟 ((掃描面 py 3774 · ps 1062))
+  [OK] ① 掃描面的排除清單**問正典**(L77),不自己列一張。**負控**:正典問不到要誠實 NODATA —— 硬掃出來的分母是假的,比不掃還糟 ((掃描面 py 3779 · ps 1062))
   [OK] ② **提到加速器的名字 ≠ 有橋**(批715 根因):舊導入器用『文中出現加速器名字』當『已橋』,**18 支從來沒有橋卻一直被報成綠的**;而兩支加速器正本自己都帶真標記,那道守衛從來沒保護過任何東西。**正控**:判準只認標記本身 ((只提到名字→有橋? False))
   [OK] ③ **PS 稽核一律問引擎**(ANC-30 的 `xps_audit` / `xps_join`),本支一條規則都不抄(LL404)。**正控**:`xps_join` 出來的要帶章;**負控**:裸 .ps1 要被判缺 ((裸→joined False/缺 3 · join 出來帶章 True))
   [OK] ④ **既有債棘輪**:樹上 838 支既有 .ps1 沒有模板章 —— 那是**既有債不是違律**(L70:未經操作員逐次許可不得修改任何 .ps1)。基線在**資料檔**不在碼裡(批709 教訓)。**負控**:基線以外新冒出來的一支都算紅,不然這道閘等於沒有 ((既有債 28 · 基線外新缺 0))
   [OK] ⑤ **批345 不可動律**:新版以**尾版身分並存**,舊正本一個位元組都不准動。要不要把舊正本退役是**操作員的手**(v0101:冊上有退役裁定 → 不在即合規;又出現就得位元相符) ((舊正本 不在 · hash 相符 False · 退役裁定 有 · 尾版正主 VeritasCeleritas_v1141.py))
-  [OK] ⑥ **LL133 自我指涉**:本支原始碼裡就寫著它在數的那個標記,所以掃描時把**自己整個家族**排掉 —— 一把把自己算進去的尺,量的是自己不是樹。**負控**:排掉的要**報出來**(排了不說 = 分母偷偷變小) ((自家族 CGC_MDL183_CeleritasPolicyGate · 排掉 6))
+  [OK] ⑥ **LL133 自我指涉**:本支原始碼裡就寫著它在數的那個標記,所以掃描時把**自己整個家族**排掉 —— 一把把自己算進去的尺,量的是自己不是樹。**負控**:排掉的要**報出來**(排了不說 = 分母偷偷變小) ((自家族 CGC_MDL183_CeleritasPolicyGate · 排掉 7))
   [OK] ⑦ **正典唯讀本不准注**(批715 實錄):導入器依 L102① 把加速橋注進了機構 SSOT 正典唯讀本 —— **對的規則用在不該用的檔上**。唯讀的意思是連治理自己的改動也不准。已還原並具名豁免:不算綠也不算紅,算**不准碰**。**負控**:清單要有料且那幾支身上不准有橋(有橋=又被注回去了) ((唯讀本 18 支 · 身上無橋 True · 掃到 18))
   [OK] ⑧ 唯讀零網路:本支只讀檔、只比對,不出網、不寫檔 ((違禁 無))
   [計] 8 檢 OK 8 · FAIL 0
@@ -63,10 +63,15 @@
   [OK] ⑳ VRN 收容夾 .ps1 / .py → intake(INFO 照列);收容夾外同名、只含 intake 字樣的活檔照紅(負控) (ps.intake ['functional modules/VRN/intake/Pack_v9999/Run.ps1'] · py.intake ['functional modules/VRN/intake/Pack_v9999/tool.py'] · 新缺 ['functional modules/VRN/intake_like/Run.ps1'])
   [OK] ㉑ 有效唯讀本 = 基線 − 鎖冊 removed(退場座位不算正典唯讀本;基線資料檔不改) (唯讀本 18 · 鎖冊退場 4)
   [OK] ㉒a 有效既有債 = 基線 − 已還 − PS 退役帳(已退役且不在原位);退役件不再列債 (退役扣除 22)
-  [FAIL] ㉒ 實樹:PY 缺 0 · PS 基線外新缺 0(收容件照列不消失) (PY 缺 ['functional modules/VRN/VRN2_UIAction_v0100.py', 'functional modules/VRN/nonstock_v0310/engine/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310.py'] · PS 新缺 [])
+  [OK] ㉒ 實樹:PY 缺 0 · PS 基線外新缺 0(收容件照列不消失) (PY 缺 [] · PS 新缺 [])
   [OK] ㉓ report 與各層 scan / baseline 同一把尺
-  [計] CGC_MDL183_CeleritasPolicyGate v0105 本版 4/5 · 前版 PASS · 合計 FAIL
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL156_VIAAcceleratorControl_v011 | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL156_VIAAcceleratorControl_v0115.py'] → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 101, 'changed': 287, 'stale': 0, 'expected': 19835, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-  [教訓] 重複出錯:run CGC_MDL183_CeleritasPolicyGate · rc=1 · (無例外訊息) · 第 24 次 · 帳本 CGC_MDL058(via-lessons)
-[監控] 背景全景監控中 pid 1376 · 觸碰 run CGC_MDL183_CeleritasPolicyGate · 交接閘 RED · 落後 372 提交 · 快照 834.9h · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [計] CGC_MDL183_CeleritasPolicyGate v0105 本版 5/5 · 前版 PASS · 合計 PASS
+=== CGC_MDL183_CeleritasPolicyGate v0106 薄尾加檢(PY 名冊豁免 · 版史)===
+  [OK] ㉔ CGC_MDL156 尾版名冊 _ACCEL_EXEMPT 由 AST 讀到(名單在冊不在碼)· 含操作員原件前綴 (13 條 · CGC_MDL156_VIAAcceleratorControl_v0115.py)
+  [OK] ㉕ 名冊前綴命中 → py.roster_exempt(INFO 照列 · 帶名冊理由),不算紅 ([{'file': 'functional modules/VRN/nonstock_v0310/engine/X_v0310.py', 'why': '操作員原件(非個股摘要器 v0310 引擎)byte-exact:交接冊 frozen_sources 守 SHA;同夾 reuse/vrn2 轉接器照注'}])
+  [OK] ㉖ 版號舊檔 + 同夾同族更高版號帶橋 → py.history(INFO 照列 · 記尾版) ([{'file': 'functional modules/VRN/Foo_v0100.py', 'tail': 'functional modules/VRN/Foo_v0102.py'}])
+  [OK] ㉗ 沒同族尾版 / 尾版也沒橋 → 照紅(負控) (缺 ['functional modules/VRN/Baz_v0101.py', 'functional modules/VRN/Bar_v0100.py', 'functional modules/VRN/Baz_v0100.py'])
+  [OK] ㉘ 實樹:PY 缺 0(名冊豁免與版史照列不消失 · 被指名的照紅) (缺 [] · 豁免 ['functional modules/VRN/nonstock_v0310/engine/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310.py'] · 版史 ['functional modules/VRN/VRN2_UIAction_v0100.py'] · 擋 [])
+  [OK] ㉙ 各層 scan 同一把尺(v0101 … v0105 都讀本版)
+  [計] CGC_MDL183_CeleritasPolicyGate v0106 本版 6/6 · 前版 PASS · 合計 PASS
+[監控] 背景全景監控中 pid 3412 · 觸碰 run CGC_MDL183_CeleritasPolicyGate · 交接閘 RED · 落後 380 提交 · 快照 838.9h · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
