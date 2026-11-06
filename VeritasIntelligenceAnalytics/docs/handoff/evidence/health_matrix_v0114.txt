@@ -31,9 +31,34 @@
 [政策] L50 全景 · 尾版 648 · import 0 · 提及 106 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL274_HealthMatrix_v0114.py(家族 core)
+  [via-vcgc run] [流程] 政策過 · CGC_MDL274_HealthMatrix_v0116.py(家族 core)
+=== CGC_MDL274_HealthMatrix v0116 · 薄尾自測(VeritasReportNova Workbench 範本:印章頁首 · 字型 · VRN 分頁)===
+  [OK] ① 冊尾版 ≥ v0104 有 assets(印章 · 字型 · 雜湊對上)· systems.VCGC caps / title(冊 VIA_UI_Template_SSOT_v0104.json)
+  [OK] ② 操作台頁首 = 範本頁首(印章 data URI · 大寫小字 · h1 · 原說明與燈號圖例原樣)
+  [OK] ③ VRN 分頁 → VeritasReportNova Workbench(名稱 + iframe)· VDF 分頁不動
+  [OK] ④ 字型包解到 via_ui_assets/(fonts.css + woff2)· 頁上一條 fonts.css 連結
+  [OK] ⑤ 冪等:再跑一次逐字相同(換新不疊)
+  [OK] ⑥ 印章無框無陰影無濾鏡 · 主印框高 = 文字區塊高 ÷ 佔比 · 44 ~ 120px
+  [OK] ⑦ 原有功能不改:拿掉本版加的 = 前版頁(左面板 · 分頁 · 其他 iframe)
+  [OK] ⑧ 入口頁:範本頁首 · VRN = VeritasReportNova Workbench · 燈讀 VRN 自報(REVIEW → 黃)
+  [OK] ⑧b 同夾健康矩陣頁(iframe)只連字型 · 冪等 · 頁首不動
+  [OK] ⑨ 資產對不上 → 不嵌印章 / 字型(頁首照範本字 · 不當掉)
+  [OK] ⑩ 只讀他系統:不寫 VRN / VDF 的檔 · 零網路 · 不碰 TA-Lib
+  ── 前版鏈自測(VIA_SKIP_PRIOR_SELFTEST=1 略過 · 前版用它那個年代的冊 v0103 以前:它們的自測寫死 v0103 的色值)──
+=== CGC_MDL274_HealthMatrix v0115 · 薄尾自測(設計稿 1a 母系統視覺 + theme preview)===
+  [OK] ① 冊尾版 ≥ v0103:有 systems.VCGC · design.css · serif / cjk-serif token · serif_selector(冊 VIA_UI_Template_SSOT_v0103.json)
+  [OK] ② 1a 覆蓋:米白紙底 #f2f1ec · 白卡 · 頁首 #ffffff / #1b1a17 · 青 acc #2f6f6f · 印泥紅 sys #9e2b25 · 標 "1a" · 品牌 VERITAS INTELLIGENCE ANALYTICS · 燈四色仍鎖
+  [OK] ③ 套件仍一段 style + 一段 script(v2:present / pick 仍在):尾端接 [VIA:DESIGN] :root(--sys:#9e2b25 · --lamp-red:#dc2626 · --serif)+ design.css · JS 字體吸附對 h1 / .via-serif / .brand 放行 · 零外部連結
+  [OK] ④ 冪等:插在 </head> 前(頁自己的 style 之後)→ 第二次 same · 只一段;頁上 :root 有 --head:#ffffff · --bg:#f2f1ec(壓過頁內固定色)
+  [OK] ⑤ 本體已換:v0114 的 typekit_block / _TK_JS · 鏈上每份 typekit_book · v0112 的 ui_theme_load 都指到本版(matrix / ui / portal 後補套與 via-theme 段都走本版)
+  [OK] ⑥ via-theme 段改讀冊尾版 + systems.VCGC:--sys:#9e2b25 · --acc:#2f6f6f · --lamp-red:#dc2626 · 冊名 = 尾版
+  [OK] ⑦ theme preview:rc 0 · 一頁三區(1a VERITAS INTELLIGENCE ANALYTICS · 1b VERITAS REPORT NOVA · 1c VERITAS DATA FORGE)· 各區 inline token(--head:#ccd8ea · --head:#cfe0dc)· 套件一段 · 燈四色 · 零外部連結
+  [OK] ⑦b 入口頁補套(portal 後):VIA_Reports/VIA_UI_latest.html 插一段套件 + 1a 視覺(--sys:#9e2b25)· 再補 same
+  [OK] ⑧ 誠實退路:冊沒 systems.VCGC / design.css 壞(@import)→ css 不收 · why 寫明 · 燈紅仍 #dc2626;沒冊 → why · 不套 · preview NODATA
+  [OK] ⑨ 檔頭:加速器橋在(__future__ 之後);不碰 TA-Lib;不直派子行程;不載外部函式庫;只讀冊不寫冊;不寫他系統的檔
+  ── 前版鏈自測(VIA_SKIP_PRIOR_SELFTEST=1 略過)──
 === CGC_MDL274_HealthMatrix v0114 · 薄尾自測(展現規則:健康矩陣頁)===
-  [OK] ① 冊尾版有 presentation 節:燈號列門檻 8 列 · 燈欄比例 0.6 · 路徑 40 字 · 預選 via-pick(冊 VIA_UI_Template_SSOT_v0104.json)
+  [OK] ① 冊尾版有 presentation 節:燈號列門檻 8 列 · 燈欄比例 0.6 · 路徑 40 字 · 預選 via-pick(冊 VIA_UI_Template_SSOT_v0103.json)
   [OK] ② 套件 v2:燈欄第一 · 問題在前 · 燈號列 · 空值 — · 路徑縮檔名 · 燈號 JSON 改人話 · #via-pick · 換行一欄一條;門檻來自冊;仍只一段 style + 一段 script · 零外部連結
   [OK] ③ 頁上舊版套件(v1)→ 換成 v2,仍只一段(冪等換新,不疊加)
   [OK] ④ 前版 v0113 的 matrix / ui / 動詞後補套已改走本版:typekit_book · typekit_dir 換成 v0114
@@ -41,8 +66,8 @@
   [OK] ⑥ 檔頭:加速器橋在(__future__ 之後);不碰 TA-Lib;不直派子行程;不載外部函式庫
   ── 前版鏈自測(VIA_SKIP_PRIOR_SELFTEST=1 略過)──
 === CGC_MDL274_HealthMatrix v0113 · 薄尾自測(字級套件:健康矩陣頁字體 / 階層一致 + 日期 YYYY-MM-DD)===
-  [FAIL] ① 冊尾版有字級 token:四級 16 / 13 / 12 / 11 · 字重 400 / 700(冊 VIA_UI_Template_SSOT_v0104.json) · {'tokens': {'font': '"DM Sans","Noto Sans TC","Microsoft JhengHei UI","Microsoft JhengHei","PingFang TC","Segoe UI",system-ui,sans-serif', 'mono': '"DM Mono","Noto Sans TC",Consolas,"Cascadia Mono","Noto Sans Mono",monospace', 'fs-title': '20px', 'fs-h': '14.5px', 'fs': '12px', 'fs-note': '10.5px', 
-  [FAIL] ② 套件:四級 px · 按鈕輸入框繼承字體 · 日期框 YYYY-MM-DD + 日曆鈕 · 一段 style + 一段 script · 零外部連結 · 可關 · 後長內容照吸附
+  [OK] ① 冊尾版有字級 token:四級 16 / 13 / 12 / 11 · 字重 400 / 700(冊 VIA_UI_Template_SSOT_v0103.json)
+  [OK] ② 套件:四級 px · 按鈕輸入框繼承字體 · 日期框 YYYY-MM-DD + 日曆鈕 · 一段 style + 一段 script · 零外部連結 · 可關 · 後長內容照吸附
   [OK] ③ matrix:前版鏈產頁時先不開(VIA_NO_OPEN=1)→ 套件 → 環境還原;頁上只有一段套件
   [OK] ④ 冪等 · 範圍:再跑仍一段;只動 VCGC 健康矩陣夾直下 *_latest.html(子夾 · VDF 的頁不碰,L120)
   [OK] ⑤ 只收 VCGC 呼叫(VIA_FROM_VCGC≠YES → rc 2,照前版)
@@ -67,10 +92,13 @@
   [OK] ⑧ 帶加速器橋 · 健康共用段 · VIA_FROM_VCGC 閘
 [計] CGC_MDL274_HealthMatrix_v0112 自測 17/17 · PASS
   [OK] ⑦ 前版 CGC_MDL274_HealthMatrix_v0112 自測 rc 0
-[計] CGC_MDL274_HealthMatrix v0113 本版 5/7 · FAIL
-  [FAIL] ⑦ 前版 CGC_MDL274_HealthMatrix_v0113 自測 rc 0
-[計] CGC_MDL274_HealthMatrix v0114 本版 6/7 · FAIL
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL156_VIAAcceleratorControl_v011 | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL156_VIAAcceleratorControl_v0115.py'] → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 117, 'changed': 291, 'stale': 0, 'expected': 19851, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-  [教訓] 重複出錯:run CGC_MDL274_HealthMatrix · rc=1 · (無例外訊息) · 第 6 次 · 帳本 CGC_MDL058(via-lessons)
-[監控] 背景全景監控中 pid 1376 · 觸碰 run CGC_MDL274_HealthMatrix_v0114 · 交接閘 RED · 落後 372 提交 · 快照 835.3h · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[計] CGC_MDL274_HealthMatrix v0113 本版 7/7 · PASS
+  [OK] ⑦ 前版 CGC_MDL274_HealthMatrix_v0113 自測 rc 0
+[計] CGC_MDL274_HealthMatrix v0114 本版 7/7 · PASS
+  [OK] ⑩ 前版 CGC_MDL274_HealthMatrix_v0114 自測 rc 0
+[計] CGC_MDL274_HealthMatrix v0115 本版 11/11 · PASS
+  [OK] ⑪ 前版 CGC_MDL274_HealthMatrix_v0115 自測 rc 0
+[計] CGC_MDL274_HealthMatrix v0116 本版 12/12 · PASS
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL183_CeleritasPolicyGate_v0106. | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL183_CeleritasPolicyGate_v0106.py'] → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 6, 'changed': 148, 'stale': 0, 'expected': 19879, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 3412 · 觸碰 run CGC_MDL274_HealthMatrix · 交接閘 RED · 落後 380 提交 · 快照 839.0h · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

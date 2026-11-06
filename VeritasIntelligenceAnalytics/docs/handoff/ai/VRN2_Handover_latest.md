@@ -311,3 +311,29 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v011
 
 - 為什麼:Codex 在 PR #599 / #600 抓到 VQG v0106 四項缺陷;v0106 與 SettleAll v0115 已隨 #599 發布到 main → 照版本律不原地改,出 VQG v0107(修四項)與 SettleAll v0116(釘 v0107 · ⑧b 用最新尾版)。
 - VAP 開 U/I 指令同 §29(VAP v0302 不變);`export-vap` 改用 `VQG_AllInOne_v0107.py`。
+
+## 31. VRN-1 備援 · VCGC 省 Token 功能全啟用(操作員 2026-11-06 令;§30 一行照舊)
+
+- **VRN-1 = VRN-2 的備援支援倉**(`https://github.com/tonykuni/VIA-VDF-VRN`,桌機 `C:\Users\tonyk\VIA-VDF-VRN`):規則不變 —— 四系統對等(L120)· 工具橋只讀對方工具冊、逐檔 sha256 核對、不複製不改;VRN-2 一鍵 ⑫a 自動同步 VRN-1(clone / pull)。容器 clone 已同步到 `0993c2d`(VRN-1 PR #82)。
+- **VCGC 省 Token 功能 6/6 已啟用**:NLP 尾版 `SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108.py` 經 `via-vcgc tools activate nlp … --apply` 進鎖冊(v0106 → v0108;CGC_MDL233 v0108 認轉接鏈);桌機核對:
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";git -C $r pull -q origin main;$V=(Get-ChildItem "$r\VeritasIntelligenceAnalytics\supportive modules\registry\CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"|Sort-Object Name|Select-Object -Last 1).FullName;$env:VIA_FROM_VCGC="YES";python $V token;python $V tools
+```
+
+- 預期:`已啟用 6/6 · NLP SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108.py` · 席位卡 nlp `v0108 · waiting []`;長文摘要照卡上那行 `… _v0108.py text --file <檔> --brief`。
+
+## 32. VIA_SettleAll_v0117(2026-11-06 · ③ 同步被未追蹤檔擋下 → 備份移走再重試;取代 §30 那行;v0116 一字不動留存)+ 分階層矩陣一行
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0117";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0117.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0117.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'C0D6724B89CA69593D32392712B8B548374C85FCCCA6CC1AD79EB060A7FBB8B5'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
+- 為什麼:桌機 23:45 貼回 ③ 同步 RED(落後 262 提交 · 14 支未追蹤舊發布文件擋 merge → abort → ④⑥⑬ 不在舊版上跑);v0117 把 git 點名的未追蹤檔移到 `VIA_Reports\settle\untracked_parked\<時戳>\`(原件保留)再重試合併。
+- ③ 綠之後再跑**分階層整合矩陣**(VDF 分階層輸入 / 輸出 × VQG 分階層量化數據項目;只讀;要 ⑧b 匯出夾在):
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics";$x=(Get-ChildItem "$r\VIA_Reports\vqg\vap_export\vap_export_*" -Directory|Sort-Object Name|Select-Object -Last 1).FullName;$env:VIA_FROM_VCGC="YES";python "$r\docs\handoff\ai\VIA_LayerMatrix_v0100.py" --export $x --snapshot "$r\VIA_Reports\layer_matrix\VIA_VDF_VQG_LayerMatrix_desktop.md";Start-Process "$r\VIA_Reports\layer_matrix\VIA_LayerMatrix_latest.html"
+```
+
+- 預期:`VDF 層 5 · VQG 層 5 · 整合格 7`;紅的格 = 交接案本身紅(桌機 pwsh / 套件在 → 多數轉綠);曆三欄那格 🟡 = VDF 自己的手(G2)。
