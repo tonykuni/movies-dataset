@@ -45,7 +45,7 @@
   CGC_MDL233_ToolActivate_v0100 selftest 8/8 PASS
   [OK] ⑪ 四家同一把尺:accelerator · network · layout · nlp · accelerator, layout, network, nlp
   [OK] ⑫ layout 新版過 v0100 的全部檢查(SUP_MDL743_GenericLayoutHub_v0109.py) · 9 檢
-  [FAIL] ⑫ nlp 新版過 v0100 的全部檢查(SUP_MDL866_VIAUnifiedNLPOrchestrator_v0105.py) · 公開名稱不少於現役(SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108.py):BACKEND_MOD_V0108, ENGINE, L1_CORE_V0108, PRIOR_PATH, V0106_PATH, missing_v0108, needs_v0108; 參數只增不減、不衝
+  [FAIL] ⑫ nlp 新版過 v0100 的全部檢查(SUP_MDL866_VIAUnifiedNLPOrchestrator_v0105.py) · 公開名稱不少於現役(SUP_MDL866_VIAUnifiedNLPOrchestrator_v0106.py):BODY, OCR_PKGS, REGISTRY, REPO, VIA, paragraphs_of, pdf_text, praddle_pinned, run_pdf_text; 參數只增不減、不衝突(
   [OK] ⑬ 家別不對的檔擋下(NLP 檔不能當 LAYOUT 啟用)
   CGC_MDL233_ToolActivate_v0101 selftest +3/4 FAIL
   [OK] ⑭ 五家同一把尺:accelerator · network · layout · nlp · token · accelerator, layout, network, nlp, token
@@ -59,8 +59,8 @@
   [OK] ㉑ 已經 VCGC 啟用:鎖冊 frame 指到冊上那一支、檔在、位元吻合(CRLF 工作複本照 CGC_MDL225 v0102 容忍) · 鎖 v0100 · SUP_MDL755_VIAPolarsFrame_v0100.py
   CGC_MDL233_ToolActivate_v0103 selftest +4/4 FAIL
   [OK] ㉒ 席位唯一:同家族兩列 engine 擋下;席位 + candidate(network v1652 先例)放行 · 兩列 A CGC_MDL158_VIAPanoramaAuditRepair_v0117.py / B CGC_MDL158_VIAPanoramaAuditRepair_v0117.py · 一列 A CGC_MDL158_VIAPanoramaAuditRepair_v0117.py
-  [OK] ㉓ 實冊:每家席位最多一列(token 的 VIA-TOOL-0212 已改 candidate) · {'listings': 1, 'pdfplumber': 1, 'layout': 1, 'accelerator': 1, 'network': 1, 'sentiment': 1, 'tools': 0, 'nlp': 1, 'token': 1, 'ocr': 1, 'frame': 1, 'valuation': 1, 'praddle': 1}
-  [OK] ㉔ 鎖冊帶 activated_at(UTC 帶時區)· previous 留前版;同檔重啟用沿用真前版 · {'version': 'v0117', 'path': 'p/a_v0117.py', 'sha256': 's2', 'why': 'w', 'activated_by': 'VCGC CGC_MDL233_ToolActivate_v0104', 'activated_at': '2026-11-06T20:36:02+00:00', 'previous': {'version': 'v0116', 'path': 'p/a_v0116.py', 'sha256': 's1'}}
+  [OK] ㉓ 實冊:每家席位最多一列(token 的 VIA-TOOL-0212 已改 candidate) · {'frame': 1, 'nlp': 1, 'layout': 1, 'token': 1, 'tools': 0, 'ocr': 1, 'network': 1, 'praddle': 1, 'accelerator': 1, 'pdfplumber': 1, 'valuation': 1, 'sentiment': 1, 'listings': 1}
+  [OK] ㉔ 鎖冊帶 activated_at(UTC 帶時區)· previous 留前版;同檔重啟用沿用真前版 · {'version': 'v0117', 'path': 'p/a_v0117.py', 'sha256': 's2', 'why': 'w', 'activated_by': 'VCGC CGC_MDL233_ToolActivate_v0104', 'activated_at': '2026-11-06T20:46:28+00:00', 'previous': {'version': 'v0116', 'path': 'p/a_v0116.py', 'sha256': 's1'}}
   [OK] ㉕ 名冊換名出下一個版號檔(version 換新 · prior 指回前版),前版位元不動;沒提到的名冊不寫 · {'version': 'VIA_ToolRoster_SSOT_v0103', 'tools': ['Tool_v0117.py'], 'prior': 'VIA_ToolRoster_SSOT_v0102.json'}
   [OK] ㉖ 裝進本體(plan / main 走本版)· 加速器橋在 · 不碰 TA-Lib
   CGC_MDL233_ToolActivate_v0104 selftest +5/5 FAIL
@@ -84,13 +84,14 @@
   [OK] ㊵ 加速器橋在 · 不碰 TA-Lib · 本行程沒載任何 OCR 套件
   CGC_MDL233_ToolActivate_v0107 selftest +5/6 FAIL
 === CGC_MDL233_ToolActivate_v0108 · 薄尾自測(啟用檢查認轉接鏈)===
-  [FAIL] ㊶ 前版鏈自測過(v0100 … v0107) · rc 1
+  [OK] ㊶ 前版鏈自測過(v0100 … v0107;唯一容許的紅 = v0101 寫死候選 v0105 的 ⑫:NLP 席位已由 v0106 前進到 v0108,v0105 本就不該再過「不少於現役」,照實列出不消失) · rc 1 · 前版 FAIL 2(舊夾具 1 · 連帶 1 · 其他 0)
   [OK] ㊷ 沙盒:沒有具體本體的轉接薄尾沿版號往下(v0102 → v0101 → v0100 止);有具體本體(ENGINE_VERSION)的照 v0100 _body_of 直接跳到本體 · Fam_v0102.py → Fam_v0101.py → Fam_v0100.py | Body_v0102.py → Body_v0100.py
   [OK] ㊸ 沙盒:鏈上名字 / 參數表聯集(f · T · R#regex 都在;U 新增照過) · ['PRIOR', 'R', 'T', 'U', '__getattr__', 'f'] · ['R#regex', 'T', 'U']
   [OK] ㊹ 沙盒:不轉接的檔鏈只有自己(名字真的少了照擋 · 負控) · Fam_v0103.py
   [OK] ㊺ 沙盒:鏈上同鍵異值仍是衝突(新檔蓋舊 → T.a 1 ≠ 2 照擋 · 負控) · ["T['a']"]
-  [FAIL] ㊻ 真樹:NLP 尾版 SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108.py 的公開名稱 / 參數表兩檢沿轉接鏈判為過(鏈 3 支)
-  [OK] ㊼ 本版已裝在本體(plan 走本版 checks)· 加速器橋在 · 不碰 TA-Lib
-  CGC_MDL233_ToolActivate_v0108 selftest +5/7 FAIL
-  [沿用] gate_ok · 鑰匙 b78cc8b042bb5c4e · 11s 前算的(--fresh 強制重算)
-[監控] 背景全景監控中 pid 3412 · 觸碰 run CGC_MDL233_ToolActivate · 交接閘 RED · 落後 386 提交 · 快照 839.4h · 未登 2388 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [OK] ㊻ 真樹:NLP 尾版 SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108.py 沿轉接鏈(鏈 3 支 · 本體 SUP_MDL866_VIAUnifiedNLPOrchestrator_v0106.py)公開名稱 / 參數表一個不少(不論它是候選還是現役席位) · 本體公開名 13 · 少 [] · 表少 [] · 衝突 []
+  [OK] ㊼ 本版已裝在本體(plan 走本版 checks · _body_of 認轉接鏈末端)· 加速器橋在 · 不碰 TA-Lib
+  CGC_MDL233_ToolActivate_v0108 selftest +7/7 PASS
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL183_CeleritasPolicyGate_v0106. → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 14, 'changed': 154, 'stale': 0, 'expected': 19887, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 3412 · 觸碰 run CGC_MDL233_ToolActivate · 交接閘 RED · 落後 387 提交 · 快照 839.6h · 未登 2388 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
