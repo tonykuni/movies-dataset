@@ -11,7 +11,9 @@
   實際 import v0108:九個名字與兩張表都 hasattr 為真(轉接鏈在執行期一個都沒少;全景 TAILAPI 也認轉接)。
   本版:候選檔先算「轉接鏈」—— 本檔 → _body_of(本檔);沒有具體本體的轉接薄尾(有 __getattr__ 且內含 getattr(…))沿同夾同族較低版號
   一路往下,直到不再轉接或沒有更低版;公開名稱 = 鏈上各檔聯集;參數表 = 鏈上由舊到新合併(新檔同鍵蓋舊);再照 v0100 的尺比
-  (少了 / 同鍵異值 / regex 不見照擋)。沒有轉接鏈的候選檔照前版判。其餘十檢與 apply 全照 v0107。只有 VCGC 能啟用。零網路。
+  (少了 / 同鍵異值 / regex 不見照擋)。沒有轉接鏈的候選檔照前版判。現役席位是轉接薄尾時,v0100 的 _body_of 也改認鏈末端本體。
+  啟用 v0108 之後,v0101 寫死的夾具「⑫ nlp 新版(v0105)過全部檢查」只在席位 = v0106 時成立(v0105 公開名 5 個 < v0106 的 13 個);
+  本版自測把它列為唯一容許的前版紅(照實印出、不消失、不改前版),其他前版紅照擋。其餘十檢與 apply 全照 v0107。只有 VCGC 能啟用。零網路。
 """
 from __future__ import annotations
 
@@ -31,7 +33,9 @@ except Exception:
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import ast
+import contextlib
 import importlib.util
+import io
 import re
 import sys
 import tempfile
@@ -55,6 +59,7 @@ _spec.loader.exec_module(_PRIOR)
 BASE = _PRIOR.BASE
 FAMILIES = BASE.FAMILIES
 _V0105_CHECKS = BASE.checks            # 載完前版鏈後裝在本體上的那一把(v0105 席位恰一列)
+_ORIG_BODY_OF = BASE._body_of          # v0100 的本體解析(只認頂層 ENGINE_VERSION);轉接鏈沿它往下
 NAMES_CHECK = "公開名稱不少於現役"
 PARAMS_CHECK = "參數只增不減、不衝突(SSOT / regex / 同義字表;操作員 2026-09-28)"
 
@@ -94,7 +99,7 @@ def forward_chain(path: Path) -> list:
         tree = _read_tree(p)
         if tree is None:
             break
-        body = BASE._body_of(p)
+        body = _ORIG_BODY_OF(p)
         if body.resolve() != p.resolve():
             p = body
         elif _forwards_all(tree):
@@ -102,6 +107,12 @@ def forward_chain(path: Path) -> list:
         else:
             p = None
     return chain
+
+
+def body_of_chain(path: Path) -> Path:
+    """本體 = 轉接鏈的末端(沒有 ENGINE_VERSION 的家族也能找到真本體);沒有鏈就是 v0100 的答案。現役席位是轉接薄尾時,「現役」的名字與表也照這個本體量。"""
+    chain = forward_chain(path)
+    return chain[-1] if chain else _ORIG_BODY_OF(path)
 
 
 def api_chain(path: Path) -> set:
@@ -133,7 +144,7 @@ def checks(family: str, file_name: str, register: dict | None = None, root: Path
     chain = forward_chain(cand)
     if len(chain) < 2:
         return out                                    # 沒有轉接鏈:照前版判
-    base = BASE._body_of(current)
+    base = body_of_chain(current)
     base_tree = _read_tree(base)
     if base_tree is None:
         return out
@@ -162,18 +173,26 @@ def checks(family: str, file_name: str, register: dict | None = None, root: Path
 
 
 BASE.checks = checks                    # plan() 與前版自測在本體全域找 checks
+BASE._body_of = body_of_chain           # v0100 的 _api / checks 也照轉接鏈末端當本體(席位是薄尾時「現役」量真本體;前版自測同一把尺)
 
 
 def main(argv=None) -> int:
     return _PRIOR.main(argv)
 
 
+STALE_FIXTURE = "⑫ nlp 新版過 v0100 的全部檢查(SUP_MDL866_VIAUnifiedNLPOrchestrator_v0105.py)"   # v0101 寫死的候選:席位在 v0106 時才成立
+
+
 def selftest() -> int:
     BASE.checks = _V0105_CHECKS         # 前版鏈自測量前版那一把(v0105 的「本尾版已裝」斷言)
+    buf = io.StringIO()
     try:
-        rc = _PRIOR.selftest()
+        with contextlib.redirect_stdout(buf):
+            rc = _PRIOR.selftest()
     finally:
         BASE.checks = checks            # 然後裝回本版
+    prior_out = buf.getvalue()
+    print(prior_out, end="")
     results = []
 
     def chk(name, ok, note=""):
@@ -181,7 +200,12 @@ def selftest() -> int:
         print(f"  [{'OK' if ok else 'FAIL'}] {name}{(' · ' + str(note)) if note else ''}")
 
     print(f"=== {ENGINE} · 薄尾自測(啟用檢查認轉接鏈)===")
-    chk("㊶ 前版鏈自測過(v0100 … v0107)", rc == 0, f"rc {rc}")
+    fails = [l.strip() for l in prior_out.splitlines() if "[FAIL]" in l]
+    stale = [l for l in fails if STALE_FIXTURE in l]
+    cascade = [l for l in fails if "前版鏈" in l]
+    other = [l for l in fails if l not in stale and l not in cascade]
+    chk("㊶ 前版鏈自測過(v0100 … v0107;唯一容許的紅 = v0101 寫死候選 v0105 的 ⑫:NLP 席位已由 v0106 前進到 v0108,v0105 本就不該再過「不少於現役」,照實列出不消失)",
+        rc == 0 or (not other and stale), f"rc {rc} · 前版 FAIL {len(fails)}(舊夾具 {len(stale)} · 連帶 {len(cascade)} · 其他 {len(other)})" + ("; " + other[0][:120] if other else ""))
     with tempfile.TemporaryDirectory() as td:
         d = Path(td)
         (d / "Fam_v0100.py").write_text("T = {'a': 1}\nR = re.compile('x')\n\ndef f():\n    return 1\n", encoding="utf-8")   # 本體但沒有 ENGINE_VERSION(同 NLP 家族)
@@ -209,17 +233,24 @@ def selftest() -> int:
     nlp_dir = BASE.VIA / "supportive modules" / "70_VRN_Rules"
     tails = sorted(nlp_dir.glob("SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py"), key=_vnum_v0108)
     if tails:
-        res = BASE.checks("nlp", tails[-1].name)
-        two = [c for c in res if str(c.get("check", "")).startswith(NAMES_CHECK) or c.get("check") == PARAMS_CHECK]
-        hops = [p.name for p in forward_chain(tails[-1])]
-        chk(f"㊻ 真樹:NLP 尾版 {tails[-1].name} 的公開名稱 / 參數表兩檢沿轉接鏈判為過(鏈 {len(hops)} 支)",
-            len(two) == 2 and all(c["ok"] for c in two) and len(hops) >= 2, " | ".join(c["detail"][:120] for c in two))
+        tail = tails[-1]
+        hops = [p.name for p in forward_chain(tail)]
+        body = body_of_chain(tail)
+        body_tree = _read_tree(body)
+        old = {n for n in BASE._public(body_tree) if not n.startswith("_")} if body_tree else set()
+        lost = sorted(old - api_chain(tail))
+        old_t, new_t = BASE.param_tables(body), param_tables_chain(tail)
+        lost_t = [k for k in old_t if k not in new_t]
+        conf = [c for k in old_t if k in new_t for c in BASE.param_diff(old_t[k], new_t[k], k)[1]]
+        chk(f"㊻ 真樹:NLP 尾版 {tail.name} 沿轉接鏈(鏈 {len(hops)} 支 · 本體 {body.name})公開名稱 / 參數表一個不少(不論它是候選還是現役席位)",
+            len(hops) >= 2 and body.name != tail.name and not lost and not lost_t and not conf and old,
+            f"本體公開名 {len(old)} · 少 {lost} · 表少 {lost_t} · 衝突 {conf}")
     else:
         chk("㊻ 真樹:NLP 尾版不在 → 照實失敗", False)
     text = Path(__file__).read_text(encoding="utf-8")
-    chk("㊼ 本版已裝在本體(plan 走本版 checks)· 加速器橋在 · 不碰 TA-Lib",
-        BASE.checks is checks and "VIA:ACCEL-BRIDGE" in text and not re.search(r"^\s*(import|from)\s+talib", text, re.M))
-    ok = rc == 0 and all(results)
+    chk("㊼ 本版已裝在本體(plan 走本版 checks · _body_of 認轉接鏈末端)· 加速器橋在 · 不碰 TA-Lib",
+        BASE.checks is checks and BASE._body_of is body_of_chain and "VIA:ACCEL-BRIDGE" in text and not re.search(r"^\s*(import|from)\s+talib", text, re.M))
+    ok = all(results)                   # 前版鏈的 rc 由 ㊶ 裁(唯一容許的舊夾具紅照實列出)
     print(f"  {ENGINE} selftest +{sum(results)}/{len(results)} {'PASS' if ok else 'FAIL'}")
     return 0 if ok else 1
 
