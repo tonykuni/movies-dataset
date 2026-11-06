@@ -12,6 +12,20 @@ git 近三天紀錄(本地 git log,零網路)。不改任何系統的檔;輸出�
 五系統對等(L120 / L123):矩陣是 VCGC 的攤開,不代表任何系統的驗收;VDF 曆三欄(session_index / available_on / market)仍是 VDF 自己的手(G2)。
 """
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import argparse
 import csv
@@ -145,8 +159,9 @@ def export_columns(export_dir: Path | None, name: str) -> dict:
                 out["entries"] = len(d["entries"])
             if isinstance(d, dict) and "connections" in d:
                 out["connections"] = len(d["connections"])
-        except ValueError:
+        except ValueError as exc:
             out["state"] = "RED"
+            out["why"] = f"{name} 不是合法 JSON:{str(exc)[:60]}"
     return out
 
 
@@ -204,7 +219,9 @@ def build(export_dir: Path | None) -> dict:
     for l in VQG_LAYERS:
         r = resolve(l)
         r["export"] = export_columns(export_dir, l["export_file"])
-        if r["export"]["state"] == "NODATA" and r["lamp"] == "GREEN":
+        if r["export"]["state"] == "RED":
+            r["lamp"] = "RED"                                   # 匯出檔壞了(JSON 剖析不過)→ 本層紅,不讓壞證據看起來像綠
+        elif r["export"]["state"] == "NODATA" and r["lamp"] == "GREEN":
             r["lamp"] = "YELLOW"
         vqg.append(r)
     cells = []
@@ -242,7 +259,7 @@ def to_md(m: dict) -> str:
     L += ["", "## 二、VQG 分階層(量化數據項目)", "", "| 燈 | 層 | 量化數據項目 | 匯出夾實測(欄 · 列 · sha12 · SHA256SUMS) | 引擎 / 冊 | 交接案 |", "|---|---|---|---|---|---|"]
     for l in m["vqg_layers"]:
         e = l["export"]
-        live = (f"`{e['file']}` sha {e['sha12']} · {'在' if e.get('in_sha256sums') else '不在'} SHA256SUMS" + (f" · 欄 {len(e['columns'])}:{' · '.join(e['columns'][:16])}" if e.get("columns") else "") + (f" · 列 {e['rows']}" if "rows" in e else "") + (f" · entries {e['entries']}" if "entries" in e else "") + (f" · connections {e['connections']}" if "connections" in e else "")) if e["state"] == "GREEN" else f"⚪ {e.get('why', 'NODATA')}"
+        live = (f"`{e['file']}` sha {e['sha12']} · {'在' if e.get('in_sha256sums') else '不在'} SHA256SUMS" + (f" · 欄 {len(e['columns'])}:{' · '.join(e['columns'][:16])}" if e.get("columns") else "") + (f" · 列 {e['rows']}" if "rows" in e else "") + (f" · entries {e['entries']}" if "entries" in e else "") + (f" · connections {e['connections']}" if "connections" in e else "")) if e["state"] == "GREEN" else f"{LAMP.get(e['state'], '⚪')} {e.get('why', 'NODATA')}"
         eng = "<br>".join(f"`{x['tail'].split('/')[-1] if x['tail'] else x['pattern']}` {x['sha12']}" for x in l["engines_resolved"]) + "<br>" + "<br>".join(f"`{b['file'].split('/')[-1]}` {b['sha12']}" for b in l["books_resolved"])
         cases = "<br>".join(f"{LAMP[c['state']]} {c['case']} rc {c.get('rc', '-')} · {c.get('at', '-')}" if c["state"] != "NODATA" else f"⚪ {c['case']}" for c in l["cases_resolved"]) or "—"
         L.append(f"| {LAMP[l['lamp']]} | **{l['id']}** {l['name']} | {'<br>'.join(l['items'])} | {live} | {eng} | {cases} |")
@@ -319,7 +336,9 @@ def selftest() -> int:
 
     print(f"=== {ENGINE} {VERSION} 自測(只讀 · 零網路 · 只寫沙盒)===")
     text = Path(__file__).read_text(encoding="utf-8")
-    chk("① 零網路 import · 不 import 任何系統模組(只讀檔)", not any(f"import {x}" in text for x in ("urllib", "requests", "httpx", "socket", "duckdb", "polars", "pandas")) and "[VIA:ACCEL-BRIDGE" in text)
+    chk("① 零網路 import · 不 import 任何系統模組(只讀檔)· 加速器橋真的裝了(try: import VIA_SuperAccel_Module,缺席 graceful)",
+        not any(f"import {x}" in text for x in ("urllib", "requests", "httpx", "socket", "duckdb", "polars", "pandas")) and "[VIA:ACCEL-BRIDGE" in text
+        and "import VIA_SuperAccel_Module as VIA_ACCEL" in text and "VIA_ACCEL" in globals())
     with tempfile.TemporaryDirectory() as td:
         d = Path(td)
         ex = d / "export"
@@ -338,6 +357,17 @@ def selftest() -> int:
         chk("② 匯出夾實測:CSV 表頭 4 欄 · 列 2 · 在 SHA256SUMS;JSON entries / connections 計數", e1["columns"] == ["date", "ticker", "adj_close", "volume"] and e1["rows"] == 2 and e1["in_sha256sums"] is True
             and export_columns(ex, "vqg_vdf_catalog.json")["entries"] == 1 and export_columns(ex, "vqg_connection_manifest.json")["connections"] == 2)
         chk("③ 沒有的檔照實 NODATA(不冒充)", export_columns(ex, "nothing.csv")["state"] == "NODATA" and export_columns(None, "x")["state"] == "NODATA")
+        bad = d / "export_bad"
+        bad.mkdir()
+        for name in ("vqg_series.csv", "vqg_indicator_results.csv", "SHA256SUMS.txt"):
+            (bad / name).write_text((ex / name).read_text(encoding="utf-8"), encoding="utf-8")
+        for name in ("vqg_vdf_catalog.json", "vqg_connection_manifest.json", "VAP_AllInOne_v0300.config.json"):
+            (bad / name).write_text("{}", encoding="utf-8")
+        (bad / "export_receipt.json").write_text("{ not json", encoding="utf-8")
+        mb = build(bad)
+        q4 = next(l for l in mb["vqg_layers"] if l["id"] == "VQG-Q4")
+        chk("③b 匯出檔壞了(export_receipt.json 不是 JSON)→ 該檔 RED 且 VQG-Q4 層燈 RED(壞證據不得看起來像綠);報告格印紅燈與原因",
+            q4["export"]["state"] == "RED" and q4["lamp"] == "RED" and "不是合法 JSON" in q4["export"].get("why", "") and "🔴 export_receipt.json 不是合法 JSON" in to_md(mb))
         eng_missing = [e["pattern"] for l in m["vdf_layers"] + m["vqg_layers"] for e in l["engines_resolved"] if e["state"] != "GREEN"]
         chk("④ 真樹:每層的引擎 glob 都解析到尾版(帶 sha12)", not eng_missing, f"缺 {eng_missing}")
         book_missing = [b["file"] for l in m["vdf_layers"] + m["vqg_layers"] for b in l["books_resolved"] if b["state"] != "GREEN"]

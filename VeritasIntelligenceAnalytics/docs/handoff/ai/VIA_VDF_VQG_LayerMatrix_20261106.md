@@ -1,4 +1,4 @@
-# VDF 分階層輸入 / 輸出 × VQG 分階層量化數據項目 —— 高度整合可驗證矩陣(VIA_LayerMatrix v0100 · 2026-11-06 20:53:53 +0000)
+# VDF 分階層輸入 / 輸出 × VQG 分階層量化數據項目 —— 高度整合可驗證矩陣(VIA_LayerMatrix v0100 · 2026-11-06 21:17:30 +0000)
 
 > VCGC / VDF / VRN-2 / VQG / VAP 皆為獨立系統(L120 / L123);本矩陣只讀攤開,不代改、不代驗收。匯出夾:`/tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/vqgvap/vqg_export/vap_export_20261106_173005`。每格證據:尾版 sha256 前 12 · 冊 sha · 交接案 rc / 標記 / 日期 · 匯出夾 SHA256SUMS。
 
@@ -34,7 +34,7 @@
 
 ## 四、過去三天紀錄(git log · 本地)
 
-- **VCGC**:58 提交<br>　`f0db62702 2026-11-06 鏈 3:交接案 tool_activate_v0108 rc 0 標記見到(收據)· 編號(MDL233 v0108 二修 · 交接冊)· 功能帳(test --quick 站 12 綠 10 黃 2 紅 0)`<br>　`b7d58aec3 2026-11-06 CGC_MDL233 v0108 二修:席位是轉接薄尾時 v0100 的 _body_of 也認鏈末端本體 · 自測把 v0101 寫死候選 v0105 的 ⑫ 列為唯一容許的前版紅(照實列出不消失)· 7/7 PASS;編號冊(鏈 2)· 功能帳 · tool_activat`<br>　`4f8357bf6 2026-11-06 冊 add-only:交接冊 +案 tool_activate_v0108 · +工作項 3(VCGC-REQ188)· 需求冊 v0215(+VCGC-REQ188 省 Token 全啟用 · VRN-1 備援)· 交接 §31(VRN-1 備援 · 桌機核對 token /`<br>　`f4c407ee9 2026-11-06 省 Token 功能全啟用(操作員 2026-11-06 令):NLP 尾版 v0108 經 via-vcgc tools activate --apply 進工具鎖冊(v0106 → v0108)· CGC_MDL233 v0108 薄尾(啟用檢查認轉接鏈 · 7/7)· 註`<br>　`9e49b186a 2026-11-06 VCGC 功能帳(test --quick):站 12 · 綠 10 黃 2 紅 0 · 沿用 9 · 家族尾版 283 支 compile 錯 0 缺橋 0(MDL183 v0106 自測入帳)`<br>　`750df1ef6 2026-11-06 VCGC 編號(CGC_MDL237 --apply --scope 5 檔):MDL183 v0106 · 覆蓋 SSOT v0104 · 需求冊 v0214 · 註冊冊 · 交接冊 → 編號冊 +32 列(audit 遺失 0 · 改身分 0 · 重號 0 · 冊內不一致 `
+- **VCGC**:65 提交<br>　`aa57cc0ca 2026-11-06 五系統收尾:交接冊三案帶理由轉態(vdf_refill · vdf_manager_frozen_sample → VDF_SystemManager 尾版;provenance → VRN-2 SM 尾版判決行)· 相依案重跑收據(numbering · token · to`<br>　`e0da032bc 2026-11-06 VCGC 功能帳(鏈 5 test --quick):站 11 · 綠 9 黃 2 紅 0 · case 237/237 · 家族尾版 283 支 compile 錯 0 缺橋 0`<br>　`adfccab1d 2026-11-06 VCGC 編號(鏈 5 · 盤點冊 v0191)· audit 遺失 0 · 改身分 0 · 重號 0`<br>　`ae59837cc 2026-11-06 盤點冊 v0191:coverage.case 補 tool_activate_v0108 → 站 C-tool_activate_v0108(CGC_MDL224 ⑧ 綠)`<br>　`b08492117 2026-11-06 盤點冊 v0191(+站 C-tool_activate_v0108;交接案沒站 → CGC_MDL224 ⑧ 紅 → 登站後自測過)· 功能帳(鏈 4)`<br>　`a5d8a4961 2026-11-06 VCGC 編號(鏈 4 · --apply --scope 5 檔):SettleAll v0117 · LayerMatrix v0100 · 盤點冊 v0190 · 需求冊 v0216 · 交接冊 → 編號冊 +134 列(audit 遺失 0 · 改身分 0 · 重號 0`
 - **VDF**:3 提交<br>　`bc5efc568 2026-11-04 [VDF] ENG113 / ENG115 / ENG116 v0104:補 v0103 轉接漏洞(前版鏈公開名稱取不到 · PR #589 Codex P2)`<br>　`e707713f2 2026-11-04 [VDF] MDL011 AkshareFetcher v0104:文件爬取 _get 由直連 requests.get 改經 VIA 網路工具 http_text(L103)`<br>　`9d25bf279 2026-11-04 [VDF] ENG113 / ENG115 / ENG116 v0103:直連 urllib 改經 VIA 網路工具(L103 · 收尾規格 §8-3)`
 - **VRN-2**:2 提交<br>　`e33bf4d7c 2026-11-06 雙橋 100%(操作員令 L103):VCGC 橋掃器 CGC_MDL124 v0111 --subsystems --apply 注加速器橋 11 支(VRN 10 · SUP_MDL753;全部 compile 過 · 自測 9 PASS + 2 環境項)→ VDF/acc`<br>　`82d6154df 2026-11-06 VRN-2 非個股摘要器 v0310 入倉:引擎原檔(SHA 釘 frozen_sources)· reuse/vrn2 三支改 VIA 席位轉接(TableRestorer 正本轉出 · PyMuPDF + SUP_MDL743 版面 · 本地抽取式 + SUP_MDL866`
 - **VQG**:4 提交<br>　`3c8dbd12e 2026-11-06 版本律(Codex #600 P1):已發布的 VQG v0106 / SettleAll v0115 還原為 main 位元組 → 出 VQG v0107(四項修正 + 先濾再取 N 點 · 自測 12/12)· SettleAll v0116(釘 v0107 · ⑧b 用最`<br>　`2fb05cb61 2026-11-06 VQG v0106:修 Codex #599 三項(收據夾在 VDF 庫裡連收據都不寫 · 截止日照市場且觀測日不超過 as-of · MACD 等結構值展開成分量欄)· SettleAll v0115 重釘 v0106 SHA · 交接 §29 SHA · 契約文件`<br>　`f8f21872c 2026-11-06 VQG v0106 export-vap(VDF 庫夾整理全部 · 一票一表 SERIES / INDICATOR_RESULT · VAP 連線證據指紋)· VAP v0302(修 duckdb DATE 列 · xField)· SettleAll v0115(⑧b 匯出 `<br>　`dad067642 2026-11-04 VQG 獨立系統入倉(VeritaQuantGuard v0104 原檔 + v0105 薄尾:輸入 = VDF 資料庫 · 只讀)· VIA Agent OS v0102(引擎 1.0.2 hardened · VCGC 線啟動)· DeployLedger v0300 只測`
@@ -49,4 +49,4 @@
 | VQG | 1 | 0 | — |
 | VCGC | 27 | 2 | tool_coverage_matrix · tool_probe_v0106 |
 
-- SettleAll 近兩版文件:`VIA_SettleAll_v0115.md` da8569e42de3 · `VIA_SettleAll_v0116.md` 84cc830a4dfa;交接 `VRN2_Handover_latest.md` 節 32 sha 4c43882d3bd2
+- SettleAll 近兩版文件:`VIA_SettleAll_v0116.md` 84cc830a4dfa · `VIA_SettleAll_v0117.md` bc88a250d328;交接 `VRN2_Handover_latest.md` 節 33 sha ce4a628253de
