@@ -23,7 +23,7 @@ VDF 增量寫批次 parquet → VQG v0106 `export-vap` 只讀 VDF 庫夾 → 整
 | `vqg_vdf_catalog.json` | 整理全部 | 所有人 | VDF 庫夾每一個 parquet 一列:路徑 · 大小 · 批次戳 · 認得的欄位 · 列數 · 票樣本 · SHA-256 · 是否被新批次取代 · 讀不了 |
 | `series/<票>.parquet` + `.csv` | 無加工 SERIES | VAP(一票一表) | v0105 `load_series` 原樣倒出:date · adj_close · volume · turnover…(全空的欄不列)· market · session_index · available_on · source_files · engine_version;x = date 不重複升冪 |
 | `vqg_series.parquet` + `.csv` | 無加工 SERIES | 其他應用 | 全部票長表(含 ticker 欄) |
-| `indicators/<票>.parquet` + `.csv` | 有加工 INDICATOR_RESULT | VAP(一票一表) | 最近 `--indicator-points`(預設 60)個交易日各跑一次 v0105 `run_local`;x = observation_date;欄 = `<指標>_<窗>_<解>`(例 `SMA_20_S1` · `RSI_14_S2` · `MACD_26_S3`)· 無效值留空 |
+| `indicators/<票>.parquet` + `.csv` | 有加工 INDICATOR_RESULT | VAP(一票一表) | 最近 `--indicator-points`(預設 60)個交易日各跑一次 v0105 `run_local`;x = observation_date;欄 = `<指標>_<窗>_<解>`(例 `SMA_20_S1` · `RSI_14_S2`)· 結構值展開 `<欄>_<分量>`(`MACD_26_S1_line` / `_signal` / `_histogram`)· 截止日照市場(台股 = 觀測日隔天 · 美股 = 當日)且不超過 `--as-of`(台股最後觀測日 = as-of 前一交易日 · 美股 = as-of 當日)· 無效值留空 |
 | `vqg_indicator_results.parquet` + `.csv` | 有加工 INDICATOR_RESULT | 其他應用 | as-of 當天快照 · 欄位 = v0104 FIELDS 23 欄(長表);`--out-dir` 下既有 `vqg_<uuid>/vqg_result.parquet`(v0104 `calc --export-dir`)一併合入去重 |
 | `vqg_connection_manifest.json` | 連線證據 | VAP | schema `VIA-VQG-VAP-CONNECTION-MANIFEST/1.0` · 每張 VAP 表一筆(見 §3) |
 | `vdf_connection_manifest.json` | 連線證據 | VAP | schema `VIA-VDF-VAP-CONNECTION-MANIFEST/1.0` · connections `[]`(VDF 不直連) |
@@ -98,5 +98,6 @@ VAP 開在 http://127.0.0.1:8765(U/I 寫死這個埠 · 換埠 U/I 會 `ERR_CONN
 ## 9. 獨立性與未決
 
 - VQG v0106 不 import VAP(自測 ② 驗)· VAP v0302 不 import VQG · SettleAll 只讀兩邊收據。
+- Codex 在 #599 的三項(已修 · 自測 ⑦ ⑫ 驗):收據夾在 VDF 庫裡 → 連收據都不寫(rc 2);美股截止日 = 觀測日當天且觀測日不超過 as-of(不漏未來);MACD 等結構值展開成分量欄(原本全空)。
 - VAP 的 VDF 直連路徑(`def_vdf_evidence`)要求股票類帶 `taLibEvidence.engine == "TA-Lib"`,跟 VIA 政策 L50(不用 TA-Lib)相衝;本契約不走 VDF 直連(connections 空)所以不觸發 · 不改 VAP 這段(VAP 線自己決定)。
 - 曆嚴格綠要 VDF 線出欄位(G2 範圍 · 不代改)。

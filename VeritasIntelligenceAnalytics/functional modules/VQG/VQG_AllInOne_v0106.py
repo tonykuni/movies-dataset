@@ -21,7 +21,8 @@ v0106 加一個動詞 export-vap(其餘動詞原樣交 v0105):
      series/<票>.parquet(+ .csv · 一票一表 · x = date · 全空的欄不列 · 值不補不改)給 VAP;vqg_series.parquet(+ .csv · 全部票長表)給其他應用。
      同表多批次照 --snapshots latest 只取最新;曆照 --calendar(預設 auto:嚴格先試 · 缺曆才推)。
   ③ 有加工(INDICATOR_RESULT):每張票跑 v0105 run_local(預設 sma rsi macd · 三解 · 驗證):
-     indicators/<票>.parquet(+ .csv · 一票一表 · x = observation_date · 最近 --indicator-points 個交易日各算一次 · 欄 = <指標>_<窗>_<解>(例 SMA_20_S1)· 無效值留空)給 VAP;
+     indicators/<票>.parquet(+ .csv · 一票一表 · x = observation_date · 最近 --indicator-points 個交易日各算一次 · 欄 = <指標>_<窗>_<解>(例 SMA_20_S1)· 結構值展開 <欄>_<分量>(例 MACD_26_S1_line / _signal / _histogram)·
+     截止日照市場(台股 = 觀測日隔天 · 美股 = 當日)· 觀測日不超過 --as-of · 無效值留空)給 VAP;
      vqg_indicator_results.parquet(+ .csv · as-of 當天的快照 · 欄位 = v0104 FIELDS 23 欄 · 長表)給其他應用;
      --out-dir 下既有的 vqg_<uuid>/vqg_result.parquet(v0104 calc --export-dir 丟的)一併合進長表(同 request_key + solution_id + observation_date 去重)。
   ④ 連線證據:vqg_connection_manifest.json(schema VIA-VQG-VAP-CONNECTION-MANIFEST/1.0 · 每張 VAP 表一筆 · state AUTHORIZED · readOnly · engine PARQUET ·
@@ -31,7 +32,7 @@ v0106 加一個動詞 export-vap(其餘動詞原樣交 v0105):
      authority VQG · allowedRoots 含輸出夾 · loopback)。VAP 啟動:python VAP_AllInOne_v03xx.py --config <輸出夾>\VAP_AllInOne_v0300.config.json。
   ⑤ 收據:export_receipt.json(每張表帶 VAP U/I 閘的預檢:列數 · x 不重複升冪 · 數值欄 ≥ 2)+ SHA256SUMS.txt(輸出夾)· VQG_ExportVAP_latest.json
      (<VIA 根>\VIA_Reports\vqg\)· 一行燈 + 下一步。
-  邊界:輸出夾不准在 VDF 庫裡(OUTPUT_INSIDE_SOURCE_ROOT · rc 2)· 跑前跑後核對 VDF 庫檔案清單與 mtime 一字沒動(收據 vdf_root_untouched)·
+  邊界:輸出夾 / 收據夾不准在 VDF 庫裡(OUTPUT_INSIDE_SOURCE_ROOT · rc 2 · 連收據都不寫)· 跑前跑後核對 VDF 庫檔案清單與 mtime 一字沒動(收據 vdf_root_untouched)·
         前版 v0105 位元組被改過 → 不匯出(rc 2 · 血統要乾淨才能給別的應用)· 零網路(本檔不匯入任何網路模組 · VIA:NET-BRIDGE 不適用)· 不 import VAP。
   燈:GREEN = 全部票匯出且曆嚴格;YELLOW = 曆是推的(VDF 日線缺 session_index / available_on / market)或有票跳過 / 截斷;RED = 一張票都沒匯出 / 邊界違反。
 自測:python VQG_AllInOne_v0106.py selftest(v0105 自測 + 本版 12 項 · 零網路 · 只在 tempfile 沙盒寫 · 跑 v0105 自測時暫時拿掉 $env:VQG_VDF_ROOT · 不然 v0105 ⑩ 會誤判)。
@@ -225,6 +226,28 @@ def _ind_col(row: dict) -> str:
     return "%s_%s_%s" % (str(row.get("indicator_id", "")).split(".")[-1], row.get("window_n"), row.get("solution_id"))
 
 
+def _ind_values(row: dict) -> dict:
+    """一列指標 → {欄名: 數值}:純量 = value_num;結構值(MACD line / signal / histogram · bollinger …)從 value_json 展開成 <欄>_<分量>(無效 → None)。"""
+    base = _ind_col(row)
+    if not row.get("valid"):
+        return {base: None}
+    if row.get("value_num") is not None:
+        return {base: float(row["value_num"])}
+    try:
+        obj = json.loads(row.get("value_json") or "null")
+    except ValueError:
+        obj = None
+    if isinstance(obj, dict):
+        return {"%s_%s" % (base, k): (float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else None) for k, v in obj.items()}
+    return {base: float(obj) if isinstance(obj, (int, float)) and not isinstance(obj, bool) else None}
+
+
+def _cutoff_for(ticker: str, day, forced):
+    """算 day 這個觀測日要給的 as-of:台股照 v0104「只用 as-of 前一日以前」→ day + 1;美股 as-of 當日含 → day。"""
+    mkt = forced or PRIOR._market_of_ticker(ticker) or "TW"
+    return day + timedelta(days=1) if mkt == "TW" else day
+
+
 def export_indicators(sources, tickers: list, metrics: list, windows, as_of, cal: str, snaps: str, forced, root: Path, sessions: dict, points: int) -> tuple:
     """③ 有加工:每張票 (a) as-of 快照(長表 · v0104 FIELDS)(b) 最近 points 個交易日各跑一次 run_local → 一票一表(x = observation_date · 欄 = 指標_窗_解)。"""
     snap_rows, per, skipped, modes, per_frames, meta = [], {}, {}, set(), {}, {}
@@ -245,17 +268,21 @@ def export_indicators(sources, tickers: list, metrics: list, windows, as_of, cal
         days = [d for d in (sessions.get(tk) or []) if d <= as_of]
         wide, cols_meta = {}, {}
         for day in (days[-points:] if points > 0 else []):
+            cut = _cutoff_for(tk, day, forced)                                 # 截止日照市場(TW = day + 1 · US = day)· 觀測日 = day
+            if cut > as_of:                                                    # 截止日不得超過 --as-of(台股 as-of 當天的價照 v0104 不用 · 最後觀測日 = 前一交易日)
+                continue
             try:
-                rows_d, _ = once(tk, day + timedelta(days=1))                  # as-of 隔天 → 觀測日 = day(台股照 v0104 只用前一日以前)
+                rows_d, _ = once(tk, cut)
             except (ValueError, OSError):
                 continue
             for r in rows_d:
                 od = r.get("observation_date")
-                if od is None:
+                if od is None or od > as_of:                                   # 觀測日不得超過 --as-of(Codex P1:美股截止含當日 · 歷史匯出不漏未來)
                     continue
-                c = _ind_col(r)
-                wide.setdefault(od, {"observation_date": od})[c] = r.get("value_num") if r.get("valid") else None
-                cols_meta.setdefault(c, {"indicatorId": r.get("indicator_id"), "window": r.get("window_n"), "solution": r.get("solution_id"), "estimator": r.get("estimator"), "unit": r.get("unit")})
+                for c, v in _ind_values(r).items():
+                    wide.setdefault(od, {"observation_date": od})[c] = v
+                    cols_meta.setdefault(c, {"indicatorId": r.get("indicator_id"), "window": r.get("window_n"), "solution": r.get("solution_id"), "estimator": r.get("estimator"), "unit": r.get("unit"),
+                                             "component": c[len(_ind_col(r)) + 1:] or None})
         if wide:
             cols = sorted(cols_meta)
             schema = {"observation_date": pl.Date, **{c: pl.Float64 for c in cols}}
@@ -302,7 +329,7 @@ def series_semantics(frame) -> dict:
 def indicator_semantics(cols_meta: dict) -> dict:
     out = {"observation_date": _sem("VQG.FIELD.OBSERVATION_DATE", "Observation Date", "Date", "Date", "X_TIME")}
     for c, m in cols_meta.items():
-        out[c] = dict(_sem("VQG.IND.%s" % c, "%s %s · %s %s" % (str(m.get("indicatorId", "")).split(".")[-1], m.get("window"), m.get("solution"), m.get("estimator") or ""), str(m.get("unit") or "value"), "Decimal", "LEFT_VALUE"), indicatorId=m.get("indicatorId"))
+        out[c] = dict(_sem("VQG.IND.%s" % c, "%s %s · %s %s%s" % (str(m.get("indicatorId", "")).split(".")[-1], m.get("window"), m.get("solution"), m.get("estimator") or "", (" · " + m["component"]) if m.get("component") else ""), str(m.get("unit") or "value"), "Decimal", "LEFT_VALUE"), indicatorId=m.get("indicatorId"))
     return out
 
 
@@ -347,6 +374,7 @@ def export_vap(args) -> int:
         root, how = PRIOR.default_root(via)
     out_root = Path(getattr(args, "out_dir", None) or ((via / "VIA_Reports" / "vqg" / "vap_export") if via else Path.cwd() / "VIA_Reports" / "vqg" / "vap_export"))
     receipt_dir = Path(getattr(args, "receipt_dir", None) or ((via / "VIA_Reports" / "vqg") if via else Path.cwd() / "VIA_Reports" / "vqg"))
+    receipt_ok = [True]                                                      # 收據夾在 VDF 庫裡 → False:finish 只印不寫(Codex P1 · 邊界不能被收據破)
     rec = {"system": "VQG", "verb": "export-vap", "engine": "VeritaQuantGuard " + VERSION_TAIL, "formula_engine": ENGINE_VERSION, "prior_sha_ok": PRIOR_SHA_OK,
            "at": t0.isoformat(timespec="seconds"), "via_root": str(via or ""), "vdf_root": str(root), "vdf_root_from": how, "out_root": str(out_root),
            "rule": "VQG 只讀 VDF 庫 · 不連網 · 不寫 VDF 的夾 · 輸出夾不在 VDF 庫裡 · VAP 只拿 VQG 的正式輸出(連線證據帶指紋)· 一票一表 = VAP U/I 一條時間軸", "steps": []}
@@ -359,6 +387,9 @@ def export_vap(args) -> int:
         rec["lamp"] = lamp
         rec["meaning"] = meaning
         rec["elapsed_s"] = round((datetime.now() - t0).total_seconds(), 1)
+        if not receipt_ok[0]:
+            print("[%s] VQG export-vap · %s · 收據沒寫(收據夾 %s 在 VDF 庫裡 · VQG 不寫 VDF 的夾)· %.1f 秒%s" % (lamp, meaning, receipt_dir, rec["elapsed_s"], (" · 下一步:" + next_step) if next_step else ""), flush=True)
+            return 0 if lamp in ("GREEN", "YELLOW") else 2
         with contextlib.suppress(OSError):
             receipt_dir.mkdir(parents=True, exist_ok=True)
             body = json.dumps(rec, ensure_ascii=False, indent=1, default=str)
@@ -374,8 +405,10 @@ def export_vap(args) -> int:
         step("① VDF 庫", "RED", "VDF 庫根不在:%s(%s)" % (root, how))
         return finish("RED", "沒有 VDF 庫", "--root <VDF 庫根> 或 $env:VQG_VDF_ROOT")
     root = root.resolve()
-    if out_root.resolve().is_relative_to(root) or receipt_dir.resolve().is_relative_to(root):
-        step("① 邊界", "RED", "OUTPUT_INSIDE_SOURCE_ROOT:輸出夾 / 收據夾在 VDF 庫裡(%s)· VQG 只讀 VDF · 不寫" % out_root)
+    if receipt_dir.resolve().is_relative_to(root):
+        receipt_ok[0] = False
+    if out_root.resolve().is_relative_to(root) or not receipt_ok[0]:
+        step("① 邊界", "RED", "OUTPUT_INSIDE_SOURCE_ROOT:輸出夾 / 收據夾在 VDF 庫裡(%s · %s)· VQG 只讀 VDF · 不寫 · 收據也不寫" % (out_root, receipt_dir))
         return finish("RED", "輸出夾不准在 VDF 庫裡", "--out-dir 指到 VDF 庫外(預設 <VIA 根>\\VIA_Reports\\vqg\\vap_export)")
     sig_before = _tree_signature(root)
     sources, errors = PRIOR.discover(root)
@@ -542,6 +575,7 @@ def selftest() -> int:
         new = [(d, tk, o, h, l, c, ac * 0.97, v) for (d, tk, o, h, l, c, ac, v) in PRIOR._bars("2330.TW", d0, 126) + PRIOR._bars("2317.TW", d0, 126, skip=(100,), base=80)]
         PRIOR._vdf_like(vdf / "output_hub" / "tw_daily_prices_20261101_120000.parquet", old)
         PRIOR._vdf_like(vdf / "output_hub" / "tw_daily_prices_20261102_120000.parquet", new)
+        PRIOR._vdf_like(vdf / "output_hub" / "us_daily_prices_20261101_120000.parquet", PRIOR._bars("NVDA", d0, 130, base=50))   # 美股 · 資料到 as-of 之後 4 天(驗觀測日不漏未來)
         (vdf / "notes.parquet").write_bytes(b"not a parquet")
         out = t / "out"
         out.mkdir()
@@ -551,7 +585,7 @@ def selftest() -> int:
         rows0, _ = PRIOR.run_local(src, a0)
         PRIOR.export_snapshot(rows0, out)
         sig0 = _tree_signature(vdf)
-        ns = types.SimpleNamespace(via_root=None, root=str(vdf), out_dir=str(out), receipt_dir=str(t / "rcpt"), ticker=[], max_tickers=50, metrics=["sma", "rsi"], windows=None,
+        ns = types.SimpleNamespace(via_root=None, root=str(vdf), out_dir=str(out), receipt_dir=str(t / "rcpt"), ticker=[], max_tickers=50, metrics=["sma", "rsi", "macd"], windows=None,
                                    as_of=as_of, series_rows=50, indicator_points=12, calendar="auto", snapshots="latest", market=None, vap_port=8765)
         buf2 = io.StringIO()
         with contextlib.redirect_stdout(buf2):
@@ -559,13 +593,13 @@ def selftest() -> int:
         exp = sorted(out.glob("vap_export_*"))
         ed = exp[-1] if exp else None
         names = sorted(str(p.relative_to(ed)).replace("\\", "/") for p in ed.rglob("*") if p.is_file()) if ed else []
-        chk("③ export-vap rc 0 · 輸出夾:series/<票> ×2 · indicators/<票> ×2(parquet + csv)· 兩張長表 · catalog · 兩份 manifest · config · receipt · SHA256SUMS",
-            rc == 0 and ed is not None and {"series/2330_TW.parquet", "series/2317_TW.csv", "indicators/2330_TW.parquet", "indicators/2317_TW.csv", "vqg_series.parquet", "vqg_indicator_results.parquet",
+        chk("③ export-vap rc 0 · 輸出夾:series/<票> ×3 · indicators/<票> ×3(parquet + csv · 含美股 NVDA)· 兩張長表 · catalog · 兩份 manifest · config · receipt · SHA256SUMS",
+            rc == 0 and ed is not None and {"series/2330_TW.parquet", "series/2317_TW.csv", "series/NVDA.parquet", "indicators/2330_TW.parquet", "indicators/2317_TW.csv", "indicators/NVDA.parquet", "vqg_series.parquet", "vqg_indicator_results.parquet",
                                             "vqg_vdf_catalog.json", "vqg_connection_manifest.json", "vdf_connection_manifest.json", VAP_CONFIG_NAME, "export_receipt.json", "SHA256SUMS.txt"} <= set(names))
         man = json.loads((ed / "vqg_connection_manifest.json").read_text(encoding="utf-8")) if ed else {}
         conns = man.get("connections") or []
-        chk("④ 連線證據照 VAP 驗法:schema · 4 筆(2 票 × SERIES / INDICATOR_RESULT)AUTHORIZED readOnly PARQUET sourceSystem VQG · limits 5000/100/252 · 政策字串 · 指紋重算相同 · dataSha256 = 檔案",
-            man.get("schema") == VAP_VQG_SCHEMA and len(conns) == 4 and all(c["state"] == "AUTHORIZED" and c["readOnly"] is True and c["engine"] == "PARQUET" and c["sourceSystem"] == "VQG" for c in conns)
+        chk("④ 連線證據照 VAP 驗法:schema · 6 筆(3 票 × SERIES / INDICATOR_RESULT)AUTHORIZED readOnly PARQUET sourceSystem VQG · limits 5000/100/252 · 政策字串 · 指紋重算相同 · dataSha256 = 檔案",
+            man.get("schema") == VAP_VQG_SCHEMA and len(conns) == 6 and all(c["state"] == "AUTHORIZED" and c["readOnly"] is True and c["engine"] == "PARQUET" and c["sourceSystem"] == "VQG" for c in conns)
             and {c["datasetType"] for c in conns} == {"SERIES", "INDICATOR_RESULT"} and all(c["limits"] == {"maxInputRows": 5000, "maxOutputRows": 100, "maxWindow": 252} for c in conns)
             and all(c["upstreamEvidence"]["pricePolicy"] == "ADJUSTED_PRICE_ONLY" and c["upstreamEvidence"]["taLibPolicy"] == "CALCULATE_ONLY_NO_FETCH" and c["upstreamEvidence"]["vdfAuthorized"] is True for c in conns)
             and all(c["fingerprint"] == vap_fingerprint(c) for c in conns) and all(c["dataSha256"] == _sha256_file(ed / c["dataFile"]) for c in conns))
@@ -574,33 +608,38 @@ def selftest() -> int:
         chk("⑤ SERIES 無加工:一票一表 2330 · ≤ --series-rows 50 列 · x = date 不重複升冪 · 欄 date / adj_close / volume / market / session_index / available_on · 全空欄不列 · 取最新批次(adj_close = 新批次 ×0.97)· 長表兩票都在",
             sf is not None and sf.height <= 50 and sf["date"].to_list() == sorted(set(sf["date"].to_list())) and {"date", "adj_close", "volume", "market", "session_index", "available_on"} <= set(sf.columns)
             and "turnover" not in sf.columns and abs(float(sf.sort("date")["adj_close"][-1]) - float([r for r in new if r[1] == "2330.TW" and date.fromisoformat(r[0]) <= as_of][-1][6])) < 1e-9
-            and lf is not None and set(lf["ticker"].unique().to_list()) == {"2330.TW", "2317.TW"})
+            and lf is not None and set(lf["ticker"].unique().to_list()) == {"2330.TW", "2317.TW", "NVDA"})
         inf = pl.read_parquet(ed / "vqg_indicator_results.parquet") if ed else None
         rcp0 = json.loads((ed / "export_receipt.json").read_text(encoding="utf-8")) if ed else {}
-        chk("⑥ INDICATOR_RESULT 長表:欄位 = v0104 FIELDS(23 欄)· sma + rsi 兩票都有 · 既有 vqg_<uuid> 快照(早 7 天的 sma 5)合進來 3 列 · 去重後 sma 5 共 9 列",
-            inf is not None and list(inf.columns) == list(PRIOR.FIELDS.keys()) and set(inf["ticker"].unique().to_list()) == {"2330.TW", "2317.TW"}
-            and {"VQG.IND.SMA", "VQG.IND.RSI"} <= set(inf["indicator_id"].unique().to_list())
+        chk("⑥ INDICATOR_RESULT 長表:欄位 = v0104 FIELDS(23 欄)· sma + rsi + macd 三票都有 · 既有 vqg_<uuid> 快照(早 7 天的 sma 5)合進來 3 列 · 去重後 sma 5 共 12 列",
+            inf is not None and list(inf.columns) == list(PRIOR.FIELDS.keys()) and set(inf["ticker"].unique().to_list()) == {"2330.TW", "2317.TW", "NVDA"}
+            and {"VQG.IND.SMA", "VQG.IND.RSI", "VQG.IND.MACD"} <= set(inf["indicator_id"].unique().to_list())
             and inf.unique(subset=["request_key", "solution_id", "observation_date", "indicator_id", "window_n", "ticker"]).height == inf.height
-            and (rcp0.get("indicators") or {}).get("merged_prior_rows") == 3 and inf.filter((pl.col("window_n") == 5) & (pl.col("indicator_id") == "VQG.IND.SMA")).height == 9)
+            and (rcp0.get("indicators") or {}).get("merged_prior_rows") == 3 and inf.filter((pl.col("window_n") == 5) & (pl.col("indicator_id") == "VQG.IND.SMA")).height == 12)
         wf = pl.read_parquet(ed / "indicators" / "2330_TW.parquet") if ed else None
-        chk("⑦ INDICATOR 一票一表:x = observation_date 不重複升冪 · 最近 --indicator-points 12 個交易日 · 欄 SMA_5_S1 … RSI_14_S3 · SMA_5 值 = 長表同觀測日的值",
+        wn = pl.read_parquet(ed / "indicators" / "NVDA.parquet") if ed else None
+        sn = pl.read_parquet(ed / "series" / "NVDA.parquet") if ed else None
+        chk("⑦ INDICATOR 一票一表:x = observation_date 不重複升冪 · 最近 --indicator-points 12 個交易日 · 欄 SMA_5_S1 … RSI_14_S3 · SMA_5 值 = 長表同觀測日的值 · MACD 結構值展開 MACD_26_S1_line / _signal / _histogram 且最後一列有值 · 美股 NVDA 觀測日 ≤ as-of 且最後觀測日 = as-of(當日含)· 台股最後觀測日 = as-of 前一交易日",
             wf is not None and 3 <= wf.height <= 12 and wf["observation_date"].to_list() == sorted(set(wf["observation_date"].to_list()))
-            and {"SMA_5_S1", "SMA_5_S2", "SMA_5_S3", "RSI_14_S1"} <= set(wf.columns)
-            and _same_point(wf, inf.filter((pl.col("ticker") == "2330.TW") & (pl.col("window_n") == 5) & (pl.col("solution_id") == "S1") & (pl.col("as_of") == as_of)), "SMA_5_S1"))
+            and {"SMA_5_S1", "SMA_5_S2", "SMA_5_S3", "RSI_14_S1", "MACD_26_S1_line", "MACD_26_S1_signal", "MACD_26_S1_histogram"} <= set(wf.columns)
+            and wf.sort("observation_date")["MACD_26_S1_line"][-1] is not None and "MACD_26_S1" not in wf.columns
+            and _same_point(wf, inf.filter((pl.col("ticker") == "2330.TW") & (pl.col("window_n") == 5) & (pl.col("solution_id") == "S1") & (pl.col("as_of") == as_of)), "SMA_5_S1")
+            and wn is not None and max(wn["observation_date"].to_list()) == as_of and max(wf["observation_date"].to_list()) == as_of - timedelta(days=1)
+            and sn is not None and max(sn["date"].to_list()) <= as_of)
         cat = json.loads((ed / "vqg_vdf_catalog.json").read_text(encoding="utf-8")) if ed else {}
         ents = cat.get("entries") or []
-        chk("⑧ 整理全部:VDF 庫夾 3 個 parquet 全列(2 認得 · 1 被新批次取代 · 1 讀不了)· 帶 SHA-256 / 列數 / 票樣本",
-            len(ents) == 3 and cat.get("recognized") == 2 and cat.get("superseded") == 1 and cat.get("unreadable") == 1
+        chk("⑧ 整理全部:VDF 庫夾 4 個 parquet 全列(3 認得 · 1 被新批次取代 · 1 讀不了)· 帶 SHA-256 / 列數 / 票樣本",
+            len(ents) == 4 and cat.get("recognized") == 3 and cat.get("superseded") == 1 and cat.get("unreadable") == 1
             and any(e["superseded"] and e["snapshot"] == "20261101_120000" for e in ents) and all(e.get("sha256") for e in ents) and any(e.get("tickers_sample") for e in ents))
         cfg = json.loads((ed / VAP_CONFIG_NAME).read_text(encoding="utf-8")) if ed else {}
         root_cfg = json.loads((out / VAP_CONFIG_NAME).read_text(encoding="utf-8")) if (out / VAP_CONFIG_NAME).is_file() else {}
-        chk("⑨ VAP config:formalInputAuthority VQG · 4 來源 authority VQG · engine PARQUET · 位置 / manifest 路徑真的在 · 每來源在 manifest 有同 id 同 contract 的證據 · allowedRoots 含輸出夾 · loopback · 輸出夾根有一份指最新",
-            cfg.get("formalInputAuthority") == "VQG" and len(cfg.get("sources") or []) == 4 and all(s["authority"] == "VQG" and s["engine"] == "PARQUET" and Path(s["location"]).is_file() for s in cfg["sources"])
+        chk("⑨ VAP config:formalInputAuthority VQG · 6 來源 authority VQG · engine PARQUET · 位置 / manifest 路徑真的在 · 每來源在 manifest 有同 id 同 contract 的證據 · allowedRoots 含輸出夾 · loopback · 輸出夾根有一份指最新",
+            cfg.get("formalInputAuthority") == "VQG" and len(cfg.get("sources") or []) == 6 and all(s["authority"] == "VQG" and s["engine"] == "PARQUET" and Path(s["location"]).is_file() for s in cfg["sources"])
             and all(any(c["sourceId"] == s["id"] and c["contractId"] == s["vqgContractId"] for c in conns) for s in cfg["sources"])
             and Path(cfg["vqgGateway"]["manifest"]).is_file() and Path(cfg["vdfGateway"]["manifest"]).is_file() and str(ed) in cfg["allowedRoots"] and cfg["host"] == "127.0.0.1" and root_cfg == cfg)
         gates = [ui_gate(pl.read_parquet(s["location"]), next(c["xField"] for c in conns if c["sourceId"] == s["id"])) for s in (cfg.get("sources") or [])]
-        chk("⑩ VAP U/I 閘預檢:4 張表都 PASS(列 ≥ 3 · x 不重複升冪 · 數值欄 ≥ 2)· 收據 tables 同結果 · manifest fieldSemantics 涵蓋每個數值欄",
-            len(gates) == 4 and all(g["gate"] == "PASS" for g in gates) and all(tb["ui_gate"]["gate"] == "PASS" for tb in rcp0.get("tables") or [])
+        chk("⑩ VAP U/I 閘預檢:6 張表都 PASS(列 ≥ 3 · x 不重複升冪 · 數值欄 ≥ 2)· 收據 tables 同結果 · manifest fieldSemantics 涵蓋每個數值欄",
+            len(gates) == 6 and all(g["gate"] == "PASS" for g in gates) and all(tb["ui_gate"]["gate"] == "PASS" for tb in rcp0.get("tables") or [])
             and all(set(g["numeric"]) <= set(c["fieldSemantics"].keys()) for g, c in zip(gates, [next(c for c in conns if c["sourceId"] == s["id"]) for s in cfg["sources"]])))
         sums_ok = ed is not None and all(_sha256_file(ed / ln.split("  ", 1)[1]) == ln.split("  ", 1)[0] for ln in (ed / "SHA256SUMS.txt").read_text(encoding="utf-8").splitlines() if ln.strip())
         latest = json.loads((t / "rcpt" / "VQG_ExportVAP_latest.json").read_text(encoding="utf-8")) if (t / "rcpt" / "VQG_ExportVAP_latest.json").is_file() else {}
@@ -611,6 +650,8 @@ def selftest() -> int:
         with contextlib.redirect_stdout(buf3):
             rc_in = export_vap(types.SimpleNamespace(via_root=None, root=str(vdf), out_dir=str(vdf / "out"), receipt_dir=str(t / "rcpt2"), ticker=[], max_tickers=0, metrics=None, windows=None,
                                                      as_of=as_of, series_rows=0, indicator_points=0, calendar="auto", snapshots="latest", market=None, vap_port=8765))
+            rc_in2 = export_vap(types.SimpleNamespace(via_root=None, root=str(vdf), out_dir=str(t / "out3"), receipt_dir=str(vdf / "receipts"), ticker=[], max_tickers=0, metrics=None, windows=None,
+                                                      as_of=as_of, series_rows=0, indicator_points=0, calendar="auto", snapshots="latest", market=None, vap_port=8765))
         old_env = os.environ.get("VQG_VDF_ROOT")
         os.environ["VQG_VDF_ROOT"] = str(vdf)
         try:
@@ -631,8 +672,8 @@ def selftest() -> int:
         e2 = sorted((t / "out2").glob("vap_export_*"))
         sf2 = pl.read_parquet(e2[-1] / "series" / "2317_TW.parquet") if e2 else None
         cfg2 = json.loads((e2[-1] / VAP_CONFIG_NAME).read_text(encoding="utf-8")) if e2 else {}
-        chk("⑫ 邊界與指令列:輸出夾在 VDF 庫裡 → RED rc 2 不寫;VQG_VDF_ROOT 當庫根 · --ticker 只匯那張 · --series-rows 20 · --indicator-points 0 → 只有 SERIES 來源 · rc 0;doctor 原樣交 v0105 · --help 有 export-vap",
-            rc_in == 2 and not (vdf / "out").exists() and _tree_signature(vdf) == sig0 and "OUTPUT_INSIDE_SOURCE_ROOT" in buf3.getvalue()
+        chk("⑫ 邊界與指令列:輸出夾在 VDF 庫裡 → RED rc 2 不寫;收據夾在 VDF 庫裡 → RED rc 2 連收據都不寫(VDF 庫一字沒動 · 收據夾沒建);VQG_VDF_ROOT 當庫根 · --ticker 只匯那張 · --series-rows 20 · --indicator-points 0 → 只有 SERIES 來源 · rc 0;doctor 原樣交 v0105 · --help 有 export-vap",
+            rc_in == 2 and not (vdf / "out").exists() and rc_in2 == 2 and not (vdf / "receipts").exists() and not (t / "out3").exists() and _tree_signature(vdf) == sig0 and "OUTPUT_INSIDE_SOURCE_ROOT" in buf3.getvalue() and "收據沒寫" in buf3.getvalue()
             and rc_env == 0 and sf2 is not None and sf2.height <= 20 and len(cfg2.get("sources") or []) == 1 and cfg2["sources"][0]["id"] == "VQG-SERIES-2317_TW"
             and rc_doc == 0 and '"verdict"' in buf5.getvalue() and rc_help == 0 and "export-vap [--root R]" in buf6.getvalue() and "v0105 指令" in buf6.getvalue())
     n = 12
