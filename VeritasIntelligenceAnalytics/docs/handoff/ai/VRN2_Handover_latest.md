@@ -238,3 +238,9 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v010
 $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0107";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0107.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0107.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'F40722F5B68F40A95A5DC020D4045ED1EFB2952D887AAF480E2F911CE298AACA'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
 ```
 
+## 20. VIA_SettleAll_v0108(2026-11-06 · ⑫ 系統矩陣:三種燈 · 版本 · 狀態 · 只增帳記綠 · HTML 自動開 · Agent OS / Graphify / MCP 掛 VCGC)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0108";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0108.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0108.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'A628681884170D4188CE3487BBE13ED2149CBF6B7681839F919B916BCEEE0741'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
