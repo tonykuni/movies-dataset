@@ -286,3 +286,9 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v011
 ```powershell
 $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0114";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0114.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0114.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'594064C04294B4E21800D4D589461F9C0F729A9627C24DE962F06B1364B26085'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
 ```
+
+## 28. 操作員 2026-11-06 泛用授權(GENERAL AUTHORIZATION A1–A9 / G1–G7)入檔 + 桌機參數
+
+- 原文與 SHA-256:`VIA_AgentOS_CoworkOS_v1.1_GeneralAuthorization_20261106.md`;帳:`VIA_WorkflowLedger.jsonl`(只增)。
+- 桌機參數(不代改):VRN 測試樣本夾 `C:\測試樣本報告`;VDF 資料範圍 2022 ~ 現在。
+- 之後每份回報 CLOSEOUT 末尾加 `[ASSUMED]` 與 `[NEED_APPROVAL]`(僅 G1–G7)。
