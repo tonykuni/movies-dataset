@@ -311,3 +311,14 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v011
 
 - 為什麼:Codex 在 PR #599 / #600 抓到 VQG v0106 四項缺陷;v0106 與 SettleAll v0115 已隨 #599 發布到 main → 照版本律不原地改,出 VQG v0107(修四項)與 SettleAll v0116(釘 v0107 · ⑧b 用最新尾版)。
 - VAP 開 U/I 指令同 §29(VAP v0302 不變);`export-vap` 改用 `VQG_AllInOne_v0107.py`。
+
+## 31. VRN-1 備援 · VCGC 省 Token 功能全啟用(操作員 2026-11-06 令;§30 一行照舊)
+
+- **VRN-1 = VRN-2 的備援支援倉**(`https://github.com/tonykuni/VIA-VDF-VRN`,桌機 `C:\Users\tonyk\VIA-VDF-VRN`):規則不變 —— 四系統對等(L120)· 工具橋只讀對方工具冊、逐檔 sha256 核對、不複製不改;VRN-2 一鍵 ⑫a 自動同步 VRN-1(clone / pull)。容器 clone 已同步到 `0993c2d`(VRN-1 PR #82)。
+- **VCGC 省 Token 功能 6/6 已啟用**:NLP 尾版 `SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108.py` 經 `via-vcgc tools activate nlp … --apply` 進鎖冊(v0106 → v0108;CGC_MDL233 v0108 認轉接鏈);桌機核對:
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";git -C $r pull -q origin main;$V=(Get-ChildItem "$r\VeritasIntelligenceAnalytics\supportive modules\registry\CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"|Sort-Object Name|Select-Object -Last 1).FullName;$env:VIA_FROM_VCGC="YES";python $V token;python $V tools
+```
+
+- 預期:`已啟用 6/6 · NLP SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108.py` · 席位卡 nlp `v0108 · waiting []`;長文摘要照卡上那行 `… _v0108.py text --file <檔> --brief`。
