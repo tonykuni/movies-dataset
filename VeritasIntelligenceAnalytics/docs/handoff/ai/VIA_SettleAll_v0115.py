@@ -212,7 +212,7 @@ FAMILIES = {   # 家族 → (夾, 前綴);只讀,不改他系統的檔
 PINNED = {   # 從工作樹 / 分支取檔時核 SHA-256(CRLF 先正規化成 LF · 與各一行的算法相同);不對就不跑
     "functional modules/VQG/VQG_AllInOne_v0104.py": "d2a5ca07fa4d29435584c111095a31951075ab585b51cc74b14b22ef48ca1d02",
     "functional modules/VQG/VQG_AllInOne_v0105.py": "cc050f0fe42786f7113dbf0dd920d954feaf0b020e216456f336ce0d30801619",
-    "functional modules/VQG/VQG_AllInOne_v0106.py": "665aca584c04381dccb41df77e52897a472e4b04d7ea36e8968c4d565b7f308b",
+    "functional modules/VQG/VQG_AllInOne_v0106.py": "e3fb9d7d8dc843e51414667f002191297445026601f532caabf367257a638d6f",
     "supportive modules/agent_os/VIA_AgentOS_v0102.py": "3d23c7adefce5e688277676fadc0a4a70311da3d41fd6b6ef6de1c1bcd9077fb",
 }
 VQG_FILES = ("functional modules/VQG/VQG_AllInOne_v0104.py", "functional modules/VQG/VQG_AllInOne_v0105.py", "functional modules/VQG/VQG_AllInOne_v0106.py")
