@@ -337,3 +337,11 @@ $r="$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics";$x=(Ge
 ```
 
 - 預期:`VDF 層 5 · VQG 層 5 · 整合格 7`;紅的格 = 交接案本身紅(桌機 pwsh / 套件在 → 多數轉綠);曆三欄那格 🟡 = VDF 自己的手(G2)。
+
+## 33. 五系統收尾狀態(操作員 2026-11-06 令「GO ON COMPLETE CLOSE-OUT FOR 5 SYSTEM」;§32 兩行照舊)
+
+- 容器 SettleAll v0117 實跑(`--no-sync` · VQG 夾具家):綠 ⓪①③④⑨⑫⑭⑮⑰ · 黃 ②⑤⑧⑧b⓫⑯ · 紅 ⑥(VCGC 交接既有紅)⑬(VDF 引擎 🔴 6 = curl_cffi / yfinance 容器缺)· 灰 ⑦(Graphify 隔離環境沒裝)。
+- 車道轉態實跑綠:`provenance`(VRN-2 v0256 起 `provenance --selftest` 進本版自測 → 認尾版判決行)· `vdf_refill` / `vdf_manager_frozen_sample`(認 VDF_SystemManager 尾版;v0168 鏈逐版印 v0130 / v0158 判決行);`vrn_logic_index`:冊由 `via_vrn_logic_book v0112 build` 重建(ENG062 v0103 → v0113)→ updated_n 0。
+- 環境紅(容器缺套件 · 桌機 §32 兩行跑完多數轉綠):cov_vrn_eng399 / eng400(pymupdf · fitz · PIL)· vdf_fetch_* / vdf_finstmt_gate2(curl_cffi · yfinance)· vrn_docclass / vrn_plugin_hub / nlp_*(fitz)· tool_coverage_matrix / tool_probe_v0106 ㊱(pwsh)。
+- VDF 車道攤開(不代改):`VDF_SystemManager v0168 ui` 在非 Windows 把冊上的 Windows 絕對路徑當相對路徑 → 在 `functional modules/VDF/` 底下生出 `C:\Users\…` 夾(容器兩次 · 已移除不入倉);桌機無此問題。
+- 需求冊 v0217(VCGC-REQ191)· 工作項 +5;VCGC 衝突閘「子系統邊界」擋下對 VRN 邏輯冊的編號(照 L123 不代編)。
