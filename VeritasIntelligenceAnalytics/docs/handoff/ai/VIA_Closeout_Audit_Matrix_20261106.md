@@ -1,4 +1,4 @@
-# VIA 全景收尾審計矩陣 · 2026-11-06T15:32:36(容器 · 只讀各系統自報;桌機數字標「桌機 22:19」)
+# VIA 全景收尾審計矩陣 · 2026-11-06T17:20:38(容器 · 只讀各系統自報;桌機數字標「桌機 22:19」)
 
 | 燈 | 系統 / 項目 | 版本 | VCGC 編號 | 狀態 | 證據 / 備註 |
 |---|---|---|---|---|---|
@@ -9,10 +9,11 @@
 | ⚪ | 　└ Agent OS | v0102 | VIA-SUP-MDL1198 · 2026-11-04 | 容器:這輪沒測 | 桌機 22:19:🟡 selftest 48 項 · 失敗 0 錯誤 1(環境 N/A 1 · 真的 0)· skills rc 0 · st |
 | ⚪ | 　└ Graphify | v0101 一行 · graphifyy | — | 容器:這輪沒測 | 桌機 22:19:🟡 VRN 🟢 · VRN_Shared 🟡 · VDF 🟢 · VCGC 🟡 |
 | 🟢 | 　└ MCP 伺服器 | v0101 | VIA-VCGC-MDL1627 · 2026-11-06 | 容器:自測 12 項 · 不過 0 | 桌機 22:19:⚪ 工作樹沒這支(同步後才有) |
-| 🟡 | 　└ 政策全景 L103 | SettleAll v0113 | — | 容器:L103 · .py 3646(沒加速器橋 17 · 網路 import 沒網路橋 65)· .ps1 1028(沒 Celeritas 161)· 快取命中 4623 · 例 v | 桌機 22:19:🟡 L103 · .py 4072(沒加速器橋 21 · 網路 import 沒網路橋 78)· .ps1 1041(沒 C |
-| ⚪ | VQG | AllInOne v0105 | VIA-VQG-MDL002 · 2026-11-04 | 容器:這輪沒測 | 桌機 22:19:🟡 closeout YELLOW · ① 自測=GREEN ② VD=YELLOW ③ 探針=YELLOW |
-| 🟢 | VAP(支援模組) | AllInOne v0300 · SM v0100 | VIA-VAP-MDL051 · 2026-11-06 | 容器:VAP_AllInOne v0300 自測 PASS · 檢查 16 項 · 不過 0 · rc 0 · 0 秒 · 缺選用套件 duckdb talib | 桌機 22:19:⚪ 未納入自動測試(供 VRN-2 繪圖 · 桌機 VAP_AllInOne 未上傳) |
-| 🟢 | 模組矩陣 ⑭ | 509 模組尾版 | — | 容器:509 模組尾版 · 🟢 280 🟡 0 🔴 4 ⚪ 225 · AST 錯 0 · 無加速器橋 1 · VRN-2 ⚪90 · VDF ⚪98 · VCGC ⚪283 · VCG | 桌機 22:19:🟢 527 模組尾版 · 🟢 280 🟡 1 🔴 1 ⚪ 245 · AST 錯 0 · 無加速器橋 0 · VRN-2 🟡 |
+| ⚪ | 　└ 政策全景 L103 | SettleAll v0115 | — | 容器:這輪沒測 | 桌機 22:19:🟡 L103 · .py 4072(沒加速器橋 21 · 網路 import 沒網路橋 78)· .ps1 1041(沒 C |
+| 🟡 | VQG | AllInOne v0106 | 未登號 | 容器:closeout YELLOW · ① 自測=GREEN ② VD=YELLOW ③ 探針=YELLOW | 桌機 22:19:🟡 closeout YELLOW · ① 自測=GREEN ② VD=YELLOW ③ 探針=YELLOW |
+| 🟢 | VAP(支援模組) | AllInOne v0302 · SM v0100 | 未登號 | 容器:VAP_AllInOne v0302 自測 PASS · 檢查 16 項 · 不過 0 · rc 0 · 0 秒 · 缺選用套件 duckdb talib | 桌機 22:19:⚪ 未納入自動測試(供 VRN-2 繪圖 · 桌機 VAP_AllInOne 未上傳) |
+| 🟡 | 　└ VQG→VAP 匯出 ⑧b | export-vap v0106 | — | 容器:export-vap rc 0 · VAP 來源 4 · 表 4(閘過 4)· 已匯出 · 但 曆是 VQG 從 VDF 日線推的 | — |
+| 🟢 | 　└ VQG→VAP 串接 ⑰ | VAP_AllInOne_v0302.py | — | 容器:VAP v0302 --once-refresh rc 0 · 表 4 / 來源 4 · 錯 0 · 全 vqgVerified True | — |
 | 🟢 | PS / PY 加速器橋 100%(尾版律 · VCGC 橋掃器為準) | CGC_MDL124 v0111 · 名冊 CGC_MDL156 v0115 | VIA-VCGC-MDL1587 | VDF/accel 146/146 (100.0%) · VDF/net 146/146 (100.0%) · VAP/accel 225/225 (100.0%) · VRN/accel 171/171 (100.0%) · VIA/accel 1128/1128 (100.0%) · ALL/a | 本輪注入 11 支(VRN 10 · SUP_MDL753)· 操作員原件 / 一行釘住件以名冊豁免(13 條) |
 | 🟢 | PS 尾版 PS-ACCEL 橋 | CGC_MDL124 --ps --ps-tail | — | root=. · 掃 1223 · 已掛 1009 · 缺 0 · 版史 38 · 排除 176 · 計畫 0(dry-run) · 覆蓋 100.0% | 版史 38 不算 |
 | 🟢 | VDF / 向外擷取引擎 網路工具橋 100% | via_net_injector v0101 · 橋掃 NET | VIA-VCGC-MDL1346 | VDF/net 146/146 (100.0%) | --net-callers:外呼件 35/35 · 非擷取 111 不算 |
@@ -44,7 +45,7 @@
 | VCGC | 283 | 279 | 0 | 4 | 0 | 0 | 0 |
 | VCGC·支援 | 33 | 0 | 0 | 0 | 33 | 0 | 0 |
 | VCGC·Agent OS | 1 | 0 | 0 | 0 | 1 | 0 | 0 |
-| VQG | 1 | 0 | 0 | 0 | 1 | 0 | 0 |
+| VQG | 1 | 0 | 0 | 1 | 0 | 0 | 0 |
 | VAP | 3 | 1 | 0 | 0 | 2 | 0 | 0 |
 
 ## SHA-256 憑證
