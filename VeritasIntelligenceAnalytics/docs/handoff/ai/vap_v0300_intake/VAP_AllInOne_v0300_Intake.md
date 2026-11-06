@@ -24,3 +24,12 @@ byte-exact 進 zip(`VAP_AllInOne_v0300_upload_20261106.zip` · SHA 在 `SHA256.t
 | 副作用 | 引擎把 `state/ logs/ output/` 寫在**自己的夾**(不是 VIA_Reports)→ 入倉夾加 .gitignore;UI `<title>` 仍寫 v027 |
 
 VCGC 登錄:SettleAll v0113 **⑮ VAP** 每輪跑它的自測(容器 🟢)· ⑭ 模組矩陣列 · 編號 / 盤點冊站 `E-vap-allinone` 見本輪提交。
+
+## v0301(2026-11-06 · AI 修 Codex 在 PR #597 留的 2 個 P1 · v0300 原件一字不動留存)
+
+| P1 | 修法(`VAP_AllInOne_v0301.py` / `VAP_AllInOne_UI_v0301.html`)| 實測 |
+|---|---|---|
+| UI `vqgDashboardStore` 把物件當 `loadStore` 的 fallback → fresh profile 第一次 boot `TypeError: fallback is not a function`,儀表板與 catalog 回呼全停 | 第二參數改 `() => ({…})`(與其他 storage helper 一致;1 處)| Chromium 載入 UI v0301:**0 個 pageerror**(只剩 UI 探預設埠 8765 的連線拒絕,因我在 8767 測)· 632 個按鈕 |
+| `refresh()` 來源閘失敗(`def_vqg_evidence` 的 PermissionError / 清單 ValueError)仍把舊快取表以 `vqgVerified: true` 重發(`ERROR_CACHED`)| 閘失敗 → 不保留快取表(`errors[].cachedTablesExcluded = true`);只有暫時性讀取錯誤才保留 ERROR_CACHED | `--run-self-test` **PASS**(version v0301)· `/api/health` READY |
+
+引擎 v0301 的 `DEFAULT_UI_RELATIVE_PATH` 指到 UI v0301;VCGC 站 `E-vap-allinone` 的 deps glob 與 SettleAll ⑮ 都自動取尾版 v0301。
