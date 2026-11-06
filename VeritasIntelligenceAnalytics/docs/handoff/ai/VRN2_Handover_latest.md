@@ -264,3 +264,9 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v011
 ```powershell
 $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0111";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0111.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0111.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'D04B90BD5A302A9D28628EBEF21BD16C5B7A48EAE8A24A6DC73114355F95CD91'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
 ```
+
+## 24. VIA_SettleAll_v0112(2026-11-06 · 桌機 22:19 貼回:26 舊版 + 2 壞 JSON 已還原 · 剩 SM v0152 / v0153 被改 → 新類 frozen 備份後還原 HEAD · 未追蹤檔摘要 · 取代 §23 那行)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0112";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0112.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0112.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'322F1D0B1B23F4387F1921A8A553340195C49AF97E75FADD14C38D388B1DD587'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```

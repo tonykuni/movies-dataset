@@ -1,5 +1,7 @@
 # VIA_SettleAll v0111(2026-11-06 · v0110 一字不動 · ⑭ 的「未登號」是查漏不是沒編號)
 
+> **已被 v0112 取代**(一行請用 `VIA_SettleAll_v0112.md`)。
+
 v0110 容器實跑 ⑭ 有 **144 列「未登號」**(VDF 78 · VRN-2 65 · VeritasCeleritas 1)。查 VCGC 編號冊:那些家族**都在 ENG 冊**
 `VIA_NumberBooks/VIA_NumberBook_ENG_v0100.jsonl`(例 `VDF_ENG049_FiveDayFetch_v0100` = VIA-VDF-ENG015 · 2026-09-28;`VRN_ENG017_…` = VIA-VRN-ENG003;`VeritasCeleritas_v1141` = VIA-SUP-ENG013),
 v0110 只讀 MDL 冊。v0111 兩本一起讀(各一次 · 快取),**VCGC 冊零寫入、不跑編號**。
