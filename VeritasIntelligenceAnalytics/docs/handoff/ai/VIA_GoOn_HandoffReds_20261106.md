@@ -31,7 +31,22 @@
 
 ## 三、重測結果(容器)
 
-<!-- RESULTS -->
+| 案 | argv(重測後) | 收據 | 完成(UTC) | 燈 |
+|---|---|---|---|---|
+| celeritas_gate_v0103 | `CGC_MDL183_CeleritasPolicyGate --selftest` | rc 0 · 標記 見到 | 20:07:40 | 🟢 |
+| celeritas_gate_v0104 | `CGC_MDL183_CeleritasPolicyGate --selftest` | rc 0 · 標記 見到 | 20:10:40 | 🟢 |
+| version_panorama_loader | `CGC_MDL225_VersionPanorama --selftest` | rc 0 · 標記 見到 | 20:10:51 | 🟢 |
+| netunified_v0119 | `SUP_MDL740_NetUnified --selftest` | rc 0 · 標記 見到 | 17:06:20 | 🟢 |
+| ui_engine_v0101 | `CGC_MDL261_UIEngine --selftest` | rc 0 · 標記 見到 | 20:11:13 | 🟢 |
+| ui_engine_v0105 | `CGC_MDL261_UIEngine --selftest` | rc 0 · 標記 見到 | 20:11:32 | 🟢 |
+| ui_engine_v0106 | `CGC_MDL261_UIEngine --selftest` | rc 0 · 標記 見到 | 20:11:51 | 🟢 |
+| health_matrix_v0113 | `CGC_MDL274_HealthMatrix --selftest` | rc 0 · 標記 見到 | 20:12:02 | 🟢 |
+| health_matrix_v0114 | `CGC_MDL274_HealthMatrix --selftest` | rc 0 · 標記 見到 | 20:12:14 | 🟢 |
+| vcgc_console_v0191 | `CGC_MDL149_VeritasCentralGovernanceConsole --selftest` | rc 0 · 標記 見到 | 20:12:54 | 🟢 |
+| tool_coverage_matrix | `CGC_MDL230_ToolCoverageProbe --selftest` | rc 1 · 標記 沒見到 | 20:15:58 | 🔴 |
+| tool_probe_v0106 | `CGC_MDL230_ToolCoverageProbe --selftest` | rc 1 · 標記 沒見到 | 20:18:33 | 🔴 |
+
+綠 10 · 紅 2(tool_coverage_matrix · tool_probe_v0106:㊱ `pwsh` 容器不在 = 環境;㉖ 非豁免缺件只剩 py_net 2 支 `VIA_AgentOS_v0102` · `VRN2_UIAction_v0107` 照紅不豁免;py_accel 1613/1613)。netunified_v0119 為沿用(相依未變,收據 2026-11-06 17:06)。
 
 ## 四、下一步(誰的手)
 
