@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-11-06T20:55:58+00:00",
+  "updated_at": "2026-11-06T21:14:45+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -185,7 +185,7 @@
         "provenance",
         "--selftest"
       ],
-      "success_marker": "[來源回歸] fail=0",
+      "success_marker": "自測 6/6 · PASS · 鏈 v0261",
       "scope": "四來源 ID／空值／相同字形不重複計票／表格保留／失敗才升級規劃;2026-10-14 VRN_SystemManager v0152:provenance 動詞放回自測攔截之前(v0111 起 `--selftest in args[:2]` 把它吃成管理器自測鏈)",
       "dependencies": [
         "functional modules/VRN/VRN_ENG114_SourceProvenance_v0100.py",
@@ -200,9 +200,22 @@
         "supportive modules/registry/VIA_VRN_ReportFieldRules_SSOT_v0100.json",
         "supportive modules/registry/VIA_VRN_FieldSpec_SSOT_v0100.json",
         "functional modules/VRN/registry/VRN_BROKER_LIST_v01.json",
-        "supportive modules/ssot/VIA_Financial_Institution_SSOT_v0100.json"
+        "supportive modules/ssot/VIA_Financial_Institution_SSOT_v0100.json",
+        "functional modules/VRN/VRN_SystemManager_v*.py"
       ],
-      "timeout_seconds": 180
+      "timeout_seconds": 180,
+      "repinned": {
+        "from": "[來源回歸] fail=0",
+        "from_argv": [
+          "VRN_SystemManager",
+          "provenance",
+          "--selftest"
+        ],
+        "to_version": "tail",
+        "at": "2026-11-06T21:14:45+00:00",
+        "why": "GO ON 收尾 2026-11-06:VRN-2 SystemManager v0256 起 `provenance --selftest` 進本版自測(CI「VRN-2 manager contracts through its own MAIN」;v0261 L168 同),不再印「[來源回歸] fail=0」→ rc 0 但標記沒印(DRIFT);改認尾版自測判決行(鏈 v0261→…→v0239 含來源回歸);舊標記留 repinned_before;VRN-2 程式一字不動。"
+      },
+      "repinned_before": null
     },
     "numbering": {
       "argv": [
@@ -2184,7 +2197,7 @@
     },
     "vdf_refill": {
       "argv": [
-        "VDF_SystemManager_v0130",
+        "VDF_SystemManager",
         "--selftest"
       ],
       "success_marker": "[計] VDF_SystemManager v0130 本版 4/4 · 前版 PASS · 合計 PASS",
@@ -2192,9 +2205,21 @@
       "dependencies": [
         "functional modules/VDF/VDF_SystemManager_v0130.py",
         "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
-        "functional modules/VDF/VDF_FetchGroups_SSOT_v0102.json"
+        "functional modules/VDF/VDF_FetchGroups_SSOT_v0102.json",
+        "functional modules/VDF/VDF_SystemManager_v*.py"
       ],
-      "timeout_seconds": 1500
+      "timeout_seconds": 1500,
+      "repinned": {
+        "from": "[計] VDF_SystemManager v0130 本版 4/4 · 前版 PASS · 合計 PASS",
+        "from_argv": [
+          "VDF_SystemManager_v0130",
+          "--selftest"
+        ],
+        "to_version": "tail",
+        "at": "2026-11-06T21:13:58+00:00",
+        "why": "GO ON 收尾 2026-11-06(同 2026-11-04 vdf_manager_v0155 / v0156 先例):釘舊版單跑 → 舊版讀到新冊 / 新尾版就紅(vdf_refill:v0121 ⑦ 規則冊 regex 對 ENG087 尾版;frozen_sample:v0158 ① 讀模板冊 v0104);VDF_SystemManager v0168 尾版鏈逐版印判決行,本案標記照舊由鏈印出;改認家族尾版,舊 argv 留 repinned_before;VDF 程式一字不動。"
+      },
+      "repinned_before": null
     },
     "vdf_fetch_groups_v0105": {
       "argv": [
@@ -3181,7 +3206,7 @@
     },
     "vdf_manager_frozen_sample": {
       "argv": [
-        "VDF_SystemManager_v0158",
+        "VDF_SystemManager",
         "--selftest"
       ],
       "success_marker": "[計] VDF_SystemManager v0158 本版 6/6 · PASS",
@@ -3190,10 +3215,22 @@
         "functional modules/VDF/VDF_SystemManager_v0158.py",
         "functional modules/VDF/VDF_SystemManager_v0150.py",
         "functional modules/VDF/VDF_SystemManager_v0149.py",
-        "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v*.py"
+        "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v*.py",
+        "functional modules/VDF/VDF_SystemManager_v*.py"
       ],
       "timeout_seconds": 2400,
-      "registered_at": "2026-10-20T05:47:45+00:00"
+      "registered_at": "2026-10-20T05:47:45+00:00",
+      "repinned": {
+        "from": "[計] VDF_SystemManager v0158 本版 6/6 · PASS",
+        "from_argv": [
+          "VDF_SystemManager_v0158",
+          "--selftest"
+        ],
+        "to_version": "tail",
+        "at": "2026-11-06T21:13:58+00:00",
+        "why": "GO ON 收尾 2026-11-06(同 2026-11-04 vdf_manager_v0155 / v0156 先例):釘舊版單跑 → 舊版讀到新冊 / 新尾版就紅(vdf_refill:v0121 ⑦ 規則冊 regex 對 ENG087 尾版;frozen_sample:v0158 ① 讀模板冊 v0104);VDF_SystemManager v0168 尾版鏈逐版印判決行,本案標記照舊由鏈印出;改認家族尾版,舊 argv 留 repinned_before;VDF 程式一字不動。"
+      },
+      "repinned_before": null
     },
     "vdf_eng045_outputhub": {
       "argv": [
