@@ -16,3 +16,9 @@
 4. VCGC:交接案 `vrn2_nonstock` + 盤點站 + 需求(VRN-REQ 新號)· 編號 · 稽核 0 / 0 / 0。
 
 **下一步要操作員做的:上傳完整包 `VIA_NON_STOCK_SUMMARIZER_ENGINE_v0300.zip`(SHA-256 `8d7d2cef673fdb4c03b4f51cf09283fb2b6435d582ce852405b656237baa8ca1` · 含 internal/ 與 reuse/vrn2/ 三支)。**
+
+## 2026-11-06 v0310 入倉(engine · manifest · closeout · QA · ps1 · SHA txt;原樣 zip `VIA_NON_STOCK_SUMMARIZER_v0310_upload.zip`)
+
+- 引擎原檔 → `functional modules/VRN/nonstock_v0310/engine/`(SHA-256 釘進 frozen_sources · 一字不改)。
+- `reuse/vrn2/` 三支 **改用 VIA 自己的席位轉接**(操作員「將 NLP / LAYOUT / 最新加速器及網路工具」):TableRestorer = 本倉正本 importlib 轉出(不複製)· M03 版面 = PyMuPDF spans / blocks + 鎖版席位 SUP_MDL743 `zone_annotate` · M07 NLP = 本地抽取式 + 鎖版席位 SUP_MDL866 CLI brief;三支都帶加速器標記 · 零網路;容器 venv 自測 1 / 4 / 4 項全過(樣本 VRN_Meeting_Minutes.pdf · 2 頁 95 spans · 角色 TITLE / SUBTITLE / SECTION_HEADING / BODY)。
+- **仍缺 `internal/NON_STOCK_CORE_v0200.py`**(manifest:54,135 B · SHA `92f53d82…`)→ 引擎 hard gate 停在 `REUSE_HARD_GATE_FAIL`(容器實跑確認)。見 `internal/README_MISSING.md`。這支到了,引擎 `--selftest` 5 項與 6 份樣本才能在倉內重跑。
