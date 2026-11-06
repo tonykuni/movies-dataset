@@ -226,3 +226,9 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v010
 $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0105";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0105.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0105.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'3C4EE4C554B48E7E7851A93404382D4757946DA32AB322F343C5410C62815738'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
 ```
 
+## 18. VIA_SettleAll_v0106(2026-11-06 · 快:圖沒變沿用 · 記憶體不夠不跑 · 政策全景快取 · 舊樹不白跑 · 每段秒數)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0106";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0106.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0106.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'87062098DB3568DE512FE96F765AE1C24B1A6789C2BFE5638447D997032EAC78'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
