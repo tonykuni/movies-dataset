@@ -322,3 +322,18 @@ $r="$HOME\OneDrive\Documents\movies-dataset";git -C $r pull -q origin main;$V=(G
 ```
 
 - 預期:`已啟用 6/6 · NLP SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108.py` · 席位卡 nlp `v0108 · waiting []`;長文摘要照卡上那行 `… _v0108.py text --file <檔> --brief`。
+
+## 32. VIA_SettleAll_v0117(2026-11-06 · ③ 同步被未追蹤檔擋下 → 備份移走再重試;取代 §30 那行;v0116 一字不動留存)+ 分階層矩陣一行
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0117";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0117.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0117.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'C0D6724B89CA69593D32392712B8B548374C85FCCCA6CC1AD79EB060A7FBB8B5'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
+- 為什麼:桌機 23:45 貼回 ③ 同步 RED(落後 262 提交 · 14 支未追蹤舊發布文件擋 merge → abort → ④⑥⑬ 不在舊版上跑);v0117 把 git 點名的未追蹤檔移到 `VIA_Reports\settle\untracked_parked\<時戳>\`(原件保留)再重試合併。
+- ③ 綠之後再跑**分階層整合矩陣**(VDF 分階層輸入 / 輸出 × VQG 分階層量化數據項目;只讀;要 ⑧b 匯出夾在):
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics";$x=(Get-ChildItem "$r\VIA_Reports\vqg\vap_export\vap_export_*" -Directory|Sort-Object Name|Select-Object -Last 1).FullName;$env:VIA_FROM_VCGC="YES";python "$r\docs\handoff\ai\VIA_LayerMatrix_v0100.py" --export $x --snapshot "$r\VIA_Reports\layer_matrix\VIA_VDF_VQG_LayerMatrix_desktop.md";Start-Process "$r\VIA_Reports\layer_matrix\VIA_LayerMatrix_latest.html"
+```
+
+- 預期:`VDF 層 5 · VQG 層 5 · 整合格 7`;紅的格 = 交接案本身紅(桌機 pwsh / 套件在 → 多數轉綠);曆三欄那格 🟡 = VDF 自己的手(G2)。
