@@ -276,3 +276,7 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v011
 ```powershell
 $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0113";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0113.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0113.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'B5B75B7B9DBFDE3A10CB4A70B193B337CD9C08174FE0A460C88A335A0F9852B0'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
 ```
+
+## 26. 雙橋 100%(2026-11-06 · VCGC 橋掃器 --apply:ALL/accel 1800/1800 · VDF/net 146/146 · PS 1009/1009;注 11 支 · 豁免名冊 v0115 +4;一行釘住件還原 bytes 不注)
+
+詳 `VIA_BridgeSweep_20261106.md`;審計矩陣 `VIA_Closeout_Audit_Matrix_20261106.md / .html`。桌機一行仍用 §25(v0113);桌機的 ③ 會把這 11 支當「bridge」類自動合併。
