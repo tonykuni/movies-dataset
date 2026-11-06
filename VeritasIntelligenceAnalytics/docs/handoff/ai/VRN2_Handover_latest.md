@@ -292,3 +292,13 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v011
 - 原文與 SHA-256:`VIA_AgentOS_CoworkOS_v1.1_GeneralAuthorization_20261106.md`;帳:`VIA_WorkflowLedger.jsonl`(只增)。
 - 桌機參數(不代改):VRN 測試樣本夾 `C:\測試樣本報告`;VDF 資料範圍 2022 ~ 現在。
 - 之後每份回報 CLOSEOUT 末尾加 `[ASSUMED]` 與 `[NEED_APPROVAL]`(僅 G1–G7)。
+
+## 29. VIA_SettleAll_v0115(2026-11-06 · ⑧b VQG→VAP 匯出 · ⑰ 串接 · ⑯ 衝突偵測 · 取代 §27 那行)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0115";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0115.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0115.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'3E14F2B44E0B80F46BD065BAF5761CB9E1447BB41B1C33AB4AC036D7F4133C4A'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
+- 新步:⑧b(VDF 家在 → VQG v0106 `export-vap` → `VIA_Reports\vqg\vap_export\`)· ⑰(VAP 尾版 `--once-refresh --config` 串接燈)· ⑯(衝突偵測 → `VIA_Reports\settle\VIA_Conflicts_latest.md`);⑫ 矩陣多三列。
+- VQG→VAP 契約:`VIA_VQG_to_VAP_Contract_20261106.md`;Atlas / VAP U/I 視覺鎖定:`VIA_Atlas_VisualLock_20261106.md`。
+- VAP 開 U/I:`python "$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\functional modules\VAP\intake\allinone_v0300\VAP_AllInOne_v0302.py" --config "$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\vqg\vap_export\VAP_AllInOne_v0300.config.json"`(8765 埠 · 瀏覽器自開)。
