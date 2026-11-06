@@ -270,3 +270,9 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v011
 ```powershell
 $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0112";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0112.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0112.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'322F1D0B1B23F4387F1921A8A553340195C49AF97E75FADD14C38D388B1DD587'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
 ```
+
+## 25. VIA_SettleAll_v0113(2026-11-06 · ⑮ VAP v0300 實測燈 · ⑫ VCGC 站表矩陣 319 站(類型 / 測試型 / 版本 / 編號 / 功能帳 / 耗時 / 時間)· 取代 §24 那行)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0113";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0113.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0113.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'B5B75B7B9DBFDE3A10CB4A70B193B337CD9C08174FE0A460C88A335A0F9852B0'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
