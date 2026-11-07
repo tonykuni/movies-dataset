@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-11-07T15:50:58+00:00",
+  "updated_at": "2026-11-07T16:40:00+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -8247,6 +8247,72 @@
       "reason": "雲端會話查 Remote Control:桌機沒有供出任何資料夾(folders 空 · cannot_be_used 空)→ 無法由 AI 直接在桌機執行四段",
       "next": "若要 AI 直接跑:桌機 Claude 桌面版 設定 → Claude Code → Remote Control 供出 movies-dataset 夾,再叫 AI 接上",
       "registered_at": "2026-11-07T15:50:58+00:00"
+    },
+    {
+      "id": "VCGC-REQ194:workflowviz-container-run",
+      "requirement": "VCGC-REQ194",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "case": "C-workflow-viz-v0100",
+      "receipt": "VIA_Reports/workflow_viz/WORKFLOW_VIZ.json(不入倉)· 站經主控台 test --only GREEN rc 0 6.7s",
+      "reason": "三表由本倉收據生成並真寫 DuckDB:節點 933 · 邊 983 · metrics_ts 761 · 同鍵重複 0;增量 anti-join 第二次 appended 0;離線單檔 HTML 397 KB 零外部引用;自測 28/28(有 duckdb)/ 27/27(-I 無 duckdb)",
+      "next": "桌機跑同一行,讓 metrics_ts 累積桌機實跑的秒數與燈",
+      "registered_at": "2026-11-07T16:40:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ194:cycle-vcgc-vqg",
+      "requirement": "VCGC-REQ194",
+      "state": "REVIEW",
+      "owner": "操作員 · VQG 車道",
+      "case": null,
+      "receipt": "VIA_Reports/workflow_viz/edges.json(跨車道列)",
+      "reason": "拓撲實測:lane:VCGC ⇄ lane:VQG 是真環(回邊 2)—— VQG 的站用 VCGC 編號家族(station:QG-CGC_MDL237_NumberingSystem),VCGC 的站測 VQG 家族。依 L123 屬只讀互看,不是越界,但列出來讓操作員裁定要不要解耦",
+      "next": "操作員裁定:維持現狀(治理服務本來就共用)或把 VQG 的編號呼叫改成經自己入口",
+      "registered_at": "2026-11-07T16:40:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ194:desktop-22-paths",
+      "requirement": "VCGC-REQ194",
+      "state": "BLOCKED",
+      "owner": "操作員",
+      "case": null,
+      "receipt": null,
+      "reason": "操作員給的 22 條桌機路徑(C:\\Users\\tonyk\\Downloads\\* 與 C:\\測試樣本報告)雲端讀不到:list_computer_folders 回 folders 空;本輪只有 4 份經上傳入倉(SHA 見 workflow_viz_v0100/README.md)",
+      "next": "供出資料夾(桌機 Claude 設定 → Claude Code → Remote Control)或把其餘 18 份上傳",
+      "registered_at": "2026-11-07T16:40:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ194:vrn-sample-reports",
+      "requirement": "VCGC-REQ194",
+      "state": "BLOCKED",
+      "owner": "操作員 · VRN-2 車道",
+      "case": null,
+      "receipt": null,
+      "reason": "操作員要求用 C:\\測試樣本報告 做 VRN 實測 → 修正 → 輸出 → 驗證直到成功;該夾在桌機,雲端不可達",
+      "next": "供出資料夾後由 AI 直接跑 VRN-2 一鍵 + 驗證器;或操作員跑一鍵把貼回包上傳",
+      "registered_at": "2026-11-07T16:40:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ194:external-links-login-wall",
+      "requirement": "VCGC-REQ194",
+      "state": "BLOCKED",
+      "owner": "操作員",
+      "case": null,
+      "receipt": null,
+      "reason": "ChatGPT 分享(6aef5161 · 6aef339b)· Perplexity 專案(…Oadu7y92TWqCwA4kZ.qWnw)· Manus(jlcCGjChDJG1KgzkR8YtIz)四個連結全是登入牆,容器讀回 NO_CONTENT —— agentmemory / Ponytail / OmniRoute 的具體版本與介面就在那裡面,沒讀到就不能整合",
+      "next": "把內容貼成文字,或上傳匯出檔(.md / .json / .zip)",
+      "registered_at": "2026-11-07T16:40:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ194:allinone-ps1-not-run",
+      "requirement": "VCGC-REQ194",
+      "state": "PENDING",
+      "owner": "操作員",
+      "case": null,
+      "receipt": "docs/handoff/ai/Invoke-VIA-AllInOne-v0100.ps1.reference(SHA 85d435aef4bb94e2)",
+      "reason": "上傳的 Invoke-VIA-AllInOne-v0100.ps1 會在桌機建 via_vcgc_0194 venv、載 hash 釘住的 v0194 引擎、對 PyPI 裝 pyarrow、寫 %LOCALAPPDATA% → 雲端不代跑(零安裝律 + 不碰他人環境);原樣入倉作參考",
+      "next": "操作員要跑就在桌機 PowerShell 7 跑,跑完把 %LOCALAPPDATA%\\VCGC\\MultiMatrix_v0194 的收據貼回",
+      "registered_at": "2026-11-07T16:40:00+00:00"
     }
   ]
 }
