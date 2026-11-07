@@ -266,6 +266,40 @@ td.vl-num { text-align: right; font-family: var(--vl-font-mono); font-variant-nu
 RAW_COLOR_RE = re.compile(r"(?<![\w-])(#[0-9a-fA-F]{3,8}\b|rgba?\s*\([^)]*\)|hsla?\s*\([^)]*\))")
 URL_RE = re.compile(r"https?://[^\s\"'<>)]+")
 TOKEN_BLOCK_RE = re.compile(r":root\s*\{([^}]*--vl-[^}]*)\}")
+LINK_RE = re.compile(r"<link[^>]*>", re.I)
+HREF_RE = re.compile(r"""href\s*=\s*["']?([^"'\s>]+)""", re.I)
+
+
+def token_sha_of(text: str):
+    """從一段 CSS / HTML 文字抽 --vl-* token 區塊並算 sha;沒有區塊回 (None, 0)。"""
+    blocks = TOKEN_BLOCK_RE.findall(text)
+    if not blocks:
+        return None, 0
+    tokens: dict = {}
+    order: list = []
+    for block in blocks:
+        for name, value in TOKEN_RE.findall(block):
+            if name not in tokens:
+                order.append(name)
+            tokens[name] = value.strip()
+    canon = "\n".join("--vl-%s:%s" % (n, tokens[n]) for n in order)
+    return sha256_text(canon), len(tokens)
+
+
+def linked_sheets(text: str, page: Path) -> list:
+    """頁面連到的樣式表(只看相對路徑;絕對 URL 由外連判定處理)。"""
+    out = []
+    for tag in LINK_RE.findall(text):
+        if "stylesheet" not in tag.lower():
+            continue
+        got = HREF_RE.search(tag)
+        if not got:
+            continue
+        href = got.group(1).strip()
+        if href.startswith(("http://", "https://", "//", "data:")):
+            continue
+        out.append((href, (Path(page).parent / href).resolve()))
+    return out
 
 
 def check_page(path: Path, expect_sha: str) -> dict:
@@ -280,26 +314,42 @@ def check_page(path: Path, expect_sha: str) -> dict:
         return out
 
     # ① token 區塊:有就必須和正本一致
-    blocks = TOKEN_BLOCK_RE.findall(text)
-    if blocks:
-        tokens: dict = {}
-        order: list = []
-        for block in blocks:
-            for name, value in TOKEN_RE.findall(block):
-                if name not in tokens:
-                    order.append(name)
-                tokens[name] = value.strip()
-        canon = "\n".join("--vl-%s:%s" % (n, tokens[n]) for n in order)
-        got = sha256_text(canon)
-        out["token_sha256"] = got
-        out["token_count"] = len(tokens)
-        if got != expect_sha:
-            out["findings"].append("token 區塊和鎖定正本對不上(本頁 %s · 正本 %s)"
-                                   % (got[:16], expect_sha[:16]))
-    else:
-        out["token_sha256"] = None
-        if KIT_NAME not in text:
-            out["findings"].append("既沒有 token 區塊,也沒有連到 %s —— 沒有用鎖定 kit" % KIT_NAME)
+    got, count = token_sha_of(text)
+    out["token_sha256"] = got
+    out["token_count"] = count
+    if got is not None and got != expect_sha:
+        out["findings"].append("token 區塊和鎖定正本對不上(本頁 %s · 正本 %s)"
+                               % (got[:16], expect_sha[:16]))
+
+    # ①b 連到的樣式表:**真的打開驗過**才算用了 kit
+    # (之前只看檔名字串,所以連到不存在的 kit、或連到 --vl-bg 被改過的 kit,都照樣給綠 —— 那鎖就是裝飾)
+    sheets = linked_sheets(text, path)
+    out["linked_sheets"] = [href for href, _abs in sheets]
+    kit_ok = False
+    for href, target in sheets:
+        if not target.is_file():
+            out["findings"].append("連到的樣式表不存在:%s(解析成 %s)" % (href, target))
+            continue
+        try:
+            sheet_text = target.read_text(encoding="utf-8", errors="replace")
+        except OSError as exc:
+            out["findings"].append("連到的樣式表讀不動:%s · %s" % (href, exc))
+            continue
+        sheet_sha, sheet_count = token_sha_of(sheet_text)
+        if sheet_sha is None:
+            out["findings"].append("連到的樣式表沒有 --vl-* token 區塊:%s" % href)
+            continue
+        if sheet_sha != expect_sha:
+            out["findings"].append(
+                "連到的樣式表 token 和鎖定正本對不上:%s(該檔 %s · 正本 %s)"
+                % (href, sheet_sha[:16], expect_sha[:16]))
+            continue
+        out["kit_sha256"] = sheet_sha
+        out["kit_tokens"] = sheet_count
+        kit_ok = True
+    if got is None and not kit_ok:
+        out["findings"].append(
+            "既沒有自己的 token 區塊,也沒有連到驗得過的鎖定 kit —— 沒有用鎖定 kit")
 
     # ② 色彩寫死(token 區塊自己不算;那是 token 的定義處)
     stripped = TOKEN_BLOCK_RE.sub("", text)
@@ -316,8 +366,8 @@ def check_page(path: Path, expect_sha: str) -> dict:
         out["findings"].append("外連 %d 個(鎖定律:離線單檔):%s" % (len(urls), " ".join(urls[:4])))
     out["external"] = urls[:8]
 
-    # ④ 手機側邊槽 + 不橫向捲動
-    uses_kit = KIT_NAME in text
+    # ④ 手機側邊槽 + 不橫向捲動(只有「驗得過的 kit」才豁免,光連檔名不算)
+    uses_kit = kit_ok
     if not uses_kit:
         if "env(safe-area-inset-left" not in text or "max(16px" not in text:
             out["findings"].append("缺手機側邊槽 max(16px, env(safe-area-inset-left, 0px))")
@@ -666,10 +716,13 @@ def run(args) -> dict:
         report["kit"] = {"path": str(kit), "bytes": kit.stat().st_size}
         print("[kit] %s(%d bytes)" % (kit, kit.stat().st_size), flush=True)
 
+    index_lamp = None
     if args.verb in ("index", "all"):
         idx = stock_index(via / VRN_DB)
         report["index"] = {k: v for k, v in idx.items() if k != "rows"}
         report["index"]["rows"] = idx["rows"][:12]
+        # 庫讀不到 / 沒有 duckdb / 一檔都沒有 → 這件事沒做完,不能讓總燈綠
+        index_lamp = "GREEN" if (idx.get("ok") and idx.get("tickers")) else "RED"
         if idx.get("ok"):
             print("[個股盤點] %d 檔有料 · 庫 %s" % (idx["tickers"], idx["db"]), flush=True)
             for row in idx["rows"][:8]:
@@ -680,11 +733,16 @@ def run(args) -> dict:
             print("[個股盤點] GRAY · %s" % idx.get("why"), flush=True)
 
     pages = []
+    stock_lamp = None
     if args.verb in ("stock", "all"):
         tickers = [t for t in (args.ticker or "").split(",") if t.strip()]
-        if not tickers:
+        auto = not tickers
+        if auto:
             idx = stock_index(via / VRN_DB)
             tickers = [r["ticker"] for r in idx.get("rows", [])[:max(args.top, 1)]]
+            if not idx.get("ok"):
+                report.setdefault("stock_why", []).append(
+                    "自動選股票失敗(庫讀不到):%s" % idx.get("why"))
         for ticker in tickers:
             facts = stock_facts(via / VRN_DB, ticker.strip())
             card = render_stock(facts, info, out)
@@ -693,6 +751,11 @@ def run(args) -> dict:
                   % (card["path"], card["lamp"], card["reports"], card["metrics"],
                      ",".join(card["gray_sections"]) or "無"), flush=True)
         report["stock_pages"] = pages
+        # 叫了 stock 卻一張都沒出 = 沒做完,照實紅(之前這裡會因為只有 kit 過閘而印綠)
+        stock_lamp = "GREEN" if pages else "RED"
+        if not pages:
+            report.setdefault("stock_why", []).append(
+                "要出個股頁但一張都沒出:沒給 --ticker 且庫裡選不到任何 ticker")
 
     if args.verb in ("check", "all"):
         targets = [Path(p) for p in (args.files or [])]
@@ -708,6 +771,7 @@ def run(args) -> dict:
     lamps = [report["lock_site"].get("ok") and "GREEN" or "RED"]
     lamps += [c["lamp"] for c in report.get("checks", [])]
     lamps += [c["lamp"] for c in pages]
+    lamps += [x for x in (index_lamp, stock_lamp) if x]
     order = {"RED": 0, "YELLOW": 1, "GRAY": 2, "GREEN": 3}
     report["lamp"] = min(lamps, key=lambda x: order.get(x, 1)) if lamps else "GRAY"
     (out / "VISUAL_LOCK.json").write_text(
@@ -807,6 +871,38 @@ def selftest() -> int:
         chk("閘:只用 kit + token 的頁過關(SVG 命名空間不誤判)",
             check_page(okpage, info["sha256"])["lamp"] == "GREEN")
 
+        # Codex #607 兩項 P2 的回歸測(他實測重現過的情境)
+        miss = out / "links_missing_kit.html"
+        miss.write_text('<link rel="stylesheet" href="nope_v0100.css">'
+                        '<div class="vl-cell">只連檔名,檔不在</div>', encoding="utf-8")
+        got_miss = check_page(miss, info["sha256"])
+        chk("閘:連到的樣式表不存在 → 紅(之前只看檔名字串,會給綠)",
+            got_miss["lamp"] == "RED"
+            and any("樣式表不存在" in f for f in got_miss["findings"]), got_miss["findings"])
+        drift_dir = out / "driftkit"
+        drift_dir.mkdir()
+        (drift_dir / KIT_NAME).write_text(kit_text.replace("--vl-bg: #f2f1ec", "--vl-bg: #ffffff"),
+                                          encoding="utf-8")
+        drifted_page = drift_dir / "page.html"
+        drifted_page.write_text('<link rel="stylesheet" href="%s">'
+                                '<div class="vl-cell">連到的 kit 被改過</div>' % KIT_NAME,
+                                encoding="utf-8")
+        got_drift = check_page(drifted_page, info["sha256"])
+        chk("閘:連到的 kit 的 --vl-bg 被改過 → 紅(頁面自己乾淨也不放過)",
+            got_drift["lamp"] == "RED"
+            and any("樣式表 token 和鎖定正本對不上" in f for f in got_drift["findings"]),
+            got_drift["findings"])
+        ok_dir = out / "okkit"
+        ok_dir.mkdir()
+        (ok_dir / KIT_NAME).write_text(kit_text, encoding="utf-8")
+        ok_page = ok_dir / "page.html"
+        ok_page.write_text('<link rel="stylesheet" href="%s">'
+                           '<div class="vl-cell">連到真的 kit</div>' % KIT_NAME, encoding="utf-8")
+        got_ok = check_page(ok_page, info["sha256"])
+        chk("閘:連到驗得過的 kit 才給綠 · 並記下 kit 的 sha(豁免不是憑檔名)",
+            got_ok["lamp"] == "GREEN" and got_ok.get("kit_sha256") == info["sha256"]
+            and got_ok["uses_kit"] is True, got_ok.get("kit_sha256", "")[:16])
+
         # 個股頁:沒有庫 → 照實 GRAY,不編數字
         empty = stock_facts(via / VRN_DB, "2330")
         card = render_stock(empty, info, out)
@@ -902,6 +998,19 @@ def selftest() -> int:
             chk("沒有 duckdb → 盤點照實說沒有,不假裝有料",
                 stock_index(via / VRN_DB)["ok"] is False)
 
+        # 總燈回歸測:庫讀不到 / 一張頁都沒出 → all 不准綠(之前只憑 kit 過閘就印綠 rc 0)
+        import argparse as _ap
+        nodb_root = root / "nodb"
+        (nodb_root / "VeritasIntelligenceAnalytics" / LOCK_SITE).mkdir(parents=True)
+        for fname in ("index.html", "SHA256SUMS.txt"):
+            (nodb_root / "VeritasIntelligenceAnalytics" / LOCK_SITE / fname).write_text(
+                (site / fname).read_text(encoding="utf-8"), encoding="utf-8")
+        rep_nodb = run(_ap.Namespace(verb="all", via=str(nodb_root), out=str(root / "out_nodb"),
+                                     ticker="", top=3, files=None, selftest=False))
+        chk("總燈:庫讀不到 → index 紅 · 一張頁都沒出 → stock 紅 · 總燈不是 GREEN(不假綠)",
+            rep_nodb["lamp"] != "GREEN" and rep_nodb["index"]["ok"] is False
+            and rep_nodb.get("stock_pages") == [] and rep_nodb.get("stock_why"),
+            [rep_nodb["lamp"], rep_nodb.get("stock_why")])
         text_self = Path(__file__).read_text(encoding="utf-8")
         chk("本支帶加速器橋(標記 + 真載)· 第 3 行標記 · 不含 TA-Lib · 沒有自己 pip",
             "[VIA:ACCEL-BRIDGE" in text_self and ("VIA_ACCEL" in globals())
