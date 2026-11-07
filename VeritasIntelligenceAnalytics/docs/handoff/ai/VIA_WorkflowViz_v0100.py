@@ -169,6 +169,21 @@ def metric_key(row: dict) -> tuple:
     return (str(row.get("node_id")), str(row.get("ts")), str(row.get("run")))
 
 
+def accumulated_metrics(out: Path, fresh: list) -> tuple:
+    """畫圖用的指標 = 累積庫 ∪ 本輪 ingest。
+
+    ingest 只讀得到**最新那一份** TEST_latest.json,所以光用本輪的列,
+    ETL 好不容易累起來的歷史(前幾輪的站秒數與燈)在下鑽圖、時序線與熱力圖上全看不到。
+    render 單獨跑時更是連 etl 都沒跑過,只有本輪 —— 所以這裡一律把累積庫讀進來聯集。
+    """
+    store = read_json(Path(out) / "metrics_ts.json", None)
+    rows = [r for r in store if isinstance(r, dict)] if isinstance(store, list) else []
+    seen = {metric_key(r) for r in rows}
+    extra = [r for r in fresh if metric_key(r) not in seen]
+    merged = sorted(rows + extra, key=lambda r: (str(r.get("ts")), str(r.get("node_id"))))
+    return merged, {"from_store": len(rows), "fresh_only": len(extra), "used": len(merged)}
+
+
 # ---------------------------------------------------------------- ① ingest:讀真收據
 def ingest(via: Path) -> dict:
     """由本倉五系統自己的收據與冊建三表。讀不到的來源照實記在 sources 裡,不補假資料。"""
@@ -552,13 +567,21 @@ def persist(out: Path, tables: dict) -> dict:
                 for statement in DUCKDB_DDL.split(";"):
                     if statement.strip() and not statement.strip().startswith("--"):
                         con.execute(statement)
-                for name in ("nodes", "edges"):      # 現況表:整批換掉
+                # 現況表:整批換掉。**直接用本輪的列灌進去**,不經 parquet ——
+                # 之前靠 read_parquet 有兩個洞:沒有 pyarrow 時 parquet 不存在,表被 DELETE 後沒補回
+                # (JSON/CSV 有 933 列,DuckDB 卻是空的);輸出夾裡留著上一輪的 parquet 時更糟,
+                # 會把過期快照重新載進來當現況。
+                for name in ("nodes", "edges"):
                     con.execute("DELETE FROM " + name)
-                    src = out / (stem[name] + ".parquet")
-                    if src.is_file():
-                        cols = ", ".join('"%s"' % c for c in fields[name])
-                        con.execute("INSERT INTO %s (%s) SELECT %s FROM read_parquet('%s')"
-                                    % (name, cols, cols, src.as_posix()))
+                    cols = fields[name]
+                    if not tables[name]:
+                        continue
+                    con.executemany(
+                        "INSERT INTO %s (%s) VALUES (%s)"
+                        % (name, ", ".join('"%s"' % c for c in cols), ", ".join(["?"] * len(cols))),
+                        [[json.dumps(row.get(c), ensure_ascii=False)
+                          if isinstance(row.get(c), (dict, list)) else row.get(c)
+                          for c in cols] for row in tables[name]])
                 # metrics_ts 不在這裡動:只增不刪,由 etl_append() anti-join 累加
                 counts = {name: con.execute("SELECT count(*) FROM " + name).fetchone()[0]
                           for name in ("nodes", "edges", "metrics_ts")}
@@ -584,7 +607,11 @@ def etl_append(out: Path, fresh: list) -> dict:
     write_json(store, merged)
     result = {"previous": len(previous), "incoming": len(fresh), "appended": len(added),
               "total": len(merged), "key": "node_id + ts + run"}
-    if have("duckdb") and added:
+    # DuckDB 要對帳**整個累積庫**,不是只對帳本輪新增的:
+    # 前一輪若在沒有 duckdb 的環境跑(或寫庫失敗),那些列已經在 JSON 裡,下一輪 added 會是 0,
+    # 只送 added 就永遠補不回來,JSON 與 DuckDB 從此分岔且沒有回頭路。
+    # INSERT ... WHERE NOT EXISTS 本身冪等,整批送不會重複。
+    if have("duckdb") and merged:
         try:
             import duckdb
             con = duckdb.connect(str(out / "workflow.duckdb"))
@@ -599,8 +626,9 @@ def etl_append(out: Path, fresh: list) -> dict:
                     [[row.get("node_id"), row.get("ts"), row.get("run"), row.get("event"),
                       row.get("lamp"), row.get("secs"), row.get("version"), row.get("sha16"),
                       row.get("head"), row.get("node_id"), row.get("ts"), row.get("run")]
-                     for row in added])
+                     for row in merged])
                 result["duckdb_total"] = con.execute("SELECT count(*) FROM metrics_ts").fetchone()[0]
+                result["duckdb_reconciled"] = len(merged)
             finally:
                 con.close()
         except Exception as exc:                                  # noqa: BLE001
@@ -934,7 +962,12 @@ def run_all(args) -> dict:
         report["steps"]["persist"] = persist(out, tables)
         report["steps"]["etl"] = etl_append(out, tables["metrics_ts"])
     if args.verb in ("render", "all"):
-        report["steps"]["render"] = render_html(tables, topo, out, args.top)
+        drawn, origin = accumulated_metrics(out, tables["metrics_ts"])
+        view = dict(tables)
+        view["metrics_ts"] = drawn
+        card = render_html(view, topo, out, args.top)
+        card["metrics_source"] = origin        # 照實說畫的是累積庫還是只有本輪
+        report["steps"]["render"] = card
     if args.verb in ("mermaid", "all"):
         report["steps"]["mermaid"] = render_mermaid(tables, topo, out, max(args.top // 2, 20))
     lamps = [r["lamp"] for r in tables["nodes"] if r["lamp"] in LAMP_ORDER]
@@ -1093,6 +1126,58 @@ def selftest() -> int:
                 con.close()
             chk("DuckDB metrics_ts:增量進去了 · 同鍵沒有重複列", total >= len(tables["metrics_ts"]) and dups == 0,
                 [total, dups])
+
+        # Codex #606 P2 三項的回歸測
+        if have("duckdb"):
+            import duckdb
+            # A:沒有 pyarrow 也要有列(現況表不能被 DELETE 完就空著)· 不吃過期 parquet
+            no_pa = root / "out_nopa"
+            real_have = globals()["have"]            # 暫時讓 persist 以為沒有 pyarrow
+            globals()["have"] = lambda m: False if m == "pyarrow" else real_have(m)
+            try:
+                rep_nopa = persist(no_pa, tables)
+            finally:
+                globals()["have"] = real_have
+            con = duckdb.connect(str(no_pa / "workflow.duckdb"))
+            try:
+                got = {t: con.execute("SELECT count(*) FROM " + t).fetchone()[0]
+                       for t in ("nodes", "edges")}
+            finally:
+                con.close()
+            chk("A 沒有 pyarrow:DuckDB 現況兩表照樣有列(不是清空就算了)· 也沒有 parquet 檔",
+                got == {"nodes": len(tables["nodes"]), "edges": len(tables["edges"])}
+                and not (no_pa / "nodes.parquet").exists(), [got, rep_nopa.get("parquet")])
+            # B:前一輪沒有 duckdb(只落 JSON)→ 這一輪有 duckdb 要把整個累積庫對帳回來
+            lag = root / "out_lag"
+            lag.mkdir()
+            write_json(lag / "metrics_ts.json", tables["metrics_ts"])   # 假裝上一輪只寫了 JSON
+            step_lag = etl_append(lag, tables["metrics_ts"])
+            con = duckdb.connect(str(lag / "workflow.duckdb"))
+            try:
+                total = con.execute("SELECT count(*) FROM metrics_ts").fetchone()[0]
+                dups = con.execute("SELECT count(*) FROM (SELECT node_id, ts, run FROM metrics_ts"
+                                   " GROUP BY 1,2,3 HAVING count(*) > 1)").fetchone()[0]
+            finally:
+                con.close()
+            chk("B 上一輪沒 duckdb 只落 JSON → 這一輪整個累積庫對帳回 DuckDB(appended 0 也要補)",
+                step_lag["appended"] == 0 and total == len(tables["metrics_ts"]) and dups == 0,
+                [step_lag.get("appended"), total, dups])
+        # C:畫圖要用累積庫 ∪ 本輪,不是只有本輪(ingest 只讀得到最新那份 TEST_latest)
+        hist = root / "out_hist"
+        hist.mkdir()
+        old_row = {"node_id": "station:V-token", "ts": "2026-10-01T00:00:00+00:00", "run": "old",
+                   "event": "test", "lamp": "GREEN", "secs": 42.0, "version": None,
+                   "sha16": None, "head": "hold"}
+        write_json(hist / "metrics_ts.json", [old_row])
+        drawn, origin = accumulated_metrics(hist, tables["metrics_ts"])
+        chk("C 畫圖用累積庫 ∪ 本輪:前幾輪的站秒數不會從下鑽圖 / 時序線 / 熱力圖消失",
+            len(drawn) == len(tables["metrics_ts"]) + 1
+            and any(r["run"] == "old" and r["secs"] == 42.0 for r in drawn)
+            and origin == {"from_store": 1, "fresh_only": len(tables["metrics_ts"]),
+                           "used": len(tables["metrics_ts"]) + 1}, origin)
+        hist_card = render_html({**tables, "metrics_ts": drawn}, topo, hist, 120)
+        chk("C 畫出來的頁面真的帶到那一筆歷史(42.0 秒在頁面裡)",
+            "42" in (hist / "VIA_WorkflowViz.html").read_text(encoding="utf-8"), hist_card["bytes"])
 
         card = render_html(tables, topo, out, 120)
         page = (out / "VIA_WorkflowViz.html").read_text(encoding="utf-8")
