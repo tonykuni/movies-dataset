@@ -200,6 +200,65 @@ td.vl-num { text-align: right; font-family: var(--vl-font-mono); font-variant-nu
 .vl-note { color: var(--vl-muted); font-size: var(--vl-size-label); margin: 6px 0 0 }
 .vl-foot { color: var(--vl-muted); font-size: var(--vl-size-label); margin-top: 26px;
            padding-top: 10px; border-top: 1px solid var(--vl-border) }
+
+/* ===== 全螢幕 PC 盤面(操作員 2026-11-07:「個股模板全螢幕畫面 · 這是 PC · 響應式設計」) =====
+ * 大螢幕填滿視窗的 12 欄盤面;窄螢幕一路塌到單欄,側邊槽永遠在。色彩仍然只用鎖定 token。 */
+.vl-topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+             background: var(--vl-bg); border-bottom: 1px solid var(--vl-border);
+             padding: 6px 0 7px; margin: 0 0 10px;
+             display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline }
+.vl-topbar h1 { margin: 0; flex: 0 0 auto }
+.vl-kpis { display: flex; flex-wrap: wrap; gap: 6px 10px; margin-left: auto }
+.vl-kpi { border: 1px solid var(--vl-border-soft); background: var(--vl-white);
+          padding: 3px 8px; min-width: 84px }
+.vl-kpi .vl-label { display: block; color: var(--vl-muted); font-size: var(--vl-size-status);
+                    letter-spacing: .05em; text-transform: uppercase }
+.vl-kpi .vl-value { display: block; font-family: var(--vl-font-mono);
+                    font-size: var(--vl-size-primary); color: var(--vl-title) }
+.vl-kpi[data-state="GRAY"] .vl-value { color: var(--vl-muted) }
+.vl-board { display: grid; grid-template-columns: 1fr; gap: 10px; align-items: start }
+.vl-board > .vl-panel { margin: 0; min-width: 0 }
+/* 共振堆疊圖:7 卡共用同一時間索引 —— 左刻度槽等寬,X 軸對齊,十字線貫穿全部卡 */
+.vl-stack { display: grid; gap: 2px }
+.vl-stack-row { display: grid; grid-template-columns: var(--vl-scale-gutter, 56px) minmax(0, 1fr);
+                align-items: stretch; border: 1px solid var(--vl-border-soft);
+                background: var(--vl-white) }
+.vl-stack-row + .vl-stack-row { border-top: 0 }
+.vl-stack-scale { border-right: 1px solid var(--vl-border-soft); background: var(--vl-row);
+                  padding: 4px 6px; font-family: var(--vl-font-mono);
+                  font-size: var(--vl-size-status); color: var(--vl-muted);
+                  display: flex; flex-direction: column; justify-content: space-between }
+.vl-stack-plot { position: relative; min-height: 54px; min-width: 0; padding: 4px 8px;
+                 display: flex; align-items: center }
+.vl-stack-plot .vl-stack-name { font-size: var(--vl-size-label); color: var(--vl-ink) }
+.vl-stack-plot .vl-stack-empty { color: var(--vl-muted); font-size: var(--vl-size-status) }
+.vl-crosshair { position: absolute; top: 0; bottom: 0; left: 50%%; width: 1px;
+                background: var(--vl-border); pointer-events: none }
+.vl-axis { display: grid; grid-template-columns: var(--vl-scale-gutter, 56px) minmax(0, 1fr) }
+.vl-axis-ticks { display: flex; justify-content: space-between;
+                 font-family: var(--vl-font-mono); font-size: var(--vl-size-status);
+                 color: var(--vl-muted); padding: 3px 8px 0 }
+@media (min-width: 820px) {
+  .vl-board { grid-template-columns: repeat(6, minmax(0, 1fr)) }
+  .vl-board > .vl-panel { grid-column: span 6 }
+  .vl-board > .vl-panel[data-span="3"] { grid-column: span 3 }
+  .vl-board > .vl-panel[data-span="2"] { grid-column: span 3 }
+}
+@media (min-width: 1200px) {
+  body { padding-block: 14px 40px }
+  .vl-board { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 11px }
+  .vl-board > .vl-panel { grid-column: span 12 }
+  .vl-board > .vl-panel[data-span="6"] { grid-column: span 6 }
+  .vl-board > .vl-panel[data-span="4"] { grid-column: span 4 }
+  .vl-board > .vl-panel[data-span="3"] { grid-column: span 3 }
+  .vl-board > .vl-panel[data-span="2"] { grid-column: span 2 }
+  .vl-stack-row { --vl-scale-gutter: 64px }
+  .vl-stack-plot { min-height: 62px }
+}
+@media (min-width: 1700px) {
+  .vl-board { gap: 12px }
+  .vl-stack-plot { min-height: 74px }
+}
 """ % (TAG, info["source"], info["sha256"], info["count"], decls)
 
 
@@ -375,6 +434,11 @@ def cell(label: str, value, note: str = "") -> str:
             % (state, esc(label), esc(shown), extra))
 
 
+# 全螢幕 PC 盤面的欄寬(12 欄制;窄螢幕由 kit 的 media query 一路塌到單欄)
+SECTION_SPAN = {"head": "12", "basic": "4", "value": "4", "consensus": "4", "rating": "12",
+                "income": "6", "ratio": "6", "peer": "4", "stack": "12", "analyst": "4"}
+
+
 def section_block(key: str, title: str, fields: list, body: str, why: str) -> str:
     lane = LANE_OF_SECTION.get(key, "—")
     pill = ('<span class="vl-pill gray">GRAY</span>' if why
@@ -382,10 +446,10 @@ def section_block(key: str, title: str, fields: list, body: str, why: str) -> st
     note = ('<span class="vl-why">%s</span>' % esc(why)) if why else ""
     inner = body or ('<div class="vl-grid">%s</div>'
                      % "".join(cell(f, None) for f in fields))
-    return ('<section class="vl-panel" id="sec-%s"><div class="vl-head">%s'
+    return ('<section class="vl-panel" id="sec-%s" data-span="%s"><div class="vl-head">%s'
             '<h2 style="margin:0">%s</h2>'
             '<span class="vl-why">車道 %s</span>%s</div>%s</section>'
-            % (esc(key), pill, esc(title), esc(lane), note, inner))
+            % (esc(key), esc(SECTION_SPAN.get(key, "12")), pill, esc(title), esc(lane), note, inner))
 
 
 def render_stock(facts: dict, info: dict, out: Path, kit_rel: str = KIT_NAME) -> dict:
@@ -470,8 +534,28 @@ def render_stock(facts: dict, info: dict, out: Path, kit_rel: str = KIT_NAME) ->
             else:
                 why = "VRN-2 庫的 vrn_report_metrics 沒有這一類項目(本檔 %d 筆指標)" % len(
                     facts.get("metrics") or [])
+        elif key == "stack":
+            cards = ["價格 · K線 / MA / EMA / BB(20)", "成交量 · 日均量(張)",
+                     "隨機指標(9)· 超買 80 / 超賣 20", "RSI · 超買 70 / 超賣 30",
+                     "三大法人買賣超 · 四類堆疊", "融資 / 融券", "族群 / 指數相對強弱"]
+            stack_rows = "".join(
+                '<div class="vl-stack-row"><div class="vl-stack-scale"><span>—</span>'
+                '<span>—</span></div><div class="vl-stack-plot"><span class="vl-stack-name">%s</span>'
+                '<span class="vl-stack-empty" style="margin-left:auto">無 VDF 日資料</span>'
+                '<span class="vl-crosshair"></span></div></div>' % esc(name_card)
+                for name_card in cards)
+            body = ('<div class="vl-stack">%s</div>'
+                    '<div class="vl-axis"><div></div><div class="vl-axis-ticks">'
+                    '<span>—</span><span>—</span><span>—</span><span>—</span><span>—</span>'
+                    '</div></div>'
+                    '<p class="vl-note">%d 卡共用同一時間索引:左刻度槽等寬、X 軸對齊、十字線貫穿全部卡'
+                    '(版面照個股模板)。<strong>資料缺席時只畫骨架不畫線</strong> —— '
+                    '要 VDF 日資料(K線 / 量 / 三大法人 / 融資券 / 族群)才會有線;'
+                    '本機 VDF 庫未就緒 → 每張卡照實寫「無 VDF 日資料」,不畫假 K 線、不編價格。</p>'
+                    % (stack_rows, len(cards)))
+            why = "要 VDF 日資料才有線;本輪只有骨架(照實標在每張卡上)"
         elif key in NEEDS_DAILY:
-            why = ("要 VDF 日資料(K線 / 量 / 三大法人 / 融資券 / 族群);本機 VDF 庫未就緒 → "
+            why = ("要 VDF 日資料(評價分位 / 族群比較);本機 VDF 庫未就緒 → "
                    "照實 GRAY,不畫假圖、不編價格")
         if why:
             gray.append(key)
@@ -496,28 +580,45 @@ def render_stock(facts: dict, info: dict, out: Path, kit_rel: str = KIT_NAME) ->
     src_rows = "".join("<tr><td>%s</td><td class=\"vl-num\">%s</td></tr>" % (esc(k), esc(v))
                        for k, v in counts.items() if k != "db")
     lamp = "GREEN" if rows and len(gray) <= len(NEEDS_DAILY) + 1 else ("YELLOW" if rows else "GRAY")
+    def kpi(label, value, note=""):
+        state = "GRAY" if value in (None, "", "nan") else "OK"
+        return ('<div class="vl-kpi" data-state="%s"><span class="vl-label">%s</span>'
+                '<span class="vl-value">%s</span></div>'
+                % (state, esc(label), esc("—" if state == "GRAY" else value)))
+
+    kpis = "".join([
+        kpi("最新報告", latest.get("report_date")),
+        kpi("評級", latest.get("rating_raw")),
+        kpi("目標價 ADJ", latest.get("target_price_adj") or latest.get("target_price")),
+        kpi("股價 ADJ", latest.get("price_latest_adj") or latest.get("price")),
+        kpi("上漲空間", latest.get("upside_adj") or latest.get("upside_report")),
+        kpi("報告筆數", len(rows) or None),
+        kpi("燈", lamp)])
     page = """<!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>%s · %s · VIA 個股頁</title>
 <link rel="stylesheet" href="%s">
 </head><body>
-<h1>%s</h1>
-<p class="vl-sub">VIA 標準視覺鎖定 U/I · 格式 = Atlas VISUAL LOCK(token sha %s)· 版面 = 個股模板區段清單
- · 產生 %s · 燈 %s</p>
-<section class="vl-panel"><div class="vl-head"><h2 style="margin:0">這一頁的規矩</h2></div>
+<div class="vl-topbar"><h1>%s</h1><div class="vl-kpis">%s</div></div>
+<p class="vl-sub">VIA 標準視覺鎖定 U/I · 全螢幕 PC 盤面(12 欄 · 響應式一路塌到單欄)·
+ 顏色鎖定 = Atlas VISUAL LOCK(token sha %s)· 版面 = 個股模板區段清單 · 產生 %s · 燈 %s</p>
+<div class="vl-board">
+<section class="vl-panel" data-span="12"><div class="vl-head"><h2 style="margin:0">這一頁的規矩</h2></div>
 <p class="vl-note">值只來自 VRN-2 自己落庫的欄位(目標價 · ADJ · 評級 · 逐值指標 · 分析師);
 沒有的一律印「—」並標 GRAY,<strong>不補值、不猜、不畫假圖</strong>。
 GRAY 區段 %d 個,每個都在標頭寫了缺什麼、為什麼。樣式用鎖定 kit,本頁不自己寫顏色。</p></section>
 %s
-<section class="vl-panel"><div class="vl-head"><h2 style="margin:0">資料來源(本倉 · 只讀)</h2></div>
+<section class="vl-panel" data-span="12"><div class="vl-head"><h2 style="margin:0">資料來源(本倉 · 只讀)</h2></div>
 <div class="vl-scroll"><table><tr><th>表</th><th class="vl-num">列</th></tr>%s</table></div>
 <p class="vl-note">庫:%s · 唯讀開啟,本頁不寫他系統的庫。</p></section>
+</div>
 <p class="vl-foot">五系統對等獨立(L123):本頁只讀 VRN-2 自報值,不改他系統正本 / 冊 / 號 / 檔。
-視覺鎖定正本 %s —— 要改樣式只能改正本,改本頁或 kit 會被 check 判紅。</p>
+視覺鎖定正本 %s —— 要改顏色只能改正本,改本頁或 kit 的 token 會被 check 判紅
+(版面規則可以演進,顏色不行)。</p>
 </body></html>
 """ % (esc(name or ticker), esc(ticker), esc(kit_rel),
-       esc(("%s · %s" % (name, ticker)).strip(" ·") or ticker),
+       esc(("%s · %s" % (name, ticker)).strip(" ·") or ticker), kpis,
        esc(info["sha256"][:16]), esc(utc_now()), esc(lamp), len(gray),
        "\n".join(parts), src_rows, esc(counts.get("db") or "—"), esc(info["source"]))
     target = Path(out) / ("stock_%s.html" % re.sub(r"[^A-Za-z0-9_-]", "_", ticker or "unknown"))
@@ -717,6 +818,29 @@ def selftest() -> int:
             "不畫假圖、不編價格" in text and 'id="sec-stack"' in text)
         chk("個股頁:版面覆蓋模板的每一個區段(含共振堆疊圖)",
             all(('id="sec-%s"' % key) in text for key, _t, _f in STOCK_SECTIONS))
+        chk("全螢幕 PC:kit 有 12 欄盤面 + 三個斷點(820 / 1200 / 1700)+ 黏頂條 + 堆疊列",
+            "repeat(12, minmax(0, 1fr))" in kit_text and "min-width: 820px" in kit_text
+            and "min-width: 1200px" in kit_text and "min-width: 1700px" in kit_text
+            and ".vl-topbar" in kit_text and "position: sticky" in kit_text
+            and ".vl-stack-row" in kit_text and "--vl-scale-gutter" in kit_text)
+        chk("響應式:窄螢幕單欄(grid-template-columns: 1fr 在斷點之外)· 側邊槽與 overflow-x 都還在",
+            "grid-template-columns: 1fr;" in kit_text
+            and "max(16px, env(safe-area-inset-left, 0px))" in kit_text
+            and "overflow-x: hidden" in kit_text)
+        chk("個股頁:有盤面容器 · 黏頂 KPI 條 · 每個區段都標了欄寬",
+            'class="vl-board"' in text and 'class="vl-topbar"' in text
+            and 'class="vl-kpis"' in text
+            and all(('data-span="%s"' % SECTION_SPAN[k]) in text for k, _t, _f in STOCK_SECTIONS))
+        chk("共振堆疊圖:7 卡骨架真的畫出來 · 每卡有左刻度槽與十字線 · 共用 X 軸刻度列",
+            text.count('class="vl-stack-row"') == 7
+            and text.count('class="vl-crosshair"') == 7
+            and text.count('class="vl-stack-scale"') == 7
+            and 'class="vl-axis-ticks"' in text)
+        chk("共振堆疊圖:資料缺就只畫骨架不畫線,每卡照實寫「無 VDF 日資料」",
+            text.count('class="vl-stack-empty"') == 7
+            and text.count("無 VDF 日資料") == 8   # 7 張卡 + 說明文字引用那句話
+            and "資料缺席時只畫骨架不畫線" in text and "不畫假 K 線、不編價格" in text,
+            text.count('class="vl-stack-empty"'))
         chk("個股頁過鎖定閘(自己不寫顏色 · 連 kit · 無外連)",
             check_page(card["path"], info["sha256"])["lamp"] == "GREEN",
             check_page(card["path"], info["sha256"])["findings"])
