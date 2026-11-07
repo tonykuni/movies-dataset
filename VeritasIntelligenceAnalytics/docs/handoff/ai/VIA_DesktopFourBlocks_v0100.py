@@ -38,6 +38,7 @@ except Exception:
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -182,34 +183,59 @@ def heavy_processes(limit: int = 8) -> list:
 
 # ---------------------------------------------------------------- 一段一段跑
 class Runner:
-    def __init__(self, out: Path, env: dict, default_timeout: int = 1800, resume_from: dict | None = None):
+    def __init__(self, out: Path, env: dict, default_timeout: int = 1800, resume_from: dict | None = None,
+                 ctx_extra: dict | None = None):
         self.out = out
         self.env = env
         self.default_timeout = default_timeout
         self.receipts: list = []
         self.resume_from = resume_from or {}
+        self.ctx_extra = dict(ctx_extra or {})
 
-    def reusable(self, label: str) -> dict | None:
+    def context_hash(self, command: list, cwd: Path) -> str:
+        """這一段的「上下文指紋」:指令 · 工作夾 · 境根等外參 · 被叫到的模組檔內容。
+
+        續跑只憑段名沿用是不誠實的(換了倉 / 換了境根 / 模組出了新版,收據就不是這一段的)。
+        指紋對不上就重跑。
+        """
+        deps = {}
+        for item in command:
+            try:
+                path = Path(str(item))
+                if path.suffix.lower() in (".py", ".ps1", ".json", ".jsonl") and path.is_file():
+                    deps[str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
+            except OSError:
+                deps[str(item)] = "UNREADABLE"
+        blob = json.dumps({"command": [str(x) for x in command], "cwd": str(cwd),
+                           "extra": self.ctx_extra, "deps": deps},
+                          ensure_ascii=False, sort_keys=True)
+        return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+    def reusable(self, label: str, ctx: str) -> dict | None:
         prev = self.resume_from.get(label)
-        if prev and prev.get("rc") == 0 and prev.get("state") == "RETURNED_ZERO":
-            row = dict(prev)
-            row["reused"] = True
-            self.receipts.append(row)
-            write_json(self.out / "COMMANDS.json", self.receipts)
-            print("[沿用] %s 前一輪已綠(rc 0)· 本輪不重跑" % label, flush=True)
-            return row
-        return None
+        if not (prev and prev.get("rc") == 0 and prev.get("state") == "RETURNED_ZERO"):
+            return None
+        if prev.get("ctx") != ctx:
+            print("[不沿用] %s 前一輪雖綠,但指令 / 倉 / 境根 / 模組指紋對不上 · 本輪照跑" % label, flush=True)
+            return None
+        row = dict(prev)
+        row["reused"] = True
+        self.receipts.append(row)
+        write_json(self.out / "COMMANDS.json", self.receipts)
+        print("[沿用] %s 前一輪已綠(rc 0)且指紋相同 · 本輪不重跑" % label, flush=True)
+        return row
 
     def run(self, label: str, command: list, cwd: Path, timeout: int | None = None, allow_reuse: bool = True) -> dict:
+        ctx = self.context_hash(command, cwd)
         if allow_reuse:
-            got = self.reusable(label)
+            got = self.reusable(label, ctx)
             if got:
                 return got
         log = self.out / "logs" / (re.sub(r"[^A-Za-z0-9_.-]", "_", label) + ".log")
         log.parent.mkdir(parents=True, exist_ok=True)
         start = time.monotonic()
         row = {"id": label, "command": [str(x) for x in command], "cwd": str(cwd), "at": utc_now(),
-               "log": str(log), "state": "RUNNING", "rc": None}
+               "log": str(log), "state": "RUNNING", "rc": None, "ctx": ctx}
         self.receipts.append(row)
         write_json(self.out / "COMMANDS.json", self.receipts)
         print("[起] %s" % label, flush=True)
@@ -273,14 +299,19 @@ def merge_client_config(target: Path, snippet: dict, backups: Path) -> dict:
     if not servers:
         out["why"] = "片段沒有 mcpServers(不猜)"
         return out
-    current = read_json(target, None)
-    if current is None:
+    if not target.exists():
         current = {}
         out["created"] = True
-    elif not isinstance(current, dict):
-        out["why"] = "設定檔不是 JSON 物件:不動它(誠實停)"
-        return out
     else:
+        try:
+            current = json.loads(target.read_text(encoding="utf-8"))
+        except (OSError, ValueError, UnicodeDecodeError) as exc:
+            # 「讀不動 / 不是合法 JSON」≠「檔不在」:有檔就絕不覆蓋(誠實停;不備份也不寫)
+            out["why"] = "設定檔在但讀不動 / 不是合法 JSON:不動它(誠實停)· %s" % exc
+            return out
+        if not isinstance(current, dict):
+            out["why"] = "設定檔不是 JSON 物件:不動它(誠實停)"
+            return out
         backups.mkdir(parents=True, exist_ok=True)
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         copy = backups / (target.name + "." + stamp + ".bak")
@@ -346,7 +377,9 @@ def run_blocks(args) -> dict:
         for row in (read_json(Path(args.resume) / "COMMANDS.json", []) or []):
             if isinstance(row, dict) and row.get("id"):
                 prev[row["id"]] = row
-    runner = Runner(out, env, args.step_timeout, prev)
+    runner = Runner(out, env, args.step_timeout, prev,
+                    {"repo": str(repo), "via": str(via), "env_root": env_root,
+                     "base_python": args.base_python or None})
     report = {"tool": TAG, "at": utc_now(), "repo": str(repo), "via": str(via), "out": str(out),
               "env_root": env_root, "python": sys.version.split()[0], "os": os.name,
               "blocks": {}, "lamps": {}, "next": "", "resume_from": args.resume or None}
@@ -374,8 +407,8 @@ def run_blocks(args) -> dict:
         envman = call("02_envmanager", ["run", "CGC_MDL240_EnvManager"], args.step_timeout)
         envcard = call("03_env", ["env"], args.step_timeout)
         lamp = "GREEN" if token["rc"] == 0 else "RED"
-        if lamp == "GREEN" and (envman["rc"] not in (0, 2) or envcard["rc"] not in (0, 2)):
-            lamp = "YELLOW"
+        if lamp == "GREEN" and (envman["rc"] != 0 or envcard["rc"] != 0):
+            lamp = "YELLOW"      # rc 2 = 有保留 / 沒跑完:黃,不當綠
         report["blocks"]["1_pressure_env_audit"] = {
             "lamp": lamp, "resources": res, "heavy_processes": heavy,
             "token_rc": token["rc"], "envmanager_rc": envman["rc"], "env_rc": envcard["rc"],
@@ -404,7 +437,9 @@ def run_blocks(args) -> dict:
             lamp = "RED"
         elif applied is None:
             lamp = "YELLOW"      # 計畫出了但沒裝(--no-install 或被擋)
-        elif applied["rc"] not in (0, 2):
+        elif applied["rc"] == 2:
+            lamp = "YELLOW"      # 裝了但沒裝完 / 被同意閘或單測閘擋住:黃,不當綠
+        elif applied["rc"] != 0:
             lamp = "RED"
         report["blocks"]["2_environment"] = {
             "lamp": lamp, "env_root": env_root, "base_python": args.base_python,
@@ -463,8 +498,12 @@ def run_blocks(args) -> dict:
                 lamp = "RED"
             elif live is None:
                 lamp = "YELLOW"
-            elif live["rc"] not in (0, 2):
+            elif live["rc"] == 2:
+                lamp = "YELLOW"  # 擷取有保留(守門讓路 / 部分族群沒完):黃,不當綠
+            elif live["rc"] != 0:
                 lamp = "RED"
+            elif dry["rc"] == 2:
+                lamp = "YELLOW"  # 看道那段就有保留:照實黃
             report["blocks"]["4_vdf_fetch"] = {
                 "lamp": lamp, "engine": str(mdl012), "groups": args.groups, "jobs": args.jobs, "mode": args.mode,
                 "governor": {"cpu_max": args.cpu_max, "mem_min_gb": args.mem_min_gb, "temp_min_gb": args.temp_min_gb},
@@ -649,6 +688,34 @@ def selftest() -> int:
         chk("③ 冪等:同一片段再併一次 = unchanged,不重複寫壞",
             rep3["blocks"]["3_mcp"]["client_config_merge"]["unchanged"] == ["vcgc"]
             and read_json(cfg)["mcpServers"]["other"]["command"] == "node")
+        # 續跑指紋:換了境根(或倉 / 指令 / 模組)就不准沿用
+        out5 = root / "out5"
+        rep5 = run_blocks(make_args(out=str(out5), blocks="1", resume=str(out1),
+                                    env_root=str(root / "envs_other")))
+        chk("續跑指紋:換了 --env-root → 前一輪的綠收據不准沿用(照跑)",
+            all(not r.get("reused") for r in rep5["commands"])
+            and any(r.get("id") == "01_token" and r.get("ctx") for r in rep5["commands"])
+            and rep5["commands"][0]["ctx"] != (read_json(out1 / "COMMANDS.json", []) or [{}])[0].get("ctx"))
+        # 裝一半(rc 2)不准當綠
+        repo2 = root / "repo2" / "VeritasIntelligenceAnalytics" / "supportive modules" / "registry"
+        repo2.mkdir(parents=True, exist_ok=True)
+        log2 = root / "verbs2.log"
+        (repo2 / "CGC_MDL149_VeritasCentralGovernanceConsole_v0001.py").write_text(
+            "import sys\nfrom pathlib import Path\n"
+            "args = sys.argv[1:]\n"
+            "Path(%r).open('a', encoding='utf-8').write(' '.join(args) + '\\n')\n"
+            "if '--apply' in args:\n"
+            "    print('[VCGC 安裝閘] 同意閘擋住:只裝了一半')\n    raise SystemExit(2)\n"
+            "if args[:3] == ['run', 'CGC_MDL135_EnvGovernance', 'conflicts']:\n"
+            "    print('[VCGC 衝突閘] GREEN 現況乾淨')\n"
+            "raise SystemExit(0)\n" % str(log2), encoding="utf-8")
+        out6 = root / "out6"
+        rep6 = run_blocks(make_args(root=str(root / "repo2"), out=str(out6), blocks="2", install=True))
+        chk("② 裝到一半(apply rc 2)→ YELLOW,絕不寫成綠",
+            rep6["blocks"]["2_environment"]["apply_rc"] == 2
+            and rep6["blocks"]["2_environment"]["lamp"] == "YELLOW"
+            and rep6["overall"] == "YELLOW",
+            rep6["blocks"]["2_environment"]["lamp"])
         # 閘:token 紅就停
         bad = reg / "CGC_MDL149_VeritasCentralGovernanceConsole_v0002.py"
         bad.write_text("import sys\nprint('token RED')\nraise SystemExit(1)\n", encoding="utf-8")
@@ -705,7 +772,7 @@ def make_parser() -> argparse.ArgumentParser:
     home = str(Path.home())
     p.add_argument("--root", default=str(Path(home) / "OneDrive" / "Documents" / "movies-dataset"), help="倉根(含 VeritasIntelligenceAnalytics)")
     p.add_argument("--out", default="", help="輸出夾(預設 <倉根>/VIA_Reports/desktop_four_blocks/<時戳>)")
-    p.add_argument("--env-root", default="", help="受管境根(預設 %USERPROFILE%\\envs)")
+    p.add_argument("--env-root", default="", help="受管境根(預設 %%USERPROFILE%%\\envs)")
     p.add_argument("--base-python", default="", help="系統 base 的 python.exe(給 ② 用;不給就不帶)")
     p.add_argument("--blocks", default="1,2,3,4,5", help="要跑哪幾段(預設全跑;例 --blocks 3,4)")
     p.add_argument("--install", action="store_true", help="② 無衝突時真的裝(tools --apply --approve);預設只出計畫")
