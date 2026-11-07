@@ -381,3 +381,8 @@ Set-Location "$via\functional modules\VDF";$M=(Get-ChildItem . -Filter 'VDF_MDL0
 - 第 5 段 · 全景三輪(上傳的 runner · 兩根):README 第一段那四行,但 PS1 改貼 `Invoke-VCGC-Panorama-v0101.ps1`(Codex #603 P1 / P2:預設沿用相依未變的收據、逾時殺整個 process group;要全站重跑加 `-ForceFull`);預設掃 `…\VeritasIntelligenceAnalytics` 與 `…\movies-dataset`,作用中 VCGC 取第二根。
 - 貼回:`%LOCALAPPDATA%\VIA\VCGC_Panorama_v0100\<時戳>\SUMMARY.json` · VDF `VIA_Reports\vdf\…` 收據 · `python $V env` 的輸出。
 - 未讀:Manus 分享頁只讀得到標題「規劃 VIA 整合 agentmemory、Ponytail、OmniRoute 等工具」。
+
+## 35. VCGC MCP 啟用 + 三來源同步(2026-11-07 · 操作員「activate MCP, update and sync」)
+
+- 容器真 stdio 握手 OK(tools 17 · resources 27 · doctor · settle/latest)· 本倉 `.mcp.json` 入倉(Claude Code 自動接)· Claude Desktop / Manus 設定與桌機兩行見 `docs/handoff/ai/VCGC_MCP_v0101_activation_20261107.md`。
+- 同步:GitHub main 107da7d99 = 工作分支;Manus app 連結容器只讀到外殼(要登入)。
