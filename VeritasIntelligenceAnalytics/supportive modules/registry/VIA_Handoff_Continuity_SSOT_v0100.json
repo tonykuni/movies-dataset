@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-11-07T16:40:00+00:00",
+  "updated_at": "2026-11-07T18:46:00+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -8313,6 +8313,72 @@
       "reason": "上傳的 Invoke-VIA-AllInOne-v0100.ps1 會在桌機建 via_vcgc_0194 venv、載 hash 釘住的 v0194 引擎、對 PyPI 裝 pyarrow、寫 %LOCALAPPDATA% → 雲端不代跑(零安裝律 + 不碰他人環境);原樣入倉作參考",
       "next": "操作員要跑就在桌機 PowerShell 7 跑,跑完把 %LOCALAPPDATA%\\VCGC\\MultiMatrix_v0194 的收據貼回",
       "registered_at": "2026-11-07T16:40:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ195:visual-lock-standard",
+      "requirement": "VCGC-REQ195",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "case": "C-visual-lock-v0100",
+      "receipt": "VIA_Reports/visual_lock/VISUAL_LOCK.json(不入倉)· 自測 19/19 · 閘 4/4 GREEN",
+      "reason": "Atlas --vl-* 24 token 由正本抽出(區塊 sha 541574a7b42fcdac…)· 正本位元組 4/4 OK · kit 4307 bytes · 個股頁 3 張過閘 · 閘的三種違規都抓到",
+      "next": "新頁一律連 kit + 只用 var(--vl-*) + 出頁後跑 check",
+      "registered_at": "2026-11-07T17:30:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ195:stock-daily-lanes",
+      "requirement": "VCGC-REQ195",
+      "state": "PENDING",
+      "owner": "VDF 車道 · 操作員",
+      "case": null,
+      "receipt": "VIA_Reports/visual_lock/stock_3706.html(GRAY 區段清單在收據裡)",
+      "reason": "個股頁的技術面 / 籌碼面 / 評價分位 / 族群比較要 VDF 日資料(K線 · 量 · 三大法人 · 融資券);本機 VDF 庫未就緒 → 照實 GRAY,不畫假 K 線不編價格",
+      "next": "桌機跑 DesktopFourBlocks ④ 把 2015-01-01 起的日資料落庫後,個股頁那幾段自動有料",
+      "registered_at": "2026-11-07T17:30:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ195:external-design-links",
+      "requirement": "VCGC-REQ195",
+      "state": "BLOCKED",
+      "owner": "操作員",
+      "case": null,
+      "receipt": null,
+      "reason": "Manus 視覺鎖定站 302 轉 manus.im/app-auth(OAuth 登入牆)· Claude Design 連結 Artifact 工具明確不支援 → 兩個都讀不到;本輪改用倉內正本完成,但若外站版本已經比倉內新,我看不到",
+      "next": "若外站有更新版:把 HTML 貼成文字 / 上傳檔 / 發成 claude.ai/artifact 連結(那種我讀得到)",
+      "registered_at": "2026-11-07T17:30:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ195:non-stock-core-v0400",
+      "requirement": "VCGC-REQ195",
+      "state": "BLOCKED",
+      "owner": "操作員",
+      "case": null,
+      "receipt": null,
+      "reason": "操作員 2026-11-07:「v400 can replace v300」—— NON_STOCK_CORE_v0400.zip 與 README_v0400.md 在 C:\\Users\\tonyk\\Downloads,桌機未供出資料夾 → 雲端讀不到。非個股摘要器 v0310 的車道接線就等這一支",
+      "next": "上傳 NON_STOCK_CORE_v0400.zip(或供出資料夾);到手即接 VRN-2 非個股車道並出新版號",
+      "registered_at": "2026-11-07T17:30:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ195:ps-run-autocollect",
+      "requirement": "VCGC-REQ195",
+      "state": "BLOCKED",
+      "owner": "操作員",
+      "case": null,
+      "receipt": null,
+      "reason": "操作員 2026-11-07:「持續監控 PS 跑完後去自動擷取結果」+「目前電腦正在跑 MCP SYNC」。雲端會話看不到桌機的行程與輸出夾(Remote Control 未供出)→ 無法監控,也不假裝在監控",
+      "next": "供出資料夾後我可直接盯;在那之前由桌機端 DesktopFourBlocks 的收據夾 + zip 貼回包自動收",
+      "registered_at": "2026-11-07T17:30:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ195:codex-607-three",
+      "requirement": "VCGC-REQ195",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "case": "C-visual-lock-v0100",
+      "receipt": "自測 28/28 · 站 test --full --only GREEN rc 0 · VIA_Workflow_VCGC_SSOT_v0128",
+      "reason": "Codex #607 三項都成立:① 需求只登需求/盤點/交接冊,沒登工作流冊(AGENTS.md 第 3 條) ② 閘只看樣式表檔名不打開驗 —— 連到不存在或 --vl-bg 被改過的 kit 都給綠,鎖等於裝飾 ③ 庫讀不到時 index.ok=false 不進總燈,all 只憑 kit 過閘就印 GREEN rc 0(假綠)",
+      "next": "新頁掛鎖仍是三件事:連 kit · 只用 var(--vl-*) · 出頁後跑 check",
+      "registered_at": "2026-11-07T18:46:00+00:00"
     }
   ]
 }
