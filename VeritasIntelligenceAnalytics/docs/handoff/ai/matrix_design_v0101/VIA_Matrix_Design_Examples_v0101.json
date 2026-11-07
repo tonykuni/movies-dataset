@@ -1,0 +1,472 @@
+{
+  "schema": "VIA.Matrix.Design.v1",
+  "ui_version": "v0101",
+  "design_updated_at": "2026-11-07T16:00:00+08:00",
+  "mode": "DEMO",
+  "source_note": "所有範例檔案、AST 行號與燈號為設計情境；不代表電腦現況。",
+  "matrices": [
+    {
+      "id": "M00",
+      "name": "系統總覽",
+      "levels": "系統 → 類別 → 實體"
+    },
+    {
+      "id": "M01",
+      "name": "檔案與 AST",
+      "levels": "檔案 → 定義 → 語句／呼叫"
+    },
+    {
+      "id": "M02",
+      "name": "加速／網路覆蓋",
+      "levels": "要求 → 接線 → 執行證據"
+    },
+    {
+      "id": "M03",
+      "name": "輸入契約",
+      "levels": "大類 → 資料集 → 欄位"
+    },
+    {
+      "id": "M04",
+      "name": "輸出契約",
+      "levels": "大類 → 產物 → schema／品質"
+    },
+    {
+      "id": "M05",
+      "name": "參數與時間",
+      "levels": "大類 → 參數組 → 有效值"
+    },
+    {
+      "id": "M06",
+      "name": "VQG 指標",
+      "levels": "類別 → 指標 → 公式／視窗"
+    },
+    {
+      "id": "M07",
+      "name": "VAP 圖形",
+      "levels": "圖類 → 模板 → 資料／樣式"
+    },
+    {
+      "id": "M08",
+      "name": "SSOT 與依賴",
+      "levels": "契約 → 上下游 → 影響集合"
+    },
+    {
+      "id": "M09",
+      "name": "測試與驗證",
+      "levels": "U/I/S/R/C → 案例 → 收據"
+    },
+    {
+      "id": "M10",
+      "name": "錯誤與衝突",
+      "levels": "根因 → AST → 證據"
+    },
+    {
+      "id": "M11",
+      "name": "全景式修正",
+      "levels": "R1 發現 → R2 修復 → R3 驗證"
+    },
+    {
+      "id": "M12",
+      "name": "執行與效能",
+      "levels": "Run → 步驟 → 資源／Token"
+    },
+    {
+      "id": "M13",
+      "name": "版本與稽核",
+      "levels": "實體 → 版史 → 證據失效"
+    }
+  ],
+  "entities": [
+    {
+      "id": "TMP-DEMO-001",
+      "governance_id": null,
+      "system": "VCGC",
+      "name": "Example_VCGC_Registry_v0100.py",
+      "version": "v0100",
+      "updated": "未採集（示例）",
+      "status": "GREEN",
+      "sha": null,
+      "path": "設計範例/Example_VCGC_Registry_v0100.py",
+      "ast": [
+        {
+          "id": "TMP-DEMO-001-N001",
+          "kind": "Module",
+          "name": "Example_VCGC_Registry_v0100.py",
+          "line": "1–80（示例）",
+          "children": [
+            {
+              "id": "TMP-DEMO-001-N002",
+              "kind": "FunctionDef",
+              "name": "def main(config: dict) -> int",
+              "line": "20–45（示例）",
+              "children": [
+                {
+                  "id": "TMP-DEMO-001-N003",
+                  "kind": "Call",
+                  "name": "VIA_ACCEL.accel_map(worker, batches)",
+                  "line": "31（示例）",
+                  "children": []
+                },
+                {
+                  "id": "TMP-DEMO-001-N004",
+                  "kind": "Return",
+                  "name": "return validated_result",
+                  "line": "44（示例）",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "TMP-DEMO-001-N005",
+              "kind": "FunctionDef",
+              "name": "def validate_output(result) -> dict",
+              "line": "48–75（示例）",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "issue": "",
+      "solution": "保留現有有效收據；相依改變時重新驗證",
+      "patch_state": "設計情境無待修",
+      "accel": true,
+      "net": "",
+      "tests": {
+        "U": "PASS",
+        "I": "PASS",
+        "S": "PASS",
+        "R": "PASS",
+        "C": "PASS"
+      },
+      "origin": "DEMO",
+      "observed": null
+    },
+    {
+      "id": "TMP-DEMO-002",
+      "governance_id": null,
+      "system": "VDF",
+      "name": "Example_VDF_MarketFetch_v0100.py",
+      "version": "v0100",
+      "updated": "未採集（示例）",
+      "status": "RED",
+      "sha": null,
+      "path": "設計範例/Example_VDF_MarketFetch_v0100.py",
+      "ast": [
+        {
+          "id": "TMP-DEMO-002-N001",
+          "kind": "Module",
+          "name": "Example_VDF_MarketFetch_v0100.py",
+          "line": "1–80（示例）",
+          "children": [
+            {
+              "id": "TMP-DEMO-002-N002",
+              "kind": "FunctionDef",
+              "name": "def main(config: dict) -> int",
+              "line": "20–45（示例）",
+              "children": [
+                {
+                  "id": "TMP-DEMO-002-N003",
+                  "kind": "Call",
+                  "name": "requests.get(url)",
+                  "line": "31（示例）",
+                  "children": []
+                },
+                {
+                  "id": "TMP-DEMO-002-N004",
+                  "kind": "Return",
+                  "name": "return validated_result",
+                  "line": "44（示例）",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "TMP-DEMO-002-N005",
+              "kind": "FunctionDef",
+              "name": "def validate_output(result) -> dict",
+              "line": "48–75（示例）",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "issue": "未納管的 requests.get 呼叫 → N003",
+      "solution": "以 AST 定位出口，改接鎖定網路轉接器；驗證拒絕／重試／日期契約",
+      "patch_state": "PLANNED",
+      "accel": true,
+      "net": "requests.get(url)",
+      "tests": {
+        "U": "PASS",
+        "I": "FAIL",
+        "S": "BLOCKED",
+        "R": "NOT_RUN",
+        "C": "BLOCKED"
+      },
+      "origin": "DEMO",
+      "observed": null
+    },
+    {
+      "id": "TMP-DEMO-003",
+      "governance_id": null,
+      "system": "VRN",
+      "name": "Example_VRN_AnnualTable_v0100.py",
+      "version": "v0100",
+      "updated": "未採集（示例）",
+      "status": "RED",
+      "sha": null,
+      "path": "設計範例/Example_VRN_AnnualTable_v0100.py",
+      "ast": [
+        {
+          "id": "TMP-DEMO-003-N001",
+          "kind": "Module",
+          "name": "Example_VRN_AnnualTable_v0100.py",
+          "line": "1–80（示例）",
+          "children": [
+            {
+              "id": "TMP-DEMO-003-N002",
+              "kind": "FunctionDef",
+              "name": "def main(config: dict) -> int",
+              "line": "20–45（示例）",
+              "children": [
+                {
+                  "id": "TMP-DEMO-003-N003",
+                  "kind": "Call",
+                  "name": "VIA_ACCEL.accel_map(worker, batches)",
+                  "line": "31（示例）",
+                  "children": []
+                },
+                {
+                  "id": "TMP-DEMO-003-N004",
+                  "kind": "Return",
+                  "name": "return validated_result",
+                  "line": "44（示例）",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "TMP-DEMO-003-N005",
+              "kind": "FunctionDef",
+              "name": "def validate_output(result) -> dict",
+              "line": "48–75（示例）",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "issue": "年度欄對齊錯誤 → N005",
+      "solution": "保留原文座標，修復期間對齊；以獨立金標驗算",
+      "patch_state": "PLANNED",
+      "accel": true,
+      "net": "",
+      "tests": {
+        "U": "PASS",
+        "I": "PASS",
+        "S": "PASS",
+        "R": "FAIL",
+        "C": "BLOCKED"
+      },
+      "origin": "DEMO",
+      "observed": null
+    },
+    {
+      "id": "TMP-DEMO-004",
+      "governance_id": null,
+      "system": "VQG",
+      "name": "Example_VQG_Rotation_v0100.py",
+      "version": "v0100",
+      "updated": "未採集（示例）",
+      "status": "YELLOW",
+      "sha": null,
+      "path": "設計範例/Example_VQG_Rotation_v0100.py",
+      "ast": [
+        {
+          "id": "TMP-DEMO-004-N001",
+          "kind": "Module",
+          "name": "Example_VQG_Rotation_v0100.py",
+          "line": "1–80（示例）",
+          "children": [
+            {
+              "id": "TMP-DEMO-004-N002",
+              "kind": "FunctionDef",
+              "name": "def main(config: dict) -> int",
+              "line": "20–45（示例）",
+              "children": [
+                {
+                  "id": "TMP-DEMO-004-N003",
+                  "kind": "Call",
+                  "name": "VIA_ACCEL.accel_map(worker, batches)",
+                  "line": "31（示例）",
+                  "children": []
+                },
+                {
+                  "id": "TMP-DEMO-004-N004",
+                  "kind": "Return",
+                  "name": "return validated_result",
+                  "line": "44（示例）",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "TMP-DEMO-004-N005",
+              "kind": "FunctionDef",
+              "name": "def validate_output(result) -> dict",
+              "line": "48–75（示例）",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "issue": "公式或資料快照變更；舊 Result PASS 已失效",
+      "solution": "重算受影響指標，重跑獨立公式驗證",
+      "patch_state": "PLANNED",
+      "accel": true,
+      "net": "",
+      "tests": {
+        "U": "PASS",
+        "I": "PASS",
+        "S": "PASS",
+        "R": "STALE",
+        "C": "STALE"
+      },
+      "origin": "DEMO",
+      "observed": null
+    },
+    {
+      "id": "TMP-DEMO-005",
+      "governance_id": null,
+      "system": "VAP",
+      "name": "Example_VAP_Chart_v0100.py",
+      "version": "v0100",
+      "updated": "未採集（示例）",
+      "status": "YELLOW",
+      "sha": null,
+      "path": "設計範例/Example_VAP_Chart_v0100.py",
+      "ast": [
+        {
+          "id": "TMP-DEMO-005-N001",
+          "kind": "Module",
+          "name": "Example_VAP_Chart_v0100.py",
+          "line": "1–80（示例）",
+          "children": [
+            {
+              "id": "TMP-DEMO-005-N002",
+              "kind": "FunctionDef",
+              "name": "def main(config: dict) -> int",
+              "line": "20–45（示例）",
+              "children": [
+                {
+                  "id": "TMP-DEMO-005-N003",
+                  "kind": "Call",
+                  "name": "VIA_ACCEL.accel_map(worker, batches)",
+                  "line": "31（示例）",
+                  "children": []
+                },
+                {
+                  "id": "TMP-DEMO-005-N004",
+                  "kind": "Return",
+                  "name": "return validated_result",
+                  "line": "44（示例）",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "TMP-DEMO-005-N005",
+              "kind": "FunctionDef",
+              "name": "def validate_output(result) -> dict",
+              "line": "48–75（示例）",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "issue": "尚缺實際圖形視覺及時間軸驗證",
+      "solution": "檢查 Dataset 指紋、軸綁定、缺值顯示及匯出",
+      "patch_state": "PLANNED",
+      "accel": false,
+      "net": "",
+      "tests": {
+        "U": "PASS",
+        "I": "PASS",
+        "S": "NOT_RUN",
+        "R": "NOT_RUN",
+        "C": "NOT_RUN"
+      },
+      "origin": "DEMO",
+      "observed": null
+    },
+    {
+      "id": "TMP-DEMO-006",
+      "governance_id": null,
+      "system": "VDF",
+      "name": "Example_VDF_LocalNormalize_v0100.py",
+      "version": "v0100",
+      "updated": "未採集（示例）",
+      "status": "GREEN",
+      "sha": null,
+      "path": "設計範例/Example_VDF_LocalNormalize_v0100.py",
+      "ast": [
+        {
+          "id": "TMP-DEMO-006-N001",
+          "kind": "Module",
+          "name": "Example_VDF_LocalNormalize_v0100.py",
+          "line": "1–80（示例）",
+          "children": [
+            {
+              "id": "TMP-DEMO-006-N002",
+              "kind": "FunctionDef",
+              "name": "def main(config: dict) -> int",
+              "line": "20–45（示例）",
+              "children": [
+                {
+                  "id": "TMP-DEMO-006-N003",
+                  "kind": "Call",
+                  "name": "governed/offline",
+                  "line": "31（示例）",
+                  "children": []
+                },
+                {
+                  "id": "TMP-DEMO-006-N004",
+                  "kind": "Return",
+                  "name": "return validated_result",
+                  "line": "44（示例）",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "TMP-DEMO-006-N005",
+              "kind": "FunctionDef",
+              "name": "def validate_output(result) -> dict",
+              "line": "48–75（示例）",
+              "children": []
+            }
+          ]
+        }
+      ],
+      "issue": "",
+      "solution": "網路能力已納管；純本地引擎保持 offline，不新增請求",
+      "patch_state": "設計情境無待修",
+      "accel": true,
+      "net": "governed/offline",
+      "tests": {
+        "U": "PASS",
+        "I": "PASS",
+        "S": "PASS",
+        "R": "PASS",
+        "C": "PASS"
+      },
+      "origin": "DEMO",
+      "observed": null
+    }
+  ],
+  "stages": {
+    "U": "UNIT",
+    "I": "INTEGRATION",
+    "S": "SYSTEM",
+    "R": "RESULT VALIDATION",
+    "C": "CLOSE-OUT"
+  }
+}

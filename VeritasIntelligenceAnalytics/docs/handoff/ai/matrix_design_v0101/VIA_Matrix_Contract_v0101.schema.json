@@ -1,0 +1,741 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:via:matrix-contract:v0101",
+  "title": "VIA Matrix Exchange v0101",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "generated_at",
+    "scope",
+    "entities",
+    "nodes",
+    "bindings",
+    "tests",
+    "issues",
+    "patches"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v0101"
+    },
+    "snapshot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "roots",
+        "enumeration_complete",
+        "required_files",
+        "excluded"
+      ],
+      "properties": {
+        "roots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enumeration_complete": {
+          "type": "boolean"
+        },
+        "required_files": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "excluded": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "reason"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entity"
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "bindings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/binding"
+      }
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/test"
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/issue"
+      }
+    },
+    "patches": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/patch"
+      }
+    }
+  },
+  "$defs": {
+    "entity": {
+      "type": "object",
+      "required": [
+        "entity_id",
+        "governance_id",
+        "owner_system",
+        "name",
+        "version",
+        "kind",
+        "content_sha256",
+        "content_updated_at",
+        "observed_at"
+      ],
+      "properties": {
+        "entity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "governance_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "owner_system": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "file",
+            "dataset",
+            "field",
+            "indicator",
+            "chart",
+            "parameter",
+            "policy",
+            "system",
+            "tool"
+          ]
+        },
+        "content_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "content_updated_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "observed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "family_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "node_id",
+        "entity_id",
+        "entity_version",
+        "parent_id",
+        "kind",
+        "qualified_name",
+        "parser",
+        "span"
+      ],
+      "properties": {
+        "node_id": {
+          "type": "string"
+        },
+        "entity_id": {
+          "type": "string"
+        },
+        "entity_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "parent_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "type": "string"
+        },
+        "qualified_name": {
+          "type": "string"
+        },
+        "parser": {
+          "enum": [
+            "python-ast",
+            "powershell-ast",
+            "unknown"
+          ]
+        },
+        "span": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "start_line": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "end_line": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "start_column": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "end_column": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "semantic_fingerprint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-fA-F0-9]{64}$"
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "required": [
+        "binding_id",
+        "entity_id",
+        "capability",
+        "required",
+        "state",
+        "evidence_ids"
+      ],
+      "properties": {
+        "binding_id": {
+          "type": "string"
+        },
+        "entity_id": {
+          "type": "string"
+        },
+        "capability": {
+          "enum": [
+            "accelerator",
+            "network_engine",
+            "network_call"
+          ]
+        },
+        "required": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "state": {
+          "enum": [
+            "UNKNOWN",
+            "MARKER_ONLY",
+            "STATIC_BOUND",
+            "RUNTIME_VERIFIED",
+            "FAIL",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "site_node_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tool_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tool_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "RUNTIME_VERIFIED"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "tool_version",
+              "tool_sha256"
+            ],
+            "properties": {
+              "tool_version": {
+                "type": "string",
+                "minLength": 1
+              },
+              "tool_sha256": {
+                "type": "string",
+                "pattern": "^[a-fA-F0-9]{64}$"
+              },
+              "evidence_ids": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "test": {
+      "type": "object",
+      "required": [
+        "receipt_id",
+        "test_id",
+        "test_version",
+        "entity_id",
+        "entity_version",
+        "stage",
+        "status",
+        "source_sha256",
+        "rule_sha256",
+        "input_manifest_sha256",
+        "dependency_fingerprint",
+        "environment_id",
+        "started_at",
+        "finished_at",
+        "rc",
+        "assertions"
+      ],
+      "properties": {
+        "receipt_id": {
+          "type": "string"
+        },
+        "test_id": {
+          "type": "string"
+        },
+        "test_version": {
+          "type": "string"
+        },
+        "entity_id": {
+          "type": "string"
+        },
+        "entity_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stage": {
+          "enum": [
+            "UNIT",
+            "INTEGRATION",
+            "SYSTEM",
+            "RESULT_VALIDATION",
+            "CLOSE_OUT"
+          ]
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN",
+            "BLOCKED",
+            "STALE",
+            "WAIVED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "source_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "rule_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "input_manifest_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "dependency_fingerprint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "environment_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "started_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "finished_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "rc": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "assertions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "passed"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "passed": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "artifact_hashes": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "PASS"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[a-fA-F0-9]{64}$"
+              },
+              "dependency_fingerprint": {
+                "type": "string",
+                "pattern": "^[a-fA-F0-9]{64}$"
+              },
+              "environment_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "finished_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "rc": {
+                "const": 0
+              },
+              "assertions": {
+                "minItems": 1,
+                "items": {
+                  "properties": {
+                    "passed": {
+                      "const": true
+                    }
+                  }
+                }
+              },
+              "entity_version": {
+                "type": "string",
+                "minLength": 1
+              },
+              "started_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "issue": {
+      "type": "object",
+      "required": [
+        "issue_id",
+        "entity_id",
+        "node_id",
+        "rule_id",
+        "rule_version",
+        "severity",
+        "status",
+        "evidence_ids"
+      ],
+      "properties": {
+        "issue_id": {
+          "type": "string"
+        },
+        "entity_id": {
+          "type": "string"
+        },
+        "node_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rule_id": {
+          "type": "string"
+        },
+        "rule_version": {
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "BLOCKER",
+            "ERROR",
+            "WARNING",
+            "INFO"
+          ]
+        },
+        "status": {
+          "enum": [
+            "OPEN",
+            "PLANNED",
+            "APPLIED",
+            "VERIFIED",
+            "REOPENED",
+            "WAIVED"
+          ]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "patch": {
+      "type": "object",
+      "required": [
+        "patch_id",
+        "issue_ids",
+        "base_sha256",
+        "target_sha256",
+        "round",
+        "status",
+        "applied_at",
+        "verified_at",
+        "receipt_ids"
+      ],
+      "properties": {
+        "patch_id": {
+          "type": "string"
+        },
+        "issue_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "base_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "target_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "round": {
+          "enum": [
+            "R1",
+            "R2",
+            "R3"
+          ]
+        },
+        "status": {
+          "enum": [
+            "PLANNED",
+            "APPLIED",
+            "VERIFIED",
+            "FAILED",
+            "ROLLED_BACK"
+          ]
+        },
+        "applied_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "verified_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "receipt_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "VERIFIED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "base_sha256": {
+                "type": "string",
+                "pattern": "^[a-fA-F0-9]{64}$"
+              },
+              "target_sha256": {
+                "type": "string",
+                "pattern": "^[a-fA-F0-9]{64}$"
+              },
+              "applied_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "verified_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "receipt_ids": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
