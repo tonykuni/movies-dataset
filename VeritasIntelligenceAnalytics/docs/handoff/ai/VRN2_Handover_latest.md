@@ -386,3 +386,25 @@ Set-Location "$via\functional modules\VDF";$M=(Get-ChildItem . -Filter 'VDF_MDL0
 
 - 容器真 stdio 握手 OK(tools 17 · resources 27 · doctor · settle/latest)· 本倉 `.mcp.json` 入倉(Claude Code 自動接)· Claude Desktop / Manus 設定與桌機兩行見 `docs/handoff/ai/VCGC_MCP_v0101_activation_20261107.md`。
 - 同步:GitHub main 107da7d99 = 工作分支;Manus app 連結容器只讀到外殼(要登入)。
+
+## 36. 桌機四段「一行自動完成」(2026-11-07 · 操作員「繼續桌機四段自動完成」;§34 分段版照舊留著)
+
+`docs/handoff/ai/VIA_DesktopFourBlocks_v0100.py` 把 §34 的四段 + 全景第五段包成一支:有閘(token 紅就停)· 有守門(CPU / DRAM / TEMP)· 有收據(COMMANDS.json · logs · zip)· 可續跑(`--resume <前一輪輸出夾>`,綠的只讀段沿用,真跑那段永不沿用)。容器自測 17/17。
+
+- 第一趟(安全:只出計畫 · 不裝 · 不寫用戶端設定檔 · 只看道):
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$env:VIA_FROM_VCGC="YES";python "$r\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_DesktopFourBlocks_v0100.py" --root $r --env-root "$HOME\envs" --base-python "C:\Python313\python.exe" --dry-only
+```
+
+- 看完 `TOOLS_PLAN_latest.json` 沒有紅的衝突、`MCP_CLIENT_CONFIG.json` 的片段沒問題,再跑第二趟(真裝 · 真寫 Claude Desktop 設定 · 真抓 2015-01-01 起缺口到最新):
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$env:VIA_FROM_VCGC="YES";python "$r\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_DesktopFourBlocks_v0100.py" --root $r --env-root "$HOME\envs" --base-python "C:\Python313\python.exe" --install --mcp-write --jobs 5 --cpu-max 80 --mem-min-gb 3 --temp-min-gb 8
+```
+
+- 中斷了就再貼同一行(VDF 增量 anti-join:已落庫的不重抓;TEMP 在 `%LOCALAPPDATA%\Temp\VIA_progress`);想沿用上一輪綠的只讀段加 `--resume <上一輪輸出夾>`。
+- 只跑某幾段:`--blocks 3,4`;只看 VDF 的道:`--blocks 4 --dry-only`;全景要 pwsh,沒有就照實 GRAY(不裝)。
+- 輸出夾預設 `VeritasIntelligenceAnalytics\VIA_Reports\desktop_four_blocks\<時戳>`:把裡面的 zip 貼回給 AI。
+- 本支不自己 pip、不殺行程、不改他系統正本;併用戶端設定檔只動 `vcgc` 這一鍵且先備份。
+- AI 直接在桌機跑的條件:桌機 Claude 桌面版 設定 → Claude Code → Remote Control 供出 `movies-dataset` 夾(目前沒有供出,所以這一輪由操作員貼一行)。
