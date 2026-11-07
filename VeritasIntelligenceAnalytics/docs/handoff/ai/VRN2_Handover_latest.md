@@ -346,3 +346,38 @@ $r="$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics";$x=(Ge
 - VDF 車道攤開(不代改):`VDF_SystemManager v0168 ui` 在非 Windows 把冊上的 Windows 絕對路徑當相對路徑 → 在 `functional modules/VDF/` 底下生出 `C:\Users\…` 夾(容器兩次 · 已移除不入倉);桌機無此問題。
 - 需求冊 v0217(VCGC-REQ191)· 工作項 +5;VCGC 衝突閘「子系統邊界」擋下對 VRN 邏輯冊的編號(照 L123 不代編)。
 - 更正(Codex PR #602 P2 · 2026-11-06 22:02Z):上面「provenance 認尾版判決行」是錯的 —— v0239 起各版 main / `__main__` 先攔 `--selftest`,`provenance --selftest` 從沒跑到來源回歸(tests/test_SourceProvenance_v0100),拿管理器自測 PASS 當證據不算數。出 **VRN_SystemManager v0262**(薄尾 · v0261 一字不改):provenance 動詞放回攔截之前,`provenance --selftest` = 來源回歸(「[來源回歸] fail=0; tests=23」)+ 管理器自測(5/5 · 前版鏈 PASS),回傳碼取大;交接案標記改回「[來源回歸] fail=0」,工作項先退 PENDING、實跑綠再 VERIFIED。CI 同一行指令(`$mgr logic` · `$mgr provenance --selftest`)兩段都印。VRN-2 runtime 線下一個管理器號 v0263。
+
+## 34. 2026-11-07 操作員令:全景 / 整合 / MCP 對接 / VDF 擷取就緒 / 環境 / 收尾驗證(§32 §33 照舊)
+
+容器已做:三日全景矩陣頁 · 兩份上傳入倉(`docs/handoff/ai/vcgc_panorama_v0100` SHA 10/10 · 隔離回歸 13/13;`docs/handoff/ai/matrix_design_v0101` SHA 6/6)· Panorama runner 容器實跑 · VDF 尾版橋覆蓋 AST 量測 100%(23/23 · 網路 6/6)· VDF_SystemManager v0168 自測 6/6 鏈 PASS · ui GREEN · MCP 伺服器 v0101 自測 12/12 · doctor rc 0 · VRN-2 v0262(11-06)。
+桌機才能做的四段(PowerShell 7 · 一段一段貼 · 每段跑完看紅黃再下一段):
+
+- 第 1 段 · 先降壓 + 環境總檢(只查不裝):
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$via="$r\VeritasIntelligenceAnalytics";Get-Process | Where-Object {$_.Name -match '^(python|pwsh|duckdb|Code|msedge|chrome)$'} | Sort-Object WS -Descending | Select-Object -First 8 Name,Id,@{n='MB';e={[int]($_.WS/1MB)}};$V=(Get-ChildItem "$via\supportive modules\registry" -Filter 'CGC_MDL149_VeritasCentralGovernanceConsole_v*.py'|Sort-Object Name|Select-Object -Last 1).FullName;$env:VIA_FROM_VCGC='YES';$env:VIA_ENV_ROOT="$HOME\envs";python $V token;python $V run CGC_MDL240_EnvManager;python $V env
+```
+
+- 第 2 段 · 環境布建(VCGC 的 via-envgov:零安裝零刪除預設;破壞段永不自動;裝要 `--apply --approve`):
+
+```powershell
+via-envgov run --env-root "$HOME\envs" --base-python "C:\Python313\python.exe";via-envgov eight-hub --env-root "$HOME\envs" --base-python "C:\Python313\python.exe";via-envgov tools --env-root "$HOME\envs";via-envgov conflicts
+```
+
+看 `TOOLS_PLAN_latest.json` 的段(REPAIR_TOOLS → INSTALL_TOOLS → VERIFY_TOOLS;中高風險 _M / _H 一律獨立隔離境),沒有紅的衝突再 `via-envgov tools --apply --approve --env-root "$HOME\envs"`;裝壞了 `via-envrecover --execute --approve`(①還原前次 LKGC ②順序裝)。PATH 只加受管境的 `Scripts`;`--base-python` 改成你系統 base 的 python.exe。
+- 第 3 段 · MCP 對接(Claude Desktop / Manus):
+
+```powershell
+python "$via\supportive modules\registry\CGC_MDL279_MCPServer_v0101.py" --selftest;python "$via\supportive modules\registry\CGC_MDL279_MCPServer_v0101.py" --client-config --root $r
+```
+
+印出的 JSON 貼進用戶端 mcpServers(Claude Desktop:`%APPDATA%\Claude\claude_desktop_config.json`);用戶端連上先叫 `vcgc_token` → `vcgc_functions` → `vcgc_handoff_check`。
+- 第 4 段 · VDF 擷取(2015-01-01 起 · 增量 · 五流 · 守門 · TEMP):先 `--dry` 看道,再真跑;中斷再跑同一行即續(增量 anti-join,已落庫的不重抓;TEMP 在 `%LOCALAPPDATA%\Temp\VIA_progress`):
+
+```powershell
+Set-Location "$via\functional modules\VDF";$M=(Get-ChildItem . -Filter 'VDF_MDL012_FetchGroups_v*.py'|Sort-Object Name|Select-Object -Last 1).FullName;python $M run --groups TW_EQUITY,TW_ETF,US_MACRO_FRED,CN_AKSHARE,GLOBAL_INDEX --jobs 5 --mode live --cpu-max 80 --mem-min-gb 3 --temp-min-gb 8 --dry;python $M run --groups TW_EQUITY,TW_ETF,US_MACRO_FRED,CN_AKSHARE,GLOBAL_INDEX --jobs 5 --mode live --cpu-max 80 --mem-min-gb 3 --temp-min-gb 8
+```
+
+- 第 5 段 · 全景三輪(上傳的 runner · 兩根):README 第一段那四行,但 PS1 改貼 `Invoke-VCGC-Panorama-v0101.ps1`(Codex #603 P1 / P2:預設沿用相依未變的收據、逾時殺整個 process group;要全站重跑加 `-ForceFull`);預設掃 `…\VeritasIntelligenceAnalytics` 與 `…\movies-dataset`,作用中 VCGC 取第二根。
+- 貼回:`%LOCALAPPDATA%\VIA\VCGC_Panorama_v0100\<時戳>\SUMMARY.json` · VDF `VIA_Reports\vdf\…` 收據 · `python $V env` 的輸出。
+- 未讀:Manus 分享頁只讀得到標題「規劃 VIA 整合 agentmemory、Ponytail、OmniRoute 等工具」。

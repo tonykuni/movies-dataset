@@ -1,0 +1,114 @@
+{
+  "artifact": "VIA MultiMatrix Design",
+  "version": "v0101",
+  "checked_at": "2026-11-07T08:43:53.296222+00:00",
+  "environment": "isolated Linux / managed Chromium",
+  "scope": "UI prototype and exchange-contract structural checks only",
+  "schema_checks": [
+    {
+      "name": "Schema 結構及未知／NOT_RUN 快照有效",
+      "status": "PASS"
+    },
+    {
+      "name": "拒絕缺證據的 PASS",
+      "status": "PASS",
+      "rejected_error_count": 8
+    },
+    {
+      "name": "接受具必要結構欄位的測試收據",
+      "status": "PASS"
+    },
+    {
+      "name": "拒絕非零 rc 的 PASS",
+      "status": "PASS",
+      "rejected_error_count": 1
+    },
+    {
+      "name": "拒絕無效驗證日期",
+      "status": "PASS",
+      "rejected_error_count": 2
+    },
+    {
+      "name": "拒絕失敗斷言的 PASS",
+      "status": "PASS",
+      "rejected_error_count": 1
+    },
+    {
+      "name": "拒絕空白斷言",
+      "status": "PASS",
+      "rejected_error_count": 2
+    },
+    {
+      "name": "拒絕缺工具版本／雜湊／證據的已驗證接線",
+      "status": "PASS",
+      "rejected_error_count": 3
+    },
+    {
+      "name": "拒絕缺前後雜湊／時間／收據的已驗證修復",
+      "status": "PASS",
+      "rejected_error_count": 5
+    }
+  ],
+  "browser_checks": [
+    {
+      "check": "14 個矩陣導航皆顯示對應標題",
+      "result": "PASS"
+    },
+    {
+      "check": "M01 固定八欄與系統篩選",
+      "result": "PASS"
+    },
+    {
+      "check": "AST 檔案→def→呼叫展開，節點測試未綁定明列",
+      "result": "PASS"
+    },
+    {
+      "check": "Integration 詳情與 M09 五階段表頭",
+      "result": "PASS"
+    },
+    {
+      "check": "M03 大類→資料集→欄位展開與共用前四欄",
+      "result": "PASS"
+    },
+    {
+      "check": "VQG 示範被 VDF 系統篩選正確排除",
+      "result": "PASS"
+    },
+    {
+      "check": "61 筆合成清冊匯入與 50+11 分頁",
+      "result": "PASS"
+    },
+    {
+      "check": "M00 聚合全部 61 筆，不受分頁影響；一筆 ERROR 使系統紅燈",
+      "result": "PASS"
+    },
+    {
+      "check": "匯入清冊的 PARSED／標記不提升為已驗證綠燈",
+      "result": "PASS"
+    },
+    {
+      "check": "匯入模式不混入契約示例，重設可回到示例",
+      "result": "PASS"
+    },
+    {
+      "check": "緊湊三行標題與契約展開版面視覺檢查",
+      "result": "PASS"
+    }
+  ],
+  "syntax_checks": {
+    "javascript": "node --check PASS"
+  },
+  "not_tested": [
+    "Windows local filesystem",
+    "PowerShell native AST execution",
+    "VIA source injection or production pipelines",
+    "real accelerator/network routing",
+    "real Unit/Integration/System/Result validation",
+    "large-scale performance"
+  ],
+  "notes": [
+    "Demo PASS states are fictional design examples, not QA receipts for VIA.",
+    "Schema date-time tested with explicit timezone-aware format checker; format assertions must be enabled by consumers.",
+    "9 contract cases validate structure and rejection conditions; referential integrity and evidence authenticity require production semantic validation."
+  ]
+}
