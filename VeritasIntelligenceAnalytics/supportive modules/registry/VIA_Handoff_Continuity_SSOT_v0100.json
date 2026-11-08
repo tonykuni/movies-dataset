@@ -4042,6 +4042,20 @@
     "docs/handoff/ai/VIA_SkillExport_v0100.py"
    ],
    "timeout_seconds": 600
+  },
+  "C-vrn2-peerbridge-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_PeerBridge_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[自測] 43/43 PASS",
+   "scope": "VRN-2 為主向 VRN-1 借用:差異矩陣證據律 · VRN-1 只讀不留位元碼 · 薄尾 PEP 562 入口 · 工具冊三態 · 整合閘不綠必拒 · 借用冊只增 · 索引效能迴歸",
+   "dependencies": [
+    "functional modules/VRN/VRN2_PeerBridge_v0100.py"
+   ],
+   "timeout_seconds": 600
   }
  },
  "work_items": [
@@ -8523,6 +8537,88 @@
    "receipt": "",
    "reason": "連結內文顯示桌機已有 VCGC v0193 / v0194 套件與 Start-VCGC-v0194.ps1(本倉主控台仍是 v0192),但都在 Downloads 未上傳、桌機未供出資料夾 → 讀不到,不能比對也不能升級。",
    "next": "操作員上傳 VCGC_MultiMatrix_Integration_v0193.zip · VCGC_MultiMatrix_Resilience_v0194.zip · README_v0194.md(或經 Remote Control 供出 Downloads 夾)→ 本倉比對主控台 v0192 與 v0193/v0194 的差距後再評估升級。"
+  },
+  {
+   "id": "VCGC-REQ197:vrn2-side-bridge",
+   "requirement": "VCGC-REQ197",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "case": "C-vrn2-peerbridge-v0100",
+   "receipt": "docs/handoff/evidence/C-vrn2-peerbridge-v0100.json",
+   "reason": "動手前實查:VRN-1 有自己的 ToolBridge,VRN-2 側倉內一支都沒有,而 VRN-1 要找的 VRN-2 工具冊位在從不提交的 VIA_Reports/** → 兩邊其實都借不到。本支補上 VRN-2 那一側的橋。"
+  },
+  {
+   "id": "VCGC-REQ197:gap-matrix-computed",
+   "requirement": "VCGC-REQ197",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "case": "C-vrn2-peerbridge-v0100",
+   "receipt": "docs/handoff/evidence/C-vrn2-peerbridge-v0100.json",
+   "reason": "差異矩陣由程式算不手寫:VRN-1 的 23 個能力逐項掃 VRN-2 的 650 檔 → MATCH 14 · REVIEW 0 · GAP 9。MATCH 一律附證據檔;判不出來寫 REVIEW,不寫 MATCH 也不寫 GAP。"
+  },
+  {
+   "id": "VCGC-REQ197:nine-gaps-really-borrowed",
+   "requirement": "VCGC-REQ197",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "case": "C-vrn2-peerbridge-v0100",
+   "receipt": "docs/handoff/evidence/C-vrn2-peerbridge-v0100.json",
+   "reason": "9 項缺口**逐項實借成功**(不是理論可借):各驗 sha256、載入成功、公開名 24–49 個。prove.lock / truth.matrix / run.cache / temp.store / focus.only / ast.id / dataframe.headers / ticker.record / book.check。"
+  },
+  {
+   "id": "VCGC-REQ197:vrn1-readonly-proven",
+   "requirement": "VCGC-REQ197",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "case": "C-vrn2-peerbridge-v0100",
+   "receipt": "docs/handoff/evidence/C-vrn2-peerbridge-v0100.json",
+   "reason": "對 VRN-1 只讀是查證過的不是宣稱:borrow 用 sys.dont_write_bytecode 包住載入;實查 VRN-1 內 *.cpython-313*.pyc 為 0(本容器是 3.13),既有 __pycache__ 是 2026-10-20 的 cpython-312 且我借的 9 支一支都沒 .pyc;git status 乾淨。"
+  },
+  {
+   "id": "VCGC-REQ197:lend-manifest-4of4",
+   "requirement": "VCGC-REQ197",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "case": "C-vrn2-peerbridge-v0100",
+   "receipt": "docs/handoff/evidence/C-vrn2-peerbridge-v0100.json",
+   "reason": "VRN-1 指名要借的 section.near / ocr.image 一開始判 NO_ENTRY —— 查下去是**我的入口函式名猜錯**:兩支都是薄尾版,公開面靠 PEP 562 __getattr__ 轉接,AST 只看得到 main。入口改認 main 並標 forwards_dynamically(不假裝列舉被動態轉接的名字)→ 工具冊 4/4 LENDABLE。"
+  },
+  {
+   "id": "VCGC-REQ197:manifest-two-copies",
+   "requirement": "VCGC-REQ197",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "case": "C-vrn2-peerbridge-v0100",
+   "receipt": "docs/handoff/evidence/C-vrn2-peerbridge-v0100.json",
+   "reason": "工具冊寫兩份且內容相同:倉內可提交正本 functional modules/VRN/ssot/,加上 VRN-1 寫死會去找的 VIA_Reports/vrn2/tools/(不提交 · 每次重生)。VRN-1 是別的系統的倉,我不改它來配合我。"
+  },
+  {
+   "id": "VCGC-REQ197:integration-gate",
+   "requirement": "VCGC-REQ197",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "case": "C-vrn2-peerbridge-v0100",
+   "receipt": "docs/handoff/evidence/C-vrn2-peerbridge-v0100.json",
+   "reason": "「等 VRN-2 功能完美才去整合」做成會擋的閘不是承諾:integrate 在就緒燈不綠時實測 rc 1 拒絕,並印出擋住的原因與操作員那句令。就緒燈現為 YELLOW(只剩 GAP 9)。"
+  },
+  {
+   "id": "VCGC-REQ197:perf-index-once",
+   "requirement": "VCGC-REQ197",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "case": "C-vrn2-peerbridge-v0100",
+   "receipt": "docs/handoff/evidence/C-vrn2-peerbridge-v0100.json",
+   "reason": "開發中踩到真效能缺陷:差異矩陣原本對每個沒命中的能力重掃全樹並剖析(650×9×2),all 又跑三遍 → 實測吃掉 120s 逾時。改成整輪只建一次索引 → 6.5s;補兩個迴歸測(每檔最多讀一次 · 第二次 0 次讀檔)。"
+  },
+  {
+   "id": "VCGC-REQ197:integration-not-done",
+   "requirement": "VCGC-REQ197",
+   "state": "BLOCKED",
+   "owner": "AI",
+   "case": "C-vrn2-peerbridge-v0100",
+   "receipt": "",
+   "reason": "本輪**沒有做整合**,也沒把 9 支 VRN-1 引擎複製進 VRN-2(借用是執行期載入,不是搬檔)。",
+   "next": "操作員決定:① 先補完 GAP 9(要在 VRN-2 側寫自己的實作,另一輪)② 整合範圍怎麼定(冊 / 號 / 入口 / U/I 各自怎麼併)—— 我不自己決定範圍。readiness 轉綠後 integrate 才會放行。"
   }
  ]
 }

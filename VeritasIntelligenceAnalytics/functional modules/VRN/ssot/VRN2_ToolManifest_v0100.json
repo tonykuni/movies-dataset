@@ -1,0 +1,70 @@
+{
+ "schema": "VIA.VRN2.ToolManifest.v1",
+ "system": "VRN-2",
+ "version": "v0100",
+ "ts": "2026-11-08T01:18:56Z",
+ "note": "VRN-2 借出的工具冊。VRN-1 的橋會讀這本冊並驗 sha256。倉內正本是可提交的那一份;VIA_Reports 下那一份是 VRN-1 期待的位置,每次重生。",
+ "tools": {
+  "section.near": {
+   "state": "LENDABLE",
+   "path": "functional modules/VRN/VRN_ENG049_ContentReconcile_v0103.py",
+   "sha256": "1f89f74dd8504400b479e83e2b31bb0e3b5f0c41573a70c196b1b7d796ed7112",
+   "func": "main",
+   "func_candidates": [
+    "main",
+    "near_section",
+    "section_near",
+    "reconcile"
+   ],
+   "forwards_dynamically": true,
+   "why": "同段鄰近比對(VRN-1 的橋指名要借這支)"
+  },
+  "ocr.image": {
+   "state": "LENDABLE",
+   "path": "functional modules/VRN/VRN_ENG057_ScanOcrRescue_v0105.py",
+   "sha256": "b8bb456c4c02736987651b39fe8a77014e3a88ef2e511773ef4731b79f313327",
+   "func": "main",
+   "func_candidates": [
+    "main",
+    "ocr_image",
+    "rescue",
+    "run"
+   ],
+   "forwards_dynamically": true,
+   "why": "影像 OCR 救援(VRN-1 的橋指名要借這支)"
+  },
+  "table.omni": {
+   "state": "LENDABLE",
+   "path": "functional modules/VRN/VRN_ENG058_TableOmni_v0105.py",
+   "sha256": "98de4ea834f7652a049ad8d0637d54633ce0dc3c2cb7c6c2a36968417b2fab71",
+   "func": "main",
+   "func_candidates": [
+    "restore",
+    "run",
+    "main"
+   ],
+   "forwards_dynamically": false,
+   "why": "表格全式還原"
+  },
+  "verified.matrix": {
+   "state": "LENDABLE",
+   "path": "functional modules/VRN/VRN_ENG083_VerifiedMatrix_v0120.py",
+   "sha256": "80900c0903bbb0937d4e04b587a8d5916b5207474ac114bc6fe0b4bd9814f0f8",
+   "func": "main",
+   "func_candidates": [
+    "build",
+    "run",
+    "main"
+   ],
+   "forwards_dynamically": false,
+   "why": "驗證過的輸出矩陣"
+  }
+ },
+ "lendable": [
+  "ocr.image",
+  "section.near",
+  "table.omni",
+  "verified.matrix"
+ ],
+ "not_lendable": []
+}
