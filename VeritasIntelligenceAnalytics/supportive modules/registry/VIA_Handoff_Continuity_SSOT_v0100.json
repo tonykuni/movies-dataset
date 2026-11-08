@@ -4114,6 +4114,22 @@
    ],
    "timeout_seconds": 600,
    "marker_note": "標記不釘檢數,只釘「· FAIL 0 · PASS」—— 只有全過才印得出來,以後加檢也不會過期"
+  },
+  "C-skillexport-v0101": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_SkillExport_v0101.py",
+    "--selftest"
+   ],
+   "success_marker": "· FAIL 0 · PASS",
+   "scope": "技能引擎雙觸發 + 可組合:前版自測全過且動詞全轉接 · 登錄表不另抄一份 · 十技能各自的觸發語都命中自己 · 偵測確定性(同查詢兩次同結果)· 命中詞附來源欄位且真在查詢裡 · 沒命中不硬掛(none + rc 3)· 抬頭字面 [ACTIVE SKILLS: /a, /b] · 同分照登錄表原序 · 串接解得開且 Tier2 照使用者順序 · 加速器取聯集不重 · 箭頭與不帶斜線寫法都收 · 假技能整條拒跑(rc 2)· 空鏈拒跑 · 比對詞只來自 Tier1 不含 sop · 一字詞不進字典 · 片語層保留整句觸發語(回歸:只切空白會讓『多 Agent 交接』消失)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_SkillExport_v0101.py",
+    "docs/handoff/ai/VIA_SkillExport_v0100.py"
+   ],
+   "timeout_seconds": 900,
+   "marker_note": "標記不釘檢數,只釘「· FAIL 0 · PASS」—— 只有全過才印得出來"
   }
  },
  "work_items": [
@@ -8704,6 +8720,15 @@
    "what": "VDF_MDL014_ThreeCodeUniverse v0100:三種代號當輸入 · 一個指令併成 OUT-01 · 驗證十一項 · 自測 67/67。實跑抓到真缺陷:種子冊 38 列混了 7 支 D 尾主動債券 + 1 支已退役 → 照冊律濾成主動股票 ETF 30 檔全驗證過。",
    "receipt": "docs/handoff/evidence/V-threecode-v0100.json",
    "note": "操作員 2026-11-08 令。三支抓料引擎(009 / 010 / e232)原本就在擷取冊上,本輪補的是 OUT-01 併表與代號路由。個股組只有 6 筆種子(下限 900 / 700)→ AMBER;轉綠要跑上游真相庫,需網路 + 同意閘,引擎不代設。"
+  },
+  {
+   "id": "VCGC-REQ201:skill-dual-trigger",
+   "requirement": "VCGC-REQ201",
+   "case": "C-skillexport-v0101",
+   "state": "VERIFIED",
+   "what": "VIA_SkillExport v0101:補上規格 §I 缺的三件(語意自動偵測 · [ACTIVE SKILLS] 抬頭 · 多技能串接)· 自測 46/46(含前版 56/56)。規格其餘七項 v0100 早已做完,未重做。",
+   "receipt": "docs/handoff/evidence/C-skillexport-v0101.json",
+   "note": "操作員 2026-11-08 令。同輪另出各 AI 近三日紀錄稽核(提交 133 · PR #603–#610 全 merged · 三日鎖 220 · REGRESSED 0)。desktop-commander MCP 實測在本容器非桌機、Gemini 分享頁讀不到,照實記。"
   }
  ]
 }
