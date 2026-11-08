@@ -136,6 +136,11 @@ LAYERS = (("/usr/local/lib/python3.13/dist-packages", "主層"),
 
 LEVEL_ORDER = {"RED": 0, "YELLOW": 1, "GRAY": 2}
 
+# 量測地點。本容器是雲端沙盒直譯器(非 venv),它的「主層」是**這台**的 base,
+# 不是桌機那顆 BASE(冊 evidence.workstation_20260907:BASE 681 件 136 衝突,另有實錄)。
+# 不寫清楚的話,容器層的發現會被誤讀成桌機結論。
+MEASURED_ON = "雲端容器(py3.13 系統直譯器,非 venv)"
+
 
 # ───────────────────────── 小工具 ─────────────────────────
 def norm(name: str) -> str:
@@ -202,10 +207,25 @@ def declared_index(bl: dict) -> dict[str, list[tuple[str, str]]]:
     return dict(idx)
 
 
-def pip_of(imp: str, idx: dict) -> tuple[str, bool]:
-    """import 名 → (pip 名, 是否有依據)。認不出來就回正規化名並標 False(= L7)。"""
-    if imp in PIP_NAME:
-        return PIP_NAME[imp], True
+def import_map(bl: dict) -> dict[str, str]:
+    """import 名 → pip 名。**冊上的 import_name_map 是正本**,引擎內建 PIP_NAME 只是退路。
+
+    順序很重要:冊上的先用。少一條對映就會把在冊的件誤判成未宣告
+    (踩過:surya 其實就是 ocr 家族的 surya-ocr,被當成 65 個假缺件之一)。
+    """
+    m = dict(PIP_NAME)
+    for k, v in (bl.get("import_name_map") or {}).items():
+        if k.startswith("_") or not isinstance(v, str):
+            continue                       # _note 這種註解鍵不是對映
+        m[k] = v
+    return m
+
+
+def pip_of(imp: str, idx: dict, imap: dict | None = None) -> tuple[str, bool]:
+    """import 名 → (pip 名, 是否有依據)。認不出來就回正規化名並標 False。"""
+    m = imap if imap is not None else PIP_NAME
+    if imp in m:
+        return norm(m[imp]), True          # 值也要正規化:冊上索引鍵是正規化過的
     n = norm(imp)
     if n in idx:
         return n, True
@@ -248,8 +268,13 @@ def own_names(via: Path = VIA) -> set[str]:
     return out
 
 
-def scan_tree(via: Path = VIA) -> tuple[dict, int, set[str]]:
-    """AST 取真 import(不用 grep 猜)。回 (tops, 掃過的檔數, 自家模組名小寫)。"""
+def scan_tree(via: Path = VIA, parse_fail: list | None = None) -> tuple[dict, int, set[str]]:
+    """AST 取真 import(不用 grep 猜)。回 (tops, 掃過的檔數, 自家模組名小寫)。
+
+    AST 剖不過的檔**逐支記進 parse_fail 並回報數量**。不能默默 continue:
+    剖不過就讀不到它的 import,那支檔的套件需求會整個消失,盤冊卻看起來很完整。
+    (全景工具報過我這裡原本是 SWALLOW —— 它說得對。)
+    """
     std = set(sys.stdlib_module_names)
     tops: dict[str, dict[str, set]] = defaultdict(lambda: defaultdict(set))
     own = own_names(via)
@@ -261,8 +286,10 @@ def scan_tree(via: Path = VIA) -> tuple[dict, int, set[str]]:
         nfile += 1
         try:
             tree = ast.parse(f.read_bytes(), filename=rel)
-        except Exception:
-            continue                      # AST 不過的檔由全景工具報,不在這裡重複報
+        except Exception as e:
+            if parse_fail is not None:
+                parse_fail.append({"file": rel, "error": f"{type(e).__name__}: {e}"})
+            continue
         for n in ast.walk(tree):
             mods: list[str] = []
             if isinstance(n, ast.Import):
@@ -295,10 +322,12 @@ def container_layer(imp: str, via: Path = VIA) -> str:
     return "其他:" + o[:40]
 
 
-def build_rows(bl: dict, via: Path = VIA) -> tuple[list[dict], int, list[dict]]:
-    """回 (第三方列, 掃過檔數, 自家模組不在位列)。兩者分流,不互相汙染。"""
+def build_rows(bl: dict, via: Path = VIA) -> tuple[list[dict], int, list[dict], list[dict]]:
+    """回 (第三方列, 掃過檔數, 自家模組不在位列, AST 剖不過列)。各自分流,不互相汙染。"""
     idx = declared_index(bl)
-    tops, nfile, own = scan_tree(via)
+    imap = import_map(bl)
+    parse_fail: list[dict] = []
+    tops, nfile, own = scan_tree(via, parse_fail)
     rows: list[dict] = []
     own_missing: list[dict] = []
     for imp, lanes in tops.items():
@@ -311,7 +340,7 @@ def build_rows(bl: dict, via: Path = VIA) -> tuple[list[dict], int, list[dict]]:
             if imp.lower() not in own:    # 名字是自家的、樹內卻沒有這個檔
                 own_missing.append({"import": imp, "nfiles": n, "lanes": ln})
             continue                      # 自家模組一律不進第三方列
-        pip, mapped = pip_of(imp, idx)
+        pip, mapped = pip_of(imp, idx, imap)
         rows.append({
             "import": imp,
             "pip": pip,
@@ -323,7 +352,7 @@ def build_rows(bl: dict, via: Path = VIA) -> tuple[list[dict], int, list[dict]]:
         })
     rows.sort(key=lambda r: (-r["nfiles"], r["pip"]))
     own_missing.sort(key=lambda r: -r["nfiles"])
-    return rows, nfile, own_missing
+    return rows, nfile, own_missing, parse_fail
 
 
 # ───────────────────────── 衝突偵測(純函式,可餵夾具) ─────────────────────────
@@ -350,7 +379,7 @@ def detect(rows: list[dict], bl: dict, own_missing: list[dict] | None = None) ->
         if bad_fams and layer in base_layers:
             add("L1_BLOCKED_IN_BASE", "RED", r,
                 f"封鎖家族 {'/'.join(bad_fams)} 的件卻在 base 層",
-                f"容器實況={layer};冊 never_in_base_families 列有 {'/'.join(bad_fams)}",
+                f"容器實況={layer}({MEASURED_ON});冊 never_in_base_families 列有 {'/'.join(bad_fams)}",
                 f"拉出到 {'/'.join(envs) or '家族境'};base 端移除須待目標境 VERIFY 綠(R2)")
 
         if len(fams) >= 2:
@@ -362,33 +391,36 @@ def detect(rows: list[dict], bl: dict, own_missing: list[dict] | None = None) ->
         if "base/engine_core" in buckets and layer == "使用者層":
             add("L3_CORE_WRONG_LAYER", "RED", r,
                 "engine_core 共用基座件卻裝在使用者層 → 版本會蓋過主層而沒人看見",
-                f"容器實況={layer}(主層沒有);冊 base/engine_core",
+                f"容器實況={layer}(主層沒有);{MEASURED_ON};冊 base/engine_core",
                 "歸位主層(R2);本案實證:duckdb 2.0.0 移除 fetchone 讓 VRN_ENG115 自測當掉")
 
         if decl and absent:
             core = "base/engine_core" in buckets
             add("L4_DECLARED_ABSENT", "RED" if core else "YELLOW", r,
                 "冊上宣告了、容器沒有" + ("(且是共用基座件)" if core else ""),
-                f"容器實況={layer};冊上={'、'.join(sorted(set(buckets)))}",
+                f"容器實況={layer}({MEASURED_ON});冊上={'、'.join(sorted(set(buckets)))}",
                 f"裝進 {'/'.join(envs) or 'base'}(R2:經 via-envgov tools --apply --approve)")
 
         if not decl and not absent:
             add("L5_UNDECLARED_PRESENT", "YELLOW", r,
                 "容器有、冊上沒有 → 會悄悄變版而沒人比對得出來",
-                f"容器實況={layer};冊上五個來源都查不到 {r.get('pip')}",
+                f"容器實況={layer}({MEASURED_ON});冊上五個來源都查不到 {r.get('pip')}",
                 "登入冊上對應家族 members(或 base low_risk_allow)—— 純冊修(R1)")
 
         if not decl and absent:
+            guess = "" if r.get("mapped", True) else ";pip 名是用 import 名猜的,對不對要到鏡像才知道"
             add("L6_UNDECLARED_ABSENT", "RED", r,
                 "冊上沒有、容器也沒有 → 匯入它的程式一行都跑不起來",
-                f"容器實況={layer};冊上查無;{r.get('nfiles')} 支現役 .py 匯入它",
+                f"容器實況={layer}({MEASURED_ON});冊上查無;{r.get('nfiles')} 支現役 .py 匯入它{guess}",
                 "先登冊決定家族與目標境(R1),再裝(R2)")
 
-        if not r.get("mapped", True):
+        if not r.get("mapped", True) and not absent:
+            # 只有「裝在容器裡、冊上又查不到」才是真的 L7:它在位、卻釘不住版本。
+            # ABSENT 那批已由 L6 收走,在這裡再報一次只會把黃燈灌水(踩過:65 筆重複)。
             add("L7_MAP_UNKNOWN", "YELLOW", r,
-                "import 名沒有 pip 名對映 → 解析器拿它去鏡像找不到",
-                f"import 名 {r.get('import')};PIP_NAME 與冊上都沒有對映",
-                "把對映寫進冊(或本引擎 PIP_NAME)—— 純冊修(R1)")
+                "在位卻查不到 pip 名 → 釘不住版本,也比對不出它何時變了",
+                f"import 名 {r.get('import')};容器={layer}({MEASURED_ON});PIP_NAME 與冊上都沒有對映",
+                "把對映與版本寫進冊 —— 純冊修(R1)")
 
     for env, pkgs in (bl.get("naming_law", {}) or {}).get("renames", {}).items():
         out.append({"code": "L8_NAMING_LAW", "level": "GRAY", "pip": env, "import": env,
@@ -465,18 +497,23 @@ def env_closure(rows: list[dict], bl: dict) -> dict[str, list[str]]:
 
 
 # ───────────────────────── 盤冊 ─────────────────────────
-def substance(rows: list[dict], conf: list[dict]) -> str:
-    """實質指紋:套件集合 + 層 + 宣告 + 衝突碼。重跑而結果一樣就不出新版號。"""
+def substance(rows: list[dict], conf: list[dict], parse_fail: list[dict] | None = None) -> str:
+    """實質指紋:套件集合 + 層 + 宣告 + 衝突碼 + AST 剖不過的檔。重跑結果一樣就不出新版號。
+
+    剖不過的檔名也算實質:多一支剖不過就等於盤冊多一個讀不到的缺口,
+    那是盤冊內容真的變了,不該被當成「沒變」而不出新版號。
+    """
     import hashlib
     key = [[r["pip"], r["layer"], sorted({b for b, _ in (r.get("declared") or [])})] for r in rows]
     key.sort()
     cc = sorted((c["code"], c["pip"]) for c in conf)
-    return hashlib.sha256(json.dumps([key, cc], ensure_ascii=False,
+    pf = sorted(x["file"] for x in (parse_fail or []))
+    return hashlib.sha256(json.dumps([key, cc, pf], ensure_ascii=False,
                                      sort_keys=True).encode("utf-8")).hexdigest()
 
 
 def make_book(rows: list[dict], conf: list[dict], bl: dict, bl_name: str, nfile: int,
-              own_missing: list[dict] | None = None) -> dict:
+              own_missing: list[dict] | None = None, parse_fail: list[dict] | None = None) -> dict:
     lv = defaultdict(int)
     for c in conf:
         lv[c["level"]] += 1
@@ -492,7 +529,9 @@ def make_book(rows: list[dict], conf: list[dict], bl: dict, bl_name: str, nfile:
         "engine": "VIA_LibsInventory_v0100.py",
         "generated_at_utc": utc_now(),
         "baseline_book": bl_name,
+        "import_name_map_source": "冊 import_name_map" if bl.get("import_name_map") else "引擎內建 PIP_NAME(冊上還沒有正本)",
         "baseline_untouched": True,
+        "measured_on": MEASURED_ON,
         "scanned_py_files": nfile,
         "third_party_total": len(rows),
         "declared_total": declared_n,
@@ -503,8 +542,11 @@ def make_book(rows: list[dict], conf: list[dict], bl: dict, bl_name: str, nfile:
         "mirror_chain": (bl.get("mirror_chain") or {}).get("order", []),
         "mirror_probe": "GRAY_NOT_RUN(探測屬網路行為過同意閘;本引擎不代設)",
         "install_executed": "NONE(裝件一律經 VCGC via-envgov tools --apply --approve)",
-        "substance_sha256": substance(rows, conf),
+        "substance_sha256": substance(rows, conf, parse_fail),
         "own_module_missing": own_missing or [],
+        "ast_parse_failed": parse_fail or [],
+        "ast_parse_failed_note": "剖不過 = 讀不到它的 import = 它的套件需求沒進盤冊。數字不為 0 就代表盤冊有缺口,"
+                                 "照實記,不當 0。",
         "rows": rows,
         "conflicts": conf,
         "env_closure": env_closure(rows, bl),
@@ -558,7 +600,14 @@ def plan_text(book: dict, bl: dict) -> str:
         for s in rnd["R1"]:
             A(f"- `{s}`")
     else:
-        A("- (無)")
+        A("**已清空** —— 冊修全部完成,衝突偵測在 R1 這一類已歸零。做了什麼看正本冊自己的紀錄:")
+        A("")
+        A("- `change_v0103`:三件被兩個家族同時認領(目標境歧義)→ 依冊自己的 `moved_out` /")
+        A("  `functional_moved_to_via` 裁決歸屬,各留一個正主")
+        A("- `change_v0104`:65 件樹內真的 import、冊上卻查無的件全部落冊 ——")
+        A("  58 件歸既有家族(每家族一條理由)· 5 件推不出歸屬 → `unclassified` → 黑環境待裁 ·")
+        A("  2 件其實早在冊上只是 import 名 ≠ pip 名 → 新增 `import_name_map` 正本鍵")
+        A("- 驗帳:冊上覆蓋率 57.2% → 100.0%;`CGC_MDL135_EnvGovernance` 尾版自測 52/52 + 5/5 沒退步")
     A("")
     A("## R2 境修(要鏡像 + 同意閘 + 拓撲序 —— 桌機照下面貼上跑,不用再測)")
     A("")
@@ -792,9 +841,28 @@ def selftest() -> int:
     chk("⑳ L5 與 L6 互斥(同一列不會同時出現)",
         not ({"L5_UNDECLARED_PRESENT", "L6_UNDECLARED_ABSENT"} <= codes(c)))
 
-    # ㉑ L7
+    # ㉑ L7:只收「在位卻查不到 pip 名」;ABSENT 那批不重複報(回歸測:重複過 65 筆)
     c = detect([row("weirdlib", mapped=False, layer="主層")], fx)
-    chk("㉑ L7 無對映 = YELLOW", "L7_MAP_UNKNOWN" in codes(c))
+    chk("㉑ L7 在位卻無對映 = YELLOW", "L7_MAP_UNKNOWN" in codes(c))
+    c = detect([row("weirdlib", mapped=False, layer="ABSENT")], fx)
+    chk("㉑b ABSENT 的無對映只報 L6,不重複報 L7",
+        "L6_UNDECLARED_ABSENT" in codes(c) and "L7_MAP_UNKNOWN" not in codes(c))
+    chk("㉑c L6 證據寫明 pip 名是猜的",
+        any("猜" in x["evidence"] for x in c if x["code"] == "L6_UNDECLARED_ABSENT"))
+    chk("㉑d 衝突證據標明量測地點(容器主層不等於桌機 BASE)",
+        all(MEASURED_ON in x["evidence"] for x in c if x["code"] == "L6_UNDECLARED_ABSENT"))
+    # ㉑f 冊上 import_name_map 是正本,贏過引擎內建;_note 不算對映
+    fx_map = dict(fx)
+    fx_map["import_name_map"] = {"_note": "註解不是對映", "fitz": "pymupdf-override", "surya": "surya-ocr"}
+    im = import_map(fx_map)
+    chk("㉑f 冊上對映覆蓋引擎內建", im.get("fitz") == "pymupdf-override")
+    chk("㉑g _note 不被當成對映", "_note" not in im)
+    chk("㉑h 冊上新增的對映生效", pip_of("surya", {}, im) == ("surya-ocr", True))
+    chk("㉑i 沒給 imap 時退回引擎內建", pip_of("fitz", {}) == ("pymupdf", True))
+
+    # ㉑e PIP_NAME 的值要正規化,不然查不到冊上索引鍵
+    chk("㉑e pdfminer → pdfminer-six 且查得到冊上(值未正規化就會誤報 L5)",
+        pip_of("pdfminer", declared_index({"families": {"table_extraction": {"members": ["pdfminer.six"]}}})) == ("pdfminer-six", True))
 
     # ㉒ L8 GRAY:不能寫成紅也不能寫成綠
     c = detect([], fx)
@@ -827,6 +895,11 @@ def selftest() -> int:
     r1 = [row("duckdb"), row("seaborn")]
     chk("㉛ 指紋與列序無關", substance(r1, []) == substance(list(reversed(r1)), []))
     chk("㉜ 指紋對層變化敏感", substance(r1, []) != substance([row("duckdb", layer="使用者層"), row("seaborn")], []))
+    chk("㉜b 指紋對 AST 剖不過敏感(多一支讀不到 = 盤冊真的變了)",
+        substance(r1, []) != substance(r1, [], [{"file": "x.py", "error": "SyntaxError"}]))
+    chk("㉜c 剖不過的列序也不影響指紋",
+        substance(r1, [], [{"file": "a.py", "error": "e"}, {"file": "b.py", "error": "e"}])
+        == substance(r1, [], [{"file": "b.py", "error": "e"}, {"file": "a.py", "error": "e"}]))
 
     # ㉝ 盤冊:實質沒變不出新版號、已發布不覆寫
     bk = make_book(rr, detect(rr, fx), fx, "fx.json", 7)
@@ -858,6 +931,21 @@ def selftest() -> int:
     chk("㊷ HTML 轉義使用者內容", "<b>x</b>" not in h and "&lt;b&gt;x&lt;/b&gt;" in h)
     chk("㊸ HTML 顏色全走 --vl-* token", h.count("--vl-") > 30 and "prefers-color-scheme" in h)
     chk("㊹ HTML 兩個主題都定義 + body 有底色", 'data-theme="dark"' in h and "background:var(--vl-bg)" in h)
+
+    # ㊽b AST 剖不過不得默默吞掉(全景工具報過這裡是 SWALLOW)
+    with tempfile.TemporaryDirectory() as td:
+        d = Path(td)
+        (d / "ok.py").write_text("import pandas\n", encoding="utf-8")
+        (d / "broken.py").write_text("def f(:\n", encoding="utf-8")
+        pfx: list[dict] = []
+        tops, n, _ = scan_tree(d, pfx)
+        chk("㊽b 剖得過的照讀", "pandas" in tops)
+        chk("㊽c 剖不過的逐支記下來(檔名 + 真錯誤)",
+            len(pfx) == 1 and pfx[0]["file"] == "broken.py" and "Error" in pfx[0]["error"])
+        chk("㊽d 不給收集器也不炸(退路)", scan_tree(d)[1] == n)
+        bkp = make_book([], [], fx, "fx.json", n, [], pfx)
+        chk("㊽e 剖不過進盤冊,且註明它代表盤冊有缺口",
+            bkp["ast_parse_failed"] == pfx and "缺口" in bkp["ast_parse_failed_note"])
 
     # ㊺ 正本冊真的沒被動到(讀進來再比一次位元)
     try:
@@ -894,9 +982,11 @@ def selftest() -> int:
 # ───────────────────────── 動詞 ─────────────────────────
 def cmd_scan(args) -> int:
     bl, name = load_baseline()
-    rows, nfile, own_missing = build_rows(bl)
+    rows, nfile, own_missing, pf = build_rows(bl)
     print(f"[普查] 掃 {nfile} 支現役 .py · 第三方頂層套件 {len(rows)} 個 · "
-          f"自家模組不在位 {len(own_missing)} 個 · 正本冊 {name}(未改)")
+          f"自家模組不在位 {len(own_missing)} 個 · AST 剖不過 {len(pf)} 支 · 正本冊 {name}(未改)")
+    for x in pf[:5]:
+        print(f"   [剖不過] {x['file']} —— {x['error'][:70]}")
     dn = sum(1 for r in rows if r["declared"])
     print(f"[對帳] 冊上有 {dn} · 冊上沒有 {len(rows)-dn} · 覆蓋率 {100.0*dn/len(rows):.1f}%")
     print(f"\n{'套件':24}{'容器':10}{'冊上':28}{'檔':>5}  車道")
@@ -910,11 +1000,12 @@ def cmd_scan(args) -> int:
 
 def cmd_audit(args) -> int:
     bl, name = load_baseline()
-    rows, nfile, own_missing = build_rows(bl)
+    rows, nfile, own_missing, pf = build_rows(bl)
     conf = detect(rows, bl, own_missing)
-    book = make_book(rows, conf, bl, name, nfile, own_missing)
+    book = make_book(rows, conf, bl, name, nfile, own_missing, pf)
     lv = book["conflict_levels"]
-    print(f"[普查] {nfile} 支 .py · 第三方 {len(rows)} 個 · 覆蓋率 {book['declared_ratio_pct']}%")
+    print(f"[普查] {nfile} 支 .py · 第三方 {len(rows)} 個 · 覆蓋率 {book['declared_ratio_pct']}% · "
+          f"AST 剖不過 {len(pf)} 支(剖不過 = 它的套件需求沒進盤冊)")
     print(f"[衝突] RED {lv.get('RED',0)} · YELLOW {lv.get('YELLOW',0)} · GRAY {lv.get('GRAY',0)}")
     for code, n in sorted(book["conflict_codes"].items()):
         ex = next((c["pip"] for c in conf if c["code"] == code), "")
@@ -926,18 +1017,14 @@ def cmd_audit(args) -> int:
         print(f"[盤冊] {st} {p.name}")
     else:
         print("[盤冊] 未寫(加 --apply 才寫)")
-    (HERE / "_libs_book_cache.json").write_text(json.dumps(book, ensure_ascii=False), encoding="utf-8")
     return 0
 
 
 def _load_book() -> dict:
     p = tail(REGISTRY, BOOK_STEM, ".json")
-    if p is not None:
-        return json.loads(p.read_text(encoding="utf-8"))
-    c = HERE / "_libs_book_cache.json"
-    if c.exists():
-        return json.loads(c.read_text(encoding="utf-8"))
-    raise SystemExit("[紅] 還沒有盤冊 —— 先跑 audit")
+    if p is None:
+        raise SystemExit("[紅] 還沒有盤冊 —— 先跑 audit --apply")
+    return json.loads(p.read_text(encoding="utf-8"))
 
 
 def cmd_plan(args) -> int:
