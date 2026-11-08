@@ -239,27 +239,77 @@ def group_stock(ins: dict) -> dict:
             "meta": {"state": st, "hint": "先跑 E-01 ENG055 L1 lane_listings(要同意閘)"}}
 
 
-def group_etf(ins: dict) -> dict:
+def retired_codes(here: Path = HERE) -> dict[str, str]:
+    """退役冊(VDF_ActiveETF_Retired_SSOT)。冊自己寫:revoked_at 有值 = 不算退役。"""
+    p = tail(here, "VDF_ActiveETF_Retired_SSOT_v")
+    if p is None:
+        return {}
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    out = {}
+    for r in (d.get("retired") or []):
+        if isinstance(r, dict) and r.get("ticker") and not r.get("revoked_at"):
+            out[str(r["ticker"]).upper()] = str(r.get("retired_at") or r.get("ruling") or "RETIRED")
+    return out
+
+
+def _etf_filter(raw: list[dict], ins: dict, here: Path = HERE) -> tuple[list, list]:
+    """照冊 IN-02 自己的律過濾,不是把不合的塞進清單再標紅。
+
+    冊上 IN-02 寫得很清楚:code_regex ^00[0-9]{3}A$ · exclude 有「D 尾(主動債券)」
+    「下架 / 無持股揭露」。種子冊 38 列裡混了 7 支 D 尾(那是主動債券 ETF,不是主動股票 ETF)
+    和 1 支已退役,它們本來就不該進這一組。
+    被排除的逐件留 reason —— 排掉不等於消失,看得到才查得動。
+    """
+    rx = re.compile(str(ins.get("IN-02", {}).get("code_regex") or r"^00[0-9]{3}A$"))
+    ret = retired_codes(here)
+    keep, drop = [], []
+    for r in raw:
+        code = str(r.get("code", "")).upper()
+        if not rx.match(code):
+            drop.append({**r, "rejected": "NOT_ACTIVE_EQUITY_CODE",
+                         "why": f"不合冊上 IN-02 代碼律 {rx.pattern}"
+                                + ("(D 尾 = 主動債券 ETF,不是主動股票)" if code.endswith("D") else "")})
+            continue
+        if code in ret:
+            drop.append({**r, "rejected": "RETIRED",
+                         "why": f"退役冊列為退役({ret[code]});冊 rule:unify 之後濾掉、不入當日宇宙列"})
+            continue
+        keep.append(r)
+    return keep, drop
+
+
+def group_etf(ins: dict, here: Path = HERE) -> dict:
     rows, st = _db_rows(DB_ETF, "SELECT ticker, name, issuer, verified FROM active_tw_etf_registry")
     if st == "LIVE_DB":
-        out = [{"code": str(r[0]), "name": str(r[1] or ""), "issuer": str(r[2] or ""),
+        raw = [{"code": str(r[0]), "name": str(r[1] or ""), "issuer": str(r[2] or ""),
                 "verified": bool(r[3]), "source": "LIVE_DB", "state": "ACTIVE"} for r in rows]
-        return {"id": "IN-02", "rows": out, "source": "LIVE_DB", "meta": {"db": DB_ETF.name}}
+        keep, drop = _etf_filter(raw, ins, here)
+        return {"id": "IN-02", "rows": keep, "rejected": drop, "source": "LIVE_DB",
+                "meta": {"db": DB_ETF.name, "kept": len(keep), "rejected": len(drop)}}
     seed, meta = _seed(SEED_ETF, "etfs")
     if seed:
-        out = []
+        raw = []
         for r in seed:
             stt = str(r.get("status", ""))
-            out.append({"code": str(r.get("ticker", "")),
+            raw.append({"code": str(r.get("ticker", "")),
                         "name": str(r.get("official_name") or r.get("name") or ""),
                         "issuer": str(r.get("issuer", "")),
                         # 只有 OpenAPI 真的驗過的才算 verified;PENDING / MISMATCH 一律 False
                         "verified": stt == "VERIFIED_OPENAPI",
                         "source": "SEED_BOOK", "state": stt or "UNKNOWN"})
-        meta["verified_openapi"] = sum(1 for r in out if r["verified"])
-        meta["not_verified"] = len(out) - meta["verified_openapi"]
-        return {"id": "IN-02", "rows": out, "source": "SEED_BOOK", "meta": meta}
-    return {"id": "IN-02", "rows": [], "source": "ABSENT",
+        keep, drop = _etf_filter(raw, ins, here)
+        meta["seed_rows"] = len(raw)
+        meta["kept"] = len(keep)
+        meta["rejected"] = len(drop)
+        meta["rejected_by"] = {k: sum(1 for d in drop if d["rejected"] == k)
+                               for k in sorted({d["rejected"] for d in drop})}
+        meta["verified_openapi"] = sum(1 for r in keep if r["verified"])
+        meta["not_verified"] = len(keep) - meta["verified_openapi"]
+        return {"id": "IN-02", "rows": keep, "rejected": drop, "source": "SEED_BOOK", "meta": meta}
+    return {"id": "IN-02", "rows": [], "rejected": [], "source": "ABSENT",
             "meta": {"state": st, "hint": "先跑 E-02 ENG077 / 擷取 010(要同意閘)"}}
 
 
@@ -373,8 +423,16 @@ def validate(rows: list[dict], groups: list[dict], inb: dict) -> dict:
     # V10 種子冊天花板:用到 SEED_BOOK 的組,就不給綠
     seeded = [g["id"] for g in groups if g["source"] == "SEED_BOOK"]
     add("V10", "來源層級(SEED_BOOK 不算當日官方真相)", "AMBER" if seeded else "GREEN",
-        ("用了種子冊:" + "、".join(f"{i}({gm[i]['meta'].get('as_of', '?')})" for i in seeded)
+        ("用了種子冊:" + "、".join(f"{i}({gm[i]['meta'].get('as_of') or '無 as_of'})" for i in seeded)
          + " —— 驗證時間不是今天,燈頂到 AMBER") if seeded else "三組都不是種子冊")
+
+    # V11 排除件照律且逐件有理由(排掉不等於消失)
+    rej = [d for g in groups for d in (g.get("rejected") or [])]
+    noreason = [d.get("code") for d in rej if not d.get("why")]
+    add("V11", "排除件逐件有理由", "RED" if noreason else "GREEN",
+        (f"排除 {len(rej)} 件 · " + " · ".join(
+            f"{k} {sum(1 for d in rej if d.get('rejected') == k)}"
+            for k in sorted({d.get("rejected", "?") for d in rej})) ) if rej else "本輪沒有排除件")
 
     lamp = "GREEN"
     for c in checks:
@@ -394,7 +452,9 @@ def build(apply: bool = False, here: Path = HERE, out_root: Path | None = None) 
         "schema": SCHEMA, "engine": TAG, "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "books": {"input_universe": in_name, "fetch_system": fetch_name},
         "lamp": v["lamp"], "checks": v["checks"], "count": len(rows),
-        "groups": [{"id": g["id"], "source": g["source"], "rows": len(g["rows"]), "meta": g["meta"]} for g in groups],
+        "groups": [{"id": g["id"], "source": g["source"], "rows": len(g["rows"]),
+                    "rejected": len(g.get("rejected") or []), "meta": g["meta"]} for g in groups],
+        "rejected_rows": [d for g in groups for d in (g.get("rejected") or [])],
         "net_gate": {"consent_env": "VIA_NET_CONSENT",
                      "set_here": bool(os.environ.get("VIA_NET_CONSENT")),
                      "tool": ("在位" if net else "缺席"),
@@ -607,6 +667,32 @@ def selftest() -> int:
         chk("⑤d 未驗的沒有被寫成 verified=True",
             all(r["verified"] is (r["state"] == "VERIFIED_OPENAPI") for r in g2["rows"]))
 
+    # ⑤e–⑤h 照冊 IN-02 的 exclude 律過濾:D 尾(主動債券)與退役件不得進這一組
+    chk("⑤e D 尾(主動債券)不得進主動股票 ETF 組",
+        not [r for r in g2["rows"] if str(r["code"]).upper().endswith("D")],
+        [r["code"] for r in g2["rows"] if str(r["code"]).upper().endswith("D")][:5])
+    ret = retired_codes()
+    chk("⑤f 退役件不得進清單(退役冊說的)",
+        not [r for r in g2["rows"] if str(r["code"]).upper() in ret], sorted(ret))
+    chk("⑤g 被排除的逐件留 reason(排掉不等於消失)",
+        all(d.get("why") for d in (g2.get("rejected") or [])))
+    chk("⑤h 排除理由分類得出來(代碼律 / 退役)",
+        set((g2["meta"].get("rejected_by") or {})) <= {"NOT_ACTIVE_EQUITY_CODE", "RETIRED"},
+        g2["meta"].get("rejected_by"))
+    rx2chk = re.compile(ins["IN-02"]["code_regex"])
+    chk("⑤i 留下來的每一件都合代碼律(V3 之後就該是綠)",
+        all(rx2chk.match(str(r["code"]).upper()) for r in g2["rows"]))
+    # 夾具:撤銷退役(revoked_at 有值)就不算退役 —— 冊自己寫的
+    import tempfile as _tf
+    with _tf.TemporaryDirectory() as _td:
+        _d = Path(_td)
+        (_d / "VDF_ActiveETF_Retired_SSOT_v0100.json").write_text(json.dumps(
+            {"retired": [{"ticker": "00998A", "retired_at": "2026-10-13", "revoked_at": None},
+                         {"ticker": "00997A", "retired_at": "2026-10-13", "revoked_at": "2026-11-01"}]},
+            ensure_ascii=False), encoding="utf-8")
+        rr = retired_codes(_d)
+        chk("⑤j revoked_at 有值 = 不算退役(冊 rule)", "00998A" in rr and "00997A" not in rr, rr)
+
     # ⑥ 指數組:冊上宣告的兩個一定在,沒日資料就標 DECLARED_NO_DAILY
     g3 = group_index(ins)
     codes3 = {r["code"] for r in g3["rows"]}
@@ -632,6 +718,10 @@ def selftest() -> int:
     many_tw = [{"code": str(1000 + i), "name": f"股{i}", "market": "TWSE", "state": "LISTED"} for i in range(900)]
     many_tp = [{"code": str(3000 + i), "name": f"櫃{i}", "market": "TPEX", "state": "LISTED"} for i in range(700)]
     good_etf = [{"code": "00980A", "name": "x", "issuer": "y", "verified": True, "state": "ACTIVE"}]
+
+    def fxr(gs, rej):
+        gs[1] = {**gs[1], "rejected": rej}
+        return gs
 
     def lamps(gs):
         gg = gs
@@ -662,6 +752,15 @@ def selftest() -> int:
     chk("⑰ 用了種子冊 → V10 AMBER 天花板(全合規也不給綠)", cc["V10"] == "AMBER" and lp == "AMBER")
     lp, cc = lamps(fx(many_tw[:5], good_etf, good_idx))
     chk("⑱ 列數不足 → V9 AMBER 且註明是上游沒建起來", cc["V9"] == "AMBER")
+
+    gs = fxr(fx(many_tw + many_tp, good_etf, good_idx), [{"code": "00980D", "rejected": "NOT_ACTIVE_EQUITY_CODE", "why": "D 尾"}])
+    v = validate(assemble(gs, inb), gs, inb)
+    cc = {c["id"]: c["lamp"] for c in v["checks"]}
+    chk("⑱b 排除件有理由 → V11 GREEN,且數量印出來", cc["V11"] == "GREEN"
+        and "排除 1 件" in next(c["note"] for c in v["checks"] if c["id"] == "V11"))
+    gs = fxr(fx(many_tw + many_tp, good_etf, good_idx), [{"code": "00980D", "rejected": "X"}])
+    cc = {c["id"]: c["lamp"] for c in validate(assemble(gs, inb), gs, inb)["checks"]}
+    chk("⑱c 排除件沒寫理由 → V11 RED(不准無聲排除)", cc["V11"] == "RED")
 
     # ⑲ 重抓次序照冊 needs,不是我排的
     st = plan_steps(fetch)
