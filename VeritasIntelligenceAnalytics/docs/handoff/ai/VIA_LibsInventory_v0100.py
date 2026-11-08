@@ -637,6 +637,35 @@ def plan_text(book: dict, bl: dict) -> str:
     for s in rnd.get("R3", []):
         A(f"  - `{s}`")
     A("")
+    A("## R2(Windows PowerShell 版 · 同一份閉包,只換殼)")
+    A("")
+    A("倉內本來就有 `scripts/envcheck.ps1`(與 .sh 同功能,相容 PowerShell 5.1 / 7),所以桌機直接用這份。")
+    A("")
+    A("```powershell")
+    A('$env:VIA_NET_CONSENT = "YES"   # 同意閘:只有操作員能開')
+    A(".\\scripts\\envcheck.ps1 doctor                 # ① 三鏡像連通 + uv cache 體檢")
+    A("")
+    for env, pkgs in clo.items():
+        if not pkgs:
+            continue
+        py = _env_python(env, bl)
+        q = " ".join(pkgs)
+        A(f"# {env}({len(pkgs)} 件 · python {py})")
+        A(f"uv venv {env} --python {py}")
+        A(f".\\scripts\\envcheck.ps1 resolve {q}")
+        A(f"uv pip install --python {env} {q}")
+        A(f"uv pip check --python {env}")
+        A("")
+    A("```")
+    A("")
+    A("**PowerShell 的兩個坑**(踩過:操作員把 .mcp.json 的 JSON 片段貼進提示字元,PowerShell 回"
+      " ParserError「運算式或陳述式中有未預期的語彙基元 ':'」):")
+    A("")
+    A("- `$env:VIA_NET_CONSENT` **只活在那一個 PowerShell 視窗**。關掉視窗就沒了,下次要重設。")
+    A("  要跨視窗請自己決定是否持久化(`setx`)—— 同意閘要不要常開是操作員的裁量,引擎不代決。")
+    A("- 本文件裡的 JSON / 設定片段(例如 `.mcp.json` 的內容)**是檔案內容,不是指令**,")
+    A("  貼進提示字元一定 ParserError。只有 ```powershell 區塊裡的那些才是可貼的指令。")
+    A("")
     A("## 這份計畫沒有做到的事(照實寫)")
     A("")
     A(f"- 鏡像連通:{book['mirror_probe']}")
@@ -921,6 +950,14 @@ def selftest() -> int:
     chk("㊳ 計畫把同意閘留給操作員", "VIA_NET_CONSENT" in pt and "不代設" in pt)
     chk("㊴ 計畫照實寫沒跑過", "沒跑過" in pt and "GRAY" in pt)
     chk("㊵ 計畫用冊上的 python 版本", "--python 3.12" in pt or "--python 3.13" in pt)
+    # ㊵b–㊵e 兩個平台都要有可貼的(倉內 envcheck 有 .sh 也有 .ps1)
+    chk("㊵b 計畫同時給 bash 與 PowerShell 兩版", "envcheck.sh" in pt and "envcheck.ps1" in pt)
+    chk("㊵c PowerShell 版用 .ps1 不用 .sh(不要叫 Windows 跑 bash)",
+        "scripts\\\\envcheck.ps1 doctor" in pt or ".\\scripts\\envcheck.ps1 doctor" in pt or "envcheck.ps1 doctor" in pt)
+    chk("㊵d 提醒 $env: 只活在那一個視窗(踩過:關掉視窗同意閘就沒了)",
+        "只活在那一個 PowerShell 視窗" in pt)
+    chk("㊵e 提醒設定片段不是指令(踩過:JSON 貼進提示字元 ParserError)",
+        "是檔案內容,不是指令" in pt and "ParserError" in pt)
 
     # ㊶ HTML:只用 --vl-* 、無骨架標籤、有轉義
     h = ui_html(make_book([row("<script>bad</script>", pip="<b>x</b>", layer="主層")],

@@ -159,6 +159,125 @@ uv pip check --python via_vrn_312                     # ③ 裝後相容性;非 
   - `L8_NAMING_LAW:paddle_312`
   - `L8_NAMING_LAW:vmt_pm`
 
+## R2(Windows PowerShell 版 · 同一份閉包,只換殼)
+
+倉內本來就有 `scripts/envcheck.ps1`(與 .sh 同功能,相容 PowerShell 5.1 / 7),所以桌機直接用這份。
+
+```powershell
+$env:VIA_NET_CONSENT = "YES"   # 同意閘:只有操作員能開
+.\scripts\envcheck.ps1 doctor                 # ① 三鏡像連通 + uv cache 體檢
+
+# via_camelot_311(1 件 · python 3.13)
+uv venv via_camelot_311 --python 3.13
+.\scripts\envcheck.ps1 resolve camelot-py
+uv pip install --python via_camelot_311 camelot-py
+uv pip check --python via_camelot_311
+
+# via_html_312(5 件 · python 3.12)
+uv venv via_html_312 --python 3.12
+.\scripts\envcheck.ps1 resolve beautifulsoup4 html2text lxml readability-lxml trafilatura
+uv pip install --python via_html_312 beautifulsoup4 html2text lxml readability-lxml trafilatura
+uv pip check --python via_html_312
+
+# via_iso_ml_cuda_H(5 件 · python 3.11)
+uv venv via_iso_ml_cuda_H --python 3.11
+.\scripts\envcheck.ps1 resolve funasr llama-cpp-python marker-pdf sentence-transformers transformers
+uv pip install --python via_iso_ml_cuda_H funasr llama-cpp-python marker-pdf sentence-transformers transformers
+uv pip check --python via_iso_ml_cuda_H
+
+# via_iso_quarantine(5 件 · python 3.12)
+uv venv via_iso_quarantine --python 3.12
+.\scripts\envcheck.ps1 resolve crewai email-case-tracker google langgraph pdf-table-validator
+uv pip install --python via_iso_quarantine crewai email-case-tracker google langgraph pdf-table-validator
+uv pip check --python via_iso_quarantine
+
+# via_iso_scrape_H(3 件 · python 3.11)
+uv venv via_iso_scrape_H --python 3.11
+.\scripts\envcheck.ps1 resolve js2py playwright selenium
+uv pip install --python via_iso_scrape_H js2py playwright selenium
+uv pip check --python via_iso_scrape_H
+
+# via_iso_webui_M(4 件 · python 3.12)
+uv venv via_iso_webui_M --python 3.12
+.\scripts\envcheck.ps1 resolve pywebview streamlit streamlit-agraph streamlit-mermaid
+uv pip install --python via_iso_webui_M pywebview streamlit streamlit-agraph streamlit-mermaid
+uv pip check --python via_iso_webui_M
+
+# via_mix_api_v2_M(3 件 · python 3.12)
+uv venv via_mix_api_v2_M --python 3.12
+.\scripts\envcheck.ps1 resolve fastapi redis uvicorn
+uv pip install --python via_mix_api_v2_M fastapi redis uvicorn
+uv pip check --python via_mix_api_v2_M
+
+# via_mix_ds_np2_M(10 件 · python 3.12)
+uv venv via_mix_ds_np2_M --python 3.12
+.\scripts\envcheck.ps1 resolve dask datacompy joblib numba numexpr pandera ray recordlinkage scikit-learn statsmodels
+uv pip install --python via_mix_ds_np2_M dask datacompy joblib numba numexpr pandera ray recordlinkage scikit-learn statsmodels
+uv pip check --python via_mix_ds_np2_M
+
+# via_mix_http_M(1 件 · python 3.12)
+uv venv via_mix_http_M --python 3.12
+.\scripts\envcheck.ps1 resolve httpx
+uv pip install --python via_mix_http_M httpx
+uv pip check --python via_mix_http_M
+
+# via_nlp(24 件 · python 3.12)
+uv venv via_nlp --python 3.12
+.\scripts\envcheck.ps1 resolve ckip-transformers dateparser fasttext flashtext ftfy gensim google-re2 jellyfish jieba keybert nltk opencc pinyin pkuseg polyfuzz pyahocorasick pycorrector pypinyin quantulum3 rapidfuzz spacy sumy wtpsplit-lite yake
+uv pip install --python via_nlp ckip-transformers dateparser fasttext flashtext ftfy gensim google-re2 jellyfish jieba keybert nltk opencc pinyin pkuseg polyfuzz pyahocorasick pycorrector pypinyin quantulum3 rapidfuzz spacy sumy wtpsplit-lite yake
+uv pip check --python via_nlp
+
+# via_onnxruntime(1 件 · python 3.12)
+uv venv via_onnxruntime --python 3.12
+.\scripts\envcheck.ps1 resolve onnxruntime
+uv pip install --python via_onnxruntime onnxruntime
+uv pip check --python via_onnxruntime
+
+# via_paddle_311(9 件 · python 3.13)
+uv venv via_paddle_311 --python 3.13
+.\scripts\envcheck.ps1 resolve easyocr img2table onnxruntime opencv-contrib-python paddleocr pytesseract pyvips rapidocr-onnxruntime surya-ocr
+uv pip install --python via_paddle_311 easyocr img2table onnxruntime opencv-contrib-python paddleocr pytesseract pyvips rapidocr-onnxruntime surya-ocr
+uv pip check --python via_paddle_311
+
+# via_tabula_311(1 件 · python 3.11)
+uv venv via_tabula_311 --python 3.11
+.\scripts\envcheck.ps1 resolve tabula-py
+uv pip install --python via_tabula_311 tabula-py
+uv pip check --python via_tabula_311
+
+# via_tools_312(9 件 · python 3.12)
+uv venv via_tools_312 --python 3.12
+.\scripts\envcheck.ps1 resolve chardet keyring lz4 prefect pytest structlog transitions watchdog xxhash
+uv pip install --python via_tools_312 chardet keyring lz4 prefect pytest structlog transitions watchdog xxhash
+uv pip check --python via_tools_312
+
+# via_vap_312(8 件 · python 3.12)
+uv venv via_vap_312 --python 3.12
+.\scripts\envcheck.ps1 resolve dash dash-bootstrap-components duckdb matplotlib numpy pandas plotly seaborn
+uv pip install --python via_vap_312 dash dash-bootstrap-components duckdb matplotlib numpy pandas plotly seaborn
+uv pip check --python via_vap_312
+
+# via_vdf_312(18 件 · python 3.12)
+uv venv via_vdf_312 --python 3.12
+.\scripts\envcheck.ps1 resolve akshare curl-cffi duckdb fredapi google-api-python-client google-auth-oauthlib gspread gspread-dataframe imap-tools msal numpy pandas pandas-datareader plotly polars pyarrow python-calamine yfinance
+uv pip install --python via_vdf_312 akshare curl-cffi duckdb fredapi google-api-python-client google-auth-oauthlib gspread gspread-dataframe imap-tools msal numpy pandas pandas-datareader plotly polars pyarrow python-calamine yfinance
+uv pip check --python via_vdf_312
+
+# via_vrn_312(33 件 · python 3.12)
+uv venv via_vrn_312 --python 3.12
+.\scripts\envcheck.ps1 resolve borb docling docx2python duckdb extract-msg fonttools markitdown numpy odfpy openpyxl-style-writer pandas pdf2image pdfminer-six pdfplumber pdfquery pdfrw pikepdf plotly pyarrow pymupdf pymupdf4llm pypdf pypdfium2 python-docx python-pptx pywin32 reportlab striprtf textract tika unstructured weasyprint xlrd
+uv pip install --python via_vrn_312 borb docling docx2python duckdb extract-msg fonttools markitdown numpy odfpy openpyxl-style-writer pandas pdf2image pdfminer-six pdfplumber pdfquery pdfrw pikepdf plotly pyarrow pymupdf pymupdf4llm pypdf pypdfium2 python-docx python-pptx pywin32 reportlab striprtf textract tika unstructured weasyprint xlrd
+uv pip check --python via_vrn_312
+
+```
+
+**PowerShell 的兩個坑**(踩過:操作員把 .mcp.json 的 JSON 片段貼進提示字元,PowerShell 回 ParserError「運算式或陳述式中有未預期的語彙基元 ':'」):
+
+- `$env:VIA_NET_CONSENT` **只活在那一個 PowerShell 視窗**。關掉視窗就沒了,下次要重設。
+  要跨視窗請自己決定是否持久化(`setx`)—— 同意閘要不要常開是操作員的裁量,引擎不代決。
+- 本文件裡的 JSON / 設定片段(例如 `.mcp.json` 的內容)**是檔案內容,不是指令**,
+  貼進提示字元一定 ParserError。只有 ```powershell 區塊裡的那些才是可貼的指令。
+
 ## 這份計畫沒有做到的事(照實寫)
 
 - 鏡像連通:GRAY_NOT_RUN(探測屬網路行為過同意閘;本引擎不代設)
