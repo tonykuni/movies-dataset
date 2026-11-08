@@ -2,7 +2,7 @@
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0231",
  "batch": "VCGC-REQ202 五系統串測 VCGC → VDF → VRN → VQG → VAP 2026-11-08",
- "ts": "2026-11-08T16:06:58Z",
+ "ts": "2026-11-08T16:38:59Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -6530,10 +6530,12 @@
    "status": "PARTIAL",
    "homes": [
     "VIA_EnvGovernance_Baseline_v0104.json",
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
     "VIA_LibsInventory_SSOT_v0101.json",
     "VIA_VCGC_FunctionInventory_SSOT_v0201.json",
-    "VIA_Handoff_Continuity_SSOT_v0100.json",
-    "VIA_Workflow_VCGC_SSOT_v0132.json"
+    "VIA_VCGC_FunctionInventory_SSOT_v0206.json",
+    "VIA_Workflow_VCGC_SSOT_v0132.json",
+    "VIA_Workflow_VCGC_SSOT_v0133.json"
    ],
    "workflow": "VCGC-WKF026",
    "modules": [
@@ -6543,7 +6545,8 @@
     "supportive modules/registry/VIA_LibsInventory_SSOT_v0100.json",
     "supportive modules/registry/VIA_LibsInventory_SSOT_v0101.json",
     "docs/handoff/ai/VIA_LibsInventory_Plan.md",
-    "docs/handoff/ai/VIA_LibsInventory_UI.html"
+    "docs/handoff/ai/VIA_LibsInventory_UI.html",
+    "docs/handoff/ai/VIA_LibsInventory_v0101.py"
    ],
    "evidence": "容器 2026-11-08 實跑。普查 4064 支現役 .py · 第三方頂層套件 152 個 · 自家模組不在位 9 個(分流不混算)。**冊上覆蓋率 57.2% → 100.0%**。衝突 RED 78 → 13 · YELLOW(去重後)57 → 122 · GRAY 4。R1 冊修全部在雲端完成:正本冊 add-only 出 v0103(三件跨家族認領,依冊自己的 moved_out / functional_moved_to_via 裁決)與 v0104(65 件落冊:58 件歸既有家族 · 5 件推不出歸屬進 unclassified → via_iso_quarantine 待裁 · 2 件其實早在冊只是 import 名 ≠ pip 名 → 新增 import_name_map 正本鍵);v0102 原檔一位元未動。讀冊端沒退步:CGC_MDL135_EnvGovernance v0118 自測 52/52 + 5/5 PASS。引擎自測 60/60 PASS,其中 6 條是回歸測(families 正本鍵是 members 不是 packages · 自家模組不得當第三方 · ABSENT 的無對映不重複報 L7 · PIP_NAME 值要正規化 · 冊上對映覆蓋引擎內建 · L10 不混進 libs 輪次)。閉包:17 境 140 件次。",
    "blocked": "R2(動境)在本容器做不了,兩件事都在同意閘後面:① 鏡像連通探測 ② 實際安裝。冊 mirror_chain.config 明寫「探測屬網路行為過同意閘 VIA_NET_CONSENT=YES」,CLAUDE.md 與 token 卡明寫「禁代設同意閘」→ 本輪一律標 GRAY_NOT_RUN,不寫成綠。剩下的 RED 13(封鎖家族件在容器主層 2 · engine_core 落使用者層 4 · 基座件宣告沒裝 7)與 YELLOW 113(宣告沒裝)全部要裝件或搬層,計畫已出:docs/handoff/ai/VIA_LibsInventory_Plan.md,桌機照貼即可。GRAY 4 = 冊上 naming_law 待改名的四境,本容器沒有任何 via_ 境,看不到就不自報。"
@@ -6822,5 +6825,5 @@
  "why_v0217": "v0217 已發布 → 出新版;+VCGC-REQ192;tally 重算;其餘一字不動",
  "why_v0218": "v0218 已發布 → 出新版;+VCGC-REQ193;tally 重算;其餘一字不動",
  "tally_note": "v0227 存的 tally 是 {\"RECORDED\": 24, \"COVERED\": 122, \"PARTIAL\": 92, \"MISSING\": 1},但照 requirements 逐筆重數是 {\"RECORDED\": 24, \"COVERED\": 123, \"PARTIAL\": 95, \"MISSING\": 1} —— 存的數字已經落後(不是本輪改的)。v0228 的 tally 一律由 requirements 逐筆重數而來,所以它與 v0227 的差額不等於『本輪只加了一筆 PARTIAL』。本輪真的只加一筆:VCGC-REQ200(PARTIAL)。",
- "why_v0231": "v0230 已發布 → 出新版;+VCGC-REQ202(五系統串測);tally 照 requirements 逐筆重數;其餘一字不動。同時補掉 v0230 的一個懸空歸屬:REQ201 寫 homes 指 VIA_Workflow_VCGC_SSOT_v0133.json,但那支當時還沒出 —— 本輪一起出 v0133,歸屬才落地。"
+ "why_v0231": "v0230 已發布 → 出新版;+VCGC-REQ202(五系統串測);tally 照 requirements 逐筆重數;其餘一字不動。同時補掉 v0230 的一個懸空歸屬:REQ201 寫 homes 指 VIA_Workflow_VCGC_SSOT_v0133.json,但那支當時還沒出 —— 本輪一起出 v0133,歸屬才落地。 再補一筆:REQ200 的 modules 加上薄尾 docs/handoff/ai/VIA_LibsInventory_v0101.py。原本把 PowerShell 增補就地寫進已併進 main 的 v0100,違「修改開新版 · 已鎖成功來源維持原樣」(AGENTS.md 四;Codex #612 P1)。v0100 與它的收據已逐位元還原,增補改走薄尾。"
 }

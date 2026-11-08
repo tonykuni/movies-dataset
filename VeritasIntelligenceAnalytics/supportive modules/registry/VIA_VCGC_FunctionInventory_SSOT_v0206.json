@@ -2,7 +2,7 @@
  "schema": "VIA.VCGC.FunctionInventory.v1",
  "version": "v0206",
  "batch": "VCGC-REQ202 五系統串測登站 2026-11-08",
- "ts": "2026-11-08T16:06:58Z",
+ "ts": "2026-11-08T16:38:59Z",
  "prior": "VIA_VCGC_FunctionInventory_SSOT_v0205.json",
  "req": "VCGC-REQ199",
  "why": "v0199 → v0200:+站 E-vrn-eng115-v0102 / E-vrn-eng400-v0102(操作員 2026-11-08 A/B/C 全授權輪的兩支 add-only 修正)。只增不減,其餘一字不動。",
@@ -4924,6 +4924,18 @@
     "--selftest"
    ],
    "timeout": 900
+  },
+  {
+   "id": "C-libsinventory-v0101",
+   "name": "VIA_LibsInventory v0101 自測(薄尾:布建計畫補 PowerShell 版 · 前版自測全過轉接 · 前版檔案位元沒被碰(版本律回歸測)· bash 段與 PS 段套件集合逐一相同 · 插入處留空行 · 不代設同意閘 · 不派子行程;30 項 · 零網路)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_LibsInventory_v0101.py",
+    "--selftest"
+   ],
+   "timeout": 900
   }
  ],
  "coverage": {
@@ -5868,6 +5880,10 @@
    "C-fivesystemchain-v0100": {
     "state": "COVERED",
     "by": "C-fivesystemchain-v0100"
+   },
+   "C-libsinventory-v0101": {
+    "state": "COVERED",
+    "by": "C-libsinventory-v0101"
    }
   },
   "workflow": {
@@ -6255,6 +6271,10 @@
    "VCGC-WKF027-STP004": {
     "state": "COVERED",
     "by": "C-fivesystemchain-v0100"
+   },
+   "VCGC-WKF026-STP008": {
+    "state": "COVERED",
+    "by": "C-libsinventory-v0101"
    }
   },
   "ps": {
@@ -6366,5 +6386,5 @@
  "change_v0203": "登站 V-threecode-v0100 + coverage.case + VDF-WKF015 的 7 個 step code(覆蓋檢讀的是 coverage,且比對 steps[*].code —— v0202 那一輪學到的)。",
  "change_v0204": "登站 C-skillexport-v0101 + coverage.case(VCGC-REQ201 技能引擎雙觸發 + 可組合)。",
  "change_v0205": "拔掉 7 個 VDF-WKF015-STP* —— **登錯車道**。VCGC 串測的覆蓋檢(CGC_MDL224 coverage)只讀 VIA_Workflow_VCGC_SSOT 的 steps[*].code;VDF-WKF015 的步驟在 VIA_Workflow_VDF_SSOT_v0106.json 裡,VCGC 那支永遠看不到 → 判 GONE 7,把 workflow 從 118/118 打成 118/125,VCGC 串測站從紅 0 變紅 1。五系統對等獨立(政策 L123):VDF 的工作流覆蓋是 VDF 自己的事,不該登進 VCGC 的覆蓋冊。VDF-WKF015 本身仍完整留在 VDF 工作流冊 v0106,一個字沒刪;站 V-threecode-v0100 與 coverage.case 也不動(case 243/243 本來就是綠的)。上一輪學到的是『登的形狀要對』,這一輪是『登的車道要對』—— 兩件不一樣。",
- "change_v0206": "+1 站 C-fivesystemchain-v0100(自測站,唯讀)· coverage.case +1 · coverage.workflow +7。七個步碼全部是 VCGC 車道(VIA_Workflow_VCGC_SSOT v0133 的 steps[*].code)—— v0205 的教訓是車道要對:VDF / VRN / VQG / VAP 的工作流步仍在它們自己的冊裡,一個都不登進本冊。串測本體(run --apply)會真的派五個子行程、寫盤冊,所以站只登它的 --selftest,照『會寫冊的動作由自測站驗』那條律。"
+ "change_v0206": "+1 站 C-fivesystemchain-v0100(自測站,唯讀)· coverage.case +1 · coverage.workflow +7。七個步碼全部是 VCGC 車道(VIA_Workflow_VCGC_SSOT v0133 的 steps[*].code)—— v0205 的教訓是車道要對:VDF / VRN / VQG / VAP 的工作流步仍在它們自己的冊裡,一個都不登進本冊。串測本體(run --apply)會真的派五個子行程、寫盤冊,所以站只登它的 --selftest,照『會寫冊的動作由自測站驗』那條律。 同輪再 +1 站 C-libsinventory-v0101(薄尾)· case +1 · workflow +1(WKF026-STP008):Codex #612 P1 判「就地改已發布的 v0100」違版本律,還原 v0100、增補改走薄尾,所以登的是薄尾的站。"
 }

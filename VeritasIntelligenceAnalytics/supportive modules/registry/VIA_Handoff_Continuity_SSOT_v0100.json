@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-08T16:06:58Z",
+ "updated_at": "2026-11-08T16:38:59Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4142,6 +4142,22 @@
    "scope": "五系統串測:五支入口都解到自己的家族尾版 · 上游不綠不擋下游(AST 判 run_chain 裡沒有 break) · 判決一律取對方自己印的那一行 · 印 JSON 的系統解 JSON 頂層鍵(擋巢狀同名鍵 health.status) · rc≠0 只代表不綠:判決行說黃記黃、沒判決可依才記紅、rc≠0 又印 PASS 記紅擋漂白、rc≠0 永不給綠 · 總燈取最差 · 不代設同意閘(全支無 os.environ[...]) · 入口旗標只 VIA_FROM_* 且值只有 YES · 不走 shell · 不碰 TA-Lib · 盤冊 add-only · U/I 無骨架標籤且第六頁不帶逐字 stdout",
    "dependencies": [
     "docs/handoff/ai/VIA_FiveSystemChain_v0100.py"
+   ],
+   "timeout_seconds": 900,
+   "marker_note": "標記不釘檢數,只釘「· FAIL 0 · PASS」—— 只有全過才印得出來"
+  },
+  "C-libsinventory-v0101": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_LibsInventory_v0101.py",
+    "--selftest"
+   ],
+   "success_marker": "· FAIL 0 · PASS",
+   "scope": "libs 治理盤薄尾:前版自測仍全過且公開名稱全轉接 · **前版檔案位元沒被本版碰**(版本律回歸測:已併進 main 且有鎖住收據的來源不得就地改)· 前版計畫每一行都還在(只插入不改寫)· bash 段與 PowerShell 段的套件集合逐一相同(同一份閉包只換殼)· PowerShell 版用 .ps1 不用 .sh · python 版本照冊上取 · 插入處留空行 · 兩個踩過的坑寫進計畫($env: 只活一個視窗 · 設定片段不是指令會 ParserError)· 不代設同意閘(AST)· 不派子行程 · 不碰 TA-Lib",
+   "dependencies": [
+    "docs/handoff/ai/VIA_LibsInventory_v0101.py",
+    "docs/handoff/ai/VIA_LibsInventory_v0100.py"
    ],
    "timeout_seconds": 900,
    "marker_note": "標記不釘檢數,只釘「· FAIL 0 · PASS」—— 只有全過才印得出來"
@@ -8753,6 +8769,15 @@
    "what": "VIA_FiveSystemChain v0100:VCGC → VDF → VRN → VQG → VAP 一輪跑完,各走自己宣告的入口。容器第三次實跑總燈 YELLOW(綠 4 · 黃 1 · 紅 0):VCGC rc 2 但自己判 YELLOW 就記黃。自測 48/48。",
    "receipt": "docs/handoff/evidence/C-fivesystemchain-v0100.json",
    "note": "操作員 2026-11-08 令「自動測試VCGC to VDF TO VRN TO VQG TOVAP」。三次實跑抓到的三個缺陷都在串測本身,不在五系統:車道錯、行正則碰 JSON、rc≠0 一律判紅。VCGC 的黃是它自己站表上兩站黃,屬 VCGC 自己的收尾範圍,本支只攤開不代修(政策 L123)。"
+  },
+  {
+   "id": "VCGC-REQ200:libs-plan-powershell",
+   "requirement": "VCGC-REQ200",
+   "case": "C-libsinventory-v0101",
+   "state": "VERIFIED",
+   "what": "VIA_LibsInventory v0101 薄尾:布建計畫同時出 bash 與 PowerShell 兩版(同一份相依閉包,只換殼;17 境 / 140 槽位)。自測 30/30。",
+   "receipt": "docs/handoff/evidence/C-libsinventory-v0101.json",
+   "note": "Codex #612 P1:上一版把這個增補就地寫進已併進 main 的 v0100,違版本律。v0100 與它的 C-libsinventory-v0100 收據已逐位元還原,增補改走薄尾。判得對 —— 那份舊收據記著當時的來源 SHA,就地改會讓它指向一支不存在的程式。"
   }
  ]
 }

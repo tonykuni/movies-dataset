@@ -4,7 +4,7 @@
  "subsystem": "VCGC",
  "zh": "中央治理 · 中樞工作流",
  "batch": "VCGC-WKF027 五系統串測 + WKF023 補雙觸發三步 2026-11-08",
- "ts": "2026-11-08T16:06:58Z",
+ "ts": "2026-11-08T16:38:59Z",
  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
  "sdd": {
   "layers": [
@@ -2334,7 +2334,8 @@
      "正本冊 VIA_EnvGovernance_Baseline 只能 add-only 出新版號,舊版一位元不動;改完必跑 CGC_MDL135_EnvGovernance 尾版 --selftest 確認讀冊端沒退步",
      "鏡像探測與安裝一律 GRAY_NOT_RUN:不代設 VIA_NET_CONSENT、不跑 pip —— GRAY 不是綠,黃也不是綠",
      "U/I 不含 <!doctype / <html / <body;逸出 HTML 特殊字元;色值只用 Atlas --vl-*",
-     "自測 60/60 PASS"
+     "自測 60/60 PASS",
+     "計畫要同時出 bash 與 PowerShell 兩版(倉內有 envcheck.ps1、桌機是 Windows);增補一律出薄尾新版號,**不就地改已併進 main 的 v0100** —— 它有一份鎖住的成功收據,就地改會讓那份收據指向一支已經不存在的程式(Codex #612 P1 判過,判得對)"
     ],
     "entry": "python3 \"docs/handoff/ai/VIA_LibsInventory_v0100.py\" all --apply",
     "evidence": "docs/handoff/evidence/C-libsinventory-v0100.json · docs/handoff/ai/VIA_LibsInventory_Plan.md",
@@ -2429,6 +2430,25 @@
      "inside": "VCGC run",
      "evidence": "self:VIA_LibsInventory",
      "what": "GRAY 不是綠"
+    },
+    {
+     "code": "VCGC-WKF026-STP008",
+     "alias": "plan_powershell",
+     "name": "布建計畫出 PowerShell 版(薄尾 v0101;同一份閉包只換殼)",
+     "engine": "docs/handoff/ai/VIA_LibsInventory_v0101.py",
+     "verb": "plan",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_LibsInventory",
+     "what": "bash + PowerShell 兩段 · 套件集合逐一相同 · 兩個 PS 坑寫進計畫"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VCGC-WKF026-TST002",
+     "case": "C-libsinventory-v0101",
+     "engine": "docs/handoff/ai/VIA_LibsInventory_v0101.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 30/30 PASS(含前版自測全過轉接、前版檔案位元沒被碰、兩段套件集合一致)"
     }
    ]
   },
@@ -2549,5 +2569,5 @@
  "why_v0129": "操作員 2026-11-08 貼上 Cowork / Manus 超級版 v2.0(三層漸進載入 · 雙觸發 · 10 技能登錄表 · /export-skill · Level-0 授權)並指定 NEXT 首測 `/export-skill /ast-diag`;新增 VCGC-WKF023 把技能引擎登為工作流。AGENTS.md 第 3 條要求新需求需求冊與工作流冊兩邊都登。",
  "why_v0130": "操作員 2026-11-08:「VRN-2為主 缺少功能自VRN-1抓來用 等VRN-2功能完美才去整合」。新增 VCGC-WKF024 把借用橋與整合閘登為工作流。",
  "change_v0132": "① 新增 VCGC-WKF026 libs_inventory。② 把 VCGC-WKF025 的字串步驟改成有 code 的結構步驟 —— 串測覆蓋檢只收 steps[*].code(WKF001–024 都是這形狀),上一輪我把步驟寫成字串塞在 spec 裡,於是盤點冊 coverage.workflow 登的 \"VCGC-WKF025\" 永遠對不上,被判 GONE。登錯地方不是閘的錯。原字串步驟保留在 spec.steps_prose_v0131 / spec.steps_prose,一個字沒刪。v0131 原檔不動。",
- "why_v0133": "v0132 已發布 → 出新版。兩件:① 新 VCGC-WKF027(五系統串測),登 REQ202;② WKF023 補上 v0101 薄尾真的多出來的三步(detect / header / chain)與它的自測案 —— v0230 的 REQ201 把 homes 寫成本冊 v0133,當時這支還沒出,歸屬是懸空的,本輪補實。WKF023 原有的八步與 TST001 一個字不動(步碼是盤點冊覆蓋檢的鍵,改碼等於製造 GONE)。"
+ "why_v0133": "v0132 已發布 → 出新版。兩件:① 新 VCGC-WKF027(五系統串測),登 REQ202;② WKF023 補上 v0101 薄尾真的多出來的三步(detect / header / chain)與它的自測案 —— v0230 的 REQ201 把 homes 寫成本冊 v0133,當時這支還沒出,歸屬是懸空的,本輪補實。WKF023 原有的八步與 TST001 一個字不動(步碼是盤點冊覆蓋檢的鍵,改碼等於製造 GONE)。 另補:WKF026 多一步 STP008(布建計畫 PowerShell 版,薄尾 v0101)與它的案 —— 原本那個增補是就地改已併進 main 的 v0100,Codex #612 判 P1;還原 v0100,改走薄尾。"
 }

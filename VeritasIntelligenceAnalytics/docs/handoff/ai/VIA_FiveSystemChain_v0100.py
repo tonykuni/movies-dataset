@@ -44,6 +44,7 @@ except Exception:
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import argparse
+import hashlib
 import html
 import json
 import os
@@ -61,6 +62,10 @@ TAG = "VIA_FiveSystemChain v" + Path(__file__).stem.rsplit("_v", 1)[-1]
 BOOK_DIR = VIA / "supportive modules" / "registry"
 BOOK_STEM = "VIA_FiveSystemChain_SSOT_v"
 UI_NAME = "VIA_FiveSystemChain_UI.html"
+# 每一次實跑的「私有」收據與逐字日誌:VIA_Reports/** 本倉不入版控,
+# 所以逐字 stdout(含本機路徑與環境值)留在這裡可診斷,又不會因為分享而外洩。
+# 入冊的只有相對路徑 + 日誌 sha256 + 被測程式 sha256 —— 把「跑的是哪一支」釘死。
+RUN_LOG_DIR = VIA / "VIA_Reports" / "five_system_chain"
 
 RANK = {"GREEN": 0, "YELLOW": 1, "GRAY": 2, "RED": 3}
 LAMPS = tuple(RANK)
@@ -167,6 +172,16 @@ def extract_verdict(sysrow: dict, out: str) -> str:
     return hit
 
 
+def _rel(p: Path | None) -> str:
+    """入冊一律相對 VIA 的路徑;樹外的路徑(夾具)照實給絕對路徑,不要炸掉。"""
+    if p is None:
+        return ""
+    try:
+        return str(p.relative_to(VIA))
+    except ValueError:
+        return str(p)
+
+
 def judge(sysrow: dict, rc: int | None, out: str, elapsed: float,
           entry: Path | None, timed_out: bool = False) -> dict:
     """一個系統的燈 + 它自己印的判決行(逐字)。
@@ -174,7 +189,7 @@ def judge(sysrow: dict, rc: int | None, out: str, elapsed: float,
     次序刻意:入口不在 → 逾時 → rc → 有沒有判決行 → 判決行說什麼。
     rc 0 排在「有沒有判決行」之前,就是為了讓「rc 0 但沒印判決」落在 YELLOW 而不是 GREEN。
     """
-    base = {"code": sysrow["code"], "entry": (str(entry.relative_to(VIA)) if entry else ""),
+    base = {"code": sysrow["code"], "entry": _rel(entry),
             "argv": list(sysrow["argv"]), "elapsed_s": round(elapsed, 1),
             "rc": rc, "verdict_line": "", "lamp": "GRAY", "why": ""}
     if entry is None:
@@ -233,8 +248,55 @@ def roll_up(rows: list[dict]) -> str:
     return lamp if rows else "GRAY"
 
 
+# ───────────────────────── 證據(私有日誌 + 被測來源指紋) ─────────────────────────
+def sha256_text(t: str) -> str:
+    return hashlib.sha256(t.encode("utf-8", "replace")).hexdigest()
+
+
+def sha256_file(p: Path) -> str:
+    """被測程式的指紋。讀不到就照實回空字串,不編一個假的。"""
+    try:
+        return hashlib.sha256(p.read_bytes()).hexdigest()
+    except Exception as exc:                     # 讀不到就說讀不到
+        return f"UNREADABLE:{type(exc).__name__}"
+
+
+def write_run_receipt(row: dict, sysrow: dict, out: str, entry: Path | None,
+                      run_id: str, base: Path = RUN_LOG_DIR) -> dict:
+    """一個系統一份私有收據 + 一份逐字日誌。
+
+    交接律(AGENTS.md 五)要「實際命令、rc、目標標記、程式／規則 SHA 與日誌」都留著。
+    判燈只取判決行,但**取完就把逐字輸出丟掉等於毀證**:紅了就再也查不出為什麼紅。
+    所以先落地、再縮成報告用的那一列。逾時也落地(部分輸出往往就是卡在哪裡的唯一線索)。
+    """
+    d = base / run_id
+    try:
+        d.mkdir(parents=True, exist_ok=True)
+        log = d / f"{row['code']}.log.txt"
+        log.write_text(out, encoding="utf-8")
+        rec = {
+            "schema": "VIA.FiveSystemChain.RunReceipt.v1",
+            "code": row["code"], "run_id": run_id,
+            "command": [sys.executable, str(entry) if entry else "", *sysrow["argv"]],
+            "cwd": str(VIA), "env_overrides": dict(sysrow.get("env") or {}),
+            "rc": row["rc"], "timed_out": row.get("timed_out", False),
+            "elapsed_s": row["elapsed_s"], "lamp": row["lamp"],
+            "verdict_line": row["verdict_line"], "why": row["why"],
+            "entry": row["entry"], "entry_sha256": row.get("entry_sha256", ""),
+            "log": _rel(log), "log_sha256": sha256_text(out),
+            "log_bytes": len(out.encode("utf-8", "replace")),
+            "note": "私有收據:逐字輸出留在 VIA_Reports(本倉不入版控),入冊只帶路徑與指紋",
+        }
+        (d / f"{row['code']}.receipt.json").write_text(
+            json.dumps(rec, ensure_ascii=False, indent=1), encoding="utf-8")
+        return {"log": rec["log"], "log_sha256": rec["log_sha256"],
+                "receipt": _rel(d / f"{row['code']}.receipt.json")}
+    except Exception as exc:                     # 寫不出來照實記,不假裝有證據
+        return {"log": "", "log_sha256": "", "receipt": f"UNWRITTEN:{type(exc).__name__}: {exc}"}
+
+
 # ───────────────────────── 實跑 ─────────────────────────
-def run_one(sysrow: dict, via: Path = VIA) -> dict:
+def run_one(sysrow: dict, via: Path = VIA, run_id: str | None = None) -> dict:
     entry = resolve_entry(sysrow, via)
     if entry is None:
         return judge(sysrow, None, "", 0.0, None)
@@ -242,22 +304,45 @@ def run_one(sysrow: dict, via: Path = VIA) -> dict:
     env.update(sysrow.get("env") or {})
     env["PYTHONIOENCODING"] = "utf-8"
     t0 = time.monotonic()
+    timed_out = False
     try:
+        # 子行程被我們強制用 utf-8 印(PYTHONIOENCODING),所以**解碼也得指明 utf-8**。
+        # 不指明的話,父行程在 Windows 會照地區編碼(cp950 / cp1252)解,
+        # 「[計]」「[VCGC 全功能串測]」整行變亂碼 → 判決正則一條都對不上
+        # → VDF / VRN-2 明明綠的被判黃、VCGC 合法的 rc 2 黃被判紅。桌機是 Windows,這不是假設。
         p = subprocess.run([sys.executable, str(entry), *sysrow["argv"]], cwd=str(via),
-                           env=env, capture_output=True, text=True, errors="replace",
+                           env=env, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace",
                            timeout=sysrow["timeout"])
-        el = time.monotonic() - t0
-        return judge(sysrow, p.returncode, (p.stdout or "") + "\n" + (p.stderr or ""), el, entry)
-    except subprocess.TimeoutExpired:
-        return judge(sysrow, None, "", time.monotonic() - t0, entry, timed_out=True)
+        rc, el = p.returncode, time.monotonic() - t0
+        out = (p.stdout or "") + "\n" + (p.stderr or "")
+    except subprocess.TimeoutExpired as exc:
+        # 逾時也有部分輸出 —— 那往往就是「卡在哪一步」的唯一線索,不能丟。
+        rc, el, timed_out = None, time.monotonic() - t0, True
+        out = _as_text(exc.stdout) + "\n" + _as_text(exc.stderr)
+    row = judge(sysrow, rc, out, el, entry, timed_out=timed_out)
+    row["timed_out"] = timed_out
+    row["entry_sha256"] = sha256_file(entry)
+    row.update(write_run_receipt(row, sysrow, out, entry,
+                                 run_id or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")))
+    return row
+
+
+def _as_text(x) -> str:
+    """TimeoutExpired 的 stdout/stderr 可能是 bytes 也可能是 str(看有沒有設 encoding)。"""
+    if x is None:
+        return ""
+    return x if isinstance(x, str) else bytes(x).decode("utf-8", "replace")
 
 
 def run_chain(only: list[str] | None = None, via: Path = VIA) -> dict:
     """五個一律都跑 —— 上游紅不擋下游(對等獨立)。only 只給人手動縮範圍用。"""
     pick = [s for s in SYSTEMS if not only or s["code"] in only]
-    rows = [run_one(s, via) for s in pick]            # 不 break:這是刻意的
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    rows = [run_one(s, via, run_id) for s in pick]     # 不 break:這是刻意的
     return {
-        "schema": SCHEMA, "engine": TAG,
+        "schema": SCHEMA, "engine": TAG, "run_id": run_id,
+        "evidence_dir": _rel(RUN_LOG_DIR / run_id),
         "ran_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "order": [s["code"] for s in pick],
         "chain_lamp": roll_up(rows),
@@ -284,8 +369,13 @@ def all_headers(engine_ver: str = "v0103", date: str = "2026-11-05") -> list[dic
 
 # ───────────────────────── 盤冊(add-only) ─────────────────────────
 def substance(rep: dict) -> str:
-    import hashlib
-    key = sorted((r["code"], r["lamp"], r["verdict_line"]) for r in rep["systems"])
+    """實質 = 誰 · 什麼燈 · 它自己的判決行 · **被測來源指紋**。
+
+    entry_sha256 要納入:同樣的燈但跑的是不同一支程式,那是另一回事,值得出新版號。
+    log_sha256 不納入:逐字輸出每跑都會變(耗時秒數就會變),納入等於每跑都出新版號 —— 那是灌水。
+    """
+    key = sorted((r["code"], r["lamp"], r["verdict_line"], r.get("entry_sha256", ""))
+                 for r in rep["systems"])
     return hashlib.sha256(json.dumps(key, ensure_ascii=False).encode("utf-8")).hexdigest()
 
 
@@ -341,6 +431,14 @@ def ui_html(rep: dict) -> str:
                   f'<td class="m">{e(flags)}</td>'
                   f'<td class="m">{s["timeout"]}s</td></tr>')
     ex_rows = "".join(ex)
+    ev_dir = e(rep.get("evidence_dir") or "(這一輪沒留證據夾)")
+    ev_rows = "".join(
+        "<tr><td>{}</td><td><code>{}</code></td><td><code>{}</code></td>"
+        "<td><code>{}</code></td><td><code>{}</code></td></tr>".format(
+            e(r["code"]), e(r["entry"] or "—"),
+            e((r.get("entry_sha256") or "—")[:16]), e(r.get("log") or "—"),
+            e((r.get("log_sha256") or "—")[:16]))
+        for r in rep["systems"])
     cnt = rep["counts"]
     chips = [("總燈", rep["chain_lamp"]), ("GREEN", cnt["GREEN"]), ("YELLOW", cnt["YELLOW"]),
              ("RED", cnt["RED"]), ("GRAY", cnt["GRAY"]), ("次序", " → ".join(rep["order"]))]
@@ -432,14 +530,19 @@ VCGC 的同義字冊)。本引擎只讀不改,也不在這裡抄一份 —— �
 </tbody></table></div>
 <p class="note">入口一律解析家族尾版,不釘版號 —— 釘死就會指到舊版(PINVER)。</p></div>
 <div class="card" data-p="test" hidden><h2>5｜測試與輸出</h2>
-<p class="note">判燈四條:入口不在 = GRAY · 逾時 = GRAY 並記實際秒數 · rc≠0 = RED ·
-<b>rc 0 但沒印判決行 = YELLOW UNVERIFIED</b>(rc 0 本身不是證據,同交接閘 target_marker_seen)。<br>
+<p class="note">判燈:入口不在 = GRAY · 逾時 = GRAY 並記實際秒數 ·
+<b>rc≠0 = 不綠(不等於紅)</b> —— 由它自己的判決行決定黃或紅;rc≠0 卻印 PASS 一律記紅(擋漂白);
+rc≠0 永遠不給綠。<b>rc 0 但沒印判決行 = YELLOW UNVERIFIED</b>(rc 0 本身不是證據,同交接閘 target_marker_seen)。<br>
 判決行說 YELLOW 就留 YELLOW,不漂白成綠。總燈 = 五個之中最壞的那一個。</p></div>
 <div class="card" data-p="detail" hidden><h2>6｜詳細報告 🔒</h2>
 <p class="note">逐字原文(每個系統的完整 stdout / stderr)**不進這一頁** ——
 它們可能含本機路徑與環境值,寫進可分享的頁面等於外洩。<br>
-完整原文留在盤冊 <code>{e(BOOK_STEM)}*.json</code> 的 <code>verdict_line</code> 與各系統自己的日誌裡,
-要看請在本機開。這一頁只說它在哪裡,不把它搬過來。</p></div>
+但也沒有被丟掉:每一輪每一個系統都落地一份私有收據 + 一份逐字日誌,放在
+<code>{ev_dir}</code>(<code>VIA_Reports/**</code> 本倉不入版控),要看請在本機開。
+下表只給指紋,讓人能確認「看到的那份就是跑出來的那份」。</p>
+<div class="scroll"><table>
+<thead><tr><th>系統</th><th>被測入口</th><th>入口 sha256</th><th>日誌</th><th>日誌 sha256</th></tr></thead>
+<tbody>{ev_rows}</tbody></table></div></div>
 </div>
 <script>
 document.querySelectorAll('.tab').forEach(function (b) {{
@@ -648,6 +751,82 @@ def selftest() -> int:
     imported = {a.name.split(".")[0] for n in _ast.walk(tree) if isinstance(n, _ast.Import)
                 for a in n.names}
     chk("㉝ 不碰 TA-Lib", not {"talib", "ta_lib"} & imported, sorted(imported))
+
+    # ㉞ 解碼要指明 utf-8(Codex #612 P2;桌機是 Windows,照地區編碼解會整行亂碼)。
+    #    AST 檢:subprocess.run 的呼叫一定要帶 encoding="utf-8"。
+    runs = [n for n in _ast.walk(tree) if isinstance(n, _ast.Call)
+            and isinstance(n.func, _ast.Attribute) and n.func.attr == "run"
+            and isinstance(n.func.value, _ast.Name) and n.func.value.id == "subprocess"]
+    enc = [any(k.arg == "encoding" and getattr(k.value, "value", None) == "utf-8"
+               for k in c.keywords) for c in runs]
+    chk("㉞ 派子行程的解碼指明 utf-8(AST;不吃父行程的地區編碼)",
+        len(runs) == 1 and all(enc), f"runs={len(runs)} enc={enc}")
+
+    # ㉟ 逾時那條路要留部分輸出(AST:except 有綁例外,而且真的讀了它的 stdout)。
+    handlers = [h for h in _ast.walk(tree) if isinstance(h, _ast.ExceptHandler)
+                and h.name and "Timeout" in _ast.dump(h.type or _ast.Pass())]
+    reads = [any(isinstance(n, _ast.Attribute) and n.attr in ("stdout", "stderr")
+                 and isinstance(n.value, _ast.Name) and n.value.id == h.name
+                 for n in _ast.walk(h)) for h in handlers]
+    chk("㉟ 逾時也保留部分輸出(AST:except … as exc 並讀 exc.stdout)",
+        handlers and all(reads), f"handlers={len(handlers)} reads={reads}")
+
+    # ㊱–㊳ 私有收據:逐字日誌落地 · 被測來源指紋 · 入冊只帶路徑與指紋
+    import tempfile as _tf
+    with _tf.TemporaryDirectory() as td:
+        d = Path(td)
+        fake = d / "fake_entry_v0100.py"
+        fake.write_text("print('x')\n", encoding="utf-8")
+        fixrow = judge(SYSTEMS[1], 0, "  [計] VDF_SystemManager v0168 本版 6/6 · 合計 PASS",
+                       1.2, fake)
+        fixrow["entry_sha256"] = sha256_file(fake)
+        got = write_run_receipt(fixrow, SYSTEMS[1], "逐字輸出\n第二行 stderr", fake, "RID", d)
+        rec_p = d / "RID" / "VDF.receipt.json"
+        log_p = d / "RID" / "VDF.log.txt"
+        rec = json.loads(rec_p.read_text(encoding="utf-8")) if rec_p.is_file() else {}
+        chk("㊱ 逐字日誌真的落地(判完燈不把輸出丟掉 —— 丟掉等於毀證)",
+            log_p.is_file() and log_p.read_text(encoding="utf-8") == "逐字輸出\n第二行 stderr",
+            got)
+        chk("㊲ 私有收據齊備:命令 · rc · 判決行 · 程式 SHA · 日誌 + 日誌 SHA(交接律五)",
+            all(rec.get(k) not in (None, "") for k in
+                ("command", "verdict_line", "entry_sha256", "log", "log_sha256"))
+            and rec.get("rc") == 0 and rec["log_sha256"] == sha256_text("逐字輸出\n第二行 stderr"),
+            sorted(rec))
+        chk("㊳ 被測來源指紋是真的 sha256(改一個位元就換號)",
+            len(fixrow["entry_sha256"]) == 64
+            and fixrow["entry_sha256"] != sha256_text("print('y')\n"))
+        fake.write_text("print('y')\n", encoding="utf-8")
+        chk("㊳b 來源變了指紋就變(不是把路徑當指紋)",
+            sha256_file(fake) != fixrow["entry_sha256"])
+    chk("㊴ 私有收據寫在 VIA_Reports(本倉不入版控)—— 逐字輸出不會因分享而外洩",
+        RUN_LOG_DIR.is_relative_to(VIA / "VIA_Reports"), str(RUN_LOG_DIR))
+    # ㊵b 實質指紋:來源指紋算進去,日誌指紋不算進去(不然每跑都出新版號 = 灌水)
+    base_rep = {"systems": [{"code": "A", "lamp": "GREEN", "verdict_line": "x",
+                             "entry_sha256": "a" * 64, "log_sha256": "1" * 64}]}
+    same_log_diff = {"systems": [{**base_rep["systems"][0], "log_sha256": "2" * 64}]}
+    diff_src = {"systems": [{**base_rep["systems"][0], "entry_sha256": "b" * 64}]}
+    chk("㊵b 同燈同判決、換了日誌指紋 → 實質不變(不出新版號)",
+        substance(base_rep) == substance(same_log_diff))
+    chk("㊵c 同燈同判決、換了被測來源 → 實質變了(該出新版號)",
+        substance(base_rep) != substance(diff_src))
+    # ㊵d U/I 第六頁:給指紋與證據夾,但不得把逐字原文搬進可分享的頁面
+    rep_ui = {**rep, "evidence_dir": "VIA_Reports/five_system_chain/RID",
+              "systems": [{**rep["systems"][0], "entry_sha256": "c" * 64,
+                           "log": "VIA_Reports/five_system_chain/RID/VCGC.log.txt",
+                           "log_sha256": "d" * 64}]}
+    h6 = ui_html(rep_ui)
+    chk("㊵d 第六頁給證據夾與兩個指紋(可確認看到的就是跑出來的那份)",
+        "VIA_Reports/five_system_chain/RID" in h6 and "c" * 16 in h6 and "d" * 16 in h6)
+    chk("㊵e 第六頁仍然不帶逐字原文(含本機路徑與環境值,分享就外洩)",
+        "逐字原文" in h6 and "不進這一頁" in h6)
+    chk("㊵f 第五頁不再寫「rc≠0 = RED」那句舊話(判法已改成『不綠』)",
+        "rc≠0 = 不綠" in h6)
+
+    chk("㊵ 寫不出收據就照實回 UNWRITTEN,不假裝有證據",
+        write_run_receipt({"code": "X", "rc": 0, "elapsed_s": 0.0, "lamp": "GRAY",
+                           "verdict_line": "", "why": "", "entry": ""},
+                          SYSTEMS[0], "o", None,
+                          "RID", Path("/proc/nonexistent-dir"))["receipt"].startswith("UNWRITTEN"))
 
     print(f"[計] {TAG} 自測 OK {ok} · FAIL {fail} · {'PASS' if fail == 0 else 'FAIL'}")
     return 0 if fail == 0 else 1
