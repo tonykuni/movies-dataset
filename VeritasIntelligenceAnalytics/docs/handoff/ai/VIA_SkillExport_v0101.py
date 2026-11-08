@@ -81,9 +81,32 @@ def __getattr__(name):
 #   _TOKEN  再切空白 → 補上「Agent」「交接」這種較鬆的子詞
 # 只用 _TOKEN 的話,「多 Agent 交接」會被切成「多」(一字,會被長度閘丟掉)+ 兩個子詞,
 # 整句觸發語就不見了 —— 自測第 ④ 條紅過一次,就是這個。
-_PHRASE = re.compile(r"[/·、,,。;;|]+")
+# **分隔用的斜線 vs 詞內的斜線**(Codex #611 P2,實測確認):
+#   登錄表寫 `圖表 / U/I / 報告` —— 分隔的是「空白 + / + 空白」,而 `U/I` 的斜線兩側沒有空白,
+#   它是詞的一部分。原本不分青紅皂白切 `/`,`U/I` 就變成 `U` + `I` 兩個一字詞,
+#   雙雙被長度閘丟掉 → detect("U/I") 一個技能都不回,而那是冊上登錄的觸發語。
+#   同理 `跨 PS·PY 注入` 的 `·` 也在詞內,而 category `C 視覺 · 治理` 的 `·` 兩側有空白才是分隔。
+#   規則:**/ 與 · 只有在至少一側貼著空白時才算分隔符**;CJK 標點一律算分隔符。
+_PHRASE = re.compile(r"\s+[/·]\s*|\s*[/·]\s+|[、，,。;；|]+")
 _TOKEN = re.compile(r"\s+")
 _SPLIT = _PHRASE      # 相容:前版若引用 _SPLIT 仍指片語層
+
+# 拉丁 / 數字詞(可含 . _ + - / ·)比對時要卡詞界,CJK 不卡(中文沒有詞界可卡)。
+# **為什麼要卡**(Codex #611 P2,實測確認):`ps`(來自 `跨 PS·PY 注入`)與 `cli`(來自 `寫腳本 / CLI`)
+#   都是三字以下的拉丁短詞,不卡詞界就會被 `eclipse` 這種普通英文字含進去 ——
+#   eclipse[1:4] == "cli",eclipse 也含 ps;psychology 同樣含 ps。
+#   結果「Describe the eclipse」會被掛上 /ast-diag + /self-heal,「沒命中就不硬掛」的承諾就破了。
+_LATINISH = re.compile(r"^[a-z0-9][a-z0-9+._/·-]*$")
+
+
+def hits_query(word: str, q: str) -> bool:
+    """一個比對詞是否真的出現在查詢裡。拉丁詞卡詞界,CJK 詞用子字串。
+
+    詞界只擋拉丁字母與數字,所以 CJK 貼著拉丁詞(例「做PDF擷取」)仍然算命中 —— 那是真的提到了。
+    """
+    if _LATINISH.match(word):
+        return re.search(r"(?<![a-z0-9])" + re.escape(word) + r"(?![a-z0-9])", q) is not None
+    return word in q
 
 
 def phrases(s: dict) -> list[tuple[str, str]]:
@@ -119,7 +142,7 @@ def detect(query: str, limit: int = 3) -> list[dict]:
     q = str(query or "").lower()
     rows: list[dict] = []
     for i, s in enumerate(SKILLS):
-        hits = [(w, src) for w, src in phrases(s) if w in q]
+        hits = [(w, src) for w, src in phrases(s) if hits_query(w, q)]
         if hits:
             rows.append({"slash": s["slash"], "name": s["name"], "category": s["category"],
                          "score": len(hits), "order": i,
@@ -220,7 +243,7 @@ def selftest() -> int:
     chk("⑨ 每個命中都附命中詞與來源欄位",
         all(r["hits"] and all(h["word"] and h["field"] for h in r["hits"]) for r in rows))
     chk("⑩ 命中詞真的在查詢字串裡(不是編的)",
-        all(h["word"] in q.lower() for r in rows for h in r["hits"]))
+        all(hits_query(h["word"], q.lower()) for r in rows for h in r["hits"]))
 
     # ⑪ 抬頭字面照規格
     chk("⑪ 抬頭格式字面照規格",
@@ -269,6 +292,28 @@ def selftest() -> int:
     chk("㉘ 整句比子詞更精確:整句查詢分數不低於子詞查詢",
         detect("多 Agent 交接", limit=10)[0]["slash"] == "/token-state",
         [r["slash"] for r in detect("多 Agent 交接", limit=10)])
+
+    # Codex #611 兩個 P2 的回歸測(兩個都先實測重現過才改)
+    cz = {w for w, f in phrases(SLASH_INDEX["/canvas-zen"]) if f == "trigger"}
+    chk("㉙ 詞內斜線保住:u/i 在 /canvas-zen 的比對詞裡", "u/i" in cz, sorted(cz))
+    chk("㉚ detect U/I 回得出 /canvas-zen(冊上登錄的觸發語必須可用)",
+        "/canvas-zen" in [r["slash"] for r in detect("U/I", limit=10)],
+        [r["slash"] for r in detect("U/I", limit=10)])
+    chk("㉛ 分隔的斜線照切(圖表 · 報告 都還在)", {"圖表", "報告"} <= cz, sorted(cz))
+    ad = {w for w, f in phrases(SLASH_INDEX["/ast-diag"]) if f == "trigger"}
+    chk("㉜ 詞內的 · 也保住(ps·py 不被切成 ps + py)", "ps·py" in ad, sorted(ad))
+    for q2 in ("Describe the eclipse", "Explain the psychology of sleep"):
+        chk("㉝ 拉丁詞卡詞界:" + q2 + " 不得掛上任何技能", detect(q2, limit=10) == [],
+            [(r["slash"], [h["word"] for h in r["hits"]]) for r in detect(q2, limit=10)])
+    chk("㉞ 卡了詞界,真的提到還是要命中(PDF / ETL / CLI)",
+        "/doc-extract" in [r["slash"] for r in detect("這份 PDF 財報", limit=10)]
+        and "/data-pipe" in [r["slash"] for r in detect("時序 ETL 大表", limit=10)]
+        and "/self-heal" in [r["slash"] for r in detect("寫一個 CLI 批次", limit=10)])
+    chk("㉟ CJK 貼著拉丁詞也算命中(做PDF擷取)",
+        "/doc-extract" in [r["slash"] for r in detect("做PDF擷取", limit=10)])
+    chk("㊱ 詞界擋住同字根的長字(reporter 不等於 repo)",
+        "/token-state" not in [r["slash"] for r in detect("ask the reporter", limit=10)],
+        [(r["slash"], [h["word"] for h in r["hits"]]) for r in detect("ask the reporter", limit=10)])
 
     print(f"[計] {TAG} 自測 OK {ok} · FAIL {fail} · {'PASS' if fail == 0 else 'FAIL'}")
     return 0 if fail == 0 else 1
