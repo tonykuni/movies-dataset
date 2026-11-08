@@ -2180,14 +2180,6 @@
     "requirements": [
      "VCGC-REQ198"
     ],
-    "steps": [
-     "① scan:視窗起點 = git 最新提交日 − 2 天(不用機器當下時間,收據才可重現);盤提交數 / 改檔次 / 車道分佈",
-     "② 讀收據:四條門檻全要才算綠(schema / rc 0 / 標記見到 / completed_at + log_sha256)",
-     "③ lock --apply:寫鎖冊。實質 = 鎖了哪些 (case, log_sha256);實質沒變不出新版號,不覆蓋已發布版號",
-     "④ verify:拿鎖冊比現況 → LOCKED_OK / REGRESSED / GONE / NEW_GREEN;有回歸或消失一律 rc 1",
-     "⑤ 分類未鎖案:只掃日誌真訊號(ENV_PKG / NO_PWSH / NET_GATE / DESKTOP / FROZEN / OPERATOR),認不出來 UNKNOWN、沒日誌 NO_LOG;一律附逐字證據那一行",
-     "⑥ ui:出 Atlas --vl-* 視覺鎖定頁;有回歸就印總燈 RED,不印綠"
-    ],
     "acceptance": [
      "綠門檻一字不放寬:少任一條就進未鎖,附缺哪一條",
      "鎖冊 add-only:實質沒變不出新版號;目標版號已存在 rc 1 拒寫且已發布檔一字不動;撤鎖寫 revoked_at",
@@ -2201,8 +2193,83 @@
     "evidence": "docs/handoff/evidence/C-threedaylock-v0100.json",
     "books": [
      "docs/handoff/ai/VIA_ThreeDayLock_v0100.json"
+    ],
+    "steps_prose_v0131": [
+     "① scan:視窗起點 = git 最新提交日 − 2 天(不用機器當下時間,收據才可重現);盤提交數 / 改檔次 / 車道分佈",
+     "② 讀收據:四條門檻全要才算綠(schema / rc 0 / 標記見到 / completed_at + log_sha256)",
+     "③ lock --apply:寫鎖冊。實質 = 鎖了哪些 (case, log_sha256);實質沒變不出新版號,不覆蓋已發布版號",
+     "④ verify:拿鎖冊比現況 → LOCKED_OK / REGRESSED / GONE / NEW_GREEN;有回歸或消失一律 rc 1",
+     "⑤ 分類未鎖案:只掃日誌真訊號(ENV_PKG / NO_PWSH / NET_GATE / DESKTOP / FROZEN / OPERATOR),認不出來 UNKNOWN、沒日誌 NO_LOG;一律附逐字證據那一行",
+     "⑥ ui:出 Atlas --vl-* 視覺鎖定頁;有回歸就印總燈 RED,不印綠"
     ]
-   }
+   },
+   "plan": {
+    "enter": "VCGC",
+    "exit": "VCGC",
+    "order": "scan → lock → verify → classify → ui"
+   },
+   "steps": [
+    {
+     "code": "VCGC-WKF025-STP001",
+     "alias": "scan",
+     "name": "三日視窗盤點(視窗起點 = git HEAD 日 − 2 天,可重現)",
+     "engine": "docs/handoff/ai/VIA_ThreeDayLock_v0100.py",
+     "verb": "scan",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_ThreeDayLock",
+     "what": "提交數 / 改檔次 / 車道分佈"
+    },
+    {
+     "code": "VCGC-WKF025-STP002",
+     "alias": "green_gate",
+     "name": "綠門檻四條全要(schema / rc 0 / 標記見到 / completed_at + log_sha256)",
+     "engine": "docs/handoff/ai/VIA_ThreeDayLock_v0100.py",
+     "verb": "scan",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_ThreeDayLock",
+     "what": "少一條就進未鎖,附缺哪一條"
+    },
+    {
+     "code": "VCGC-WKF025-STP003",
+     "alias": "lock",
+     "name": "寫鎖冊(add-only:實質沒變不出新版號,拒覆蓋已發布版號)",
+     "engine": "docs/handoff/ai/VIA_ThreeDayLock_v0100.py",
+     "verb": "lock --apply",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_ThreeDayLock",
+     "what": "鎖 (case, log_sha256) 對"
+    },
+    {
+     "code": "VCGC-WKF025-STP004",
+     "alias": "verify",
+     "name": "拿鎖冊比現況:LOCKED_OK / REFRESHED / REGRESSED / GONE / NEW_GREEN",
+     "engine": "docs/handoff/ai/VIA_ThreeDayLock_v0100.py",
+     "verb": "verify",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_ThreeDayLock",
+     "what": "有回歸或消失一律 rc 1"
+    },
+    {
+     "code": "VCGC-WKF025-STP005",
+     "alias": "classify",
+     "name": "未鎖案只認日誌真訊號分類(不看案名),認不出來留 UNKNOWN",
+     "engine": "docs/handoff/ai/VIA_ThreeDayLock_v0100.py",
+     "verb": "scan",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_ThreeDayLock",
+     "what": "逐字證據那一行"
+    },
+    {
+     "code": "VCGC-WKF025-STP006",
+     "alias": "ui",
+     "name": "出 HTML U/I(Atlas --vl-* 視覺鎖定;有回歸就印 RED)",
+     "engine": "docs/handoff/ai/VIA_ThreeDayLock_v0100.py",
+     "verb": "ui",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_ThreeDayLock",
+     "what": "不含骨架標籤 · 逸出 · 只用 --vl-*"
+    }
+   ]
   },
   {
    "code": "VCGC-WKF026",
@@ -2213,15 +2280,6 @@
     "goal": "讓每一支現役 .py 真的 import 的第三方套件,都算得出「該裝進哪一境」。以前算不出來,所以 duckdb 2.0.0 能在使用者層躺著直到它弄掉 VRN_ENG115 的自測才被發現。",
     "requirements": [
      "VCGC-REQ200"
-    ],
-    "steps": [
-     "① scan:AST 取真 import(不 grep 猜),跳 references/intake · _superseded · _retired · VIA_RetiredEngines · _archive · /envs/ · _inbox_to_classify;自家模組名(樹內同名檔 / 夾 + 自家命名律)一律分流,不進第三方列",
-     "② 對帳:宣告索引吃五個來源 —— base.toolchain / base.engine_core / base.low_risk_allow / families[*].**members** / family_env_core / package_env_overrides;import 名 → pip 名以冊上 import_name_map 為正本,引擎內建表只是退路",
-     "③ detect:十類離線衝突(L1 封鎖家族在 base · L2 跨家族認領 · L3 engine_core 落使用者層 · L4 宣告沒裝 · L5 裝了沒宣告 · L6 兩邊都沒有 · L7 在位卻查不到 pip 名 · L8 命名律 · L9 famcore 孤件 · L10 自家檔不在位)。每一筆都帶證據與量測地點",
-     "④ 輪次分配照冊 rounds:R1 = 純冊修(彼此不相依,雲端做完)· R2 = 動境(要鏡像 + 同意閘 + 拓撲序,桌機做)· R3 = 收尾",
-     "⑤ audit --apply:寫盤冊 VIA_LibsInventory_SSOT_v*.json(add-only;實質 = 套件集合 + 層 + 宣告 + 衝突碼,沒變就不出新版號,已發布版號拒覆寫)",
-     "⑥ plan:出布建計畫。鏡像三個一起生效(uv.toml first-index 清華 → 阿里 → 官方 default 兜底),**不得**叫人加 UV_NO_CONFIG=1(那會只用一個索引);每境印 envcheck resolve 預演 + uv pip install + uv pip check",
-     "⑦ ui:出 Atlas --vl-* 視覺鎖定頁;沒量到的照實留白"
     ],
     "acceptance": [
      "宣告索引必須讀 families[*].members(讀錯鍵名會讓家族覆蓋變 0,看起來像全樹失治 —— 已納回歸測)",
@@ -2241,8 +2299,94 @@
      "VIA_LibsInventory_SSOT_v0101.json",
      "VIA_Requirements_SSOT_v0228.json",
      "VIA_VCGC_FunctionInventory_SSOT_v0201.json"
+    ],
+    "steps_prose": [
+     "① scan:AST 取真 import(不 grep 猜),跳 references/intake · _superseded · _retired · VIA_RetiredEngines · _archive · /envs/ · _inbox_to_classify;自家模組名(樹內同名檔 / 夾 + 自家命名律)一律分流,不進第三方列",
+     "② 對帳:宣告索引吃五個來源 —— base.toolchain / base.engine_core / base.low_risk_allow / families[*].**members** / family_env_core / package_env_overrides;import 名 → pip 名以冊上 import_name_map 為正本,引擎內建表只是退路",
+     "③ detect:十類離線衝突(L1 封鎖家族在 base · L2 跨家族認領 · L3 engine_core 落使用者層 · L4 宣告沒裝 · L5 裝了沒宣告 · L6 兩邊都沒有 · L7 在位卻查不到 pip 名 · L8 命名律 · L9 famcore 孤件 · L10 自家檔不在位)。每一筆都帶證據與量測地點",
+     "④ 輪次分配照冊 rounds:R1 = 純冊修(彼此不相依,雲端做完)· R2 = 動境(要鏡像 + 同意閘 + 拓撲序,桌機做)· R3 = 收尾",
+     "⑤ audit --apply:寫盤冊 VIA_LibsInventory_SSOT_v*.json(add-only;實質 = 套件集合 + 層 + 宣告 + 衝突碼,沒變就不出新版號,已發布版號拒覆寫)",
+     "⑥ plan:出布建計畫。鏡像三個一起生效(uv.toml first-index 清華 → 阿里 → 官方 default 兜底),**不得**叫人加 UV_NO_CONFIG=1(那會只用一個索引);每境印 envcheck resolve 預演 + uv pip install + uv pip check",
+     "⑦ ui:出 Atlas --vl-* 視覺鎖定頁;沒量到的照實留白"
     ]
-   }
+   },
+   "plan": {
+    "enter": "VCGC",
+    "exit": "VCGC",
+    "order": "scan → 對帳 → detect → 輪次 → audit --apply → plan → ui"
+   },
+   "steps": [
+    {
+     "code": "VCGC-WKF026-STP001",
+     "alias": "scan",
+     "name": "AST 取真 import(不 grep 猜);自家模組名分流不進第三方列",
+     "engine": "docs/handoff/ai/VIA_LibsInventory_v0100.py",
+     "verb": "scan",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_LibsInventory",
+     "what": "4064 支 .py · 第三方 152 · 自家不在位 9"
+    },
+    {
+     "code": "VCGC-WKF026-STP002",
+     "alias": "reconcile",
+     "name": "宣告索引吃五個來源(families 正本鍵是 members)+ 冊上 import_name_map 為正本",
+     "engine": "docs/handoff/ai/VIA_LibsInventory_v0100.py",
+     "verb": "audit",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_LibsInventory",
+     "what": "覆蓋率 100.0%"
+    },
+    {
+     "code": "VCGC-WKF026-STP003",
+     "alias": "detect",
+     "name": "十類離線衝突,每筆帶證據與量測地點(容器主層 ≠ 桌機 BASE)",
+     "engine": "docs/handoff/ai/VIA_LibsInventory_v0100.py",
+     "verb": "audit",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_LibsInventory",
+     "what": "RED 13 · YELLOW 122 · GRAY 4"
+    },
+    {
+     "code": "VCGC-WKF026-STP004",
+     "alias": "rounds",
+     "name": "依相依性分輪:R1 純冊修(雲端做完)· R2 動境(桌機)· R3 收尾",
+     "engine": "docs/handoff/ai/VIA_LibsInventory_v0100.py",
+     "verb": "audit",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_LibsInventory",
+     "what": "R1 0 · R2 126 · R3 13"
+    },
+    {
+     "code": "VCGC-WKF026-STP005",
+     "alias": "book",
+     "name": "寫盤冊(add-only;實質含 AST 剖不過的檔,沒變不出新版號)",
+     "engine": "docs/handoff/ai/VIA_LibsInventory_v0100.py",
+     "verb": "audit --apply",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_LibsInventory",
+     "what": "VIA_LibsInventory_SSOT_v*.json"
+    },
+    {
+     "code": "VCGC-WKF026-STP006",
+     "alias": "plan",
+     "name": "出布建計畫:三鏡像一起生效(不加 UV_NO_CONFIG),逐境 resolve → install → check",
+     "engine": "docs/handoff/ai/VIA_LibsInventory_v0100.py",
+     "verb": "plan",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_LibsInventory",
+     "what": "17 境 140 件次"
+    },
+    {
+     "code": "VCGC-WKF026-STP007",
+     "alias": "ui",
+     "name": "出 HTML U/I(Atlas --vl-*);鏡像探測與安裝照實留 GRAY",
+     "engine": "docs/handoff/ai/VIA_LibsInventory_v0100.py",
+     "verb": "ui",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_LibsInventory",
+     "what": "GRAY 不是綠"
+    }
+   ]
   }
  ],
  "prior": "VIA_Workflow_VCGC_SSOT_v0130.json",
@@ -2272,5 +2416,6 @@
  "why_v0127": "v0126 已發布 → 出新版;政策 L120 三方對等:WKF001 / 002 / 004 / 008 / 009 / 020 的「唯一入口 / 唯一接觸口 / 只經 VCGC / 一對二」字樣改成 VCGC 自己的入口與編排(只改字;代碼 · 步 · match · 引擎一字不動);需求回指只增:WKF018 +VCGC-REQ177(三系統統一 U/I)· WKF020 +VCGC-REQ176(三方對等)。操作員 2026-10-10:「不再視為一入口 三系統獨立 政策及全部寫入 VCGC VRN VDF SYSTEM MANAGER獨立互不影響但互相監控而獨立運作功能」(政策 L120)",
  "why_v0128": "v0128:登 VCGC-REQ195 的工作流(本系統標準視覺鎖定 U/I)。AGENTS.md 第 3 條要求新需求同時進中央需求冊與相應 VIA_Workflow_*_SSOT;v0127 一字不動。",
  "why_v0129": "操作員 2026-11-08 貼上 Cowork / Manus 超級版 v2.0(三層漸進載入 · 雙觸發 · 10 技能登錄表 · /export-skill · Level-0 授權)並指定 NEXT 首測 `/export-skill /ast-diag`;新增 VCGC-WKF023 把技能引擎登為工作流。AGENTS.md 第 3 條要求新需求需求冊與工作流冊兩邊都登。",
- "why_v0130": "操作員 2026-11-08:「VRN-2為主 缺少功能自VRN-1抓來用 等VRN-2功能完美才去整合」。新增 VCGC-WKF024 把借用橋與整合閘登為工作流。"
+ "why_v0130": "操作員 2026-11-08:「VRN-2為主 缺少功能自VRN-1抓來用 等VRN-2功能完美才去整合」。新增 VCGC-WKF024 把借用橋與整合閘登為工作流。",
+ "change_v0132": "① 新增 VCGC-WKF026 libs_inventory。② 把 VCGC-WKF025 的字串步驟改成有 code 的結構步驟 —— 串測覆蓋檢只收 steps[*].code(WKF001–024 都是這形狀),上一輪我把步驟寫成字串塞在 spec 裡,於是盤點冊 coverage.workflow 登的 \"VCGC-WKF025\" 永遠對不上,被判 GONE。登錯地方不是閘的錯。原字串步驟保留在 spec.steps_prose_v0131 / spec.steps_prose,一個字沒刪。v0131 原檔不動。"
 }
