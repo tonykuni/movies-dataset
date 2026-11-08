@@ -263,12 +263,13 @@
     "VRN_SystemManager",
     "--selftest"
    ],
-   "success_marker": "[VRN 來源入口] fail=0",
+   "success_marker": "· PASS · 前版鏈 rc 0",
    "scope": "VRN Manager 保持原路由與來源入口",
    "dependencies": [
     "functional modules/VRN/VRN_SystemManager_v*.py"
    ],
-   "timeout_seconds": 180
+   "timeout_seconds": 180,
+   "marker_note": "標記原為 [VRN 來源入口] fail=0,尾版 v0262 已不印那行;改用只有全鏈過才印的「· PASS · 前版鏈 rc 0」(2026-11-08 容器實測)"
   },
   "sdd": {
    "argv": [
@@ -879,7 +880,7 @@
     "VRN_SystemManager",
     "--selftest"
    ],
-   "success_marker": "[計] VRN_SystemManager v0111 薄尾 11/11 · 前版 PASS · 合計 PASS",
+   "success_marker": "· PASS · 前版鏈 rc 0",
    "scope": "VRN 管理員 outputs 動詞(表頭 · DataFrame · 驗證 · 順序 · 三方對照 · Parquet · 鎖)與 VDF universe 同一套能力(R50 互比補弱 · VDF-REQ017)",
    "dependencies": [
     "functional modules/VRN/VRN_SystemManager_v*.py",
@@ -888,7 +889,8 @@
     "supportive modules/registry/CGC_MDL252_ManagerParity_v*.py",
     "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py"
    ],
-   "timeout_seconds": 900
+   "timeout_seconds": 900,
+   "marker_note": "原標記釘 v0111;同上"
   },
   "manager_parity": {
    "argv": [
@@ -931,19 +933,20 @@
   },
   "vrn_header_frame": {
    "argv": [
-    "VRN_ENG115_HeaderFrameTemp",
+    "--family",
+    "vrn",
+    "functional modules/VRN/VRN_ENG115_HeaderFrameTemp_v0102.py",
     "--selftest"
    ],
-   "success_marker": "[計] 7 檢 OK · FAIL 0",
+   "success_marker": "VRN_ENG115_HeaderFrameTemp v0102 薄尾 6/6 · PASS",
    "scope": "PR #419 VRN 首頁:HEADER → DataFrame(先落 TEMP parquet,超過 mem_rows 只回預覽,全量留磁碟與 DuckDB)· 文左表右 · ENG392 R0–R3 修復(掉覆蓋整輪退回)· ENG082 字袋 / 序列互核 · 完整才一標題四點;v0100 12 檢 + v0101 7 檢",
    "dependencies": [
-    "functional modules/VRN/VRN_ENG115_HeaderFrameTemp_v*.py",
-    "functional modules/VRN/VRN_FrameFlow_SSOT_v*.json",
-    "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
-    "functional modules/VRN/VRN_ENG082_ExtractionLogic_v*.py",
-    "functional modules/VRN/VRN_ENG107_TextRestore_v*.py"
+    "functional modules/VRN/VRN_ENG115_HeaderFrameTemp_v0102.py",
+    "functional modules/VRN/VRN_ENG115_HeaderFrameTemp_v0101.py",
+    "functional modules/VRN/VRN_ENG115_HeaderFrameTemp_v0100.py"
    ],
-   "timeout_seconds": 600
+   "timeout_seconds": 600,
+   "marker_note": "根因:duckdb 2.0 拿掉 Relation.fetchone(),v0100 自測第 332 行炸 AttributeError → 整支連總表行都印不出來。add-only 出 v0102 補相容墊片(跑完還原),案改指 v0102"
   },
   "tooling": {
    "argv": [
@@ -989,13 +992,14 @@
     "VRN_SystemManager",
     "--selftest"
    ],
-   "success_marker": "[計] VRN_SystemManager v0114 本版 6/6 · 前版 PASS",
+   "success_marker": "· PASS · 前版鏈 rc 0",
    "scope": "VRN 單引擎啟動冊:engine 動詞 · 啟動前閘 · 經 VCGC run",
    "dependencies": [
     "functional modules/VRN/VRN_SystemManager_v*.py",
     "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
    ],
-   "timeout_seconds": 900
+   "timeout_seconds": 900,
+   "marker_note": "原標記釘 v0114,尾版已 v0262;改用版本無關且只有成功才印的子字串"
   },
   "onepage": {
    "argv": [
@@ -1203,13 +1207,14 @@
     "VRN_SystemManager",
     "--selftest"
    ],
-   "success_marker": "[計] VRN_SystemManager v0115 本版 7/7 · 前版 PASS · 合計 PASS",
+   "success_marker": "· PASS · 前版鏈 rc 0",
    "scope": "VRN 管理員 params / prep 動詞:ENG398 備料卡七段 · engine params 同路 · prep 72 支 json + html · 未經 VCGC 拒絕(VCGC-REQ133)",
    "dependencies": [
     "functional modules/VRN/VRN_SystemManager_v*.py",
     "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
    ],
-   "timeout_seconds": 1200
+   "timeout_seconds": 1200,
+   "marker_note": "原標記釘 v0115;同上"
   },
   "engine_tools": {
    "argv": [
@@ -1353,12 +1358,13 @@
     "VRN_SystemManager",
     "--selftest"
    ],
-   "success_marker": "[計] VRN_SystemManager v0116 本版 6/6",
+   "success_marker": "· PASS · 前版鏈 rc 0",
    "scope": "VRN 管理員 v0116 未知動詞拒跑 · read logic 歸位(VCGC-REQ140)",
    "dependencies": [
     "functional modules/VRN/VRN_SystemManager_v*.py"
    ],
-   "timeout_seconds": 1200
+   "timeout_seconds": 1200,
+   "marker_note": "原標記釘 v0116;同上"
   },
   "vdf_fetch_verb": {
    "argv": [
@@ -2144,7 +2150,7 @@
     "CGC_MDL265_VdfVrnReadiness",
     "--selftest"
    ],
-   "success_marker": "[計] CGC_MDL265_VdfVrnReadiness_v0100 自測 11/11 · PASS",
+   "success_marker": "CGC_MDL265_VdfVrnReadiness_v0101 自測 10/10 · v0100 鏈 PASS · PASS",
    "scope": "VCGC 監控 VRN / VDF:token · RunGate · LKGC · 修理計畫(雙閘 GATED)· 覆蓋率 + L111 歸屬 · PS 短令兩段接線(pwsh mock)(VCGC-REQ170)",
    "dependencies": [
     "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0100.py",
@@ -2153,7 +2159,8 @@
     "Register-VIA-Commands-v0275.ps1",
     "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0101.py"
    ],
-   "timeout_seconds": 600
+   "timeout_seconds": 600,
+   "marker_note": "原標記 11/11,實跑是 v0101 薄尾 10/10 · v0100 鏈 PASS(2026-11-08 容器實測)"
   },
   "vdf_activate": {
    "argv": [
@@ -2351,26 +2358,32 @@
     "VRN_ENG399_RealTestHarness",
     "--selftest"
    ],
-   "success_marker": "[計] VRN_ENG399_RealTestHarness_v0100 自測 8/8 · PASS",
+   "success_marker": "VRN_ENG399_RealTestHarness_v0100 自測 7/7 · PASS",
    "scope": "VRN_ENG399 實測工作台 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
    "dependencies": [
     "functional modules/VRN/VRN_ENG399_RealTestHarness_v*.py"
    ],
    "timeout_seconds": 900,
-   "registered_at": "2026-10-10T08:33:32+00:00"
+   "registered_at": "2026-10-10T08:33:32+00:00",
+   "marker_note": "原標記 8/8,實跑是 7/7 · PASS(2026-11-08 容器實測)"
   },
   "cov_vrn_eng400": {
    "argv": [
-    "VRN_ENG400_SixEngineShell",
+    "--family",
+    "vrn",
+    "functional modules/VRN/VRN_ENG400_SixEngineShell_v0102.py",
     "--selftest"
    ],
-   "success_marker": "[計] VRN_ENG400_SixEngineShell_v0101 自測 10/10 · PASS",
+   "success_marker": "VRN_ENG400_SixEngineShell v0102 薄尾 8/8 · PASS",
    "scope": "VRN_ENG400 六引擎外殼 v0100–v0101 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
    "dependencies": [
-    "functional modules/VRN/VRN_ENG400_SixEngineShell_v*.py"
+    "functional modules/VRN/VRN_ENG400_SixEngineShell_v0102.py",
+    "functional modules/VRN/VRN_ENG400_SixEngineShell_v0101.py",
+    "functional modules/VRN/VRN_ENG400_SixEngineShell_v0100.py"
    ],
    "timeout_seconds": 900,
-   "registered_at": "2026-10-10T08:33:32+00:00"
+   "registered_at": "2026-10-10T08:33:32+00:00",
+   "marker_note": "根因:v0100 自測對 ③–⑦ 有缺件跳過,但 ⑩ EVIDENCE 帳沒做 → 無 fitz 環境必紅,且 v0101 的 ⑨ 總結檢跟著紅。add-only 出 v0102:相依件逐字記錄、只中和 ⑩ 與其總結檢、獨立紅一律照紅"
   },
   "cov_vrn_libplugins": {
    "argv": [

@@ -70,6 +70,9 @@ BLOCK_KINDS = {
 LOG_SIGNALS = (
     (re.compile(r"No module named ['\"]([A-Za-z0-9_.]+)['\"]"), "ENV_PKG"),
     (re.compile(r"ModuleNotFoundError"), "ENV_PKG"),
+    # 有些工具不丟 ModuleNotFoundError,而是自己印「缺核心套件 X —— 不代裝」
+    (re.compile(r"缺(核心)?套件\s*([A-Za-z0-9_.\-]+)"), "ENV_PKG"),
+    (re.compile(r"\[ABSENT\].*(缺|不代裝)"), "ENV_PKG"),
     (re.compile(r"pwsh\s*不在|PS 讀法 pwsh|pwsh.*not found"), "NO_PWSH"),
     (re.compile(r"VIA_NET_CONSENT|VIA_SCRAPE_CONSENT|同意閘(未開|關)|DENY"), "NET_GATE"),
     (re.compile(r"Remote Control|C:\\Users|桌機(未|沒)"), "DESKTOP"),
@@ -648,10 +651,16 @@ def selftest() -> int:
         chk("㉖ 認不出來判 UNKNOWN,不猜", classify_block("c", "")[0] == "UNKNOWN")
         (EVIDENCE / "d.txt").write_text("同意閘未開,DENY 網路\n", encoding="utf-8")
         chk("㉗ 同意閘字樣判 NET_GATE", classify_block("d", "")[0] == "NET_GATE")
+        (EVIDENCE / "e.txt").write_text(
+            "[ABSENT] VDF_MDL008_FetchSystem v0102:本直譯器缺核心套件 yfinance —— 不代裝\n",
+            encoding="utf-8")
+        ke, eve = classify_block("e", "rc=3")
+        chk("㉘ 自己印「缺核心套件 X」也判 ENV_PKG 且證據帶套件名",
+            ke == "ENV_PKG" and "yfinance" in eve, f"{ke} · {eve[:60]}")
 
     EVIDENCE, LOCK_DIR = keep_e, keep_l
 
-    chk("㉘ 車道判定", lane_of("functional modules/VRN/x.py") == "VRN-2"
+    chk("㉙ 車道判定", lane_of("functional modules/VRN/x.py") == "VRN-2"
         and lane_of("supportive modules/registry/y.json") == "VCGC"
         and lane_of("docs/z.md") == "docs")
 
@@ -662,9 +671,9 @@ def selftest() -> int:
         from datetime import date, timedelta
         y, m, dd = (int(x) for x in head_day.split("-"))
         want = (date(y, m, dd) - timedelta(days=WINDOW_DAYS - 1)).isoformat()
-    chk("㉙ 視窗起點 = HEAD 日 − 2 天(可重現,不用機器當下時間)",
+    chk("㉚ 視窗起點 = HEAD 日 − 2 天(可重現,不用機器當下時間)",
         bool(ws) and ws == want, f"ws={ws} want={want} head={head_day}")
-    chk("㉚ git 壞掉回空字串不炸", git("definitely-not-a-git-verb") == "")
+    chk("㉛ git 壞掉回空字串不炸", git("definitely-not-a-git-verb") == "")
 
     print(f"  [計] VIA_ThreeDayLock v0100 自測 OK {ok} · FAIL {fail}")
     return 0 if fail == 0 else 1
