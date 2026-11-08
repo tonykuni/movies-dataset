@@ -287,6 +287,28 @@ def cmd_peer(args) -> int:
 # ═══════════════════════════════════════════════════════════════════════════
 # VRN-2 自己的工具冊
 # ═══════════════════════════════════════════════════════════════════════════
+def substance(d: dict) -> str:
+    """實質內容(把每次都會變的時間戳排除)—— 只有實質變了才該出新版號,
+    否則每跑一次 --apply 就多一個版本,冊會被噪音淹掉。"""
+    x = {k: v for k, v in (d or {}).items() if k != "ts"}
+    return json.dumps(x, ensure_ascii=False, sort_keys=True)
+
+
+def next_version_path(p: Path) -> Path:
+    """`…_v0100.json` → `…_v0101.json`(找到第一個還不存在的版號)。"""
+    m = re.search(r"_v(\d{4})(\.[A-Za-z0-9]+)$", p.name)
+    if not m:
+        return p.with_name(p.stem + "_v0101" + p.suffix)
+    n, ext = int(m.group(1)), m.group(2)
+    base = p.name[: m.start()]
+    while n < 9999:
+        n += 1
+        cand = p.with_name(f"{base}_v{n:04d}{ext}")
+        if not cand.exists():
+            return cand
+    return p.with_name(f"{base}_v9999{ext}")
+
+
 def tail_of(via: Path, glob: str) -> Path | None:
     hits = sorted(via.glob(glob))
     return hits[-1] if hits else None
@@ -345,13 +367,32 @@ def cmd_manifest(args) -> int:
     if mf["not_lendable"]:
         print(f"[照實] 借不出去的:{mf['not_lendable']}(找不到檔或找不到入口函式,不假裝能借)")
     if args.apply:
-        for rel in (MANIFEST_REL, PEER_EXPECTED_REL):
-            out = via / rel
+        # 倉內正本是**已發布的版本號檔**:只增不減,不原地覆寫(AGENTS.md「修改開新版」)。
+        # 先前的版本每次 --apply 都直接蓋掉 v0100,等於把已鎖的路徑與指紋沖掉
+        # (Codex #609 P1 抓到的就是這個;而我自己對借用冊早就擋了覆寫,這裡卻漏了)。
+        canon = via / MANIFEST_REL
+        target_rel = MANIFEST_REL
+        if canon.is_file():
+            if substance(json.loads(canon.read_text(encoding="utf-8"))) == substance(mf):
+                print(f"[不動] {MANIFEST_REL} 內容實質未變(只有時間戳會動)→ 正本保持原樣")
+                target_rel = None
+            else:
+                nxt = next_version_path(canon)
+                if nxt.exists():
+                    print(f"[拒寫] {nxt.relative_to(via).as_posix()} 已存在 —— 只增不減,請人工裁定版號")
+                    return 1
+                target_rel = nxt.relative_to(via).as_posix()
+                print(f"[開新版] 正本已存在且內容變了 → 不覆寫 v0100,改出 {target_rel}")
+        if target_rel:
+            out = via / target_rel
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_text(json.dumps(mf, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-            print(f"[寫入] {rel}")
-        print("[說明] VRN-1 的橋寫死去 VIA_Reports 找,而本倉不提交 VIA_Reports →"
-              " 倉內另存一份可提交正本,兩份內容相同。")
+            print(f"[寫入] {target_rel}")
+        # VIA_Reports 那份是用完就丟的(本倉不提交),每次重生沒有版本律問題
+        eph = via / PEER_EXPECTED_REL
+        eph.parent.mkdir(parents=True, exist_ok=True)
+        eph.write_text(json.dumps(mf, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(f"[重生] {PEER_EXPECTED_REL}(VRN-1 寫死會去找這裡 · 不提交 · 可丟棄)")
     return 0
 
 
@@ -468,8 +509,31 @@ def load_readonly(path: Path, name: str):
     return mod
 
 
-def borrow(tool_id: str, via: Path | None = None,
-           vrn1: Path | None = None) -> tuple[object, dict]:
+def pinned_sha(via: Path, tool_id: str) -> str | None:
+    """借用冊裡記過的指紋(沒記過回 None)。"""
+    book = via / BORROW_BOOK_REL
+    if not book.is_file():
+        return None
+    try:
+        d = json.loads(book.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    for e in d.get("entries", []):
+        if e.get("tool_id") == tool_id:
+            return e.get("vrn1_sha256") or None
+    return None
+
+
+def borrow(tool_id: str, via: Path | None = None, vrn1: Path | None = None,
+           expect_sha256: str | None = None) -> tuple[object, dict]:
+    """向 VRN-1 借一支工具。
+
+    **指紋要真的比對**:借用冊裡記過的指紋(或呼叫端給的 `expect_sha256`)
+    必須和現在檔案的 sha256 相同,**不同就在載入之前擋下來**。
+    先前的版本只「算」指紋卻從不比對 —— VRN-1 的引擎事後被改過,照樣會載入並回報
+    BORROWED,等於把「驗 sha256」寫成了裝飾(Codex #609 P2 抓到的就是這個)。
+    沒記過指紋時誠實標 `BORROWED_UNPINNED`,不假裝驗過。
+    """
     via = via or via_root()
     if vrn1 is None:
         vrn1, why = find_vrn1(via)
@@ -483,10 +547,20 @@ def borrow(tool_id: str, via: Path | None = None,
     if not path.is_file():
         raise BorrowError(f"VRN-1 側找不到 {cap['engine']}(路徑 {path})")
     digest = sha256(path)
+    expected = expect_sha256 or pinned_sha(via, tool_id)
+    if expected and expected != digest:
+        # 載入**之前**就擋下:跑過的東西再退回來已經太晚
+        raise BorrowError(
+            f"指紋對不上,拒絕載入 {cap['engine']}:"
+            f"冊上記 {expected[:16]}… · 現在是 {digest[:16]}… —— "
+            "VRN-1 那支被改過。要採用新版請先重跑 `fill --apply` 出新版借用冊(只增)並人工確認。")
     mod = load_readonly(path, "_vrn1_borrowed_" + re.sub(r"\W+", "_", tool_id))
     rec = {"tool_id": tool_id, "vrn1_engine": cap["engine"],
            "path": str(path), "sha256": digest, "ts": utc(),
-           "what": cap["what"], "state": "BORROWED"}
+           "what": cap["what"],
+           "state": "BORROWED" if expected else "BORROWED_UNPINNED",
+           "pinned_sha256": expected,
+           "verified": bool(expected)}
     return mod, rec
 
 
@@ -651,9 +725,42 @@ def selftest() -> int:
         mod, rec = borrow("prove.lock", via=fake, vrn1=tmp / "via-vdf-vrn")
         ck("借到 VRN-1 的工具", hasattr(mod, "prove") and mod.prove(7) == 7)
         ck("借用紀錄帶 sha256", len(rec["sha256"]) == 64)
-        ck("紀錄標 BORROWED", rec["state"] == "BORROWED")
+        # 這一借還沒有借用冊可比對 → 照實是 UNPINNED,不是「驗過」的 BORROWED
+        ck("首次借用(無冊可比)標 BORROWED_UNPINNED",
+           rec["state"] == "BORROWED_UNPINNED" and rec["verified"] is False, str(rec)[:100])
         ck("**不在 VRN-1 夾裡留 __pycache__**",
            not (v1 / "__pycache__").exists(), str(list(v1.iterdir())))
+
+        # ── Codex #609 P2 迴歸:冊上記過指紋後,VRN-1 那支被改過就必須在**載入前**擋下 ──
+        bb_dir = (fake / BORROW_BOOK_REL).parent
+        bb_dir.mkdir(parents=True, exist_ok=True)
+        good = sha256(eng)
+        (fake / BORROW_BOOK_REL).write_text(json.dumps(
+            {"entries": [{"tool_id": "prove.lock", "vrn1_sha256": good}]}), encoding="utf-8")
+        mod_p, rec_p = borrow("prove.lock", via=fake, vrn1=tmp / "via-vdf-vrn")
+        ck("指紋相符時標 BORROWED 且 verified=True",
+           rec_p["state"] == "BORROWED" and rec_p["verified"] is True, str(rec_p)[:110])
+        # 把 VRN-1 那支改掉(模擬事後被改)
+        eng.write_text('"""tampered"""\n\n\ndef prove(x=1):\n    return 999\n', encoding="utf-8")
+        try:
+            borrow("prove.lock", via=fake, vrn1=tmp / "via-vdf-vrn")
+            ck("**指紋對不上必須拒絕載入**", False, "竟然載入了(= 原本的缺陷)")
+        except BorrowError as exc:
+            ck("指紋對不上拒絕載入(載入前擋下)", "指紋對不上" in str(exc), str(exc)[:80])
+            ck("錯誤訊息印出冊上與現在兩個指紋",
+               good[:16] in str(exc) and sha256(eng)[:16] in str(exc), str(exc)[:120])
+        # 呼叫端直接給 expect_sha256 也要擋
+        try:
+            borrow("prove.lock", via=fake, vrn1=tmp / "via-vdf-vrn", expect_sha256=good)
+            ck("expect_sha256 對不上也要擋", False, "沒擋")
+        except BorrowError:
+            ck("expect_sha256 對不上也擋", True)
+        # 沒記過指紋 → 照實標 UNPINNED,不假裝驗過
+        (fake / BORROW_BOOK_REL).unlink()
+        mod_u, rec_u = borrow("prove.lock", via=fake, vrn1=tmp / "via-vdf-vrn")
+        ck("沒記過指紋標 BORROWED_UNPINNED 且 verified=False",
+           rec_u["state"] == "BORROWED_UNPINNED" and rec_u["verified"] is False, str(rec_u)[:110])
+        eng.write_text('"""fake lock"""\n\n\ndef prove(x=1):\n    return x\n', encoding="utf-8")
 
         # 檔不在 → BorrowError,不是靜靜回 None
         try:
@@ -785,6 +892,38 @@ def selftest() -> int:
         a = json.loads((fake / MANIFEST_REL).read_text(encoding="utf-8"))
         b = json.loads((fake / PEER_EXPECTED_REL).read_text(encoding="utf-8"))
         ck("兩份內容相同", a == b)
+
+        # ── Codex #609 P1 迴歸:已發布的版本號正本不准原地覆寫 ──
+        canon_before = (fake / MANIFEST_REL).read_text(encoding="utf-8")
+        buf4 = io.StringIO()
+        globals()["via_root"] = lambda start=None: fake
+        try:
+            with contextlib.redirect_stdout(buf4):
+                cmd_manifest(argparse.Namespace(apply=True))   # 內容沒變
+        finally:
+            globals()["via_root"] = _orig
+        ck("內容未變時正本保持原樣(不因時間戳就改檔)",
+           (fake / MANIFEST_REL).read_text(encoding="utf-8") == canon_before
+           and "不動" in buf4.getvalue(), buf4.getvalue()[-90:])
+        # 讓內容真的變(再放一支可借出的工具)
+        (d2 / "VRN_ENG058_TableOmni_v0100.py").write_text(
+            '"""x"""\n\n\ndef main():\n    return 0\n', encoding="utf-8")
+        buf5 = io.StringIO()
+        globals()["via_root"] = lambda start=None: fake
+        try:
+            with contextlib.redirect_stdout(buf5):
+                cmd_manifest(argparse.Namespace(apply=True))
+        finally:
+            globals()["via_root"] = _orig
+        nxt = fake / MANIFEST_REL.replace("v0100", "v0101")
+        ck("**內容變了不覆寫 v0100,改出 v0101**",
+           (fake / MANIFEST_REL).read_text(encoding="utf-8") == canon_before and nxt.is_file(),
+           buf5.getvalue()[-140:])
+        ck("開新版時說明寫清楚", "開新版" in buf5.getvalue())
+        ck("VIA_Reports 那份照舊重生(可丟棄 · 無版本律問題)",
+           "重生" in buf5.getvalue() and (fake / PEER_EXPECTED_REL).is_file())
+        new_mf = json.loads(nxt.read_text(encoding="utf-8"))
+        ck("v0101 收的是新內容", "table.omni" in new_mf["lendable"], str(new_mf["lendable"]))
 
         os.environ.pop("VIA_VRN1_ROOT", None)
     finally:
