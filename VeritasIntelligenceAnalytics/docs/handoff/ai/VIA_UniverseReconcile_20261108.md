@@ -140,7 +140,8 @@ VDF SYSTEM MANAGER管理」。
 | 收斂三支為單頁 | 三支原檔都在 `FlowSystem_v2/uploads_original/`:`marketflow_index_v0112.html` · `flow_monitor_original.html` · `world_flow_original.html` | 三支齊備 |
 | 70 FIS 宇宙檔 | `config/universe.json` = **70** 檔;T1 9 · T2 15 · T3 22 · T4 24 | 數字對上 |
 | 7 情境相位 · 180d · 10區·4層·8類 | `config/sim.json`:keyframes **7** · span_days **180** · steps 84 · regions **10** · tiers **4** · types **8** | 五項全對上 |
-| 30 監控族群(內文又寫 33、表列 31) | `TW_Group_Classification_v0110.json`:group_count **31** · member 149 · leader 41 | **頁內自相矛盾 30/31/33,該統一照冊寫 31** |
+| 30 監控族群(chip)vs 33 族群(第二段標題) | 無頭瀏覽器渲染實測:族群表 **30 列**(指數 benchmark 2 · 美股主題ETF 12 · 台股主題族群 5 · GICS 產業 11)· 指數表 15 列 · 0 page error | **chip 30 是對的,標題 33 是真錯 → v0102 改 30** |
+| 70 FIS 宇宙檔(chip)vs 69 檔 FIS 宇宙涵蓋(第二段標題) | 冊 `config/universe.json` = **70** 檔;頁內正文也寫「70 檔 ETF 宇宙」 | **chip 70 是對的,標題 69 是第二處真錯 → v0102 改 70** |
 | 台股主動式ETF ~28 檔(2026Q1)· 流量 NeedsFetch | 冊 A 碼 31(as_of 2026-10-03);流量確實沒有 | as_of 不同,非矛盾;同一誠實分級 |
 | 全球 ETF 宇宙 | `Global_ETF_Universe_v0100.json`:股市各區 8 · 債券 5 · 商品 4 · 比特幣 3 · 房地產 3 | 在倉 |
 | FIS 引擎 | 8 支 FLOW_ENG 在位:ENG001 Autotest · ENG009 Manager · ENG019 Attractiveness · ENG020 Leadlag · ENG021 GlobalEtfFlowscope · ENG022 GroupTaxonomy · ENG023 TwActiveEtf · ENG024 RegistryOps | 引擎齊備 |
@@ -230,11 +231,59 @@ FlowSystem 6 檔種子與這 47 檔交集 = **3 檔**(2330 · 2317 · 3665)。
 (`platform linux` · `allowedDirectories []`),桌機側一律讀不到 —— 與 2026-11-08
 連結全檢那份收據同一結論,沒變。
 
-## ⑨ 另記:貼回頁要修的一處
+## ⑨ 族群數修正 —— 照實說:不是 31
 
-族群數在貼回頁內三處不一致(chip「30 監控族群」· 內文「33 族群」· 表列 31 行)。
-冊上是 **31 群 / 149 成員 / 41 領頭**(`TW_Group_Classification_v0110.json` v1.1,
-2026-08-19 生成,批52 操作員策展冊轉錄)。該統一照冊寫 31。
+**我上一輪寫「冊上是 31 群,該統一照冊寫 31」,那句是錯的。** 用省 Token 工具重查後,
+三個數字量的是**三個不同母體**,不能互相覆蓋:
+
+| 數 | 它量什麼 | 實證 | 判決 |
+|---|---|---|---|
+| **30** | 整合 Console「監控族群」:指數 benchmark 2 · 美股主題ETF 12 · 台股主題族群 5 · GICS 產業 11 | KPI chip 寫 30;無頭瀏覽器渲染後族群表 **實際 30 列**(表頭 族群/分類/方向/強度/走勢%/軌跡/成分)· 0 page error | **對的,就是本頁真值** |
+| 33 | 第二段標題「33 族群方向/力道/走勢」 | 對不上 chip、對不上渲染列數、對不上任何冊 | **真錯 → 改 30** |
+| 31 | `TW_Group_Classification_v0110.json` 台股族群冊 | 冊卡實證 `len(groups)=31` = `group_count` 31;成員實和 **149** = `member_count` 149;`leader_count` 41 —— **冊自身完全一致** | 是**另一個母體**;本頁台股主題族群只收 5 族,不是這 31 族 |
+
+**把 31 寫到本頁 chip 上,會把一個本來對的 30 改成錯的。** 照冊的正確做法是:
+本頁統一寫 **30**,31 留在它該在的地方(台股族群冊)。
+
+同一段還查到**第二處漂移**:chip 寫「70 FIS 宇宙檔」、正文寫「70 檔 ETF 宇宙」,
+但第二段標題寫「69 檔 FIS 宇宙涵蓋」。冊 `config/universe.json` = **70** 檔
+(T1 9 · T2 15 · T3 22 · T4 24)→ 69 也是錯的。
+
+### 已修(add-only;v0101 不動一字)
+
+`supportive modules/ui_support/VIA_Flow_Overview_Console_v0102.html`
+(v0101 已在 main,照版本律不改原地,出新版號):
+
+* 第二段標題 `33 族群方向/力道/走勢 · 69 檔 FIS 宇宙涵蓋` → `30 … · 70 …`
+* 標題字樣 `v0101 Porcelain` → `v0102 Porcelain`
+* 頁尾依「只增不減」加一行修正紀錄,把 33→30 / 69→70 的理由與冊名寫進頁內
+
+渲染複驗(無頭 Chromium · `file://` 本機 · 不觸網):chip 15 / 30 / 70 / 22 / 7 / 180d ·
+第二段標題 30 / 70 · 指數表 15 列 · 族群表 30 列 · 商品表 17 列 · **page error 0**。
+
+### 還沒做、等你一句話
+
+本頁「台股主題族群」只收 5 族(軍工國防 · AI伺服器供應鏈 · 散熱 · 光通訊/CPO · 重電/綠電),
+台股族群冊卻有 **31 族 / 149 成員**。若你要的是**把本頁擴成監控全部 31 族**,
+那是資料面擴充(不是數字筆誤),我照 add-only 出 v0103 再做。
+
+### 找檔紀錄(你說的備用檔案夾)
+
+* 整合 Console 原來就在倉裡:`supportive modules/ui_support/VIA_Flow_Overview_Console_v0100.html` /
+  `_v0101.html` —— 這同時補上了 2026-11-06 那輪列為「未上傳」的 `VIA_Flow_Overview_Console`
+* `supportive modules/VIA_FlowSystem/_archive_uploads/VIA_FlowSystem_v1_original_sha6ed157c85d1b.zip`
+  (44 檔)= FlowSystem **v1** 舊樹,沒有 monitor 頁、沒有台股族群冊 → 不是這頁的來源
+* `FlowSystem_v2/uploads_original/` 10 檔 = 收斂前的三支分頁原版(marketflow_index · flow_monitor ·
+  world_flow 等),族群數字不在其中硬寫
+* 本倉 `flow_monitor.py` **不含硬寫族群數**:由 `universe.json` 的 `asset_class` 推導(8 桶),
+  所以引擎側沒有要改的數字 —— 漂移只在那張手寫的整合 Console 頁上
+
+### 本輪用到的省 Token 工具(照 L65 次序)
+
+`token` 卡 6/6 已啟用 → `read` 骨架卡(flow_monitor.py 省 95.0% · flow_hub.py 省 95.0% ·
+flow_ui.py)→ `read --depth 2`(冊 `TW_Group_Classification_v0110.json` 直接看出 `groups[31]`
+與每族成員數)→ `slice`(`build_monitor` · `universe.json` 的 `etfs[*].asset_class`)。
+整檔一次都沒讀進對話。
 
 ---
 
