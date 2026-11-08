@@ -22,6 +22,20 @@
   --selftest 自測
 """
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import argparse
 import hashlib
@@ -288,10 +302,21 @@ def cmd_lock(apply_: bool) -> tuple[int, dict, str]:
 
 
 def cmd_verify() -> tuple[int, dict]:
+    """拿鎖冊比現況。
+
+    四種結果,**REGRESSED 的定義很窄**:只有「本來綠、現在不綠」才算回歸。
+      LOCKED_OK  還是綠,而且 log_sha256 一模一樣
+      REFRESHED  還是綠,但 log_sha256 變了 —— 重跑過而已(日誌帶時戳,每跑必變)。
+                 **不是回歸**,不給紅;鎖冊下次寫就會自動收下新指紋。
+      REGRESSED  收據還在,但已經不綠了(rc != 0 或標記沒印)→ 真回歸,紅。
+      GONE       收據整個不見了 → 紅。
+    """
     tail = lock_tail()
-    green, _ = read_receipts()
+    green, other = read_receipts()
     now = {r["case"]: r["log_sha256"] for r in green}
-    out: dict = {"locked_ok": [], "regressed": [], "gone": [], "new_green": [], "book": None}
+    not_green = {r["case"]: r.get("why", "") for r in other}
+    out: dict = {"locked_ok": [], "refreshed": [], "regressed": [], "gone": [],
+                 "new_green": [], "book": None}
     if not tail:
         out["new_green"] = sorted(now)
         return 0, out
@@ -304,12 +329,17 @@ def cmd_verify() -> tuple[int, dict]:
     locked = {r["case"]: r["log_sha256"] for r in prev.get("locked", [])
               if not r.get("revoked_at")}
     for case, sha in sorted(locked.items()):
-        if case not in now:
-            out["gone"].append(case)
-        elif now[case] != sha:
-            out["regressed"].append({"case": case, "locked": sha[:12], "now": now[case][:12]})
+        if case in now:
+            if now[case] == sha:
+                out["locked_ok"].append(case)
+            else:
+                out["refreshed"].append({"case": case, "locked": sha[:12],
+                                         "now": now[case][:12]})
+        elif case in not_green:
+            out["regressed"].append({"case": case, "locked": sha[:12],
+                                     "why": not_green[case][:120]})
         else:
-            out["locked_ok"].append(case)
+            out["gone"].append(case)
     out["new_green"] = sorted(set(now) - set(locked))
     return (1 if (out["regressed"] or out["gone"]) else 0), out
 
@@ -360,17 +390,19 @@ def render_ui(book: dict, ver: dict) -> str:
     if red:
         reg = "".join(f'<tr><td class="c">{esc(r["case"])}</td>'
                       f'<td class="c">{esc(r["locked"])}…</td>'
-                      f'<td class="c">{esc(r["now"])}…</td></tr>' for r in ver["regressed"])
+                      f'<td>{esc(r.get("why", ""))}</td></tr>' for r in ver["regressed"])
         gone = "".join(f'<tr><td class="c">{esc(g)}</td><td colspan="2">GONE:鎖住的案不見了</td></tr>'
                        for g in ver["gone"])
         reg_block = ('<h2>④ 回歸 REGRESSED / 消失 GONE</h2><div class="tw"><table><thead><tr>'
-                     '<th>案</th><th>鎖住時 log_sha</th><th>現在</th></tr></thead><tbody>'
+                     '<th>案</th><th>鎖住時 log_sha</th><th>現在怎麼了</th></tr></thead><tbody>'
                      + reg + gone + '</tbody></table></div>')
     else:
         reg_block = ('<h2>④ 回歸</h2><p>' + lamp("g", "無回歸")
                      + f' 鎖冊 {esc(ver.get("book") or "(首次)")} 比對:'
-                       f'LOCKED_OK <b>{len(ver["locked_ok"])}</b> · REGRESSED <b>0</b> · '
-                       f'GONE <b>0</b> · 新綠 <b>{len(ver["new_green"])}</b></p>')
+                       f'LOCKED_OK <b>{len(ver["locked_ok"])}</b> · '
+                       f'REFRESHED <b>{len(ver["refreshed"])}</b>(重跑過仍綠,不算回歸)· '
+                       f'REGRESSED <b>0</b> · GONE <b>0</b> · '
+                       f'新綠 <b>{len(ver["new_green"])}</b></p>')
 
     locked_names = " · ".join(r["case"] for r in book["locked"])
 
@@ -465,7 +497,8 @@ def print_scan(book: dict, ver: dict) -> None:
     for r in book["not_locked"]:
         if r["block"] in ("ENV_PKG", "NO_PWSH", "UNKNOWN", "NO_LOG"):
             print(f"   [{r['block']}] {r['case']} · {r['block_evidence'][:90]}")
-    print(f"[比對] LOCKED_OK {len(ver['locked_ok'])} · REGRESSED {len(ver['regressed'])}"
+    print(f"[比對] LOCKED_OK {len(ver['locked_ok'])} · REFRESHED {len(ver['refreshed'])}"
+          f"(重跑過仍綠,不算回歸)· REGRESSED {len(ver['regressed'])}"
           f" · GONE {len(ver['gone'])} · 新綠 {len(ver['new_green'])}")
 
 
@@ -498,10 +531,14 @@ def main(argv=None) -> int:
         return rc_lock
     if a.verb == "verify":
         print(f"[比對] 鎖冊 {ver.get('book') or '(還沒有)'}")
-        print(f"   LOCKED_OK {len(ver['locked_ok'])} · REGRESSED {len(ver['regressed'])}"
+        print(f"   LOCKED_OK {len(ver['locked_ok'])} · REFRESHED {len(ver['refreshed'])}"
+              f"(重跑過仍綠)· REGRESSED {len(ver['regressed'])}"
               f" · GONE {len(ver['gone'])} · 新綠 {len(ver['new_green'])}")
+        for r in ver["refreshed"]:
+            print(f"   [綠] REFRESHED {r['case']} 鎖 {r['locked']}… → 現 {r['now']}…"
+                  f"(重跑過,還是綠)")
         for r in ver["regressed"]:
-            print(f"   [RED] REGRESSED {r['case']} 鎖 {r['locked']}… → 現 {r['now']}…")
+            print(f"   [RED] REGRESSED {r['case']} 鎖 {r['locked']}… → 已不綠:{r['why']}")
         for g in ver["gone"]:
             print(f"   [RED] GONE {g}")
         return rc_ver
@@ -576,12 +613,22 @@ def selftest() -> int:
             json.loads(lock_versions()[-1].read_text(encoding="utf-8")).get("prior", "")
             .endswith("v0100.json"))
 
+        # 重跑仍綠:日誌帶時戳,log_sha256 每跑必變 —— 這**不是**回歸
         (EVIDENCE / "good.json").write_text(json.dumps({**base, "log_sha256": "c" * 64}),
                                             encoding="utf-8")
         rcv, ver = cmd_verify()
-        chk("⑩ 同案指紋變了判 REGRESSED 且 rc 1",
-            rcv == 1 and [r["case"] for r in ver["regressed"]] == ["good"],
-            str(ver["regressed"]))
+        chk("⑩ 重跑仍綠判 REFRESHED、不判 REGRESSED、rc 0",
+            rcv == 0 and [r["case"] for r in ver["refreshed"]] == ["good"]
+            and not ver["regressed"], f"rc={rcv} refreshed={ver['refreshed']}")
+        # 真回歸:收據還在,但已經不綠(rc 1)
+        (EVIDENCE / "good.json").write_text(
+            json.dumps({**base, "rc": 1, "log_sha256": "c" * 64}), encoding="utf-8")
+        rcv_r, ver_r = cmd_verify()
+        chk("⑩b 本來綠現在不綠才判 REGRESSED 且 rc 1",
+            rcv_r == 1 and [r["case"] for r in ver_r["regressed"]] == ["good"]
+            and "rc=1" in ver_r["regressed"][0]["why"], str(ver_r["regressed"]))
+        (EVIDENCE / "good.json").write_text(json.dumps({**base, "log_sha256": "c" * 64}),
+                                            encoding="utf-8")
 
         (EVIDENCE / "good.json").unlink()
         rcv2, ver2 = cmd_verify()
@@ -621,15 +668,15 @@ def selftest() -> int:
         chk("⑰ U/I 不含骨架標籤(Artifact 契約)",
             not any(x in html_green.lower() for x in ("<!doctype", "<html", "<body")))
         chk("⑱ 沒回歸時總燈 GREEN", ">總燈 GREEN<" in html_green)
-        ver_red = {"locked_ok": [], "regressed": [{"case": "x", "locked": "aaaaaaaaaaaa",
-                                                   "now": "bbbbbbbbbbbb"}],
+        ver_red = {"locked_ok": [], "refreshed": [],
+                   "regressed": [{"case": "x", "locked": "aaaaaaaaaaaa",
+                                  "why": "rc=1 · 標記沒印"}],
                    "gone": ["y"], "new_green": [], "book": "t.json"}
         html_red = render_ui(b5, ver_red)
         chk("⑲ 有回歸就印總燈 RED,且不同時出現 GREEN 總燈",
             ">總燈 RED<" in html_red and ">總燈 GREEN<" not in html_red)
-        chk("⑳ 回歸的案與兩個指紋都印在頁上(可追)",
-            "aaaaaaaaaaaa" in html_red and "bbbbbbbbbbbb" in html_red
-            and "GONE" in html_red)
+        chk("⑳ 回歸的案 · 鎖住指紋 · 不綠的理由都印在頁上(可追)",
+            "aaaaaaaaaaaa" in html_red and "rc=1" in html_red and "GONE" in html_red)
         chk("㉑ U/I 逸出 HTML 特殊字元(不讓日誌內容破版)",
             "&lt;" in render_ui({**b5, "measured_by": "<img>"}, ver4))
 
@@ -675,7 +722,10 @@ def selftest() -> int:
         bool(ws) and ws == want, f"ws={ws} want={want} head={head_day}")
     chk("㉛ git 壞掉回空字串不炸", git("definitely-not-a-git-verb") == "")
 
-    print(f"  [計] VIA_ThreeDayLock v0100 自測 OK {ok} · FAIL {fail}")
+    # 總表行附一個「只有全過才印」且不帶檢數的結語,交接冊的成功標記釘這個 ——
+    # 以後加檢也不會讓標記過期(本輪 C 的九個案就是被釘住計數害的)
+    print(f"  [計] VIA_ThreeDayLock v0100 自測 OK {ok} · FAIL {fail} · "
+          + ("PASS" if fail == 0 else "FAIL"))
     return 0 if fail == 0 else 1
 
 

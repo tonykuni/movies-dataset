@@ -41,7 +41,8 @@
   [OK] ⑦ 實質沒變 → 不動(不出 v0101) 不動(VIA_ThreeDayLock_v0100.json 實質沒變:鎖 1 案)
   [OK] ⑧ 實質變了 → 出 v0101 已寫 VIA_ThreeDayLock_v0101.json(鎖 2 案)
   [OK] ⑨ 新版記 prior 
-  [OK] ⑩ 同案指紋變了判 REGRESSED 且 rc 1 [{'case': 'good', 'locked': 'aaaaaaaaaaaa', 'now': 'cccccccccccc'}]
+  [OK] ⑩ 重跑仍綠判 REFRESHED、不判 REGRESSED、rc 0 rc=0 refreshed=[{'case': 'good', 'locked': 'aaaaaaaaaaaa', 'now': 'cccccccccccc'}]
+  [OK] ⑩b 本來綠現在不綠才判 REGRESSED 且 rc 1 [{'case': 'good', 'locked': 'aaaaaaaaaaaa', 'why': 'rc=1'}]
   [OK] ⑪ 案不見了判 GONE 且 rc 1 ['good']
   [OK] ⑫ 撤鎖的案不再判 GONE []
   [OK] ⑬ 目標版號已存在 → rc 1 拒寫 拒寫:VIA_ThreeDayLock_v0101.json 已存在(版本律:不覆蓋已發布)
@@ -51,7 +52,7 @@
   [OK] ⑰ U/I 不含骨架標籤(Artifact 契約) 
   [OK] ⑱ 沒回歸時總燈 GREEN 
   [OK] ⑲ 有回歸就印總燈 RED,且不同時出現 GREEN 總燈 
-  [OK] ⑳ 回歸的案與兩個指紋都印在頁上(可追) 
+  [OK] ⑳ 回歸的案 · 鎖住指紋 · 不綠的理由都印在頁上(可追) 
   [OK] ㉑ U/I 逸出 HTML 特殊字元(不讓日誌內容破版) 
   [OK] ㉒ 缺套件判 ENV_PKG 且帶逐字證據 ENV_PKG · ModuleNotFoundError: No module named 'fitz'
   [OK] ㉓ pwsh 不在判 NO_PWSH 
@@ -59,9 +60,10 @@
   [OK] ㉕ 沒日誌判 NO_LOG,不硬歸類 
   [OK] ㉖ 認不出來判 UNKNOWN,不猜 
   [OK] ㉗ 同意閘字樣判 NET_GATE 
-  [OK] ㉘ 車道判定 
-  [OK] ㉙ 視窗起點 = HEAD 日 − 2 天(可重現,不用機器當下時間) ws=2026-11-06 want=2026-11-06 head=2026-11-08
-  [OK] ㉚ git 壞掉回空字串不炸 
-  [計] VIA_ThreeDayLock v0100 自測 OK 30 · FAIL 0
-  [同步] 樹有變 · 註冊冊待同步 {'new': 253, 'changed': 162, 'stale': 0, 'expected': 20126, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 1055 · 觸碰 run --family · 交接閘 RED · 落後 417 提交 · 快照 872.1h · 未登 2381 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [OK] ㉘ 自己印「缺核心套件 X」也判 ENV_PKG 且證據帶套件名 ENV_PKG · [ABSENT] VDF_MDL008_FetchSystem v0102:本直譯器缺核心套件 yfinance —— 
+  [OK] ㉙ 車道判定 
+  [OK] ㉚ 視窗起點 = HEAD 日 − 2 天(可重現,不用機器當下時間) ws=2026-11-06 want=2026-11-06 head=2026-11-08
+  [OK] ㉛ git 壞掉回空字串不炸 
+  [計] VIA_ThreeDayLock v0100 自測 OK 32 · FAIL 0 · PASS
+  [同步] 樹有變 · 註冊冊待同步 {'new': 263, 'changed': 171, 'stale': 54, 'expected': 20082, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 790 · 觸碰 run --family · 交接閘 RED · 落後 420 提交 · 快照 873.0h · 未推 1 · 未登 2380 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

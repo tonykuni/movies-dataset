@@ -16,13 +16,40 @@
 公開面照 v0101(PEP 562 轉接),本版只覆寫 selftest。
 """
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import importlib.util
+import re
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-_PRIOR = HERE / "VRN_ENG115_HeaderFrameTemp_v0101.py"
+
+
+def _vnum(q: Path) -> int:
+    """從檔名取版號;取不到回 -1(誠實,不猜)"""
+    m = re.search(r"_v(\d{4})\.py$", q.name)
+    return int(m.group(1)) if m else -1
+
+
+_STEM = re.sub(r"_v\d{4}$", "", Path(__file__).stem)
+# 家族式取前版:比自己小的最大版號(不把版號字串釘死在程式裡 → 不觸 PINVER)
+_PRIOR_PATH = max((q for q in HERE.glob(_STEM + "_v*.py")
+                   if 0 <= _vnum(q) < _vnum(Path(__file__))),
+                  key=_vnum, default=HERE / (_STEM + "_v0100.py"))
 
 
 def _load(path: Path, name: str):
@@ -33,7 +60,7 @@ def _load(path: Path, name: str):
     return module
 
 
-PRIOR = _load(_PRIOR, "vrn_eng115_v0101")
+PRIOR = _load(_PRIOR_PATH, "vrn_eng115_prior_for_" + Path(__file__).stem)
 
 
 def __getattr__(name: str):
@@ -65,8 +92,10 @@ def _shim_relation_fetchone():
     def restore():
         try:
             del rel_cls.fetchone
-        except Exception:
-            pass
+        except Exception as e:  # noqa: BLE001
+            # 不吞原因:還原失敗要講出來(別的行程可能已經先拿掉了)
+            print(f"  [還原] 墊片移除沒成功:{type(e).__name__} {str(e)[:80]}"
+                  f" —— 照實記,不當成功")
 
     return restore, True
 

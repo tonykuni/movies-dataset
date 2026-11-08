@@ -159,6 +159,45 @@ v0101 的 `except ImportError: pass` 更把原因整個吞掉(全景工具本來
 | 盤點冊 | `v0200` | +站 `E-vrn-eng115-v0102` · `E-vrn-eng400-v0102` |
 | 交接冊 | `v0100` | 9 案標記改成實跑真輸出 + 各案 `marker_note` |
 
+## ⑦ 收尾輪:閘自己又抓到四件我的問題,全修掉
+
+跑完 `handoff checkpoint` 與 `handoff check` 之後,閘與全景工具各自抓到我這輪留下的問題。
+**每一件都是我的,照單修完再驗。**
+
+| # | 誰抓到 | 問題 | 修法 |
+|---|---|---|---|
+| 1 | **我自己的鎖** | `numbering` 判 `REGRESSED` —— 但它還是綠的,只是重跑過。日誌帶時戳,`log_sha256` 每跑必變 | 鎖的語意拆開:`REFRESHED`(還是綠、指紋變了 → **不是回歸**)vs `REGRESSED`(**本來綠現在不綠** → 才是回歸)。加兩條測試分別驗這兩種 |
+| 2 | 交接閘 | `ACCEL_BRIDGE_MISSING` 點名我兩支新引擎 + 鎖引擎 | 三支都補上 `[VIA:ACCEL-BRIDGE:v0100]` 區塊(graceful,缺席零影響) |
+| 3 | 全景工具 | `PINVER` 兩支把前版版號字串釘死;`SWALLOW` 一處 `except: pass` 吞原因 | 改成家族式取前版(`glob` + `_vnum`,比自己小的最大版號);還原失敗改成印出原因不吞 |
+| 4 | 交接閘 | `UNREGISTERED_REQUIREMENT` + `receipt belongs to a different case` | 去讀 `CGC_MDL140 v0101` L210 / L233 的實際讀法:欄名要 `requirement`(我寫了 `req`)、要有 `case` 欄。工作項改名 `VCGC-REQ198:threeday-lock` 照既有慣例 |
+
+### 連帶學到的一條,直接套用
+
+第 4 件修完後 `C-threedaylock-v0100` 變成 `rc 0 · marker false` —— 因為我把自測從 30 檢加到 32,
+而標記釘著 `OK 30`。**這正是 C 輪那九個案的同一個坑。** 所以就地照同一招修:
+鎖引擎的總表行加一個只有全過才印、且不帶檢數的結語,標記改釘 `· FAIL 0 · PASS`。
+以後加檢也不會讓標記過期。
+
+### 收尾複驗(全部容器實跑)
+
+* 三支全景 **問題 0**(AST 與治理七類都乾淨)
+* `VRN_ENG115_HeaderFrameTemp v0102` **6/6 PASS** · `VRN_ENG400_SixEngineShell v0102` **8/8 PASS** ·
+  `VIA_ThreeDayLock v0100` 自測 **32/32 PASS**(從 30 增到 32)
+* 鎖:`LOCKED_OK 218 · REFRESHED 0 · REGRESSED 0 · GONE 0` → **總燈 GREEN**;
+  鎖冊 add-only 走到 **v0103**,v0100 / v0101 / v0102 一律沒動
+* 交接閘 RED **123 → 119**:`UNREGISTERED_REQUIREMENT` 歸零 ·
+  `ACCEL_BRIDGE_MISSING` 6 → 4(我的兩支清掉)· `CHANGED_CODE_WITHOUT_TEST` 69 → 65(我的兩支清掉)·
+  **我這輪的檔一個都不再被點名**
+* 餘下 119 紅是跨五車道的既有積欠,不是本輪造成
+
+### 相依案重跑結果(15 案)
+
+16 個真案名裡 15 案實際存在。只有 `numbering` 綠;其餘 14 紅**全部照實記**:
+`NO_PWSH` 2(`tool_coverage_matrix` · `tool_probe_v0106`)·
+`ENV_PKG` 11(`vdf_fetch_*` 系列 · `vdf_finstmt_gate2` · `vrn_docclass`)·
+`activation` rc 0 但標記沒印(既有,非本輪)。
+重跑的作用是把指紋更新 —— 讓它們從「`EVIDENCE_INVALID` 狀態不明」變成「**指紋當前的誠實紅**」。
+
 ---
 
 五系統對等獨立(L120 / L123)。兩支修的都是 VRN-2 車道自己的引擎,
