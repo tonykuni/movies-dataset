@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-07T18:46:00+00:00",
+ "updated_at": "2026-11-08T16:06:58Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4127,6 +4127,21 @@
    "dependencies": [
     "docs/handoff/ai/VIA_SkillExport_v0101.py",
     "docs/handoff/ai/VIA_SkillExport_v0100.py"
+   ],
+   "timeout_seconds": 900,
+   "marker_note": "標記不釘檢數,只釘「· FAIL 0 · PASS」—— 只有全過才印得出來"
+  },
+  "C-fivesystemchain-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_FiveSystemChain_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "· FAIL 0 · PASS",
+   "scope": "五系統串測:五支入口都解到自己的家族尾版 · 上游不綠不擋下游(AST 判 run_chain 裡沒有 break) · 判決一律取對方自己印的那一行 · 印 JSON 的系統解 JSON 頂層鍵(擋巢狀同名鍵 health.status) · rc≠0 只代表不綠:判決行說黃記黃、沒判決可依才記紅、rc≠0 又印 PASS 記紅擋漂白、rc≠0 永不給綠 · 總燈取最差 · 不代設同意閘(全支無 os.environ[...]) · 入口旗標只 VIA_FROM_* 且值只有 YES · 不走 shell · 不碰 TA-Lib · 盤冊 add-only · U/I 無骨架標籤且第六頁不帶逐字 stdout",
+   "dependencies": [
+    "docs/handoff/ai/VIA_FiveSystemChain_v0100.py"
    ],
    "timeout_seconds": 900,
    "marker_note": "標記不釘檢數,只釘「· FAIL 0 · PASS」—— 只有全過才印得出來"
@@ -8729,6 +8744,15 @@
    "what": "VIA_SkillExport v0101:補上規格 §I 缺的三件(語意自動偵測 · [ACTIVE SKILLS] 抬頭 · 多技能串接)· 自測 46/46(含前版 56/56)。規格其餘七項 v0100 早已做完,未重做。",
    "receipt": "docs/handoff/evidence/C-skillexport-v0101.json",
    "note": "操作員 2026-11-08 令。同輪另出各 AI 近三日紀錄稽核(提交 133 · PR #603–#610 全 merged · 三日鎖 220 · REGRESSED 0)。desktop-commander MCP 實測在本容器非桌機、Gemini 分享頁讀不到,照實記。"
+  },
+  {
+   "id": "VCGC-REQ202:five-system-chain",
+   "requirement": "VCGC-REQ202",
+   "case": "C-fivesystemchain-v0100",
+   "state": "VERIFIED",
+   "what": "VIA_FiveSystemChain v0100:VCGC → VDF → VRN → VQG → VAP 一輪跑完,各走自己宣告的入口。容器第三次實跑總燈 YELLOW(綠 4 · 黃 1 · 紅 0):VCGC rc 2 但自己判 YELLOW 就記黃。自測 48/48。",
+   "receipt": "docs/handoff/evidence/C-fivesystemchain-v0100.json",
+   "note": "操作員 2026-11-08 令「自動測試VCGC to VDF TO VRN TO VQG TOVAP」。三次實跑抓到的三個缺陷都在串測本身,不在五系統:車道錯、行正則碰 JSON、rc≠0 一律判紅。VCGC 的黃是它自己站表上兩站黃,屬 VCGC 自己的收尾範圍,本支只攤開不代修(政策 L123)。"
   }
  ]
 }
