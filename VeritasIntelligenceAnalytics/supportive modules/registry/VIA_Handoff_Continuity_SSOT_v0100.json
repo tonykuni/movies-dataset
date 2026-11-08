@@ -4028,6 +4028,20 @@
    ],
    "timeout_seconds": 1800,
    "registered_at": "2026-11-06T20:35:25+00:00"
+  },
+  "C-skill-export-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_SkillExport_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[自測] 56/56 PASS",
+   "scope": "技能引擎:三層分層真量測 · 10 技能↔加速器 · /export-skill 官方結構 · Celeritas 三檢真 AST(含裝飾器窄豁免正負向)· 無 pwsh 時 ParseFile 標 UNAVAILABLE 不當通過 · VSKE 只增拒覆寫 · ④ 省 Token 量不到總燈不綠(假綠迴歸)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_SkillExport_v0100.py"
+   ],
+   "timeout_seconds": 600
   }
  },
  "work_items": [
@@ -8386,8 +8400,9 @@
    "state": "VERIFIED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "自測 56/56 · registry 印 Tier1 1194 / Tier2 5099 字元 · 4.27×",
-   "reason": "LAW-7 三層漸進載入做成真分層:Tier1 索引常駐 · Tier2 要 sop <slash> 才載 · Tier3 只有 export 才生成;分層省多少是量出來的,不是宣稱。"
+   "receipt": "docs/handoff/evidence/C-skill-export-v0100.json",
+   "reason": "LAW-7 三層漸進載入做成真分層:Tier1 索引常駐 · Tier2 要 sop <slash> 才載 · Tier3 只有 export 才生成;分層省多少是量出來的,不是宣稱。",
+   "note": "自測 56/56 · registry 印 Tier1 1194 / Tier2 5099 字元 · 4.27×"
   },
   {
    "id": "VCGC-REQ196:export-skill-first-test",
@@ -8395,8 +8410,9 @@
    "state": "VERIFIED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "/export-skill /ast-diag 三檢 GREEN 19/19 · N/A 1 · 灰 0 · SKILL.md sha256 ef857dc99a41c287…",
-   "reason": "操作員 NEXT 指定的首測。官方結構 SKILL.md(YAML + 四段)+ scripts/ + references/ + assets/ 齊備且過三檢。"
+   "receipt": "docs/handoff/evidence/C-skill-export-v0100.json",
+   "reason": "操作員 NEXT 指定的首測。官方結構 SKILL.md(YAML + 四段)+ scripts/ + references/ + assets/ 齊備且過三檢。",
+   "note": "/export-skill /ast-diag 三檢 GREEN 19/19 · N/A 1 · 灰 0 · SKILL.md sha256 ef857dc99a41c287…"
   },
   {
    "id": "VCGC-REQ196:ten-skills-vske",
@@ -8404,8 +8420,9 @@
    "state": "VERIFIED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "export-all GREEN 10/10 · VSKE VIA_VSKE_SkillRegistry_v0100.json 10 筆(已存在拒寫)",
-   "reason": "首測過了才照 NEXT 條件把 10 技能全匯出並一次登錄 VSKE;10/10 對上 Celeritas 加速器,無 UNMAPPED。"
+   "receipt": "docs/handoff/evidence/C-skill-export-v0100.json",
+   "reason": "首測過了才照 NEXT 條件把 10 技能全匯出並一次登錄 VSKE;10/10 對上 Celeritas 加速器,無 UNMAPPED。",
+   "note": "export-all GREEN 10/10 · VSKE VIA_VSKE_SkillRegistry_v0100.json 10 筆(已存在拒寫)"
   },
   {
    "id": "VCGC-REQ196:three-checks-real-ast",
@@ -8413,8 +8430,9 @@
    "state": "VERIFIED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "自測含壞技能夾判 RED、語法錯 / 缺 frontmatter / 缺四段 / input() / shell=True 各一負向測",
-   "reason": "Celeritas 三檢 + PY 骨架八項都用 ast.parse 與走訪 FunctionDef/Call 實作,不是字串比對;閘會真的抓錯,不是橡皮章。"
+   "receipt": "docs/handoff/evidence/C-skill-export-v0100.json",
+   "reason": "Celeritas 三檢 + PY 骨架八項都用 ast.parse 與走訪 FunctionDef/Call 實作,不是字串比對;閘會真的抓錯,不是橡皮章。",
+   "note": "自測含壞技能夾判 RED、語法錯 / 缺 frontmatter / 缺四段 / input() / shell=True 各一負向測"
   },
   {
    "id": "VCGC-REQ196:decorator-narrow-exempt",
@@ -8422,8 +8440,9 @@
    "state": "VERIFIED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "兩個負向 / 正向測:沒被當裝飾器用的單參數借用函式 FAIL · 真裝飾器 PASS 且註記理由",
-   "reason": "我的樣板自己被 ② 判缺預設 —— 細看是規則太寬:裝飾器的參數本來就該是位置參數。改成結構判定的窄豁免(名字真的在某個 decorator_list 且恰好一個位置參數),不是看名字放水。"
+   "receipt": "docs/handoff/evidence/C-skill-export-v0100.json",
+   "reason": "我的樣板自己被 ② 判缺預設 —— 細看是規則太寬:裝飾器的參數本來就該是位置參數。改成結構判定的窄豁免(名字真的在某個 decorator_list 且恰好一個位置參數),不是看名字放水。",
+   "note": "兩個負向 / 正向測:沒被當裝飾器用的單參數借用函式 FAIL · 真裝飾器 PASS 且註記理由"
   },
   {
    "id": "VCGC-REQ196:no-false-green",
@@ -8431,8 +8450,9 @@
    "state": "VERIFIED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "迴歸測:④ 量不到時斷言總燈不是 GREEN 且寫明原因",
-   "reason": "開發中踩到假綠:三段 GREEN + ④ YELLOW 卻印 [總燈] GREEN —— 與 Codex #607 抓的 DB 失敗不進總燈同一類。改成 ④ 的燈進總燈。"
+   "receipt": "docs/handoff/evidence/C-skill-export-v0100.json",
+   "reason": "開發中踩到假綠:三段 GREEN + ④ YELLOW 卻印 [總燈] GREEN —— 與 Codex #607 抓的 DB 失敗不進總燈同一類。改成 ④ 的燈進總燈。",
+   "note": "迴歸測:④ 量不到時斷言總燈不是 GREEN 且寫明原因"
   },
   {
    "id": "VCGC-REQ196:no-ps1-authoring",
@@ -8440,8 +8460,9 @@
    "state": "VERIFIED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "自測:.ps1 出現就判 RED 並列「不產 .ps1(L70)」那條 FAIL",
-   "reason": "v2.0 規格要 scripts 含 PS 八段式,但本倉 L70 禁改 .ps1、鬆散 .ps1 從不提交 → 只產 Python,PS 規則改成唯讀驗證器 check --ps,不代寫不代改。這是對規格的必要偏離,照實記。"
+   "receipt": "docs/handoff/evidence/C-skill-export-v0100.json",
+   "reason": "v2.0 規格要 scripts 含 PS 八段式,但本倉 L70 禁改 .ps1、鬆散 .ps1 從不提交 → 只產 Python,PS 規則改成唯讀驗證器 check --ps,不代寫不代改。這是對規格的必要偏離,照實記。",
+   "note": "自測:.ps1 出現就判 RED 並列「不產 .ps1(L70)」那條 FAIL"
   },
   {
    "id": "VCGC-REQ196:pwsh-unavailable",
@@ -8449,8 +8470,9 @@
    "state": "VERIFIED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "自測:無 pwsh 時斷言 ParseFile 為 UNAVAILABLE 且不計入通過數",
-   "reason": "容器沒有 pwsh → PS Parser.ParseFile 這一檢做不到。UNAVAILABLE 不當通過也不當失敗;.ps1 只做文字剖析並在收據寫明「文字剖析,不是 Parser.ParseFile」。黃不是綠。"
+   "receipt": "docs/handoff/evidence/C-skill-export-v0100.json",
+   "reason": "容器沒有 pwsh → PS Parser.ParseFile 這一檢做不到。UNAVAILABLE 不當通過也不當失敗;.ps1 只做文字剖析並在收據寫明「文字剖析,不是 Parser.ParseFile」。黃不是綠。",
+   "note": "自測:無 pwsh 時斷言 ParseFile 為 UNAVAILABLE 且不計入通過數"
   },
   {
    "id": "VCGC-REQ196:token-saving-measured",
@@ -8458,8 +8480,9 @@
    "state": "VERIFIED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "tokens:6 個真檔 759075 → 46494 字元 · 省 93.9%",
-   "reason": "省 Token 不用估:拿鎖版全景工具對本倉真檔跑 read,比整檔與骨架卡的字元數。鎖冊路徑是相對倉根寫的(我一開始拿 VIA 根去接導致找不到工具),已改成兩個都試。"
+   "receipt": "docs/handoff/evidence/C-skill-export-v0100.json",
+   "reason": "省 Token 不用估:拿鎖版全景工具對本倉真檔跑 read,比整檔與骨架卡的字元數。鎖冊路徑是相對倉根寫的(我一開始拿 VIA 根去接導致找不到工具),已改成兩個都試。",
+   "note": "tokens:6 個真檔 759075 → 46494 字元 · 省 93.9%"
   },
   {
    "id": "VCGC-REQ196:links-full-check",
@@ -8467,8 +8490,9 @@
    "state": "VERIFIED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "VIA_LinkSync_20261108.md 連結全檢矩陣 12 條逐一實測",
-   "reason": "改用無頭 Chromium 渲染後,manus.im/share 與 chatgpt.com/share ×4 都讀到真內容 —— 我前幾輪把它們回報成 BLOCKED 是錯的,原因是只取原始 HTML 而那些站是前端渲染。manus.im/app 要登入,/share 不用;以後請給 /share。"
+   "receipt": "docs/handoff/evidence/C-skill-export-v0100.json",
+   "reason": "改用無頭 Chromium 渲染後,manus.im/share 與 chatgpt.com/share ×4 都讀到真內容 —— 我前幾輪把它們回報成 BLOCKED 是錯的,原因是只取原始 HTML 而那些站是前端渲染。manus.im/app 要登入,/share 不用;以後請給 /share。",
+   "note": "VIA_LinkSync_20261108.md 連結全檢矩陣 12 條逐一實測"
   },
   {
    "id": "VCGC-REQ196:manus-side-first-test",
@@ -8476,8 +8500,9 @@
    "state": "BLOCKED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "無收據",
-   "reason": "操作員 NEXT 要「兩邊各丟 /export-skill /ast-diag 比對」。Manus 側不是本執行環境,跑不到 → 只完成本倉這半邊,不冒充雙邊通過。"
+   "receipt": "",
+   "reason": "操作員 NEXT 要「兩邊各丟 /export-skill /ast-diag 比對」。Manus 側不是本執行環境,跑不到 → 只完成本倉這半邊,不冒充雙邊通過。",
+   "next": "操作員在 Manus 側丟 `/export-skill /ast-diag`,把它產出的 SKILL.md 與 scripts 貼回或上傳 → 本倉用 `VIA_SkillExport_v0100.py check <夾>` 跑同一套三檢,兩邊逐項比對後才算「兩邊都過」。"
   },
   {
    "id": "VCGC-REQ196:claude-skills-landing",
@@ -8485,8 +8510,9 @@
    "state": "BLOCKED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "無收據",
-   "reason": ".claude/skills/ 落地會改變這個會話自己的技能集,屬操作員的環境決定,不代裝;產物依官方結構留在 VIA_Reports/skills/,要落地請操作員自行複製。"
+   "receipt": "",
+   "reason": ".claude/skills/ 落地會改變這個會話自己的技能集,屬操作員的環境決定,不代裝;產物依官方結構留在 VIA_Reports/skills/,要落地請操作員自行複製。",
+   "next": "操作員決定是否把 VIA_Reports/skills/ 的 10 個技能夾複製進 .claude/skills/;要落地就說一聲(會改變本會話的技能集,所以不代裝)。"
   },
   {
    "id": "VCGC-REQ196:v0193-v0194-packages",
@@ -8494,8 +8520,9 @@
    "state": "BLOCKED",
    "owner": "AI",
    "case": "C-skill-export-v0100",
-   "receipt": "無收據",
-   "reason": "連結內文顯示桌機已有 VCGC v0193 / v0194 套件與 Start-VCGC-v0194.ps1(本倉主控台仍是 v0192),但都在 Downloads 未上傳、桌機未供出資料夾 → 讀不到,不能比對也不能升級。"
+   "receipt": "",
+   "reason": "連結內文顯示桌機已有 VCGC v0193 / v0194 套件與 Start-VCGC-v0194.ps1(本倉主控台仍是 v0192),但都在 Downloads 未上傳、桌機未供出資料夾 → 讀不到,不能比對也不能升級。",
+   "next": "操作員上傳 VCGC_MultiMatrix_Integration_v0193.zip · VCGC_MultiMatrix_Resilience_v0194.zip · README_v0194.md(或經 Remote Control 供出 Downloads 夾)→ 本倉比對主控台 v0192 與 v0193/v0194 的差距後再評估升級。"
   }
  ]
 }
