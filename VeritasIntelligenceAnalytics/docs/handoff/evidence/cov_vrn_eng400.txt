@@ -28,10 +28,11 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 649 · import 0 · 提及 107 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 657 · import 0 · 提及 110 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VRN_ENG400_SixEngineShell_v0101.py(家族 vrn)
+  [via-vcgc run] [流程] 政策過 · VRN_ENG400_SixEngineShell_v0102.py(家族 vrn)
+  [相依] fitz=ABSENT(ModuleNotFoundError) · PIL=PRESENT  ← 缺 fitz(pymupdf / pillow;照政策不 pip,經 via-envgov 安裝閘)
   [OK] ① 重型正主三家族全找得到尾版(ENG082 · ENG072 · SUP_MDL747)
   [OK] ② 車道與轉接器名對齊操作員實錄(via_paddle_311 · paddle 三支)
   [OK] ③ ENG082 後端健康可讀(broken_backends 回列表)
@@ -44,7 +45,17 @@
   [FAIL] ⑨ 前版 v0100 自測在本版接管下仍全過
   [OK] ⑩ 帶加速器橋 · VIA_FROM_VCGC 閘 · _PRIOR_PATH 家族式
 [計] VRN_ENG400_SixEngineShell_v0101 自測 9/10 · FAIL
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL183_CeleritasPolicyGate_v0106. → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 31, 'changed': 154, 'stale': 0, 'expected': 19904, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-  [教訓] 重複出錯:run VRN_ENG400_SixEngineShell · rc=1 · (無例外訊息) · 第 2 次 · 帳本 CGC_MDL058(via-lessons)
-[監控] 背景全景監控中 pid 3412 · 觸碰 run VRN_ENG400_SixEngineShell · 交接閘 RED · 落後 395 提交 · 快照 840.3h · 未推 1 · 未登 2386 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [前版 v0100 逐檢][FAIL] ⑩ EVIDENCE 只增帳:每引擎動作都有列(引擎名+版本+UTC 時戳)
+  [OK] ① 相依件狀態有逐字記錄(不吞原因)
+  [OK] ①b 直接跑 v0100 拿到逐檢行(不靠 v0101 過濾後的輸出) v0100 行數 13 · rc 1
+  [OK] ⑩ EVIDENCE 只增帳:fitz 缺席環境:跳實跑、不假造(證據列由 ③–⑦ 那段實跑產生,該段已依 v0100 原則跳過)
+  [OK] ⑨ 前版 v0100 自測在本版接管下仍全過:這是總結檢,跟著 ⑩ 紅而已(⑩ 已依缺件原則處理,故同屬可歸因)
+  [OK] ② 缺件環境:⑩ 與同函式的 ③–⑦ 一致做誠實跳過
+  [OK] ③ 獨立檢一個都沒紅(總結檢不算;有獨立紅就不漂白) 獨立紅 0 · 總結紅 1
+  [OK] ④ 獨立紅認得出來(⑦ 不會被當成 ⑩ 或總結檢) ['⑦ 別的檢也紅了']
+  [OK] ⑤ 解析器只認 [FAIL] 行,不把 [OK] 當紅
+  [OK] ⑥ 總結檢認得出來,且窄到不會誤收別的檢
+  [OK] ⑦ 缺件不是萬用漂白劑:有獨立紅時這支一定回 rc 1 missing=True 獨立紅=0 rc=0
+  [計] VRN_ENG400_SixEngineShell v0102 薄尾 8/8 · PASS · 相依缺 fitz
+  [同步] 樹有變 · 註冊冊待同步 {'new': 262, 'changed': 170, 'stale': 0, 'expected': 20135, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 790 · 觸碰 run --family · 交接閘 RED · 落後 419 提交 · 快照 872.6h · 未登 2381 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
