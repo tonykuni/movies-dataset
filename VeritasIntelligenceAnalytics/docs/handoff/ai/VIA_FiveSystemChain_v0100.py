@@ -103,8 +103,10 @@ SYSTEMS: list[dict] = [
         "zh": "自動製圖", "concat": True,
         "dir": "functional modules/VAP/intake/allinone_v0300", "stem": "VAP_AllInOne_v",
         "argv": ["--run-self-test"], "env": {"VIA_FROM_VCGC": "YES"},
-        # VAP 的判決是 JSON 的頂層 status,不是一行中文 —— 照它實際印的格式抓,不要求它改。
-        "verdict": r'^\s*"status":\s*"(PASS|FAIL|[A-Z_]+)"\s*,?\s*$', "timeout": 900,
+        # VAP 印的是 JSON,就當 JSON 讀 —— **頂層** status。
+        # 實跑踩過:用行正則 + 「最後一條勝」會抓到巢狀的 health.status = READY,
+        # 不是頂層 .status = PASS,於是把綠的誤判成黃。用行正則碰 JSON 是偷懶。
+        "verdict": None, "verdict_json": "status", "timeout": 900,
     },
 ]
 
@@ -130,6 +132,36 @@ YELLOWISH = re.compile(r"\b(YELLOW|AMBER|WARN)\b")
 REDISH = re.compile(r"\b(RED|FAIL)\b")
 
 
+def extract_verdict(sysrow: dict, out: str) -> str:
+    """把系統自己印的判決抓出來(逐字)。兩種系統兩種讀法:
+
+      · 印人讀文字的 → 行正則,最後一條勝(自測總結通常在最後)
+      · 印 JSON 的   → **解 JSON 讀頂層那個鍵**。不可以用行正則碰 JSON:
+        巢狀也會有同名鍵(VAP 的 health.status = READY vs 頂層 status = PASS),
+        行正則配「最後一條勝」會抓到裡層那個,把綠的誤判成黃(實跑踩過)。
+    """
+    key = sysrow.get("verdict_json")
+    if key:
+        m = re.search(r"\{.*\}", out, re.S)
+        if not m:
+            return ""
+        try:
+            d = json.loads(m.group(0))
+        except Exception:
+            return ""
+        if not isinstance(d, dict) or key not in d:
+            return ""
+        return f'{key}={d[key]}(JSON 頂層)'        # 逐字帶出,並標明是頂層
+    pat = sysrow.get("verdict")
+    if not pat:
+        return ""
+    hit = ""
+    for line in out.splitlines():
+        if re.match(pat, line):
+            hit = line.strip()                       # 最後一條勝(自測通常最後才印總結)
+    return hit
+
+
 def judge(sysrow: dict, rc: int | None, out: str, elapsed: float,
           entry: Path | None, timed_out: bool = False) -> dict:
     """一個系統的燈 + 它自己印的判決行(逐字)。
@@ -146,10 +178,7 @@ def judge(sysrow: dict, rc: int | None, out: str, elapsed: float,
     if timed_out:
         base["why"] = f"逾時 {sysrow['timeout']}s 沒拿到判決(實跑 {base['elapsed_s']}s)—— 沒拿到判決就不猜"
         return base
-    hit = ""
-    for line in out.splitlines():
-        if re.match(sysrow["verdict"], line):
-            hit = line.strip()                       # 最後一條勝(自測通常最後才印總結)
+    hit = extract_verdict(sysrow, out)
     base["verdict_line"] = hit
     if rc != 0:
         base["lamp"] = "RED"
@@ -466,11 +495,26 @@ def selftest() -> int:
         "VDF": "  [計] VDF_SystemManager v0168 本版 6/6 · 前版鏈 PASS · 合計 PASS",
         "VRN": "[計] VRN-2 SystemManager v0262(VRN_SystemManager_v0262.py)自測 5/5 · PASS · 前版鏈 rc 0",
         "VQG": "[PASS] VQG v0107 selftest · 12/12(含 v0105 全部)· 零網路 · 只在沙盒寫",
-        "VAP": '      "status": "PASS",',
+        "VAP": '{"status": "PASS", "health": {"status": "READY"}}',
     }
     for code, line in real.items():
-        chk(f"⑫ {code} 的判決正則對得上它實際印的那一行",
-            bool(re.match(S[code]["verdict"], line)), line)
+        chk(f"⑫ {code} 的判決抓得到它實際印的那一行",
+            bool(extract_verdict(S[code], line)), (code, extract_verdict(S[code], line)))
+    # ⑫b VAP 的 JSON 巢狀同名鍵回歸測(實跑踩過:抓到 health.status=READY 誤判黃)
+    vap_out = ('{\n "status": "PASS",\n "refresh": {"status": "UPDATED"},\n'
+               ' "inventory": {"status": "PASS"},\n "health": {"status": "READY"}\n}')
+    got = extract_verdict(S["VAP"], vap_out)
+    chk("⑫b VAP 取 JSON **頂層** status,不被巢狀 health.status=READY 蓋掉",
+        got == "status=PASS(JSON 頂層)", got)
+    chk("⑫c 用這個判決去判燈 = GREEN(不是黃)",
+        judge(S["VAP"], 0, vap_out, 1.0, Path(__file__))["lamp"] == "GREEN")
+    chk("⑫d 頂層 status 真的 FAIL 就判 RED",
+        judge(S["VAP"], 0, '{"status": "FAIL", "health": {"status": "READY"}}', 1.0,
+              Path(__file__))["lamp"] == "RED")
+    chk("⑫e JSON 壞掉 / 沒有 status → 當沒印判決(YELLOW UNVERIFIED),不猜",
+        judge(S["VAP"], 0, "not json at all", 1.0, Path(__file__))["lamp"] == "YELLOW"
+        and judge(S["VAP"], 0, '{"health": {"status": "READY"}}', 1.0,
+                  Path(__file__))["lamp"] == "YELLOW")
 
     # ⑬ 最後一條判決勝(自測通常最後才印總結)
     j = judge(S["VQG"], 0, "[PASS] VQG v0105 selftest · 9/9\n[PASS] VQG v0107 selftest · 12/12", 1.0, Path(__file__))
