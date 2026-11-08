@@ -13,7 +13,12 @@
 判燈四條,一條都不放寬:
   ABSENT   入口檔不在          → GRAY(沒量到,不是紅)
   TIMEOUT  逾時沒拿到判決       → GRAY + 記實際秒數(沒拿到判決就不准猜)
-  rc != 0                      → RED
+  rc != 0                      → **不綠**,由它自己的判決行決定黃或紅
+           判決行說 YELLOW → YELLOW(VCGC 的 test --quick 判自己黃時就回 rc 2,「黃不是綠」所以 rc 非 0;
+           一律判紅等於把合法的黃講成紅 —— 黃不是綠,紅也不是黃)
+           判決行說 RED / 認不出 / 根本沒印 → RED
+           判決行說 PASS / GREEN → RED(自相矛盾,正是要擋的漂白)
+           **rc != 0 一律不給綠**
   rc == 0 但找不到它自己的判決行 → **YELLOW UNVERIFIED**
            rc 0 本身不是證據 —— 系統得自己印出判決才算(跟交接閘的 target_marker_seen 同一條規矩)
   rc == 0 且判決行說 PASS / GREEN → GREEN;判決行說 YELLOW / RED → 照它說的,不漂白
@@ -181,8 +186,25 @@ def judge(sysrow: dict, rc: int | None, out: str, elapsed: float,
     hit = extract_verdict(sysrow, out)
     base["verdict_line"] = hit
     if rc != 0:
-        base["lamp"] = "RED"
-        base["why"] = f"它自己的入口回 rc {rc}" + (f";判決行:{hit}" if hit else ";而且沒印判決行")
+        # rc != 0 的意思是「不綠」,不等於「紅」。
+        # 實跑踩到:VCGC 的 test --quick 判自己 YELLOW(綠 9 · 黃 2 · 紅 0)時回 rc 2
+        # —— 它的規矩是「黃不是綠」所以 rc 非 0。我原本一律判 RED,等於把合法的黃講成紅,
+        # 那是另一種不誠實(黃不是綠,紅也不是黃)。
+        # 所以:**rc != 0 把燈的上限壓在「不綠」,由它自己的判決行決定是黃還是紅。**
+        if not hit:
+            base["lamp"] = "RED"
+            base["why"] = f"它自己的入口回 rc {rc},而且沒印判決行 —— 沒有判決可依,只能照紅"
+        elif GREENISH.search(hit) and not YELLOWISH.search(hit) and not REDISH.search(hit):
+            base["lamp"] = "RED"
+            base["why"] = (f"rc {rc} 卻印 PASS / GREEN —— **自相矛盾**,照紅。"
+                           f"(rc 非 0 配一句舊的 PASS,正是要擋的漂白)判決行:{hit}")
+        elif YELLOWISH.search(hit) and not REDISH.search(hit):
+            base["lamp"] = "YELLOW"
+            base["why"] = (f"rc {rc} = 不綠;它自己的判決行說 YELLOW,就照黃不照紅"
+                           f"(黃不是綠,紅也不是黃)。判決行:{hit}")
+        else:
+            base["lamp"] = "RED"
+            base["why"] = f"rc {rc} 且判決行說紅。判決行:{hit}"
         return base
     if not hit:
         base["lamp"] = "YELLOW"
@@ -472,7 +494,23 @@ def selftest() -> int:
     chk("⑤ 逾時 = GRAY 且記實際秒數(不猜)",
         j["lamp"] == "GRAY" and "601.2" in j["why"] and "不猜" in j["why"])
     j = judge(S["VDF"], 1, "  [計] VDF_SystemManager v0168 本版 6/6 · 合計 PASS", 1.0, Path(__file__))
-    chk("⑥ rc≠0 = RED,即使判決行寫 PASS 也不翻綠", j["lamp"] == "RED", j)
+    chk("⑥ rc≠0 卻印 PASS = RED(自相矛盾,正是要擋的漂白)",
+        j["lamp"] == "RED" and "自相矛盾" in j["why"], j)
+    # ⑥b–⑥e rc != 0 的意思是「不綠」不是「紅」—— 實跑踩過:
+    #        VCGC 判自己 YELLOW(綠 9 黃 2 紅 0)時回 rc 2,我原本一律判紅 = 把合法的黃講成紅
+    j = judge(S["VCGC"], 2, "[VCGC 全功能串測] YELLOW · 站 11(綠 9 · 黃 2 · 紅 0)", 1.0, Path(__file__))
+    chk("⑥b rc≠0 + 判決行說 YELLOW = YELLOW(不浮報成紅)",
+        j["lamp"] == "YELLOW" and "紅也不是黃" in j["why"], j)
+    j = judge(S["VCGC"], 2, "[VCGC 全功能串測] RED · 站 11(綠 8 · 黃 2 · 紅 1)", 1.0, Path(__file__))
+    chk("⑥c rc≠0 + 判決行說 RED = RED", j["lamp"] == "RED", j)
+    j = judge(S["VCGC"], 2, "[VCGC 全功能串測] 站 11 跑完了", 1.0, Path(__file__))
+    chk("⑥d rc≠0 + 判決行認不出燈字 = RED(沒有判決可依,只能照紅)", j["lamp"] == "RED", j)
+    j = judge(S["VDF"], 3, "沒有判決行", 1.0, Path(__file__))
+    chk("⑥e rc≠0 + 完全沒印判決行 = RED", j["lamp"] == "RED" and "沒有判決可依" in j["why"], j)
+    chk("⑥f rc≠0 一律不給綠(四種組合沒有一個是 GREEN)",
+        all(judge(S["VCGC"], 2, o, 1.0, Path(__file__))["lamp"] != "GREEN" for o in
+            ("[VCGC 全功能串測] YELLOW · x", "[VCGC 全功能串測] RED · x",
+             "[VCGC 全功能串測] PASS GREEN", "")))
     j = judge(S["VDF"], 0, "跑完了,沒有判決行", 1.0, Path(__file__))
     chk("⑦ rc 0 但沒印判決行 = YELLOW UNVERIFIED(rc 0 不是證據)",
         j["lamp"] == "YELLOW" and "rc 0 本身不是證據" in j["why"], j)
