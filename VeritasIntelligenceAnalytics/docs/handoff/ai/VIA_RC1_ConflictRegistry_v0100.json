@@ -1,0 +1,141 @@
+{
+ "schema": "VIA.RC1.ConflictRegistry.v1",
+ "version": "v0100",
+ "created_utc": "2026-11-09T05:40Z",
+ "first_run_exception": "RC-1 v2.1:Lesson / Conflict Registry 檔不存在時首跑建立為唯一例外;升入 supportive modules/registry 與編號是 W3",
+ "append_only": true,
+ "entries": [
+  {
+   "id": "CONFLICT-00001",
+   "severity": "CRITICAL",
+   "class": "Duplicate Engine · 版本號搶號",
+   "status": "CONTAINED(只在審閱夾,未入倉)",
+   "what": "上傳包 VCGC_MultiMatrix_Integration_v0193.zip / Resilience_v0194.zip 各含 CGC_MDL149_VeritasCentralGovernanceConsole_v0193.py / v0194.py —— 直接拿走 VCGC 主控台家族的下兩個版號。",
+   "evidence": "repo 尾版 v0192 頂層定義 9;上傳 v0193 定義 64(與 v0192 共用 2 · 新 62)、v0194 定義 89(共用 2 · 新 87)—— 同家族名、不同程式。動詞含 install --apply --activate-tools(安裝器範圍 → 牴觸 OBS-0194「既有 Installer/EnvManager/InstallGate/Token 不換」)。SHA256SUMS 17/17 相符;AST 可剖;無 NET-BRIDGE;import subprocess。",
+   "impact": "落入 registry 夾即成為家族尾版,CLAUDE.md 第一步的 `ls …_v*.py | tail -1` 會解析到它 —— 整個 VCGC 入口被另一個 AI 的程式接管(LESSON-0003 現場)。",
+   "resolution_proposal": "不入倉。若要採用:改成獨立家族(例 CGC_MDLxxx_MultiMatrix_v0100)走 VCGC 自己的編號 / 註冊 / 串測;v0193 / v0194 兩個號碼留給 VCGC 自己的鏈。",
+   "rc1_blocking": true
+  },
+  {
+   "id": "CONFLICT-00002",
+   "severity": "MEDIUM",
+   "class": "Duplicate Module · 版本漂移",
+   "status": "OPEN",
+   "what": "VeritasAegisNexus(網路橋本體)在活目錄有 8 份、4 種內容。",
+   "evidence": "network/VeritasAegisNexus_v1652.py = 1.65.2(尾版)· VIA 根 VeritasAegisNexus.py 與 network/…_v1651.py = 1.65.1(sha b983…)· supportive modules/ · network/ · 50_Protection_Acceleration/ 三份同 sha f5f8… 無 ENGINE_VERSION · network/…_v0116 / _v0117 另兩種。",
+   "impact": "誰 import 到哪一份取決於 sys.path 順序;P6「版本化橋接」的本體自己沒版本化。",
+   "resolution_proposal": "W1 Conflict Fix:呼叫點全部指向 v1652 尾版,其餘副本進 _superseded(不刪)。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00003",
+   "severity": "MEDIUM",
+   "class": "Duplicate Engine(MCP server)",
+   "status": "CONTAINED(審閱包)",
+   "what": "Review Kit v0106.4 的 scripts/via_governance_mcp_v0105.py(3 工具:via_status · via_inventory_query · via_token_prepare)與本倉 CGC_MDL279_MCPServer_v0101 是兩個 VCGC 治理 MCP server。",
+   "evidence": "kit 自己的 handover 寫 RED/BLOCKED · live_vcgc_connected=false · OBS-0186;kit 另含 via_agent_os_unified_readonly_hardened.py 4293 行(平行治理引擎)。",
+   "impact": "兩個 server 兩套工具名,接哪一個就是哪一個的事實。",
+   "resolution_proposal": "不入倉;若要借其三工具,以 CGC_MDL279 新版號吸收,不並存。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00004",
+   "severity": "HIGH",
+   "class": "Duplicate Governance Module(活目錄)",
+   "status": "OPEN",
+   "what": "114 個 .py 檔名在多個活目錄重複;其中治理核心各 3 份:VIA_EnvManager.py · VIA_SSOT_Unified.py · VIA_RegistryCore_v1.py · VIA_Runtime_Bridge_All_in_One.py · VIA_Panorama_AST_RuntimeInjector.py;VDF_MDL003_SentimentMacroEngine.py ×3。",
+   "evidence": "basename 掃描(排除 Retired / quarantine / intake / new modules engines / Standalone / SCOPE_COPY 後仍 114)。",
+   "impact": "Hydra 判定:治理引擎多頭 → RED。",
+   "resolution_proposal": "W1:每個治理件選一份尾版(有版號者取最高),其餘進 _superseded;import 路徑重指。",
+   "rc1_blocking": true
+  },
+  {
+   "id": "CONFLICT-00005",
+   "severity": "MEDIUM",
+   "class": "Clone files",
+   "status": "OPEN",
+   "what": "277 個 `_sha<hex8>` 分身檔(例 VIA_Panorama_AST_RuntimeInjector_sha63cefe28.py · StartVIAUnified_shaa1b427ff.ps1)。",
+   "evidence": "檔名正則 _sha[0-9a-f]{8,};P3 圖裡 VDF_MDL001 / 105 / 303 都各有 sha 分身參與 import。",
+   "impact": "同一引擎兩個名字,各自被 import。",
+   "resolution_proposal": "W1:確認無呼叫者後 retire;有呼叫者者重指到正名尾版。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00006",
+   "severity": "MEDIUM",
+   "class": "同號異名(編號撞)",
+   "status": "OPEN(沿用 · 待操作員裁)",
+   "what": "15 組同一編號掛不同名:VCGC 8(CGC_MDL135 EnvGovernance/EnvPlan · CGC_MDL142 AccelImport/TWNameBook · CGC_MDL149 BoxesFlow/ChainAll/Closeout/EntryLock/FilenameCut/GreenMatrix/Identity/Integra… 等)· VDF 4(VDF_ENG110 AKShareProbe/USMacroProbe/USMacroTree · VDF_ENG117 · VDF_ENG118 · VDF_MDL014)· VRN 2(VRN_ENG109 · VRN_ENG397)· SUP 1(SUP_MDL743 六名)。",
+   "evidence": "ssot panorama 命名格(2026-11-09 實跑)。",
+   "impact": "編號不是唯一鍵。",
+   "resolution_proposal": "是伴隨模組就記命名冊;真撞號由操作員裁定改號(不自動改)。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00007",
+   "severity": "LOW",
+   "class": "Branch sprawl",
+   "status": "OPEN",
+   "what": "275 個遠端分支(vcgc 138 · 根 54 · claude 30 · codex 11 …);抽樣 12 支非 claude 分支各有 1104–3342 筆未併入 main 的提交。",
+   "evidence": "git branch -r · rev-list --count origin/main..origin/<b>。",
+   "impact": "LESSON-0004 現場;分支不是落後而是分岔。",
+   "resolution_proposal": "W3:標 archive/ 前綴或刪遠端(操作員決定);不在 RC-1 內動。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00008",
+   "severity": "HIGH",
+   "class": "Compile Error",
+   "status": "OPEN",
+   "what": "compileall 8 支失敗(見 P2)。",
+   "evidence": "python -m compileall 2026-11-09;四條車道尾版全部可編譯。",
+   "impact": "RC-1 NO-GO 條件「Compile Error」字面成立。",
+   "resolution_proposal": "W1 AST Fix:4 支 COMPILE 類把加速器橋移到 from __future__ 之後(機械);4 支 quarantine/intake 標 non-shipping 或移出 compile 範圍。",
+   "rc1_blocking": true
+  },
+  {
+   "id": "CONFLICT-00009",
+   "severity": "LOW",
+   "class": "Config/JSON",
+   "status": "OPEN",
+   "what": "JSON 77 支讀不進:62 BOM(utf-8-sig 可讀)· 13 語法(控制字元 / JSONC)· 2 空檔(vdf_network_report.json · CGE/Console/inventory/manifest.json)。",
+   "evidence": "json.loads 全樹 6457 支。",
+   "impact": "讀冊端若不吃 utf-8-sig 就是 77 個潛在 JSONDecodeError;CGE manifest 空檔碰到「CGE v0400 SEALED」的佐證。",
+   "resolution_proposal": "W1 Config Fix:去 BOM、跳脫控制字元、補或移除空檔(機械,可一批)。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00010",
+   "severity": "LOW",
+   "class": "Tool self-bug(沿用)",
+   "status": "OPEN",
+   "what": "ssot panorama「上下連結@VCGC」RED:正主呼叫失敗 AttributeError 'list' object has no attribute 'get'(第 203 次重複)。",
+   "evidence": "/tmp/rc1_ssotp.txt。",
+   "impact": "一格永遠紅,其他格的黃綠被它蓋住。",
+   "resolution_proposal": "W1 Bug Fix(CGC_MDL247 家族新版號)。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00011",
+   "severity": "LOW",
+   "class": "Numbering/Registry lag",
+   "status": "OPEN",
+   "what": "缺號 5(VDF_MDL014_ThreeCodeUniverse_v0100 · VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310 · VRN_ENG115_HeaderFrameTemp_v0102 · VRN_ENG400_SixEngineShell_v0102 + 1)· 元件冊乾跑 新 9 · 變 23 · 過期 29 · 交接閘 RED 122(65 CHANGED_CODE_WITHOUT_TEST · 49 EVIDENCE_INVALID · 4 MODULE_UNREGISTERED · 4 ACCEL_BRIDGE_MISSING)。",
+   "evidence": "ssot panorama + handoff check 2026-11-09。",
+   "impact": "HOLD 條件「Missing Tool Registration」。",
+   "resolution_proposal": "W3:NumberingSystem --apply · registry-sync --apply;交接閘 122 筆分 VCGC 車道逐案(跨輪欠帳)。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00012",
+   "severity": "MEDIUM",
+   "class": "多 AI 版本分岔(VRN-2 啟動器)",
+   "status": "OPEN",
+   "what": "VRN-2 啟動器 ActivateVRN-2 本倉只有 docs 內的 release zip 到 v0132;本機 vrn2_work 最高 v0178;操作員表列 v0149+。管理器本倉尾版 v0262、本機 v0260。",
+   "evidence": "find ActivateVRN-2* · vrn2_work 掃描。",
+   "impact": "LESSON-0003 / 0004 現場:啟動器線 local-only、三個數字三個來源。",
+   "resolution_proposal": "W2:本機測過的那一版才上;上之前先掃 local ∪ origin/main 取號。",
+   "rc1_blocking": false
+  }
+ ]
+}
