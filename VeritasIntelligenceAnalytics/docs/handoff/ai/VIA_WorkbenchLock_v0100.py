@@ -10,6 +10,10 @@
 界線:審查包自己的燈與資料(OBS-*)不進本倉工作台;不執行審查包任何 .py / .ps1;唯讀本倉冊;不發號、不改燈。
 燈號:RED = 來源自報 RED / OPEN / BLOCKED;GREEN = 來源自報 GREEN / VERIFIED / 檔案在;其餘 YELLOW(未跑 ≠ 綠)。
 
+前端伺服器(操作員 2026-11-09「自建 FRONT-END SERVER HTML U/I」):build 另寫 `api/VIA_Workbench_<SYS>.json`(同一份 LAST_MATRIX,明文 JSON,
+資料契約 = 正本 js 的 bundle:version · system · LAST_MATRIX{9 類} · SHARED_EVIDENCE · source)與 `api/index.json`。頁面是純靜態單檔,
+用任何靜態伺服器就能供應(本引擎不開 socket;桌機:`python -m http.server 8000 --bind 127.0.0.1`,在輸出夾執行)。
+
 用法:
   python VIA_WorkbenchLock_v0100.py kit|build|check|all [--via <VIA>] [--out <夾>] [--open] [--files …]
   python VIA_WorkbenchLock_v0100.py --selftest
@@ -67,6 +71,7 @@ SYS_TOKENS = {"VCGC": ("VCGC",), "VDF": ("VDF",), "VRN-2": ("VRN-2", "VRN2", "VR
 KIT_OUT = HERE / "VIA_WorkbenchLock_kit_latest.json"
 CHECK_OUT = HERE / "VIA_WorkbenchLock_check_latest.json"
 PAGE_NAME = "VIA_Workbench_{sys}_latest.html"
+API_NAME = "VIA_Workbench_{sys}.json"      # 前端伺服器用的明文 JSON(資料契約同 bundle)
 HUB_NAME = "index.html"
 WARNINGS: list[str] = []            # 不吞錯:讀不到 / 開不了的都記這裡,寫進 build / check 收據
 
@@ -508,9 +513,20 @@ def build(via: Path, out: Path, open_after: bool = False) -> dict:
         html_text = render_page(site, sysname, bundle, HUB_NAME)
         fn = out / PAGE_NAME.format(sys=sysname)
         fn.write_text(html_text, encoding="utf-8")
-        pages[sysname] = {"file": str(fn), "bundle": bundle, "rows": {c: len(v) for c, v in M.items()}}
+        api_dir = out / "api"
+        api_dir.mkdir(parents=True, exist_ok=True)
+        (api_dir / API_NAME.format(sys=sysname)).write_text(json.dumps(bundle, ensure_ascii=False, indent=1), encoding="utf-8")
+        pages[sysname] = {"file": str(fn), "bundle": bundle, "rows": {c: len(v) for c, v in M.items()},
+                          "api": str(api_dir / API_NAME.format(sys=sysname))}
     hub = out / HUB_NAME
     hub.write_text(render_hub(site, pages, s, info), encoding="utf-8")
+    (out / "api" / "index.json").write_text(json.dumps({
+        "engine": ENGINE, "ui_contract_version": UI_CONTRACT_VERSION, "generated_utc": info["generated_utc"], "main": main_sha,
+        "constitution_lamp": s["constitution"].get("lamp", "NOT_OBSERVED"),
+        "systems": {k: {"api": "api/" + API_NAME.format(sys=k), "page": PAGE_NAME.format(sys=k), "rows": v["rows"]} for k, v in pages.items()},
+        "contract": "bundle = version · system · LAST_MATRIX{" + " · ".join(CATEGORIES) + "} · SHARED_EVIDENCE · source;row 必有 status · id · ssot_name · version · completion_time · tools · error_detail",
+        "serve_hint": "python -m http.server 8000 --bind 127.0.0.1(在本夾執行;本引擎不開 socket)"},
+        ensure_ascii=False, indent=1), encoding="utf-8")
     res = {"lamp": "GREEN", "engine": ENGINE, "generated_utc": info["generated_utc"], "out": str(out), "hub": str(hub),
            "pages": {k: {"file": v["file"], "rows": v["rows"]} for k, v in pages.items()}}
     if open_after:
@@ -614,6 +630,10 @@ def selftest() -> int:
         t("⑫ 刪結構 id → check 紅", "inspector" in next(f for f in chk3["files"] if f["file"].endswith("VDF_latest.html"))["ids_missing"])
         vcgc = res["pages"]["VCGC"]["rows"]
         t("⑬ VCGC 頁:policy 含 L125 · conflicts 列 = 憲法 OPEN 數", vcgc["policy"] >= 4 and vcgc["conflicts"] == len((load_sources(via)["constitution"].get("conflicts_open") or [])))
+        api = json.loads((out / "api" / API_NAME.format(sys="VQG")).read_text(encoding="utf-8"))
+        idx = json.loads((out / "api" / "index.json").read_text(encoding="utf-8"))
+        t("⑮ 前端伺服器 JSON:api/<SYS>.json = bundle 契約 · index.json 五系統", api.get("version") == UI_CONTRACT_VERSION and api.get("system") == "VQG"
+          and set(api.get("LAST_MATRIX", {})) == set(CATEGORIES) and set(idx.get("systems", {})) == set(SYSTEMS))
         hub_text = (out / HUB_NAME).read_text(encoding="utf-8")
         _, site_block, _ = extract_tokens((lock_site(via) / LOCK_FILES["css"]).read_text(encoding="utf-8"))
         t("⑭ hub 含五系統 + VRN-1 只讀列 + 正本 token 區塊", all(x in hub_text for x in SYSTEMS) and "VRN-1" in hub_text and site_block in hub_text)

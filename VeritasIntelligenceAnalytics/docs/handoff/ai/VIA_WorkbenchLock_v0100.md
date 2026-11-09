@@ -34,10 +34,22 @@ payload 走正本 js 要求的信封(gzip + base64 + raw / gzip sha256;`bundle.v
 
 ## 三、本輪實測(容器 2026-11-09)
 
-- `--selftest` **14/14**(鎖站 4/4 · 抽 token · 契約 · 信封往返 · 燈號律 · 系統辨識(VRN-2 不吃 VRN-1)· CSP sha · 真資料 build 五頁 + hub · check 綠 · 篡改 token 紅 · 刪結構 id 紅 · VCGC 頁 policy / conflicts · hub)。
+- `--selftest` **15/15**(鎖站 4/4 · 抽 token · 契約 · 信封往返 · 燈號律 · 系統辨識(VRN-2 不吃 VRN-1)· CSP sha · 真資料 build 五頁 + hub · check 綠 · 篡改 token 紅 · 刪結構 id 紅 · VCGC 頁 policy / conflicts · hub · 前端伺服器 JSON)。
 - `all`:五頁 rows VCGC 415 · VDF 307 · VRN-2 159 · VQG 19 · VAP 21;check 6/6 GREEN。
 - Playwright(Chromium 1440×900):五頁 pageerror **0**、console error **0**;KPI 由 payload 算出(VCGC 415 / 9 / 16 / 135)· 分類頁籤 10 · 點列 Inspector 顯示編號(VIA-VCGC-MDL1625 …);hub 400px 不橫向捲。
 - 輸出在 `VIA_Reports/workbench/`(不提交);桌機:`python docs/handoff/ai/VIA_WorkbenchLock_v0100.py all --open` 自動開 hub。
+
+## 三b、自建前端伺服器(操作員「是否可以自建 FRONT-END SERVER HTML U/I」)
+
+可以,而且已經是:五頁 + hub 都是純靜態單檔,`build` 另寫 `api/VIA_Workbench_<SYS>.json`(明文,資料契約 = 正本 js 的 bundle)與 `api/index.json`。
+引擎本身不開 socket(VIA 樹的 NET 治理類);要當伺服器供應,用 Python 內建的靜態伺服器在輸出夾執行(只綁 loopback):
+
+```powershell
+python "$r\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_WorkbenchLock_v0100.py" all
+Set-Location "$r\VeritasIntelligenceAnalytics\VIA_Reports\workbench"; python -m http.server 8000 --bind 127.0.0.1
+```
+→ `http://127.0.0.1:8000/`(hub)· `/VIA_Workbench_VCGC_latest.html` · `/api/VIA_Workbench_VCGC.json` · `/api/index.json`。
+資料要更新只重跑 `build`(不動 HTML / CSS / JS = 省 Token 的「前後端分離」);MCP 要讀同一份資料就讀 `api/*.json`(VCGC MCP v0101 是 stdio 只讀;新增 resource 走它自己的版本鏈,本輪不動)。
 
 ## 四、與 Atlas 鎖(VIA_VisualLock v0100 · 2026-11-07)的關係
 
