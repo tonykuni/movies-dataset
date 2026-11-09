@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-09T07:36:56Z",
+ "updated_at": "2026-11-09T07:56:22Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -8844,14 +8844,14 @@
    "id": "VCGC-REQ203:w1-conflict-shims",
    "requirement": "VCGC-REQ203",
    "case": "sdd_validator_v0107",
-   "state": "REVIEW",
-   "owner": "操作員(驗收)",
-   "what": "Conflict Fix(CONFLICT-00004 / 00002):9 份位元相同的治理件副本換成轉接殼(runpy 正本 · 正本不在就 FileNotFoundError 不接):VIA_EnvManager ×2 · VIA_RegistryCore_v1 ×2 · VIA_Panorama_AST_RuntimeInjector ×2 · VIA_Runtime_Bridge_All_in_One ×1 · VIA_SSOT_Unified ×1 → supportive modules/ 根正本;50_Protection_Acceleration/VeritasAegisNexus → network/VeritasAegisNexus_v1652 尾版(v1651 136 defs ⊇ 舊 119)。載入後公開名稱全齊。",
+   "state": "BLOCKED",
+   "owner": "操作員(裁正本)",
+   "what": "Conflict Fix 嘗試:9 份位元相同副本換轉接殼 → 撤回(違版本律)。現況回到 W0:治理核心各 3 份在活目錄。",
    "receipt": "docs/handoff/ai/VIA_RC1_ConflictRegistry_v0101.json",
    "note": "沒動:內容不同的副本(ssot/VIA_SSOT_Unified 8345 行 · 10_Core_Runtime/Runtime_Bridge)與兩份有 exec 引用的 AegisNexus(20 / 37 處)→ W2 桌機。",
-   "reason": "9 份位元相同副本已換殼、載入後公開名稱齊;殼本身沒有自測站",
-   "next": "W2 桌機 diff 裁 3 件異本後,W3 登殼載入站 → 收據",
-   "updated_at": "2026-11-09T07:20:47Z"
+   "reason": "Codex #615 P1(判得對):9 支轉接殼是就地覆寫已併進 main 的檔,違版本律(AGENTS.md 四;同 #612 / #613 判例);10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py 還明確載入 50_Protection_Acceleration/VeritasAegisNexus.py 這條路徑。9 支已逐位元還原成 main。正解 = 出版本化轉接件並遷移呼叫者(相依鏈驗證 + 操作員裁正本)→ W2,不在 W1 六類。",
+   "next": "W2:每件治理核心做相依鏈驗證(誰 import · 哪條 PRIOR 鏈)→ 操作員裁正本 → 出版本化轉接件 + 遷呼叫者;原檔不就地改",
+   "updated_at": "2026-11-09T07:56:22Z"
   },
   {
    "id": "VCGC-REQ203:w1-mdl245-v0107",

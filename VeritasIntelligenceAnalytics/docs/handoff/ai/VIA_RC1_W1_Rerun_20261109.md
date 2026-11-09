@@ -1,6 +1,6 @@
 # VIA RC-1 W1 重跑報告(P2 / P4 / P8 v2)
 
-`[MODE] RC-1 W1` · `[GO] HOLD` · 2026-11-09T07:46Z · 基底 main `04df4b879` + W1 工作樹 · 前版 W0:`VIA_RC1_W0_Audit_20261109.md`(NO-GO)
+`[MODE] RC-1 W1` · `[GO] NO-GO` · 2026-11-09T07:57Z · 基底 main `04df4b879` + W1 工作樹 · 前版 W0:`VIA_RC1_W0_Audit_20261109.md`(NO-GO)
 
 ## W1 做了什麼(HARD FREEZE 六類內)
 
@@ -8,7 +8,7 @@
 |---|---|
 | AST Fix | 4 支橋塊搬到 from __future__ 之後(行多重集合不變)→ 出貨範圍 compile 0 |
 | Config Fix | JSON 62 BOM + 12 控制字元 → 讀不進 77 → 3 |
-| Conflict Fix | 9 份位元相同副本 → 轉接殼(公開名稱齊) |
+| Conflict Fix | 嘗試 9 份位元相同副本 → 轉接殼;Codex #615 P1 判就地覆寫違版本律 → 逐位元還原(0 件);衝突冊 00002 / 00004 回 OPEN 附理由 |
 | Bug Fix | MDL245 v0107 + MDL246 v0102(tests 列表式同病兩支;check 整輪跑完;LESSON-0006) |
 | Documentation Fix | Policy v0114 +L124 · 工作流 VCGC v0134(WKF025 tests · WKF028)· VDF v0107(WKF015 tests)· 需求 v0232(REQ203 · REQ022 歸屬)· 盤點 v0207 · 交接冊 +1 案 +7 項 · 衝突冊 v0101 · 教訓冊 v0101 |
 | Test Fix | handoff test sdd_validator_v0107 · validation_ssot_v0102 rc 0 標記見到;相依變了的已宣告案重跑(sdd · numbering · vdf_consensus_fixture · vdf_universe_r50 rc 0);編號 --apply --scope 15 檔 +725 列 遺失 0 改身分 0 重號 0 · VCGC 缺號 0 |
@@ -20,21 +20,21 @@
 | py compile 失敗(出貨範圍) | 8 | **0** |
 | py compile 失敗(全樹) | 8 | 4(凍結 quarantine / intake) |
 | JSON 讀不進 | 77 | **3**(2 空 · 1 intake JSONC) |
-| 治理核心位元相同副本 | 8 | **0**(換殼 9) |
-| 活目錄重名 .py | 114 | 116(含殼;內容不同的留 W2) |
+| 治理核心位元相同副本 | 8 | 8(殼方案撤回;W2 版本化轉接件) |
+| 活目錄重名 .py | 114 | 114 |
 
-## P4 Hydra · YELLOW
+## P4 Hydra · RED
 
-位元相同的治理核心副本 8 份 → 轉接殼;剩的都是內容不同的雙頭(ssot/VIA_SSOT_Unified · 10_Core_Runtime/Runtime_Bridge · AegisNexus 兩份 exec 引用),要 diff 裁誰是正本 → W2;277 _sha 分身與 15 組同號異名沿用(操作員裁)。不再是「各 3 份一模一樣」的多頭 → 不是 NO-GO 條件,是 HOLD 的 Medium Conflict。
+維持 W0 的 RED:治理核心 5 件各 3 份 + AegisNexus 8 份仍在活目錄。W1 曾把 9 份位元相同副本換成轉接殼,Codex #615 P1 判「就地覆寫已發布檔」違版本律(AGENTS.md;#612 / #613 同判例)→ 已逐位元還原。正解不是殼:相依鏈驗證(誰 import · 哪條 PRIOR 鏈)→ 操作員裁正本 → 出版本化轉接件 + 遷呼叫者 → 舊副本進 _superseded;這是 W2 設計決策,不在 W1 六類。
 
 | 治理件 | 現況 |
 |---|---|
-| `VIA_EnvManager.py` | 1 正本 + 2 殼 |
-| `VIA_RegistryCore_v1.py` | 1 正本 + 2 殼 |
-| `VIA_Panorama_AST_RuntimeInjector.py` | 1 正本 + 2 殼 |
-| `VIA_Runtime_Bridge_All_in_One.py` | 1 正本 + 1 殼 + 1 異本(10_Core_Runtime,W2 diff) |
-| `VIA_SSOT_Unified.py` | 1 正本 + 1 殼 + 1 異本(ssot/,8345 行,W2 diff) |
-| `VeritasAegisNexus.py` | 尾版 network/_v1652 + 1 殼 + 2 份有 exec 引用的異本(20 / 37 處,W2) |
+| `VIA_EnvManager.py` | 3 份(位元相同 ×3) |
+| `VIA_RegistryCore_v1.py` | 3 份(位元相同 ×3) |
+| `VIA_Panorama_AST_RuntimeInjector.py` | 3 份(位元相同 ×3) |
+| `VIA_Runtime_Bridge_All_in_One.py` | 3 份(2 同 + 10_Core_Runtime 異本,且它明確載入 50_Protection_Acceleration/VeritasAegisNexus.py) |
+| `VIA_SSOT_Unified.py` | 3 份(2 同 + ssot/ 異本 8345 行) |
+| `VeritasAegisNexus.py` | 8 份 · 4 種內容(尾版 network/_v1652 · 兩份有 exec 引用 20 / 37 處) |
 
 ## P4 SSOT 全景(VCGC 主控台)
 
@@ -65,6 +65,7 @@
 | 35 | `ssot panorama(第二輪)` | 2 | YELLOW · 無紅 · 自動編號@VCGC 缺號 0 · 上下連結@VCGC YELLOW(待重驗鎖 4) |
 | 36 | `test --quick(第二輪)` | 2 | YELLOW · 站 12(綠 10 · 黃 2 · 紅 0)· case 247/247 · workflow 131/131 · compile 錯 0 · 缺橋 0 |
 | 41–42 | `handoff test sdd_validator_v0107 · handoff check` | 0/1 | 收據重發 rc 0;交接閘 RED 141(CHANGED_CODE_WITHOUT_TEST 80 · EVIDENCE_INVALID 52 · MODULE_UNREGISTERED 5 · ACCEL_BRIDGE_MISSING 4)—— REQ203 項 0 紅;餘為跨輪欠帳(W0 122 → 本輪相依變更一度 157 → 141) |
+| 51 | `handoff check(殼撤回後)` | 1 | RED 139(CHANGED_CODE_WITHOUT_TEST 79 · EVIDENCE_INVALID 52 · ACCEL_BRIDGE_MISSING 4 · MODULE_UNREGISTERED 4) |
 
 ## SYSTEM MATRIX
 
@@ -81,9 +82,9 @@
 | ID | 嚴重 | 狀態 | 一句話 |
 |---|---|---|---|
 | CONFLICT-00001 | CRITICAL | CONTAINED(只在審閱夾,未入倉) | 上傳包 VCGC_MultiMatrix_Integration_v0193.zip / Resilience_v0194.zip 各含 CGC_MDL149_VeritasCentralGovernanceConsol |
-| CONFLICT-00002 | MEDIUM | PARTIAL | VeritasAegisNexus(網路橋本體)在活目錄有 8 份、4 種內容。 |
+| CONFLICT-00002 | MEDIUM | OPEN | VeritasAegisNexus(網路橋本體)在活目錄有 8 份、4 種內容。 |
 | CONFLICT-00003 | MEDIUM | CONTAINED(審閱包) | Review Kit v0106.4 的 scripts/via_governance_mcp_v0105.py(3 工具:via_status · via_inventory_query · via_token_pre |
-| CONFLICT-00004 | HIGH | PARTIAL | 114 個 .py 檔名在多個活目錄重複;其中治理核心各 3 份:VIA_EnvManager.py · VIA_SSOT_Unified.py · VIA_RegistryCore_v1.py · VIA_Runtim |
+| CONFLICT-00004 | HIGH | OPEN | 114 個 .py 檔名在多個活目錄重複;其中治理核心各 3 份:VIA_EnvManager.py · VIA_SSOT_Unified.py · VIA_RegistryCore_v1.py · VIA_Runtim |
 | CONFLICT-00005 | MEDIUM | OPEN | 277 個 `_sha<hex8>` 分身檔(例 VIA_Panorama_AST_RuntimeInjector_sha63cefe28.py · StartVIAUnified_shaa1b427ff.ps1)。 |
 | CONFLICT-00006 | MEDIUM | OPEN(沿用 · 待操作員裁) | 15 組同一編號掛不同名:VCGC 8(CGC_MDL135 EnvGovernance/EnvPlan · CGC_MDL142 AccelImport/TWNameBook · CGC_MDL149 BoxesFlo |
 | CONFLICT-00007 | LOW | OPEN | 275 個遠端分支(vcgc 138 · 根 54 · claude 30 · codex 11 …);抽樣 12 支非 claude 分支各有 1104–3342 筆未併入 main 的提交。 |
@@ -106,23 +107,23 @@
 | VDF PASS | ✘ PENDING —— 自測 ✔ · 橋接 100% ✔ · reader chain 封印收據 GRAY(W2) |
 | Compile Error = 0 | ✔ 出貨範圍 0(W0 8 → 0;全樹餘 4 = 凍結 quarantine / intake,範圍外) |
 | Critical Conflict = 0 | △ CONFLICT-00001 CRITICAL 仍 CONTAINED(未入倉,不採用) |
-| Hydra = GREEN | ✘ YELLOW(RED → YELLOW:位元相同副本已收斂成殼;剩內容不同的雙頭 3 件待 W2 diff 裁定) |
+| Hydra = GREEN | ✘ RED(維持;W1 殼方案違版本律已撤回 —— 正解 = 版本化轉接件 + 遷呼叫者,W2 裁正本) |
 | Lesson Registry Updated | ✔ v0101(+LESSON-0006) |
 | Policy Registry Updated | ✔ v0114 +L124 RC1_AUDIT_MODE_READONLY(AgentOS LAW-10 對映) |
 | Conflict Registry Updated | ✔ v0101(FIXED 4 · PARTIAL 2 · 沿用 6;0 消失) |
 
-**[GO] HOLD** —— NO-GO 兩條都清了(Compile 0 · Hydra 不再 RED)→ HOLD。HOLD 三條:Medium Conflict 6 筆(3 件要 W2 diff 裁)· 工具登記(缺號已清 0;交接閘 RED 141(W0 122;REQ203 工作項 0 紅;其餘跨輪欠帳,逐案多輪))· 文件(CGE / V018E-F 佐證)。三個 PASS 條件:VCGC YELLOW · VRN-2 四本書未驗 · VDF reader chain 收據未取得。
+**[GO] NO-GO** —— NO-GO 兩條清了一條(Compile 8 → 0);Hydra 仍 RED(W1 殼方案違版本律,已撤回;正解是 W2 的版本化轉接件 + 遷呼叫者)→ 仍 NO-GO。另 HOLD 三條:Medium Conflict 6 筆(3 件要 W2 diff 裁)· 工具登記(缺號已清 0;交接閘 RED 139(W0 122;REQ203 工作項 0 紅;其餘跨輪欠帳,逐案多輪;殼撤回後 CHANGED_CODE_WITHOUT_TEST 79 · EVIDENCE_INVALID 52 · ACCEL_BRIDGE_MISSING 4 · MODULE_UNREGISTERED 4))· 文件(CGE / V018E-F 佐證)。三個 PASS 條件:VCGC YELLOW · VRN-2 四本書未驗 · VDF reader chain 收據未取得。
 
 ## [NEXT]
 
 1. W1 收口(本 PR 併入後):MDL246 v0102 · 教訓冊 v0101 · W1 報告三檔已提交 → --apply --scope 補發號 → registry-sync --apply;VDF 工作流冊 v0107 的發號走 VDF 車道(VCGC 衝突閘「子系統邊界」擋 VCGC 代發)
-2. W2 桌機:① ssot/VIA_SSOT_Unified.py vs 根正本 diff、10_Core_Runtime/Runtime_Bridge vs 根正本 diff → 裁正本、另一份換殼;② AegisNexus 兩份 exec 引用(20 / 37 處)逐支改指 network/_v1652 再換殼;③ VRN-2 四本書(真 PDF)· 本機 ActivateVRN-2 v0178 入倉;④ VDF reader chain V018E/F 原收據;⑤ CGE v0400 manifest 重出
+2. W2 桌機:① 治理核心 5 件 + AegisNexus:相依鏈驗證(AST:誰 import · 哪條 PRIOR 鏈載它)→ 操作員裁正本 → 出版本化轉接件(新檔名帶版號)+ 遷呼叫者 → 舊副本進 _superseded;② 10_Core_Runtime/Runtime_Bridge 與 ssot/SSOT_Unified 兩份異本 diff;③ VRN-2 四本書(真 PDF)· 本機 ActivateVRN-2 v0178 入倉;④ VDF reader chain V018E/F 原收據;⑤ CGE v0400 manifest 重出
 3. W3:登記冊(Conflict / Lesson)升入 supportive modules/registry 並編號;WKF/STP/REQ 43 碼 --apply --scope;15 組同號異名操作員裁;交接閘逐案
 4. W4:P8 v3 → 三個 PASS 條件齊 + Hydra GREEN → GO → tag rc-1
 
 ---
 ```
 [MODE] RC-1 W1
-[GO]   HOLD —— NO-GO 兩條都清了(Compile 0 · Hydra 不再 RED)→ HOLD。HOLD 三條:Medium Conflict 6 筆(3 件要 W2 diff 裁)· 工具登記(缺號已清 0;交接閘 RED 141(W0 122;REQ203 工作項 0 紅;其餘跨輪欠帳,逐案多輪))· 文件(CGE / V018E-F 佐證)。三個 PASS 條件:VCGC YELLOW · VRN-2 四本書未驗 · VDF reader chain 收據未取得。
+[GO]   NO-GO —— NO-GO 兩條清了一條(Compile 8 → 0);Hydra 仍 RED(W1 殼方案違版本律,已撤回;正解是 W2 的版本化轉接件 + 遷呼叫者)→ 仍 NO-GO。另 HOLD 三條:Medium Conflict 6 筆(3 件要 W2 diff 裁)· 工具登記(缺號已清 0;交接閘 RED 139(W0 122;REQ203 工作項 0 紅;其餘跨輪欠帳,逐案多輪;殼撤回後 CHANGED_CODE_WITHOUT_TEST 79 · EVIDENCE_INVALID 52 · ACCEL_BRIDGE_MISSING 4 · MODULE_UNREGISTERED 4))· 文件(CGE / V018E-F 佐證)。三個 PASS 條件:VCGC YELLOW · VRN-2 四本書未驗 · VDF reader chain 收據未取得。
 [NEXT] W1 收口(本 PR 併入後):MDL246 v0102 · 教訓冊 v0101 · W1 報告三檔已提交 → --apply --scope 補發號 → registry-sync --apply;VDF 工作流冊 v0107 的發號走 VDF 車道(VCGC 衝突閘「子系統邊界」擋 VCGC 代發)
 ```

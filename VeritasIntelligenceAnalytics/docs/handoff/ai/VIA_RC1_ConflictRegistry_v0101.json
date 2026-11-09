@@ -20,7 +20,7 @@
    "id": "CONFLICT-00002",
    "severity": "MEDIUM",
    "class": "Duplicate Module · 版本漂移",
-   "status": "PARTIAL",
+   "status": "OPEN",
    "what": "VeritasAegisNexus(網路橋本體)在活目錄有 8 份、4 種內容。",
    "evidence": "network/VeritasAegisNexus_v1652.py = 1.65.2(尾版)· VIA 根 VeritasAegisNexus.py 與 network/…_v1651.py = 1.65.1(sha b983…)· supportive modules/ · network/ · 50_Protection_Acceleration/ 三份同 sha f5f8… 無 ENGINE_VERSION · network/…_v0116 / _v0117 另兩種。",
    "impact": "誰 import 到哪一份取決於 sys.path 順序;P6「版本化橋接」的本體自己沒版本化。",
@@ -32,6 +32,12 @@
      "from": "OPEN",
      "to": "PARTIAL",
      "why": "W1:8 份 → 位元相同的 50_Protection_Acceleration 副本換成轉接殼指 network/VeritasAegisNexus_v1652 尾版(v1651 136 defs ⊇ 舊 119 defs 驗過)。餘:supportive modules/VeritasAegisNexus.py(exec 引用 20 處)與 network/VeritasAegisNexus.py(37 處)內容不同、有人 exec 它 → W2 桌機逐支改指尾版後才能換殼;根 VeritasAegisNexus.py 1.65.1 留。"
+    },
+    {
+     "at": "2026-11-09T07:56:22Z",
+     "from": "PARTIAL",
+     "to": "OPEN",
+     "why": "Codex #615 P1(判得對):9 支轉接殼是就地覆寫已併進 main 的檔,違版本律(AGENTS.md 四;同 #612 / #613 判例);10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py 還明確載入 50_Protection_Acceleration/VeritasAegisNexus.py 這條路徑。9 支已逐位元還原成 main。正解 = 出版本化轉接件並遷移呼叫者(相依鏈驗證 + 操作員裁正本)→ W2,不在 W1 六類。"
     }
    ]
   },
@@ -50,7 +56,7 @@
    "id": "CONFLICT-00004",
    "severity": "HIGH",
    "class": "Duplicate Governance Module(活目錄)",
-   "status": "PARTIAL",
+   "status": "OPEN",
    "what": "114 個 .py 檔名在多個活目錄重複;其中治理核心各 3 份:VIA_EnvManager.py · VIA_SSOT_Unified.py · VIA_RegistryCore_v1.py · VIA_Runtime_Bridge_All_in_One.py · VIA_Panorama_AST_RuntimeInjector.py;VDF_MDL003_SentimentMacroEngine.py ×3。",
    "evidence": "basename 掃描(排除 Retired / quarantine / intake / new modules engines / Standalone / SCOPE_COPY 後仍 114)。",
    "impact": "Hydra 判定:治理引擎多頭 → RED。",
@@ -62,6 +68,12 @@
      "from": "OPEN",
      "to": "PARTIAL",
      "why": "W1:治理核心 5 件 × 位元相同副本 8 份 → 轉接殼(runpy 正本;正本不在就 FileNotFoundError 不接;載入後公開名稱齊)。餘:ssot/VIA_SSOT_Unified.py(6ddd · 8345 行,內容不同)· 10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py(2b03,內容不同)→ 要先 diff 判誰是正本,W2;其餘 109 個重名多為 VDF_MDL003 類資料模組副本與 SCOPE_COPY,W3 盤。"
+    },
+    {
+     "at": "2026-11-09T07:56:22Z",
+     "from": "PARTIAL",
+     "to": "OPEN",
+     "why": "Codex #615 P1(判得對):9 支轉接殼是就地覆寫已併進 main 的檔,違版本律(AGENTS.md 四;同 #612 / #613 判例);10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py 還明確載入 50_Protection_Acceleration/VeritasAegisNexus.py 這條路徑。9 支已逐位元還原成 main。正解 = 出版本化轉接件並遷移呼叫者(相依鏈驗證 + 操作員裁正本)→ W2,不在 W1 六類。"
     }
    ]
   },
@@ -194,5 +206,5 @@
  ],
  "prior": "VIA_RC1_ConflictRegistry_v0100.json",
  "updated_utc": "2026-11-09T07:12:31Z",
- "why_v0101": "v0100 已併進 main(PR #613)→ 出新版。W1 六類修復後 6 筆帶理由轉態(FIXED 4 · PARTIAL 2),其餘 6 筆沿用;沒有一筆消失。"
+ "why_v0101": "v0100 已併進 main(PR #613)→ 出新版。W1 六類修復後 4 筆帶理由轉態 FIXED(00008 · 00009 · 00010 · 00011);00002 / 00004 一度 PARTIAL(轉接殼),Codex #615 P1 判違版本律 → 撤回、回 OPEN,理由留在 history;其餘 6 筆沿用;沒有一筆消失。"
 }
