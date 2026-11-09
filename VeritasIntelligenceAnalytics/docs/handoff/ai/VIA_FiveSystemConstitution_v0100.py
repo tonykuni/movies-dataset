@@ -14,7 +14,7 @@
   ⑤ 憲法性:GREEN = 入口有號 · 治理器該系統紅 0 · 衝突 0 · 留白 0;YELLOW = 入口有號但留白 / 黃 / 未登記治理器;RED = 入口空號或衝突 / 紅。
   ⑥ 實測:五系統各自 --selftest(子程序 · 並行 · 各自逾時 · 一個紅不影響別人);rc 0 → GREEN,逾時 124 / 其他 → RED。
   ⑦ 進度帳:docs/handoff/ai/VIA_FiveSystem_Progress_v0100.jsonl 只增(每系統每輪一列);矩陣附每系統歷史次數 · 最近一次綠 · 連綠。
-  ⑧ 輸出:VIA_FiveSystemConstitution_v0100.json / .md / VIA_FiveSystemConstitution_UI.html(Atlas --vl-* 鎖定色票)。
+  ⑧ 輸出:VIA_FiveSystemConstitution_latest.json / .md / VIA_FiveSystemConstitution_UI.html(Atlas --vl-* 鎖定色票;輸出不帶版號 → 每輪重生不踩已發布冊 IMMUT)。
   Codex PR 619(併入前就地修,本檔尚未上 main):P1 治理器 dry-run 擬發的號不算有號(只認落冊)· P1 --no-run 入口 sha 變了不沿用舊綠 · P1 加速器橋 / 網路橋(graceful)。
 
 用法:
@@ -75,8 +75,8 @@ from pathlib import Path
 ENGINE = "VIA_FiveSystemConstitution_v0100"
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]                      # …/VeritasIntelligenceAnalytics
-OUT_JSON = HERE / "VIA_FiveSystemConstitution_v0100.json"
-OUT_MD = HERE / "VIA_FiveSystemConstitution_v0100.md"
+OUT_JSON = HERE / "VIA_FiveSystemConstitution_latest.json"      # 不帶版號:每輪重生;帶版號的冊一旦發布就不能就地改(編號稽核 IMMUT)
+OUT_MD = HERE / "VIA_FiveSystemConstitution_latest.md"
 OUT_UI = HERE / "VIA_FiveSystemConstitution_UI.html"
 LEDGER = HERE / "VIA_FiveSystem_Progress_v0100.jsonl"
 LAW = "L125"
