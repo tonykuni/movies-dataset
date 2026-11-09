@@ -8,7 +8,7 @@ VIA_Runtime_Bridge_All_in_One · VIA_SSOT_Unified · VeritasAegisNexus)各 3 份
 W1 試過「位元相同的副本換轉接殼」,Codex #615 P1 判就地覆寫已發布檔違版本律 → 撤回。
 正解要先回答三個問題,這支就只回答這三個問題(不動手):
   ① 每個治理件有幾份副本、哪些位元相同、哪些是另一份的超集(append-only 加了塊)、哪些真的分岔;
-  ② 誰載它、怎麼載(裸 import 經 sys.path · 字面路徑 · 以名字 + 搜尋夾動態找)、靜態推得出會落到哪一份 —— 治理件彼此的載入也算(只排除同家族自我引用);
+  ② 誰載它、怎麼載(裸 import 經 sys.path · 字面路徑 · 以名字 + 搜尋夾動態找)、靜態推得出會落到哪一份;
   ③ 據此給每一份一個建議:正本候選 / 可退(沒有獨佔載入者)/ 遷呼叫者後再退 / 要操作員裁(分岔)。
 解法不在這支裡 —— 殼 / 版本化轉接件 / _superseded 是 W2 操作員裁完才做的事。
 三種目錄慣例並存是多頭的根因:平鋪根(supportive modules/X.py)· 編號夾(10_Core_Runtime … 50_Protection_Acceleration)·
@@ -236,12 +236,13 @@ def scan_loaders(root: Path, copies_by_family: dict) -> list:
     fam_copies_paths = {f: {c["path"] for c in cs} for f, cs in copies_by_family.items()}
     for p in active_py(root):
         r = p.resolve().relative_to(root.resolve()).as_posix()
-        self_fam = family_of(p.stem)                    # 治理件也要掃:它們彼此會載(10_Core_Runtime 橋 → 20_Registry_SSOT 兩份);只排除對自己家族的引用(Codex PR 616 P2)
+        if family_of(p.stem):
+            continue                                    # 副本自己不算載入者
         try:
             src = p.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        if not any(f in src for f in FAMILIES if f != self_fam):
+        if not any(f in src for f in FAMILIES):
             continue
         try:
             with warnings.catch_warnings():
@@ -275,8 +276,6 @@ def scan_loaders(root: Path, copies_by_family: dict) -> list:
                             hits.append((fam, "NAME_ONLY", "name-only", node.lineno, v))
                         break
         for fam, how, layout, line, text in hits:
-            if fam == self_fam:
-                continue                                # 自我引用(檔名 / 版史 / 說明字串)不算載入者
             resolved, conf = resolve(fam, how, layout, r, has_bridge or inserts_root, fam_copies_paths[fam])
             rows.append({"loader": r, "lane": lane_of(r), "family": fam, "how": how, "layout": layout, "line": line,
                          "text": text, "resolved": resolved, "confidence": conf, "bridge": has_bridge})
@@ -338,12 +337,13 @@ def scan_writers(root: Path) -> list:
     rows = []
     for p in active_py(root):
         r = p.resolve().relative_to(root.resolve()).as_posix()
-        self_fam = family_of(p.stem)
+        if family_of(p.stem):
+            continue
         try:
             src = p.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        if not any(f in src for f in FAMILIES if f != self_fam):
+        if not any(f in src for f in FAMILIES):
             continue
         try:
             with warnings.catch_warnings():
@@ -365,7 +365,7 @@ def scan_writers(root: Path) -> list:
             else:
                 continue
             strs = [s_ for pn in path_nodes for s_ in _strings_under(pn)]
-            fams = sorted({f for f in FAMILIES for s_ in strs if TARGET_RX[f].search(s_) and f != self_fam})   # 目標必須是模組檔本身(X.py / X_v####.py),輸出冊 / 報告名不算;自我引用不算
+            fams = sorted({f for f in FAMILIES for s_ in strs if TARGET_RX[f].search(s_)})   # 目標必須是模組檔本身(X.py / X_v####.py),輸出冊 / 報告名不算
             if not fams:
                 continue
             fn_node = _enclosing_func(node, par)
@@ -660,14 +660,6 @@ def selftest() -> int:
         (sm / "network" / "VIA_Runtime_Bridge_All_in_One.py").write_text("X = 1\nZ = 3\n", encoding="utf-8")        # 分岔
         (sm / "network" / "VeritasAegisNexus_v1651.py").write_text("N = 1\n", encoding="utf-8")
         (sm / "network" / "VeritasAegisNexus_v1652.py").write_text("N = 2\n", encoding="utf-8")
-        (sm / "20_Registry_SSOT").mkdir()
-        (sm / "VIA_RegistryCore_v1.py").write_text("R = 1\n", encoding="utf-8")
-        (sm / "20_Registry_SSOT" / "VIA_RegistryCore_v1.py").write_text("R = 1\n", encoding="utf-8")
-        (sm / "10_Core_Runtime").mkdir()
-        (sm / "10_Core_Runtime" / "VIA_Runtime_Bridge_All_in_One.py").write_text(
-            "X = 1\nY = 2\nimport importlib.util\nfrom pathlib import Path\nME = 'VIA_Runtime_Bridge_All_in_One'\n"
-            "P = Path(__file__).resolve().parent.parent / '20_Registry_SSOT' / 'VIA_RegistryCore_v1.py'\n"
-            "spec = importlib.util.spec_from_file_location('VIA_RegistryCore_v1', str(P))\n", encoding="utf-8")
         (root / "functional modules" / "VRN" / "VRN_X.py").write_text(
             "# ===== [VIA:ACCEL-BRIDGE:v0100]\nimport sys\nsys.path.insert(0, 'supportive modules')\nimport VIA_EnvManager\nfrom VIA_SSOT_Unified import extract\nimport VeritasAegisNexus\n"
             "from pathlib import Path\nP = Path(__file__).parent.parent / '40_Environment_Health' / 'VIA_EnvManager.py'\n"
@@ -697,18 +689,9 @@ def selftest() -> int:
             any(r["kind"] == "SUPERSET" and r["superset"].endswith("ssot/VIA_SSOT_Unified.py") and r["added_lines"] == 2 for r in ss["relations"])
             and ss["lamp"] == "YELLOW" and any("正本候選" in c["advice"] for c in ss["copies"] if "ssot/" in c["path"]), (ss["relations"], ss["lamp"]))
         rb = D["families"]["VIA_Runtime_Bridge_All_in_One"]
-        net_copy = next(c for c in rb["copies"] if "network/" in c["path"])
-        chk("⑨ 分岔:根與 network 兩份各有獨有行 → DIVERGED · 家族 RED · 分岔那份(network)建議『要 diff 裁』;10_Core_Runtime 是根的超集 → 正本候選;總燈取最差 RED",
+        chk("⑨ 分岔:兩份各有獨有行 → DIVERGED · 家族 RED · 建議『要 diff 裁』;總燈取最差 RED",
             any(r["kind"] == "DIVERGED" and r["only_a"] == 1 and r["only_b"] == 1 for r in rb["relations"]) and rb["lamp"] == "RED"
-            and "裁" in net_copy["advice"] and any("正本候選" in c["advice"] for c in rb["copies"] if "10_Core_Runtime" in c["path"]) and D["lamp"] == "RED",
-            (rb["relations"], rb["lamp"], [c["advice"] for c in rb["copies"]], D["lamp"]))
-        rc_ = D["families"]["VIA_RegistryCore_v1"]
-        edge = [lr for lr in D["loader_rows"] if lr["family"] == "VIA_RegistryCore_v1" and lr["loader"].endswith("10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py")]
-        chk("⑱ 跨家族邊(Codex PR 616 P2):治理件 10_Core_Runtime 橋以 BinOp 路徑載 20_Registry_SSOT/VIA_RegistryCore_v1 → 算進該副本的載入者(numbered · HIGH);自我引用字串 ME 不算",
-            edge and edge[0]["how"] == "PATH_LITERAL" and edge[0]["resolved"].endswith("20_Registry_SSOT/VIA_RegistryCore_v1.py") and edge[0]["confidence"] == "HIGH"
-            and next(c for c in rc_["copies"] if "20_Registry_SSOT" in c["path"])["loader_total"] == 1
-            and not any(lr["family"] == "VIA_Runtime_Bridge_All_in_One" and lr["loader"].endswith("10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py") for lr in D["loader_rows"]),
-            (edge, [(c["path"], c["loader_total"]) for c in rc_["copies"]]))
+            and all("裁" in c["advice"] for c in rb["copies"]) and D["lamp"] == "RED", (rb["relations"], rb["lamp"], D["lamp"]))
         chk("⑩ 建議:三份 EnvManager 都有載入者落到 → 全是『遷呼叫者後再退』;SSOT 子集(根)有 import 載入者 → 『被超集涵蓋:可退(先遷…)』",
             all("遷呼叫者" in c["advice"] for c in env["copies"]) and any("被超集涵蓋:可退(先遷" in c["advice"] for c in ss["copies"] if c["path"] == "supportive modules/VIA_SSOT_Unified.py"),
             [c["advice"] for c in env["copies"]] + [c["advice"] for c in ss["copies"]])

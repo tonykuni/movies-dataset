@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-09T10:14:48Z",
+ "updated_at": "2026-11-09T10:57:47Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4212,6 +4212,23 @@
    "timeout_seconds": 900,
    "marker_note": "標記只釘「· FAIL 0 · PASS」,加檢不失效",
    "registered_at": "2026-11-09T10:05:56Z"
+  },
+  "C-govcorechain-v0101": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_GovCoreChain_v0101.py",
+    "--selftest"
+   ],
+   "success_marker": "· FAIL 0 · PASS",
+   "scope": "GovCoreChain v0101 薄尾:換裝在位(scan_loaders / scan_writers / build · 輸出指 v0101)· 跨家族邊(10_Core_Runtime 橋 BinOp 路徑 → 20_Registry_SSOT/RegistryCore PATH_LITERAL HIGH)· 同家族自我引用不算 · 本支自身排除 · tempfile 夾具字串另列不計數 · 實樹 20_Registry_SSOT/RegistryCore 真載入者 1 · 改動權 GREEN · 正本候選不變 · 前版鏈 v0100 17/17",
+   "dependencies": [
+    "docs/handoff/ai/VIA_GovCoreChain_v0101.py",
+    "docs/handoff/ai/VIA_GovCoreChain_v0100.py"
+   ],
+   "timeout_seconds": 1500,
+   "marker_note": "標記只釘「· FAIL 0 · PASS」(薄尾那一行);前版鏈 FAIL 時 rc 1",
+   "registered_at": "2026-11-09T10:57:47Z"
   }
  },
  "work_items": [
@@ -8938,6 +8955,17 @@
    "next": "handoff test C-govcorechain-v0100 實跑轉 VERIFIED → 操作員裁正本 → 版本化轉接件 + 遷呼叫者(不就地改)",
    "receipt": "docs/handoff/evidence/C-govcorechain-v0100.json",
    "updated_at": "2026-11-09T10:14:48Z"
+  },
+  {
+   "id": "VCGC-REQ203:w2-govcore-matrix-v0101",
+   "requirement": "VCGC-REQ203",
+   "case": "C-govcorechain-v0101",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "Codex PR 616 P2(治理件彼此的載入漏掉 → 編號夾 RegistryCore 誤判可退)· PR 617 P1(把修正就地寫進已併入 main 且有鎖住收據的 v0100,違版本律 → 還原,改出薄尾 v0101)· PR 617 P2(本支自身夾具字串被算成載入者 → 自身排除 · tempfile 夾具另列不計數)",
+   "next": "handoff test C-govcorechain-v0101 實跑轉 VERIFIED → 操作員裁正本",
+   "receipt": "docs/handoff/evidence/C-govcorechain-v0101.json",
+   "updated_at": "2026-11-09T10:57:47Z"
   }
  ]
 }
