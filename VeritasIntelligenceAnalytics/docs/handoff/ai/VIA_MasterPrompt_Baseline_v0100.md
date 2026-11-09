@@ -92,6 +92,7 @@ VDF:管線 fixture 跑通;live 擷取是桌機項(REQ192/193/195 · REQ145/147/1
 | EnvManager v0101 @ commit 7bf30ea6 SHA-256 `8c1cdc6a…` | `git show 7bf30ea6:…CGC_MDL240_EnvManager_v0101.py` sha256 = `8c1cdc6a57f75f9a…`;main 尾版同為 v0101,同 sha | **一致**(審的是真檔) |
 | 「VIA_FROM_VCGC 只在 docstring,實作沒看到閘」 | v0101 是薄尾(L10「規矩照前一版」);閘在前版 v0100 的 main() 實作 | 宣稱對 v0101 單檔成立,對家族不成立(閘沒丟) |
 | 原生 MCP v0102 離線自測 66/66(scratch · 無憑證) | `VIA_MCP_Engine/VIA_MCP_Engine_v0102.py` 在 main;本倉 `.mcp.json` 指的是 VCGC 只讀 MCP `CGC_MDL279_MCPServer_v0101`(stdio · 16 工具 · 零網路),兩者不同物 | 只記錄;不把 Manus scratch 結果當本倉收據 |
+| 「VCGC 功能庫重號:281 families / 238 unique module_id;以 candidate_id = family+path 保留,不改號不丟」 | 本倉在 commit 7bf30ea6 實算:CGC_MDL 檔 1467 支 · 家族(號+名)286 · 不同 MDL 號 238 · **13 個號被 >1 家族共用**(MDL123 DataHome/SixStreams · 124 BridgeSweeper/SystemCharter · 125 · 126 · 135 · 142 …)= 交接冊 `VCGC-REQ131:number-collisions` PENDING「撞號 14 組 · 操作員裁定命名」;VCGC 號冊以家族(號+名)為鍵,audit 重號 0 | Manus 做法與 L122 / L125 一致(AI 不改正式號;裁名是操作員 W2);31 MiB 模型 gzip 內嵌 = 本倉工作台同一信封(本倉頁 0.45–0.53 MB) |
 | 「以 viaatlas-39ozanmz.manus.space 為功能介面視覺鎖」 | 已是:`review/VIA_Atlas_LocalSite_v0100/`(位元組鎖 · VisualLock v0100 `--vl-*` 24 token);本輪工作台鎖(審查包 U/I)管五系統工作台頁 | 兩鎖並存各管各頁;合一 = W2 |
 
 ## 6. 下一個最小動作(順序)
