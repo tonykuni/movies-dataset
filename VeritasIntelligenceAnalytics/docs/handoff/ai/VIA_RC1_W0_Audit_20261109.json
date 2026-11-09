@@ -1,0 +1,715 @@
+{
+ "schema": "VIA.RC1.W0.Audit.v1",
+ "version": "v2.1",
+ "mode": "RC-1 READONLY",
+ "ran_at_utc": "2026-11-09T05:40Z",
+ "flags": {
+  "AUDIT_MODE": "READONLY",
+  "FREEZE_RC1": true,
+  "ALLOW_AUTOFIX": false,
+  "ALLOW_DEPLOY": false,
+  "ALLOW_SYNC": false
+ },
+ "scope": {
+  "in": [
+   "VCGC",
+   "VRN-2",
+   "VDF"
+  ],
+  "reserved_gray": [
+   "VAP(Veritas AutoPlot · 真實子系統 · RC-1 外)",
+   "VQG(本倉有實體:functional modules/VQG 4 支 · 1 家族 v0104–v0107;自測 12/12 — 更正「查無實體」)"
+  ],
+  "readonly_reference": [
+   "VRN-1(tonykuni/VIA-VDF-VRN · 他隊線)"
+  ]
+ },
+ "P0_freeze": {
+  "git": {
+   "repo": "tonykuni/movies-dataset",
+   "main": "366551b4f(PR #612 merge · 2026-11-09T05:14:47Z)",
+   "audit_branch": "claude/optimistic-goodall-yhalc5 = main(ff)",
+   "remote_branches": 275,
+   "tags": 11
+  },
+  "filesystem": {
+   "root": "VeritasIntelligenceAnalytics",
+   "files": 49401,
+   "tree_sha256_16": "4e102ba464747e21",
+   "by_ext": {
+    "svg": 14614,
+    "png": 12908,
+    "json": 6457,
+    "py": 5286,
+    "txt": 3655,
+    "html": 1248,
+    "ps1": 1220,
+    "md": 1107
+   }
+  },
+  "registry": {
+   "dir": "supportive modules/registry",
+   "files": 2472,
+   "sha256_16": "a5cca77da06b1b3b"
+  },
+  "token": {
+   "card": "已啟用 6/6 · 全景 CGC_MDL158_VIAPanoramaAuditRepair_v0117 · NLP SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108",
+   "lamp": "GREEN"
+  }
+ },
+ "P1_inventory": {
+  "repos": [
+   {
+    "repo": "tonykuni/movies-dataset",
+    "role": "master",
+    "local": "/home/user/movies-dataset",
+    "head": "main 366551b4f",
+    "pushed_at": "2026-11-09T05:14:47Z",
+    "note": "本倉 · RC-1 審計基底"
+   },
+   {
+    "repo": "tonykuni/VIA-VDF-VRN",
+    "role": "參考(VRN-1 他隊線 · 只讀)",
+    "local": "/home/user/via-vdf-vrn",
+    "head": "main 0993c2d(PR #82 · 2026-11-05)· clean",
+    "pushed_at": "2026-11-05T12:56:51Z",
+    "note": "不入 RC-1"
+   },
+   {
+    "repo": "tonykuni/VeritasIntelligenceAnalytics",
+    "role": "重建地(OneDrive)",
+    "local": "(容器無 clone)",
+    "head": "metadata only",
+    "pushed_at": "2026-10-27T15:12:34Z",
+    "note": "P1 只看到推送時間;內容未核對 → GRAY"
+   },
+   {
+    "repo": "tonykuni/VIA-VERB-ENGINE",
+    "role": "隔離名冊(28 引擎 · 只查 lock)",
+    "local": "(容器無 clone)",
+    "head": "metadata only",
+    "pushed_at": "2026-10-03T08:26:12Z",
+    "note": "P4 lock 四項未核對(無 clone)→ GRAY"
+   }
+  ],
+  "local_roots_extra": [
+   {
+    "path": "/home/user/vrn2_work",
+    "role": "VRN-2 工作夾(非 git)",
+    "found": "VRN_SystemManager 最高 v0260 · ActivateVRN-2 最高 v0178 · 版本夾 v159–v163"
+   },
+   {
+    "path": "/home/user/graphify-labs/graphify",
+    "role": "Graphify 工具 clone(非安裝)",
+    "found": "可見原始碼;python 模組未安裝"
+   }
+  ],
+  "branch_matrix": {
+   "total_remote": 275,
+   "by_prefix": {
+    "vcgc": 138,
+    "(root)": 54,
+    "claude": 30,
+    "codex": 11,
+    "vdf": 8,
+    "panorama": 5,
+    "pr": 3,
+    "nlp": 3,
+    "local": 3,
+    "fix": 3,
+    "others": 17
+   },
+   "note": "非 claude/* 分支抽樣 12 支全部對 main 有 1104–3342 筆未併入提交(各自分岔,不是落後)"
+  },
+  "tag_matrix": {
+   "total": 11,
+   "by_prefix": {
+    "pre-r3": 3,
+    "pre-tfl": 2,
+    "pre-sync": 1,
+    "pre-round2": 1,
+    "pre-fixy": 1,
+    "pre-books": 1,
+    "lock-vcgc-vdf": 1,
+    "closeout": 1
+   },
+   "rc_tag": "rc-1 不存在(W3 才打)"
+  },
+  "commit_matrix_3day": {
+   "since": "2026-11-06",
+   "total": 148,
+   "by_author": {
+    "Claude": 99,
+    "tonykuni": 22,
+    "Tony Huang": 27
+   },
+   "by_day": {
+    "2026-11-06": 76,
+    "2026-11-07": 24,
+    "2026-11-08": 47,
+    "2026-11-09": 1
+   },
+   "prs_merged": "#598–#612(15 支全 merged)"
+  },
+  "commit_matrix_7day": {
+   "since": "2026-11-02",
+   "total": 229
+  }
+ },
+ "P2_ast": {
+  "python": {
+   "files": 5286,
+   "compile_errors": 8,
+   "detail": {
+    "non_shipping(quarantine/intake)": [
+     "functional modules/VIA_RetiredEngines/batch180_wave1/…/_review_quarantine/stock_sector_analysis_engine.py",
+     "functional modules/VIA_RetiredEngines/batch180_wave1/…/_review_quarantine/veritas_via_system_integration_test_suite.py(全形逗號)",
+     "functional modules/VIA_RetiredEngines/batch183_wave3/…/_review_quarantine/code_artifact.py",
+     "functional modules/GroupIndex/flow_simulation_v0400/references/intake/3a2e975b-….py"
+    ],
+    "superseded(尾版可編譯)": [
+     "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0103.py → 尾版 v0105 OK",
+     "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0114.py → 尾版 v0117 OK",
+     "supportive modules/registry/CGC_MDL180_FreezeSealAudit_v0100.py → 尾版 v0101 OK"
+    ],
+    "unversioned_active_copy": [
+     "supportive modules/accelerator/VeritasCeleritas.py:加速器橋注在 L4、from __future__ 在 L19(COMPILE 類);89 支 VRN 舊版 import 它,四條車道尾版沒有一支 import 它"
+    ],
+    "root_cause": "全部八支裡四支是同一類:[VIA:ACCEL-BRIDGE] 注在 from __future__ 之前(全景工具 v0114 起的 COMPILE 類)。修法機械:把橋塊移到 __future__ 之後。"
+   }
+  },
+  "json": {
+   "files": 6457,
+   "ok": 6380,
+   "bom_only": 62,
+   "syntax": 13,
+   "empty": 2,
+   "detail": {
+    "bom_lanes": {
+     "supportive modules/*": 50,
+     "functional modules/VAP": 8,
+     "functional modules/VRN": 4
+    },
+    "syntax": "4 支 VRN GO-M01 smoke JSON(欄 ~285 有原始控制字元)+ 8 支 VAP/ASSETS/SCOPE_COPY 鏡像 + 1 支 intake tsconfig.json(JSONC 註解)",
+    "empty": [
+     "vdf_network_report.json(VIA 根)",
+     "CGE/Console/inventory/manifest.json(0 bytes —— 觸及「CGE v0400 SEALED」的佐證)"
+    ]
+   }
+  },
+  "yaml": {
+   "files": 10,
+   "bad": 0
+  },
+  "toml": {
+   "files": 15,
+   "bad": 0
+  },
+  "ini_cfg": {
+   "files": 1,
+   "note": "唯一一支是 venv 的 pyvenv.cfg,不是本倉設定 → 不計"
+  },
+  "powershell": {
+   "files": 1220,
+   "status": "GRAY detect-only(容器無 pwsh;Parser.ParseFile / PSScriptAnalyzer 沒量)"
+  },
+  "markdown": {
+   "files": 1107,
+   "status": "GRAY(無 linter;只計數)"
+  },
+  "tools": {
+   "compileall": "RUN",
+   "json/yaml/toml": "RUN",
+   "pyright": "present · NOT_RUN(W0 只 detect)",
+   "ruff": "present · NOT_RUN",
+   "Parser.ParseFile": "ABSENT(no pwsh)",
+   "PSScriptAnalyzer": "ABSENT"
+  },
+  "coverage_claim": "Python 100% 編譯掃過;JSON/YAML/TOML 100% 剖過;PS/MD 0%(灰,不是綠)"
+ },
+ "P3_depgraph": {
+  "tool": "Graphify ABSENT(clone 在 graphify-labs,未安裝)→ 用本輪自寫 AST 靜態 import 圖代跑;結果是下限",
+  "active_tail_nodes": 704,
+  "static_edges": 83,
+  "circular": 0,
+  "isolated_static": {
+   "total": 646,
+   "VCGC": 335,
+   "VRN": 165,
+   "VDF": 115,
+   "VAP": 30,
+   "VQG": 1
+  },
+  "isolated_note": "薄尾家族用 importlib/glob 動態載入前版,靜態圖看不到 → 646 不等於孤兒,是量法下限",
+  "cross_lane_static": {
+   "VDF→VRN": 2,
+   "VDF→VCGC": 4,
+   "VCGC→VDF": 2
+  },
+  "cross_lane_detail": [
+   "VDF_MDL001_TWEquityEngine(+sha 分身)→ VeritasCeleritas_v1141(實體在 VRN 路徑下)",
+   "VDF_MDL105_CrossValidator / VDF_MDL303_RegistryActivation(+sha 分身)→ VDF_MDL104_RegistryLoader(實體放在 registry 夾)"
+  ],
+  "duplicate_engine": "見 P4 CONFLICT-00004 / 00006",
+  "orphan_module": "靜態量不準,GRAY"
+ },
+ "P6_vdf_net": {
+  "first_priority_bridge": {
+   "vdf_outward_total": 113,
+   "bridged": 83,
+   "bridge_versions": {
+    "v0100": 83
+   },
+   "unbridged": 30,
+   "unbridged_breakdown": {
+    "superseded_old_versions(尾版已橋)": 8,
+    "references/intake 凍結副本": 22,
+    "active_tail_unbridged": 0
+   },
+   "active_tail_coverage": "100%(83/83 · 全部 [VIA:NET-BRIDGE:v0100] 版本化)",
+   "lamp": "GREEN",
+   "aegis": {
+    "network_tail": "VeritasAegisNexus_v1652.py(ENGINE_VERSION 1.65.2)",
+    "drift": "見 CONFLICT-00002"
+   }
+  },
+  "other_lanes_info": {
+   "VRN": "49 外向 · 16 橋 · 33 無橋(含舊版;非 P6 範圍)",
+   "VAP": "34 外向 · 22 橋 · 12 無橋",
+   "VCGC_tails_only": "6 支尾版外向無橋:CGC_MDL095_DeckServer_v0161(urllib)· CGC_MDL136 / 138 / 139(socket · 本機 UI 埠)· VIA_RegistryCore_v1 · VETF_VIA_RegistryCore_v1(socket)"
+  },
+  "second_priority_tools": {
+   "Graphify": "ABSENT(module)· clone 在 graphify-labs",
+   "Ponytail": "ABSENT",
+   "OmniRoute": "ABSENT",
+   "Playwright": "python module ABSENT · 二進位 present(容器預裝 Chromium 用)",
+   "AgentReach": "ABSENT",
+   "Scrapling": "ABSENT",
+   "ChartDB": "ABSENT",
+   "SupabaseMCP": "ABSENT",
+   "SkillUI": "ABSENT",
+   "Awareness": "ABSENT"
+  },
+  "tools_lamp": "YELLOW · Not Blocking(十個都是 detect-only;VDF 最低五件 Graphify/Playwright/AgentReach/Scrapling/OmniRoute 容器只有 Playwright 二進位)"
+ },
+ "P7_accelerators": [
+  {
+   "item": "Celeritas 加速器(SUP_MDL737_SuperAccelModule v0110 + VeritasCeleritas_v1141)",
+   "lamp": "GREEN",
+   "state": "Installed · v1141 可編譯 · 加速器橋全樹"
+  },
+  {
+   "item": "AutoImport(CGC_MDL142_AccelImport)",
+   "lamp": "GREEN",
+   "state": "Registered(與 TWNameBook 同號異名 → CONFLICT-00006)"
+  },
+  {
+   "item": "Policy Registry(VIA_Policy_Laws_SSOT_v0113 · 120 律 · L50…L123)",
+   "lamp": "GREEN",
+   "state": "可 append(add-only 新版號)"
+  },
+  {
+   "item": "SSOT Registry(CGC_MDL155_VIAUnifiedSSOTAutoCode v0101 · 元件冊 20154 活元件)",
+   "lamp": "GREEN",
+   "state": "Installed · 乾跑 新 9 · 變 23 · 過期 29(W3 apply)"
+  },
+  {
+   "item": "Synonym Registry(VIA_SSOT_SynonymUnion_v0107)",
+   "lamp": "YELLOW",
+   "state": "Registered · booksync 2 格黃(NONCANONICAL 1 · DIVERGED 2/5)"
+  },
+  {
+   "item": "Regex Registry(regex_registry.json + VIA_Central_Synonym_Regex_v0102)",
+   "lamp": "GREEN",
+   "state": "Registered"
+  },
+  {
+   "item": "Lesson Registry",
+   "lamp": "YELLOW",
+   "state": "事件帳 VIA_Lessons_Ledger_v0100(1611 筆 · append-only · never-commit)存在,但沒有 LESSON-xxxx 卡式登錄 → 本輪依「首跑唯一例外」出 docs/handoff/ai/VIA_RC1_LessonRegistry_v0100.json(W3 再升入 registry 夾)"
+  },
+  {
+   "item": "Conflict Registry",
+   "lamp": "YELLOW",
+   "state": "只有守門引擎 via_conflict_guard v0102,沒有 CONFLICT-xxxxx 帳 → 本輪首跑出 VIA_RC1_ConflictRegistry_v0100.json(12 筆)"
+  },
+  {
+   "item": "AST Slice(CGC_MDL158 panorama read/slice/digest · 鎖版 v0117)",
+   "lamp": "GREEN",
+   "state": "Installed · token 卡 6/6"
+  },
+  {
+   "item": "Anchor Map",
+   "lamp": "GRAY",
+   "state": "Not Registered(樹內找不到同名件)"
+  },
+  {
+   "item": "Dependency Cache",
+   "lamp": "GRAY",
+   "state": "Not Registered"
+  },
+  {
+   "item": "Graphify",
+   "lamp": "YELLOW",
+   "state": "Registered(2026-11-03 導入輪)· Not Installed(容器)"
+  },
+  {
+   "item": "Ponytail",
+   "lamp": "GRAY",
+   "state": "Not Registered · Not Installed"
+  },
+  {
+   "item": "OmniRoute",
+   "lamp": "GRAY",
+   "state": "Not Registered · Not Installed"
+  }
+ ],
+ "P4_hydra": {
+  "lamp": "RED",
+  "why": "活目錄治理核心各 3 份 · 277 分身 · 15 組同號異名 · 外部 AI 搶號 2 支",
+  "conflicts": [
+   {
+    "id": "CONFLICT-00001",
+    "severity": "CRITICAL",
+    "class": "Duplicate Engine · 版本號搶號",
+    "status": "CONTAINED(只在審閱夾,未入倉)",
+    "what": "上傳包 VCGC_MultiMatrix_Integration_v0193.zip / Resilience_v0194.zip 各含 CGC_MDL149_VeritasCentralGovernanceConsole_v0193.py / v0194.py —— 直接拿走 VCGC 主控台家族的下兩個版號。",
+    "evidence": "repo 尾版 v0192 頂層定義 9;上傳 v0193 定義 64(與 v0192 共用 2 · 新 62)、v0194 定義 89(共用 2 · 新 87)—— 同家族名、不同程式。動詞含 install --apply --activate-tools(安裝器範圍 → 牴觸 OBS-0194「既有 Installer/EnvManager/InstallGate/Token 不換」)。SHA256SUMS 17/17 相符;AST 可剖;無 NET-BRIDGE;import subprocess。",
+    "impact": "落入 registry 夾即成為家族尾版,CLAUDE.md 第一步的 `ls …_v*.py | tail -1` 會解析到它 —— 整個 VCGC 入口被另一個 AI 的程式接管(LESSON-0003 現場)。",
+    "resolution_proposal": "不入倉。若要採用:改成獨立家族(例 CGC_MDLxxx_MultiMatrix_v0100)走 VCGC 自己的編號 / 註冊 / 串測;v0193 / v0194 兩個號碼留給 VCGC 自己的鏈。",
+    "rc1_blocking": true
+   },
+   {
+    "id": "CONFLICT-00002",
+    "severity": "MEDIUM",
+    "class": "Duplicate Module · 版本漂移",
+    "status": "OPEN",
+    "what": "VeritasAegisNexus(網路橋本體)在活目錄有 8 份、4 種內容。",
+    "evidence": "network/VeritasAegisNexus_v1652.py = 1.65.2(尾版)· VIA 根 VeritasAegisNexus.py 與 network/…_v1651.py = 1.65.1(sha b983…)· supportive modules/ · network/ · 50_Protection_Acceleration/ 三份同 sha f5f8… 無 ENGINE_VERSION · network/…_v0116 / _v0117 另兩種。",
+    "impact": "誰 import 到哪一份取決於 sys.path 順序;P6「版本化橋接」的本體自己沒版本化。",
+    "resolution_proposal": "W1 Conflict Fix:呼叫點全部指向 v1652 尾版,其餘副本進 _superseded(不刪)。",
+    "rc1_blocking": false
+   },
+   {
+    "id": "CONFLICT-00003",
+    "severity": "MEDIUM",
+    "class": "Duplicate Engine(MCP server)",
+    "status": "CONTAINED(審閱包)",
+    "what": "Review Kit v0106.4 的 scripts/via_governance_mcp_v0105.py(3 工具:via_status · via_inventory_query · via_token_prepare)與本倉 CGC_MDL279_MCPServer_v0101 是兩個 VCGC 治理 MCP server。",
+    "evidence": "kit 自己的 handover 寫 RED/BLOCKED · live_vcgc_connected=false · OBS-0186;kit 另含 via_agent_os_unified_readonly_hardened.py 4293 行(平行治理引擎)。",
+    "impact": "兩個 server 兩套工具名,接哪一個就是哪一個的事實。",
+    "resolution_proposal": "不入倉;若要借其三工具,以 CGC_MDL279 新版號吸收,不並存。",
+    "rc1_blocking": false
+   },
+   {
+    "id": "CONFLICT-00004",
+    "severity": "HIGH",
+    "class": "Duplicate Governance Module(活目錄)",
+    "status": "OPEN",
+    "what": "114 個 .py 檔名在多個活目錄重複;其中治理核心各 3 份:VIA_EnvManager.py · VIA_SSOT_Unified.py · VIA_RegistryCore_v1.py · VIA_Runtime_Bridge_All_in_One.py · VIA_Panorama_AST_RuntimeInjector.py;VDF_MDL003_SentimentMacroEngine.py ×3。",
+    "evidence": "basename 掃描(排除 Retired / quarantine / intake / new modules engines / Standalone / SCOPE_COPY 後仍 114)。",
+    "impact": "Hydra 判定:治理引擎多頭 → RED。",
+    "resolution_proposal": "W1:每個治理件選一份尾版(有版號者取最高),其餘進 _superseded;import 路徑重指。",
+    "rc1_blocking": true
+   },
+   {
+    "id": "CONFLICT-00005",
+    "severity": "MEDIUM",
+    "class": "Clone files",
+    "status": "OPEN",
+    "what": "277 個 `_sha<hex8>` 分身檔(例 VIA_Panorama_AST_RuntimeInjector_sha63cefe28.py · StartVIAUnified_shaa1b427ff.ps1)。",
+    "evidence": "檔名正則 _sha[0-9a-f]{8,};P3 圖裡 VDF_MDL001 / 105 / 303 都各有 sha 分身參與 import。",
+    "impact": "同一引擎兩個名字,各自被 import。",
+    "resolution_proposal": "W1:確認無呼叫者後 retire;有呼叫者者重指到正名尾版。",
+    "rc1_blocking": false
+   },
+   {
+    "id": "CONFLICT-00006",
+    "severity": "MEDIUM",
+    "class": "同號異名(編號撞)",
+    "status": "OPEN(沿用 · 待操作員裁)",
+    "what": "15 組同一編號掛不同名:VCGC 8(CGC_MDL135 EnvGovernance/EnvPlan · CGC_MDL142 AccelImport/TWNameBook · CGC_MDL149 BoxesFlow/ChainAll/Closeout/EntryLock/FilenameCut/GreenMatrix/Identity/Integra… 等)· VDF 4(VDF_ENG110 AKShareProbe/USMacroProbe/USMacroTree · VDF_ENG117 · VDF_ENG118 · VDF_MDL014)· VRN 2(VRN_ENG109 · VRN_ENG397)· SUP 1(SUP_MDL743 六名)。",
+    "evidence": "ssot panorama 命名格(2026-11-09 實跑)。",
+    "impact": "編號不是唯一鍵。",
+    "resolution_proposal": "是伴隨模組就記命名冊;真撞號由操作員裁定改號(不自動改)。",
+    "rc1_blocking": false
+   },
+   {
+    "id": "CONFLICT-00007",
+    "severity": "LOW",
+    "class": "Branch sprawl",
+    "status": "OPEN",
+    "what": "275 個遠端分支(vcgc 138 · 根 54 · claude 30 · codex 11 …);抽樣 12 支非 claude 分支各有 1104–3342 筆未併入 main 的提交。",
+    "evidence": "git branch -r · rev-list --count origin/main..origin/<b>。",
+    "impact": "LESSON-0004 現場;分支不是落後而是分岔。",
+    "resolution_proposal": "W3:標 archive/ 前綴或刪遠端(操作員決定);不在 RC-1 內動。",
+    "rc1_blocking": false
+   },
+   {
+    "id": "CONFLICT-00008",
+    "severity": "HIGH",
+    "class": "Compile Error",
+    "status": "OPEN",
+    "what": "compileall 8 支失敗(見 P2)。",
+    "evidence": "python -m compileall 2026-11-09;四條車道尾版全部可編譯。",
+    "impact": "RC-1 NO-GO 條件「Compile Error」字面成立。",
+    "resolution_proposal": "W1 AST Fix:4 支 COMPILE 類把加速器橋移到 from __future__ 之後(機械);4 支 quarantine/intake 標 non-shipping 或移出 compile 範圍。",
+    "rc1_blocking": true
+   },
+   {
+    "id": "CONFLICT-00009",
+    "severity": "LOW",
+    "class": "Config/JSON",
+    "status": "OPEN",
+    "what": "JSON 77 支讀不進:62 BOM(utf-8-sig 可讀)· 13 語法(控制字元 / JSONC)· 2 空檔(vdf_network_report.json · CGE/Console/inventory/manifest.json)。",
+    "evidence": "json.loads 全樹 6457 支。",
+    "impact": "讀冊端若不吃 utf-8-sig 就是 77 個潛在 JSONDecodeError;CGE manifest 空檔碰到「CGE v0400 SEALED」的佐證。",
+    "resolution_proposal": "W1 Config Fix:去 BOM、跳脫控制字元、補或移除空檔(機械,可一批)。",
+    "rc1_blocking": false
+   },
+   {
+    "id": "CONFLICT-00010",
+    "severity": "LOW",
+    "class": "Tool self-bug(沿用)",
+    "status": "OPEN",
+    "what": "ssot panorama「上下連結@VCGC」RED:正主呼叫失敗 AttributeError 'list' object has no attribute 'get'(第 203 次重複)。",
+    "evidence": "/tmp/rc1_ssotp.txt。",
+    "impact": "一格永遠紅,其他格的黃綠被它蓋住。",
+    "resolution_proposal": "W1 Bug Fix(CGC_MDL247 家族新版號)。",
+    "rc1_blocking": false
+   },
+   {
+    "id": "CONFLICT-00011",
+    "severity": "LOW",
+    "class": "Numbering/Registry lag",
+    "status": "OPEN",
+    "what": "缺號 5(VDF_MDL014_ThreeCodeUniverse_v0100 · VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310 · VRN_ENG115_HeaderFrameTemp_v0102 · VRN_ENG400_SixEngineShell_v0102 + 1)· 元件冊乾跑 新 9 · 變 23 · 過期 29 · 交接閘 RED 122(65 CHANGED_CODE_WITHOUT_TEST · 49 EVIDENCE_INVALID · 4 MODULE_UNREGISTERED · 4 ACCEL_BRIDGE_MISSING)。",
+    "evidence": "ssot panorama + handoff check 2026-11-09。",
+    "impact": "HOLD 條件「Missing Tool Registration」。",
+    "resolution_proposal": "W3:NumberingSystem --apply · registry-sync --apply;交接閘 122 筆分 VCGC 車道逐案(跨輪欠帳)。",
+    "rc1_blocking": false
+   },
+   {
+    "id": "CONFLICT-00012",
+    "severity": "MEDIUM",
+    "class": "多 AI 版本分岔(VRN-2 啟動器)",
+    "status": "OPEN",
+    "what": "VRN-2 啟動器 ActivateVRN-2 本倉只有 docs 內的 release zip 到 v0132;本機 vrn2_work 最高 v0178;操作員表列 v0149+。管理器本倉尾版 v0262、本機 v0260。",
+    "evidence": "find ActivateVRN-2* · vrn2_work 掃描。",
+    "impact": "LESSON-0003 / 0004 現場:啟動器線 local-only、三個數字三個來源。",
+    "resolution_proposal": "W2:本機測過的那一版才上;上之前先掃 local ∪ origin/main 取號。",
+    "rc1_blocking": false
+   }
+  ]
+ },
+ "P5_lessons": [
+  {
+   "id": "LESSON-0001",
+   "title": "Session 遺失",
+   "root_cause": "多 AI 對話各自為政,結論未落地為檔",
+   "impact": "VCGC/VDF/VRN 被 Copilot 重新定義為 Vision/Value/Validation;同一決策重做",
+   "resolution": "RC-1 期間所有 AI 只讀 paste pack;決策只認 PolicySSOT 與 registry 檔",
+   "prevention": "每次 CLOSEOUT 必有 [DELTA] 寫入 ledger;無 ledger 行 = 未發生",
+   "evidence": "Copilot/Gemini 文件中的 VAP/VQG 審計定義 vs 真實子系統 VAP=AutoPlot;本輪上傳 gemini-code-1794143633893.txt 又是一份「Level-0 全權初始化」提示;Review Kit v0106.4 handover 自述 RED/BLOCKED"
+  },
+  {
+   "id": "LESSON-0002",
+   "title": "收尾期間新增架構",
+   "root_cause": "Level-0 授權無凍結層;AI 以「補強」名義造新件",
+   "impact": "v2.0 超級版新增 10 skills、NetAccelerator、Skills Engine,收尾未完先擴張",
+   "resolution": "LAW-10 凌駕 LAW-6;HARD FREEZE 六禁",
+   "prevention": "任何新件先過「是否在 RC-1 僅允許六類」檢查,否則記 CONFLICT 不執行",
+   "evidence": "2026-11-06～09 四份 prompt 新增項目清單;VRN-2 v0147/v0148 線(HTTP workbench);本輪 CONFLICT-00001 / 00003(兩個 AI 各交一套新治理引擎)"
+  },
+  {
+   "id": "LESSON-0003",
+   "title": "多 AI 版本分岔",
+   "root_cause": "同一家族由不同 session 取號,無取號前掃描",
+   "impact": "VRN-2 三條線(Closeout v01xx / v0147–148 停用 / v0149 續行);PR #512 與聊天線同號 v0123、MDL269;本輪 v0193 / v0194 被外部 AI 搶號",
+   "resolution": "共祖 v0244 已合併;≥v0245 單線;同名異內容 = 停,不覆寫",
+   "prevention": "取任何版本號前掃 local ∪ origin/main;已發布者保號,本地改號進 _superseded",
+   "evidence": "VRN_SystemManager v0231→v0243/v0244 合併紀錄;本輪 CONFLICT-00001(repo v0192 ↔ 上傳 v0193/v0194 只共用 2 個定義)· CONFLICT-00005 277 個 _sha 分身 · CONFLICT-00012"
+  },
+  {
+   "id": "LESSON-0004",
+   "title": "GitHub 與本地不同步",
+   "root_cause": "四個本機根(Downloads / C:\\VIA / OneDrive via_0x / C:\\Users\\tonyk\\VIA-VDF-VRN)+ 三個 repo",
+   "impact": "VRN-2 local-only;VDF/VCGC 已上 GitHub;movies-dataset 定為 master 但 OneDrive 為重建地",
+   "resolution": "P1 Repo Matrix 標明每根目錄對應 repo 與角色(master / 重建 / 參考 / 資料家)",
+   "prevention": "上傳規則:本機測過才上;衝突即時解,不留側枝;資料永不進 git",
+   "evidence": "2026-09-30 GitHub master 規則 vs 2026-10-10 OneDrive via_02_vrn 重建決定;本輪:275 遠端分支 · 抽樣 12 支各分岔 1104–3342 提交 · ActivateVRN-2 本倉 v0132 / 本機 v0178"
+  },
+  {
+   "id": "LESSON-0005",
+   "title": "缺少 Done Definition",
+   "root_cause": "只有 VRN-2 有六條 DoD;VDF/VCGC/RC-1 整體無",
+   "impact": "無法判 GO;「做完」由 AI 自報",
+   "resolution": "RC-1 GO 條件即整體 DoD;VDF DoD = reader chain 封印 + 橋接版本化 100%;VCGC DoD = 11 gates + 監控頁不含入口",
+   "prevention": "新任務 S0 必填 SUCCESS=,無 SUCCESS 不進 S1",
+   "evidence": "VRN-2 DoD 2026-10-15 六條;VDF 僅有 Gate 名稱無整體 DoD;本輪「CGE v0400 11 gates SEALED」在樹內只找到 VIACGEOneShotv0400.ps1 一支 + CGE/Console/inventory/manifest.json 0 bytes,佐證不足以判 SEALED"
+  }
+ ],
+ "system_matrix": [
+  {
+   "system": "VCGC",
+   "lamp": "YELLOW",
+   "entry": "CGC_MDL149_…Console_v0192 test --quick",
+   "evidence": "2026-11-08 串測收據 20261108T163926Z:YELLOW · 站 11(綠 9 · 黃 2 · 紅 0)· case 245/245 · workflow 126/126;交接閘 RED 122;token 6/6;compile:CGC_MDL180 v0100 已被 v0101 取代",
+   "rc1_pass": false,
+   "why": "自己的判決是 YELLOW(兩站黃:交接閘跨輪欠帳 · 無 pwsh)→ 不是 PASS"
+  },
+  {
+   "system": "VDF",
+   "lamp": "GREEN*",
+   "entry": "VDF_SystemManager_v0168 --selftest",
+   "evidence": "收據:本版 6/6 · 前版鏈 PASS;NET-BRIDGE 活尾版 100%(83/83 v0100);compile:ENG088 v0103 已被 v0105 取代;缺號 1",
+   "rc1_pass": true,
+   "why": "*reader chain「V018E/F 封印 12/12 · DUCKDB_PASS」樹內找不到同名件,容器沒跑 → 該項 GRAY;PASS 只涵蓋自測 + 橋接"
+  },
+  {
+   "system": "VRN-2",
+   "lamp": "YELLOW",
+   "entry": "VRN_SystemManager_v0262 --selftest",
+   "evidence": "收據:5/5 PASS · 前版鏈 rc 0;compile:SUP_MDL749 v0114 已被 v0117 取代;accelerator/VeritasCeleritas.py 只被 89 支舊版 import;缺號 4;啟動器 local-only(本倉 v0132 / 本機 v0178)",
+   "rc1_pass": false,
+   "why": "四本輸出書 DoD 六條需要真 PDF + 桌機,容器未驗 → IN-LOOP;啟動器線未上倉"
+  },
+  {
+   "system": "VQG",
+   "lamp": "GRAY",
+   "entry": "VQG_AllInOne_v0107 --selftest",
+   "evidence": "收據:12/12 PASS · 零網路;本倉實體 4 支 / 1 家族",
+   "rc1_pass": null,
+   "why": "RC-1 保留 · 不阻擋(更正:非「查無實體」)"
+  },
+  {
+   "system": "VAP",
+   "lamp": "GRAY",
+   "entry": "VAP_AllInOne_v0302 --run-self-test",
+   "evidence": "收據:status=PASS(JSON 頂層)",
+   "rc1_pass": null,
+   "why": "RC-1 保留 · 不阻擋(Veritas AutoPlot · 真實子系統)"
+  }
+ ],
+ "sealed_check": [
+  {
+   "item": "Celeritas v1141 + AutoImport + Workflow 26–30",
+   "claim": "SEALED 37/37",
+   "w0_check": "VeritasCeleritas_v1141.py 在位且可編譯;加速器橋全樹;37/37 收據未在本輪重跑(READONLY)",
+   "lamp": "GREEN(claim) · 本輪未重測"
+  },
+  {
+   "item": "Policy SSOT L106–L119",
+   "claim": "SEALED",
+   "w0_check": "VIA_Policy_Laws_SSOT_v0113 120 律 · 含 L50…L123;add-only 可 append",
+   "lamp": "GREEN"
+  },
+  {
+   "item": "VCGC CGE v0400",
+   "claim": "SEALED 11 gates · 79 向量",
+   "w0_check": "樹內只找到 VIACGEOneShotv0400.ps1(PS,容器無法剖)+ CGE/Console/inventory/manifest.json 為 0 bytes",
+   "lamp": "GRAY(佐證不足,不能判 SEALED)"
+  },
+  {
+   "item": "VDF reader chain(6 active datasets)",
+   "claim": "SEALED V018E/F 12/12 · DUCKDB_PASS",
+   "w0_check": "V018E / V018F 名稱樹內無對應檔;VDF 自測 6/6 是另一件事",
+   "lamp": "GRAY(容器沒跑 · 名稱對不上)"
+  },
+  {
+   "item": "VIA-VERB-ENGINE 隔離名冊 28 引擎",
+   "claim": "SEALED(P4 只查 lock 四項)",
+   "w0_check": "容器無該 repo clone;只有 GitHub metadata(pushed 2026-10-03)",
+   "lamp": "GRAY"
+  },
+  {
+   "item": "網路橋接版本化覆蓋(VDF 外向引擎)",
+   "claim": "IN-LOOP 黃",
+   "w0_check": "活尾版 83/83 全部 [VIA:NET-BRIDGE:v0100];30 無橋全是舊版或 intake 副本",
+   "lamp": "GREEN(升級:P6 第一順位已達 100%)"
+  },
+  {
+   "item": "VRN-2 四本輸出書",
+   "claim": "IN-LOOP 黃",
+   "w0_check": "容器無真 PDF / 桌機;不可驗",
+   "lamp": "YELLOW(維持)"
+  },
+  {
+   "item": "VRN-2 薄尾鏈收斂(約 150 檔)",
+   "claim": "IN-LOOP 黃",
+   "w0_check": "VRN 車道活目錄 553 支版本化 .py / 114 家族;VRN_SystemManager 69 檔 v0100–v0262",
+   "lamp": "YELLOW(維持;retire 只留最高版 = W2)"
+  },
+  {
+   "item": "VRN-2 GitHub 上傳",
+   "claim": "GATED",
+   "w0_check": "ActivateVRN-2 本倉 v0132(docs zip)/ 本機 v0178",
+   "lamp": "GATED(維持)"
+  },
+  {
+   "item": "多 AI 版本分岔",
+   "claim": "紅 · 現存風險",
+   "w0_check": "本輪又新增一例:外部 AI 交 v0193 / v0194 搶 VCGC 家族號",
+   "lamp": "RED(確認)"
+  }
+ ],
+ "P8_go": {
+  "verdict": "NO-GO",
+  "conditions": {
+   "VCGC PASS": "✘ YELLOW(自判)",
+   "VRN PASS": "✘ 自測 PASS 但四本書 DoD 未驗 · 啟動器 local-only",
+   "VDF PASS": "✔ 自測 6/6 + 橋接活尾版 100%(reader chain 封印項 GRAY)",
+   "Compile Error = 0": "✘ 8(4 non-shipping · 3 superseded · 1 unversioned accelerator copy)",
+   "Critical Conflict = 0": "△ CONFLICT-00001 CRITICAL 但 CONTAINED(未入倉);CONFLICT-00004 / 00008 HIGH OPEN",
+   "Hydra = GREEN": "✘ RED(治理核心各 3 份在活目錄 · 277 分身 · 15 組同號異名)",
+   "Lesson Registry Updated": "△ 首跑建立 VIA_RC1_LessonRegistry_v0100(5 筆)· 尚未升入 registry 夾",
+   "Policy Registry Updated": "△ v0113 在位;LAW-10 尚未寫入(W3 出 v0114)",
+   "Conflict Registry Updated": "△ 首跑建立 VIA_RC1_ConflictRegistry_v0100(12 筆)"
+  },
+  "hold_conditions_present": [
+   "Medium Conflict > 0(00002 · 00003 · 00005 · 00006 · 00012)",
+   "Missing Tool Registration(缺號 5 · 元件冊 新 9 變 23 過期 29 · 交接閘 122)",
+   "Missing Documentation(CGE v0400 / V018E-F 佐證)"
+  ],
+  "no_go_conditions_present": [
+   "Compile Error(8)",
+   "Hydra = RED"
+  ],
+  "unmet_summary": "NO-GO 兩條:Compile Error 8 · Hydra RED。兩條都是機械可修(W1 一批)。"
+ },
+ "next": [
+  "W1-A AST Fix ×4:accelerator/VeritasCeleritas.py · VDF_ENG088 v0103 · SUP_MDL749 v0114 · CGC_MDL180 v0100 —— 把 [VIA:ACCEL-BRIDGE] 塊移到 from __future__ 之後(或後三支直接進 _superseded);4 支 quarantine/intake 移出 compile 範圍 → Compile Error 0",
+  "W1-B Conflict Fix:治理核心五件(EnvManager · SSOT_Unified · RegistryCore_v1 · Runtime_Bridge_All_in_One · Panorama_AST_RuntimeInjector)各留一份尾版,其餘進 _superseded;AegisNexus 全指 v1652;277 個 _sha 分身無呼叫者者 retire → Hydra YELLOW",
+  "W1-C 拒收 / 改號:v0193 · v0194 · Review Kit v0106.4 不入倉(CONFLICT-00001 / 00003 登冊即可);要採用就改獨立家族號",
+  "W1-D Config Fix(可併同一批):62 BOM 去頭 · 13 JSON 跳脫 · 2 空檔補或移",
+  "W1-E Bug Fix:CGC_MDL247 SSOTPanorama 上下連結 AttributeError(第 203 次)→ 新版號",
+  "→ 重跑 RC-1 P2 / P4 → 預期 HOLD(剩 Medium:同號異名 15 組 · 缺號 5 · 交接閘 122 · VRN-2 四本書)",
+  "W2:VRN-2 四本書桌機實驗 + 薄尾 retire;W3:NumberingSystem --apply · registry-sync --apply · LAW-10 入 Policy v0114 · Lesson / Conflict 冊升入 registry · tag rc-1"
+ ],
+ "one_batch": {
+  "可一次同步解決(機械 · 無設計決策 · 全在 RC-1 允許六類內)": [
+   "W1-A 4 支 COMPILE(移橋塊)+ 4 支 non-shipping 標記",
+   "W1-D 62 BOM + 13 JSON + 2 空檔",
+   "W1-B AegisNexus 單一尾版 v1652 重指(呼叫點全在樹內可 AST 定位)",
+   "W1-E CGC_MDL247 AttributeError(單一呼叫點)",
+   "W3 缺號 5 → NumberingSystem --apply;元件冊 registry-sync --apply(都是現成動詞)",
+   "W3 LAW-10 add-only 寫入 Policy v0114;Lesson / Conflict 兩冊升入 registry 夾並編號"
+  ],
+  "不能一批(需要裁定或桌機)": [
+   "治理核心五件 ×3 份選哪一份當尾版(需看呼叫者 + 操作員裁)",
+   "15 組同號異名改號(操作員裁)",
+   "275 分支處置(操作員裁)",
+   "VRN-2 四本書 DoD(真 PDF + 桌機)",
+   "VRN-2 啟動器 v0178 上倉(本機測過才上)",
+   "交接閘 122 筆(逐案 · 多輪)",
+   "CGE v0400 / V018E-F 封印佐證(要原收據)"
+  ]
+ },
+ "closeout_patch": {
+  "MODE": "RC-1 READONLY",
+  "GO": "NO-GO",
+  "GO_unmet": "Compile Error 8 · Hydra RED(VCGC YELLOW · VRN-2 DoD 未驗同列)",
+  "NEXT": "W1-A/B/C/D/E 一批 → 重跑 RC-1 → 預期 HOLD → W2 VRN-2 四本書"
+ },
+ "readonly_attestation": "本輪零程式修改 · 零部署 · 零 registry-sync/編號寫入 · 零 pip · 零同意閘;寫出的只有本報告、JSON、兩本首跑登錄冊與 HTML(文件類)。被測系統收據引用 2026-11-08 串測 run_id 20261108T163926Z,未為本審計重跑。"
+}
