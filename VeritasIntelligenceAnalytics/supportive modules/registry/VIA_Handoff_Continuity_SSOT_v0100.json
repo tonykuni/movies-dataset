@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-09T13:58:44Z",
+ "updated_at": "2026-11-09T14:26:12Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4282,6 +4282,25 @@
    "timeout_seconds": 900,
    "marker_note": "標記釘「== 17/17」(selftest 全過才印)",
    "registered_at": "2026-11-09T13:58:44Z"
+  },
+  "C-vqg-v0108": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VQG/VQG_AllInOne_v0108.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VQG v0108 selftest · 本版 12/12 · 前版鏈 v0107 PASS",
+   "scope": "VQG v0108:五新指標(obv · atr · clean_flow_ratio · rolling_sharpe · rel_strength)換裝在位 · 缺輸入 null · window_plan 25 組 · export-vap 夾具 10 指標 · 量化分析檔 + 收據 analysis 節 + SHA256SUMS 重生 · VAP config 不動(12 項)+ v0107 自測全部",
+   "dependencies": [
+    "functional modules/VQG/VQG_AllInOne_v0108.py",
+    "functional modules/VQG/VQG_AllInOne_v0107.py",
+    "functional modules/VQG/VQG_AllInOne_v0105.py",
+    "functional modules/VQG/VQG_AllInOne_v0104.py"
+   ],
+   "timeout_seconds": 1500,
+   "marker_note": "標記釘「[PASS] VQG v0108 selftest · 本版 12/12 · 前版鏈 v0107 PASS」(本版 + 前版鏈都過才印)",
+   "registered_at": "2026-11-09T14:26:12Z"
   }
  },
  "work_items": [
@@ -9052,6 +9071,17 @@
    "next": "桌機:python docs/handoff/ai/VIA_WorkbenchLock_v0100.py all --open;前端伺服器 python -m http.server 8000 --bind 127.0.0.1(在 VIA_Reports/workbench);Atlas 鎖(功能介面)與工作台鎖並存,合一由操作員裁",
    "receipt": "docs/handoff/evidence/C-workbench-lock-v0100.json",
    "updated_at": "2026-11-09T13:58:44Z"
+  },
+  {
+   "id": "VCGC-REQ207:vqg-v0108-indicators-analysis",
+   "requirement": "VCGC-REQ207",
+   "case": "C-vqg-v0108",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "操作員 2026-11-09 VQG 加指標 + 量化分析 → v0108 薄尾(自測 12/12 + v0107 鏈)· 真夾具 export rc 0 · VAP v0302 READY 4 表",
+   "next": "handoff test C-vqg-v0108 → 編號 → audit → test --quick → 推 → PR",
+   "receipt": "docs/handoff/evidence/C-vqg-v0108.json",
+   "updated_at": "2026-11-09T14:26:12Z"
   }
  ]
 }
