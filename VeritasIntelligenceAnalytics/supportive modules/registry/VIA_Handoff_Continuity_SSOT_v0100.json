@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-09T12:55:35Z",
+ "updated_at": "2026-11-09T13:58:44Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4262,6 +4262,26 @@
    "timeout_seconds": 1500,
    "marker_note": "標記釘「合計 PASS」(本版 + 前版鏈都過才印)",
    "registered_at": "2026-11-09T12:44:07Z"
+  },
+  "C-workbench-lock-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_WorkbenchLock_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "== 17/17",
+   "scope": "WorkbenchLock v0100:鎖站 SHA 4/4 · :root token 抽取 · 版面契約 · 信封往返 · 燈號律 · 系統辨識 · CSP · 真資料 build 五頁 + hub · check 綠 / 篡改紅 / 刪 id 紅 · VCGC 頁 · 前端伺服器 JSON api/<SYS>.json + index.json · hub · 共享證據 {category,row} · 收據 rc 0 無標記不綠(17 項)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_WorkbenchLock_v0100.py",
+    "review/VIA_Workbench_LockSite_v0106_4/SHA256SUMS.txt",
+    "review/VIA_Workbench_LockSite_v0106_4/subsystem_v0106_4.css",
+    "review/VIA_Workbench_LockSite_v0106_4/subsystem_v0106_4.html",
+    "review/VIA_Workbench_LockSite_v0106_4/subsystem_v0106_4.js"
+   ],
+   "timeout_seconds": 900,
+   "marker_note": "標記釘「== 17/17」(selftest 全過才印)",
+   "registered_at": "2026-11-09T13:58:44Z"
   }
  },
  "work_items": [
@@ -9021,6 +9041,17 @@
    "next": "操作員桌機貼開機行(cmd 版)→ 貼回 ⑫ 矩陣到 ⑩ 報告;注橋後的檔由操作員 commit 走 PR",
    "receipt": "docs/handoff/evidence/C-settleall-v0118.json",
    "updated_at": "2026-11-09T12:55:35Z"
+  },
+  {
+   "id": "VCGC-REQ206:workbench-lock-v0100",
+   "requirement": "VCGC-REQ206",
+   "case": "C-workbench-lock-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-09 視覺鎖定審查包 HTML U/I 自建工作台 → 鎖站 review/VIA_Workbench_LockSite_v0106_4(4/4)+ VIA_WorkbenchLock v0100(自測 14/14 · all 綠 · Playwright 0 錯) → handoff test rc 0(15/15)· 編號 MDL +1 FNC +30 · audit 遺失 0 改身分 0 重號 0 IMMUT 0 · 盤點冊 v0212(+站 + coverage.case)· test --quick YELLOW(站 9 綠 2 黃(環境:無 pwsh · handoff 既有紅)0 紅 · case 252/252) → Codex #620 P2 ×2 修:收據同 evidence_status 規則才綠 · 共享證據包 {category,row};自測 17/17",
+   "next": "桌機:python docs/handoff/ai/VIA_WorkbenchLock_v0100.py all --open;前端伺服器 python -m http.server 8000 --bind 127.0.0.1(在 VIA_Reports/workbench);Atlas 鎖(功能介面)與工作台鎖並存,合一由操作員裁",
+   "receipt": "docs/handoff/evidence/C-workbench-lock-v0100.json",
+   "updated_at": "2026-11-09T13:58:44Z"
   }
  ]
 }
