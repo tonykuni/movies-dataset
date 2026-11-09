@@ -14,6 +14,22 @@
 邊界:只讀;不 import 管理器(用正則抽 _SK_EXCL 字面 · 不執行);不連網;不改 VRN-2 任何檔;VCGC 的燈不寫成 VRN-2 的成功(四系統對等 · 只讀互看)。
 """
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_root = _sa_Path(__file__).resolve()
+    for _ in range(6):
+        _sa_root = _sa_root.parent
+        if (_sa_root / "VeritasIntelligenceAnalytics").is_dir() or _sa_root.name == "VeritasIntelligenceAnalytics":
+            break
+    _sa_dir = (_sa_root / "VeritasIntelligenceAnalytics" if (_sa_root / "VeritasIntelligenceAnalytics").is_dir() else _sa_root) / "supportive modules" / "accelerator"
+    if _sa_dir.is_dir() and str(_sa_dir) not in _sa_sys.path:
+        _sa_sys.path.insert(0, str(_sa_dir))
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:  # noqa: BLE001
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import argparse
 import json
