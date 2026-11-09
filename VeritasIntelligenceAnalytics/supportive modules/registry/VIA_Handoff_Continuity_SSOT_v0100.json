@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-09T07:20:47Z",
+ "updated_at": "2026-11-09T07:36:56Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4179,6 +4179,23 @@
    ],
    "timeout_seconds": 1500,
    "marker_note": "標記釘本版薄尾 9/9 那一行;本體與 v0101–v0106 前版鏈的 PASS 由 rc 0 保證(任一層 FAIL 就 rc 1)"
+  },
+  "validation_ssot_v0102": {
+   "argv": [
+    "CGC_MDL246_ValidationSSOT_v0102",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL246_ValidationSSOT_v0102 薄尾 7/7 · PASS",
+   "scope": "CGC_MDL246 v0102:工作流冊 tests 列表式(TST 案)不炸 —— workflow_books 出口給字典視圖(self=案名 · cross=[] · real=[] · tst=原列表;深拷貝不動原冊),本體 check 的 .get('cross') 吃得下,V-XREF 不假造 X-*;真冊 GREEN;前版鏈 v0101 → v0100 自測 rc 0(VCGC-REQ203)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0102.py",
+    "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0101.py",
+    "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0100.py",
+    "supportive modules/registry/VIA_Validation_SSOT_v0101.json",
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0107.py"
+   ],
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-09T07:36:56Z"
   }
  },
  "work_items": [
@@ -8883,6 +8900,17 @@
    "next": "桌機貼回 → W3 入冊編號 → W4 發布",
    "reason": "要桌機 / 真 PDF / 原收據:AegisNexus 兩份 exec 引用異本 · VRN-2 四本書 · 本機 v0178 · CGE manifest · V018E-F",
    "updated_at": "2026-11-09T07:20:47Z"
+  },
+  {
+   "id": "VCGC-REQ203:w1-mdl246-v0102",
+   "requirement": "VCGC-REQ203",
+   "case": "validation_ssot_v0102",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "Bug Fix:MDL246 v0102 薄尾(同一類 tests 列表式崩潰;handoff test validation_ssot_v0101 重跑時 AttributeError 抓到)。容器直跑 --selftest 7/7 · 前版鏈 8/8。",
+   "next": "handoff test validation_ssot_v0102 實跑轉 VERIFIED",
+   "receipt": "docs/handoff/evidence/validation_ssot_v0102.json",
+   "updated_at": "2026-11-09T07:36:56Z"
   }
  ]
 }

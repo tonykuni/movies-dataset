@@ -4954,6 +4954,23 @@
     "supportive modules/registry/VIA_Workflow_VDF_SSOT_v0107.json",
     "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0106.json"
    ]
+  },
+  {
+   "id": "C-validation_ssot_v0102",
+   "name": "交接案 validation_ssot_v0102(CGC_MDL246 v0102:工作流冊 tests 列表式(TST 案)不炸 —— workflow_books 出口給字典視圖 cross=[],V-XREF 不假造 X-*;真冊 GREEN;前版鏈 v0101 8/8 · v0100(VCGC-REQ203))",
+   "argv": [
+    "run",
+    "CGC_MDL246_ValidationSSOT_v0102",
+    "--selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0102.py",
+    "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0101.py",
+    "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0100.py",
+    "supportive modules/registry/VIA_Validation_SSOT_v0101.json",
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0107.py"
+   ]
   }
  ],
  "coverage": {
@@ -5906,6 +5923,10 @@
    "sdd_validator_v0107": {
     "state": "COVERED",
     "by": "C-sdd_validator_v0107"
+   },
+   "validation_ssot_v0102": {
+    "state": "COVERED",
+    "by": "C-validation_ssot_v0102"
    }
   },
   "workflow": {
@@ -6429,5 +6450,5 @@
  "change_v0204": "登站 C-skillexport-v0101 + coverage.case(VCGC-REQ201 技能引擎雙觸發 + 可組合)。",
  "change_v0205": "拔掉 7 個 VDF-WKF015-STP* —— **登錯車道**。VCGC 串測的覆蓋檢(CGC_MDL224 coverage)只讀 VIA_Workflow_VCGC_SSOT 的 steps[*].code;VDF-WKF015 的步驟在 VIA_Workflow_VDF_SSOT_v0106.json 裡,VCGC 那支永遠看不到 → 判 GONE 7,把 workflow 從 118/118 打成 118/125,VCGC 串測站從紅 0 變紅 1。五系統對等獨立(政策 L123):VDF 的工作流覆蓋是 VDF 自己的事,不該登進 VCGC 的覆蓋冊。VDF-WKF015 本身仍完整留在 VDF 工作流冊 v0106,一個字沒刪;站 V-threecode-v0100 與 coverage.case 也不動(case 243/243 本來就是綠的)。上一輪學到的是『登的形狀要對』,這一輪是『登的車道要對』—— 兩件不一樣。",
  "change_v0206": "+1 站 C-fivesystemchain-v0100(自測站,唯讀)· coverage.case +1 · coverage.workflow +7。七個步碼全部是 VCGC 車道(VIA_Workflow_VCGC_SSOT v0133 的 steps[*].code)—— v0205 的教訓是車道要對:VDF / VRN / VQG / VAP 的工作流步仍在它們自己的冊裡,一個都不登進本冊。串測本體(run --apply)會真的派五個子行程、寫盤冊,所以站只登它的 --selftest,照『會寫冊的動作由自測站驗』那條律。 同輪再 +1 站 C-libsinventory-v0101(薄尾)· case +1 · workflow +1(WKF026-STP008):Codex #612 P1 判「就地改已發布的 v0100」違版本律,還原 v0100、增補改走薄尾,所以登的是薄尾的站。",
- "change_v0207": "+1 站 C-sdd_validator_v0107(自測站,唯讀)· coverage.case +1 · coverage.workflow +5(VCGC-WKF028 五步,全是 VCGC 車道;步只掛現有站驗得到的動作:L-policy · V-ssot-panorama · 本站 · E-number-audit · V-handoff-check)。WKF025 / VDF-WKF015 本輪只補 tests 欄,步碼沒動,覆蓋不變;VDF-WKF015 的步仍在 VDF 自己的冊,一個都不登進本冊(v0205 教訓)。"
+ "change_v0207": "+1 站 C-sdd_validator_v0107(自測站,唯讀)· coverage.case +1 · coverage.workflow +5(VCGC-WKF028 五步,全是 VCGC 車道;步只掛現有站驗得到的動作:L-policy · V-ssot-panorama · 本站 · E-number-audit · V-handoff-check)。WKF025 / VDF-WKF015 本輪只補 tests 欄,步碼沒動,覆蓋不變;VDF-WKF015 的步仍在 VDF 自己的冊,一個都不登進本冊(v0205 教訓)。 同輪再 +1 站 C-validation_ssot_v0102(MDL246 v0102:同一類 tests 列表式崩潰,handoff test validation_ssot_v0101 重跑時抓到)· case +1。"
 }
