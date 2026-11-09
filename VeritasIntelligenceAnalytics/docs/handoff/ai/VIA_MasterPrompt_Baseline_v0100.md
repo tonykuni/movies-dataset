@@ -85,6 +85,15 @@ VDF:管線 fixture 跑通;live 擷取是桌機項(REQ192/193/195 · REQ145/147/1
 | VIA_Matrix_Audit_v0105_1 json / xlsx(22 工作表)· Full Model json.gz(36,837 列)· ZIP 稽核 md v0105.2 · RED 修復計畫 md v0105.2 · matrix_detail 收據 | 它那輪的 36,837 列模型與 12 RED(5 系統閘 · 5 治理衝突 · 2 環境閘),scope = 它的 add-on zip bf5ac1a1…,不是本倉燈;只記錄 |
 | mcp_stdio_smoke_v0105_2.py(上傳 2 次) | 不執行;它要的 `scripts/via_governance_mcp_v0105.py` 與 engines 不在本倉 |
 
+## 5c. Manus 子任務結果交叉核對(操作員 2026-11-09 貼回)
+
+| Manus 宣稱 | 本倉核對 | 判定 |
+|---|---|---|
+| EnvManager v0101 @ commit 7bf30ea6 SHA-256 `8c1cdc6a…` | `git show 7bf30ea6:…CGC_MDL240_EnvManager_v0101.py` sha256 = `8c1cdc6a57f75f9a…`;main 尾版同為 v0101,同 sha | **一致**(審的是真檔) |
+| 「VIA_FROM_VCGC 只在 docstring,實作沒看到閘」 | v0101 是薄尾(L10「規矩照前一版」);閘在前版 v0100 的 main() 實作 | 宣稱對 v0101 單檔成立,對家族不成立(閘沒丟) |
+| 原生 MCP v0102 離線自測 66/66(scratch · 無憑證) | `VIA_MCP_Engine/VIA_MCP_Engine_v0102.py` 在 main;本倉 `.mcp.json` 指的是 VCGC 只讀 MCP `CGC_MDL279_MCPServer_v0101`(stdio · 16 工具 · 零網路),兩者不同物 | 只記錄;不把 Manus scratch 結果當本倉收據 |
+| 「以 viaatlas-39ozanmz.manus.space 為功能介面視覺鎖」 | 已是:`review/VIA_Atlas_LocalSite_v0100/`(位元組鎖 · VisualLock v0100 `--vl-*` 24 token);本輪工作台鎖(審查包 U/I)管五系統工作台頁 | 兩鎖並存各管各頁;合一 = W2 |
+
 ## 6. 下一個最小動作(順序)
 
 1. 操作員桌機:`git -C <repo> pull --ff-only origin main`,`Test-Path …VIA_DesktopFourBlocks_v0100.py` 回 True 後跑四區塊 live 擷取。
