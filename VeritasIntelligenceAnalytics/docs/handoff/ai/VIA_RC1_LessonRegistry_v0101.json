@@ -1,0 +1,73 @@
+{
+ "schema": "VIA.RC1.LessonRegistry.v1",
+ "version": "v0101",
+ "created_utc": "2026-11-09T05:40Z",
+ "format": [
+  "root_cause",
+  "impact",
+  "resolution",
+  "prevention",
+  "evidence"
+ ],
+ "first_run_exception": "同上",
+ "append_only": true,
+ "entries": [
+  {
+   "id": "LESSON-0001",
+   "title": "Session 遺失",
+   "root_cause": "多 AI 對話各自為政,結論未落地為檔",
+   "impact": "VCGC/VDF/VRN 被 Copilot 重新定義為 Vision/Value/Validation;同一決策重做",
+   "resolution": "RC-1 期間所有 AI 只讀 paste pack;決策只認 PolicySSOT 與 registry 檔",
+   "prevention": "每次 CLOSEOUT 必有 [DELTA] 寫入 ledger;無 ledger 行 = 未發生",
+   "evidence": "Copilot/Gemini 文件中的 VAP/VQG 審計定義 vs 真實子系統 VAP=AutoPlot;本輪上傳 gemini-code-1794143633893.txt 又是一份「Level-0 全權初始化」提示;Review Kit v0106.4 handover 自述 RED/BLOCKED"
+  },
+  {
+   "id": "LESSON-0002",
+   "title": "收尾期間新增架構",
+   "root_cause": "Level-0 授權無凍結層;AI 以「補強」名義造新件",
+   "impact": "v2.0 超級版新增 10 skills、NetAccelerator、Skills Engine,收尾未完先擴張",
+   "resolution": "LAW-10 凌駕 LAW-6;HARD FREEZE 六禁",
+   "prevention": "任何新件先過「是否在 RC-1 僅允許六類」檢查,否則記 CONFLICT 不執行",
+   "evidence": "2026-11-06～09 四份 prompt 新增項目清單;VRN-2 v0147/v0148 線(HTTP workbench);本輪 CONFLICT-00001 / 00003(兩個 AI 各交一套新治理引擎)"
+  },
+  {
+   "id": "LESSON-0003",
+   "title": "多 AI 版本分岔",
+   "root_cause": "同一家族由不同 session 取號,無取號前掃描",
+   "impact": "VRN-2 三條線(Closeout v01xx / v0147–148 停用 / v0149 續行);PR #512 與聊天線同號 v0123、MDL269;本輪 v0193 / v0194 被外部 AI 搶號",
+   "resolution": "共祖 v0244 已合併;≥v0245 單線;同名異內容 = 停,不覆寫",
+   "prevention": "取任何版本號前掃 local ∪ origin/main;已發布者保號,本地改號進 _superseded",
+   "evidence": "VRN_SystemManager v0231→v0243/v0244 合併紀錄;本輪 CONFLICT-00001(repo v0192 ↔ 上傳 v0193/v0194 只共用 2 個定義)· CONFLICT-00005 277 個 _sha 分身 · CONFLICT-00012"
+  },
+  {
+   "id": "LESSON-0004",
+   "title": "GitHub 與本地不同步",
+   "root_cause": "四個本機根(Downloads / C:\\VIA / OneDrive via_0x / C:\\Users\\tonyk\\VIA-VDF-VRN)+ 三個 repo",
+   "impact": "VRN-2 local-only;VDF/VCGC 已上 GitHub;movies-dataset 定為 master 但 OneDrive 為重建地",
+   "resolution": "P1 Repo Matrix 標明每根目錄對應 repo 與角色(master / 重建 / 參考 / 資料家)",
+   "prevention": "上傳規則:本機測過才上;衝突即時解,不留側枝;資料永不進 git",
+   "evidence": "2026-09-30 GitHub master 規則 vs 2026-10-10 OneDrive via_02_vrn 重建決定;本輪:275 遠端分支 · 抽樣 12 支各分岔 1104–3342 提交 · ActivateVRN-2 本倉 v0132 / 本機 v0178"
+  },
+  {
+   "id": "LESSON-0005",
+   "title": "缺少 Done Definition",
+   "root_cause": "只有 VRN-2 有六條 DoD;VDF/VCGC/RC-1 整體無",
+   "impact": "無法判 GO;「做完」由 AI 自報",
+   "resolution": "RC-1 GO 條件即整體 DoD;VDF DoD = reader chain 封印 + 橋接版本化 100%;VCGC DoD = 11 gates + 監控頁不含入口",
+   "prevention": "新任務 S0 必填 SUCCESS=,無 SUCCESS 不進 S1",
+   "evidence": "VRN-2 DoD 2026-10-15 六條;VDF 僅有 Gate 名稱無整體 DoD;本輪「CGE v0400 11 gates SEALED」在樹內只找到 VIACGEOneShotv0400.ps1 一支 + CGE/Console/inventory/manifest.json 0 bytes,佐證不足以判 SEALED"
+  },
+  {
+   "id": "LESSON-0006",
+   "title": "工具自己炸 = 假紅,會遮住後面所有誠實燈",
+   "root_cause": "CGC_MDL245 v0100 三處寫死 (w.get('tests') or {}).get(...);工作流冊 v0133 起 WKF022+ 的 tests 改成 TST 列表,驗證器一碰到就 AttributeError,整輪 X-* 列一條都沒出來,ssot panorama 把「上下連結@VCGC」記 RED(第 203 次)。",
+   "impact": "紅燈指向錯的地方(以為冊壞),真正的兩個缺口(VCGC-WKF025 · VDF-WKF015 沒有 tests 欄)被遮了 200 多輪;RC-1 W0 把它算進 HOLD 條件。",
+   "resolution": "v0107 薄尾:load_books 出口把列表式換成字典視圖(.cases 留原列表 · real 空字串不冒充 ai 實跑),check_columns 逐項驗;修好後 X-COL 第一次誠實標出兩個缺口 → 同輪補 tests(VCGC v0134 · VDF v0107)。",
+   "prevention": "① 檢查器一列一列失敗,不整輪炸(每個 X-* 自己 try,炸了記 RED 附 repr,其餘照跑);② 冊換形狀前先給驗證器一個帶新形狀的自測(薄尾 add-only);③ 連續同一例外出現 >3 次就是工具病不是冊病,先修工具。",
+   "evidence": "RC-1 W0 CONFLICT-00010;MDL245 v0107 自測 ⑧「本體 check(write=False) 整輪跑完不炸」;ssot panorama 2026-11-09 上下連結@VCGC RED → YELLOW(待重驗鎖 4,內容是另一件事)"
+  }
+ ],
+ "prior": "VIA_RC1_LessonRegistry_v0100.json",
+ "updated_utc": "2026-11-09T07:46Z",
+ "why_v0101": "v0100 已併進 main(PR #613)→ 出新版;+LESSON-0006(工具假紅);五筆舊教訓一字不動。"
+}
