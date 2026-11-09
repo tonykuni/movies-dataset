@@ -24,6 +24,33 @@
 Ponytail:Claude Code 外掛,桌機側啟用;本倉只記錄啟用步驟(`via_settleall_v0118` 文件)。
 其餘 T01–T20 狀態 = DISCOVERED / UNVERIFIED,不作「已啟用」宣稱。
 
+
+## 2b. 操作員貼來的 Gemini 分享(省 Token 工具候選,主提示詞 §4 的續表;全部 DISCOVERED / UNVERIFIED,不裝)
+
+分享連結 `share.gemini.google/EhfQgofAViEM` 本容器讀不到(302 → gemini.google.com 空頁),內容以操作員貼文為準。
+貼文裡的數字(「省 70 倍」「40k stars」「94%」)是工具作者 / 搜尋摘要的宣稱,不是本專案量測(§5 K20:無計量標 UNKNOWN)。
+
+| ID | 候選 | 類型 | 本倉現況 | 採用條件 |
+|---|---|---|---|---|
+| T21 | rtk(Rust Token Killer) | CLI 輸出壓縮 | 未裝;本倉同功能 = VCGC `digest`(日誌只留判決行,已鎖版實測) | 只在 digest 蓋不到的 npm / docker 輸出有需要時評估 |
+| T22 | Caveman | 回覆精簡 skill | 未裝;CLAUDE.md 已要求對話只回報變更 / 證據 / 阻擋 | 不裝(與既有規則重疊) |
+| T23 | PromptThrift MCP | 歷史壓縮 MCP | 未裝;宿主已有 context 摘要 | 要先查精確專案身分與資料外送(K14 / §1-6) |
+| T24 | code-context-engine(elara-labs) | 本機向量索引 MCP | 未裝;本倉同功能 = `token` 卡 read / slice / pack + Graphify 圖譜 | 要 embedding 費用與外送授權核對 |
+| T25 | super-token-saver | session 還原 | 未裝 | 身分未核(名稱泛用),UNVERIFIED |
+| T26 | Token Economizer(「Microsoft」) | 重試迴圈攔截 | 未裝;本倉 P5 律「相同失敗最多兩次」已覆蓋 | 出處「微軟」未核,UNVERIFIED |
+| T27 | Headroom | payload / AST 壓縮 | 未裝 | 出處未核,UNVERIFIED |
+| T28 | Portal / Shunt(「Spotify」) | 讀取分流到便宜模型 | 未裝 | 會把本倉原始碼送第三方模型 → 需操作員外送授權(§1-6) |
+| T29 | codeburn | Token × git 看板 | 未裝 | 可讀性高、無外送;若要量測 K20 可評估 |
+| T30 | `.claudeignore` 排除清單 | 設定 | **Claude Code 不讀 `.claudeignore`**(它遵守 `.gitignore` 與 settings 的 deny 規則);本倉 `.gitignore` 已排除 __pycache__ / .venv / VIA_Reports 等 | 不另建;要擋讀取用 `.claude/settings.json` permissions.deny |
+
+已在本倉有紀錄的三支(T12 Ponytail · Graphify · OmniRoute)維持 `via_settleall_v0118` 文件的啟用步驟,桌機裝完 ⑳ 才轉綠。
+
+## 2c. 桌機 git 現況(操作員 2026-11-09 貼回)
+
+`git pull --ff-only origin main` → `Not possible to fast-forward`:桌機分支**有本機提交**與 main 分岔(不是只落後)。
+另有 ~50 個未追蹤檔(`functional modules/VRN/registry/VRN_Engine_Register_v0100…v0128.json` · `vrn_*.py` · `webscraping_dualengine_v20260819/*` · 根目錄 `_git_conflict/` `registry/`),
+抽查 5 個都**不在 main**(= 桌機本地產物,不會被合併蓋掉)。解法見對話:先建備份分支 → `merge --no-ff origin/main` → 衝突就 `--abort` 貼回。
+
 ## 3. 審查包 v0106.4 自報的 VCGC RED(原文 ID,只攤開不代修)
 
 | ID | 內容 | 對應本倉 |
