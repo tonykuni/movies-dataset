@@ -74,4 +74,18 @@ python "docs\handoff\ai\VIA_DailyBackup_v0100.py" check
 
 ## 閘鏈實錄
 
-(見下方由閘鏈輸出貼入的段落)
+第一輪(提交 91cd0e866 後):
+- CGC_MDL237 `--apply --scope` 8 支 → 發號 +130 列(CLS_VDF +2 · FNC_CORE +27 · FNC_VCGC +5 · FNC_VDF +53 · FNC_VQG +23 · FNC_VRN +12 · MDL +8)· 未提交不發號 0。
+- audit:遺失 0 · 改身分 0 · 重號 0 · IMMUT 0;黃 = FPSTALE 539(舊冊指紋 · 基線)· UNCOMMITTED 150(基線)。
+- registry-sync:撞號 0 · 本次改發 0。
+- test --quick **RED**(站 12:綠 8 黃 2 紅 2):`upd:CGC_MDL237_NumberingSystem_v0119` 自測指出工作流步碼 `-TST001` 不是冊上代碼形式;`upd:CGC_MDL224_TestAuto_v0106` ⑧ 指出盤點冊 coverage 有非 VCGC 工作流鍵(VDF-WKF016/017 · VRN-WKF010 → GONE)。
+- handoff check:新 REQ 全 REQ_CHANGED 黃;`VDF-REQ018:ws-fork-*` 兩案 EVIDENCE_INVALID(相依多了 VDF_FetchSystem_SSOT_v0107.json)。
+
+修正(書未上 main · 就地改):七個步碼 TST → STP(VCGC-WKF032-STP003 · 033-STP003 · 034-STP004 · 035-STP003 · VDF-WKF016-STP003 · 017-STP003 · VRN-WKF010-STP002)· 移除 8 個非 VCGC 覆蓋鍵 · VRN_ReportLaneCheck 補 [VIA:ACCEL-BRIDGE] 標頭(交接閘 ACCEL_BRIDGE_MISSING)。
+
+第二輪:
+- handoff test `vdf_ws_eng093_lists` rc 0(EVIDENCE_INVALID 消)。
+- test --quick **YELLOW**(站 11:綠 9 黃 2 紅 0)· verb 47/47 · seat 6/6 · card 13/13 · case 261/261 · workflow 154/154 · ps 2/2 · 尾版 283 支 compile 錯 0 · 缺橋 0(黃 = 環境無 pwsh · 與今日基線同)。
+- handoff check:ReportLaneCheck 橋紅消;剩既有 VRN 車道紅(nonstock v0310 reuse 三支 MODULE_UNREGISTERED · _vdf_fetch 舊檔)與「numbering」舊案因交接冊變動的 EVIDENCE_INVALID(每次動交接冊都會出現的基線)。
+
+提交:91cd0e866(六項令)· 6639b98e6(交接報告)· 7db115120(閘鏈帳本 + 書修正)· 00eb96c0f(併 origin/main · PR #621 已合併)。
