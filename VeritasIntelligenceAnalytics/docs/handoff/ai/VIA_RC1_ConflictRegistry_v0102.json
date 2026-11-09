@@ -1,0 +1,223 @@
+{
+ "schema": "VIA.RC1.ConflictRegistry.v1",
+ "version": "v0102",
+ "created_utc": "2026-11-09T05:40Z",
+ "first_run_exception": "RC-1 v2.1:Lesson / Conflict Registry 檔不存在時首跑建立為唯一例外;升入 supportive modules/registry 與編號是 W3",
+ "append_only": true,
+ "entries": [
+  {
+   "id": "CONFLICT-00001",
+   "severity": "CRITICAL",
+   "class": "Duplicate Engine · 版本號搶號",
+   "status": "CONTAINED(只在審閱夾,未入倉)",
+   "what": "上傳包 VCGC_MultiMatrix_Integration_v0193.zip / Resilience_v0194.zip 各含 CGC_MDL149_VeritasCentralGovernanceConsole_v0193.py / v0194.py —— 直接拿走 VCGC 主控台家族的下兩個版號。",
+   "evidence": "repo 尾版 v0192 頂層定義 9;上傳 v0193 定義 64(與 v0192 共用 2 · 新 62)、v0194 定義 89(共用 2 · 新 87)—— 同家族名、不同程式。動詞含 install --apply --activate-tools(安裝器範圍 → 牴觸 OBS-0194「既有 Installer/EnvManager/InstallGate/Token 不換」)。SHA256SUMS 17/17 相符;AST 可剖;無 NET-BRIDGE;import subprocess。",
+   "impact": "落入 registry 夾即成為家族尾版,CLAUDE.md 第一步的 `ls …_v*.py | tail -1` 會解析到它 —— 整個 VCGC 入口被另一個 AI 的程式接管(LESSON-0003 現場)。",
+   "resolution_proposal": "不入倉。若要採用:改成獨立家族(例 CGC_MDLxxx_MultiMatrix_v0100)走 VCGC 自己的編號 / 註冊 / 串測;v0193 / v0194 兩個號碼留給 VCGC 自己的鏈。",
+   "rc1_blocking": true
+  },
+  {
+   "id": "CONFLICT-00002",
+   "severity": "MEDIUM",
+   "class": "Duplicate Module · 版本漂移",
+   "status": "OPEN",
+   "what": "VeritasAegisNexus(網路橋本體)在活目錄有 8 份、4 種內容。",
+   "evidence": "network/VeritasAegisNexus_v1652.py = 1.65.2(尾版)· VIA 根 VeritasAegisNexus.py 與 network/…_v1651.py = 1.65.1(sha b983…)· supportive modules/ · network/ · 50_Protection_Acceleration/ 三份同 sha f5f8… 無 ENGINE_VERSION · network/…_v0116 / _v0117 另兩種。",
+   "impact": "誰 import 到哪一份取決於 sys.path 順序;P6「版本化橋接」的本體自己沒版本化。",
+   "resolution_proposal": "W1 Conflict Fix:呼叫點全部指向 v1652 尾版,其餘副本進 _superseded(不刪)。",
+   "rc1_blocking": false,
+   "history": [
+    {
+     "at": "2026-11-09T07:12:31Z",
+     "from": "OPEN",
+     "to": "PARTIAL",
+     "why": "W1:8 份 → 位元相同的 50_Protection_Acceleration 副本換成轉接殼指 network/VeritasAegisNexus_v1652 尾版(v1651 136 defs ⊇ 舊 119 defs 驗過)。餘:supportive modules/VeritasAegisNexus.py(exec 引用 20 處)與 network/VeritasAegisNexus.py(37 處)內容不同、有人 exec 它 → W2 桌機逐支改指尾版後才能換殼;根 VeritasAegisNexus.py 1.65.1 留。"
+    },
+    {
+     "at": "2026-11-09T07:56:22Z",
+     "from": "PARTIAL",
+     "to": "OPEN",
+     "why": "Codex #615 P1(判得對):9 支轉接殼是就地覆寫已併進 main 的檔,違版本律(AGENTS.md 四;同 #612 / #613 判例);10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py 還明確載入 50_Protection_Acceleration/VeritasAegisNexus.py 這條路徑。9 支已逐位元還原成 main。正解 = 出版本化轉接件並遷移呼叫者(相依鏈驗證 + 操作員裁正本)→ W2,不在 W1 六類。"
+    },
+    {
+     "at": "2026-11-09T10:05:56Z",
+     "from": "OPEN",
+     "to": "OPEN",
+     "why": "W2 矩陣:AegisNexus 8 份 5 組 —— 根 VeritasAegisNexus.py = network/_v1651 位元相同(8438 行);50_Protection_Acceleration / 平鋪根 / network 三份 5186 行位元相同但與 v1651 分岔(各自獨有 45 行);鎖冊尾版 _v1652 薄尾,SUP_MDL737 v0110 把裸 import 接到它(39 列);5186 行副本只剩 29 筆字面路徑指平鋪根。要裁:v1651 體系為正本,那 45 行獨有要不要保。"
+    }
+   ]
+  },
+  {
+   "id": "CONFLICT-00003",
+   "severity": "MEDIUM",
+   "class": "Duplicate Engine(MCP server)",
+   "status": "CONTAINED(審閱包)",
+   "what": "Review Kit v0106.4 的 scripts/via_governance_mcp_v0105.py(3 工具:via_status · via_inventory_query · via_token_prepare)與本倉 CGC_MDL279_MCPServer_v0101 是兩個 VCGC 治理 MCP server。",
+   "evidence": "kit 自己的 handover 寫 RED/BLOCKED · live_vcgc_connected=false · OBS-0186;kit 另含 via_agent_os_unified_readonly_hardened.py 4293 行(平行治理引擎)。",
+   "impact": "兩個 server 兩套工具名,接哪一個就是哪一個的事實。",
+   "resolution_proposal": "不入倉;若要借其三工具,以 CGC_MDL279 新版號吸收,不並存。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00004",
+   "severity": "HIGH",
+   "class": "Duplicate Governance Module(活目錄)",
+   "status": "OPEN",
+   "what": "114 個 .py 檔名在多個活目錄重複;其中治理核心各 3 份:VIA_EnvManager.py · VIA_SSOT_Unified.py · VIA_RegistryCore_v1.py · VIA_Runtime_Bridge_All_in_One.py · VIA_Panorama_AST_RuntimeInjector.py;VDF_MDL003_SentimentMacroEngine.py ×3。",
+   "evidence": "basename 掃描(排除 Retired / quarantine / intake / new modules engines / Standalone / SCOPE_COPY 後仍 114)。",
+   "impact": "Hydra 判定:治理引擎多頭 → RED。",
+   "resolution_proposal": "W1:每個治理件選一份尾版(有版號者取最高),其餘進 _superseded;import 路徑重指。",
+   "rc1_blocking": true,
+   "history": [
+    {
+     "at": "2026-11-09T07:12:31Z",
+     "from": "OPEN",
+     "to": "PARTIAL",
+     "why": "W1:治理核心 5 件 × 位元相同副本 8 份 → 轉接殼(runpy 正本;正本不在就 FileNotFoundError 不接;載入後公開名稱齊)。餘:ssot/VIA_SSOT_Unified.py(6ddd · 8345 行,內容不同)· 10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py(2b03,內容不同)→ 要先 diff 判誰是正本,W2;其餘 109 個重名多為 VDF_MDL003 類資料模組副本與 SCOPE_COPY,W3 盤。"
+    },
+    {
+     "at": "2026-11-09T07:56:22Z",
+     "from": "PARTIAL",
+     "to": "OPEN",
+     "why": "Codex #615 P1(判得對):9 支轉接殼是就地覆寫已併進 main 的檔,違版本律(AGENTS.md 四;同 #612 / #613 判例);10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py 還明確載入 50_Protection_Acceleration/VeritasAegisNexus.py 這條路徑。9 支已逐位元還原成 main。正解 = 出版本化轉接件並遷移呼叫者(相依鏈驗證 + 操作員裁正本)→ W2,不在 W1 六類。"
+    },
+    {
+     "at": "2026-11-09T10:05:56Z",
+     "from": "OPEN",
+     "to": "OPEN",
+     "why": "W2 矩陣(VIA_GovCoreChain v0100):EnvManager / RegistryCore_v1 / Panorama 各 3 份位元相同;Runtime Bridge 10_Core_Runtime 為根的 +79 行超集 → 正本候選;SSOT_Unified ssot/ 為根的 +95 行超集 → 正本候選。多頭根因 = 三種目錄慣例並存(平鋪根 · 編號夾 · 主題夾),各有載入器。改動權:樹上會寫這些檔的程式 0 筆。待操作員裁正本後才出版本化轉接件。"
+    }
+   ]
+  },
+  {
+   "id": "CONFLICT-00005",
+   "severity": "MEDIUM",
+   "class": "Clone files",
+   "status": "OPEN",
+   "what": "277 個 `_sha<hex8>` 分身檔(例 VIA_Panorama_AST_RuntimeInjector_sha63cefe28.py · StartVIAUnified_shaa1b427ff.ps1)。",
+   "evidence": "檔名正則 _sha[0-9a-f]{8,};P3 圖裡 VDF_MDL001 / 105 / 303 都各有 sha 分身參與 import。",
+   "impact": "同一引擎兩個名字,各自被 import。",
+   "resolution_proposal": "W1:AST 確認無 import 者、且不在任何薄尾 PRIOR 鏈上,才 retire;有呼叫者者重指到正名尾版。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00006",
+   "severity": "MEDIUM",
+   "class": "同號異名(編號撞)",
+   "status": "OPEN(沿用 · 待操作員裁)",
+   "what": "15 組同一編號掛不同名:VCGC 8(CGC_MDL135 EnvGovernance/EnvPlan · CGC_MDL142 AccelImport/TWNameBook · CGC_MDL149 BoxesFlow/ChainAll/Closeout/EntryLock/FilenameCut/GreenMatrix/Identity/Integra… 等)· VDF 4(VDF_ENG110 AKShareProbe/USMacroProbe/USMacroTree · VDF_ENG117 · VDF_ENG118 · VDF_MDL014)· VRN 2(VRN_ENG109 · VRN_ENG397)· SUP 1(SUP_MDL743 六名)。",
+   "evidence": "ssot panorama 命名格(2026-11-09 實跑)。",
+   "impact": "編號不是唯一鍵。",
+   "resolution_proposal": "是伴隨模組就記命名冊;真撞號由操作員裁定改號(不自動改)。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00007",
+   "severity": "LOW",
+   "class": "Branch sprawl",
+   "status": "OPEN",
+   "what": "275 個遠端分支(vcgc 138 · 根 54 · claude 30 · codex 11 …);抽樣 12 支非 claude 分支各有 1104–3342 筆未併入 main 的提交。",
+   "evidence": "git branch -r · rev-list --count origin/main..origin/<b>。",
+   "impact": "LESSON-0004 現場;分支不是落後而是分岔。",
+   "resolution_proposal": "W3:標 archive/ 前綴或刪遠端(操作員決定);不在 RC-1 內動。",
+   "rc1_blocking": false
+  },
+  {
+   "id": "CONFLICT-00008",
+   "severity": "HIGH",
+   "class": "Compile Error",
+   "status": "FIXED",
+   "what": "compileall 8 支失敗(見 P2)。",
+   "evidence": "python -m compileall 2026-11-09;四條車道尾版全部可編譯。",
+   "impact": "RC-1 NO-GO 條件「Compile Error」字面成立。",
+   "resolution_proposal": "W1 AST Fix:4 支 COMPILE 類把加速器橋移到 from __future__ 之後(機械);4 支 quarantine/intake 標 non-shipping 或移出 compile 範圍。",
+   "rc1_blocking": true,
+   "history": [
+    {
+     "at": "2026-11-09T07:12:31Z",
+     "from": "OPEN",
+     "to": "FIXED",
+     "why": "W1 AST Fix:出貨範圍 compileall 0 錯。8 支 → 4 支就地搬橋(VeritasCeleritas.py · VDF_ENG088 v0103 · SUP_MDL749 v0114 · CGC_MDL180 v0100;行多重集合不變)· 3 支已被尾版取代(superseded,不出貨)· 1 支在 intake(凍結)。全樹仍 4 錯 = quarantine / intake,RC-1 範圍外。"
+    }
+   ]
+  },
+  {
+   "id": "CONFLICT-00009",
+   "severity": "LOW",
+   "class": "Config/JSON",
+   "status": "FIXED",
+   "what": "JSON 77 支讀不進:62 BOM(utf-8-sig 可讀)· 13 語法(控制字元 / JSONC)· 2 空檔(vdf_network_report.json · CGE/Console/inventory/manifest.json)。",
+   "evidence": "json.loads 全樹 6457 支。",
+   "impact": "讀冊端若不吃 utf-8-sig 就是 77 個潛在 JSONDecodeError;CGE manifest 空檔碰到「CGE v0400 SEALED」的佐證。",
+   "resolution_proposal": "W1 Config Fix:去 BOM、跳脫控制字元、補或移除空檔(機械,可一批)。",
+   "rc1_blocking": false,
+   "history": [
+    {
+     "at": "2026-11-09T07:12:31Z",
+     "from": "OPEN",
+     "to": "FIXED",
+     "why": "W1 Config Fix:62 BOM 去除 · 12 控制字元逸出 → 77 → 3。餘 3:vdf_network_report.json 空 · CGE/Console/inventory/manifest.json 空(正主重出)· intake tsconfig.json JSONC(凍結)。"
+    }
+   ]
+  },
+  {
+   "id": "CONFLICT-00010",
+   "severity": "LOW",
+   "class": "Tool self-bug(沿用)",
+   "status": "FIXED",
+   "what": "ssot panorama「上下連結@VCGC」RED:正主呼叫失敗 AttributeError 'list' object has no attribute 'get'(第 203 次重複)。",
+   "evidence": "/tmp/rc1_ssotp.txt。",
+   "impact": "一格永遠紅,其他格的黃綠被它蓋住。",
+   "resolution_proposal": "W1 Bug Fix(CGC_MDL247 家族新版號)。",
+   "rc1_blocking": false,
+   "history": [
+    {
+     "at": "2026-11-09T07:12:31Z",
+     "from": "OPEN",
+     "to": "FIXED",
+     "why": "W1 Bug Fix:CGC_MDL245_SDDValidator_v0107 薄尾(tests 列表式視圖 + check_columns 逐項驗);check(write=False) 整輪跑完;上下連結@VCGC 不再假紅。修好後 X-COL 誠實標出 WKF025 / VDF-WKF015 缺 tests → 同輪補(VCGC v0134 · VDF v0107)。"
+    },
+    {
+     "at": "2026-11-09T07:36:56Z",
+     "from": "FIXED",
+     "to": "FIXED",
+     "why": "同病第二支:CGC_MDL246_ValidationSSOT v0100 check() 也寫死 tests 字典(handoff test validation_ssot_v0101 重跑 rc 1 AttributeError)→ v0102 薄尾 workflow_books 視圖;7/7 · 前版鏈 8/8。LESSON-0006 的『連續同一例外 = 工具病』再印證一次。"
+    }
+   ]
+  },
+  {
+   "id": "CONFLICT-00011",
+   "severity": "LOW",
+   "class": "Numbering/Registry lag",
+   "status": "FIXED",
+   "what": "缺號 5(VDF_MDL014_ThreeCodeUniverse_v0100 · VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310 · VRN_ENG115_HeaderFrameTemp_v0102 · VRN_ENG400_SixEngineShell_v0102 + 1)· 元件冊乾跑 新 9 · 變 23 · 過期 29 · 交接閘 RED 122(65 CHANGED_CODE_WITHOUT_TEST · 49 EVIDENCE_INVALID · 4 MODULE_UNREGISTERED · 4 ACCEL_BRIDGE_MISSING)。",
+   "evidence": "ssot panorama + handoff check 2026-11-09。",
+   "impact": "HOLD 條件「Missing Tool Registration」。",
+   "resolution_proposal": "W3:NumberingSystem --apply · registry-sync --apply;交接閘 122 筆分 VCGC 車道逐案(跨輪欠帳)。",
+   "rc1_blocking": false,
+   "history": [
+    {
+     "at": "2026-11-09T07:12:31Z",
+     "from": "OPEN",
+     "to": "FIXED",
+     "why": "W1:--apply --scope 4 檔 → +94 列 · 遺失 0 · 改身分 0 · 重號 0;registry-sync --apply 與整輪 --apply(新尾版 + WKF/STP/REQ 36 碼)在本輪閘序完成,見 HANDOFF_latest。"
+    }
+   ]
+  },
+  {
+   "id": "CONFLICT-00012",
+   "severity": "MEDIUM",
+   "class": "多 AI 版本分岔(VRN-2 啟動器)",
+   "status": "OPEN",
+   "what": "VRN-2 啟動器 ActivateVRN-2 本倉只有 docs 內的 release zip 到 v0132;本機 vrn2_work 最高 v0178;操作員表列 v0149+。管理器本倉尾版 v0262、本機 v0260。",
+   "evidence": "find ActivateVRN-2* · vrn2_work 掃描。",
+   "impact": "LESSON-0003 / 0004 現場:啟動器線 local-only、三個數字三個來源。",
+   "resolution_proposal": "W2:本機測過的那一版才上;上之前先掃 local ∪ origin/main 取號。",
+   "rc1_blocking": false
+  }
+ ],
+ "prior": "VIA_RC1_ConflictRegistry_v0101.json",
+ "updated_utc": "2026-11-09T10:05:56Z",
+ "why_v0101": "v0100 已併進 main(PR #613)→ 出新版。W1 六類修復後 4 筆帶理由轉態 FIXED(00008 · 00009 · 00010 · 00011);00002 / 00004 一度 PARTIAL(轉接殼),Codex #615 P1 判違版本律 → 撤回、回 OPEN,理由留在 history;其餘 6 筆沿用;沒有一筆消失。",
+ "why_v0102": "v0101 已併進 main(PR #615)→ 出新版。W2 第一項矩陣結果記進 00002 / 00004 的 history(狀態不變,仍 OPEN 待裁);沒有一筆消失。"
+}
