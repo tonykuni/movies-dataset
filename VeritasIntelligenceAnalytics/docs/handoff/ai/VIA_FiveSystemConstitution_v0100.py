@@ -15,6 +15,7 @@
   ⑥ 實測:五系統各自 --selftest(子程序 · 並行 · 各自逾時 · 一個紅不影響別人);rc 0 → GREEN,逾時 124 / 其他 → RED。
   ⑦ 進度帳:docs/handoff/ai/VIA_FiveSystem_Progress_v0100.jsonl 只增(每系統每輪一列);矩陣附每系統歷史次數 · 最近一次綠 · 連綠。
   ⑧ 輸出:VIA_FiveSystemConstitution_v0100.json / .md / VIA_FiveSystemConstitution_UI.html(Atlas --vl-* 鎖定色票)。
+  Codex PR 619(併入前就地修,本檔尚未上 main):P1 治理器 dry-run 擬發的號不算有號(只認落冊)· P1 --no-run 入口 sha 變了不沿用舊綠 · P1 加速器橋 / 網路橋(graceful)。
 
 用法:
   python3 docs/handoff/ai/VIA_FiveSystemConstitution_v0100.py run [--apply] [--no-run] [--timeout 900]
@@ -22,6 +23,37 @@
   python3 docs/handoff/ai/VIA_FiveSystemConstitution_v0100.py --selftest   (夾具樹 · 零網路 · 只在 tempfile 寫)
 """
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+
+# ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(批115 VDF 全導入令;graceful 零行為變更;本檔零網路,只掛路徑) =====
+VIA_NET_TOOL_PATH = None
+try:
+    from pathlib import Path as _nb_Path
+    _nb_p = _nb_Path(__file__).resolve()
+    while _nb_p.parent != _nb_p:
+        _nb_dir = _nb_p / "supportive modules" / "network"
+        if _nb_dir.exists():
+            _nb_hits = sorted(_nb_dir.glob("via_net_unified_v*.py"))
+            if _nb_hits:
+                VIA_NET_TOOL_PATH = str(_nb_hits[-1])
+            break
+        _nb_p = _nb_p.parent
+except Exception:
+    VIA_NET_TOOL_PATH = None
+# ===== [VIA:NET-BRIDGE:END] =====
 
 import concurrent.futures
 import datetime
@@ -178,32 +210,47 @@ def governor_dry(root: Path) -> dict:
             res = mod.govern(apply=False)
     except Exception as ex:                       # noqa: BLE001 —— 誠實回報,不冒充
         return {"available": False, "why": "%s: %s" % (type(ex).__name__, str(ex)[:160]), "engine": gp.name, "subs": [], "per_sub": {}}
+    per = summarize_governor(res, getattr(mod, "SUBS", ()))
+    return {"available": True, "engine": gp.name, "lamp": res.get("lamp"), "subs": list(per.keys()), "per_sub": per,
+            "summary": res.get("summary", {}), "notes": res.get("_notes", [])}
+
+
+def summarize_governor(res: dict, subs) -> dict:
+    """govern(apply=False) 的結果 → 每系統 功 / 表 紅黃綠留白。
+    留白 = 沒有號 **或** 號是本輪擬發、沒落冊(res.issued_fns / issued_tables 的鍵;dry-run 下治理器會把擬發的號放進 rec,但不寫
+    VIA_RegistryNumbers / VIA_TableNumbers)。只有落冊的號才算有號(Codex PR 619 P1:矩陣不得替沒發過的號背書)。"""
     per = {}
-    for s in getattr(mod, "SUBS", ()):
+    for s in subs:
         per[s] = {"fns": 0, "f_red": 0, "f_yellow": 0, "f_green": 0, "f_blank": 0, "blank_why": {},
-                  "tables": 0, "t_red": 0, "t_yellow": 0, "t_green": 0, "t_blank": 0}
-    for rec in res.get("fns", {}).values():
+                  "tables": 0, "t_red": 0, "t_yellow": 0, "t_green": 0, "t_blank": 0, "proposed_unissued": 0}
+    proposed_f = {e.get("key") for e in res.get("issued_fns", [])}
+    proposed_t = {e.get("key") for e in res.get("issued_tables", [])}
+    for key, rec in res.get("fns", {}).items():
         s = rec.get("sub")
         if s not in per:
             continue
         P = per[s]
         P["fns"] += 1
-        P["f_" + rec["lamp"].lower()] += 1
-        if not rec.get("code"):
+        P["f_" + str(rec.get("lamp", "YELLOW")).lower()] += 1
+        unissued = key in proposed_f
+        if not rec.get("code") or unissued:
             P["f_blank"] += 1
-            why = (rec.get("test") or "留白").split(":")[0]
+            why = "PROPOSED_UNISSUED" if unissued else (rec.get("test") or "留白").split(":")[0]
             P["blank_why"][why] = P["blank_why"].get(why, 0) + 1
-    for rec in res.get("tables", {}).values():
+            if unissued:
+                P["proposed_unissued"] += 1
+    for key, rec in res.get("tables", {}).items():
         s = rec.get("sub")
         if s not in per:
             continue
         P = per[s]
         P["tables"] += 1
-        P["t_" + rec["lamp"].lower()] += 1
-        if not rec.get("table_no"):
+        P["t_" + str(rec.get("lamp", "YELLOW")).lower()] += 1
+        if not rec.get("table_no") or key in proposed_t:
             P["t_blank"] += 1
-    return {"available": True, "engine": gp.name, "lamp": res.get("lamp"), "subs": list(per.keys()), "per_sub": per,
-            "summary": res.get("summary", {}), "notes": res.get("_notes", [])}
+            if key in proposed_t:
+                P["proposed_unissued"] += 1
+    return per
 
 
 # ───────────────────────── ④ 衝突冊 ─────────────────────────
@@ -367,7 +414,11 @@ def build(root: Path, systems: list | None = None, do_run: bool = True, governor
         elif "run" not in r:
             prog_prev = progress_of(history, r["sys"])
             last = prog_prev["last"] or {}
-            r["run"] = {"cmd": None, "rc": last.get("run_rc"), "secs": 0, "lamp": (last.get("run_lamp") or "GRAY"), "last": "--no-run · 沿用上一列進度 %s" % (last.get("ts") or "(無)"), "lines": 0, "reused": True}
+            same = bool(last) and last.get("entry_sha8") == r["entry_sha8"] and last.get("entry") == r["entry"]
+            if same:
+                r["run"] = {"cmd": None, "rc": last.get("run_rc"), "secs": 0, "lamp": (last.get("run_lamp") or "GRAY"), "last": "--no-run · 入口 sha %s 沒變 · 沿用上一列 %s" % (r["entry_sha8"], last.get("ts") or "(無)"), "lines": 0, "reused": True}
+            else:
+                r["run"] = {"cmd": None, "rc": None, "secs": 0, "lamp": "YELLOW", "last": "--no-run · 入口變了(舊 %s → 新 %s)· 未測,不沿用舊結果(AGENTS.md L11 相依變了要重測)" % (last.get("entry_sha8") or "無紀錄", r["entry_sha8"]), "lines": 0, "untested": True}
         if do_run and not r["external"] and r["_entry_path"] is not None:
             new_rows.append({"ts": ts, "run_id": run_id, "sys": r["sys"], "entry": r["entry"], "entry_version": r["entry_version"], "entry_sha8": r["entry_sha8"],
                              "number": r["number"], "constitution": r["constitution"]["status"], "constitution_lamp": r["constitution"]["lamp"],
@@ -583,6 +634,11 @@ def selftest() -> int:
         D3, rows3 = build(root, do_run=False, governor=False, ledger=ledger)
         by3 = {r["sys"]: r for r in D3["systems"]}
         chk("⑪ --no-run 沿用上一列進度(VQG RED · 不新增列)", by3["VQG"]["run"]["lamp"] == "RED" and by3["VQG"]["run"].get("reused") and rows3 == [])
+        (root / "functional modules/VDF/VDF_SystemManager_v0010.py").write_text("import sys; sys.exit(9)\n", encoding="utf-8")
+        D3b, _ = build(root, do_run=False, governor=False, ledger=ledger)
+        by3b = {r["sys"]: r for r in D3b["systems"]}
+        chk("⑪b --no-run 入口 sha 變了 → 不沿用舊綠:VDF YELLOW untested · VQG 仍沿用", by3b["VDF"]["run"]["lamp"] == "YELLOW" and by3b["VDF"]["run"].get("untested") and not by3b["VDF"]["run"].get("reused") and by3b["VQG"]["run"].get("reused"), json.dumps(by3b["VDF"]["run"], ensure_ascii=False)[:200])
+        (root / "functional modules/VDF/VDF_SystemManager_v0010.py").write_text("import sys; print('VDF ok'); sys.exit(0)\n", encoding="utf-8")
         chk("⑫ SSOT 冊取尾版(VDF_SSOT_Register v0002)· 不在的標 ✘", any(s["tail"] and s["tail"].endswith("VDF_SSOT_Register_v0002.json") for s in by["VDF"]["ssot"]) and any(not s["present"] for s in by["VDF"]["ssot"]))
         # 逾時 → rc 124 RED
         (root / "functional modules/VAP/VAP_SystemManager_v0001.py").write_text("import time; time.sleep(5)\n", encoding="utf-8")
@@ -591,9 +647,22 @@ def selftest() -> int:
         md, ui = to_md(D2), to_ui(D2)
         chk("⑭ 輸出:md 有矩陣表 · UI 用 --vl-* 色票 · 無 <html>/<body> 骨架 · 有雙主題", "| 系統 |" in md and "--vl-success-bg" in ui and "<html" not in ui and "<body" not in ui and 'data-theme="dark"' in ui and "prefers-color-scheme" in ui)
         chk("⑮ 分開命名:輸出寫 VRN-2 / VRN-1,不出現籠統「| VRN |」列", "| VRN-2 |" in md and "| VRN-1 |" in md and "| VRN |" not in md)
+    fake = {"fns": {"VDF|a|v1": {"sub": "VDF", "lamp": "GREEN", "code": "VIA-VDF-MDL900", "test": "PASS"},      # dry-run 擬發(在 issued_fns)→ 留白
+                    "VDF|b|v1": {"sub": "VDF", "lamp": "GREEN", "code": "VIA-VDF-MDL001", "test": None},        # 落冊的號 → 有號
+                    "VDF|c|v1": {"sub": "VDF", "lamp": "YELLOW", "code": "", "test": "WAIT:父檔未有號"},
+                    "VRN|d|v1": {"sub": "VRN", "lamp": "RED", "code": "", "test": "FAIL:x"}},
+            "tables": {"VDF|t1|h": {"sub": "VDF", "lamp": "GREEN", "table_no": "SSOT-VCGC-VDF-TBL0009"}},
+            "issued_fns": [{"key": "VDF|a|v1", "code": "VIA-VDF-MDL900"}], "issued_tables": [{"key": "VDF|t1|h", "table_no": "SSOT-VCGC-VDF-TBL0009"}]}
+    g = summarize_governor(fake, ("VDF", "VRN"))
+    chk("⑯b 治理器 dry-run 擬發的號不算有號:VDF 功留白 2(擬發 1 + WAIT 1)· 表留白 1(擬發)· VRN 紅 1 留白 1",
+        g["VDF"]["f_blank"] == 2 and g["VDF"]["blank_why"].get("PROPOSED_UNISSUED") == 1 and g["VDF"]["blank_why"].get("WAIT") == 1 and g["VDF"]["t_blank"] == 1 and g["VDF"]["proposed_unissued"] == 2 and g["VRN"]["f_red"] == 1 and g["VRN"]["f_blank"] == 1, json.dumps(g, ensure_ascii=False)[:300])
+    lamp_c, st_c, _ = constitution("VIA-VDF-MDL001", g["VDF"], True, [], False)
+    chk("⑯c 擬發未落冊 → 憲法性只到 YELLOW PARTIAL_BLANK,不給 GREEN", lamp_c == "YELLOW" and st_c == "PARTIAL_BLANK", st_c)
     src = Path(__file__).read_text(encoding="utf-8")
     body = src.split("def selftest", 1)[0]
-    chk("⑯ 紀律:零網路 · 不 pip · 不設 VIA_NET_CONSENT / VIA_SCRAPE_CONSENT · 只寫 ALLOWED_WRITES + 進度帳", "VIA_NET_" + "CONSENT" not in body and "VIA_SCRAPE_" + "CONSENT" not in body and "pip install" not in body and "urllib" not in body and "requests" not in body.replace("subprocess", ""))
+    chk("⑯ 紀律:加速器橋 · 網路橋在(from __future__ 之後)· 零網路 · 不 pip · 不設 VIA_NET_CONSENT / VIA_SCRAPE_CONSENT · 只寫 ALLOWED_WRITES + 進度帳",
+        "[VIA:ACCEL-BRIDGE:v0100]" in body and "[VIA:NET-BRIDGE:v0100]" in body and body.index("from __future__") < body.index("[VIA:ACCEL-BRIDGE:v0100]")
+        and "VIA_NET_" + "CONSENT" not in body and "VIA_SCRAPE_" + "CONSENT" not in body and "pip install" not in body and "urllib" not in body and "requests" not in body.replace("subprocess", ""))
     # 實樹:五系統入口都解析得到(不跑子程序)
     real_ok = True
     detail = []
