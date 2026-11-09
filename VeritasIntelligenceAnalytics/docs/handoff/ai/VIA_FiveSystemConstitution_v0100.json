@@ -1,0 +1,590 @@
+{
+ "engine": "VIA_FiveSystemConstitution_v0100",
+ "law": "L125",
+ "generated_utc": "2026-11-09T11:37:14Z",
+ "run_id": "20261109T113714Z",
+ "root": "/home/user/movies-dataset/VeritasIntelligenceAnalytics",
+ "lamp": "RED",
+ "counts": {
+  "systems": 5,
+  "run_green": 5,
+  "run_red": 0,
+  "constitutional": 0,
+  "blank": 0,
+  "conflict_open_total": 6,
+  "ledger_rows_before": 0,
+  "ledger_rows_added": 5
+ },
+ "rule": {
+  "L125": "五系統各自 MAIN() SSOT 主導;編號預設空著;衝突解了 + VCGC 偵測無誤發號 → 號才有憲法性;唯一跨系統關聯 = 編號;引擎能實跑一個收一個、每次記進度、互不影響完成度;VRN-1 倉外只讀",
+  "lamps": "憲法性:GREEN 入口有號·治理器紅0黃0·留白0·衝突0 / YELLOW 有號但留白·黃·未登記治理器 / RED 空號·衝突 OPEN·治理器紅;實測:rc 0 GREEN · 逾時 124 / 其他 RED;總燈 = 各系統(憲法性 × 實測)取最差,VRN-1 GRAY 不算"
+ },
+ "governor": {
+  "available": true,
+  "engine": "CGC_MDL270_RegistryGovernor_v0106.py",
+  "lamp": "YELLOW",
+  "subs": [
+   "VCGC",
+   "VDF",
+   "VRN"
+  ],
+  "summary": {
+   "tables": 269,
+   "t_red": 0,
+   "t_yellow": 229,
+   "t_green": 40,
+   "t_issued": 0,
+   "fns": 20587,
+   "f_red": 0,
+   "f_yellow": 6677,
+   "f_green": 13879,
+   "f_issued": 0,
+   "books": {
+    "VCGC": {
+     "table": "VCGC_TableHeader_v0100.json",
+     "fn": "VCGC_FunctionMatrix_v0100.json"
+    },
+    "VDF": {
+     "table": "VDF_TableHeader_v0100.json",
+     "fn": "VDF_FunctionMatrix_v0100.json"
+    },
+    "VRN": {
+     "table": "VRN_TableHeader_v0100.json",
+     "fn": "VRN_FunctionMatrix_v0100.json"
+    }
+   }
+  },
+  "notes": []
+ },
+ "conflicts_open": [
+  {
+   "id": "CONFLICT-00002",
+   "severity": "MEDIUM",
+   "status": "OPEN",
+   "what": "VeritasAegisNexus(網路橋本體)在活目錄有 8 份、4 種內容。"
+  },
+  {
+   "id": "CONFLICT-00004",
+   "severity": "HIGH",
+   "status": "OPEN",
+   "what": "114 個 .py 檔名在多個活目錄重複;其中治理核心各 3 份:VIA_EnvManager.py · VIA_SSOT_Unified.py · VIA_RegistryCore_v1.py · VIA_Runtime_Bridge_All_in_One.py · VIA_Panorama_AST_RuntimeI"
+  },
+  {
+   "id": "CONFLICT-00005",
+   "severity": "MEDIUM",
+   "status": "OPEN",
+   "what": "277 個 `_sha<hex8>` 分身檔(例 VIA_Panorama_AST_RuntimeInjector_sha63cefe28.py · StartVIAUnified_shaa1b427ff.ps1)。"
+  },
+  {
+   "id": "CONFLICT-00006",
+   "severity": "MEDIUM",
+   "status": "OPEN(沿用 · 待操作員裁)",
+   "what": "15 組同一編號掛不同名:VCGC 8(CGC_MDL135 EnvGovernance/EnvPlan · CGC_MDL142 AccelImport/TWNameBook · CGC_MDL149 BoxesFlow/ChainAll/Closeout/EntryLock/FilenameCut/GreenMat"
+  },
+  {
+   "id": "CONFLICT-00007",
+   "severity": "LOW",
+   "status": "OPEN",
+   "what": "275 個遠端分支(vcgc 138 · 根 54 · claude 30 · codex 11 …);抽樣 12 支非 claude 分支各有 1104–3342 筆未併入 main 的提交。"
+  },
+  {
+   "id": "CONFLICT-00012",
+   "severity": "MEDIUM",
+   "status": "OPEN",
+   "what": "VRN-2 啟動器 ActivateVRN-2 本倉只有 docs 內的 release zip 到 v0132;本機 vrn2_work 最高 v0178;操作員表列 v0149+。管理器本倉尾版 v0262、本機 v0260。"
+  }
+ ],
+ "systems": [
+  {
+   "sys": "VCGC",
+   "sub": "VCGC",
+   "external": false,
+   "entry": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0192.py",
+   "entry_version": "v0192",
+   "entry_sha8": "5d968efa",
+   "entry_lines": 200,
+   "number": "VIA-VCGC-MDL1625",
+   "numberbook_rows": 8448,
+   "ssot": [
+    {
+     "pattern": "supportive modules/registry/VIA_Policy_Laws_SSOT_v*.json",
+     "tail": "supportive modules/registry/VIA_Policy_Laws_SSOT_v0114.json",
+     "present": true
+    },
+    {
+     "pattern": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
+     "tail": "supportive modules/registry/VIA_Requirements_SSOT_v0234.json",
+     "present": true
+    },
+    {
+     "pattern": "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v*.json",
+     "tail": "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0136.json",
+     "present": true
+    },
+    {
+     "pattern": "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v*.json",
+     "tail": "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0209.json",
+     "present": true
+    },
+    {
+     "pattern": "supportive modules/registry/VIA_Numbering_SSOT_v*.json",
+     "tail": "supportive modules/registry/VIA_Numbering_SSOT_v0100.json",
+     "present": true
+    },
+    {
+     "pattern": "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v*.json",
+     "tail": "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json",
+     "present": true
+    }
+   ],
+   "conflicts": [
+    {
+     "id": "CONFLICT-00006",
+     "severity": "MEDIUM",
+     "status": "OPEN(沿用 · 待操作員裁)",
+     "what": "15 組同一編號掛不同名:VCGC 8(CGC_MDL135 EnvGovernance/EnvPlan · CGC_MDL142 AccelImport/TWNameBook · CGC_MDL149 BoxesFlow/ChainAll/Closeout/EntryLock/FilenameCut/GreenMat"
+    }
+   ],
+   "note": "",
+   "governor": {
+    "fns": 16196,
+    "f_red": 0,
+    "f_yellow": 5565,
+    "f_green": 10631,
+    "f_blank": 11,
+    "blank_why": {
+     "WAIT": 11
+    },
+    "tables": 68,
+    "t_red": 0,
+    "t_yellow": 53,
+    "t_green": 15,
+    "t_blank": 0,
+    "in_governor": true
+   },
+   "constitution": {
+    "lamp": "RED",
+    "status": "CONFLICT_OPEN",
+    "why": "衝突冊 OPEN 1 項點到本系統 → 號不生效,先裁衝突"
+   },
+   "run": {
+    "cmd": [
+     "CGC_MDL149_VeritasCentralGovernanceConsole_v0192.py",
+     "--selftest"
+    ],
+    "rc": 0,
+    "secs": 42.5,
+    "lamp": "GREEN",
+    "last": "  \"\"\"券商正典:CJK 別名子字串;拉丁別名詞界;≤3 字拉丁(gs/ms/mq/ubs)大寫獨立詞,或小寫但緊鄰檔名黏接字([_\\-0-9]);",
+    "lines": 397
+   },
+   "progress": {
+    "runs": 1,
+    "greens": 1,
+    "last_green": "2026-11-09T11:37:14Z",
+    "streak": 1,
+    "last": {
+     "ts": "2026-11-09T11:37:14Z",
+     "run_id": "20261109T113714Z",
+     "sys": "VCGC",
+     "entry": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0192.py",
+     "entry_version": "v0192",
+     "entry_sha8": "5d968efa",
+     "number": "VIA-VCGC-MDL1625",
+     "constitution": "CONFLICT_OPEN",
+     "constitution_lamp": "RED",
+     "conflicts_open": 1,
+     "run_rc": 0,
+     "run_secs": 42.5,
+     "run_lamp": "GREEN",
+     "engine": "VIA_FiveSystemConstitution_v0100"
+    }
+   },
+   "lamp": "RED"
+  },
+  {
+   "sys": "VDF",
+   "sub": "VDF",
+   "external": false,
+   "entry": "functional modules/VDF/VDF_SystemManager_v0168.py",
+   "entry_version": "v0168",
+   "entry_sha8": "95e25526",
+   "entry_lines": 141,
+   "number": "VIA-VDF-MDL237",
+   "numberbook_rows": 4223,
+   "ssot": [
+    {
+     "pattern": "functional modules/VDF/registry/VDF_SSOT_Register_v*.json",
+     "tail": "functional modules/VDF/registry/VDF_SSOT_Register_v0104.json",
+     "present": true
+    },
+    {
+     "pattern": "functional modules/VDF/VDF_FetchSystem_SSOT_v*.json",
+     "tail": "functional modules/VDF/VDF_FetchSystem_SSOT_v0107.json",
+     "present": true
+    },
+    {
+     "pattern": "functional modules/VDF/VDF_InputUniverse_SSOT_v*.json",
+     "tail": "functional modules/VDF/VDF_InputUniverse_SSOT_v0104.json",
+     "present": true
+    },
+    {
+     "pattern": "functional modules/VDF/VDF_DataHome_SSOT_v*.json",
+     "tail": "functional modules/VDF/VDF_DataHome_SSOT_v0101.json",
+     "present": true
+    },
+    {
+     "pattern": "supportive modules/registry/VIA_Workflow_VDF_SSOT_v*.json",
+     "tail": "supportive modules/registry/VIA_Workflow_VDF_SSOT_v0107.json",
+     "present": true
+    }
+   ],
+   "conflicts": [
+    {
+     "id": "CONFLICT-00004",
+     "severity": "HIGH",
+     "status": "OPEN",
+     "what": "114 個 .py 檔名在多個活目錄重複;其中治理核心各 3 份:VIA_EnvManager.py · VIA_SSOT_Unified.py · VIA_RegistryCore_v1.py · VIA_Runtime_Bridge_All_in_One.py · VIA_Panorama_AST_RuntimeI"
+    },
+    {
+     "id": "CONFLICT-00005",
+     "severity": "MEDIUM",
+     "status": "OPEN",
+     "what": "277 個 `_sha<hex8>` 分身檔(例 VIA_Panorama_AST_RuntimeInjector_sha63cefe28.py · StartVIAUnified_shaa1b427ff.ps1)。"
+    },
+    {
+     "id": "CONFLICT-00006",
+     "severity": "MEDIUM",
+     "status": "OPEN(沿用 · 待操作員裁)",
+     "what": "15 組同一編號掛不同名:VCGC 8(CGC_MDL135 EnvGovernance/EnvPlan · CGC_MDL142 AccelImport/TWNameBook · CGC_MDL149 BoxesFlow/ChainAll/Closeout/EntryLock/FilenameCut/GreenMat"
+    }
+   ],
+   "note": "",
+   "governor": {
+    "fns": 1318,
+    "f_red": 0,
+    "f_yellow": 457,
+    "f_green": 861,
+    "f_blank": 10,
+    "blank_why": {
+     "WAIT": 10
+    },
+    "tables": 75,
+    "t_red": 0,
+    "t_yellow": 69,
+    "t_green": 6,
+    "t_blank": 0,
+    "in_governor": true
+   },
+   "constitution": {
+    "lamp": "RED",
+    "status": "CONFLICT_OPEN",
+    "why": "衝突冊 OPEN 3 項點到本系統 → 號不生效,先裁衝突"
+   },
+   "run": {
+    "cmd": [
+     "VDF_SystemManager_v0168.py",
+     "--selftest"
+    ],
+    "rc": 0,
+    "secs": 158.3,
+    "lamp": "GREEN",
+    "last": "refill: error: unrecognized arguments: --nope",
+    "lines": 546
+   },
+   "progress": {
+    "runs": 1,
+    "greens": 1,
+    "last_green": "2026-11-09T11:37:14Z",
+    "streak": 1,
+    "last": {
+     "ts": "2026-11-09T11:37:14Z",
+     "run_id": "20261109T113714Z",
+     "sys": "VDF",
+     "entry": "functional modules/VDF/VDF_SystemManager_v0168.py",
+     "entry_version": "v0168",
+     "entry_sha8": "95e25526",
+     "number": "VIA-VDF-MDL237",
+     "constitution": "CONFLICT_OPEN",
+     "constitution_lamp": "RED",
+     "conflicts_open": 3,
+     "run_rc": 0,
+     "run_secs": 158.3,
+     "run_lamp": "GREEN",
+     "engine": "VIA_FiveSystemConstitution_v0100"
+    }
+   },
+   "lamp": "RED"
+  },
+  {
+   "sys": "VRN-2",
+   "sub": "VRN",
+   "external": false,
+   "entry": "functional modules/VRN/VRN_SystemManager_v0262.py",
+   "entry_version": "v0262",
+   "entry_sha8": "9028f26d",
+   "entry_lines": 157,
+   "number": "VIA-VRN-MDL331",
+   "numberbook_rows": 1461,
+   "ssot": [
+    {
+     "pattern": "functional modules/VRN/SSOT/VRN2_SSOT_v*.json",
+     "tail": "functional modules/VRN/SSOT/VRN2_SSOT_v0101.json",
+     "present": true
+    },
+    {
+     "pattern": "functional modules/VRN/registry/VRN_SSOT_Index_v*.json",
+     "tail": "functional modules/VRN/registry/VRN_SSOT_Index_v0101.json",
+     "present": true
+    },
+    {
+     "pattern": "functional modules/VRN/SSOT/VRN_FinLexicon_SSOT_v*.json",
+     "tail": "functional modules/VRN/SSOT/VRN_FinLexicon_SSOT_v0109.json",
+     "present": true
+    },
+    {
+     "pattern": "functional modules/VRN/VRN_FrameFlow_SSOT_v*.json",
+     "tail": "functional modules/VRN/VRN_FrameFlow_SSOT_v0102.json",
+     "present": true
+    }
+   ],
+   "conflicts": [
+    {
+     "id": "CONFLICT-00012",
+     "severity": "MEDIUM",
+     "status": "OPEN",
+     "what": "VRN-2 啟動器 ActivateVRN-2 本倉只有 docs 內的 release zip 到 v0132;本機 vrn2_work 最高 v0178;操作員表列 v0149+。管理器本倉尾版 v0262、本機 v0260。"
+    }
+   ],
+   "note": "",
+   "governor": {
+    "fns": 3073,
+    "f_red": 0,
+    "f_yellow": 676,
+    "f_green": 2397,
+    "f_blank": 10,
+    "blank_why": {
+     "WAIT": 10
+    },
+    "tables": 126,
+    "t_red": 0,
+    "t_yellow": 107,
+    "t_green": 19,
+    "t_blank": 0,
+    "in_governor": true
+   },
+   "constitution": {
+    "lamp": "RED",
+    "status": "CONFLICT_OPEN",
+    "why": "衝突冊 OPEN 1 項點到本系統 → 號不生效,先裁衝突"
+   },
+   "run": {
+    "cmd": [
+     "VRN_SystemManager_v0262.py",
+     "--selftest"
+    ],
+    "rc": 0,
+    "secs": 4.1,
+    "lamp": "GREEN",
+    "last": "[計] VRN-2 SystemManager v0262(VRN_SystemManager_v0262.py)自測 5/5 · PASS · 前版鏈 rc 0 · 鏈 v0262→v0261→v0256→v0254→v0253→v0249→v0248→v0245→v0244→v0242",
+    "lines": 15
+   },
+   "progress": {
+    "runs": 1,
+    "greens": 1,
+    "last_green": "2026-11-09T11:37:14Z",
+    "streak": 1,
+    "last": {
+     "ts": "2026-11-09T11:37:14Z",
+     "run_id": "20261109T113714Z",
+     "sys": "VRN-2",
+     "entry": "functional modules/VRN/VRN_SystemManager_v0262.py",
+     "entry_version": "v0262",
+     "entry_sha8": "9028f26d",
+     "number": "VIA-VRN-MDL331",
+     "constitution": "CONFLICT_OPEN",
+     "constitution_lamp": "RED",
+     "conflicts_open": 1,
+     "run_rc": 0,
+     "run_secs": 4.1,
+     "run_lamp": "GREEN",
+     "engine": "VIA_FiveSystemConstitution_v0100"
+    }
+   },
+   "lamp": "RED"
+  },
+  {
+   "sys": "VQG",
+   "sub": "VQG",
+   "external": false,
+   "entry": "functional modules/VQG/VQG_AllInOne_v0107.py",
+   "entry_version": "v0107",
+   "entry_sha8": "7e278523",
+   "entry_lines": 732,
+   "number": "VIA-VQG-MDL004",
+   "numberbook_rows": 7,
+   "ssot": [],
+   "conflicts": [],
+   "note": "",
+   "governor": {
+    "in_governor": false
+   },
+   "constitution": {
+    "lamp": "YELLOW",
+    "status": "NOT_IN_L122_GOVERNOR",
+    "why": "入口有號,但本系統尚未登記 L122 表頭冊 / 功能矩陣(治理器 SUBS 外)→ 只有檔號,子項無號"
+   },
+   "run": {
+    "cmd": [
+     "VQG_AllInOne_v0107.py",
+     "selftest"
+    ],
+    "rc": 0,
+    "secs": 5.2,
+    "lamp": "GREEN",
+    "last": "[計] VDF 庫根 /tmp/tmp4d5mw797/vdf_database(環境變數 VQG_VDF_ROOT)",
+    "lines": 14
+   },
+   "progress": {
+    "runs": 1,
+    "greens": 1,
+    "last_green": "2026-11-09T11:37:14Z",
+    "streak": 1,
+    "last": {
+     "ts": "2026-11-09T11:37:14Z",
+     "run_id": "20261109T113714Z",
+     "sys": "VQG",
+     "entry": "functional modules/VQG/VQG_AllInOne_v0107.py",
+     "entry_version": "v0107",
+     "entry_sha8": "7e278523",
+     "number": "VIA-VQG-MDL004",
+     "constitution": "NOT_IN_L122_GOVERNOR",
+     "constitution_lamp": "YELLOW",
+     "conflicts_open": 0,
+     "run_rc": 0,
+     "run_secs": 5.2,
+     "run_lamp": "GREEN",
+     "engine": "VIA_FiveSystemConstitution_v0100"
+    }
+   },
+   "lamp": "YELLOW"
+  },
+  {
+   "sys": "VAP",
+   "sub": "VAP",
+   "external": false,
+   "entry": "functional modules/VAP/VAP_SystemManager_v0100.py",
+   "entry_version": "v0100",
+   "entry_sha8": "0a09a97a",
+   "entry_lines": 47,
+   "number": "VIA-VAP-MDL014",
+   "numberbook_rows": 105,
+   "ssot": [
+    {
+     "pattern": "functional modules/VAP/VAP_Subsystem_Manifest.json",
+     "tail": "functional modules/VAP/VAP_Subsystem_Manifest.json",
+     "present": true
+    },
+    {
+     "pattern": "functional modules/VAP/VAP_Param_Registry_v*.json",
+     "tail": "functional modules/VAP/VAP_Param_Registry_v0100.json",
+     "present": true
+    }
+   ],
+   "conflicts": [],
+   "note": "",
+   "governor": {
+    "in_governor": false
+   },
+   "constitution": {
+    "lamp": "YELLOW",
+    "status": "NOT_IN_L122_GOVERNOR",
+    "why": "入口有號,但本系統尚未登記 L122 表頭冊 / 功能矩陣(治理器 SUBS 外)→ 只有檔號,子項無號"
+   },
+   "run": {
+    "cmd": [
+     "VAP_SystemManager_v0100.py",
+     "--selftest"
+    ],
+    "rc": 0,
+    "secs": 0.3,
+    "lamp": "GREEN",
+    "last": "  [OK]",
+    "lines": 3
+   },
+   "progress": {
+    "runs": 1,
+    "greens": 1,
+    "last_green": "2026-11-09T11:37:14Z",
+    "streak": 1,
+    "last": {
+     "ts": "2026-11-09T11:37:14Z",
+     "run_id": "20261109T113714Z",
+     "sys": "VAP",
+     "entry": "functional modules/VAP/VAP_SystemManager_v0100.py",
+     "entry_version": "v0100",
+     "entry_sha8": "0a09a97a",
+     "number": "VIA-VAP-MDL014",
+     "constitution": "NOT_IN_L122_GOVERNOR",
+     "constitution_lamp": "YELLOW",
+     "conflicts_open": 0,
+     "run_rc": 0,
+     "run_secs": 0.3,
+     "run_lamp": "GREEN",
+     "engine": "VIA_FiveSystemConstitution_v0100"
+    }
+   },
+   "lamp": "YELLOW"
+  },
+  {
+   "sys": "VRN-1",
+   "sub": null,
+   "external": true,
+   "entry": null,
+   "entry_version": null,
+   "entry_sha8": null,
+   "entry_lines": 0,
+   "number": "",
+   "numberbook_rows": 0,
+   "ssot": [],
+   "conflicts": [],
+   "note": "另一團隊的倉 tonykuni/VIA-VDF-VRN · 本倉只讀它自報的結果,不跑、不寫、不出版號(L123)",
+   "governor": {
+    "in_governor": false
+   },
+   "constitution": {
+    "lamp": "GRAY",
+    "status": "EXTERNAL_READONLY",
+    "why": "倉外只讀 · 不在本倉號冊 · 不發號(L123)"
+   },
+   "run": {
+    "cmd": null,
+    "rc": null,
+    "secs": 0,
+    "lamp": "GRAY",
+    "last": "倉外只讀 · 不跑",
+    "lines": 0
+   },
+   "progress": {
+    "runs": 0,
+    "greens": 0,
+    "last_green": null,
+    "streak": 0,
+    "last": null
+   },
+   "lamp": "GRAY"
+  }
+ ],
+ "ledger": "docs/handoff/ai/VIA_FiveSystem_Progress_v0100.jsonl",
+ "writes": [
+  "docs/handoff/ai/VIA_FiveSystemConstitution_v0100.json",
+  "docs/handoff/ai/VIA_FiveSystemConstitution_v0100.md",
+  "docs/handoff/ai/VIA_FiveSystemConstitution_UI.html",
+  "docs/handoff/ai/VIA_FiveSystem_Progress_v0100.jsonl"
+ ],
+ "not_in_scope": [
+  "不發號、不寫任何系統的冊 / 正本 / 號冊(發號只經 VCGC run CGC_MDL237 --apply --scope · L122 治理器 --apply,都要操作員授權)",
+  "不裁衝突:衝突冊 OPEN 項只點名歸屬,解法由操作員 + AI 裁定書(L122 ④)",
+  "VRN-1 倉外:不 clone、不跑、不評分(L123)"
+ ]
+}
