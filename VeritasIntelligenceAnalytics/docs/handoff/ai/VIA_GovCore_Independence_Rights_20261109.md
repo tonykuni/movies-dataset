@@ -7,20 +7,20 @@
 
 | 規則 | 驗法 | 結果 |
 |---|---|---|
-| 五系統各自獨立(L123 互不干涉) | 治理核心是 supportive modules 共用層;看每個車道對它的載入是「只讀借用」還是「寫入」 | 載入 **1670 列**全是讀;TREE 寫入者 **0** |
+| 五系統各自獨立(L123 互不干涉) | 治理核心是 supportive modules 共用層;看每個車道對它的載入是「只讀借用」還是「寫入」 | 載入 **1334 列**全是讀;TREE 寫入者 **0** |
 | 互相協助只准只讀 | 車道 × 家族載入矩陣(下表);跨車道 import 另冊 | 見矩陣;VQG 0 列(它不碰治理核心),VAP 4 列 |
 | 改動權只在操作員與 AI(經 PR) | 靜態掃所有會寫治理核心模組檔的呼叫(open 寫模式 · write_text/bytes · unlink/rename/replace · shutil.copy/move),目標必須是 X.py / X_v####.py | **GREEN**:樹上 0 筆;46 筆全是自測夾具寫 tempfile 暫存夾(VRN2_MarketFetch v0105–v0112 · SUP_MDL144 IfEngine · CGC_MDL248 FullCheck · CGC_MDL234) |
 
-## 二、各獨立系統 × 治理核心(載入列數;只讀借用;含治理件彼此的載入,Codex PR 616 P2 後補)
+## 二、各獨立系統 × 治理核心(載入列數;只讀借用)
 
 | 家族 | CORE | SUP | VAP | VCGC | VDF | VRN |
 |---|---|---|---|---|---|---|
-| VIA_EnvManager | 8 | 176 | 2 | 149 | 0 | 44 |
-| VIA_RegistryCore_v1 | 2 | 89 | 0 | 26 | 4 | 33 |
-| VIA_Panorama_AST_RuntimeInjector | 2 | 66 | 0 | 8 | 0 | 33 |
-| VIA_Runtime_Bridge_All_in_One | 2 | 77 | 0 | 16 | 0 | 33 |
-| VIA_SSOT_Unified | 3 | 126 | 0 | 32 | 10 | 58 |
-| VeritasAegisNexus | 2 | 173 | 2 | 255 | 53 | 186 |
+| VIA_EnvManager | 6 | 106 | 2 | 145 | 0 | 44 |
+| VIA_RegistryCore_v1 | 0 | 43 | 0 | 19 | 4 | 33 |
+| VIA_Panorama_AST_RuntimeInjector | 0 | 30 | 0 | 6 | 0 | 33 |
+| VIA_Runtime_Bridge_All_in_One | 0 | 44 | 0 | 10 | 0 | 33 |
+| VIA_SSOT_Unified | 0 | 75 | 0 | 30 | 10 | 58 |
+| VeritasAegisNexus | 2 | 110 | 2 | 250 | 53 | 186 |
 
 讀法:數字是靜態掃到的「引用列」(裸 import · 字面路徑 · 只給名字),不是執行期次數。VRN 的大量「只給名字」列是插件載入器拿 `ssot_dir` 與其上層當搜尋夾(桌機設定值),倉內靜態推不出落點 —— 這是 VRN 與 VCGC 可能各載到不同副本的真正風險點,也是為什麼去重前要先裁正本。
 
@@ -29,13 +29,12 @@
 | 家族 | 燈 | 副本 | 內容組 | 正本候選 |
 |---|---|---|---|---|
 | VIA_EnvManager | YELLOW | 3 | 1 | —(要裁) |
-| VIA_RegistryCore_v1 | YELLOW | 3 | 1 | —(位元相同;20_Registry_SSOT 份有 3 個載入者:10_Core_Runtime 橋 v018 adapter 指名它)|
+| VIA_RegistryCore_v1 | YELLOW | 3 | 1 | —(要裁) |
 | VIA_Panorama_AST_RuntimeInjector | YELLOW | 3 | 1 | —(要裁) |
 | VIA_Runtime_Bridge_All_in_One | YELLOW | 3 | 2 | supportive modules/10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py |
 | VIA_SSOT_Unified | YELLOW | 3 | 2 | supportive modules/ssot/VIA_SSOT_Unified.py |
 | VeritasAegisNexus | RED | 8 | 5 | supportive modules/network/VeritasAegisNexus_v1652.py |
 
-- 治理件彼此也互載:10_Core_Runtime 的 Runtime Bridge(v018 canonical adapter)以路徑指名 20_Registry_SSOT 的 RegistryCore 與 SSOT_Unified、50_Protection_Acceleration 的 AegisNexus —— 所以編號夾那幾份不是「無載入者可退」,要先遷這條橋。
 - 多頭的根因是**三種目錄慣例並存**:平鋪根(加速器橋插 sys.path → 裸 import 落這裡)· 編號夾 10_–50_(10_Core_Runtime Runtime Bridge 的 v018 canonical adapter 指名)· 主題夾 environment/registry/ssot/network(VRN 插件載入器以 ssot_dir 搜尋)。
 - 兩處「超集」是好消息:`10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py` = 根 + 79 行 append-only(v018 adapter);`ssot/VIA_SSOT_Unified.py` = 根 + 95 行 append-only(同義字計數三塊)。超集就是正本候選,子集可退。
 - 一處真分岔:根 `VeritasAegisNexus.py`(= network/_v1651 位元相同,8438 行)與三份 5186 行副本(各自獨有 45 行)。鎖冊尾版是 network/_v1652(薄尾),SUP_MDL737 v0110 已把裸 import 接到它;三份 5186 行副本只剩 29 筆字面路徑引用指向平鋪根那一份 → 要操作員裁:v1651 體系為正本,5186 行那 45 行要不要保。
