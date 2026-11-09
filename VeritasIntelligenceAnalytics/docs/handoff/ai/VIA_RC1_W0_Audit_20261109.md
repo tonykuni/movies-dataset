@@ -1,6 +1,6 @@
 # VIA RC-1 W0 凍結審計 · P8 報告(v2.1 · 2026-11-09)
 
-`[MODE] RC-1 READONLY` · `[GO] NO-GO` · 審計基底 main `366551b4f`(PR #612 併入後)· 全程唯讀:零程式修改、零部署、零 registry 寫入。
+`[MODE] RC-1 READONLY` · `[GO] NO-GO` · 審計基底 main `366551b4f`(PR #612 併入後)· 全程唯讀:零程式修改、零部署、零 registry 寫入。本版修正 Codex #613 兩項:VDF 改 PENDING(reader chain 收據未取得)· 薄尾 retire 準則改相依鏈驗證。
 
 ## CURRENT STATE
 
@@ -19,7 +19,7 @@
 | 系統 | 燈 | 入口 | 證據 | RC-1 PASS? |
 |---|---|---|---|---|
 | VCGC | **YELLOW** | `CGC_MDL149_…Console_v0192 test --quick` | 2026-11-08 串測收據 20261108T163926Z:YELLOW · 站 11(綠 9 · 黃 2 · 紅 0)· case 245/245 · workflow 126/126;交接閘 RED 122;token 6/6;compile:CGC_MDL180 v0100 已被 v0101 取代 | ✘ 自己的判決是 YELLOW(兩站黃:交接閘跨輪欠帳 · 無 pwsh)→ 不是 PASS |
-| VDF | **GREEN*** | `VDF_SystemManager_v0168 --selftest` | 收據:本版 6/6 · 前版鏈 PASS;NET-BRIDGE 活尾版 100%(83/83 v0100);compile:ENG088 v0103 已被 v0105 取代;缺號 1 | ✔ *reader chain「V018E/F 封印 12/12 · DUCKDB_PASS」樹內找不到同名件,容器沒跑 → 該項 GRAY;PASS 只涵蓋自測 + 橋接 |
+| VDF | **YELLOW** | `VDF_SystemManager_v0168 --selftest` | 自測:本版 6/6 · 前版鏈 PASS(收據 20261108T163926Z)· NET-BRIDGE 活尾版 100%(83/83 v0100)· compile:ENG088 v0103 已被 v0105 取代 · 缺號 1 · reader chain 封印(V018E/F 12/12 · DUCKDB_PASS)收據未取得:樹內無同名件、容器沒跑 | ✘ VDF DoD = reader chain 封印 + 橋接 100%,兩段都要;本輪只驗到橋接那一段 → PENDING,不是 PASS(自測 / 橋接 / 封印三件分開報,不互相代替) |
 | VRN-2 | **YELLOW** | `VRN_SystemManager_v0262 --selftest` | 收據:5/5 PASS · 前版鏈 rc 0;compile:SUP_MDL749 v0114 已被 v0117 取代;accelerator/VeritasCeleritas.py 只被 89 支舊版 import;缺號 4;啟動器 local-only(本倉 v0132 / 本機 v0178) | ✘ 四本輸出書 DoD 六條需要真 PDF + 桌機,容器未驗 → IN-LOOP;啟動器線未上倉 |
 | VQG | **GRAY** | `VQG_AllInOne_v0107 --selftest` | 收據:12/12 PASS · 零網路;本倉實體 4 支 / 1 家族 | — RC-1 保留 · 不阻擋(更正:非「查無實體」) |
 | VAP | **GRAY** | `VAP_AllInOne_v0302 --run-self-test` | 收據:status=PASS(JSON 頂層) | — RC-1 保留 · 不阻擋(Veritas AutoPlot · 真實子系統) |
@@ -35,7 +35,7 @@
 | VIA-VERB-ENGINE 隔離名冊 28 引擎 | SEALED(P4 只查 lock 四項) | 容器無該 repo clone;只有 GitHub metadata(pushed 2026-10-03) | GRAY |
 | 網路橋接版本化覆蓋(VDF 外向引擎) | IN-LOOP 黃 | 活尾版 83/83 全部 [VIA:NET-BRIDGE:v0100];30 無橋全是舊版或 intake 副本 | GREEN(升級:P6 第一順位已達 100%) |
 | VRN-2 四本輸出書 | IN-LOOP 黃 | 容器無真 PDF / 桌機;不可驗 | YELLOW(維持) |
-| VRN-2 薄尾鏈收斂(約 150 檔) | IN-LOOP 黃 | VRN 車道活目錄 553 支版本化 .py / 114 家族;VRN_SystemManager 69 檔 v0100–v0262 | YELLOW(維持;retire 只留最高版 = W2) |
+| VRN-2 薄尾鏈收斂(約 150 檔) | IN-LOOP 黃 · 只能 retire 留最高版 | VRN 車道活目錄 553 支版本化 .py / 114 家族;VRN_SystemManager 69 檔 v0100–v0262。**「只留最高版」不可行**:v0262 第 45–53 行硬載入 VRN_SystemManager_v0261.py,不在就 raise FileNotFoundError;v0261 再載 v0260…(VDF_SystemManager_v0168 也是 glob 前版)。retire 準則要改成相依鏈驗證:活尾版 PRIOR 鏈上每一支都保留,只 retire 鏈外且無呼叫者的版本 | YELLOW(維持;W2 準則修正) |
 | VRN-2 GitHub 上傳 | GATED | ActivateVRN-2 本倉 v0132(docs zip)/ 本機 v0178 | GATED(維持) |
 | 多 AI 版本分岔 | 紅 · 現存風險 | 本輪又新增一例:外部 AI 交 v0193 / v0194 搶 VCGC 家族號 | RED(確認) |
 
@@ -159,7 +159,7 @@
 |---|---|
 | VCGC PASS | ✘ YELLOW(自判) |
 | VRN PASS | ✘ 自測 PASS 但四本書 DoD 未驗 · 啟動器 local-only |
-| VDF PASS | ✔ 自測 6/6 + 橋接活尾版 100%(reader chain 封印項 GRAY) |
+| VDF PASS | ✘ PENDING —— 自測 6/6 ✔ · 橋接活尾版 100% ✔ · reader chain 封印收據 GRAY(DoD 兩段缺一段,不給 PASS) |
 | Compile Error = 0 | ✘ 8(4 non-shipping · 3 superseded · 1 unversioned accelerator copy) |
 | Critical Conflict = 0 | △ CONFLICT-00001 CRITICAL 但 CONTAINED(未入倉);CONFLICT-00004 / 00008 HIGH OPEN |
 | Hydra = GREEN | ✘ RED(治理核心各 3 份在活目錄 · 277 分身 · 15 組同號異名) |
@@ -167,19 +167,19 @@
 | Policy Registry Updated | △ v0113 在位;LAW-10 尚未寫入(W3 出 v0114) |
 | Conflict Registry Updated | △ 首跑建立 VIA_RC1_ConflictRegistry_v0100(12 筆) |
 
-**[GO] NO-GO** —— NO-GO 兩條:Compile Error 8 · Hydra RED。兩條都是機械可修(W1 一批)。
+**[GO] NO-GO** —— NO-GO 兩條:Compile Error 8 · Hydra RED(機械可修,W1 一批)。另三條 PASS 條件都未成立:VCGC YELLOW · VRN-2 四本書未驗 · VDF reader chain 收據未取得。
 
 HOLD 條件同時成立:Medium Conflict > 0(00002 · 00003 · 00005 · 00006 · 00012) · Missing Tool Registration(缺號 5 · 元件冊 新 9 變 23 過期 29 · 交接閘 122) · Missing Documentation(CGE v0400 / V018E-F 佐證)
 
 ## [NEXT] 最短修復路徑
 
 1. W1-A AST Fix ×4:accelerator/VeritasCeleritas.py · VDF_ENG088 v0103 · SUP_MDL749 v0114 · CGC_MDL180 v0100 —— 把 [VIA:ACCEL-BRIDGE] 塊移到 from __future__ 之後(或後三支直接進 _superseded);4 支 quarantine/intake 移出 compile 範圍 → Compile Error 0
-2. W1-B Conflict Fix:治理核心五件(EnvManager · SSOT_Unified · RegistryCore_v1 · Runtime_Bridge_All_in_One · Panorama_AST_RuntimeInjector)各留一份尾版,其餘進 _superseded;AegisNexus 全指 v1652;277 個 _sha 分身無呼叫者者 retire → Hydra YELLOW
+2. W1-B Conflict Fix:治理核心五件(EnvManager · SSOT_Unified · RegistryCore_v1 · Runtime_Bridge_All_in_One · Panorama_AST_RuntimeInjector)各選一份當正本,其餘**先做相依鏈驗證**(AST:誰 import 它、哪條 PRIOR 鏈載它)再進 _superseded;AegisNexus 全指 v1652;277 個 _sha 分身無呼叫者者 retire → Hydra YELLOW
 3. W1-C 拒收 / 改號:v0193 · v0194 · Review Kit v0106.4 不入倉(CONFLICT-00001 / 00003 登冊即可);要採用就改獨立家族號
 4. W1-D Config Fix(可併同一批):62 BOM 去頭 · 13 JSON 跳脫 · 2 空檔補或移
 5. W1-E Bug Fix:CGC_MDL247 SSOTPanorama 上下連結 AttributeError(第 203 次)→ 新版號
 6. → 重跑 RC-1 P2 / P4 → 預期 HOLD(剩 Medium:同號異名 15 組 · 缺號 5 · 交接閘 122 · VRN-2 四本書)
-7. W2:VRN-2 四本書桌機實驗 + 薄尾 retire;W3:NumberingSystem --apply · registry-sync --apply · LAW-10 入 Policy v0114 · Lesson / Conflict 冊升入 registry · tag rc-1
+7. W2:VRN-2 四本書桌機實驗 + 薄尾 retire(準則 = 相依鏈驗證,不是只留最高版:v0262 硬需要 v0261,鏈上每一支都留;只 retire 鏈外且無呼叫者的版本);W3:NumberingSystem --apply · registry-sync --apply · LAW-10 入 Policy v0114 · Lesson / Conflict 冊升入 registry · tag rc-1
 
 ## 可一次同步解決 vs 不能
 
@@ -194,7 +194,9 @@ HOLD 條件同時成立:Medium Conflict > 0(00002 · 00003 · 00005 · 00006 · 
 
 **不能一批(需要裁定或桌機)**
 
-- 治理核心五件 ×3 份選哪一份當尾版(需看呼叫者 + 操作員裁)
+- 治理核心五件 ×3 份選哪一份當正本(需相依鏈驗證 + 操作員裁)
+- 薄尾鏈 retire 範圍(每一家族要先算 PRIOR 鏈;v0262→v0261→… 都是硬相依)
+- VDF reader chain 封印收據(V018E/F 12/12 · DUCKDB_PASS 要原收據或桌機重跑)
 - 15 組同號異名改號(操作員裁)
 - 275 分支處置(操作員裁)
 - VRN-2 四本書 DoD(真 PDF + 桌機)
@@ -210,6 +212,6 @@ HOLD 條件同時成立:Medium Conflict > 0(00002 · 00003 · 00005 · 00006 · 
 
 ```
 [MODE] RC-1 READONLY
-[GO]   NO-GO —— Compile Error 8 · Hydra RED(VCGC YELLOW · VRN-2 DoD 未驗同列)
+[GO]   NO-GO —— Compile Error 8 · Hydra RED(VCGC YELLOW · VRN-2 四本書未驗 · VDF reader chain 收據未取得 同列)
 [NEXT] W1-A/B/C/D/E 一批(AST 修 4 + 治理核心去重 + 拒收 v0193/v0194/kit + JSON 77 + MDL247 bug)→ 重跑 RC-1 → 預期 HOLD → W2 VRN-2 四本書
 ```

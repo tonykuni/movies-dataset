@@ -240,7 +240,7 @@
    "VAP": 30,
    "VQG": 1
   },
-  "isolated_note": "薄尾家族用 importlib/glob 動態載入前版,靜態圖看不到 → 646 不等於孤兒,是量法下限",
+  "isolated_note": "薄尾家族用 importlib/glob 動態載入前版,靜態圖看不到 → 646 不等於孤兒,是量法下限;反過來說,前版鏈是硬相依(VRN_SystemManager_v0262 缺 v0261 直接 raise),任何 retire 都要先算這條鏈",
   "cross_lane_static": {
    "VDF→VRN": 2,
    "VDF→VCGC": 4,
@@ -420,7 +420,7 @@
     "what": "277 個 `_sha<hex8>` 分身檔(例 VIA_Panorama_AST_RuntimeInjector_sha63cefe28.py · StartVIAUnified_shaa1b427ff.ps1)。",
     "evidence": "檔名正則 _sha[0-9a-f]{8,};P3 圖裡 VDF_MDL001 / 105 / 303 都各有 sha 分身參與 import。",
     "impact": "同一引擎兩個名字,各自被 import。",
-    "resolution_proposal": "W1:確認無呼叫者後 retire;有呼叫者者重指到正名尾版。",
+    "resolution_proposal": "W1:AST 確認無 import 者、且不在任何薄尾 PRIOR 鏈上,才 retire;有呼叫者者重指到正名尾版。",
     "rc1_blocking": false
    },
    {
@@ -560,11 +560,11 @@
   },
   {
    "system": "VDF",
-   "lamp": "GREEN*",
+   "lamp": "YELLOW",
    "entry": "VDF_SystemManager_v0168 --selftest",
-   "evidence": "收據:本版 6/6 · 前版鏈 PASS;NET-BRIDGE 活尾版 100%(83/83 v0100);compile:ENG088 v0103 已被 v0105 取代;缺號 1",
-   "rc1_pass": true,
-   "why": "*reader chain「V018E/F 封印 12/12 · DUCKDB_PASS」樹內找不到同名件,容器沒跑 → 該項 GRAY;PASS 只涵蓋自測 + 橋接"
+   "evidence": "自測:本版 6/6 · 前版鏈 PASS(收據 20261108T163926Z)· NET-BRIDGE 活尾版 100%(83/83 v0100)· compile:ENG088 v0103 已被 v0105 取代 · 缺號 1 · reader chain 封印(V018E/F 12/12 · DUCKDB_PASS)收據未取得:樹內無同名件、容器沒跑",
+   "rc1_pass": false,
+   "why": "VDF DoD = reader chain 封印 + 橋接 100%,兩段都要;本輪只驗到橋接那一段 → PENDING,不是 PASS(自測 / 橋接 / 封印三件分開報,不互相代替)"
   },
   {
    "system": "VRN-2",
@@ -636,9 +636,9 @@
   },
   {
    "item": "VRN-2 薄尾鏈收斂(約 150 檔)",
-   "claim": "IN-LOOP 黃",
-   "w0_check": "VRN 車道活目錄 553 支版本化 .py / 114 家族;VRN_SystemManager 69 檔 v0100–v0262",
-   "lamp": "YELLOW(維持;retire 只留最高版 = W2)"
+   "claim": "IN-LOOP 黃 · 只能 retire 留最高版",
+   "w0_check": "VRN 車道活目錄 553 支版本化 .py / 114 家族;VRN_SystemManager 69 檔 v0100–v0262。**「只留最高版」不可行**:v0262 第 45–53 行硬載入 VRN_SystemManager_v0261.py,不在就 raise FileNotFoundError;v0261 再載 v0260…(VDF_SystemManager_v0168 也是 glob 前版)。retire 準則要改成相依鏈驗證:活尾版 PRIOR 鏈上每一支都保留,只 retire 鏈外且無呼叫者的版本",
+   "lamp": "YELLOW(維持;W2 準則修正)"
   },
   {
    "item": "VRN-2 GitHub 上傳",
@@ -658,7 +658,7 @@
   "conditions": {
    "VCGC PASS": "✘ YELLOW(自判)",
    "VRN PASS": "✘ 自測 PASS 但四本書 DoD 未驗 · 啟動器 local-only",
-   "VDF PASS": "✔ 自測 6/6 + 橋接活尾版 100%(reader chain 封印項 GRAY)",
+   "VDF PASS": "✘ PENDING —— 自測 6/6 ✔ · 橋接活尾版 100% ✔ · reader chain 封印收據 GRAY(DoD 兩段缺一段,不給 PASS)",
    "Compile Error = 0": "✘ 8(4 non-shipping · 3 superseded · 1 unversioned accelerator copy)",
    "Critical Conflict = 0": "△ CONFLICT-00001 CRITICAL 但 CONTAINED(未入倉);CONFLICT-00004 / 00008 HIGH OPEN",
    "Hydra = GREEN": "✘ RED(治理核心各 3 份在活目錄 · 277 分身 · 15 組同號異名)",
@@ -675,16 +675,16 @@
    "Compile Error(8)",
    "Hydra = RED"
   ],
-  "unmet_summary": "NO-GO 兩條:Compile Error 8 · Hydra RED。兩條都是機械可修(W1 一批)。"
+  "unmet_summary": "NO-GO 兩條:Compile Error 8 · Hydra RED(機械可修,W1 一批)。另三條 PASS 條件都未成立:VCGC YELLOW · VRN-2 四本書未驗 · VDF reader chain 收據未取得。"
  },
  "next": [
   "W1-A AST Fix ×4:accelerator/VeritasCeleritas.py · VDF_ENG088 v0103 · SUP_MDL749 v0114 · CGC_MDL180 v0100 —— 把 [VIA:ACCEL-BRIDGE] 塊移到 from __future__ 之後(或後三支直接進 _superseded);4 支 quarantine/intake 移出 compile 範圍 → Compile Error 0",
-  "W1-B Conflict Fix:治理核心五件(EnvManager · SSOT_Unified · RegistryCore_v1 · Runtime_Bridge_All_in_One · Panorama_AST_RuntimeInjector)各留一份尾版,其餘進 _superseded;AegisNexus 全指 v1652;277 個 _sha 分身無呼叫者者 retire → Hydra YELLOW",
+  "W1-B Conflict Fix:治理核心五件(EnvManager · SSOT_Unified · RegistryCore_v1 · Runtime_Bridge_All_in_One · Panorama_AST_RuntimeInjector)各選一份當正本,其餘**先做相依鏈驗證**(AST:誰 import 它、哪條 PRIOR 鏈載它)再進 _superseded;AegisNexus 全指 v1652;277 個 _sha 分身無呼叫者者 retire → Hydra YELLOW",
   "W1-C 拒收 / 改號:v0193 · v0194 · Review Kit v0106.4 不入倉(CONFLICT-00001 / 00003 登冊即可);要採用就改獨立家族號",
   "W1-D Config Fix(可併同一批):62 BOM 去頭 · 13 JSON 跳脫 · 2 空檔補或移",
   "W1-E Bug Fix:CGC_MDL247 SSOTPanorama 上下連結 AttributeError(第 203 次)→ 新版號",
   "→ 重跑 RC-1 P2 / P4 → 預期 HOLD(剩 Medium:同號異名 15 組 · 缺號 5 · 交接閘 122 · VRN-2 四本書)",
-  "W2:VRN-2 四本書桌機實驗 + 薄尾 retire;W3:NumberingSystem --apply · registry-sync --apply · LAW-10 入 Policy v0114 · Lesson / Conflict 冊升入 registry · tag rc-1"
+  "W2:VRN-2 四本書桌機實驗 + 薄尾 retire(準則 = 相依鏈驗證,不是只留最高版:v0262 硬需要 v0261,鏈上每一支都留;只 retire 鏈外且無呼叫者的版本);W3:NumberingSystem --apply · registry-sync --apply · LAW-10 入 Policy v0114 · Lesson / Conflict 冊升入 registry · tag rc-1"
  ],
  "one_batch": {
   "可一次同步解決(機械 · 無設計決策 · 全在 RC-1 允許六類內)": [
@@ -696,7 +696,9 @@
    "W3 LAW-10 add-only 寫入 Policy v0114;Lesson / Conflict 兩冊升入 registry 夾並編號"
   ],
   "不能一批(需要裁定或桌機)": [
-   "治理核心五件 ×3 份選哪一份當尾版(需看呼叫者 + 操作員裁)",
+   "治理核心五件 ×3 份選哪一份當正本(需相依鏈驗證 + 操作員裁)",
+   "薄尾鏈 retire 範圍(每一家族要先算 PRIOR 鏈;v0262→v0261→… 都是硬相依)",
+   "VDF reader chain 封印收據(V018E/F 12/12 · DUCKDB_PASS 要原收據或桌機重跑)",
    "15 組同號異名改號(操作員裁)",
    "275 分支處置(操作員裁)",
    "VRN-2 四本書 DoD(真 PDF + 桌機)",
@@ -708,7 +710,7 @@
  "closeout_patch": {
   "MODE": "RC-1 READONLY",
   "GO": "NO-GO",
-  "GO_unmet": "Compile Error 8 · Hydra RED(VCGC YELLOW · VRN-2 DoD 未驗同列)",
+  "GO_unmet": "Compile Error 8 · Hydra RED(VCGC YELLOW · VRN-2 四本書未驗 · VDF reader chain 收據未取得 同列)",
   "NEXT": "W1-A/B/C/D/E 一批 → 重跑 RC-1 → 預期 HOLD → W2 VRN-2 四本書"
  },
  "readonly_attestation": "本輪零程式修改 · 零部署 · 零 registry-sync/編號寫入 · 零 pip · 零同意閘;寫出的只有本報告、JSON、兩本首跑登錄冊與 HTML(文件類)。被測系統收據引用 2026-11-08 串測 run_id 20261108T163926Z,未為本審計重跑。"
