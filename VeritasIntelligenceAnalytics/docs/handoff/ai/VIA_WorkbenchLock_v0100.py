@@ -265,6 +265,38 @@ def load_sources(via: Path) -> dict:
     return s
 
 
+def receipt_errors(via: Path, d: dict) -> list:
+    """收據成功判定 = 交接台 CGC_MDL140_HandoverConsole_v0101.evidence_status 同一套規則(rc 0 不夠:要標記 · 完成時間 · 相依與日誌 sha 都對)。
+    本地重述而不 import 主控台模組(避免匯入期副作用);規則改了要同步。"""
+    errs = []
+    if d.get("schema") != "VIA.Handoff.TestReceipt.v1":
+        errs.append("receipt schema")
+    rc = d.get("rc")
+    rc_ok = rc == 0 or str(rc) == "0"
+    marker = d.get("target_marker_seen")
+    marker_ok = marker is True or str(marker).lower() == "true"
+    if not rc_ok or not marker_ok or not d.get("completed_at"):
+        errs.append("test did not prove target success")
+    deps = d.get("dependencies") or {}
+    if isinstance(deps, str):
+        try:
+            import ast as _ast
+            deps = _ast.literal_eval(deps)
+        except Exception as exc:
+            WARNINGS.append(f"receipt dependencies 不可解析 {d.get('case')}: {exc}")
+            deps = {}
+    if not d.get("command") or not deps:
+        errs.append("missing command/dependencies")
+    for rel, expected in (deps.items() if isinstance(deps, dict) else []):
+        q = via / rel
+        if not q.is_file() or sha256_file(q) != expected:
+            errs.append("dependency changed: " + str(rel))
+    log = via / str(d.get("log") or "__absent__")
+    if not log.is_file() or sha256_file(log) != d.get("log_sha256"):
+        errs.append("test log missing/changed")
+    return errs
+
+
 def rows_for(via: Path, system: str, s: dict) -> dict:
     M = {c: [] for c in CATEGORIES}
     con = s["constitution"]
@@ -374,10 +406,11 @@ def rows_for(via: Path, system: str, s: dict) -> dict:
         if not hit:
             continue
         rc = str(d.get("rc", ""))
-        M["tests"].append(_row(status="GREEN" if rc == "0" else ("RED" if rc else "YELLOW"), id=f"CASE-{case}", ssot_name=case,
+        errs = receipt_errors(via, d)
+        M["tests"].append(_row(status="GREEN" if not errs else "RED", id=f"CASE-{case}", ssot_name=case,
                                version=str(d.get("case_sha256", ""))[:12], tools=cmd[:120], system=system, source=str(rel), source_sha256=sha256_file(via / rel),
                                kind="HANDOFF_RECEIPT", scope=str(d.get("scope", ""))[:160], completion_time=str(d.get("completed_at", "")),
-                               error_detail="" if rc == "0" else f"rc {rc} · log {d.get('log', '')}"))
+                               error_detail="" if not errs else f"rc {rc} · " + " · ".join(errs) + f" · log {d.get('log', '')}"))
     return M
 
 
@@ -401,7 +434,8 @@ def shared_rows(via: Path, s: dict) -> list:
     if vrn1:
         rows.append(_row(status="YELLOW", id="SHARED-VRN-1", ssot_name="VRN-1(外倉 · 只讀)", system="VIA_SHARED", source=csrc, source_sha256=csha,
                          kind="EXTERNAL", scope="tonykuni/VIA-VDF-VRN", error_detail=str(vrn1.get("note", ""))))
-    return rows
+    # 正本 js 的 renderSharedPreview 讀 entry.category / entry.row,不是平列
+    return [{"category": "systems", "row": r} for r in rows]
 
 
 # ---------- 生成 ----------
@@ -634,6 +668,16 @@ def selftest() -> int:
         idx = json.loads((out / "api" / "index.json").read_text(encoding="utf-8"))
         t("⑮ 前端伺服器 JSON:api/<SYS>.json = bundle 契約 · index.json 五系統", api.get("version") == UI_CONTRACT_VERSION and api.get("system") == "VQG"
           and set(api.get("LAST_MATRIX", {})) == set(CATEGORIES) and set(idx.get("systems", {})) == set(SYSTEMS))
+        shared = json.loads((out / "api" / API_NAME.format(sys="VCGC")).read_text(encoding="utf-8"))["SHARED_EVIDENCE"]
+        t("⑯ 共享證據照正本 js 結構 {category,row}(id · system 在 row 裡)", bool(shared) and all(set(e) == {"category", "row"} and e["row"].get("system") == "VIA_SHARED" for e in shared))
+        tests_rows = []
+        for sysname in SYSTEMS:
+            tests_rows += json.loads((out / "api" / API_NAME.format(sys=sysname)).read_text(encoding="utf-8"))["LAST_MATRIX"]["tests"]
+        bad = [r for r in tests_rows if r["kind"] == "HANDOFF_RECEIPT"
+               and r["id"] in ("CASE-activation", "CASE-vrn_ssot_consistency", "CASE-cov_vrn_firstpage_engine")]
+        fake = {"schema": "VIA.Handoff.TestReceipt.v1", "rc": "0", "target_marker_seen": "False", "completed_at": "x", "command": "c", "dependencies": {}}
+        t("⑰ 收據 rc 0 但沒標記 → 不綠(同交接台 evidence_status 規則)", "test did not prove target success" in receipt_errors(via, fake)
+          and all(r["status"] == "RED" and "did not prove" in r["error_detail"] for r in bad) and len(bad) >= 1)
         hub_text = (out / HUB_NAME).read_text(encoding="utf-8")
         _, site_block, _ = extract_tokens((lock_site(via) / LOCK_FILES["css"]).read_text(encoding="utf-8"))
         t("⑭ hub 含五系統 + VRN-1 只讀列 + 正本 token 區塊", all(x in hub_text for x in SYSTEMS) and "VRN-1" in hub_text and site_block in hub_text)

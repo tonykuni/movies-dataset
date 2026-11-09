@@ -27,14 +27,14 @@
 | policy | `VIA_Policy_Laws_SSOT_v*.json`(提到本系統 + L120/L122/L123/L125) | ACTIVE GREEN |
 | conflicts | 憲法矩陣 `conflicts_open`(VCGC 偵測方全列;他系統列提到自己的) | OPEN RED |
 | requirements | `HANDOFF_latest.json` pending(提到本系統) | VERIFIED GREEN · BLOCKED RED · 其餘 YELLOW |
-| tests | `VIA_FiveSystem_Progress_v0100.jsonl` + `docs/handoff/evidence/*.json` 收據 | run_lamp / rc |
+| tests | `VIA_FiveSystem_Progress_v0100.jsonl` + `docs/handoff/evidence/*.json` 收據 | run_lamp;收據要過交接台 evidence_status 同一套規則(rc 0 + 標記 + 完成時間 + 相依 / 日誌 sha)才綠,否則 RED 並列出原因(Codex #620) |
 
-共享證據(separate):憲法總燈 · L122 治理器 dry-run · 交接冊燈(≠ 驗收)· VRN-1 外倉只讀列。
+共享證據(separate,包成正本 js 要的 `{category,row}`):憲法總燈 · L122 治理器 dry-run · 交接冊燈(≠ 驗收)· VRN-1 外倉只讀列。
 payload 走正本 js 要求的信封(gzip + base64 + raw / gzip sha256;`bundle.version` 必須 = `v0106.4` 是 **U/I 契約版**,工作台版另記 `workbench_engine`)。
 
 ## 三、本輪實測(容器 2026-11-09)
 
-- `--selftest` **15/15**(鎖站 4/4 · 抽 token · 契約 · 信封往返 · 燈號律 · 系統辨識(VRN-2 不吃 VRN-1)· CSP sha · 真資料 build 五頁 + hub · check 綠 · 篡改 token 紅 · 刪結構 id 紅 · VCGC 頁 policy / conflicts · hub · 前端伺服器 JSON)。
+- `--selftest` **17/17**(鎖站 4/4 · 抽 token · 契約 · 信封往返 · 燈號律 · 系統辨識(VRN-2 不吃 VRN-1)· CSP sha · 真資料 build 五頁 + hub · check 綠 · 篡改 token 紅 · 刪結構 id 紅 · VCGC 頁 policy / conflicts · hub · 前端伺服器 JSON)。
 - `all`:五頁 rows VCGC 415 · VDF 307 · VRN-2 159 · VQG 19 · VAP 21;check 6/6 GREEN。
 - Playwright(Chromium 1440×900):五頁 pageerror **0**、console error **0**;KPI 由 payload 算出(VCGC 415 / 9 / 16 / 135)· 分類頁籤 10 · 點列 Inspector 顯示編號(VIA-VCGC-MDL1625 …);hub 400px 不橫向捲。
 - 輸出在 `VIA_Reports/workbench/`(不提交);桌機:`python docs/handoff/ai/VIA_WorkbenchLock_v0100.py all --open` 自動開 hub。
