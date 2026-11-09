@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-08T16:38:59Z",
+ "updated_at": "2026-11-09T07:56:22Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4161,6 +4161,41 @@
    ],
    "timeout_seconds": 900,
    "marker_note": "標記不釘檢數,只釘「· FAIL 0 · PASS」—— 只有全過才印得出來"
+  },
+  "sdd_validator_v0107": {
+   "argv": [
+    "CGC_MDL245_SDDValidator_v0107",
+    "--selftest"
+   ],
+   "success_marker": "[CGC_MDL245_SDDValidator_v0107] 薄尾 9/9 PASS",
+   "scope": "CGC_MDL245 v0107:tests 兩種形狀(欄位字典 · TST 列表)都吃得下;load_books 出口把列表式換成字典視圖 TestCases(.cases 留原列表 · real 空字串不冒充 ai 實跑);check_columns 列表式逐項驗 case · expect · cmd|engine+verb,缺就 RED 指到 tests[i].欄名;空列表 / None 照舊 RED 不漂白;實樹 check(write=False) 整輪跑完不炸(RC-1 W0「上下連結@VCGC」假紅的根因);前版鏈全跑(VCGC-REQ203)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0107.py",
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0106.py",
+    "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0103.json",
+    "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0134.json",
+    "supportive modules/registry/VIA_Workflow_VDF_SSOT_v0107.json",
+    "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0106.json"
+   ],
+   "timeout_seconds": 1500,
+   "marker_note": "標記釘本版薄尾 9/9 那一行;本體與 v0101–v0106 前版鏈的 PASS 由 rc 0 保證(任一層 FAIL 就 rc 1)"
+  },
+  "validation_ssot_v0102": {
+   "argv": [
+    "CGC_MDL246_ValidationSSOT_v0102",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL246_ValidationSSOT_v0102 薄尾 7/7 · PASS",
+   "scope": "CGC_MDL246 v0102:工作流冊 tests 列表式(TST 案)不炸 —— workflow_books 出口給字典視圖(self=案名 · cross=[] · real=[] · tst=原列表;深拷貝不動原冊),本體 check 的 .get('cross') 吃得下,V-XREF 不假造 X-*;真冊 GREEN;前版鏈 v0101 → v0100 自測 rc 0(VCGC-REQ203)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0102.py",
+    "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0101.py",
+    "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0100.py",
+    "supportive modules/registry/VIA_Validation_SSOT_v0101.json",
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0107.py"
+   ],
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-09T07:36:56Z"
   }
  },
  "work_items": [
@@ -8778,6 +8813,104 @@
    "what": "VIA_LibsInventory v0101 薄尾:布建計畫同時出 bash 與 PowerShell 兩版(同一份相依閉包,只換殼;17 境 / 140 槽位)。自測 30/30。",
    "receipt": "docs/handoff/evidence/C-libsinventory-v0101.json",
    "note": "Codex #612 P1:上一版把這個增補就地寫進已併進 main 的 v0100,違版本律。v0100 與它的 C-libsinventory-v0100 收據已逐位元還原,增補改走薄尾。判得對 —— 那份舊收據記著當時的來源 SHA,就地改會讓它指向一支不存在的程式。"
+  },
+  {
+   "id": "VCGC-REQ203:w1-ast-fix",
+   "requirement": "VCGC-REQ203",
+   "case": "sdd_validator_v0107",
+   "state": "REVIEW",
+   "owner": "操作員(驗收)",
+   "what": "AST Fix 4 支:VeritasCeleritas.py(accelerator 無版號副本)· VDF_ENG088 v0103 · SUP_MDL749 v0114 · CGC_MDL180 v0100 的橋塊搬到 from __future__ 之後(行多重集合不變;MDL180 的橋標記字串常數用 startswith 區分)→ py_compile 過;出貨範圍 compileall 0 錯(全樹餘 4 = 凍結 quarantine / intake)。受影響尾版自測:MDL749 v0117 7/7 · MDL180 v0101 7/7 · ENG088 v0105 4/4。",
+   "receipt": "docs/handoff/ai/VIA_RC1_W0_Audit_20261109.json",
+   "note": "就地修的理由:這 4 支 compile 不過 → 沒有任何鎖住的成功收據可被破壞;版本律守的是「已鎖成功來源」。",
+   "reason": "AST Fix 已做、容器 compileall 出貨範圍 0;交接冊沒有 compileall 站,沒有機器收據可轉 VERIFIED",
+   "next": "W3 登一個唯讀 compile 站(或併入 sdd_validator 自測)→ 收據 → VERIFIED",
+   "updated_at": "2026-11-09T07:20:47Z"
+  },
+  {
+   "id": "VCGC-REQ203:w1-json-fix",
+   "requirement": "VCGC-REQ203",
+   "case": "sdd_validator_v0107",
+   "state": "REVIEW",
+   "owner": "操作員(驗收)",
+   "what": "Config Fix:62 JSON 去 BOM · 12 JSON 的 \\x1b 控制字元改 \\\\u001b 逸出(4 VRN GO_M01 模組冊 + 8 VAP SCOPE_COPY 副本)→ 讀不進 77 → 3(vdf_network_report.json 空 · CGE/Console/inventory/manifest.json 空 · intake tsconfig.json JSONC 凍結)。",
+   "receipt": "docs/handoff/ai/VIA_RC1_W0_Audit_20261109.json",
+   "note": "剩 3 支都不是改字就能修:空檔要正主重出,凍結不改。",
+   "reason": "JSON 讀不進 77 → 3 已做;沒有宣告測試能證明(餘 3 支要正主重出 / 凍結)",
+   "next": "W3 登唯讀 JSON 掃站 → 收據 → VERIFIED",
+   "updated_at": "2026-11-09T07:20:47Z"
+  },
+  {
+   "id": "VCGC-REQ203:w1-conflict-shims",
+   "requirement": "VCGC-REQ203",
+   "case": "sdd_validator_v0107",
+   "state": "BLOCKED",
+   "owner": "操作員(裁正本)",
+   "what": "Conflict Fix 嘗試:9 份位元相同副本換轉接殼 → 撤回(違版本律)。現況回到 W0:治理核心各 3 份在活目錄。",
+   "receipt": "docs/handoff/ai/VIA_RC1_ConflictRegistry_v0101.json",
+   "note": "沒動:內容不同的副本(ssot/VIA_SSOT_Unified 8345 行 · 10_Core_Runtime/Runtime_Bridge)與兩份有 exec 引用的 AegisNexus(20 / 37 處)→ W2 桌機。",
+   "reason": "Codex #615 P1(判得對):9 支轉接殼是就地覆寫已併進 main 的檔,違版本律(AGENTS.md 四;同 #612 / #613 判例);10_Core_Runtime/VIA_Runtime_Bridge_All_in_One.py 還明確載入 50_Protection_Acceleration/VeritasAegisNexus.py 這條路徑。9 支已逐位元還原成 main。正解 = 出版本化轉接件並遷移呼叫者(相依鏈驗證 + 操作員裁正本)→ W2,不在 W1 六類。",
+   "next": "W2:每件治理核心做相依鏈驗證(誰 import · 哪條 PRIOR 鏈)→ 操作員裁正本 → 出版本化轉接件 + 遷呼叫者;原檔不就地改",
+   "updated_at": "2026-11-09T07:56:22Z"
+  },
+  {
+   "id": "VCGC-REQ203:w1-mdl245-v0107",
+   "requirement": "VCGC-REQ203",
+   "case": "sdd_validator_v0107",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "what": "Bug Fix:MDL245 v0107 薄尾(tests 列表式不炸)。容器直跑 --selftest rc 0(薄尾 9/9 · v0106 6/6 · v0105 4/4 · 本體全過)。",
+   "receipt": "docs/handoff/evidence/sdd_validator_v0107.json",
+   "next": "handoff test sdd_validator_v0107 實跑轉 VERIFIED",
+   "reason": "handoff test sdd_validator_v0107 rc 0 · 標記見到(2026-11-09)",
+   "updated_at": "2026-11-09T07:20:47Z"
+  },
+  {
+   "id": "VCGC-REQ203:w1-policy-l124",
+   "requirement": "VCGC-REQ203",
+   "case": "sdd_validator_v0107",
+   "state": "REVIEW",
+   "owner": "操作員(驗收)",
+   "what": "Documentation Fix:VIA_Policy_Laws_SSOT v0114 +L124 RC1_AUDIT_MODE_READONLY(AgentOS LAW-10 對映)· 衝突登記冊 v0101(狀態帶理由轉態)· 工作流 VCGC v0134(WKF025 補 tests · WKF028 RC-1 工序)· VDF v0107(WKF015 補 tests)· 需求 v0232(REQ203 · REQ022 歸屬修正)· 盤點 v0207。",
+   "receipt": "supportive modules/registry/VIA_Policy_Laws_SSOT_v0114.json",
+   "reason": "文件類(六本新版書 + 律 L124)已寫;ssot panorama 讀到 v0114(律 121)· MDL245 X-COL GREEN;書本身不是測試對象",
+   "next": "PR 併入後 handoff checkpoint 收口",
+   "updated_at": "2026-11-09T07:20:47Z"
+  },
+  {
+   "id": "VCGC-REQ203:w1-numbering",
+   "requirement": "VCGC-REQ203",
+   "case": "sdd_validator_v0107",
+   "state": "PENDING",
+   "owner": "AI",
+   "what": "編號:--apply --scope 4 檔(VDF_MDL014 v0100 · NON_STOCK_SUMMARIZER v0310 · VRN_ENG115 v0102 · VRN_ENG400 v0102)+94 列 · 遺失 0 · 改身分 0 · 重號 0 · 冊內不一致 1(待 audit 讀原因)。本輪新尾版(MDL245 v0107 · FiveSystemChain v0100 · SkillExport v0101 · LibsInventory v0100/v0101)與 WKF/STP/REQ 36 碼待整輪 --apply。",
+   "receipt": "docs/handoff/HANDOFF_latest.json",
+   "next": "提交後 run CGC_MDL237_NumberingSystem --apply --scope <新檔> → audit → registry-sync --apply",
+   "reason": "全域 --apply 被 HOLD 擋(只准已提交的 --scope);新尾版與書要先提交才能發號",
+   "updated_at": "2026-11-09T07:20:47Z"
+  },
+  {
+   "id": "VCGC-REQ203:w2-desktop",
+   "requirement": "VCGC-REQ203",
+   "case": "sdd_validator_v0107",
+   "state": "BLOCKED",
+   "owner": "操作員(桌機)",
+   "what": "W2 桌機項:AegisNexus 兩份 exec 引用副本 · VRN-2 四本書驗收 · 本機 ActivateVRN-2 v0178 入倉 · CGE v0400 / V018E-F 收據 · 275 遠端分支收斂(CONFLICT-00007)· 15 組同號異名(CONFLICT-00006 待裁)。",
+   "receipt": "docs/handoff/ai/VIA_RC1_ConflictRegistry_v0101.json",
+   "next": "桌機貼回 → W3 入冊編號 → W4 發布",
+   "reason": "要桌機 / 真 PDF / 原收據:AegisNexus 兩份 exec 引用異本 · VRN-2 四本書 · 本機 v0178 · CGE manifest · V018E-F",
+   "updated_at": "2026-11-09T07:20:47Z"
+  },
+  {
+   "id": "VCGC-REQ203:w1-mdl246-v0102",
+   "requirement": "VCGC-REQ203",
+   "case": "validation_ssot_v0102",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "Bug Fix:MDL246 v0102 薄尾(同一類 tests 列表式崩潰;handoff test validation_ssot_v0101 重跑時 AttributeError 抓到)。容器直跑 --selftest 7/7 · 前版鏈 8/8。",
+   "next": "handoff test validation_ssot_v0102 實跑轉 VERIFIED",
+   "receipt": "docs/handoff/evidence/validation_ssot_v0102.json",
+   "updated_at": "2026-11-09T07:36:56Z"
   }
  ]
 }

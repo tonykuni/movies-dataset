@@ -1,0 +1,238 @@
+{
+ "schema": "VIA.RC1.W1Rerun.v1",
+ "ts": "2026-11-09T07:57Z",
+ "mode": "RC-1 W1(六類內修復 · 操作員 2026-11-09 全權授權)",
+ "base": "main 04df4b879 + W1 工作樹",
+ "prior": "VIA_RC1_W0_Audit_20261109.json",
+ "W1_done": {
+  "AST Fix": "4 支橋塊搬到 from __future__ 之後(行多重集合不變)→ 出貨範圍 compile 0",
+  "Config Fix": "JSON 62 BOM + 12 控制字元 → 讀不進 77 → 3",
+  "Conflict Fix": "嘗試 9 份位元相同副本 → 轉接殼;Codex #615 P1 判就地覆寫違版本律 → 逐位元還原(0 件);衝突冊 00002 / 00004 回 OPEN 附理由",
+  "Bug Fix": "MDL245 v0107 + MDL246 v0102(tests 列表式同病兩支;check 整輪跑完;LESSON-0006)",
+  "Documentation Fix": "Policy v0114 +L124 · 工作流 VCGC v0134(WKF025 tests · WKF028)· VDF v0107(WKF015 tests)· 需求 v0232(REQ203 · REQ022 歸屬)· 盤點 v0207 · 交接冊 +1 案 +7 項 · 衝突冊 v0101 · 教訓冊 v0101",
+  "Test Fix": "handoff test sdd_validator_v0107 · validation_ssot_v0102 rc 0 標記見到;相依變了的已宣告案重跑(sdd · numbering · vdf_consensus_fixture · vdf_universe_r50 rc 0);編號 --apply --scope 15 檔 +725 列 遺失 0 改身分 0 重號 0 · VCGC 缺號 0"
+ },
+ "P2": {
+  "py_shipping_compile_errors": 0,
+  "py_fulltree_compile_errors": 4,
+  "fulltree_detail": "4 支全在凍結範圍(1 intake · 3 _review_quarantine),RC-1 出貨範圍外",
+  "json_total": 6466,
+  "json_unreadable": 3,
+  "json_detail": [
+   "vdf_network_report.json(空)",
+   "CGE/Console/inventory/manifest.json(空)",
+   "supportive modules/references/intake/.../tsconfig.json(JSONC · 凍結)"
+  ],
+  "fixed": {
+   "ast": 4,
+   "json_bom": 62,
+   "json_ctrl": 12,
+   "shims": 0,
+   "shims_note": "9 支轉接殼一度做了,Codex #615 P1 判違版本律 → 逐位元還原"
+  }
+ },
+ "P4_hydra": {
+  "lamp": "RED",
+  "why": "維持 W0 的 RED:治理核心 5 件各 3 份 + AegisNexus 8 份仍在活目錄。W1 曾把 9 份位元相同副本換成轉接殼,Codex #615 P1 判「就地覆寫已發布檔」違版本律(AGENTS.md;#612 / #613 同判例)→ 已逐位元還原。正解不是殼:相依鏈驗證(誰 import · 哪條 PRIOR 鏈)→ 操作員裁正本 → 出版本化轉接件 + 遷呼叫者 → 舊副本進 _superseded;這是 W2 設計決策,不在 W1 六類。",
+  "governance_cores": {
+   "VIA_EnvManager.py": "3 份(位元相同 ×3)",
+   "VIA_RegistryCore_v1.py": "3 份(位元相同 ×3)",
+   "VIA_Panorama_AST_RuntimeInjector.py": "3 份(位元相同 ×3)",
+   "VIA_Runtime_Bridge_All_in_One.py": "3 份(2 同 + 10_Core_Runtime 異本,且它明確載入 50_Protection_Acceleration/VeritasAegisNexus.py)",
+   "VIA_SSOT_Unified.py": "3 份(2 同 + ssot/ 異本 8345 行)",
+   "VeritasAegisNexus.py": "8 份 · 4 種內容(尾版 network/_v1652 · 兩份有 exec 引用 20 / 37 處)"
+  },
+  "duplicate_basenames_active": 114
+ },
+ "P4_ssot_panorama": {
+  "line": "[SSOT 全景] YELLOW · 上下單向 VCGC → VDF → VRN → SUP · 探針 7 · 全格無紅(W0:上下連結@VCGC RED)",
+  "rows": [
+   "上下連結@VCGC YELLOW:工作流 28 · 步 131 · 需求 203 · 單向 0 · 待重驗鎖 4(WKF007 / 010 / 011 …)· 中央結構檢 GREEN —— W0 的 RED 是 MDL245 崩潰的假紅",
+   "自動編號@VCGC YELLOW:尾版 306 · 有號 306 · 缺號 0(本輪 --scope 11 檔 +631 列)· 只增稽核 列 121059 → 121784(+725)· 遺失 0 · 改身分 0 · 重號 0 · 冊內不一致 1(紅列 54 = 冊上宣告碼 ≠ 發出號,沿用)",
+   "自動編號@VRN YELLOW:缺號 1(VRN_M03_PDF_Layout_JSON_v3.py,無四碼版號)",
+   "命名 YELLOW(四車道):同號異名 VCGC 8 · VDF 4 · VRN 2 · SUP 1 組(操作員裁)· 沒版號 .py 849(Z281 不計燈)",
+   "同義字 YELLOW:booksync 網域冊 NONCANONICAL 1 · SYNONYM_LIBRARY 副本 DIVERGED(沿用)"
+  ]
+ },
+ "gates": [
+  {
+   "step": "01",
+   "cmd": "registry-sync --apply",
+   "rc": 0,
+   "result": "元件冊同步 · 他冊已發 28 號 · 撞號 0 · 時間欄補 UTC 78"
+  },
+  {
+   "step": "02",
+   "cmd": "run CGC_MDL237_NumberingSystem --apply",
+   "rc": 2,
+   "result": "[HOLD] 全域 --apply 不是收件操作;只准已提交的 --apply --scope"
+  },
+  {
+   "step": "03",
+   "cmd": "run CGC_MDL237_NumberingSystem audit",
+   "rc": 2,
+   "result": "YELLOW · 列 121059 → 121153(+94)· 遺失 0 · 改身分 0 · 重號 0 · 冊內不一致 1 · FPSTALE 534 · UNCOMMITTED 150"
+  },
+  {
+   "step": "04",
+   "cmd": "handoff test sdd_validator_v0107",
+   "rc": 0,
+   "result": "rc 0 · 標記見到 · 收據 docs/handoff/evidence/sdd_validator_v0107.json"
+  },
+  {
+   "step": "05",
+   "cmd": "ssot panorama",
+   "rc": 2,
+   "result": "YELLOW · 探針 7 · 無紅(上下連結@VCGC RED → YELLOW)"
+  },
+  {
+   "step": "06",
+   "cmd": "test --quick",
+   "rc": 2,
+   "result": "YELLOW · 站 12(綠 10 · 黃 2 · 紅 0)· case 246/246 · workflow 131/131 · compile 錯 0 · 缺橋 0"
+  },
+  {
+   "step": "07",
+   "cmd": "handoff check",
+   "rc": 1,
+   "result": "RED 157(CHANGED_CODE_WITHOUT_TEST 84 多為未提交 · EVIDENCE_INVALID 59 多為相依變了 · 工作項格式 4 → 本輪修)"
+  },
+  {
+   "step": "11",
+   "cmd": "run CGC_MDL237_NumberingSystem --apply --scope <11 檔>",
+   "rc": 1,
+   "result": "衝突閘 BLOCK:子系統邊界 RED —— VIA_Workflow_VDF_SSOT_v0107.json 是 VDF 正本,VCGC 不代發號 → 剔除後重跑"
+  },
+  {
+   "step": "13",
+   "cmd": "handoff test <相依變了的 14 案>",
+   "rc": "0/1",
+   "result": "sdd · numbering · vdf_consensus_fixture · vdf_universe_r50 rc 0;validation_ssot_v0101 rc 1 = MDL246 同病(→ v0102);celeritas_gate_v0104 rc 1 = 既有債(Parse-VCGC-Sources-v0100.ps1 無模板章,L70);其餘 8 案名只是工作項不是宣告測試(KeyError)"
+  },
+  {
+   "step": "21",
+   "cmd": "run CGC_MDL237_NumberingSystem --apply --scope <10 檔>",
+   "rc": 0,
+   "result": "放行 · +622 列(PLCY 483 · FNC 94 · STP 26 · WKF/REQ/MDL/CLS)· 遺失 0 · 改身分 0 · 重號 0"
+  },
+  {
+   "step": "31–33",
+   "cmd": "registry-sync --apply · numbering --scope MDL246 v0102 · audit",
+   "rc": "0/0/2",
+   "result": "+9 列 · 合計 121059 → 121784(+725)· 遺失 0 · 改身分 0 · 重號 0 · 冊內不一致 1(沿用)· FPSTALE 534 · UNCOMMITTED 150(沿用)"
+  },
+  {
+   "step": "34",
+   "cmd": "handoff test validation_ssot_v0102",
+   "rc": 0,
+   "result": "rc 0 · 標記見到"
+  },
+  {
+   "step": "35",
+   "cmd": "ssot panorama(第二輪)",
+   "rc": 2,
+   "result": "YELLOW · 無紅 · 自動編號@VCGC 缺號 0 · 上下連結@VCGC YELLOW(待重驗鎖 4)"
+  },
+  {
+   "step": "36",
+   "cmd": "test --quick(第二輪)",
+   "rc": 2,
+   "result": "YELLOW · 站 12(綠 10 · 黃 2 · 紅 0)· case 247/247 · workflow 131/131 · compile 錯 0 · 缺橋 0"
+  },
+  {
+   "step": "41–42",
+   "cmd": "handoff test sdd_validator_v0107 · handoff check",
+   "rc": "0/1",
+   "result": "收據重發 rc 0;交接閘 RED 141(CHANGED_CODE_WITHOUT_TEST 80 · EVIDENCE_INVALID 52 · MODULE_UNREGISTERED 5 · ACCEL_BRIDGE_MISSING 4)—— REQ203 項 0 紅;餘為跨輪欠帳(W0 122 → 本輪相依變更一度 157 → 141)"
+  },
+  {
+   "step": "51",
+   "cmd": "handoff check(殼撤回後)",
+   "rc": 1,
+   "result": "RED 139(CHANGED_CODE_WITHOUT_TEST 79 · EVIDENCE_INVALID 52 · ACCEL_BRIDGE_MISSING 4 · MODULE_UNREGISTERED 4)"
+  }
+ ],
+ "system_matrix": [
+  {
+   "system": "VCGC",
+   "lamp": "YELLOW",
+   "entry": "CGC_MDL149_…Console test --quick",
+   "evidence": "test --quick 2026-11-09(第二輪,MDL246 v0102 登站後):YELLOW · 站 12(綠 10 · 黃 2 · 紅 0)· case 247/247 · workflow 131/131 · 家族尾版 283 支 compile 錯 0 · 缺橋 0;黃 2 = V-handoff-check(交接閘 RED 141,跨輪欠帳)· P-entry(容器無 pwsh,不冒充綠)",
+   "rc1_pass": false,
+   "why": "自判 YELLOW:交接閘 RED(跨輪欠帳 + 本輪相依變更)與容器無 PowerShell;站無紅"
+  },
+  {
+   "system": "VDF",
+   "lamp": "YELLOW",
+   "entry": "VDF_SystemManager_v0168 --selftest",
+   "evidence": "W0 收據沿用(6/6 · NET-BRIDGE 83/83)· 本輪 VDF_MDL014 --selftest 67/67 · VDF-WKF015 補 tests 欄(v0107)· ENG088 v0103 橋塊修正後 compile 過;reader chain 封印收據仍未取得",
+   "rc1_pass": false,
+   "why": "PENDING:DoD 兩段缺一段(reader chain 收據 → W2 桌機)"
+  },
+  {
+   "system": "VRN-2",
+   "lamp": "YELLOW",
+   "entry": "VRN_SystemManager_v0262 --selftest",
+   "evidence": "W0 收據沿用(5/5)· SUP_MDL749 v0114 橋塊修正後 compile 過 · 缺號 3 支已發號(+94 列)· 4 支 GO_M01 模組冊控制字元修好",
+   "rc1_pass": false,
+   "why": "四本書 DoD 未驗 · 啟動器 local-only(本倉 v0132 / 本機 v0178)→ W2"
+  },
+  {
+   "system": "VQG",
+   "lamp": "GRAY",
+   "entry": "VQG_AllInOne_v0107 --selftest",
+   "evidence": "W0 收據沿用 12/12",
+   "rc1_pass": null,
+   "why": "RC-1 保留 · 不阻擋"
+  },
+  {
+   "system": "VAP",
+   "lamp": "GRAY",
+   "entry": "VAP_AllInOne_v0302 --run-self-test",
+   "evidence": "W0 收據沿用 status=PASS · 8 支 SCOPE_COPY 模組冊控制字元修好",
+   "rc1_pass": null,
+   "why": "RC-1 保留 · 不阻擋(真實子系統)"
+  }
+ ],
+ "P8_go": {
+  "verdict": "NO-GO",
+  "conditions": {
+   "VCGC PASS": "✘ YELLOW(站 12 綠 10 黃 2 紅 0;黃 = 交接閘 RED · 容器無 pwsh)",
+   "VRN PASS": "✘ 自測 PASS 但四本書 DoD 未驗 · 啟動器 local-only(W2)",
+   "VDF PASS": "✘ PENDING —— 自測 ✔ · 橋接 100% ✔ · reader chain 封印收據 GRAY(W2)",
+   "Compile Error = 0": "✔ 出貨範圍 0(W0 8 → 0;全樹餘 4 = 凍結 quarantine / intake,範圍外)",
+   "Critical Conflict = 0": "△ CONFLICT-00001 CRITICAL 仍 CONTAINED(未入倉,不採用)",
+   "Hydra = GREEN": "✘ RED(維持;W1 殼方案違版本律已撤回 —— 正解 = 版本化轉接件 + 遷呼叫者,W2 裁正本)",
+   "Lesson Registry Updated": "✔ v0101(+LESSON-0006)",
+   "Policy Registry Updated": "✔ v0114 +L124 RC1_AUDIT_MODE_READONLY(AgentOS LAW-10 對映)",
+   "Conflict Registry Updated": "✔ v0101(FIXED 4 · PARTIAL 2 · 沿用 6;0 消失)"
+  },
+  "no_go_conditions_present": [
+   "Hydra = RED(治理核心各 3 份 · AegisNexus 8 份;W1 不能用殼解)"
+  ],
+  "hold_conditions_present": [
+   "Medium Conflict > 0(00002 PARTIAL · 00003 · 00004 PARTIAL · 00005 · 00006 · 00012)",
+   "Missing Tool Registration(缺號 0 ✔ · 交接閘 RED 139(W0 122;REQ203 工作項 0 紅;其餘跨輪欠帳,逐案多輪;殼撤回後 CHANGED_CODE_WITHOUT_TEST 79 · EVIDENCE_INVALID 52 · ACCEL_BRIDGE_MISSING 4 · MODULE_UNREGISTERED 4))",
+   "Missing Documentation(CGE v0400 / V018E-F 封印佐證)"
+  ],
+  "unmet_summary": "NO-GO 兩條清了一條(Compile 8 → 0);Hydra 仍 RED(W1 殼方案違版本律,已撤回;正解是 W2 的版本化轉接件 + 遷呼叫者)→ 仍 NO-GO。另 HOLD 三條:Medium Conflict 6 筆(3 件要 W2 diff 裁)· 工具登記(缺號已清 0;交接閘 RED 139(W0 122;REQ203 工作項 0 紅;其餘跨輪欠帳,逐案多輪;殼撤回後 CHANGED_CODE_WITHOUT_TEST 79 · EVIDENCE_INVALID 52 · ACCEL_BRIDGE_MISSING 4 · MODULE_UNREGISTERED 4))· 文件(CGE / V018E-F 佐證)。三個 PASS 條件:VCGC YELLOW · VRN-2 四本書未驗 · VDF reader chain 收據未取得。"
+ },
+ "next": [
+  "W1 收口(本 PR 併入後):MDL246 v0102 · 教訓冊 v0101 · W1 報告三檔已提交 → --apply --scope 補發號 → registry-sync --apply;VDF 工作流冊 v0107 的發號走 VDF 車道(VCGC 衝突閘「子系統邊界」擋 VCGC 代發)",
+  "W2 桌機:① 治理核心 5 件 + AegisNexus:相依鏈驗證(AST:誰 import · 哪條 PRIOR 鏈載它)→ 操作員裁正本 → 出版本化轉接件(新檔名帶版號)+ 遷呼叫者 → 舊副本進 _superseded;② 10_Core_Runtime/Runtime_Bridge 與 ssot/SSOT_Unified 兩份異本 diff;③ VRN-2 四本書(真 PDF)· 本機 ActivateVRN-2 v0178 入倉;④ VDF reader chain V018E/F 原收據;⑤ CGE v0400 manifest 重出",
+  "W3:登記冊(Conflict / Lesson)升入 supportive modules/registry 並編號;WKF/STP/REQ 43 碼 --apply --scope;15 組同號異名操作員裁;交接閘逐案",
+  "W4:P8 v3 → 三個 PASS 條件齊 + Hydra GREEN → GO → tag rc-1"
+ ],
+ "not_in_W1": [
+  "治理核心去重(殼方案違版本律已撤回;版本化轉接件 + 遷呼叫者是 W2 設計決策)",
+  "VDF-WKF015 以外的 VDF / VRN 冊內容(他系統車道)",
+  "275 分支 · 15 組同號異名 · 交接閘跨輪欠帳(操作員 / W3)",
+  "v0193 / v0194 / Review Kit 不入倉(CONTAINED)"
+ ],
+ "closeout_patch": {
+  "MODE": "RC-1 W1",
+  "GO": "NO-GO",
+  "GO_unmet": "NO-GO 兩條清了一條(Compile 8 → 0);Hydra 仍 RED(W1 殼方案違版本律,已撤回;正解是 W2 的版本化轉接件 + 遷呼叫者)→ 仍 NO-GO。另 HOLD 三條:Medium Conflict 6 筆(3 件要 W2 diff 裁)· 工具登記(缺號已清 0;交接閘 RED 139(W0 122;REQ203 工作項 0 紅;其餘跨輪欠帳,逐案多輪;殼撤回後 CHANGED_CODE_WITHOUT_TEST 79 · EVIDENCE_INVALID 52 · ACCEL_BRIDGE_MISSING 4 · MODULE_UNREGISTERED 4))· 文件(CGE / V018E-F 佐證)。三個 PASS 條件:VCGC YELLOW · VRN-2 四本書未驗 · VDF reader chain 收據未取得。",
+  "NEXT": "W1 收口(本 PR 併入後):MDL246 v0102 · 教訓冊 v0101 · W1 報告三檔已提交 → --apply --scope 補發號 → registry-sync --apply;VDF 工作流冊 v0107 的發號走 VDF 車道(VCGC 衝突閘「子系統邊界」擋 VCGC 代發)"
+ }
+}
