@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="__CSP__">
+<title>VIA __SYSTEM__ Subsystem Workspace v0106.4</title>
+<style>__CSS__</style>
+</head>
+<body>
+<header id="masthead">
+  <div class="brand">
+    <img class="brand-logo" src="data:image/png;base64,__BRAND_LOGO__" alt="Veritas Intelligence Analytics">
+    <div class="brand-copy">
+      <p class="eyebrow">VIA · ARCHITECTURE BASELINE · 2026-11-05 · ENGINE v0103</p>
+      <h1>VIA System Architecture &amp; Integration Blueprint</h1>
+      <p class="subtitle">__SYSTEM__ · INDEPENDENT SUBSYSTEM WORKSPACE · v0106.4</p>
+    </div>
+  </div>
+  <div class="mast-actions">
+    <a class="hub-link" href="subsystems-v0106.4.html">五系統 Hub</a>
+    <a class="global-link" href="governance-preview-v0105.3.html">Global/common governance · existing read-only route</a>
+    <span class="badge candidate">v0106.4 CANDIDATE</span>
+    <span class="badge danger" id="actual-release">ACTUAL · RED / BLOCKED</span>
+    <span class="badge lock">ENG049 v0102 VISUAL LOCK</span>
+    <div class="pane-controls" role="group" aria-label="左右面板顯示設定">
+      <button type="button" class="pane-toggle" id="toggle-input" aria-controls="input-rail" aria-expanded="true">− 輸入面板</button>
+      <button type="button" class="pane-toggle" id="toggle-evidence" aria-controls="inspector" aria-expanded="true">− 證據面板</button>
+    </div>
+  </div>
+</header>
+<div class="review-note" id="inventory-warning" role="status">唯讀候選證據；不自動註冊、不解除燈號、不啟動 shell 或 native engine。GitHub health 由 parent 外部提供；此頁只標示原始 snapshot provenance。</div>
+<div class="source-legend" aria-label="來源邊界標籤">
+  <span class="source-tag">CANDIDATE ≠ FORMAL REGISTRATION</span>
+  <span class="source-tag">STATIC AST ≠ RUNTIME COVERAGE</span>
+  <span class="source-tag">UPLOADED PASS ≠ THIS-ROUND EXECUTION</span>
+  <span class="source-tag">source 名稱不代表 owner 正式 SSOT</span>
+</div>
+<div class="workspace" id="workspace">
+  <aside class="rail input-rail" id="input-rail" aria-label="輸入面板">
+    <div class="rail-head">
+      <span class="icon" data-icon="sliders" aria-hidden="true"></span><h2>輸入 / View Controls</h2>
+      <button type="button" class="rail-head-hide" id="hide-input" aria-controls="input-rail" aria-expanded="true" aria-label="隱藏輸入面板" title="隱藏輸入面板">−</button><span class="micro">01</span>
+    </div>
+    <div class="rail-body">
+      <a class="rail-home" href="subsystems-v0106.4.html">← 回到五系統 Hub</a>
+      <div class="system-chip"><span>FOCUS</span><strong id="focus-system">__SYSTEM__</strong></div>
+      <label for="query">搜尋名稱、來源、定位編號</label>
+      <div class="searchbox"><span class="icon" data-icon="search" aria-hidden="true"></span><input id="query" type="search" placeholder="例如 CLS、REQ、source" autocomplete="off"></div>
+      <div class="pair"><div><label for="status-filter">狀態</label><select id="status-filter"><option value="">全部狀態</option><option value="RED">RED</option><option value="YELLOW">YELLOW</option><option value="GREEN">GREEN</option></select></div><div><label for="category-select">管理分類</label><select id="category-select"><option value="all">ALL</option><option value="io">I/O</option><option value="commands">COMMANDS</option><option value="files">FILES</option><option value="environment">ENVIRONMENT</option><option value="policy">POLICY</option><option value="conflicts">CONFLICTS</option><option value="requirements">REQUIREMENTS</option><option value="tests">TESTS</option><option value="systems">SYSTEMS</option></select></div></div>
+      <button id="reset-view" class="button secondary" type="button"><span class="icon" data-icon="reset" aria-hidden="true"></span>重設篩選</button>
+      <details class="advanced-controls" id="advanced-controls" open>
+        <summary>匯出 / 本機 UI 操作</summary>
+        <p class="hint">CSV 為目前管理檢視篩選列；JSON 永遠保留此系統 LAST_MATRIX 全部九類列、共享證據與來源 metadata。</p>
+        <button id="export-json" class="button secondary" type="button"><span class="icon" data-icon="download" aria-hidden="true"></span>JSON 全量</button>
+        <button id="export-csv" class="button secondary" type="button"><span class="icon" data-icon="download" aria-hidden="true"></span>CSV（Excel 安全）</button>
+        <div class="rail-divider"></div><h3>本機 UI 狀態</h3><p class="hint">只在 localStorage namespacev0106.4 記住左右面板收合；不儲存 source、矩陣或 engine 狀態。</p>
+        <span class="badge danger">NATIVE RUNTIME · NOT_RUN</span>
+      </details>
+    </div>
+  </aside>
+  <main class="center" aria-label="中央 subsystem matrix">
+    <section class="kpis" id="kpis" aria-label="系統摘要"></section>
+    <section class="center-panel">
+      <div class="center-panel-head" id="center-panel-head"><span class="icon" data-icon="grid" aria-hidden="true"></span><h2>中央系統工作區 · LAST_MATRIX</h2><span class="micro">02 · SUMMARY / VERIFY / MATRIX</span></div>
+      <div class="tabs" role="tablist" aria-label="中央工作區分頁">
+        <button role="tab" data-tab="summary" aria-selected="false">系統摘要</button>
+        <button role="tab" data-tab="verification" aria-selected="false">驗證結果</button>
+        <button role="tab" data-tab="management" aria-selected="true">管理矩陣</button>
+      </div>
+      <div id="summary-view" class="center-view" role="tabpanel" aria-live="polite"></div>
+      <div id="verification-view" class="center-view" role="tabpanel" aria-live="polite" hidden></div>
+      <div id="management-view" class="center-view" role="tabpanel" aria-live="polite">
+        <section class="workflow-section" id="workflow-section" aria-label="Subsystem workflow chart">
+          <div class="workflow-head"><div><p class="eyebrow">EVIDENCE MAP / LAST_MATRIX</p><h3>Evidence Relationship Map · NOT A VERIFIED RUNTIME FLOW</h3><p class="hint">Only concrete identities from exact source rows are shown; edges require explicit relationship evidence and are never LIVE. Click any node to open its source row in Inspector.</p></div><span class="workflow-boundary">DECLARED/OFF · NEVER LIVE</span></div>
+          <div id="workflow-chart" class="workflow-chart"></div>
+        </section>
+        <div class="category-tabs" id="category-tabs" role="tablist" aria-label="管理矩陣分類"></div>
+        <div class="view-head" id="view-head"><div><p class="eyebrow" id="view-index">MANAGEMENT / ALL</p><h2 id="view-title">管理矩陣 · ALL</h2><p class="hint" id="view-subtitle"></p></div><span class="matrix-contract">前四欄固定 · 末欄錯誤詳細說明</span></div>
+        <div class="management-export" aria-label="完整資料輸出"><span id="export-note" class="hint">Native window.print() → choose Save as PDF; no direct PDF download. AI_HANDOVER is the default PDF scope.</span><div class="pdf-controls" id="pdf-controls" aria-label="PDF scope and bounded part selection"><label for="pdf-scope">PDF scope</label><select id="pdf-scope"><option value="AI_HANDOVER">AI_HANDOVER</option><option value="FULL_PARTS">FULL_PARTS</option></select><label for="pdf-part-size">Part size</label><select id="pdf-part-size"><option value="100">100 owned rows</option></select><button id="pdf-prev" class="export-button" type="button" aria-label="Previous PDF part">Previous</button><span id="pdf-part-meta" class="pdf-part-meta">AI_HANDOVER · summary scope</span><button id="pdf-next" class="export-button" type="button" aria-label="Next PDF part">Next</button></div><div><button id="export-pdf" class="export-button" type="button">PDF / 列印</button><button id="export-handover" class="export-button" type="button">AI handover MD</button><button id="export-md" class="export-button" type="button">MD 全量</button><button id="export-json-top" class="export-button" type="button">JSON 全量</button></div></div><p id="pdf-warning" class="pdf-warning">AI_HANDOVER default. FULL_PARTS is bounded: save every part to retain the full PDF; no single full PDF is claimed.</p>
+        <div id="view" role="region" aria-live="polite"></div>
+        <div class="table-footer"><span id="row-count"></span><div><button id="prev-page" class="page-button" type="button" aria-label="上一頁">←</button><span id="page-label"></span><button id="next-page" class="page-button" type="button" aria-label="下一頁">→</button></div></div>
+      </div>
+    </section>
+    <footer class="center-footer">所有 owned rows 以 source system 精確篩選；shared evidence 不重複計入。候選 source 與 SHA 僅供追溯；<span id="generated-at">v0106.4 CANDIDATE · original snapshot</span></footer>
+  </main>
+  <aside class="rail evidence-rail" id="inspector" aria-label="證據檢視面板">
+    <div class="rail-head"><span class="icon" data-icon="layers" aria-hidden="true"></span><h2>Evidence / Inspector</h2><button type="button" class="rail-head-hide" id="hide-evidence" aria-controls="inspector" aria-expanded="true" aria-label="隱藏證據面板" title="隱藏證據面板">−</button><span class="micro">03</span></div>
+    <div class="rail-body">
+      <div class="evidence-label">SOURCE BOUNDARY</div><h3 id="inspect-title">選取矩陣列以查看證據</h3><p id="inspect-note" class="hint">每列保留原始欄位；category 是 UI 額外分類欄，不改寫 source values。</p><div id="inspect-fields"></div>
+      <div class="rail-divider"></div><h3>共享證據（分離）</h3><p id="shared-note" class="hint"></p><div id="shared-preview"></div>
+      <div class="rail-divider"></div><h3>燈號政策</h3><div class="track"><b>RED</b><span class="badge danger">BLOCKED / ERROR</span><p>紅燈只作 2.8s 慢 pulse；不得以 UI 按鈕解除。</p></div><div class="track"><b>YELLOW</b><span class="badge warning">PENDING / UNKNOWN</span><p>資料不足、未觀測或未跑不可推論為綠燈。</p></div><div class="track"><b>GREEN</b><span class="badge success">OBSERVED</span><p>僅呈現 LAST_MATRIX 原始狀態；uploaded PASS 不等同本輪實跑。</p></div>
+    </div>
+  </aside>
+</div>
+<div id="print-all" class="print-only" aria-hidden="true"></div>
+<script id="payload" type="application/json">__PAYLOAD__</script>
+<script>__JS__</script>
+</body>
+</html>

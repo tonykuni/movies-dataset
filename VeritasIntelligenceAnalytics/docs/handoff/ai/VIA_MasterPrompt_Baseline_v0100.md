@@ -49,6 +49,15 @@ Ponytail:Claude Code 外掛,桌機側啟用;本倉只記錄啟用步驟(`via_set
 VRN-2 / VRN-1(REQ197):矩陣 · 借用 9 缺口 · 只讀證明 · 借出清單 4/4 → VERIFIED;`integration-not-done` BLOCKED 等操作員裁整合範圍。
 VDF:管線 fixture 跑通;live 擷取是桌機項(REQ192/193/195 · REQ145/147/150 PENDING),桌機 checkout 落後 main 所以檔「找不到」。
 
+## 5b. 後續上傳(同日,同一 Manus 審查包家族)
+
+| 檔 | 判定 |
+|---|---|
+| Review Kit v0106.4 zip + .sha256 + 收據 json | SHA 一致;四個 U/I 檔已位元組鎖入 `review/VIA_Workbench_LockSite_v0106_4/`;其餘(治理資料 33 MB · 審查包自己的 py / ps1)不入倉、不執行 |
+| 六系統指南 / VCGC handover md(各上傳 3 次) | 同內容(cmp 相同);見 §3 |
+| VIA_Matrix_Audit_v0105_1 json / xlsx(22 工作表)· Full Model json.gz(36,837 列)· ZIP 稽核 md v0105.2 · RED 修復計畫 md v0105.2 · matrix_detail 收據 | 它那輪的 36,837 列模型與 12 RED(5 系統閘 · 5 治理衝突 · 2 環境閘),scope = 它的 add-on zip bf5ac1a1…,不是本倉燈;只記錄 |
+| mcp_stdio_smoke_v0105_2.py(上傳 2 次) | 不執行;它要的 `scripts/via_governance_mcp_v0105.py` 與 engines 不在本倉 |
+
 ## 6. 下一個最小動作(順序)
 
 1. 操作員桌機:`git -C <repo> pull --ff-only origin main`,`Test-Path …VIA_DesktopFourBlocks_v0100.py` 回 True 後跑四區塊 live 擷取。
