@@ -1,0 +1,13 @@
+# VIA 全新電腦一條 PS(v0100 · 2026-11-09)— 先用 Windows 內建 PowerShell 5 貼這一行;它會裝 PS7,再用 PS7 跑完全部,最後自動跳 HTML 工作台。
+# 做的事(全部走既有引擎,無新 .ps1):① winget 裝 PowerShell 7 + Git(已有就略過)② 取倉(沒有就 clone · 有就 pull)③ VIA_DesktopFourBlocks ①降壓/環境總檢 ②環境布建:VCGC EnvManager + EnvGovernance 衝突檢查 → 無衝突的安裝計畫直接 --install(操作員 2026-11-09 授權)
+#          ④ ③MCP 對接 ④VDF 擷取(live · 5 流 · 2022-01-01 起由 ENG064 HistoryBackfill 分年段補)⑤全景 ⑤ WorkbenchLock v0101 build --open(自動跳 hub)。
+# 第一次跑之前,在同一個視窗先設同意閘(只能你設):$env:VIA_NET_CONSENT = 'YES'
+# 最少參數:全部預設;要改倉根設 $env:VIA_ROOT;只想看計畫不裝:把 --install 拿掉。
+
+& { $ErrorActionPreference = 'Continue'; $r = if ($env:VIA_ROOT) { $env:VIA_ROOT } else { Join-Path $HOME 'OneDrive\Documents\movies-dataset' }
+  if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) { winget install --id Microsoft.PowerShell -e --accept-source-agreements --accept-package-agreements --silent | Out-Host }
+  if (-not (Get-Command git -ErrorAction SilentlyContinue)) { winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements --silent | Out-Host }
+  $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
+  if (-not (Test-Path (Join-Path $r '.git'))) { git clone --depth 50 https://github.com/tonykuni/movies-dataset.git $r | Out-Host } else { git -C $r fetch -q origin main; git -C $r merge --no-ff origin/main -m 'boot: merge main' | Out-Host }
+  $via = Join-Path $r 'VeritasIntelligenceAnalytics'; $fb = Join-Path $via 'docs\handoff\ai\VIA_DesktopFourBlocks_v0100.py'; $wb = Join-Path $via 'docs\handoff\ai\VIA_WorkbenchLock_v0101.py'
+  pwsh -NoProfile -ExecutionPolicy Bypass -Command "& { `$env:VIA_FROM_VCGC='YES'; python '$fb' --root '$r' --blocks 1,2 --install; python '$fb' --root '$r' --blocks 3,4,5 --mode live --jobs 5; python '$wb' all --via '$via' --open }" }
