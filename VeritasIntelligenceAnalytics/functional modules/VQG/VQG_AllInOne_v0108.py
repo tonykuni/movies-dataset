@@ -186,7 +186,7 @@ NEW_CORE = {
                                    {"id": "S3", "name": "excess_vs_factor_2330", "method": "票 n 日報酬 − 因子序列(factor_adj_close · 2330)n 日報酬;缺 = null"}], "window": 60},
 }
 NEW_SPECIAL = {"obv": 20, "atr": 14, "clean_flow_ratio": 20, "rolling_sharpe": 60, "rel_strength": 60}
-NEW_EXTRA = {"obv": 1, "atr": 1, "clean_flow_ratio": None, "rolling_sharpe": None, "rel_strength": None}
+NEW_EXTRA = {"obv": 1, "atr": None, "clean_flow_ratio": None, "rolling_sharpe": None, "rel_strength": None}   # atr None:Wilder 遞迴要整段歷史(Codex #621 P2),不截到 n+1
 NEW_OPTIONAL = {"obv": ["volume", "daytrade_volume", "clean_volume"], "atr": ["high", "low"],
                 "clean_flow_ratio": ["volume", "daytrade_volume", "clean_volume", "turnover", "daytrade_turnover", "clean_turnover"],
                 "rolling_sharpe": ["rf_annual"], "rel_strength": ["benchmark_adj_close", "benchmark_market", "factor_adj_close"]}
@@ -238,11 +238,16 @@ def _quintile(rank) -> int | None:
     return None if rank is None else min(5, max(1, math.ceil(rank * 5)))
 
 
-def _last_valid(frame, col):
-    if col not in frame.columns:
+def _at_last(frame, col):
+    """快照觀測日那一列的值;該列 null 就是 null(不回退到更早的值 · Codex #621 P2:不混日期、不遮缺輸入)。"""
+    if col not in frame.columns or frame.height == 0:
         return None
-    vals = [v for v in frame[col].to_list() if v is not None and math.isfinite(v)]
-    return vals[-1] if vals else None
+    v = frame[col][-1]
+    return float(v) if v is not None and math.isfinite(v) else None
+
+
+def _last_valid(frame, col):
+    return _at_last(frame, col)
 
 
 def _streak(frame, col) -> int | None:
@@ -322,6 +327,10 @@ def analyze_ticker(ticker: str, wide, series) -> dict:
         missing.append("BENCHMARK_SERIES_MISSING(rel_strength 要 benchmark_adj_close + benchmark_market 欄;S3 另要 factor_adj_close = 2330)")
     core = [out["trend_regime"] != "INSUFFICIENT", rsi is not None, out["macd_hist"] is not None, vol is not None, out["drawdown_60"] is not None, atrp is not None, out["obv_20_normalized"] is not None]
     out["core_fields_present"] = sum(core)
+    null_latest = [c for c in ("RSI_14_S1", "MACD_26_S1_histogram", "VOLATILITY_20_S1", "DRAWDOWN_60_S1", "ATR_14_S3", "OBV_20_S2")
+                   if c in cols and _at_last(W, c) is None and any(v is not None and math.isfinite(v) for v in W[c].to_list())]
+    if null_latest:
+        missing.append("LATEST_NULL(" + ",".join(null_latest) + ":快照日那一列為 null,較早的值不拿來充數)")
     out["lamp"] = "RED" if W.height == 0 else ("GREEN" if all(core) and not missing else "YELLOW")
     out["missing_inputs"] = missing
     out["rules"] = ("趨勢 = 價 vs SMA(定義性);動能 / 波動 / 真實波幅的「高低」= 該票自己歷史的百分位與五分位(資料驅動 · 無靜態門檻);"
@@ -471,6 +480,8 @@ def selftest() -> int:
     r_none = rel_strength(F.drop(["benchmark_adj_close", "benchmark_market", "factor_adj_close"]), 60)
     chk("⑧ rel_strength:有基準 → 三解皆數;沒基準 → 三 null;atr 沒 high/low → 三 null", all(x is not None for x in (r1, r2, r3)) and r_none == (None, None, None) and atr(F.drop(["high", "low"]), 14) == (None, None, None))
     chk("⑨ 缺當沖欄:obv S3 / clean_flow_ratio S1 null · S2(obv) 仍數", obv(F.drop("daytrade_volume"), 20)[2] is None and clean_flow_ratio(F.drop("daytrade_volume"), 20)[0] is None and obv(F.drop("daytrade_volume"), 20)[1] is not None)
+    Wn = pl.DataFrame({"observation_date": [date(2026, 1, 5), date(2026, 1, 6)], "RSI_14_S1": [55.0, None]})
+    chk("⑨b 快照日那一列 null → _at_last 給 null(不回退)· atr EXTRA = None(Wilder 用整段歷史)", _at_last(Wn, "RSI_14_S1") is None and _at_last(Wn.head(1), "RSI_14_S1") == 55.0 and V4.EXTRA["atr"] is None)
     env_root = os.environ.pop("VQG_VDF_ROOT", None)
     try:
         with tempfile.TemporaryDirectory() as td:
