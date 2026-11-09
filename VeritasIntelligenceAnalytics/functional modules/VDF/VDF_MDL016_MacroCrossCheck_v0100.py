@@ -226,8 +226,13 @@ def judge(ak: dict, off: dict, freq: str, n: int, tol: dict) -> dict:
     off_latest, ak_latest = max(off), max(ak)
     rows = [{"period": k, "akshare": ak[k], "official": off.get(k)} for k in ak_keys]
     same = [r for r in rows if r["official"] is not None]
-    if same and all(within(r["akshare"], r["official"], tol) for r in same) and len(same) == len(rows):
-        return {"verdict": "AGREE", "note": "最新 %d 筆同期同值(容忍 abs %s · pct %s%%)" % (len(rows), tol.get("abs"), tol.get("pct")), "rows": rows}
+    if same and all(within(r["akshare"], r["official"], tol) for r in same):
+        if len(same) == len(rows):
+            return {"verdict": "AGREE", "note": "最新 %d 筆同期同值(容忍 abs %s · pct %s%%)" % (len(rows), tol.get("abs"), tol.get("pct")), "rows": rows}
+        missing_periods = [r["period"] for r in rows if r["official"] is None]
+        if ak_latest > off_latest:                                   # 重疊的全對 · AKShare 多出更新的期 → 官方庫落後(Codex #622 P2)
+            return {"verdict": "SOURCE_DIFF:OFFICIAL_LAGGING", "note": "重疊 %d 筆同值 · AKShare 多出 %s(官方最新 %s)→ 官方庫落後,該回填;不是 AKShare 錯" % (len(same), " / ".join(missing_periods), off_latest), "rows": rows}
+        return {"verdict": "AGREE", "note": "重疊 %d 筆同值 · 官方庫缺中間期 %s(照實列 · 不算錯)" % (len(same), " / ".join(missing_periods)), "rows": rows, "official_missing_periods": missing_periods}
     for sh in (-1, 1):
         shifted = [(r["akshare"], off.get(shift_key(r["period"], freq, sh))) for r in rows]
         if all(o is not None and within(a, o, tol) for a, o in shifted):
@@ -447,7 +452,10 @@ def selftest() -> int:
     chk("④ UNIT_SCALE:差固定 1000 倍 → 單位不同", j["verdict"] == "SOURCE_DIFF:UNIT_SCALE" and j.get("scale") == 1000.0)
     ak_new = {"2026-08": off["2026-08"], "2026-09": off["2026-09"], "2026-10": 5.1}
     off_old = {k: v for k, v in off.items() if k <= "2026-09"}
-    chk("⑤ 部分同期對上 + AKShare 多一期(官方還沒)→ 不是 SUSPECT(同期 2 筆對上才算 AGREE 範圍外)", judge(ak_new, off_old, "M", 3, tol)["verdict"] in ("AGREE", "SOURCE_DIFF:OFFICIAL_LAGGING", "AKSHARE_SUSPECT"))
+    chk("⑤ 重疊 2 筆同值 + AKShare 多一期(官方還沒)→ OFFICIAL_LAGGING(不是 SUSPECT;Codex #622 P2)", judge(ak_new, off_old, "M", 3, tol)["verdict"] == "SOURCE_DIFF:OFFICIAL_LAGGING")
+    ak_gap = {"2026-06": off["2026-06"], "2026-08": off["2026-08"], "2026-09": off["2026-09"]}
+    off_gap = {k: v for k, v in off.items() if k != "2026-08"}
+    chk("⑤b 重疊同值 · 官方缺中間期 → AGREE 並列缺期(不升 SUSPECT)", judge(ak_gap, off_gap, "M", 3, tol)["verdict"] == "AGREE" and judge(ak_gap, off_gap, "M", 3, tol).get("official_missing_periods") == ["2026-08"])
     chk("⑥ OFFICIAL_LAGGING:AKShare 三筆全比官方新 → 官方庫該回填", judge({"2026-10": 1, "2026-11": 1, "2026-12": 1}, off, "M", 3, tol)["verdict"] == "SOURCE_DIFF:OFFICIAL_LAGGING")
     ak_stale = {"2026-05": 9.9, "2026-06": 9.9, "2026-07": 9.9}
     chk("⑦ AKSHARE_STALE:AKShare 最新落後官方 2 期且值對不上", judge(ak_stale, off, "M", 3, tol)["verdict"] == "AKSHARE_STALE")

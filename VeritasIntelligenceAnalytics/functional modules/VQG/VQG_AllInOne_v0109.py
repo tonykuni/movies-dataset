@@ -317,8 +317,10 @@ def stats_rows(series_frames: dict) -> tuple:
     for tk, s in series_frames.items():
         s = s.sort("date")
         px = [_f(x) for x in s["adj_close"].to_list()]
-        r = [(px[i] / px[i - 1] - 1.0) for i in range(1, len(px)) if px[i] is not None and px[i - 1]]
-        rets_by[tk] = dict(zip(s["date"].to_list()[1:], r))
+        dts = s["date"].to_list()
+        pairs = [(dts[i], px[i] / px[i - 1] - 1.0) for i in range(1, len(px)) if px[i] is not None and px[i - 1]]   # 日期與報酬一起過濾(缺價不錯位 · Codex #622 P2)
+        r = [v for _, v in pairs]
+        rets_by[tk] = dict(pairs)
         n = len(r)
         if n < 10:
             rows.append({"ticker": tk, "n": n, "state": "INSUFFICIENT"})
@@ -562,6 +564,13 @@ def selftest() -> int:
             two = {k: v for k, v in list({p.stem: pl.read_parquet(p) for p in (ed / "indicators").glob("*.parquet")}.items())[:2]}
             _, fs2 = factor_ic(two, {k: pl.read_parquet(ed / "series" / (k + ".parquet")) for k in two})
             chk("⑫ 票 < 3 → 因子 INSUFFICIENT_TICKERS 照實(不假算)", fs2["state"] == "INSUFFICIENT_TICKERS")
+            sA = pl.read_parquet(ed / "series" / "2330_TW.parquet").sort("date")
+            vals = sA["adj_close"].to_list()
+            vals[40] = None                                                    # 中間缺一個價(v0105 load_series 會留 null 列)
+            sB = sA.with_columns(pl.Series("adj_close", vals, dtype=pl.Float64))
+            _, corrAB = stats_rows({"A": sA, "B": sB})
+            cAB = corrAB["B"].to_list()[corrAB["ticker"].to_list().index("A")]
+            chk("⑬ 統計:缺價那一列的日期與報酬一起過濾 → 同一序列挖一個洞仍相關 1.0(錯位會掉;Codex #622 P2)", cAB is not None and abs(cAB - 1.0) < 1e-9)
     finally:
         if env_root is not None:
             os.environ["VQG_VDF_ROOT"] = env_root
