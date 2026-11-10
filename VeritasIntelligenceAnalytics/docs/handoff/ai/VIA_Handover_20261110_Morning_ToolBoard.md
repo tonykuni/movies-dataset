@@ -138,3 +138,6 @@ python3 "docs/handoff/ai/VIA_DailyBackup_v0100.py" check && python3 "docs/handof
 | P2 見證燈只看 rc(引擎自報 YELLOW 仍 GREEN) | `step_lamp()`:本輪收據 JSON 的 lamp > stdout 首個 `[GREEN|YELLOW|RED|GRAY|PASS|FAIL]` > rc;行程失敗不可能綠 / 黃;整件 = 各步最差 | 自測 ⓗ:rc 0 + 收據 YELLOW → 步 YELLOW · 整件 YELLOW;ⓗ2 `[PASS]` → GREEN |
 
 登冊:盤點 v0219(+C-parquet-lake-v0101 · C-parquet-lake 回 10 項 · C-lake-console 19 項 · WKF037-STP001 → v0101)· 需求 v0243 · 工作流 v0144 · 交接冊。操作台使用者測試重跑(新碼 · 埠 8767):Playwright 三視窗 **39 步 0 失敗 0 pageerror · GREEN**(2026-11-10T03:19:56Z · `VIA_Reports/lake/CONSOLE_UserTest_latest.{json,md}`;下拉自測 → 矩陣真跑收據連結 → 拖曳兩檔預覽 / 勾主鍵 / 入湖 VCGC → 選檔 VDF 落 `_inbox` → 選資料夾 → 無權杖 403 / 非白名單 400)。三串 Codex 已回覆並 resolve(8cf4d1b94);編號冊 +23 已提交(fa50dbae4)。
+
+閘鏈第 16 輪(修後):`test --quick` **YELLOW**(站 9 綠 2 黃 0 紅 · case 267/267 · workflow 164/164 · 紀錄 +3)。`handoff check` **RED 143 → 141**:本輪兩項已清(C-vcgc-toolboard 收據重生,因 seat_path 修在收據之後;REQ214 systems-adopt-lake OPEN 不是合法態 → PENDING)。
+**更正**:前幾輪交接文件寫的「handoff check 16 紅」是擷取只留尾 18 行的誤記;真實基線是 11-09 的 139 紅(EVIDENCE_INVALID 52 全為 11-06 席位冊 `VIA_VCGC_SubsystemSeat_v0100` 變更後的連鎖:chain / backup / numbering 等舊收據失效 → 其相依模組落成 CHANGED_CODE_WITHOUT_TEST 81),不是本輪新紅;要清要在桌機 `handoff test chain` / `backup` / `numbering` 重跑舊案後 `handoff checkpoint`。新案(lake · console · parquet v0101 · toolboard)紅 0。
