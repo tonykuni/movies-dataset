@@ -26,13 +26,28 @@ r"""VIA_SystemCard v0100 — 全景到底的動詞引擎:給一個資料夾(或 
   slice  <索引裡的檔> <定義名>                       只取一個定義的原文(帶行號;A 讀磁碟 · B 讀 git ref;索引外的檔不讀)
   mcp    [--out DIR]                                 stdio MCP 伺服器(只讀):via_card · via_find · via_where · via_system · via_numbers · via_slice
                                                      —— Claude / ChatGPT / Manus / Gemini / Copilot 經 VIA_MCP_Engine 接同一支
-  diff   <A 輸出夾> <B 輸出夾>                       A×B 對帳:SYNC · LOCAL_AHEAD · REMOTE_ONLY · DIVERGED(只報告,不 push / pull)
+  diff   <A 輸出夾> <B 輸出夾> [--map A根=B根]      A×B 對帳:SYNC · LOCAL_AHEAD · REMOTE_ONLY · DIVERGED(只報告,不 push / pull)
   tools                                              省 Token 外部工具在不在(Graphify · Ponytail · 記憶外掛 · Playwright · DuckDB · ChartDB)
   --selftest
 事後閘(每道都真的算,不寫死 PASS):G1 檔案守恆 · G2 AST 守恆 · G3 掃描零變動 · G4 孤兒 ≤ 5% · G5 尾版編號覆蓋 · G6 來源可讀(B 軌 ref 解不開 = RED)。
 邊界:唯讀被掃的樹;只寫 --out(預設 VIA_Reports/systemcard/<軌>/,不進倉);不執行被掃的檔;零網路;不用 TA-Lib;不 import VCGC。
 """
 from __future__ import annotations
+
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更)=====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import argparse
 import base64
@@ -187,11 +202,12 @@ def _family(rel: str) -> tuple[str, int]:
 
 
 def _num_of(path: str, nums: dict) -> str:
-    """號冊 source 是相對 VIA 根(functional modules/… · supportive modules/…)→ 先切到 VIA 根下精確查,再退後綴比對。"""
+    """號冊 source 是相對 VIA 根(functional modules/… · supportive modules/…)→ 先切到 VIA 根下精確查,再退後綴比對;nums 鍵 = (掃描根, source)。"""
+    root = path.split("/", 1)[0]
     key = path.split("VeritasIntelligenceAnalytics/", 1)[-1] if "VeritasIntelligenceAnalytics/" in path else path.split("/", 1)[-1]
-    if key in nums:
-        return nums[key]
-    return next((c for k, c in nums.items() if key.endswith("/" + k) or k.endswith("/" + key)), "")
+    if (root, key) in nums:                # 只查同一個掃描根的號冊:別倉的號不借用
+        return nums[(root, key)]
+    return next((c for (r, k), c in nums.items() if r == root and (key.endswith("/" + k) or k.endswith("/" + key))), "")
 
 
 def load_numbers(files: dict) -> tuple[dict, int]:
@@ -208,7 +224,7 @@ def load_numbers(files: dict) -> tuple[dict, int]:
                     continue
                 src = str(r.get("source") or "").replace("\\", "/")
                 if src and r.get("code"):
-                    nums.setdefault(src, r["code"])
+                    nums.setdefault((rel.split("/", 1)[0], src), r["code"])   # (掃描根, source):兩倉同路徑不互蓋(Codex #627 P1)
     return nums, books
 
 
@@ -772,12 +788,23 @@ def v_system(rows: list, s: str) -> list:
             for r in sorted((r for r in rows if r["s"] == s and r["tail"] and r["ext"] in (".py", ".ps1")), key=lambda r: (not r["entry"], r["p"]))]
 
 
-def v_diff(a_out: Path, b_out: Path) -> dict:
-    """A×B:以「倉內相對路徑」對齊(去掉第一層夾名),比 git blob 雜湊。"""
+def v_diff(a_out: Path, b_out: Path, root_map: dict | None = None) -> dict:
+    """A×B:以「倉根 + 倉內相對路徑」對齊,比 git blob 雜湊。兩倉同掃時倉根留在鍵裡(README.md 不互蓋;Codex #627 P2)。
+    A / B 夾名不同:各只有一個根 → 自動對上;多根 → 同名對同名,不同名用 root_map {A 根名: B 根名}(CLI --map A=B)。"""
     _, ra = _load(a_out)
     _, rb = _load(b_out)
-    key = lambda r: r["p"].split("/", 1)[-1]  # noqa: E731
-    A, B = {key(r): r for r in ra}, {key(r): r for r in rb}
+    roots_a = sorted({r["p"].split("/", 1)[0] for r in ra})
+    roots_b = sorted({r["p"].split("/", 1)[0] for r in rb})
+    rmap = dict(root_map or {})
+    if not rmap and len(roots_a) == 1 and len(roots_b) == 1:
+        rmap = {roots_a[0]: roots_b[0]}
+
+    def key(r, side):
+        root, _, inner = r["p"].partition("/")
+        return "%s/%s" % (rmap.get(root, root) if side == "A" else root, inner)
+    A, B = {key(r, "A"): r for r in ra}, {key(r, "B"): r for r in rb}
+    if len(A) != len(ra) or len(B) != len(rb):
+        raise ValueError("對帳鍵撞了(同根同路徑兩列):A %d→%d · B %d→%d" % (len(ra), len(A), len(rb), len(B)))
     states = Counter()
     rows = []
     for k in sorted(set(A) | set(B)):
@@ -789,7 +816,7 @@ def v_diff(a_out: Path, b_out: Path) -> dict:
         states[st] += 1
         if st != "SYNC":
             rows.append({"path": k, "state": st, "system": (a or b)["s"], "tail": (a or b)["tail"]})
-    return {"engine": ENGINE, "at": _now(), "states": dict(states), "rows": rows}
+    return {"engine": ENGINE, "at": _now(), "states": dict(states), "rows": rows, "root_map": rmap, "roots": {"A": roots_a, "B": roots_b}}
 
 
 def v_numbers(rows: list, missing: bool = False, limit: int = 30) -> list:
@@ -814,7 +841,8 @@ def v_slice(summary: dict, rows: list, path: str, name: str) -> str:
         if summary["track"] == "B":
             top = _git(root, "rev-parse", "--show-toplevel").stdout.decode().strip()
             sub = str(root.resolve().relative_to(Path(top).resolve())).replace("\\", "/")
-            spec = "%s:%s" % (summary["ref"], (sub + "/" if sub not in (".", "") else "") + inner)
+            rev = (summary.get("refs") or {}).get(root_name) or summary["ref"]   # 索引記下的 commit,不是會往前走的 ref(Codex #627 P2)
+            spec = "%s:%s" % (rev, (sub + "/" if sub not in (".", "") else "") + inner)
             text = _git(Path(top), "show", spec).stdout.decode("utf-8", "replace")
         else:
             text = (root / inner).read_text(encoding="utf-8", errors="replace")
@@ -827,14 +855,27 @@ def v_slice(summary: dict, rows: list, path: str, name: str) -> str:
     except SyntaxError as exc:
         return "(語法錯,無法切:%s)" % exc
     want = name.split(".")
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.name == want[-1]:
-            lines = text.splitlines()
-            a, b = node.lineno, getattr(node, "end_lineno", node.lineno)
-            if getattr(node, "decorator_list", None):
-                a = min(d.lineno for d in node.decorator_list)
-            return "\n".join("%5d  %s" % (i, lines[i - 1]) for i in range(a, min(b, a + 400) + 1)) + ("\n…(截在 400 行)" if b - a > 400 else "")
-    return "(%s 裡沒有 %s)" % (inner, name)
+    kinds = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+
+    def walk_path(nodes, parts):          # Class.method 逐層走,不丟限定詞(Codex #627 P2)
+        for nd in nodes:
+            if isinstance(nd, kinds) and nd.name == parts[0]:
+                if len(parts) == 1:
+                    return nd
+                hit = walk_path(nd.body, parts[1:])
+                if hit is not None:
+                    return hit
+        return None
+    found = walk_path(tree.body, want)
+    if found is None and len(want) == 1:
+        found = next((nd for nd in ast.walk(tree) if isinstance(nd, kinds) and nd.name == want[0]), None)
+    if found is None:
+        return "(%s 裡沒有 %s)" % (inner, name)
+    lines = text.splitlines()
+    a, b = found.lineno, getattr(found, "end_lineno", found.lineno)
+    if getattr(found, "decorator_list", None):
+        a = min(d.lineno for d in found.decorator_list)
+    return "\n".join("%5d  %s" % (i, lines[i - 1]) for i in range(a, min(b, a + 400) + 1)) + ("\n…(截在 400 行)" if b - a > 400 else "")
 
 
 # ---------------------------------------------------------------- MCP(stdio · JSON-RPC 2.0 · 只讀)
@@ -1019,10 +1060,44 @@ def selftest() -> int:
         s2 = scan([root, two], "A", Path(td) / "outTwo")
         chk("⑮ 兩倉同掃 VRN 逐列標:本倉 VRN_ = VRN-2 · via-vdf-vrn 倉 = VRN-1(不互相吃掉)",
             s2["by_system"].get("VRN-1") == 1 and s2["by_system"].get("VRN-2") == s["by_system"].get("VRN-2"), s2["by_system"])
+        # ⑯ Codex #627 四條回歸:號冊依倉 · 對帳鍵留倉根 · slice 限定名 · B 軌 slice 用索引當下的 commit
+        r1, r2 = Path(td) / "repoX", Path(td) / "repoY"
+        same = "supportive modules/registry/CGC_MDL002_Same_v0100.py"
+        for rr, code in ((r1, "VIA-VCGC-MDL101"), (r2, "VIA-VCGC-MDL202")):
+            (rr / same).parent.mkdir(parents=True, exist_ok=True)
+            (rr / same).write_text('"""同路徑"""\nclass First:\n    def run(self):\n        return 1\nclass Second:\n    def run(self):\n        return 2\n', encoding="utf-8")
+            bk = rr / "supportive modules/registry/VIA_NumberBooks/VIA_NumberBook_MDL_v0100.jsonl"
+            bk.parent.mkdir(parents=True, exist_ok=True)
+            bk.write_text(json.dumps({"code": code, "source": same}) + "\n", encoding="utf-8")
+            (rr / "README.md").write_text("# 同名\n", encoding="utf-8")
+        o1 = Path(td) / "outXY1"
+        sxy = scan([r1, r2], "A", o1)
+        _, rxy = _load(o1)
+        num = {r["p"]: r["num"] for r in rxy}
+        (r1 / "README.md").write_text("# repoX 改了\n", encoding="utf-8")
+        o2 = Path(td) / "outXY2"
+        scan([r1, r2], "A", o2)
+        dxy = v_diff(o2, o1)
+        sl = v_slice(sxy, rxy, "repoX/" + same, "Second.run")
+        subprocess.run(["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t", "add", "-A"], check=True)
+        tool = root / "supportive modules/registry/CGC_MDL001_Tool_v0101.py"
+        tool_orig = tool.read_text(encoding="utf-8")
+        tool.write_text('"""後來才加"""\ndef newfn():\n    return 9\n', encoding="utf-8")
+        subprocess.run(["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qam", "later"], check=True)
+        sb_s, sb_rows = _load(outB)
+        late = v_slice(sb_s, sb_rows, "supportive modules/registry/CGC_MDL001_Tool_v0101.py", "newfn")
+        then = v_slice(sb_s, sb_rows, "supportive modules/registry/CGC_MDL001_Tool_v0101.py", "T.go")
+        tool.write_text(tool_orig, encoding="utf-8")   # 還原夾具,後面 ⑭(A 軌讀磁碟)不受影響
+        chk("⑯ Codex #627:號冊依倉不互借(X=101 · Y=202)· 兩倉同名 README 對帳不互蓋(DIVERGED 1)· slice Second.run 取到 Second · B 軌 slice 讀索引當下 commit(之後才加的 newfn 取不到)",
+            num.get("repoX/" + same) == "VIA-VCGC-MDL101" and num.get("repoY/" + same) == "VIA-VCGC-MDL202"
+            and dxy["states"].get("DIVERGED") == 1 and any(r["path"] == "repoX/README.md" for r in dxy["rows"])
+            and "return 2" in sl and "return 1" not in sl and "沒有" in late and "def go" in then,
+            (num, dxy["states"], sl[-20:], late[-20:]))
         chk("⑬ 號冊整本讀(MDL 冊 > 1 MB 也讀 · 實測 2.6 MB)· source 相對 VIA 根精確對號",
             _readable("x/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_NumberBooks/VIA_NumberBook_MDL_v0100.jsonl", 2_700_000)
             and not _readable("x/big.json", 2_700_000)
-            and _num_of("movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_A_v0101.py", {"functional modules/VDF/VDF_A_v0101.py": "VIA-VDF-MDL009"}) == "VIA-VDF-MDL009")
+            and _num_of("movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_A_v0101.py", {("movies-dataset", "functional modules/VDF/VDF_A_v0101.py"): "VIA-VDF-MDL009"}) == "VIA-VDF-MDL009"
+            and _num_of("via-vdf-vrn/functional modules/VDF/VDF_A_v0101.py", {("movies-dataset", "functional modules/VDF/VDF_A_v0101.py"): "VIA-VDF-MDL009"}) == "")
         msgs = [{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2025-06-18"}},
                 {"jsonrpc": "2.0", "method": "notifications/initialized"},
                 {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
@@ -1056,6 +1131,7 @@ def main(argv=None) -> int:
     ap.add_argument("--budget", type=int, default=3000)
     ap.add_argument("--system", default="")
     ap.add_argument("--limit", type=int, default=30)
+    ap.add_argument("--map", action="append", default=[], help="diff 用:A 根名=B 根名(可重複)")
     ap.add_argument("--missing", action="store_true")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args(argv)
@@ -1077,7 +1153,7 @@ def main(argv=None) -> int:
         if len(a.args) != 2:
             print("用法:diff <A 輸出夾> <B 輸出夾>")
             return 2
-        d = v_diff(Path(a.args[0]), Path(a.args[1]))
+        d = v_diff(Path(a.args[0]), Path(a.args[1]), dict(m.split("=", 1) for m in a.map if "=" in m))
         print(json.dumps(d["states"], ensure_ascii=False))
         for r in d["rows"][:a.limit]:
             print("  %-12s %s %s%s" % (r["state"], r["system"], r["path"], "" if r["tail"] else "(前版)"))
