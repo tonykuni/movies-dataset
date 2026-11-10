@@ -1,0 +1,311 @@
+{
+ "schema": "VIA.Constitution.SSOT/1",
+ "version": "v0100",
+ "ts": "2026-11-10T16:00:00Z",
+ "owner": "VCGC(憲法庫;AI 與操作員共同有權修改 · 只增不改號)",
+ "source": "操作員 2026-11-10 原文貼入(第十一章 系統介面契約治理 · 第十二章 契約棄用與終止治理)",
+ "chapters_not_in_repo": {
+  "chapters": "1–10(CONST-001–030)",
+  "state": "NOT_IN_REPO",
+  "note": "原文未入倉、上傳檔也查無;不補寫、不猜,待操作員上傳原文後只增入冊"
+ },
+ "articles": [
+  {
+   "id": "CONST-031",
+   "chapter": 11,
+   "title": "介面契約原則",
+   "rule": "所有系統間之通訊均應透過正式定義之介面契約;任何系統不得依賴他系統之內部程式碼、內部資料表結構或私有函式。",
+   "measure": "auto:cross_system_refs"
+  },
+  {
+   "id": "CONST-032",
+   "chapter": 11,
+   "title": "契約優先原則",
+   "rule": "契約 → 實作 → 驗證;不得採用 實作 → 契約。契約為唯一合法通訊依據。",
+   "measure": "auto:contract_book_source"
+  },
+  {
+   "id": "CONST-033",
+   "chapter": 11,
+   "title": "MAIN()自治保護原則",
+   "rule": "各系統 MAIN() 為自治核心;他系統不得修改、覆寫、直接呼叫內部流程、攔截控制權;僅允許透過契約介面存取授權功能。",
+   "measure": "auto:cross_system_refs"
+  },
+  {
+   "id": "CONST-034",
+   "chapter": 11,
+   "title": "契約唯一識別原則",
+   "rule": "每個介面契約具永久編號(API-### 或 IFC-###),建立後不得變更。",
+   "measure": "auto:ifc_ids"
+  },
+  {
+   "id": "CONST-035",
+   "chapter": 11,
+   "title": "契約版本治理原則",
+   "rule": "允許內容升級(IFC-001 v1.0 → v1.1 → v2.0),不得變更永久識別碼。",
+   "measure": "auto:ifc_ids"
+  },
+  {
+   "id": "CONST-036",
+   "chapter": 11,
+   "title": "向下相容原則",
+   "rule": "介面升級應盡可能相容;無法相容須建立 v2.0 新契約。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-037",
+   "chapter": 11,
+   "title": "輸入輸出契約原則",
+   "rule": "所有介面必須明確定義 INPUT · OUTPUT · PARAMETERS · ERROR CODE · TIMEOUT · SECURITY;不得存在未定義行為。",
+   "measure": "auto:fields"
+  },
+  {
+   "id": "CONST-038",
+   "chapter": 11,
+   "title": "錯誤碼治理原則",
+   "rule": "錯誤標準化(ERR-001 Validation Failed · ERR-002 Unauthorized · ERR-003 Timeout · ERR-004 Dependency Failure · ERR-005 Data Integrity Failed);不得只回 Error / Fail / Unknown。",
+   "measure": "auto:error_codes"
+  },
+  {
+   "id": "CONST-039",
+   "chapter": 11,
+   "title": "契約測試原則",
+   "rule": "每個契約擁有獨立測試案例(正常 · 邊界 · 異常 · 壓力 · 安全),全部通過方可發布。",
+   "measure": "auto:tests"
+  },
+  {
+   "id": "CONST-040",
+   "chapter": 11,
+   "title": "契約變更影響原則",
+   "rule": "修改契約前必須 Impact Analysis(影響系統 · 依賴模組 · 代理服務 · 資料流程)。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-041",
+   "chapter": 11,
+   "title": "契約獨立回滾原則",
+   "rule": "契約更新失敗優先回滾契約版本(IFC-015 v2.0 → v1.5),不得直接回滾所有系統。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-042",
+   "chapter": 11,
+   "title": "契約驗證原則",
+   "rule": "契約異動須通過 Schema · Contract · Compatibility · Security · Performance 驗證方可生效。",
+   "measure": "auto:validation"
+  },
+  {
+   "id": "CONST-043",
+   "chapter": 11,
+   "title": "依賴隔離原則",
+   "rule": "不得依賴對方資料表 · 記憶體 · Cache · 內部函式;僅得依賴已公開契約。",
+   "measure": "auto:cross_system_refs"
+  },
+  {
+   "id": "CONST-044",
+   "chapter": 11,
+   "title": "契約不可繞過原則",
+   "rule": "禁止 Direct Database Access · Direct Memory Access · Internal Function Hook · Private API Call 繞過契約。",
+   "measure": "auto:cross_system_refs"
+  },
+  {
+   "id": "CONST-045",
+   "chapter": 11,
+   "title": "自治系統互操作原則",
+   "rule": "獨立 MAIN() + 獨立資料 + 獨立測試 + 共同契約。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-046",
+   "chapter": 11,
+   "title": "契約憲法最高性原則",
+   "rule": "實作與契約不一致時以契約為準,實作應修改以符合契約,不得以實作覆蓋契約。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-047",
+   "chapter": 12,
+   "title": "契約生命週期定義",
+   "rule": "DRAFT → ACTIVE → DEPRECATED → SUNSET → TERMINATED → ARCHIVED。",
+   "measure": "auto:lifecycle"
+  },
+  {
+   "id": "CONST-048",
+   "chapter": 12,
+   "title": "契約唯一生命週期原則",
+   "rule": "同一時間只能有一種生命週期狀態。",
+   "measure": "auto:lifecycle"
+  },
+  {
+   "id": "CONST-049",
+   "chapter": 12,
+   "title": "契約棄用啟動條件",
+   "rule": "技術升級 · 安全風險 · 架構重構 · 相依消失。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-050",
+   "chapter": 12,
+   "title": "棄用公告原則",
+   "rule": "公告含 契約編號 · 版本 · 棄用原因 · 替代契約 · 預定終止日 · 影響範圍。",
+   "measure": "auto:deprecation_notice"
+  },
+  {
+   "id": "CONST-051",
+   "chapter": 12,
+   "title": "替代契約原則",
+   "rule": "棄用時應提供 Replacement Contract,除非功能完全終止。",
+   "measure": "auto:deprecation_notice"
+  },
+  {
+   "id": "CONST-052",
+   "chapter": 12,
+   "title": "相容維持原則",
+   "rule": "棄用期間舊契約仍可執行,直到 SUNSET DATE。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-053",
+   "chapter": 12,
+   "title": "停止新增接入原則",
+   "rule": "SUNSET 後禁止新系統接入 · 新模組依賴 · 新代理綁定。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-054",
+   "chapter": 12,
+   "title": "既有系統保護原則",
+   "rule": "既有依賴可暫持續運行,但須完成遷移計畫。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-055",
+   "chapter": 12,
+   "title": "遷移追蹤原則",
+   "rule": "建立 Migration Matrix(來源契約 · 目標契約 · 負責單位 · 完成率 · 完成日期)。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-056",
+   "chapter": 12,
+   "title": "終止前驗證原則",
+   "rule": "終止前確認所有依賴清除(API · Service · Agent · Workflow · Database · Interface)。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-057",
+   "chapter": 12,
+   "title": "零依賴原則",
+   "rule": "終止前 Dependency Count = 0,否則不得終止。",
+   "measure": "auto:termination"
+  },
+  {
+   "id": "CONST-058",
+   "chapter": 12,
+   "title": "強制影響分析原則",
+   "rule": "終止程序必須 Impact Analysis(直接 · 間接 · 潛在影響)。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-059",
+   "chapter": 12,
+   "title": "終止前快照原則",
+   "rule": "終止前建立 Snapshot(Definition · Schema · Rules · Parameters · History)。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-060",
+   "chapter": 12,
+   "title": "緊急恢復原則",
+   "rule": "允許 ARCHIVED → RESTORED → ACTIVE。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-061",
+   "chapter": 12,
+   "title": "最短保存期限原則",
+   "rule": "終止契約資料至少保留 5 個版本週期或治理委員會指定期間。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-062",
+   "chapter": 12,
+   "title": "Agent 契約終止原則",
+   "rule": "AI Agent 退役前確認 無任務 · 無排程 · 無服務依賴。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-063",
+   "chapter": 12,
+   "title": "訓練資料保留原則",
+   "rule": "Agent 終止不得直接刪除 Prompt · Rules · Audit · Validation History,應封存。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-064",
+   "chapter": 12,
+   "title": "自治系統保護原則",
+   "rule": "終止某系統不得影響其他 SYS 編號系統;符合 獨立 MAIN() · 獨立契約 · 獨立資料。",
+   "measure": "manual"
+  },
+  {
+   "id": "CONST-065",
+   "chapter": 12,
+   "title": "契約墓碑原則",
+   "rule": "終止後保留永久紀錄(編號 · STATUS · REPLACED BY · TERMINATION DATE · REASON)。",
+   "measure": "auto:tombstone"
+  },
+  {
+   "id": "CONST-066",
+   "chapter": 12,
+   "title": "編號永久保留原則",
+   "rule": "終止契約之編號永久保留,禁止重新指派他用。",
+   "measure": "auto:ifc_ids"
+  },
+  {
+   "id": "CONST-067",
+   "chapter": 12,
+   "title": "歷史可追溯原則",
+   "rule": "終止契約可查 建立時間 · 修改歷史 · 依賴歷史 · 終止原因 · 替代契約。",
+   "measure": "manual"
+  }
+ ],
+ "beliefs": [
+  "第一信條:系統可以獨立,介面必須統一。",
+  "第二信條:MAIN()自治,不受外部直接控制。",
+  "第三信條:契約可升版,編號永存。",
+  "第四信條:系統依賴契約,不依賴實作。",
+  "第五信條:任何跨系統操作皆須可驗證、可追溯、可回滾。",
+  "第十一信條:契約可退役,不可消失。",
+  "第十二信條:終止前必先完成遷移。",
+  "第十三信條:依賴未清零,不得終止。",
+  "第十四信條:終止可回復,歷史不可抹除。",
+  "第十五信條:編號永久存在,生命週期可以結束。"
+ ],
+ "formula_VCMA": "獨立編號 + 獨立MAIN() + 獨立資料 + 獨立驗證 + 獨立回滾 + 統一介面契約 + 版本治理 + 全程稽核 = VIA Constitutional Modular Architecture(VCMA)",
+ "lifecycle": [
+  "DRAFT",
+  "ACTIVE",
+  "DEPRECATED",
+  "SUNSET",
+  "TERMINATED",
+  "ARCHIVED"
+ ],
+ "error_codes": {
+  "ERR-001": "Validation Failed",
+  "ERR-002": "Unauthorized",
+  "ERR-003": "Timeout",
+  "ERR-004": "Dependency Failure",
+  "ERR-005": "Data Integrity Failed"
+ },
+ "links_to_policy": {
+  "L04": "版本律(改動 = 新版號檔)→ CONST-035 / 041",
+  "L50": "TA-Lib 禁用(第一條)",
+  "L120 / L123": "對等獨立 · 互相只讀監控 → CONST-033 / 043 / 045 / 064",
+  "L122": "空號 → 衝突檢 → 發號(AI 與操作員共同裁定)",
+  "L125": "編號憲法性:衝突解掉、VCGC 偵測無誤才發號 → CONST-034 契約號同理",
+  "L126": "註冊必帶 編號 · 版本號 · 時間"
+ },
+ "registration_rule": "每一列註冊必帶 number(空 = 未發)· version · registered_at / updated_at(UTC ISO)",
+ "amend": "AI 與操作員共同有權修改(操作員 2026-11-10);只增:新條文 / 新版本,不刪條、不改 CONST 號"
+}

@@ -1,0 +1,345 @@
+{
+ "schema": "VIA.SystemInterfaceContract.SSOT/1",
+ "version": "v0100",
+ "ts": "2026-11-10T16:00:00Z",
+ "owner": "VCGC(契約冊);契約提供方各自 MAIN() 實作",
+ "law": "憲法 CONST-031–067 · L120 / L123 對等獨立 · L125 編號憲法性(欄位與驗證全過、無衝突 → VCGC 發 IFC 永久號)",
+ "id_format": "IFC-###(發後不改 · 終止不重用 · 墓碑永存)",
+ "error_codes": "見 VIA_Constitution_SSOT_v0100.error_codes",
+ "scope": [
+  "VCGC",
+  "VDF",
+  "VRN-2"
+ ],
+ "contracts": [
+  {
+   "cand": "IFC-CAND-01",
+   "ifc_id": "",
+   "version": "v1.0",
+   "state": "DRAFT",
+   "title": "系統自報收據(只讀互監)",
+   "provider": [
+    "VDF",
+    "VRN-2",
+    "VCGC"
+   ],
+   "consumer": [
+    "VCGC"
+   ],
+   "INPUT": "無(消費方只讀提供方自報檔)",
+   "OUTPUT": "VIA_SystemReceipt_Contract_SSOT_v0100 定義的收據 JSON(normalized_fields:system · receipt · present · lamp · at · version · age_hours · stale · missing_required · note)",
+   "PARAMETERS": {
+    "stale_hours": 48,
+    "receipt_paths": "VIA_SystemReceipt_Contract_SSOT_v0100.systems.*.receipts"
+   },
+   "ERROR_CODE": {
+    "ERR-001": "收據 schema 不符",
+    "ERR-004": "收據缺席",
+    "ERR-005": "過期 / 欄位缺(stale · missing_required)"
+   },
+   "TIMEOUT": "讀檔 ≤ 10 s",
+   "SECURITY": {
+    "read_only": "VIA_FROM_VCGC=YES 才放行;零網路;不寫提供方的冊 / 檔(L120)",
+    "write": "消費方只寫自己的矩陣"
+   },
+   "tests": [
+    "normal:收據齊 → 燈照實",
+    "boundary:age = stale_hours",
+    "error:收據缺 → ERR-004",
+    "stress:5 系統同讀",
+    "security:無 VIA_FROM_VCGC → ERR-002"
+   ],
+   "allowlist": {
+    "names": [],
+    "paths": [
+     "VIA_Reports/vdf/",
+     "VIA_Reports/vrn2/",
+     "VIA_Reports/vcgc/"
+    ]
+   },
+   "registered_at": "2026-11-10T16:00:00Z",
+   "updated_at": "2026-11-10T16:00:00Z",
+   "history": [
+    {
+     "at": "2026-11-10T16:00:00Z",
+     "state": "DRAFT",
+     "why": "憲法第十一章建立(契約優先)"
+    }
+   ]
+  },
+  {
+   "cand": "IFC-CAND-02",
+   "ifc_id": "",
+   "version": "v1.0",
+   "state": "DRAFT",
+   "title": "入口自測黑箱(MAIN() --selftest)",
+   "provider": [
+    "VDF",
+    "VRN-2",
+    "VCGC"
+   ],
+   "consumer": [
+    "VCGC"
+   ],
+   "INPUT": "argv:[\"--selftest\"](消費方以子行程呼叫提供方入口尾版,不 import 其內部)",
+   "OUTPUT": "rc(0 = PASS)+ 標記行(提供方自報);消費方記 rc · 秒數 · 尾 2000 字",
+   "PARAMETERS": {
+    "entry": "提供方入口尾版(glob 取最大版號)",
+    "timeout_cap_s": 1800
+   },
+   "ERROR_CODE": {
+    "ERR-001": "標記行缺 / 不符",
+    "ERR-003": "逾時",
+    "ERR-004": "入口尾版缺席"
+   },
+   "TIMEOUT": "提供方自訂上限,預設 1800 s",
+   "SECURITY": {
+    "read_only": "VIA_FROM_VCGC=YES 才放行;零網路;不寫提供方的冊 / 檔(L120)",
+    "process": "子行程隔離 · 不攔截提供方控制權(CONST-033)"
+   },
+   "tests": [
+    "normal:rc 0 + 標記",
+    "boundary:剛好逾時上限",
+    "error:入口缺 → ERR-004",
+    "stress:連跑 3 系統",
+    "security:不帶網路旗標"
+   ],
+   "allowlist": {
+    "names": [
+     "CGC_MDL149_VeritasCentralGovernanceConsole",
+     "VDF_SystemManager",
+     "VRN_SystemManager",
+     "ActivateVRN-2",
+     "VRN2_RoundAll"
+    ],
+    "paths": []
+   },
+   "registered_at": "2026-11-10T16:00:00Z",
+   "updated_at": "2026-11-10T16:00:00Z",
+   "history": [
+    {
+     "at": "2026-11-10T16:00:00Z",
+     "state": "DRAFT",
+     "why": "憲法第十一章建立(契約優先)"
+    }
+   ]
+  },
+  {
+   "cand": "IFC-CAND-03",
+   "ifc_id": "",
+   "version": "v1.0",
+   "state": "DRAFT",
+   "title": "SSOT 空號 → VCGC 發號(L122)",
+   "provider": [
+    "VCGC"
+   ],
+   "consumer": [
+    "VDF",
+    "VRN-2"
+   ],
+   "INPUT": "提供冊列 SSOT 新列(編號欄留空)",
+   "OUTPUT": "VCGC 號冊列(code · source · version · updated_at);提供方自讀後填回自己的冊",
+   "PARAMETERS": {
+    "books": "supportive modules/registry/VIA_NumberBooks/*.jsonl",
+    "only_add": true
+   },
+   "ERROR_CODE": {
+    "ERR-001": "冊列 schema 不符",
+    "ERR-005": "同號異名 / 重號 / 改身分(CGC_MDL237 audit)"
+   },
+   "TIMEOUT": "發號 ≤ 900 s",
+   "SECURITY": {
+    "read_only": "VIA_FROM_VCGC=YES 才放行;零網路;不寫提供方的冊 / 檔(L120)",
+    "write": "VCGC 只寫號冊;子系統只寫自己的冊(L122 ⑥)"
+   },
+   "tests": [
+    "normal:空號 → 發號",
+    "boundary:同名不同版",
+    "error:撞號 → ERR-005",
+    "stress:+1000 列",
+    "security:子系統不得寫號冊"
+   ],
+   "allowlist": {
+    "names": [
+     "CGC_MDL237_NumberingSystem",
+     "VIA_NumberBook"
+    ],
+    "paths": [
+     "supportive modules/registry/VIA_NumberBooks/"
+    ]
+   },
+   "registered_at": "2026-11-10T16:00:00Z",
+   "updated_at": "2026-11-10T16:00:00Z",
+   "history": [
+    {
+     "at": "2026-11-10T16:00:00Z",
+     "state": "DRAFT",
+     "why": "憲法第十一章建立(契約優先)"
+    }
+   ]
+  },
+  {
+   "cand": "IFC-CAND-04",
+   "ifc_id": "",
+   "version": "v1.0",
+   "state": "DRAFT",
+   "title": "VCGC InstallGate 套件申請",
+   "provider": [
+    "VCGC"
+   ],
+   "consumer": [
+    "VDF",
+    "VRN-2"
+   ],
+   "INPUT": "套件申請(name · version · requester · reason)",
+   "OUTPUT": "裁定收據(APPROVED / DENIED / BLOCKED + 原因);子系統不自行 pip",
+   "PARAMETERS": {
+    "consent": "操作員同意閘(L70)",
+    "deny_list": [
+     "TA-Lib",
+     "talib",
+     "ta_lib"
+    ]
+   },
+   "ERROR_CODE": {
+    "ERR-002": "未經同意 / 未帶 VIA_FROM_VCGC",
+    "ERR-004": "依賴解析失敗",
+    "ERR-001": "申請欄位不齊"
+   },
+   "TIMEOUT": "安裝 ≤ 1800 s",
+   "SECURITY": {
+    "read_only": "VIA_FROM_VCGC=YES 才放行;零網路;不寫提供方的冊 / 檔(L120)",
+    "install": "只經 VCGC;TA-Lib 永遠 DENIED(L50)"
+   },
+   "tests": [
+    "normal:合規套件 → APPROVED",
+    "boundary:版本釘死",
+    "error:TA-Lib → DENIED",
+    "stress:並發申請",
+    "security:無同意 → ERR-002"
+   ],
+   "allowlist": {
+    "names": [
+     "CGC_MDL056_InstallGate"
+    ],
+    "paths": []
+   },
+   "registered_at": "2026-11-10T16:00:00Z",
+   "updated_at": "2026-11-10T16:00:00Z",
+   "history": [
+    {
+     "at": "2026-11-10T16:00:00Z",
+     "state": "DRAFT",
+     "why": "憲法第十一章建立(契約優先)"
+    }
+   ]
+  },
+  {
+   "cand": "IFC-CAND-05",
+   "ifc_id": "",
+   "version": "v1.0",
+   "state": "DRAFT",
+   "title": "VDF 公開資料輸出(只讀)",
+   "provider": [
+    "VDF"
+   ],
+   "consumer": [
+    "VRN-2",
+    "VCGC"
+   ],
+   "INPUT": "無(消費方只讀 VDF 公開輸出)",
+   "OUTPUT": "VDF 公開表 / Parquet(schema 版本 · 產出時間 · 來源);消費方不讀 VDF 內部暫存與私有表",
+   "PARAMETERS": {
+    "published": "VIA_Reports/vdf/ · VDF 公開資料庫(TEMP 增量庫公開層)"
+   },
+   "ERROR_CODE": {
+    "ERR-001": "schema 版本不符",
+    "ERR-004": "輸出缺席",
+    "ERR-005": "雜湊 / 列數不一致"
+   },
+   "TIMEOUT": "讀 ≤ 60 s",
+   "SECURITY": {
+    "read_only": "VIA_FROM_VCGC=YES 才放行;零網路;不寫提供方的冊 / 檔(L120)",
+    "data": "只讀;不得 Direct Database Access 私有表(CONST-044)"
+   },
+   "tests": [
+    "normal:讀最新輸出",
+    "boundary:空表",
+    "error:schema 不符 → ERR-001",
+    "stress:全量讀",
+    "security:不得寫入"
+   ],
+   "allowlist": {
+    "names": [
+     "VDF_TW_"
+    ],
+    "paths": [
+     "VIA_Reports/vdf/"
+    ]
+   },
+   "registered_at": "2026-11-10T16:00:00Z",
+   "updated_at": "2026-11-10T16:00:00Z",
+   "history": [
+    {
+     "at": "2026-11-10T16:00:00Z",
+     "state": "DRAFT",
+     "why": "憲法第十一章建立(契約優先)"
+    }
+   ]
+  },
+  {
+   "cand": "IFC-CAND-06",
+   "ifc_id": "",
+   "version": "v1.0",
+   "state": "DRAFT",
+   "title": "VCGC MCP 只讀門面(AI 用)",
+   "provider": [
+    "VCGC"
+   ],
+   "consumer": [
+    "AI clients"
+   ],
+   "INPUT": "MCP tools/call(唯讀工具 · 參數照 inputSchema)",
+   "OUTPUT": "JSON-RPC 結果(content text);不回原檔全文,不開寫入動詞",
+   "PARAMETERS": {
+    "server": "CGC_MDL279_MCPServer 尾版 · VIA_SystemCard mcp",
+    "max_rows": 60
+   },
+   "ERROR_CODE": {
+    "ERR-001": "參數 schema 不符",
+    "ERR-002": "未授權工具",
+    "ERR-003": "逾時"
+   },
+   "TIMEOUT": "每呼叫 ≤ 60 s",
+   "SECURITY": {
+    "read_only": "VIA_FROM_VCGC=YES 才放行;零網路;不寫提供方的冊 / 檔(L120)",
+    "mcp": "stdio · readOnly · 索引外路徑拒讀"
+   },
+   "tests": [
+    "normal:tools/list",
+    "boundary:limit 上限",
+    "error:未知工具 → ERR-001",
+    "stress:連呼 100 次",
+    "security:索引外路徑拒讀"
+   ],
+   "allowlist": {
+    "names": [
+     "CGC_MDL279_MCPServer",
+     "VIA_SystemCard"
+    ],
+    "paths": []
+   },
+   "registered_at": "2026-11-10T16:00:00Z",
+   "updated_at": "2026-11-10T16:00:00Z",
+   "history": [
+    {
+     "at": "2026-11-10T16:00:00Z",
+     "state": "DRAFT",
+     "why": "憲法第十一章建立(契約優先)"
+    }
+   ]
+  }
+ ],
+ "tombstones": [],
+ "migration_matrix": []
+}
