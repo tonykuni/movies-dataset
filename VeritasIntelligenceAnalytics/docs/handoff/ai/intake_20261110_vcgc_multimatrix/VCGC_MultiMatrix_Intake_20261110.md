@@ -114,3 +114,14 @@ QA_*.json(Selftest / Integration / Resilience / UI)是對方環境自報,本倉*
 - 本機同步(WorkbenchLocal v0103 S02c):`ahead 2 · behind 461`;本機提交 `3ad7dd12f`(VRN-2 v0136 收尾)已在 origin/main,
   `122bab5f8`(VRN-2 薄尾鏈隨船 · 補 212 個 VRN-2 檔)不在 → 照規矩停;已備份到分支 `backup/main-local-20261110_171605` 與 bundle。
   這是 VRN-2 的提交(L123),上不上船由 VRN-2 決定;VCGC 不代為對齊。
+
+## 11 · 本機實跑 v0195(2026-11-10 09:50 UTC · WorkbenchLocal v0104 · `-Only S01,S02,S03,S17`)與修正
+
+| 步 | 結果 |
+|---|---|
+| `matrix selftest`(v0195) | v0194 原套件 45 / 45 PASS · v0195 B1–B4 12 / 12 PASS |
+| `matrix resilience-test`(v0195) | **21 / 22 FAIL** —— v0194 F03 `test_f03_version_drift` 在 registry 放假 `…_v0195.py`,要求 `prepare_install` 報 `NEWER_NATIVE`;v0195 換掉的 `prepare_install` 不把自己當「更新版」→ 回歸 |
+| `matrix install`(只出計畫) | `UNSUPPORTED_NATIVE_PRIOR`(本機尾版 v0191)→ 黃,預期 |
+
+修正(v0195 就地修;它只在 intake、尚未裝進任何 registry,舊內容在 git 歷史):`resilience-test` 與 `selftest` 一樣以 **v0194 原函式**跑 v0194 原套件,
+再跑本版自測;本版自測加 `F03'`(registry 尾版 v0196 → `NEWER_NATIVE` 停)→ 假 v0194 環境 13 / 13 PASS。

@@ -10,7 +10,9 @@
      `--approve-registry-sync` 才加 registry-sync --apply;`--approve-numbering` 才加 NumberingSystem --apply --scope(兩者都是操作員的手)。
   B4 前版只比版號 → 原生 v0192 必須內容相符:去 CR、去結尾換行後的 SHA-256 ∈ KNOWN_V0192(本倉 / main 的 v0192);不符就停。
 安裝目標:v0194 + v0195 + 離線頁 → 原生 registry(先出計畫;--apply 前照 v0194 跑原生六檢)。v0194 不在同夾 = 照實報錯。
-自測:`matrix selftest` = v0194 原自測(以原函式跑)+ 本版 B1–B4 自測。零網路;不碰 VRN-1;不代設同意閘。
+自測:`matrix selftest` / `matrix resilience-test` = v0194 原套件(以 v0194 原函式跑)+ 本版 B1–B4 自測。
+修訂 2026-11-10(安裝前就地修;尚未裝進任何 registry,舊內容在 git 歷史):resilience-test 原本用換過的函式跑,
+  v0194 F03(假 v0195 在 registry → 要 NEWER_NATIVE)因此 21/22 → 改成以原函式跑;本版另加「尾版 v0196 → NEWER」自測。零網路;不碰 VRN-1;不代設同意閘。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -247,6 +249,13 @@ def selftest_v0195() -> dict:
         a.write_bytes(b"line1\nline2\n")
         b.write_bytes(b"line1\r\nline2\r\n\r\n")
         chk("B4 CRLF / 結尾換行不影響正規化 SHA", normalized_sha(a) == normalized_sha(b))
+        via_n, fe_n = _fixture(d / "f0", b"x\n")
+        (via_n / "supportive modules/registry" / f"{ENGINE_FAMILY}_v0196.py").write_text("", encoding="utf-8")
+        try:
+            prepare_install(via_n, fe_n)
+            chk("F03' registry 尾版比本版新(v0196)→ NEWER_NATIVE 停", False, "沒有停")
+        except RuntimeError as exc:
+            chk("F03' registry 尾版比本版新(v0196)→ NEWER_NATIVE 停", "NEWER_NATIVE" in str(exc), exc)
         # B2 + B4 安裝計畫
         P = load_v0194()
         via, fe = _fixture(d / "f1", b"unknown v0192\n")
@@ -299,9 +308,9 @@ def main(argv=None) -> int:
     if r == "alias":
         args = ["matrix"] + args[1:]
     P = load_v0194()
-    if args[1:2] == ["selftest"]:
+    if args[1:2] in (["selftest"], ["resilience-test"]):
         with _unpatched():
-            rc194 = P.main(args)                                     # v0194 原自測(原函式)
+            rc194 = P.main(args)                                     # v0194 原套件(原函式;F03 要看到原本的 prepare_install)
         res = selftest_v0195()
         print(json.dumps({k: res[k] for k in ("schema", "version", "tests", "passed", "status")} | {"v0194_rc": rc194}, ensure_ascii=False))
         for row in res["rows"]:
