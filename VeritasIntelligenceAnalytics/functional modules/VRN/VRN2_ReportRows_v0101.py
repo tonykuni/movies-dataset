@@ -67,20 +67,42 @@ def _rows(path: Path) -> list:
     return d if isinstance(d, list) else (d.get("rows") or [])
 
 
-def load_main_books(books_dir) -> dict:
-    """VRN-2 主線冊 → {檔名鍵: {"summary":…, "basic":…}};另以 (代號, 日期) 為輔鍵。"""
-    out = {}
+class NameIndex:
+    """報告身分索引(Codex #626 P1):先比完整檔名;去中文的寬鬆鍵 / (代號, 日期) 只在**唯一**候選時才用 —— 兩份只差中文的報告不會互相覆蓋。"""
+
+    def __init__(self):
+        self.exact, self.loose, self.td = {}, {}, {}
+
+    def add(self, name: str, rec, ticker="", date=""):
+        self.exact.setdefault(Path(str(name)).name, []).append(rec)
+        self.loose.setdefault(norm_key(name), []).append(rec)
+        if ticker and date:
+            self.td.setdefault((str(ticker), str(date)), []).append(rec)
+
+    def get(self, name: str, ticker="", date=""):
+        for hits in (self.exact.get(Path(str(name)).name), self.loose.get(norm_key(name)),
+                     self.td.get((str(ticker), str(date))) if ticker and date else None):
+            if hits:
+                return hits[0] if len(hits) == 1 else None          # 有歧義 → 不猜
+        return None
+
+    def __bool__(self):
+        return bool(self.exact)
+
+
+def load_main_books(books_dir) -> NameIndex:
+    """VRN-2 主線冊 → NameIndex({"summary":…, "basic":…})。"""
+    idx = NameIndex()
     if not books_dir:
-        return out
+        return idx
     b = Path(books_dir)
-    basic = {norm_key(r.get("FILENAME", "")): r for r in _rows(b / "VRN2_BasicInfo_latest.json")}
+    basic = NameIndex()
+    for r in _rows(b / "VRN2_BasicInfo_latest.json"):
+        basic.add(r.get("FILENAME", ""), r)
     for r in _rows(b / "VRN2_Summary_latest.json"):
-        k = norm_key(r.get("FILENAME", ""))
-        rec = {"summary": r, "basic": basic.get(k, {})}
-        out[k] = rec
-        if r.get("TICKER") and r.get("REPORT_DATE"):
-            out[("td", str(r["TICKER"]), str(r["REPORT_DATE"]))] = rec
-    return out
+        fn = r.get("FILENAME", "")
+        idx.add(fn, {"summary": r, "basic": basic.get(fn) or {}}, r.get("TICKER", ""), r.get("REPORT_DATE", ""))
+    return idx
 
 
 def main_points(rec: dict) -> list:
@@ -123,13 +145,13 @@ def load_ns_results(d) -> dict:
         return {}
 
 
-def ns_index(res: dict) -> dict:
-    """{檔名鍵: {"report":…, "topics":[…], "companies":[…]}}"""
-    idx = {}
+def ns_index(res: dict) -> NameIndex:
+    """v0310 輸出 → NameIndex({"report":…, "topics":[…], "companies":[…]})(v0310 吃同一批檔,完整檔名會對上)。"""
+    idx = NameIndex()
     by_id = {}
     for r in res.get("report_summary") or []:
         rec = {"report": r, "topics": [], "companies": []}
-        idx[norm_key(r.get("FILE_NAME", ""))] = rec
+        idx.add(r.get("FILE_NAME", ""), rec)
         by_id[r.get("REPORT_ID")] = rec
     for t in res.get("topic_detail") or []:
         if t.get("REPORT_ID") in by_id:
@@ -180,12 +202,11 @@ def build_rows(name: str, pages: list, lane: dict, main=None, ns=None, ns_why=""
             r.update(source=SRC_STANDIN, source_note=r.get("note", ""))
         return standin
     whole = "\n".join(p.get("rtext") or p.get("text", "") for p in pages)
-    key = norm_key(name)
     base = {k: standin[0][k] for k in ("report_id", "file", "broker", "date", "pages_total", "lane_why") if k in standin[0]}
     kind = standin[0]["kind"]
     if kind == "stock":
         r0 = standin[0]
-        rec = (main or {}).get(key) or (main or {}).get(("td", str(r0.get("ticker", "")), str(r0.get("date", ""))))
+        rec = main.get(name, r0.get("ticker", ""), r0.get("date", "")) if main else None
         pts = main_points(rec)
         if pts:
             bi = rec.get("basic") or {}
@@ -200,15 +221,18 @@ def build_rows(name: str, pages: list, lane: dict, main=None, ns=None, ns_why=""
         for r in standin:
             r.update(source=SRC_STANDIN, source_note="VRN-2 主線冊沒有這份(或四點空)→ v0100 抽取暫代")
         return standin
-    rec = (ns or {}).get(key)
-    if rec:
-        rows = ns_rows(base, standin, rec)
-        for r in rows:
+    rec = ns.get(name) if ns else None
+    rows = ns_rows(base, standin, rec) if rec else []
+    if rows and any(r["summary"] for r in rows):                 # Codex #626 P2:上游沒抽到重點 → 不拿空行蓋掉暫代
+        rows = [r for r in rows if r["summary"]]
+        for i, r in enumerate(rows, 1):
+            r["row_no"] = i
             r.update(kind_zh=P.KIND_ZH.get(r["kind"], r["kind"]), source=SRC_NS, source_note="v0310 RESULTS.json", key_numbers=P.key_numbers("\n".join(r["summary"])))
             P.verify_row(r, whole)
         return rows
+    why = ("v0310 這份沒抽到重點(%s)" % (rec["report"].get("STATUS") or "空")) if rec else (ns_why or "v0310 輸出裡沒有這份(或檔名有歧義)")
     for r in standin:
-        r.update(source=SRC_STANDIN, source_note=(ns_why or "v0310 輸出裡沒有這份") + " → v0100 抽取暫代")
+        r.update(source=SRC_STANDIN, source_note=why + " → v0100 抽取暫代")
     return standin
 
 
@@ -253,7 +277,8 @@ def run(pdf_dir: Path, out: Path, books_dir=DEFAULT_BOOKS, ns_out=None) -> dict:
                "by_kind": dict(Counter(r["kind"] for r in rows)), "by_source": by_src, "status": dict(Counter(r["status"] for r in rows)),
                "vrn2_books": str(books_dir), "main_hits": sum(1 for r in rows if r.get("source") == SRC_MAIN), "nonstock": ns_why or "v0310 OK",
                "sentences": {"verified": sum(r.get("verified_sentences", 0) for r in rows), "total": sum(r.get("summary_sentences", 0) for r in rows)}}
-    bad = summary["status"].get("MISMATCH") or summary["status"].get("NEEDS_OCR") or by_src.get(SRC_STANDIN)
+    bad = (summary["status"].get("MISMATCH") or summary["status"].get("NEEDS_OCR") or summary["status"].get("EMPTY")
+           or by_src.get(SRC_STANDIN))
     summary["lamp"] = "RED" if not rows else ("YELLOW" if bad else "GREEN")
     write_outputs(rows, summary, out)
     return summary
@@ -319,6 +344,19 @@ def selftest() -> int:
         page = (Path(td) / "VRN2_ReportRows_latest.html").read_text(encoding="utf-8")
     chk("⑧ 輸出帶來源:CSV 有 source / source_note 欄 · HTML 檔頭寫「來源:…」", head.endswith("source,source_note") and "來源:" + SRC_NS in page, head[-30:])
     src = Path(__file__).read_text(encoding="utf-8")
+    two = {"report_summary": [{"REPORT_ID": "A", "FILE_NAME": "20260916兆豐台灣產業專題-航太產業.pdf"},
+                              {"REPORT_ID": "B", "FILE_NAME": "20260916兆豐台灣產業專題-半導體產業.pdf"}],
+           "topic_detail": [{"REPORT_ID": "A", "TOPIC_TITLE": "航太", "INDUSTRY": "航太", "POINT_1": "航太訂單能見度高,2026 年營收成長 20%。"},
+                            {"REPORT_ID": "B", "TOPIC_TITLE": "半導體", "INDUSTRY": "半導體", "POINT_1": "半導體設備需求於 2026 年成長 15%,晶圓代工產能利用率提升。"}],
+           "company_detail": []}
+    i2 = ns_index(two)
+    chk("⑦b 只差中文的兩份報告(去中文後同鍵)各自對到自己的 v0310 結果,寬鬆鍵有歧義時不猜(Codex #626 P1)",
+        i2.get("20260916兆豐台灣產業專題-航太產業.pdf")["report"]["REPORT_ID"] == "A" and i2.get("20260916兆豐台灣產業專題-半導體產業.pdf")["report"]["REPORT_ID"] == "B"
+        and i2.get("20260916兆豐台灣產業專題-其他.pdf") is None)
+    empty = {"report_summary": [{"REPORT_ID": "E", "FILE_NAME": "兆豐產業專題-半導體與散熱.pdf", "STATUS": "REVIEW"}], "topic_detail": [], "company_detail": []}
+    r = build_rows("兆豐產業專題-半導體與散熱.pdf", ind, {"lane": "non_stock"}, {}, ns_index(empty), "")
+    chk("⑦c v0310 有這份但沒抽到重點 → 保留暫代(不拿空行冒充綠)· 原因寫 REVIEW(Codex #626 P2)",
+        r and all(x["source"] == SRC_STANDIN and "REVIEW" in x["source_note"] and x["summary"] for x in r), [(x["source"], x.get("source_note")) for x in r])
     chk("⑨ 不用 TA-Lib · 不 import VCGC · 零網路", not re.search(r"^\s*(?:import|from)\s+(talib|CGC_|requests|urllib)", src, re.M | re.I))
     chk("⑩ 前版 v0100 自測(乾淨子行程)", prior_ok, "rc %s" % cp.returncode)
     n = sum(ok)
