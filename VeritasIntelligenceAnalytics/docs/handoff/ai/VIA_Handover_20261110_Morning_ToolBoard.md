@@ -108,3 +108,36 @@ python3 "docs/handoff/ai/VIA_DailyBackup_v0100.py" check && python3 "docs/handof
 | 登冊 | 盤點 **v0216**(+C-parquet-lake · C-lake-matrix · WKF037 四步)· 需求 **v0240**(+VCGC-REQ214 **PARTIAL**)· 工作流 **v0141**(+WKF037 five_system_lake · tests / what / evidence 齊)· 交接冊 +2 案 + 操作員項 systems-adopt-lake OPEN |
 
 **誠實邊界(L123)**:VCGC 不代建、不代寫他系統的湖。套件已給,VDF / VRN-2 / VQG / VAP 把既有 duckdb / parquet `append` 進自己的 `<VIA_DATA_HOME>/<SYS>` 是各系統的手;接上後矩陣燈自動轉綠。所以 REQ214 是 PARTIAL,不寫成完工。
+
+## 8. 第三輪(操作員「實測自設自修正輸出 · 輸出見證 · HTML U/I 可操作 · 高自動化高整合 · 只有必要項目才用輸入 · 滑鼠動作:Windows I/O · 拖曳 · 下拉 · 勾選」)
+
+| 件 | 結果 |
+|---|---|
+| `docs/handoff/ai/VIA_LakeConsole_v0100.py`(VCGC 本機橋操作台) | 只綁 127.0.0.1(預設隨機埠 · 桌機可 `--port 8766`)· 頁面注入當次權杖 · 副作用 POST 要同源 Origin + Sec-Fetch-Site + X-VIA-CSRF · 嚴格 JSON body · 白名單動作(檢查備份 · 工具看板 · 資料湖矩陣 · 四支自測 · 自修正鏈 · 全部自測鏈)· 子行程跑倉內尾版(單通道 · log 落盤)· 見證面板(每步 rc · 秒 · 收據連結 · 輸出尾段 · 燈)· 入湖:拖曳 / 選檔案 / 選資料夾(webkitdirectory)→ 預覽(格式 · 列 · 欄)→ 下拉表名 · 勾主鍵 · 勾增量 → VCGC 湖;他系統 → `_inbox/<SYS>`(L123 不代寫)· `/files` 只供 VIA_Reports 與湖根 |
+| 自測(真橋) | **17/17**:403 / 400 / 202 / rc 127 RED / 入湖 3 列 · 再入 0 / _inbox / `..` 擋 / 燈轉綠 / 邊界 |
+| 使用者測試(滑鼠) | Playwright 1440 / 900 / 390 × 13 步 = **39 步 0 失敗 0 pageerror**:下拉選套件自測 → 勾只看不寫 → 執行 → GREEN;下拉選資料湖矩陣 → 執行 → 收據連結;拖曳兩檔 → 預覽 2 檔 3 欄主鍵預勾 → 入湖 VCGC 新入;選檔案 → VDF → _inbox;選資料夾 → 預覽;頁內無權杖 POST 403;非白名單 400 → `VIA_Reports/lake/CONSOLE_UserTest_latest.{json,md}` + `console_shot_{pc,tablet,phone}.png` |
+| 自測抓到並修的真 bug | ① 混型來源(jsonl 的 `3` vs csv 的 `"3"`)入同表 → pyarrow 炸 → 套件 `_arrow_from_rows` 逐欄推型、字串退路(跨分片 DuckDB union_by_name 升 VARCHAR 實測)· 套件自測 10 → **11**;② 處理器例外默默斷線 → 一律 JSON 500(見證要看得到錯);③ 容器 HTTPS_PROXY 會攔 127.0.0.1 → 自測用無代理 opener |
+| 登冊 | 盤點 **v0217**(+C-lake-console · WKF038 三步)· 需求 **v0241**(+VCGC-REQ215 COVERED)· 工作流 **v0142**(+WKF038 lake_console)· 交接冊 +1 案 |
+| 桌機開法 | `python3 "docs/handoff/ai/VIA_LakeConsole_v0100.py" serve`(操作員 2026-11-10「啟動後自動跳出 HTML U/I」→ 預設即開瀏覽器;`--no-open` 給 CI / 背景;之後可掛進 CGC_MDL095 DeckServer 當 `/lake` 路由,同一套權杖律) |
+
+## 9. Codex PR #623 兩項 P2 → `VIA_LakeMatrix_v0101`(薄尾 · v0100 已在 main 不動)
+
+| 發現 | 修法 | 驗證 |
+|---|---|---|
+| 五系統 × 日 只拿每表 first / last 兩個時間點:中間日漏算、單分片算兩次 | 逐分片:每個 `part-<UTC>-<sha8>.parquet` 檔名戳一片一計;既有資產照舊以檔案更新日計 | 自測 ⓑ 三天三片 → 1 / 1 / 2;實跑 VCGC 11-07 3 · 11-10 10 |
+| 一表好一表壞仍 GREEN,壞表不出現在報表 | 任何壞表非綠(部分 YELLOW · 全壞 RED),說明點名,壞表列進資產明細(類 `lake(壞)` · 狀態 錯:…) | 自測 ⓐ YELLOW + 明細列 · ⓒ md / html 有壞表 · ⓓ 全壞 RED |
+
+本版 4/4 + 前版鏈 12/12。登冊:盤點 v0218(+C-lake-matrix-v0101 · WKF037-STP002 → v0101)· 需求 v0242(REQ214 evidence)· 工作流 v0143 · 交接案。操作台 `VIA_LakeConsole` 的動作 glob `VIA_LakeMatrix_v*.py` 自動選到 v0101。
+
+## 10. Codex PR #624 三項(P1 ×1 · P2 ×2)
+
+| 發現 | 修法 | 驗證 |
+|---|---|---|
+| **P1** 套件 `VIA_ParquetLake_v0100` 已在 main(PR #623)卻被就地改(混型推型 · 微秒戳)→ 違反 AGENTS L10 add-only | v0100 還原成 main 版本一字不動;新行為出 **`VIA_ParquetLake_v0101`**;消費者改取尾版 glob:`VIA_LakeMatrix_v0101`(覆寫 `_lake_module`)· `VIA_LakeConsole`(本來就 glob)| v0100 10/10 · v0101 11/11 · 矩陣 v0101 4/4 + 鏈 · 操作台 19/19 |
+| P2 `_inbox` 同名檔(`a/data.csv` · `b/data.csv` 同秒)互相覆蓋 | 目的檔 = `<微秒戳>-<內容 sha8>-<路徑消毒>`,`open("xb")` 絕不覆蓋,同名加序號;清單記來源路徑 | 自測 ⓜ2:同名不同夾 + 同檔再送 → 三個不同檔都在 |
+| P2 見證燈只看 rc(引擎自報 YELLOW 仍 GREEN) | `step_lamp()`:本輪收據 JSON 的 lamp > stdout 首個 `[GREEN|YELLOW|RED|GRAY|PASS|FAIL]` > rc;行程失敗不可能綠 / 黃;整件 = 各步最差 | 自測 ⓗ:rc 0 + 收據 YELLOW → 步 YELLOW · 整件 YELLOW;ⓗ2 `[PASS]` → GREEN |
+
+登冊:盤點 v0219(+C-parquet-lake-v0101 · C-parquet-lake 回 10 項 · C-lake-console 19 項 · WKF037-STP001 → v0101)· 需求 v0243 · 工作流 v0144 · 交接冊。操作台使用者測試重跑(新碼 · 埠 8767):Playwright 三視窗 **39 步 0 失敗 0 pageerror · GREEN**(2026-11-10T03:19:56Z · `VIA_Reports/lake/CONSOLE_UserTest_latest.{json,md}`;下拉自測 → 矩陣真跑收據連結 → 拖曳兩檔預覽 / 勾主鍵 / 入湖 VCGC → 選檔 VDF 落 `_inbox` → 選資料夾 → 無權杖 403 / 非白名單 400)。三串 Codex 已回覆並 resolve(8cf4d1b94);編號冊 +23 已提交(fa50dbae4)。
+
+閘鏈第 16 輪(修後):`test --quick` **YELLOW**(站 9 綠 2 黃 0 紅 · case 267/267 · workflow 164/164 · 紀錄 +3)。`handoff check` **RED 143 → 141**:本輪兩項已清(C-vcgc-toolboard 收據重生,因 seat_path 修在收據之後;REQ214 systems-adopt-lake OPEN 不是合法態 → PENDING)。
+**更正**:前幾輪交接文件寫的「handoff check 16 紅」是擷取只留尾 18 行的誤記;真實基線是 11-09 的 139 紅(EVIDENCE_INVALID 52 全為 11-06 席位冊 `VIA_VCGC_SubsystemSeat_v0100` 變更後的連鎖:chain / backup / numbering 等舊收據失效 → 其相依模組落成 CHANGED_CODE_WITHOUT_TEST 81),不是本輪新紅;要清要在桌機 `handoff test chain` / `backup` / `numbering` 重跑舊案後 `handoff checkpoint`。新案(lake · console · parquet v0101 · toolboard)紅 0。

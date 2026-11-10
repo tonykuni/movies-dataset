@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-10T02:38:30Z",
+ "updated_at": "2026-11-10T03:19:58Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4492,7 +4492,7 @@
     "supportive modules/VIA_ParquetLake_v0100.py"
    ],
    "version": "v0100",
-   "updated_at": "2026-11-10T02:35:35Z",
+   "updated_at": "2026-11-10T03:17:05Z",
    "timeout_seconds": 300,
    "registered_at": "2026-11-10T02:35:35Z"
   },
@@ -4513,6 +4513,61 @@
    "updated_at": "2026-11-10T02:35:35Z",
    "timeout_seconds": 600,
    "registered_at": "2026-11-10T02:35:35Z"
+  },
+  "C-lake-console": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_LakeConsole_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_LakeConsole v0100 selftest · 19/19",
+   "scope": "VIA_LakeConsole:本機橋(127.0.0.1 隨機埠 · 同源權杖 · 白名單動作 · 單通道子行程 · 見證)· 入湖 VCGC / 他系統 _inbox · /files 白名單",
+   "dependencies": [
+    "docs/handoff/ai/VIA_LakeConsole_v0100.py",
+    "supportive modules/VIA_ParquetLake_v0101.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-10T03:17:05Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-10T02:55:38Z"
+  },
+  "C-lake-matrix-v0101": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_LakeMatrix_v0101.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_LakeMatrix v0101 selftest · 本版 4/4 · 前版鏈 v0100 PASS",
+   "scope": "VIA_LakeMatrix v0101 薄尾:壞表非綠 + 列進資產明細 · 五系統 × 日 逐分片;前版鏈 v0100 12 項一起跑",
+   "dependencies": [
+    "docs/handoff/ai/VIA_LakeMatrix_v0101.py",
+    "docs/handoff/ai/VIA_LakeMatrix_v0100.py",
+    "supportive modules/VIA_ParquetLake_v0100.py",
+    "supportive modules/VIA_ParquetLake_v0101.py"
+   ],
+   "version": "v0101",
+   "updated_at": "2026-11-10T03:17:05Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-10T03:03:15Z"
+  },
+  "C-parquet-lake-v0101": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/VIA_ParquetLake_v0101.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_ParquetLake v0101 selftest · 11/11",
+   "scope": "VIA_ParquetLake v0101:v0100 一字不動;混型來源逐欄推型 · 微秒戳 + 檔名次序;一系統一湖 · 同主鍵增量跳過 · DuckDB VIEW",
+   "dependencies": [
+    "supportive modules/VIA_ParquetLake_v0101.py"
+   ],
+   "version": "v0101",
+   "updated_at": "2026-11-10T03:17:05Z",
+   "timeout_seconds": 300,
+   "registered_at": "2026-11-10T03:17:05Z"
   }
  },
  "work_items": [
@@ -9420,12 +9475,56 @@
    "id": "VCGC-REQ214:systems-adopt-lake",
    "requirement": "VCGC-REQ214",
    "case": null,
-   "state": "OPEN",
+   "state": "PENDING",
    "owner": "operator",
-   "reason": "VDF / VRN-2 / VQG / VAP 各自接湖是各系統的手(L123);容器只讀盤點 8 / 3 / 12 / 1 組既有資產",
+   "reason": "VDF / VRN-2 / VQG / VAP 各自接湖是各系統的手(L123);容器只讀盤點 8 / 3 / 12 / 1 組既有資產;交接閘只收 PENDING / BLOCKED / REVIEW / VERIFIED,OPEN 不是合法態(handoff check INVALID_WORK_STATE)→ 改 PENDING,owner 仍是各系統",
    "next": "各系統入口尾版 import VIA_ParquetLake 把既有 duckdb / parquet append 進 <VIA_DATA_HOME>/<SYS>",
    "receipt": null,
-   "updated_at": "2026-11-10T02:35:35Z"
+   "updated_at": "2026-11-10T03:40:00Z"
+  },
+  {
+   "id": "VCGC-REQ215:C-lake-console",
+   "requirement": "VCGC-REQ215",
+   "case": "C-lake-console",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-10:「實測自設自修正輸出 · 輸出見證 · HTML U/I 可操作 · 高自動化高整合 · 只有必要的項目才用輸入 · 介面都是滑鼠動作:Windows I/O · 拖曳式 · 下拉選單 · 勾選」 → 操作台引擎;等 handoff test 收據 → handoff test rc 0 · marker true · Playwright 39 步綠",
+   "next": "閘鏈 → 推 → PR",
+   "receipt": "docs/handoff/evidence/C-lake-console.json",
+   "updated_at": "2026-11-10T02:57:07Z"
+  },
+  {
+   "id": "VCGC-REQ214:C-lake-matrix-v0101",
+   "requirement": "VCGC-REQ214",
+   "case": "C-lake-matrix-v0101",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "Codex PR #623 P2 ×2:① 五系統 × 日 只算 first / last 兩點(中間日漏 · 單分片算兩次)→ 逐分片檔名戳;② 一表好一表壞仍 GREEN 且壞表不出現 → 任何壞表非綠(部分 YELLOW · 全壞 RED)+ 壞表列進資產明細。v0100 已在 main → 薄尾 v0101(add-only)。 等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈 → 推 → 回 Codex",
+   "receipt": "docs/handoff/evidence/C-lake-matrix-v0101.json",
+   "updated_at": "2026-11-10T03:04:57Z"
+  },
+  {
+   "id": "VCGC-REQ214:C-parquet-lake-v0101",
+   "requirement": "VCGC-REQ214",
+   "case": "C-parquet-lake-v0101",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "Codex PR #624:P1 套件 v0100 已在 main 卻被就地改 → 還原 v0100 一字不動 · 新行為出 VIA_ParquetLake_v0101(混型來源逐欄推型 · 微秒戳 · 自測 11);消費者 LakeMatrix v0101 / LakeConsole 改取尾版 glob。P2 ① _inbox 同名檔(a/data.csv · b/data.csv)互相覆蓋 → 路徑消毒 + 內容 sha8 命名 · xb 絕不覆蓋;P2 ② 見證燈只看 rc(引擎自報 YELLOW 仍 GREEN)→ 收據 lamp > stdout 標籤 > rc。 等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈 → 推 → 回 Codex",
+   "receipt": "docs/handoff/evidence/C-parquet-lake-v0101.json",
+   "updated_at": "2026-11-10T03:19:58Z"
+  },
+  {
+   "id": "VCGC-REQ215:C-lake-console:codex624",
+   "requirement": "VCGC-REQ215",
+   "case": "C-lake-console",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "Codex #624 P2 ×2 修正後重測 19/19;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈 → 推 → 回 Codex",
+   "receipt": "docs/handoff/evidence/C-lake-console.json",
+   "updated_at": "2026-11-10T03:19:58Z"
   }
  ]
 }
