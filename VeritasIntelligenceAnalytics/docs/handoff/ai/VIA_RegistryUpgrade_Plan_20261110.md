@@ -40,3 +40,10 @@
   - `--apply` 成功後自動發;重跑零新增;同號同版異 sha 標 conflict 不蓋。`receipts` 檢查:嚴格啟用日起 581 列 · 收據 581 · 缺 0 · 欄不全 0 · 衝突 0 = GREEN。
   - 今天先前編號的 581 列以 `receipts --backfill --apply` 補收據(kind=backfill,時間取 numbered_at);2026-11-10 前的列不回溯。
 - 下一段:P2 檔名規則閘 → P3 衝突 / 重複檢測加強。
+- **P2 完成 · 2026-11-10 17:48 +00:00** · `CGC_MDL237_NumberingSystem_v0121.py` = VIA-VCGC-MDL1638 · 自測 19/19(前版 v0120 20/20)· 交接案 `C-cgc237-v0121-gate`。
+  - 閘只管「本批要發號、還沒登過號的程式檔(.py / .ps1)」;已登號舊檔 · 冊 · 文件照前版(不回溯)。
+  - N1 檔名 `<族>_v<NNNN>.<py|ps1>` · N2 同族同版已在樹上別處(參考 / 收件 / 報表 / 退役夾除外)= FAIL · N3 同夾同族已有更大版號 = HOLD(`--allow-gap <檔>` 明說補環)。
+  - 擋下的檔不給號、其餘照發;全擋 rc 2 一列不寫。每個判定寫只增 LOG `supportive modules/registry/VIA_RegistrationGate_v0100.jsonl`(分鐘時間 · operator · 規則 · 原因)。`gate <檔…>` 只判不寫。
+  - 首批實跑:3 支過閘 → MDL1638 · VDF MDL247(MDL008 v0108)· VDF ENG361(ENG238 v0101)· 收據 584/584 GREEN。
+  - 同輪附帶:VCGC 衝突閘擋下 VDF 擷取冊 v0108 進編號範圍(子系統邊界,L123)→ 冊不由 VCGC 編號,只登程式檔。
+- 下一段:P3 衝突 / 重複檢測加強(同檔多碼逐筆分「設計 vs 真重號」· 同號異名 · 跨倉借號)。
