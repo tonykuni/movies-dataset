@@ -9,7 +9,8 @@
    (五系統矩陣跑完由本台複製到 VCGC 自己的 VIA_Reports → /files 白名單可開;正本仍在 docs/handoff/ai)。
 ③ 頁面多「五系統」按鈕列(一鍵 = 下拉選好 + 執行;純滑鼠)· 仍是同一支 script;見證表每步的燈改用引擎自報的 step lamp(不只 rc)。
 ④ 子行程逾時依動作(五系統 1800 · VCGC 1500 · VDF / VRN-2 / VQG 900 · VAP 600 · 其餘照 v0100 900)· 子行程環境 VIA_FROM_VCGC=YES(五系統入口要)· 只看不寫 → five_systems 去掉 --apply。
-其餘(安全閘 · 單通道 · 入湖 · _inbox · /files · 自測 19 項)照 v0100;本版自測 = 前版鏈 + 本版 10 項。
+⑤ 本台單系統啟動綁實跑的入口(帳 / 見證記 入口 · 版 · sha;燈號盞顯示實跑版與 sha;入口比矩陣新時矩陣的號 / 憲法性標成歷史值,不借舊版的號;Codex #625 P2)。
+其餘(安全閘 · 單通道 · 入湖 · _inbox · /files · 自測 19 項)照 v0100;本版自測 = 前版鏈 + 本版 12 項。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -27,6 +28,7 @@ except Exception:  # noqa: BLE001
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -70,6 +72,24 @@ P.ACTIONS.update(NEW_ACTIONS)
 P.CHAINS["activate_all"] = ("啟動五系統(逐一走自己入口:VCGC → VDF → VRN-2 → VQG → VAP)", ["activate_" + s.lower() for s in FIVE])
 P._RECEIPT_JSON[FIVE_OUT["html"]] = (FIVE_OUT["json"], lambda d: d.get("lamp"))
 _SYS_KEY = {"VCGC": "VCGC", "VDF": "VDF", "VRN-2": "VRN2", "VRN2": "VRN2", "VQG": "VQG", "VAP": "VAP"}
+_VER_RX = re.compile(r"_v(\d{4})\.py$")
+
+
+def entry_meta(via: Path, argv: list | None) -> tuple[str | None, str | None, str | None]:
+    """(入口相對路徑, 版號, sha8):記下「這一步真正跑的是哪支入口」(Codex #625 P2:本台啟動要綁到實跑的入口,不借矩陣當時的版 / 號)。"""
+    if not argv or len(argv) < 2:
+        return None, None, None
+    p = Path(argv[1])
+    try:
+        rel = p.resolve().relative_to(via.resolve()).as_posix()
+    except ValueError:
+        rel = p.name
+    m = _VER_RX.search(p.name)
+    try:
+        sha8 = hashlib.sha256(p.read_bytes()).hexdigest()[:8]
+    except OSError:
+        sha8 = None
+    return rel, ("v" + m.group(1)) if m else None, sha8
 
 
 def publish_five(via: Path, since: float) -> list[str]:
@@ -96,6 +116,7 @@ class Runner(P.Runner):
             for s in steps:
                 argv, zh = self._argv(s)
                 st = {"step": s, "zh": zh, "rc": None, "secs": None, "tail": "", "receipt": None, "timeout": TIMEOUTS.get(s, 900)}
+                st["entry"], st["entry_version"], st["entry_sha8"] = entry_meta(self.via, argv)
                 rec["steps"].append(st)
                 if argv is None:
                     st["rc"], st["tail"], st["lamp"] = 127, zh, "RED"
@@ -138,7 +159,7 @@ class Runner(P.Runner):
         rec["state"] = "DONE"
         with open(self.ledger, "a", encoding="utf-8") as f:
             f.write(json.dumps({"at": rec["ended"], "run_id": run_id, "action": rec["action"], "rc": rec["rc"], "lamp": rec["lamp"],
-                                "steps": [(s["step"], s["rc"], s["secs"], s.get("lamp")) for s in rec["steps"]], "options": rec["options"]}, ensure_ascii=False) + "\n")
+                                "steps": [(s["step"], s["rc"], s["secs"], s.get("lamp"), s.get("entry"), s.get("entry_version"), s.get("entry_sha8")) for s in rec["steps"]], "options": rec["options"]}, ensure_ascii=False) + "\n")
 
 
 P.Runner = Runner
@@ -146,7 +167,7 @@ P.Runner = Runner
 
 # ───────────────────────── ② 燈號:五系統六盞 ─────────────────────────
 def last_console_steps(via: Path) -> dict:
-    """console_ledger.jsonl → {step: (at, lamp)} 每步最近一次(本台啟動過的系統)。"""
+    """console_ledger.jsonl → {step: (at, lamp, entry, entry_version, entry_sha8)} 每步最近一次(本台啟動過的系統;帶實跑的入口)。"""
     out: dict = {}
     p = via / OUT_DIR / "console_ledger.jsonl"
     if not p.is_file():
@@ -158,7 +179,7 @@ def last_console_steps(via: Path) -> dict:
             continue
         for s in d.get("steps") or []:
             if isinstance(s, (list, tuple)) and len(s) >= 4 and s[3]:
-                out[s[0]] = (d.get("at"), s[3])
+                out[s[0]] = (d.get("at"), s[3], (s[4] if len(s) > 4 else None), (s[5] if len(s) > 5 else None), (s[6] if len(s) > 6 else None))
     return out
 
 
@@ -179,16 +200,28 @@ def lamps(via: Path, root: Path) -> list[dict]:
                 continue
             run, cons, prog = r.get("run") or {}, r.get("constitution") or {}, r.get("progress") or {}
             lamp, when, src = run.get("lamp", "GRAY"), at, "矩陣"
+            ever, esha = r.get("entry_version"), r.get("entry_sha8")
+            tile = {"key": "sys_" + s.lower(), "title": "%s 啟動" % LABEL[s], "source": "matrix", "entry_version": ever, "entry_sha8": esha}
             la = last.get("activate_" + s.lower())
             if la and la[0] and (not when or la[0] > when):
                 lamp, when, src = la[1], la[0], "本台"
-            rows.append({"key": "sys_" + s.lower(), "title": "%s 啟動" % LABEL[s], "lamp": lamp, "at": when,
-                         "note": "%s · 入口 %s · 號 %s · 憲法性 %s · 進度 %s/%s 連 %s" % (src, r.get("entry_version") or "—", r.get("number") or "空號", cons.get("status", "—"), prog.get("greens", 0), prog.get("runs", 0), prog.get("streak", 0))})
+                ever, esha = la[3] or ever, la[4] or esha
+                tile.update({"source": "console", "entry_version": ever, "entry_sha8": esha})
+                same = bool(esha) and esha == r.get("entry_sha8")
+                meta = ("號 %s · 憲法性 %s" % (r.get("number") or "空號", cons.get("status", "—"))) if same else \
+                       ("矩陣 %s 時的號 %s · 憲法性 %s 為歷史值(實跑入口 sha %s ≠ 矩陣 %s;重跑五系統矩陣才綁新號)" % (at or "—", r.get("number") or "空號", cons.get("status", "—"), esha or "—", r.get("entry_sha8") or "—"))
+                note = "%s · 入口 %s(sha %s · 實跑)· %s · 進度 %s/%s 連 %s" % (src, ever or "—", esha or "—", meta, prog.get("greens", 0), prog.get("runs", 0), prog.get("streak", 0))
+            else:
+                note = "%s · 入口 %s · 號 %s · 憲法性 %s · 進度 %s/%s 連 %s" % (src, ever or "—", r.get("number") or "空號", cons.get("status", "—"), prog.get("greens", 0), prog.get("runs", 0), prog.get("streak", 0))
+            tile.update({"lamp": lamp, "at": when, "note": note})
+            rows.append(tile)
     else:
         rows.append({"key": "five", "title": "五系統(憲法矩陣)", "lamp": "GRAY", "at": None, "note": "沒有收據(按「五系統啟動 · 實跑」)"})
         for s in FIVE:
             la = last.get("activate_" + s.lower())
-            rows.append({"key": "sys_" + s.lower(), "title": "%s 啟動" % LABEL[s], "lamp": la[1] if la else "GRAY", "at": la[0] if la else None, "note": ("本台 · 最近啟動" if la else "還沒啟動")})
+            rows.append({"key": "sys_" + s.lower(), "title": "%s 啟動" % LABEL[s], "lamp": la[1] if la else "GRAY", "at": la[0] if la else None, "source": "console" if la else None,
+                         "entry_version": la[3] if la else None, "entry_sha8": la[4] if la else None,
+                         "note": ("本台 · 入口 %s(sha %s · 實跑)· 矩陣還沒跑,沒有號 / 憲法性" % (la[3] or "—", la[4] or "—")) if la else "還沒啟動"})
     return rows
 
 
@@ -264,10 +297,17 @@ def selftest() -> int:
                 break
             time.sleep(0.1)
         return st
-    fake_const = r'''import json, sys, pathlib
+    fake_const = r'''import json, sys, pathlib, hashlib
 here = pathlib.Path(__file__).resolve().parent
+root = here.parents[2]
 apply = "--apply" in sys.argv
-systems = [{"sys": s, "external": False, "entry": "x_%s.py" % s, "entry_version": "v0100", "number": "VIA-%s-MDL001" % s, "lamp": l,
+ENTRY = {"VCGC": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0100.py", "VDF": "functional modules/VDF/VDF_SystemManager_v0100.py", "VRN-2": "functional modules/VRN/VRN_SystemManager_v0100.py", "VQG": "functional modules/VQG/VQG_AllInOne_v0100.py", "VAP": "functional modules/VAP/VAP_SystemManager_v0100.py"}
+def sha8(rel):
+    try:
+        return hashlib.sha256((root / rel).read_bytes()).hexdigest()[:8]
+    except OSError:
+        return None
+systems = [{"sys": s, "external": False, "entry": ENTRY[s], "entry_sha8": sha8(ENTRY[s]), "entry_version": "v0100", "number": "VIA-%s-MDL001" % s, "lamp": l,
             "constitution": {"lamp": "GREEN", "status": "CONSTITUTIONAL"}, "run": {"rc": 0 if l == "GREEN" else 1, "secs": 0.1, "lamp": l}, "progress": {"runs": 3, "greens": 3 if l == "GREEN" else 2, "streak": 3 if l == "GREEN" else 0}}
            for s, l in (("VCGC", "GREEN"), ("VDF", "GREEN"), ("VRN-2", "GREEN"), ("VQG", "RED"), ("VAP", "GREEN"))]
 systems.append({"sys": "VRN-1", "external": True})
@@ -339,9 +379,20 @@ sys.exit(0)
                 and [steps["activate_" + k]["timeout"] for k in ("vcgc", "vdf", "vrn2", "vqg", "vap")] == [1500, 900, 900, 900, 600], {k: (v["rc"], v.get("lamp")) for k, v in steps.items()})
             _, d = req(url + "lamps")
             tiles = {r["key"]: r for r in d["lamps"]}
-            chk("ⓗ 本台啟動比矩陣新 → 系統盞改用本台結果(來源 本台 · 時間 = 帳上時間)· 帳每步帶燈",
-                all(tiles["sys_" + k]["note"].startswith("本台") for k in ("vcgc", "vdf", "vrn2", "vqg", "vap")) and tiles["sys_vqg"]["lamp"] == "RED" and tiles["sys_vcgc"]["at"] == st["ended"]
-                and json.loads((via / OUT_DIR / "console_ledger.jsonl").read_text(encoding="utf-8").splitlines()[-1])["steps"][3][3] == "RED")
+            led = json.loads((via / OUT_DIR / "console_ledger.jsonl").read_text(encoding="utf-8").splitlines()[-1])["steps"]
+            chk("ⓗ 本台啟動比矩陣新 → 系統盞改用本台結果(來源 本台 · 時間 = 帳上時間 · 入口 = 實跑的 v0100 + sha = 矩陣入口 → 號 / 憲法性照矩陣)· 帳每步帶燈 + 入口 + 版 + sha",
+                all(tiles["sys_" + k]["note"].startswith("本台") and tiles["sys_" + k]["source"] == "console" for k in ("vcgc", "vdf", "vrn2", "vqg", "vap")) and tiles["sys_vqg"]["lamp"] == "RED" and tiles["sys_vcgc"]["at"] == st["ended"]
+                and led[3][3] == "RED" and led[1][4] == "functional modules/VDF/VDF_SystemManager_v0100.py" and led[1][5] == "v0100" and len(led[1][6] or "") == 8
+                and tiles["sys_vdf"]["entry_version"] == "v0100" and tiles["sys_vdf"]["entry_sha8"] == led[1][6]
+                and "號 VIA-VDF-MDL001 · 憲法性 CONSTITUTIONAL" in tiles["sys_vdf"]["note"] and "歷史值" not in tiles["sys_vdf"]["note"], tiles["sys_vdf"]["note"])
+            (via / "functional modules/VAP/VAP_SystemManager_v0101.py").write_text("print('[GREEN] fake VAP v0101 selftest')\n", encoding="utf-8")
+            code, d = req(url + "run", "POST", {"action": "activate_vap"}, good)
+            st4 = wait(url, d.get("run_id", ""))
+            _, d = req(url + "lamps")
+            t4 = {r["key"]: r for r in d["lamps"]}["sys_vap"]
+            chk("ⓗ2 入口出新版(VAP v0101)後本台啟動:跑的是尾版 v0101 · 盞綁實跑入口(v0101 + 新 sha)· 矩陣的號 / 憲法性標成歷史值(sha ≠ 矩陣)· 不借舊版的號(Codex #625 P2)",
+                st4.get("state") == "DONE" and st4["steps"][0]["entry_version"] == "v0101" and t4["entry_version"] == "v0101" and t4["entry_sha8"] == st4["steps"][0]["entry_sha8"]
+                and "入口 v0101" in t4["note"] and "歷史值" in t4["note"] and "實跑入口 sha" in t4["note"] and "v0100" not in t4["note"].split("·")[1], t4["note"][:160])
             code, d = req(url + "run", "POST", {"action": "five_systems"}, {"Content-Type": "application/json"})
             code2, d2 = req(url + "run", "POST", {"action": "activate_vrn1"}, good)
             chk("ⓘ 安全不變:無同源 / 權杖 → 403 · VRN-1(外部倉 · 只讀)不在白名單 → 400", code == 403 and code2 == 400 and d2.get("kind") == "unknown_action")
