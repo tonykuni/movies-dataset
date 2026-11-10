@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-10T07:00:00Z",
+ "updated_at": "2026-11-10T07:20:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4660,6 +4660,23 @@
    "updated_at": "2026-11-10T07:00:00Z",
    "timeout_seconds": 1200,
    "registered_at": "2026-11-10T07:00:00Z"
+  },
+  "V-vrn2-reportrows": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_ReportRows_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VRN2_ReportRows v0100 selftest · 11/11",
+   "scope": "VRN2_ReportRows v0100:報告一行一單位(個股 / 產業 / 主題)· 擷取還原 · 抽取式摘要原句驗證(11 項)",
+   "dependencies": [
+    "functional modules/VRN/VRN2_ReportRows_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-10T07:20:00Z",
+   "timeout_seconds": 300,
+   "registered_at": "2026-11-10T07:20:00Z"
   }
  },
  "work_items": [
@@ -9683,6 +9700,28 @@
    "next": "桌機 $env:VIA_NET_CONSENT='YES' → DesktopFourBlocks v0101 --blocks 4 --mode live → 貼回 → 驗證",
    "receipt": null,
    "updated_at": "2026-11-10T07:00:00Z"
+  },
+  {
+   "id": "VRN-REQ019:V-vrn2-reportrows",
+   "requirement": "VRN-REQ019",
+   "case": "V-vrn2-reportrows",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "一行一單位 + 真 PDF 155/155 原句驗證;等 handoff test 收據",
+   "next": "掃描檔 OCR = 桌機",
+   "receipt": "docs/handoff/evidence/V-vrn2-reportrows.json",
+   "updated_at": "2026-11-10T07:20:00Z"
+  },
+  {
+   "id": "VRN-REQ019:scanned-ocr",
+   "requirement": "VRN-REQ019",
+   "case": null,
+   "state": "PENDING",
+   "owner": "desktop",
+   "reason": "MQ-1560 等掃描檔沒有文字層;容器沒有 OCR",
+   "next": "桌機 VRN-2 OCR 橋出文字層 → 再跑 VRN2_ReportRows run",
+   "receipt": null,
+   "updated_at": "2026-11-10T07:20:00Z"
   }
  ]
 }

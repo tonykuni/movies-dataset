@@ -2,7 +2,7 @@
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0244",
  "batch": "五系統啟動 via HTML U/I → VIA_LakeConsole v0101(操作員 2026-11-10「activate 5 system via html u/i and run」)",
- "ts": "2026-11-10T07:00:00Z",
+ "ts": "2026-11-10T07:20:00Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -140,7 +140,7 @@
  "tally": {
   "RECORDED": 24,
   "COVERED": 139,
-  "PARTIAL": 104,
+  "PARTIAL": 105,
   "MISSING": 1
  },
  "requirements": [
@@ -7075,6 +7075,25 @@
    "next": "收尾條件「VDF 對外擷取引擎實測驗證無誤」要桌機開同意閘真抓(AI 不代設)→ 貼回後驗證才轉 COVERED",
    "hand": "operator",
    "why_homes": "橋是全樹政策(L103);量尺歸 VCGC;VDF / VRN-2 檔只插標記塊,行為不變"
+  },
+  {
+   "code": "VRN-REQ019",
+   "subsystem": "VRN",
+   "topic": "VRN-2 報告一行一單位:個股一行一報告 · 產業一行一產業 · 其他一行一主題(多行一報告);擷取還原(字距 / 疊字 / 模板殘字 / 兩欄側欄分開 / 斷行接回)+ 抽取式重點摘要(每句回原文驗證)+ 關鍵數字 + 提到的個股;VRN-1 摘要器規則整併(只讀照搬 · VRN-1 倉不動)",
+   "requirement": "操作員 2026-11-10:「VRN-2 為主,缺乏的功能 VRN-1 整併進來 · 使股票報告及多種非股票報告皆能擷取還原資料抓重要資料摘要 · 個股報告是一行一報告 · 產業報告是一行一產業 · 其他一行一主題 · 多行一報告 · 輸出調整優化」",
+   "status": "PARTIAL",
+   "homes": [
+    "functional modules/VRN/VRN2_ReportRows_v0100.py",
+    "VIA_Workflow_VRN_SSOT_v0108.json"
+   ],
+   "workflow": "VRN-WKF011",
+   "modules": [
+    "functional modules/VRN/VRN2_ReportRows_v0100.py"
+   ],
+   "evidence": "2026-11-10 容器 13 份真 PDF(fixtures REAL_TEST_INPUT):53 行 = 個股 7 行(一行一報告 · 代號 / 評等 / TP / 收盤 / 四點)· 產業 4 行(2 份 × 2 產業)· 主題 41 行(晨會一家公司一行 4 · 台新盤勢 13 · 中信債券周報 24)· 掃描檔 MQ-1560 = NEEDS_OCR 照實;摘要原句驗證 155/155(抽取式 · 不生字);TP / 收盤逐筆對原文:JP 1275.0 / 1130.0 · MS 4388.00 / 3190.00 · CLSA 4200.00 · 凱基 104.0 / 96.90 · 2600 / 1990 · 晶心科 300.00 / 270.00 · 瑞基 未評等 / 19.20;自測 11/11",
+   "next": "掃描檔(無文字層,例 MQ-1560)要桌機 VRN-2 OCR 橋出文字層後再跑;接進 VRN-2 啟動器 / Workbench 一頁(VRN-2 自己的入口)",
+   "hand": "desktop",
+   "why_homes": "VRN-2 底座夾(functional modules/VRN)· 分類用 VRN-2 自己的車道判準(VRN_ReportLaneCheck v0100 → v0231 _SK_EXCL);不 import VCGC / VRN-1"
   }
  ],
  "non_requirements": [

@@ -2,7 +2,7 @@
  "schema": "VIA.VCGC.FunctionInventory.v1",
  "version": "v0220",
  "batch": "五系統啟動 via HTML U/I → VIA_LakeConsole v0101(操作員 2026-11-10「activate 5 system via html u/i and run」)",
- "ts": "2026-11-10T07:00:00Z",
+ "ts": "2026-11-10T07:20:00Z",
  "prior": "VIA_VCGC_FunctionInventory_SSOT_v0219.json",
  "req": "VCGC-REQ207",
  "why": "v0212 → v0213:+站 C-vqg-v0108(操作員 2026-11-09「VQG VAP VCGC 一併順勢完成 · VQG 可能有增加指標 · 量化分析內容以增加」)。只增不減,其餘一字不動。 ｜ 2026-11-09 +站 C-workbench-lock-v0101(操作員「ICON 優雅 · LOGO 第二行放大」)。 ｜ 2026-11-09 coverage.workflow +WKF030 / WKF031 六步(Codex #621 P1:需求要有工作流正主)。",
@@ -5389,6 +5389,24 @@
    ],
    "version": "v0104",
    "updated_at": "2026-11-10T07:00:00Z"
+  },
+  {
+   "id": "V-vrn2-reportrows",
+   "name": "VRN2_ReportRows v0100 自測(個股一行一報告 · 產業一行一產業 · 主題一行一主題 · 晨會一家一行 · 掃描檔 NEEDS_OCR · 原句驗證 MISMATCH · 還原(字距 / 數字字距 / 模板殘字 / 斷行)· 同標題加子標 · TP 不截斷 · 輸出 · 零網路;11 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_ReportRows_v0100.py",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "functional modules/VRN/VRN2_ReportRows_v0100.py",
+    "functional modules/VRN/VRN_ReportLaneCheck_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-10T07:20:00Z"
   }
  ],
  "coverage": {
@@ -6446,6 +6464,10 @@
    "C-bridge-sweeper-v0104": {
     "state": "COVERED",
     "by": "C-bridge-sweeper-v0104"
+   },
+   "V-vrn2-reportrows": {
+    "state": "COVERED",
+    "by": "V-vrn2-reportrows"
    }
   },
   "workflow": {
@@ -7042,6 +7064,15 @@
    "VCGC-WKF041-STP003": {
     "state": "COVERED",
     "by": "C-bridge-sweeper-v0104"
+   },
+   "VRN-WKF011-STP001": {
+    "state": "COVERED",
+    "by": "V-vrn2-reportrows"
+   },
+   "VRN-WKF011-STP002": {
+    "state": "COVERED",
+    "by": "V-vrn2-reportrows",
+    "note": "自測 ①–⑦b 走 build_rows 全路徑;真 PDF 由 run 動詞(容器實跑 13 份)"
    }
   },
   "ps": {
