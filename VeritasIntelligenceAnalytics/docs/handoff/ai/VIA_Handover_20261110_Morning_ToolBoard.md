@@ -95,3 +95,16 @@ python3 "docs/handoff/ai/VIA_DailyBackup_v0100.py" check && python3 "docs/handof
 - 桌機:`enter`(重寫 GATE_latest)· `handoff checkpoint`(交接閘基線 RED 需先清 VRN 車道舊紅)· Ponytail · NON_STOCK_CORE 上傳 · FRED 鑰 · 三個 Gemini 連結文字。
 - VDF / VRN 冊 X-COL 三條:各系統自己的冊,VCGC 不代改。
 - MCP 多露 `vcgc/toolboard`:下一版 MCPServer v0103(今天沒做,避免再開一輪閘鏈)。
+
+## 7. 第二輪(操作員「全部完工了嗎?五系統一庫 Parquet 增量 · DuckDB 管理 · 工具活動報告矩陣 · 啟動測 / 使用者測到完善 · 跳 HTML U/I」)
+
+| 件 | 結果 |
+|---|---|
+| `supportive modules/VIA_ParquetLake_v0100.py`(五系統共用套件) | 一系統一湖:`<root>/<SYS>/<table>/part-<UTC>-<sha8>.parquet`(zstd · 原子換名)+ `_manifest.jsonl` 只增 + `<SYS>_catalog.duckdb` 一表一 VIEW(主鍵去重最新勝);同主鍵增量跳過;五系統名閘;自測 **10/10** |
+| `docs/handoff/ai/VIA_LakeMatrix_v0100.py`(VCGC) | ① VCGC 七帳本入湖(function_ledger 839 · test_state 332 · backup_manifest 6 · toolboard 3 · mutual 2 · closeout 2 · gate 2;再跑 0 新入)② 五系統只讀盤點(湖 / 既有 duckdb · parquet;壞檔照實)③ 工具活動報告矩陣(事件 × 日 · 七日類別 book 106 family 11 verb 1 · 最活躍站 · 五系統 × 日)④ HTML U/I:燈號最前 · 系統鈕 · 搜尋 · 只看有資料 · 重設;自測 **12/12** |
+| 實跑燈 | 總燈 **YELLOW**:VCGC GREEN(湖在 7 表)· VDF YELLOW(尚未入湖 · 既有 8 組 25,839 列)· VRN-2 YELLOW(3 組 1,258 列)· VQG YELLOW(12 組 4,800 列)· VAP YELLOW(1 組 7,234 列 · 2026-05 快照) |
+| 使用者測試 | Playwright 1440 / 900 / 390 × 17 步 = **51 步 0 失敗 0 pageerror**(第一輪手機橫向溢出 533 > 390 → header meta `min-width:0` + `overflow-wrap:anywhere` → 第二輪綠)→ `VIA_Reports/lake/UI_UserTest_latest.{json,md}` + 三張截圖 |
+| 湖根 | 容器無桌機資料家 → `VIA_Reports/lake`(來源照實標);桌機設 `VIA_DATA_HOME=…\via_database` 後自動讀真家 |
+| 登冊 | 盤點 **v0216**(+C-parquet-lake · C-lake-matrix · WKF037 四步)· 需求 **v0240**(+VCGC-REQ214 **PARTIAL**)· 工作流 **v0141**(+WKF037 five_system_lake · tests / what / evidence 齊)· 交接冊 +2 案 + 操作員項 systems-adopt-lake OPEN |
+
+**誠實邊界(L123)**:VCGC 不代建、不代寫他系統的湖。套件已給,VDF / VRN-2 / VQG / VAP 把既有 duckdb / parquet `append` 進自己的 `<VIA_DATA_HOME>/<SYS>` 是各系統的手;接上後矩陣燈自動轉綠。所以 REQ214 是 PARTIAL,不寫成完工。
