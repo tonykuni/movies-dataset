@@ -1,0 +1,273 @@
+{
+ "schema": "via.vrn2.integrationbook/1",
+ "version": "v0100",
+ "built_by": "VRN2_PeerBridge_v0101",
+ "ts": "2026-11-10T14:48:31Z",
+ "law": "可整合 · 不可丟失 · 不可重複:一能力一主人;借用不複製檔;VRN-1 只讀(L123)",
+ "counts": {
+  "MATCH": 14,
+  "BORROWED": 8,
+  "BY_CONTRACT": 1,
+  "REVIEW": 0,
+  "GAP": 0
+ },
+ "total": 23,
+ "entries": [
+  {
+   "cap": "output.verify",
+   "what": "輸出驗證 + 自動修正:每筆輸出回原檔逐欄證明",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VRN_ENG083_VerifiedMatrix_v0100.py"
+   }
+  },
+  {
+   "cap": "pivot.db",
+   "what": "驗證過的還原表格 → 事實表 + PIVOT",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VRN_ENG081_ParquetMainDB_v0100.py"
+   }
+  },
+  {
+   "cap": "ocr.image",
+   "what": "影像 OCR:找不到引擎照實說找不到",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VRN_ENG057_ScanOcrRescue_v0100.py"
+   }
+  },
+  {
+   "cap": "page.regions",
+   "what": "個股報告拆頁再組回",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VRN_ENG072_FirstPageText_v0100.py"
+   }
+  },
+  {
+   "cap": "title.trim",
+   "what": "標題拆解(只處理個股報告)",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VRN_ENG062_SummarizerV1.py"
+   }
+  },
+  {
+   "cap": "ticker.master",
+   "what": "台股代碼主檔",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VRN2_MarketFetch_v0100.py"
+   }
+  },
+  {
+   "cap": "firstpage.engine",
+   "what": "第一頁引擎",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VIA_VRN_FirstPageEngine_v0102.py"
+   }
+  },
+  {
+   "cap": "report.db",
+   "what": "整合報告資料庫",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0100.py"
+   }
+  },
+  {
+   "cap": "autotest.loop",
+   "what": "自動測試 → 自動修正 → 直到成功或說清楚卡在哪",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VRN_ENG076_RegressionGate_v0100.py"
+   }
+  },
+  {
+   "cap": "lexicon.valuation",
+   "what": "評價方法詞庫",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VRN_ENG063_Lexicon_v0100.py"
+   }
+  },
+  {
+   "cap": "prove.lock",
+   "what": "證明對的就鎖住:後來改壞它的變更要被拒絕",
+   "state": "BORROWED",
+   "owner": {
+    "system": "VRN-1",
+    "kind": "BORROWED_PINNED",
+    "engine": "VRN_Lock_v0100.py",
+    "sha256": "c817ed86b8d92dcf15bdcd360a4acdcb062315058a4b155b474880850251ace0",
+    "via": "VRN2_PeerBridge_v0101.py borrow prove.lock"
+   }
+  },
+  {
+   "cap": "truth.matrix",
+   "what": "母系統第一頁真值矩陣(貼上的表 → 一報告一列)",
+   "state": "BORROWED",
+   "owner": {
+    "system": "VRN-1",
+    "kind": "BORROWED_PINNED",
+    "engine": "VRN_TruthMatrix_v0100.py",
+    "sha256": "e8f38aa47994f71b5cd53943d9dd3d6c3a0e1d1ba164901a8760eacbe3b6794a",
+    "via": "VRN2_PeerBridge_v0101.py borrow truth.matrix"
+   }
+  },
+  {
+   "cap": "evidence.core",
+   "what": "兩個 VRN 引擎共用的同一套證據規則",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/engine/VRN_Evidence_Core.py"
+   }
+  },
+  {
+   "cap": "run.cache",
+   "what": "一輪讀過的放 TEMP,輸入沒變就重用",
+   "state": "BORROWED",
+   "owner": {
+    "system": "VRN-1",
+    "kind": "BORROWED_PINNED",
+    "engine": "VRN_RunCache_v0100.py",
+    "sha256": "1d5176cfe2d67b4a9b3f68cf77061f9fef16e832a936d756de36417306033fca",
+    "via": "VRN2_PeerBridge_v0101.py borrow run.cache"
+   }
+  },
+  {
+   "cap": "temp.store",
+   "what": "TEMP 分擔記憶體,刪除規則寫明",
+   "state": "BORROWED",
+   "owner": {
+    "system": "VRN-1",
+    "kind": "BORROWED_PINNED",
+    "engine": "VRN_TempStore_v0100.py",
+    "sha256": "e5d171b4b95083fc4c24e83b2125b5bd9875ec8bbbdc29de84a0a681f7206144",
+    "via": "VRN2_PeerBridge_v0101.py borrow temp.store"
+   }
+  },
+  {
+   "cap": "focus.only",
+   "what": "只處理操作員指名的那些(檔名 · 第一頁 …)",
+   "state": "BORROWED",
+   "owner": {
+    "system": "VRN-1",
+    "kind": "BORROWED_PINNED",
+    "engine": "VRN_Focus_v0100.py",
+    "sha256": "2a3a1654116f7f3798af04dd1cc9b465ecf01e9891bd2b37cee9cb9db8723c54",
+    "via": "VRN2_PeerBridge_v0101.py borrow focus.only"
+   }
+  },
+  {
+   "cap": "ast.id",
+   "what": "每個 VRN 模組 / 類 / 函式都有號、類別與說明",
+   "state": "BY_CONTRACT",
+   "owner": {
+    "system": "VCGC",
+    "kind": "BY_CONTRACT",
+    "ifc_id": "IFC-003",
+    "why": "VRN-2 的模組編號只由 VCGC 發(L122 / L125 · IFC-003 空號 → VCGC 發號);借 VRN-1 自編號引擎會與 VCGC 編號重複,且它會寫進原始碼"
+   }
+  },
+  {
+   "cap": "dataframe.headers",
+   "what": "每份輸出都是 DataFrame 並對表頭核對",
+   "state": "BORROWED",
+   "owner": {
+    "system": "VRN-1",
+    "kind": "BORROWED_PINNED",
+    "engine": "VRN_DataFrame_v0100.py",
+    "sha256": "4040db7df2bd9db75d3251b172854c3cb745f260916988761da27b71419113a7",
+    "via": "VRN2_PeerBridge_v0101.py borrow dataframe.headers"
+   }
+  },
+  {
+   "cap": "local.db",
+   "what": "公司名與 ADJ 收盤取自本機 VDF 庫",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VRN2_VDFBridge_v0100.py"
+   }
+  },
+  {
+   "cap": "ticker.record",
+   "what": "4 位代碼為鍵:一股一筆 15 欄",
+   "state": "BORROWED",
+   "owner": {
+    "system": "VRN-1",
+    "kind": "BORROWED_PINNED",
+    "engine": "VRN_TickerRecord_v0100.py",
+    "sha256": "5c24766c0bd0f2f95cf517d504f50b84098a04d80f2fc6030904b436ec84ed30",
+    "via": "VRN2_PeerBridge_v0101.py borrow ticker.record"
+   }
+  },
+  {
+   "cap": "book.check",
+   "what": "別場會話收來的冊當測試儀器",
+   "state": "BORROWED",
+   "owner": {
+    "system": "VRN-1",
+    "kind": "BORROWED_PINNED",
+    "engine": "VRN_BookCheck_v0100.py",
+    "sha256": "73089385b6fd5478e9fed0c66d6ba8621bc280cbff085eb8f1d4faff82c3c5e8",
+    "via": "VRN2_PeerBridge_v0101.py borrow book.check"
+   }
+  },
+  {
+   "cap": "run.matrix",
+   "what": "一輪的驗證結果在主控台做成矩陣",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/VRN_ENG079_ControlTowerDashboard_v0100.py"
+   }
+  },
+  {
+   "cap": "panorama.probe",
+   "what": "母系統進件十段管線全景實測(唯讀 · 禁網)",
+   "state": "MATCH",
+   "owner": {
+    "system": "VRN-2",
+    "kind": "OWN",
+    "file": "functional modules/VRN/engine/VRN_PanoramaProbe.py"
+   }
+  }
+ ],
+ "shared_evidence_files": {},
+ "problems": [],
+ "readiness": {
+  "lamp": "YELLOW",
+  "notes": [
+   "借用 8 支只過靜態驗(指紋 + ast);同指紋的 prove 全過收據沒有 → 桌機跑 prove"
+  ],
+  "borrowed_proven": false
+ }
+}

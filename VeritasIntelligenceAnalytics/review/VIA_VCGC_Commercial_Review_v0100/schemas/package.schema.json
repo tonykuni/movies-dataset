@@ -1,0 +1,128 @@
+{
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "VIA.Package/1.0"
+    },
+    "product_id": {
+      "enum": [
+        "VCGC",
+        "VDF",
+        "VRN2",
+        "VQG",
+        "VAP"
+      ]
+    },
+    "release_sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^v[0-9]{4}$"
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "os": {
+      "const": "windows"
+    },
+    "arch": {
+      "const": "x86_64"
+    },
+    "entrypoint": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "contract_version": {
+      "const": "1.0"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "path",
+          "size",
+          "sha256"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "source_policy": {
+      "const": "NO_CUSTOM_PROPRIETARY_PY_OR_PYC"
+    },
+    "forbidden_dependencies": {
+      "const": [
+        "TA-Lib",
+        "talib",
+        "ta_lib"
+      ]
+    },
+    "data_migration": {
+      "enum": [
+        "NONE",
+        "COPY_ON_WRITE"
+      ]
+    },
+    "rollback_allowed_sequences": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 2147483647
+      },
+      "uniqueItems": true
+    },
+    "issued_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "schema",
+    "product_id",
+    "release_sequence",
+    "version",
+    "source_commit",
+    "os",
+    "arch",
+    "entrypoint",
+    "contract_version",
+    "files",
+    "source_policy",
+    "forbidden_dependencies",
+    "data_migration",
+    "rollback_allowed_sequences",
+    "issued_at",
+    "expires_at"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:via:commercial-review:1.0:package"
+}

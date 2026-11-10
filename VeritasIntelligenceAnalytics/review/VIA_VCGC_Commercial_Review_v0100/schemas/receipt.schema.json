@@ -1,0 +1,134 @@
+{
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "VIA.CommercialReceipt/1.0"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9][A-Z0-9_-]{5,95}$"
+    },
+    "system": {
+      "enum": [
+        "VCGC",
+        "VDF",
+        "VRN2",
+        "VQG",
+        "VAP"
+      ]
+    },
+    "operation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED",
+        "NOT_RUN",
+        "NOT_OBSERVED",
+        "PARTIAL"
+      ]
+    },
+    "evidence_scope": {
+      "enum": [
+        "STATIC",
+        "SCHEMA_FIXTURE",
+        "CRYPTO_FIXTURE",
+        "LINUX_SANDBOX",
+        "WINDOWS_CI",
+        "WINDOWS_VM",
+        "PHYSICAL_WINDOWS",
+        "PRODUCTION"
+      ]
+    },
+    "started_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "format": "date-time"
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "artifact_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "contract_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "test_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z0-9][A-Z0-9_-]{5,95}$"
+      },
+      "uniqueItems": true
+    },
+    "exit_code": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "production_database_verified": {
+      "type": "boolean"
+    },
+    "effects": {
+      "type": "object",
+      "properties": {
+        "network_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "installed_packages": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "registry_writes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "peer_source_writes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "network_calls",
+        "installed_packages",
+        "registry_writes",
+        "peer_source_writes"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema",
+    "run_id",
+    "system",
+    "operation",
+    "state",
+    "evidence_scope",
+    "started_at",
+    "completed_at",
+    "source_commit",
+    "artifact_sha256",
+    "contract_sha256",
+    "test_ids",
+    "exit_code",
+    "production_database_verified",
+    "effects"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:via:commercial-review:1.0:receipt"
+}

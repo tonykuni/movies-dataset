@@ -1,0 +1,155 @@
+{
+  "schema": "VIA.MCPCommercialReview/1.0",
+  "owner": "VCGC",
+  "status": "SPEC_ONLY_NOT_REGISTERED",
+  "transport": "stdio",
+  "protocol_version": "2025-06-18",
+  "full_conformance_claim": false,
+  "http_endpoint": null,
+  "default_network": false,
+  "tools": [
+    {
+      "name": "vcgc_commercial_status",
+      "description": "Read readiness counts, blocked IDs and evidence scope only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "vcgc_deployment_plan",
+      "description": "Return immutable proposed plan from approved manifest registry; do not execute it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "enum": [
+              "VCGC",
+              "VDF",
+              "VRN2",
+              "VQG",
+              "VAP"
+            ]
+          },
+          "manifest_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "product_id",
+          "manifest_sha256"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "vcgc_license_explain",
+      "description": "Return sanitized decision reason; no raw license, keys, device identifiers or activation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "decision_receipt_id": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_-]{6,96}$"
+          }
+        },
+        "required": [
+          "decision_receipt_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "vcgc_evidence_query",
+      "description": "Query fixed indexed receipts by ID/hash with pagination and not_modified.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 96
+            },
+            "maxItems": 20
+          },
+          "if_etag": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "cursor": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ],
+  "lifecycle": [
+    "initialize negotiates explicit supported version",
+    "notifications/initialized",
+    "tools/list and tools/call with schemas",
+    "stdin EOF => clean owned child exit"
+  ],
+  "implementation_requirements": [
+    "stdout JSON-RPC only; stderr diagnostics",
+    "request maximum 64 KiB, response maximum 32 KiB; excess returns bounded error",
+    "max 20 rows default; full evidence available by local artifact hash, not automatic model context",
+    "strict schemas, duplicate keys rejected; unknown tool rejected",
+    "resolve IDs against fixed allowlist; caller cannot supply arbitrary filesystem paths, shell arguments, URLs or SQL",
+    "readOnlyHint is descriptive metadata, not enforcement; enforce side-effect denial in implementation",
+    "no issue/revoke/renew/install/apply/registry-sync exposed through model tools",
+    "unchanged source etag => not_modified; stale/test receipts remain scope-labelled",
+    "never infer that stdio on a PC is reachable from a cloud client; client registration is separate",
+    "do not run native read verbs until their actual side effects have been audited"
+  ],
+  "token_budget": {
+    "max_summary_chars": 1200,
+    "default_rows": 10,
+    "hard_max_rows": 20,
+    "changed_only": true,
+    "reuse_key": [
+      "source_commit",
+      "dependency_hashes",
+      "contract_version",
+      "environment_fingerprint",
+      "test_scope"
+    ],
+    "billing_claim": "None; payload bounds are not provider token or cost measurements"
+  },
+  "sd_d_traceability": "CAND-VCGC-COM-* IDs are provisional; no official central number is claimed."
+}
