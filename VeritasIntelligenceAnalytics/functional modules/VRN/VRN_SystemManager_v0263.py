@@ -71,6 +71,7 @@ SM_CONFIG = {'system': 'VRN',
  'forward_verbs': ['status'],
  'native_extra': ['test'],
  'peer_gate_flags': ['VIA_FROM_VCGC'],
+ 'own_entry_flag': None,
  'report_env': [],
  'custom_health': [{'name': 'integration_book', 'glob': 'functional modules/VRN/ssot/VRN2_IntegrationBook_v*.json'},
                    {'name': 'peer_bridge', 'glob': 'functional modules/VRN/VRN2_PeerBridge_v*.py'},
@@ -136,7 +137,16 @@ def sm_forward(args: list, root: Path) -> int:
     if pp is None:
         print(f"[{SM_TAG}] ABSENT · 前版 {SM_CONFIG['manager_family']}_v* 不在 {root / SM_CONFIG['dir']}(動詞 {args[:1]} 無從轉交)")
         return 3
-    return subprocess.run([sys.executable, str(pp), *args]).returncode
+    return subprocess.run([sys.executable, str(pp), *args], env=sm_child_env()).returncode
+
+
+def sm_child_env() -> dict:
+    """子行程環境:只補「本系統自己的」入口旗標(own_entry_flag;不設他系統旗標 · P3)。"""
+    env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+    own = SM_CONFIG.get("own_entry_flag")
+    if own:
+        env.setdefault(own, "YES")
+    return env
 
 
 _SM_PRIOR = None
@@ -239,6 +249,7 @@ def sm_static_checks(path: Path) -> dict:
     flags = [f for f in SM_CONFIG["peer_gate_flags"] if re.search(r"environ(?:\.get)?\(?\[?[\"']" + f, src)]
     return {"P1_main": sm_has_main(path),
             "P3_no_peer_gate": not flags,
+            "P3_own_flag_not_peer": SM_CONFIG.get("own_entry_flag") not in SM_CONFIG["peer_gate_flags"],
             "P4_no_peer_import": not any(i.startswith(peer_prefixes) for i in imports) and dyn_n <= 1
                            and ("sm_prior_path(sm_via_root())" in src if dyn_n else True),
             "P7_accel_bridge": "[VIA:ACCEL-BRIDGE" in src,
@@ -307,7 +318,7 @@ def sm_test_native(root: Path, only: str = "", max_n: int = 25, timeout: int = 1
     for fam, p in picked[:max_n]:
         try:
             r = subprocess.run([sys.executable, str(p), "--selftest"], cwd=tempfile.gettempdir(), capture_output=True, text=True,
-                               encoding="utf-8", errors="replace", timeout=timeout, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+                               encoding="utf-8", errors="replace", timeout=timeout, env=sm_child_env())
             rows.append({"family": fam, "rc": r.returncode, "result": "PASS" if r.returncode == 0 else "FAIL"})
         except subprocess.TimeoutExpired:
             rows.append({"family": fam, "rc": 124, "result": "TIMEOUT"})
@@ -473,6 +484,9 @@ def selftest() -> int:
         finally:
             globals()["SM_HERE"] = keep_here
         ck("轉交前版:參數原樣 · rc 原樣(7)", "PRIOR ['hello', 'x']" in r1.stdout and rc_fwd == 7, rc_fwd)
+        cenv, own_flag = sm_child_env(), SM_CONFIG.get("own_entry_flag")
+        ck("子行程只補本系統入口旗標(不補他系統旗標)", (not own_flag or cenv.get(own_flag) == "YES")
+           and not [f for f in SM_CONFIG["peer_gate_flags"] if f in cenv and f not in os.environ], own_flag)
         global _SM_PRIOR
         keep_prior, keep_root = _SM_PRIOR, globals()["sm_via_root"]
         try:
