@@ -13,9 +13,11 @@ r"""via_bridge_sweeper v0104 — v0103 薄尾(v0103 一字不動):兩支量尺�
       functional modules/VRN/intake/    VRN v0108 年度交接包原件(handover pack)· 正本不就地修改
       docs/handoff/ai/vrn2_release_     VRN-2 已發行的凍結發行包副本 · 改了就和發行雜湊對不上
       functional modules/VRN2/          VRN-2 桌機私有 runtime(不進倉 · 本倉規則 never-commit)
+另:成功鎖(交接冊 frozen_sources)上的檔改列 EXEMPT_FROZEN —— 鎖住的正本零觸碰優先(就地注入會觸發 SUCCESS_LOCK_CHANGED;
+  2026-11-10 實錄:VRN_ENG112 v0100 · 非個股引擎 v0310 注入後被交接閘抓到 → 已還原原檔一字不差)。
 本版只把這四個夾補進 EXEMPT_INTAKE(誠實列示 · 計數照算 · 不從清單消失),其他判準、注入、undo 全照 v0103。
 只增不減:豁免清單只加不減;不刪任何橋、不改任何檔。不用 TA-Lib。
-自測:python via_bridge_sweeper_v0104.py --selftest(前版 v0103 自測於乾淨子行程 + 本版 4 項)。
+自測:python via_bridge_sweeper_v0104.py --selftest(前版 v0103 自測於乾淨子行程 + 本版 5 項)。
 """
 from __future__ import annotations
 
@@ -37,6 +39,56 @@ ADDED_EXEMPT_INTAKE = ("supportive modules/intake/", "functional modules/VRN/int
                        "docs/handoff/ai/vrn2_release_", "functional modules/VRN2/")
 P.EXEMPT_INTAKE = tuple(P.EXEMPT_INTAKE) + tuple(x for x in ADDED_EXEMPT_INTAKE if x not in P.EXEMPT_INTAKE)
 EXEMPT_INTAKE = P.EXEMPT_INTAKE
+
+
+def frozen_sources() -> set:
+    """交接冊 frozen_sources(成功鎖:路徑 → sha)。鎖住的檔零觸碰優先於全樹導入令(注入會觸發 SUCCESS_LOCK_CHANGED)。"""
+    import json as _json
+    hits = sorted((HERE).glob("VIA_Handoff_Continuity_SSOT_v*.json"))
+    if not hits:
+        return set()
+    try:
+        d = _json.loads(hits[-1].read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return set()
+    return {str(k).replace("\\", "/") for k in (d.get("frozen_sources") or {})}
+
+
+FROZEN = frozen_sources()
+_classify_0103 = P.classify
+
+
+def classify(rp: str) -> str:
+    r = rp.replace("\\", "/")
+    if r in FROZEN:
+        return "EXEMPT_FROZEN"
+    return _classify_0103(rp)
+
+
+P.classify = classify
+_audit_0103 = P.audit
+
+
+def audit(root=None) -> dict:
+    _orig = P.classify
+    seen = {"n": 0}
+
+    def _cls(rp):
+        c = _orig(rp)
+        if c == "EXEMPT_FROZEN":
+            seen["n"] += 1
+            return "SKIP"                                   # v0103 的 exempt 計數表沒有這一格 → 走 SKIP 路徑,另計數
+        return c
+    P.classify = _cls
+    try:
+        a = _audit_0103(root) if root is not None else _audit_0103()
+    finally:
+        P.classify = _orig
+    a.setdefault("exempt", {})["EXEMPT_FROZEN"] = seen["n"]
+    return a
+
+
+P.audit = audit
 
 
 def __getattr__(name):
@@ -64,7 +116,9 @@ def selftest() -> int:
              "docs/handoff/ai/VIA_LakeConsole_v0101.py": "ACTIVE"}
     got = {k: P.classify(k) for k in cases}
     chk("② 新豁免只吃這四類夾 · VRN / VDF / docs 活檔照算 ACTIVE(不把活樹藏起來)", got == cases, {k.split("/")[-1]: v for k, v in got.items() if v != cases[k]})
-    a = P.audit()
+    chk("②b 成功鎖上的檔(交接冊 frozen_sources)= EXEMPT_FROZEN · 零觸碰", bool(FROZEN) and all(classify(x) == "EXEMPT_FROZEN" for x in list(FROZEN)[:5])
+        and classify("functional modules/VRN/VRN_SystemManager_v0262.py") == "ACTIVE", "鎖 %d 檔" % len(FROZEN))
+    a = audit()
     chk("③ 真樹活樹:加速缺 0 · 網路缺 0(= 全覆蓋;豁免另列計數)", not a["accel_miss"] and not a["net_miss"],
         "加速 %d/%d · 網路 %d/%d · 豁免 %s" % (a["accel_have"], a["active"], a["net_have"], a["net_need"], a["exempt"]))
     chk("④ 前版 v0103 自測(乾淨子行程)", prior_ok, "rc %s" % cp.returncode)

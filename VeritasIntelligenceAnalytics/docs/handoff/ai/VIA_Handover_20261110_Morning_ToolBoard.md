@@ -200,7 +200,7 @@ PR #624 已併入 main(04:00Z),分支併回(7598b4146)。新引擎 **`docs/hando
 | VRN-2 | 13 份真實 PDF 車道 | 個股 8 READY · 非個股 5 BLOCKED(缺 NON_STOCK_CORE)|
 | VRN-2 | 收尾套件 v0178 雜湊 | 11/11 |
 
-**雙橋**:VCGC 正式量尺 CGC_MDL124 v0111 四系統 100%;清掃器 v0103 另報加速缺 33 · 網路缺 8 → 真缺 7 支已補標記塊(+146 行 −0 行 · 自測 / 回傳碼與原檔一致),其餘 34 件屬原件收容 / 凍結發行 / 不進倉 → `via_bridge_sweeper_v0104.py` 補進豁免(只增不減)→ 活樹 加速 1127/1127 · 網路 61/61。
+**雙橋**:VCGC 正式量尺 CGC_MDL124 v0111 四系統 100%;清掃器 v0103 另報加速缺 33 · 網路缺 8 → 真缺 5 支已補標記塊(WorkbenchLock v0102 · MutualMonitor v0100 · VRN2_UIAction v0107 · AgentOS v0102 · LakeConsole v0101;只加不刪 · 自測 / 回傳碼與原檔一致);VRN_ENG112 v0100 與非個股引擎 v0310 在成功鎖(交接冊 frozen_sources)上,注入後被交接閘抓到 SUCCESS_LOCK_CHANGED → 已還原原檔一字不差;其餘屬原件收容 / 凍結發行 / 不進倉 → `via_bridge_sweeper_v0104.py` 補進豁免 + 成功鎖檔列 EXEMPT_FROZEN(只增不減)→ 活樹 加速 1120/1120 · 網路 60/60。
 **獨立性**:VDF 101 支尾版只有 1 支硬載 VCGC 模組(ENG090 → CGC_MDL142 名冊;找不到時誠實回空);VRN-2 76 支 0 支。
 
 **收尾條件未達(照實)**:操作員要的「VDF 對外擷取引擎實測驗證無誤」要開 VIA_NET_CONSENT 真抓 —— 容器不開(紅線)。REQ220 = PARTIAL,work item `vdf-live-fetch` PENDING(owner 操作員)。
