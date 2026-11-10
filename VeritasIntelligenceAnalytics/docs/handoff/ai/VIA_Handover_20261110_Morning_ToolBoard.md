@@ -207,3 +207,18 @@ PR #624 已併入 main(04:00Z),分支併回(7598b4146)。新引擎 **`docs/hando
 
 **臨門一腳(操作員 / 桌機)**:同意閘 → akshare 經 VCGC 安裝閘 → DesktopFourBlocks v0101 `--blocks 4 --mode live --jobs 5` 真抓 → 貼回驗證;e115 / e116 經 Invoke-VIAPython;MQ-1560 四點 12 項 `--confirm`;上傳 NON_STOCK_CORE;衝突冊 OPEN 6 裁決;VQG / VAP 登 L122。
 登冊:需求 v0244 +REQ219(COVERED)· +REQ220(PARTIAL)· 工作流 v0145 +WKF041(3 步)· 盤點 v0220 +2 站 · 交接冊 +2 案 + 3 work item。U/I:Artifact「VDF · VRN-2 近完工鎖定」。
+
+## 14. VRN-2 報告一行一單位(操作員「VRN-2 為主,缺乏的功能 VRN-1 整併進來 · 股票報告及多種非股票報告皆能擷取還原資料抓重要資料摘要 · 個股一行一報告 · 產業一行一產業 · 其他一行一主題 · 多行一報告 · 輸出調整優化」)
+
+- 新檔 `functional modules/VRN/VRN2_ReportRows_v0100.py`(VRN-2 底座夾;不 import VCGC / VRN-1 · 不用 TA-Lib · 零網路)。
+  `python "functional modules/VRN/VRN2_ReportRows_v0100.py" run [--pdf-dir D] [--out O]` → `VIA_Reports/vrn2/report_rows/VRN2_ReportRows_latest.{json,csv,parquet,html}`;`--selftest` 11/11。
+- 輸出律:個股 = 一行一報告(代號 · 評等 · TP · 收盤 · 四點:評價與目標 / 核心驅動 / 營運與財務 / 風險與展望);產業 = 一產業一行;
+  其他 = 一主題一行(投影片頁標題,連續同標題合併,分隔頁當章節,同標題多處出現加子標;晨會 = 一家公司一行,帶評等 / TP)。每行附關鍵數字(標籤 + 數值單位)與提到的個股。
+- 擷取還原:去疊字 · 收合字距(含「3 00 . 0 0」價格字距)· 投影片模板殘字 · 直式兩欄頁側欄 / 內文分開抽 · 斷行接回(只動空白)。
+- 摘要只抽原句,每句回原文驗證;表格頁另列前幾筆資料列(不冒充句子);沒文字層 = NEEDS_OCR 照實。
+- VRN-1 整併:`attachments/VIA_Financial_Document_Summarizer_Engine_1.py` 的正規化 / 斷句 / 去重 / 計分 / 評等 / TP / 四點規則只讀照搬(VRN-1 倉不動)。
+  注意:移植時我把 TP 數字式寫錯(`NT$1275.0` 讀成 127),已修並加自測 ⑤b;VRN-1 原式是對的。
+- 容器實測 13 份真 PDF:53 行(個股 7 · 產業 4 · 主題 41 · 掃描檔 1)· 摘要原句驗證 155/155 · TP / 收盤逐筆對原文
+  (JP 1275.0 / 1130.0 · MS 4388.00 / 3190.00 · CLSA 4200.00 · 凱基 104.0 / 96.90 · 2600 / 1990 · 晶心科 300.00 / 270.00 · 瑞基 未評等 / 19.20)。燈 YELLOW = MQ-1560 掃描檔要 OCR。
+- 登冊:VRN-REQ019(PARTIAL · 掃描檔 OCR 在桌機)· 工作流冊 v0108 +VRN-WKF011(v0107 不動)· 站 V-vrn2-reportrows · 交接案 + 待辦 `VRN-REQ019:scanned-ocr`(desktop)。
+- 已知限制:J.P. Morgan 第 1 頁側欄跨頁首,兩欄切不開,部分英文句仍夾側欄字;接進 VRN-2 啟動器 / Workbench 一頁是下一步(VRN-2 自己的入口)。
