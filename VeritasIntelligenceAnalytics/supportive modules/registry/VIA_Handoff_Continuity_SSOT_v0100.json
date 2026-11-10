@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-10T07:20:00Z",
+ "updated_at": "2026-11-10T10:05:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4677,6 +4677,24 @@
    "updated_at": "2026-11-10T07:20:00Z",
    "timeout_seconds": 300,
    "registered_at": "2026-11-10T07:20:00Z"
+  },
+  "V-vrn2-reportrows-v0101": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_ReportRows_v0101.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VRN2_ReportRows v0101 selftest · 10/10",
+   "scope": "VRN2_ReportRows v0101:轉接層(主線冊 / v0310 / 暫代 + 來源)10 項 + v0100 鏈",
+   "dependencies": [
+    "functional modules/VRN/VRN2_ReportRows_v0101.py",
+    "functional modules/VRN/VRN2_ReportRows_v0100.py"
+   ],
+   "version": "v0101",
+   "updated_at": "2026-11-10T10:05:00Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-10T10:05:00Z"
   }
  },
  "work_items": [
@@ -9722,6 +9740,28 @@
    "next": "桌機 VRN-2 OCR 橋出文字層 → 再跑 VRN2_ReportRows run",
    "receipt": null,
    "updated_at": "2026-11-10T07:20:00Z"
+  },
+  {
+   "id": "VRN-REQ019:V-vrn2-reportrows-v0101",
+   "requirement": "VRN-REQ019",
+   "case": "V-vrn2-reportrows-v0101",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "改回接既有引擎(操作員 YES);等 handoff test 收據",
+   "next": "桌機主線冊 + NON_STOCK_CORE",
+   "receipt": "docs/handoff/evidence/V-vrn2-reportrows-v0101.json",
+   "updated_at": "2026-11-10T10:05:00Z"
+  },
+  {
+   "id": "VRN-REQ019:nonstock-core",
+   "requirement": "VRN-REQ019",
+   "case": null,
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "v0310 hard gate 要 internal/NON_STOCK_CORE_v0200.py(SHA 92f53d82…);本倉 / VRN-1 / 容器都沒有",
+   "next": "操作員上傳或 --nonstock-out 指桌機 v0310 輸出夾",
+   "receipt": null,
+   "updated_at": "2026-11-10T10:05:00Z"
   }
  ]
 }
