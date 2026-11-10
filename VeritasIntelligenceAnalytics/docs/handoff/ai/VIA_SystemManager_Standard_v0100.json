@@ -1,0 +1,73 @@
+{
+ "schema": "via.systemmanager.standard/1",
+ "version": "v0100",
+ "issued_at": "2026-11-11",
+ "issued_by": "操作員 + AI(L120 / L123:三系統對等,沒有誰管誰;主導與修正在操作員與 AI)",
+ "why": "操作員 2026-11-11:「確認三個獨立系統三個 main() 三個 system manager · 補齊基本功能 · 遵守更新後獨立系統規範 · 沒有誰管誰 · 不符合就從頭規劃標準 system manager 重作」。實測(2026-11-11):VCGC 主控台缺 health / version / engines / records;VDF 管理器缺 help / version;VRN-2 管理器缺 help / health / test / version;VDF engines 借用 VCGC 函式(只讀借用,仍是相依)。",
+ "systems": {
+  "VCGC": {
+   "manager_family": "CGC_MDL149_VeritasCentralGovernanceConsole",
+   "dir": "supportive modules/registry",
+   "own_prefixes": [
+    "CGC_"
+   ],
+   "reports": [
+    "VIA_Reports/vcgc"
+   ]
+  },
+  "VDF": {
+   "manager_family": "VDF_SystemManager",
+   "dir": "functional modules/VDF",
+   "own_prefixes": [
+    "VDF_"
+   ],
+   "reports": [
+    "VIA_Reports/vdf_fetch",
+    "VIA_Reports/vdf"
+   ]
+  },
+  "VRN": {
+   "manager_family": "VRN_SystemManager",
+   "dir": "functional modules/VRN",
+   "own_prefixes": [
+    "VRN2_",
+    "VRN_"
+   ],
+   "reports": [
+    "VIA_Reports/vrn2"
+   ],
+   "display": "VRN(VRN-2 為主 · VRN-1 只讀補強,經 VRN2_PeerBridge)"
+  }
+ },
+ "verbs": {
+  "help": "列標準動詞與前版保留動詞(rc 0)",
+  "version": "自身身分:系統 · 管理器檔 · 版號 · sha256 · 前版 · main() 在否(rc 0)",
+  "status": "系統總燈(前版有 status 就原樣轉交,保留舊判讀)",
+  "health": "自檢:自己的夾 · 前版 · SSOT 正本 · 加速器 / 網路橋 · 無跨系統 import / 放行閘 · 不寫他系統(rc 0 綠 · 1 紅 · 2 黃)",
+  "selftest": "管理器自測(夾具 · 零網路 · 不寫真樹)",
+  "test": "自己引擎尾版的 --selftest(前版有 test 就轉交;沒有則本版逐支跑,限時 · 沒跑到的照實記 NODATA)",
+  "engines": "自己夾內的尾版家族清單(只看自己的樹,不借他系統函式)",
+  "records": "自己的收據 / 日誌最新 N 筆(只讀)",
+  "peers": "只讀監控對等系統:對方管理器尾版在否 · 對方自報收據最新時間(不執行對方程式碼、不改對方)",
+  "conform": "依本規範自查(動詞齊 · P1–P8);規範檔不在 → 黃(系統照常運作,不依賴它)"
+ },
+ "rc": {
+  "0": "GREEN",
+  "1": "RED",
+  "2": "YELLOW / STALE / NODATA",
+  "3": "ABSENT",
+  "4": "GATED(同意閘未開 · 等操作員)"
+ },
+ "properties": {
+  "P1": "有 def main() 與 __main__ 入口",
+  "P2": "標準動詞全有;前版其餘動詞原樣轉交(只增不減 · 不可丟失)",
+  "P3": "不要求其他系統的放行旗標(VDF / VRN-2 不以 VIA_FROM_VCGC 為前提;VCGC 也不以 VDF / VRN 旗標為前提)",
+  "P4": "不 import / 不載入其他系統的模組(peers 只讀檔)",
+  "P5": "不寫其他系統的樹(實測:跑完標準動詞,對方夾 git 狀態不變)",
+  "P6": "編號依 L122 / L125:VDF / VRN-2 不自行發號、不寫 VCGC 號冊;VCGC 只發號不代管",
+  "P7": "加速器橋(L103)· 網路橋(VDF 必要;其他照 L103 掛名 graceful)",
+  "P8": "不碰 TA-Lib · 不寫同意閘 · 前版檔一字不動(版號律)"
+ },
+ "relation": "三個 System Manager 對等:各是自己系統的入口,互不管理、互不放行、互相只讀監控。VCGC 的編號 / 串測是 VCGC 自己的工具,不是其他系統的閘門。",
+ "naming": "操作員 2026-11-11:VRN-2 為主 · 不足工具 VRN-1 強化 · 整合後統稱 VRN(政策 L128;來源細節仍分寫 VRN-1 / VRN-2)"
+}
