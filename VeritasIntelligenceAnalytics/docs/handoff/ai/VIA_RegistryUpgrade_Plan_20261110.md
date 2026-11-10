@@ -32,3 +32,11 @@
 | P7 | 跨 AI 共用:同一組 MCP 給 Claude / ChatGPT / Gemini / Copilot 查號 | VIA_MCP_Engine v0103 parity + OmniRoute(桌機,未裝) |
 
 建議先做 P1 → P2 → P3(都在 VCGC 自己的編號機制內,直接補 CONST-030 缺口);P4–P7 偏顯示與整合,排後。
+
+## 四、進度(只增)
+- **P1 完成 · 2026-11-10 17:26 +00:00** · `CGC_MDL237_NumberingSystem_v0120.py` = VIA-VCGC-MDL1637(ENV115)· 自測 20/20 · 前版鏈 v0119 PASS · 交接案 `C-cgc237-v0120-receipts` rc 0。
+  - 收據帳 `supportive modules/registry/VIA_RegistrationReceipts_v0100.jsonl`(只增;不在號冊夾,號冊一字不動)。
+  - 欄:code · book · version · source · registered_at(分鐘 + 時區)· uuid · operator · bytes · format · sha256 · kind(new / version / backfill)· engine · functions(函式子號併母號,不單發)。
+  - `--apply` 成功後自動發;重跑零新增;同號同版異 sha 標 conflict 不蓋。`receipts` 檢查:嚴格啟用日起 581 列 · 收據 581 · 缺 0 · 欄不全 0 · 衝突 0 = GREEN。
+  - 今天先前編號的 581 列以 `receipts --backfill --apply` 補收據(kind=backfill,時間取 numbered_at);2026-11-10 前的列不回溯。
+- 下一段:P2 檔名規則閘 → P3 衝突 / 重複檢測加強。
