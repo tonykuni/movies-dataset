@@ -141,3 +141,84 @@ python3 "docs/handoff/ai/VIA_DailyBackup_v0100.py" check && python3 "docs/handof
 
 閘鏈第 16 輪(修後):`test --quick` **YELLOW**(站 9 綠 2 黃 0 紅 · case 267/267 · workflow 164/164 · 紀錄 +3)。`handoff check` **RED 143 → 141**:本輪兩項已清(C-vcgc-toolboard 收據重生,因 seat_path 修在收據之後;REQ214 systems-adopt-lake OPEN 不是合法態 → PENDING)。
 **更正**:前幾輪交接文件寫的「handoff check 16 紅」是擷取只留尾 18 行的誤記;真實基線是 11-09 的 139 紅(EVIDENCE_INVALID 52 全為 11-06 席位冊 `VIA_VCGC_SubsystemSeat_v0100` 變更後的連鎖:chain / backup / numbering 等舊收據失效 → 其相依模組落成 CHANGED_CODE_WITHOUT_TEST 81),不是本輪新紅;要清要在桌機 `handoff test chain` / `backup` / `numbering` 重跑舊案後 `handoff checkpoint`。新案(lake · console · parquet v0101 · toolboard)紅 0。
+
+## 11. 五系統啟動 via HTML U/I(操作員「PR 已合併 繼續併回 main 收尾 activate 5 system via html u/i and run」)
+
+PR #624 已併入 main(04:00Z),分支併回(7598b4146)。新引擎 **`docs/handoff/ai/VIA_LakeConsole_v0101.py`**(v0100 薄尾,v0100 一字不動):
+
+| 項 | 內容 |
+|---|---|
+| 白名單 +6 | `five_systems`(= `VIA_FiveSystemConstitution run --apply`:VCGC · VDF · VRN-2 · VQG · VAP 各走自己的入口並行實測 · 記進度帳 · 矩陣)· `activate_vcgc / vdf / vrn2 / vqg / vap`(單系統走它自己的入口 selftest)· 鏈 `activate_all`(逐一)。VRN-1 外部倉只讀,不在白名單(L123) |
+| 燈 +6 盞 | 五系統總燈(憲法矩陣)+ 每系統一盞:實測燈 · 入口版 · 號 · 憲法性 · 進度(綠 / 跑 · 連綠)· 本台啟動比矩陣新就改用本台 |
+| 頁面 | 「五系統啟動」按鈕列 7 顆(一鍵 = 下拉選好 + 執行;純滑鼠)· 仍是同一支 script · 見證表每步燈改用引擎自報 step lamp |
+| 收據 | 矩陣正本仍在 `docs/handoff/ai/VIA_FiveSystemConstitution_{latest.json,latest.md,UI.html}`;本台把本輪新產的複製到 `VIA_Reports/lake/FIVE_SYSTEMS_latest.*` 給 `/files` 開;只看不寫 → 去 `--apply` 不記進度帳、不拿舊收據的燈 |
+| 子行程 | 逾時依動作(五系統 1800 · VCGC 1500 · VDF / VRN-2 / VQG 900 · VAP 600)· `VIA_FROM_VCGC=YES` · 帳每步帶燈 |
+
+**自測** 本版 11/11 + 前版鏈 v0100 19/19(前版鏈改走乾淨子行程:行程內 v0100 的 ACTIONS / lamps 已被換成五系統版)。
+**容器實跑**(`serve --port 8768 --no-open`)· Playwright 三視窗 **31 步 0 失敗 0 pageerror · GREEN**(`VIA_Reports/lake/CONSOLE_UserTest_v0101_latest.{json,md}` + 三張截圖):燈 10 盞 → 按「五系統並行實測 + 矩陣」→ DONE 172.6s + 收據可開 → 按「啟動 VAP」「啟動 VRN-2」→ DONE GREEN → 系統盞改用本台 → 403 / 400。
+**五系統各走自己入口 5/5 綠**:VCGC v0192 47.4s · VDF v0168 159.6s · VRN-2 v0262 6.9s · VQG v0109 170.0s · VAP v0100 0.1s;進度帳 +5(`VIA_FiveSystem_Progress_v0100.jsonl` 25 列)。
+**誠實**:矩陣總燈 **RED** 不是實跑紅,是憲法性基線(11-09 已知):衝突冊 OPEN 6 項點到 VCGC / VDF / VRN-2(`CONFLICT_OPEN`)· VQG / VAP 未登 L122 治理冊(`NOT_IN_L122_GOVERNOR`)→ 憲法性 0/5;裁衝突 / 登治理冊是操作員的手。見證面板照實顯示 RED rc 1。
+
+登冊:盤點 **v0220**(+C-lake-console-v0101;WKF038-STP001 → v0101;+WKF039 覆蓋)· 需求 **v0244**(+VCGC-REQ216 COVERED)· 工作流 **v0145**(+VCGC-WKF039 five_system_activate)· 交接冊 +1 案 VERIFIED(handoff test rc 0 · marker)。編號 +23(遺失 0 · 改身分 0 · 重號 0 · IMMUT 0 · DUPREG 0)· registry-sync 撞號 0。
+桌機:`python3 "docs/handoff/ai/VIA_LakeConsole_v0101.py" serve`(自動開頁)→ 按「五系統並行實測 + 矩陣」。
+
+## 12. VQG 產出進 TEMP 增量 Parquet 庫(操作員「VQG 產出的數據到 TEMP 存放 增量更新去重維護 用 PARQUET 一樣 刪除機制未定 先維持現況」)
+
+`functional modules/VQG/VQG_AllInOne_v0110.py`(v0109 薄尾 · v0109 一字不動 · SHA 釘住)。儲存用五系統共用套件 `supportive modules/VIA_ParquetLake_v0101.py`(main 上;Parquet zstd 分片 · `_manifest.jsonl` 只增 · DuckDB `VQG_catalog.duckdb` 每表一個 VIEW 取最新)。
+
+| 項 | 內容 |
+|---|---|
+| 位置 | TEMP 根 = `VIA_TEMP_ROOT` > Windows `%LOCALAPPDATA%\VIA_TEMP` > 系統 temp/VIA_TEMP(同 VDF ActivateVDF)→ `<TEMP 根>/VIA_Lake/VQG/`;`VIA_VQG_STORE_ROOT` 或 `--store-root` 可換 |
+| 九表與去重鍵 | series(ticker, date)· indicators(ticker, observation_date)· indicator_results(ticker, observation_date, indicator_id, window_n, solution_id)· quant_analysis(ticker, observation_date)· backtest_curve(ticker, date)· backtest_summary(ticker, strategy)· factor_ic(date)· stats(ticker)· return_corr(ticker);另 store_runs 每次一列 |
+| 去重 | 每列內容指紋 `vqg_row_sha`:新鍵 → 新增;同鍵同值 → 跳過;同鍵值變 → 追加新版本(VIEW 取最新,舊版本留在舊分片)。as_of · request_key · input_sha256 · engine_version · engine · formula_engine · link_id · source_files 每輪會變,不算進指紋 |
+| 刪除 | 不刪(機制未定 · 維持現況);入庫程式碼沒有任何刪除呼叫(自測 ⑩ 以 AST 檢查) |
+| 接法 | `export-vap` 跑完自動入庫(`--no-store` 不入);`store [--export-dir D]` 單獨入庫;`store status` 看各表原始列 / 鍵數 / 分片 |
+
+驗證(容器):自測本版 11/11 + 前版鏈 v0109 14/14 · CLI 實跑 4 票夾具:第一次入庫 2543 列 · 同一匯出再入 0 新增 · 第二次匯出(新夾 · 同資料)0 新增 0 更新 · 值變 1 列 → 新版本 1 · 新一天 → 新增 1。
+
+**注意**:REQ214 原定湖根是 `<VIA_DATA_HOME>/<SYS>`;VQG 依本令改放 TEMP,所以五系統湖矩陣(LakeMatrix)預設看不到 VQG 這座湖。要讓矩陣看到,把 `VIA_VQG_STORE_ROOT` 指到資料家目錄即可。系統暫存清理工具若清 TEMP,庫會跟著消失;刪除與保留機制待操作員決定。
+
+登冊:需求 v0244 +`VCGC-REQ218` COVERED · 工作流 v0145 +`VCGC-WKF040` vqg_temp_store(3 步)· 盤點 v0220 +C-vqg-v0110 · 交接冊 +case + work item VERIFIED。
+桌機:`python "functional modules/VQG/VQG_AllInOne_v0110.py" export-vap --root <VDF 庫>` → `... store status`。
+
+## 13. 近完工狀態鎖定 · 卡點清單 · VDF / VRN-2 實測 · 雙橋 100%(操作員「CLAUDE / MANUS / GITHUB … 很多次幾乎完工 … 建立紀錄鎖定 · 臨門一腳抓出來 · 缺工具去 VCGC 裝 · VDF VRN 實測跳 U/I」「不可使用 TALIB · 各自獨立」「全景除錯 · 注入 AST 加速器 100% · 網路工具只增不減去重不衝突 · VDF 對外擷取實測驗證無誤才算收尾」)
+
+**來源**:GitHub 兩倉可讀(movies-dataset · VIA-VDF-VRN 只讀);桌機兩根與 Downloads 未經 Remote Control 供出(清單空);Manus 連結是登入後才顯示的 app 頁,抓到只有標題。
+
+**鎖定**:`VIA_NearCompleteLock_v0100.py`(只用標準庫 + git · 不 import 任何系統模組 · 不用 TA-Lib)→ `VIA_NearCompleteLock_v0100.json / .md`。67 個近完工里程碑(VCGC 19 · VDF 19 · VRN-2 21 · VRN-1 8)全部鎖:main 上的 commit · 整倉 tree 雜湊 · 當時入口 blob 雜湊。`check` 重驗 67 · 壞 0 · 漂移 0(GREEN)。歷史被改寫或鎖檔被手改 = RED;入口往前換版只算漂移。
+盤點結論:三系統從未有過 GREEN 驗收收尾;最好狀態是 YELLOW / REVIEW / DATA_GAP;11-09 RC-1 W0 / W1 都是 NO-GO。
+
+**今天實測(各走自己入口)**
+
+| 系統 | 項目 | 結果 |
+|---|---|---|
+| VDF | 入口 VDF_SystemManager v0168 自測 | 本版 6/6 · 前版鏈 PASS · rc 0 |
+| VDF | 全族群夾具實跑(零網路)| 18 支:綠 3 · 同意閘拒跑 13(設計)· e077 缺宇宙 1 · 011d 缺 akshare 1 |
+| VDF | akshare 經 VCGC 安裝閘 | 閘要求先開同意閘才下載 → 停(紅線不代設) |
+| VRN-2 | 入口 VRN_SystemManager v0262 自測 | 5/5 · 前版鏈 rc 0 |
+| VRN-2 | RoundAll v0135 自測 | 111/111(倉外);倉內 2 項不過 = 先找到本倉 VIA 根,測試環境差異 |
+| VRN-2 | 13 份真實 PDF 車道 | 個股 8 READY · 非個股 5 BLOCKED(缺 NON_STOCK_CORE)|
+| VRN-2 | 收尾套件 v0178 雜湊 | 11/11 |
+
+**雙橋**:VCGC 正式量尺 CGC_MDL124 v0111 四系統 100%;清掃器 v0103 另報加速缺 33 · 網路缺 8 → 真缺 5 支已補標記塊(WorkbenchLock v0102 · MutualMonitor v0100 · VRN2_UIAction v0107 · AgentOS v0102 · LakeConsole v0101;只加不刪 · 自測 / 回傳碼與原檔一致);VRN_ENG112 v0100 與非個股引擎 v0310 在成功鎖(交接冊 frozen_sources)上,注入後被交接閘抓到 SUCCESS_LOCK_CHANGED → 已還原原檔一字不差;其餘屬原件收容 / 凍結發行 / 不進倉 → `via_bridge_sweeper_v0104.py` 補進豁免 + 成功鎖檔列 EXEMPT_FROZEN(只增不減)→ 活樹 加速 1120/1120 · 網路 60/60。
+**獨立性**:VDF 101 支尾版只有 1 支硬載 VCGC 模組(ENG090 → CGC_MDL142 名冊;找不到時誠實回空);VRN-2 76 支 0 支。
+
+**收尾條件未達(照實)**:操作員要的「VDF 對外擷取引擎實測驗證無誤」要開 VIA_NET_CONSENT 真抓 —— 容器不開(紅線)。REQ220 = PARTIAL,work item `vdf-live-fetch` PENDING(owner 操作員)。
+
+**臨門一腳(操作員 / 桌機)**:同意閘 → akshare 經 VCGC 安裝閘 → DesktopFourBlocks v0101 `--blocks 4 --mode live --jobs 5` 真抓 → 貼回驗證;e115 / e116 經 Invoke-VIAPython;MQ-1560 四點 12 項 `--confirm`;上傳 NON_STOCK_CORE;衝突冊 OPEN 6 裁決;VQG / VAP 登 L122。
+登冊:需求 v0244 +REQ219(COVERED)· +REQ220(PARTIAL)· 工作流 v0145 +WKF041(3 步)· 盤點 v0220 +2 站 · 交接冊 +2 案 + 3 work item。U/I:Artifact「VDF · VRN-2 近完工鎖定」。
+
+## 14. VRN-2 報告一行一單位(操作員「VRN-2 為主,缺乏的功能 VRN-1 整併進來 · 股票報告及多種非股票報告皆能擷取還原資料抓重要資料摘要 · 個股一行一報告 · 產業一行一產業 · 其他一行一主題 · 多行一報告 · 輸出調整優化」)
+
+- 新檔 `functional modules/VRN/VRN2_ReportRows_v0100.py`(VRN-2 底座夾;不 import VCGC / VRN-1 · 不用 TA-Lib · 零網路)。
+  `python "functional modules/VRN/VRN2_ReportRows_v0100.py" run [--pdf-dir D] [--out O]` → `VIA_Reports/vrn2/report_rows/VRN2_ReportRows_latest.{json,csv,parquet,html}`;`--selftest` 11/11。
+- 輸出律:個股 = 一行一報告(代號 · 評等 · TP · 收盤 · 四點:評價與目標 / 核心驅動 / 營運與財務 / 風險與展望);產業 = 一產業一行;
+  其他 = 一主題一行(投影片頁標題,連續同標題合併,分隔頁當章節,同標題多處出現加子標;晨會 = 一家公司一行,帶評等 / TP)。每行附關鍵數字(標籤 + 數值單位)與提到的個股。
+- 擷取還原:去疊字 · 收合字距(含「3 00 . 0 0」價格字距)· 投影片模板殘字 · 直式兩欄頁側欄 / 內文分開抽 · 斷行接回(只動空白)。
+- 摘要只抽原句,每句回原文驗證;表格頁另列前幾筆資料列(不冒充句子);沒文字層 = NEEDS_OCR 照實。
+- VRN-1 整併:`attachments/VIA_Financial_Document_Summarizer_Engine_1.py` 的正規化 / 斷句 / 去重 / 計分 / 評等 / TP / 四點規則只讀照搬(VRN-1 倉不動)。
+  注意:移植時我把 TP 數字式寫錯(`NT$1275.0` 讀成 127),已修並加自測 ⑤b;VRN-1 原式是對的。
+- 容器實測 13 份真 PDF:53 行(個股 7 · 產業 4 · 主題 41 · 掃描檔 1)· 摘要原句驗證 155/155 · TP / 收盤逐筆對原文
+  (JP 1275.0 / 1130.0 · MS 4388.00 / 3190.00 · CLSA 4200.00 · 凱基 104.0 / 96.90 · 2600 / 1990 · 晶心科 300.00 / 270.00 · 瑞基 未評等 / 19.20)。燈 YELLOW = MQ-1560 掃描檔要 OCR。
+- 登冊:VRN-REQ019(PARTIAL · 掃描檔 OCR 在桌機)· 工作流冊 v0108 +VRN-WKF011(v0107 不動)· 站 V-vrn2-reportrows · 交接案 + 待辦 `VRN-REQ019:scanned-ocr`(desktop)。
+- 已知限制:J.P. Morgan 第 1 頁側欄跨頁首,兩欄切不開,部分英文句仍夾側欄字;接進 VRN-2 啟動器 / Workbench 一頁是下一步(VRN-2 自己的入口)。
