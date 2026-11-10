@@ -70,7 +70,7 @@ QA_*.json(Selftest / Integration / Resilience / UI)是對方環境自報,本倉*
 ## 7 · 下一步(操作員)
 
 - 決定 B1–B4 的修法 → VCGC 出 v0195 薄尾;或先在本機跑第 5 點的三個指令把收據傳回。
-- 本分支(`claude/practical-pasteur-p67i78`)比 main 舊;合併前要先接上 main(main 2026-11-10 `8fc49fff`)。
+- ~~本分支比 main 舊~~(更正 2026-11-10:本分支已包含 main `8fc49fff`;先前判斷有誤)。
 
 ## 8 · 操作員本機實跑回報(2026-11-10 08:52–08:54 UTC · 照貼原文,未在本倉重現)
 
@@ -91,3 +91,26 @@ QA_*.json(Selftest / Integration / Resilience / UI)是對方環境自報,本倉*
 - 本機主控台尾版:`CGC_MDL149_…_v0189`(15,340 B)· `v0190`(9,511 B)· **`v0191`(5,161 B,2026-10-11)** → v0194 install 停在 `UNSUPPORTED_NATIVE_PRIOR` 的原因確認(要 v0192 / v0193)。
 - 結論:本機 main 要先接上 origin/main(落後 404)才會有 v0192;接上的方式要保住 2 個本機提交與 8 個改動(AllInOne 的 SYNC 段規矩:先備份、只 stash 追蹤檔、只 `--ff-only`、分岔就停)。未追蹤件多屬 VRN-2 / VDF,VCGC 不代動(L123)。
 - 腳本取得:`git show … | Set-Content` 會被 PowerShell 用主控台編碼(繁中 Windows 為 cp950)轉碼,中文腳本可能變亂碼 → 改用 `git archive`(位元組原樣)。
+
+## 10 · v0195(修 B1–B4)與第二批上傳(2026-11-10)
+
+`v0195/CGC_MDL149_VeritasCentralGovernanceConsole_v0195.py`:v0194 薄尾,v0194 一字不改;放在 intake,**不進 registry**(要放在 v0194 旁邊跑)。
+
+| 問題 | v0195 修法 |
+|---|---|
+| B1 matrix 遮蔽 | 只有 `matrix <14 個 action>` 與 `_parse-worker` 交 v0194;`matrix` 單獨、`matrix --family …` 與其他動詞交回原生(同夾 ≤ v0192 最高版);別名 `mmatrix <action>` |
+| B2 自行發號 | 需求 / 工作流列 code 留白、`number_state=BLANK_PENDING_L125`;同名列不重登;盤點冊只加站 `C-multimatrix-v0195` |
+| B3 自動寫冊 / 發號 | 預設 `registry-sync`(乾跑)+ `NumberingSystem audit`;`--approve-registry-sync` / `--approve-numbering` 才各自加回 `--apply` |
+| B4 前版只比版號 | 原生 v0192 正規化 SHA(去 CR、去結尾換行)必須 ∈ 已知清單 `482d2010…`(本倉 / main v0192) |
+
+驗證(本倉):AST / 全景卡 0 問題;以**本工作階段自寫的假 v0194**(只提供 v0195 會呼叫的函式)跑 `matrix selftest` → 12 / 12 PASS;
+路由實測:`matrix --family vdf,vrn,vap` / `matrix` / `token` → 原生 v0192;`matrix scan` / `mmatrix doctor` → v0194。
+真 v0194 + v0195 的合併自測要在操作員本機跑(WorkbenchLocal v0104 的 S17 會自動放好並執行)。
+
+第二批上傳:
+- `VIA_MatrixGovernance_README_v0100.md`(`f1d25131…`)· `VIA_MatrixGovernance_AllInOne_v0100.py`(`bb8d5911…`)= 交接文件釘選值 → 相符(綠)。
+- `VIA_Settle_v0112.zip` 內的 `VIA_SettleAll_v0112.py`:去 CR 後與本倉 v0112 位元組相同(只差 Windows 換行)。
+- `VIA_Settle_20261106_234531.zip`:桌機收據(settle · vrn2 · vdf · graphify · SystemMatrix),只記錄。
+- 本機同步(WorkbenchLocal v0103 S02c):`ahead 2 · behind 461`;本機提交 `3ad7dd12f`(VRN-2 v0136 收尾)已在 origin/main,
+  `122bab5f8`(VRN-2 薄尾鏈隨船 · 補 212 個 VRN-2 檔)不在 → 照規矩停;已備份到分支 `backup/main-local-20261110_171605` 與 bundle。
+  這是 VRN-2 的提交(L123),上不上船由 VRN-2 決定;VCGC 不代為對齊。
