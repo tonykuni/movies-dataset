@@ -1,0 +1,448 @@
+{
+ "freeze_status": "FREEZE_OK",
+ "group": "VRN-2",
+ "system": "VRN-2",
+ "independent": true,
+ "lock": "VRN2_FreezeLock_v0104",
+ "prior": "VRN2_FreezeLock_v0103",
+ "locked_at": "2026-11-10T14:55:34Z",
+ "branch_commit_at_measure": "cd22a9dd5652be8920c4c7d4df2971526438b2d8",
+ "locked_by": "操作員 2026-11-10 令「VRN 最難 · 回顧過去完工或接近完工的兩三次鎖定住測編號 · 比較補不足 · VRN-1 VRN-2 部分功能強化整合(可整合 · 不可丟失 · 不可重複)· 臨門一腳」+「先一個系統成功則鎖住 · 測 · 存檔所有版本現況」",
+ "hash_rule": "sha256 of file bytes with CRLF normalized to LF(同 v0103)",
+ "compared_locks": {
+  "VRN2_FreezeLock_v0103 (2026-11-02)": "14 檔 sha:相同 9 · 變 5(雙橋注入 · 已授權只增)· 缺 0;closeout REVIEW",
+  "VIA_ThreeDayLock_v0103 (2026-11-08)": "VRN 交接案鎖 23 · 撤 0;未鎖 5(DESKTOP 2:cov_vrn_firstpage_engine · vrn_ssot_consistency;ENV_PKG 3:vrn_docclass · vrn_layout · vrn_plugin_hub)",
+  "VIA_NearCompleteLock_v0100 (2026-11-10)": "VRN-2 里程碑 21(commit/tree/blob)· 入口 VRN_SystemManager_v0262;VRN-1 8(HEAD 0993c2d)"
+ },
+ "gaps_filled_this_lock": [
+  "v0103 只鎖 14 檔、沒編號、沒逐檔自測 → v0104 每檔帶 VCGC 編號(號 · 版本 · 發號時間)+ 容器自測結果",
+  "v0103 之後新出的 VRN-2 尾版未入鎖(管理器 v0262 · VDFBridge · PeerBridge · ReportRows v0101 · ReportLaneCheck · VerifiedMatrix v0120 · ContentReconcile v0103 · release v0179)→ 補入",
+  "VRN-1 ⇄ VRN-2 能力整合:v0100 只登借用冊(GAP 9 · 整合閘未實作)→ PeerBridge v0101 + 整合冊 v0100:23 項一能力一主人 · 丟失 0 · 重複 0"
+ ],
+ "integration": {
+  "book": "functional modules/VRN/ssot/VRN2_IntegrationBook_v0100.json",
+  "counts": {
+   "MATCH": 14,
+   "BORROWED": 8,
+   "BY_CONTRACT": 1,
+   "REVIEW": 0,
+   "GAP": 0
+  },
+  "by_contract": {
+   "ast.id": "VRN-2 編號只由 VCGC 發(L122 / L125 · IFC-003);不借 VRN-1 自編號引擎"
+  },
+  "vrn1_head": "0993c2d230a2786692110d09e14e69e7cf6f7852",
+  "vrn1_pinned": {
+   "prove.lock": "c817ed86b8d92dcf15bdcd360a4acdcb062315058a4b155b474880850251ace0",
+   "truth.matrix": "e8f38aa47994f71b5cd53943d9dd3d6c3a0e1d1ba164901a8760eacbe3b6794a",
+   "run.cache": "1d5176cfe2d67b4a9b3f68cf77061f9fef16e832a936d756de36417306033fca",
+   "temp.store": "e5d171b4b95083fc4c24e83b2125b5bd9875ec8bbbdc29de84a0a681f7206144",
+   "focus.only": "2a3a1654116f7f3798af04dd1cc9b465ecf01e9891bd2b37cee9cb9db8723c54",
+   "ast.id": "7348bc0534731a0d485dffbeaa34b516b5d38621ecc720b076b0d8724f07a2ce",
+   "dataframe.headers": "4040db7df2bd9db75d3251b172854c3cb745f260916988761da27b71419113a7",
+   "ticker.record": "5c24766c0bd0f2f95cf517d504f50b84098a04d80f2fc6030904b436ec84ed30",
+   "book.check": "73089385b6fd5478e9fed0c66d6ba8621bc280cbff085eb8f1d4faff82c3c5e8"
+  },
+  "vrn1_untouched": true
+ },
+ "files": {
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_SystemManager_v0256.py": {
+   "sha256": "fc50c2ac6d35e971359160642f07fc5a21ef1673b39e76b7a146cef7d651ea5a",
+   "vs_v0103": "SAME",
+   "numbers": [
+    {
+     "code": "VIA-VRN-MDL307",
+     "version": "v0256",
+     "issued_at": "2026-10-29 02:59:15 +0000"
+    }
+   ],
+   "last_commit": "d79548b71 2026-10-29T02:59:15+00:00 結案輪:VRN-2 薄尾鏈補環 v0248 / v0253(原檔從未進倉 · 直通前版 · v0254 依賴的六個名稱依呼叫處還原 · Headers V3 只讀桌機 SSOT 冊)+ 尾版 v0256(檔面",
+   "selftest": {
+    "rc": 0,
+    "last": "[計] VRN-2 SystemManager v0256(VRN_SystemManager_v0256.py)自測 6/6 · PASS · 鏈 v0256→v0254→v0253→v0249→v0248→v0245→v0244→v0242→v0239→v0232"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN2_ChainShip_v0101.py": {
+   "sha256": "8fbc455b5828e06d0b7ec76a6a35b500221386c20ce0d487e9dfb6083b69baa6",
+   "vs_v0103": "CHANGED",
+   "numbers": [
+    {
+     "code": "VIA-VRN-MDL309",
+     "version": "v0101",
+     "issued_at": "2026-10-28 20:01:51 +0000"
+    }
+   ],
+   "last_commit": "e33bf4d7c 2026-11-06T15:34:00+00:00 雙橋 100%(操作員令 L103):VCGC 橋掃器 CGC_MDL124 v0111 --subsystems --apply 注加速器橋 11 支(VRN 10 · SUP_MDL753;全部 comp",
+   "selftest": {
+    "rc": 0,
+    "last": "[計] VRN2_ChainShip v0101 --selftest · OK 27 · FAIL 0"
+   },
+   "why_changed": "v0103 之後內容變:2026-11-06 e33bf4d7c 雙橋 100%(操作員令 L103 · VCGC 橋掃器只增注加速器橋 14 行);UIAction 另 2026-11-10 48646e423;Release json 為 v0169 同日後續提交"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG397_P1Segment_v0129.py": {
+   "sha256": "45e34fefce7d5961fa50bf877765723aaca30545df1f1effd9bb530213cf5f1d",
+   "vs_v0103": "CHANGED",
+   "numbers": [
+    {
+     "code": "VIA-VRN-ENG329",
+     "version": "v0129",
+     "issued_at": "2026-10-27 16:40:09 +0800"
+    }
+   ],
+   "last_commit": "e33bf4d7c 2026-11-06T15:34:00+00:00 雙橋 100%(操作員令 L103):VCGC 橋掃器 CGC_MDL124 v0111 --subsystems --apply 注加速器橋 11 支(VRN 10 · SUP_MDL753;全部 comp",
+   "selftest": {
+    "rc": 0,
+    "last": "[計] VRN_ENG397 v0129 自測 35/35 · PASS"
+   },
+   "why_changed": "v0103 之後內容變:2026-11-06 e33bf4d7c 雙橋 100%(操作員令 L103 · VCGC 橋掃器只增注加速器橋 14 行);UIAction 另 2026-11-10 48646e423;Release json 為 v0169 同日後續提交"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG062_SummarizerV1_v0113.py": {
+   "sha256": "88955e60abba372f30f046154c492182c763bc4ff2b78fb40c2425459d20ef71",
+   "vs_v0103": "SAME",
+   "numbers": [
+    {
+     "code": "VIA-VRN-ENG327",
+     "version": "v0113",
+     "issued_at": "2026-10-27 13:46:13 +0800"
+    }
+   ],
+   "last_commit": "a4e0b075e 2026-10-27T13:46:13+08:00 VRN-2 v0122 收尾 · 完成判定 完成 · 紅 0 黃 5 · 自動上船(只含 VRN-2 程式 / 設定冊 / 交接報告)",
+   "selftest": {
+    "rc": 1,
+    "last": "NO TESTS RAN"
+   },
+   "note": "--selftest 用 unittest 找同夾 test_summary*.py;倉內沒有(測試隨套件出)→ NO TESTS RAN = 證據不在倉,非紅"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN2_MarketFetch_v0112.py": {
+   "sha256": "8452a0d2981841b920c0ae5e33695acbb6b59c923623923ccdac20bebbd98a6a",
+   "vs_v0103": "SAME",
+   "numbers": [
+    {
+     "code": "VIA-VRN-MDL310",
+     "version": "v0112",
+     "issued_at": "2026-10-28 13:58:22 +0800"
+    }
+   ],
+   "last_commit": "918461d4c 2026-10-28T13:58:22+08:00 VRN-2 v0155 收尾 · 完成判定 完成 · 紅 0 黃 5 · 自動上船(只含 VRN-2 程式 / 設定冊 / 交接報告)",
+   "selftest": {
+    "rc": 0,
+    "last": "[計] VRN2_MarketFetch v0112 自測 13/13 · PASS"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN2_Publish_v0101.py": {
+   "sha256": "28c92c6d6fca3924495355d3e685f70cd46bfc664c202256281572a68b8547df",
+   "vs_v0103": "CHANGED",
+   "numbers": [
+    {
+     "code": "VIA-VRN-MDL311",
+     "version": "v0101",
+     "issued_at": "2026-10-28 13:58:22 +0800"
+    }
+   ],
+   "last_commit": "e33bf4d7c 2026-11-06T15:34:00+00:00 雙橋 100%(操作員令 L103):VCGC 橋掃器 CGC_MDL124 v0111 --subsystems --apply 注加速器橋 11 支(VRN 10 · SUP_MDL753;全部 comp",
+   "selftest": {
+    "rc": 0,
+    "last": "[計] VRN2_Publish v0101 自測 4/4 · PASS"
+   },
+   "why_changed": "v0103 之後內容變:2026-11-06 e33bf4d7c 雙橋 100%(操作員令 L103 · VCGC 橋掃器只增注加速器橋 14 行);UIAction 另 2026-11-10 48646e423;Release json 為 v0169 同日後續提交"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN2_UIAction_v0107.py": {
+   "sha256": "5a57ac41680af9fe7699fe2806d44147e74a720246bbdf427bd9a45fe45e339e",
+   "vs_v0103": "CHANGED",
+   "numbers": [
+    {
+     "code": "VIA-VRN-MDL312",
+     "version": "v0107",
+     "issued_at": "2026-10-28 13:58:22 +0800"
+    }
+   ],
+   "last_commit": "48646e423 2026-11-10T06:18:06+00:00 feat(vcgc): 近完工狀態鎖定 67 里程碑 + 雙橋活樹 100% + VDF / VRN-2 實測 · REQ219 / REQ220 · WKF041",
+   "note": "無自測入口;要桌機 ActivateVRN-2 產生的 VRN2_UIAction_Config.json → 桌機項",
+   "why_changed": "v0103 之後內容變:2026-11-06 e33bf4d7c 雙橋 100%(操作員令 L103 · VCGC 橋掃器只增注加速器橋 14 行);UIAction 另 2026-11-10 48646e423;Release json 為 v0169 同日後續提交"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/_vdf_fetch/VDF_TW_AllInOne_v039.py": {
+   "sha256": "a5d8ad12832c5977ecdafbb6436ab5339b2233f3c72fa1db0402546e7e9a2c6a",
+   "vs_v0103": "SAME",
+   "numbers": [
+    {
+     "code": "VIA-VDF-ENV053",
+     "version": "v039",
+     "issued_at": "2026-10-28 00:54:49 +0800"
+    },
+    {
+     "code": "VIA-VDF-ENV054",
+     "version": "v039",
+     "issued_at": "2026-10-28 00:54:49 +0800"
+    },
+    {
+     "code": "VIA-VDF-ENV055",
+     "version": "v039",
+     "issued_at": "2026-10-28 00:54:49 +0800"
+    },
+    {
+     "code": "VIA-VDF-MDL241",
+     "version": "v039",
+     "issued_at": "2026-10-28 00:54:49 +0800"
+    }
+   ],
+   "last_commit": "d9c146208 2026-10-28T00:54:49+08:00 VRN-2 v0146 收尾 · 完成判定 完成 · 紅 0 黃 5 · 自動上船(只含 VRN-2 程式 / 設定冊 / 交接報告)"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/SSOT/VRN2_SSOT_v0101.json": {
+   "sha256": "5bea84aade3815906e62a2f6a9ebf7190f9333328ea037ed9462e0e574a2d8e4",
+   "vs_v0103": "SAME",
+   "numbers": null,
+   "last_commit": "918461d4c 2026-10-28T13:58:22+08:00 VRN-2 v0155 收尾 · 完成判定 完成 · 紅 0 黃 5 · 自動上船(只含 VRN-2 程式 / 設定冊 / 交接報告)"
+  },
+  "VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0169/VRN2_HandleAll_v0118.md": {
+   "sha256": "8bee4e8759fe0041b7db8b19267148e8fb7877aa6006cdc0af5d86af4dae8dc5",
+   "vs_v0103": "SAME",
+   "numbers": null,
+   "last_commit": "5c8561499 2026-11-01T21:00:04+00:00 [VRN] Handle-All v0118:收尾燈 REVIEW 顏色只給 Yellow(修 Write-Host ForegroundColor 繫結錯誤)"
+  },
+  "VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0169/VRN2_HandleAll_v0118_boot.txt": {
+   "sha256": "bb86271f9fd19aa724948153176ff926a3e5f3c14720d3611ffdda80814018b2",
+   "vs_v0103": "SAME",
+   "numbers": null,
+   "last_commit": "5c8561499 2026-11-01T21:00:04+00:00 [VRN] Handle-All v0118:收尾燈 REVIEW 顏色只給 Yellow(修 Write-Host ForegroundColor 繫結錯誤)"
+  },
+  "VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0169/VRN2_RoundAll_v0126.py": {
+   "sha256": "4a1b85ef0fb2ee4701b7dfe985267339d8f3f86a31576846246c18c4b9043d59",
+   "vs_v0103": "SAME",
+   "numbers": [
+    {
+     "code": "VIA-CORE-MDL830",
+     "version": "v0126",
+     "issued_at": "2026-11-01 21:00:04 +0000"
+    }
+   ],
+   "last_commit": "761c2ad45 2026-11-01T21:00:04+00:00 [VRN] RoundAll v0126:貼回包同名檔只寫一次(修 zip Duplicate name 警告)",
+   "selftest": {
+    "rc": 1,
+    "last": "[FAIL] VRN2_RoundAll v0126 --selftest · 90 項 · 不過 2"
+   },
+   "note": "倉內跑 FAIL 2(①② 找 VIA 根:本檔在倉內 → 先找到真倉,假預設位置測不到);複製到倉外跑 90/90 PASS(2026-11-10 容器實測)= 測試位置問題,不是功能缺陷"
+  },
+  "VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0169/VRN2_Release_v0169.json": {
+   "sha256": "fb6682b24497af3490ca7405a70c2222bdbd91a7c8f6142454584e2ffac6fa53",
+   "vs_v0103": "CHANGED",
+   "numbers": null,
+   "last_commit": "74c805a7a 2026-11-02T04:56:42+00:00 VRN-2 v0169 · RoundAll v0125(⑥f 同意閘列 → 人工 · 合規 DENY → VCGC)· Handle-All v0117(整輪 + 閘未開先問中止 · 永不代設)· 套件 v",
+   "why_changed": "v0103 之後內容變:2026-11-06 e33bf4d7c 雙橋 100%(操作員令 L103 · VCGC 橋掃器只增注加速器橋 14 行);UIAction 另 2026-11-10 48646e423;Release json 為 v0169 同日後續提交"
+  },
+  "VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0169/VRN2_Closeout_v0169.zip": {
+   "sha256": "dfcaee78394483cd4746e06e814e12a349980c875be2ae9c93e6f00ab73702e6",
+   "vs_v0103": "SAME",
+   "numbers": null,
+   "last_commit": "3e403eff3 2026-11-01T19:00:12+00:00 VeritasReportNova v0169 · Workbench v0104:畫面名稱 VeritasReportNova / VRN(VRN 唯一系統 · 檔名與資料不改)· 內建透明印章(無框無特效"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_SystemManager_v0262.py": {
+   "sha256": "9028f26d8ab47de8f70bf57b645d9e77888ad8c6c05262ca57833b363a8d8e3d",
+   "vs_v0103": "NEW",
+   "numbers": [
+    {
+     "code": "VIA-VRN-MDL331",
+     "version": "v0262",
+     "issued_at": "2026-11-06 22:07:16 +0000"
+    }
+   ],
+   "last_commit": "284378620 2026-11-06T22:07:16+00:00 VRN-2 SystemManager v0262(Codex #602 P2):provenance 動詞放回 --selftest 攔截之前 → provenance --selftest = 來源回歸 ",
+   "selftest": {
+    "rc": 0,
+    "last": "[計] VRN-2 SystemManager v0262(VRN_SystemManager_v0262.py)自測 5/5 · PASS · 前版鏈 rc 0 · 鏈 v0262→v0261→v0256→v0254→v0253→v0249→v0248→v0245→v0244→v0242"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN2_VDFBridge_v0100.py": {
+   "sha256": "1d6c9593c17e65ecba10b589a0ae2ff87c301c3775d40229ded9abe652edbb21",
+   "vs_v0103": "NEW",
+   "numbers": [
+    {
+     "code": "VIA-VRN-MDL313",
+     "version": "v0100",
+     "issued_at": "2026-10-27 18:26:02 +0800"
+    }
+   ],
+   "last_commit": "e33bf4d7c 2026-11-06T15:34:00+00:00 雙橋 100%(操作員令 L103):VCGC 橋掃器 CGC_MDL124 v0111 --subsystems --apply 注加速器橋 11 支(VRN 10 · SUP_MDL753;全部 comp",
+   "selftest": {
+    "rc": 0,
+    "last": "[計] VRN2_VDFBridge v0100 自測 6/6 · PASS"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN2_PeerBridge_v0100.py": {
+   "sha256": "e08c47ec9e96953c1faa24a0cd0dde2cda034e21b96f55a748d6e3c6f07acb85",
+   "vs_v0103": "NEW",
+   "numbers": [
+    {
+     "code": "VIA-VRN-ENV095",
+     "version": "v0100",
+     "issued_at": "2026-11-08 01:23:23 +0000"
+    },
+    {
+     "code": "VIA-VRN-MDL332",
+     "version": "v0100",
+     "issued_at": "2026-11-08 01:23:23 +0000"
+    }
+   ],
+   "last_commit": "c7a0db098 2026-11-08T01:34:36+00:00 修 Codex #609 兩項:borrow 從不比對記錄過的指紋(P2)· manifest --apply 覆寫已發布正本(P1)",
+   "selftest": {
+    "rc": 0,
+    "last": "[自測] 43/43 PASS"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN2_PeerBridge_v0101.py": {
+   "sha256": "fb5510b96be170d1a0e2ec26315e08d7379551512f3cf45e9a5f14d979b1f1c6",
+   "vs_v0103": "NEW",
+   "numbers": [
+    {
+     "code": "VIA-VRN-MDL337",
+     "version": "v0101",
+     "issued_at": "2026-11-10 14:49:40 +0000"
+    }
+   ],
+   "last_commit": "55f96b708 2026-11-10T14:49:40+00:00 feat(vrn-2): PeerBridge v0101 薄尾 · VRN-1/VRN-2 能力整合冊 v0100(23 項 · 不丟失 0 · 不重複 0)",
+   "note": "自測經交接案 C-vrn2-peerbridge-v0101 rc 0 · 22/22(另含 v0100 43/43,有無 VIA_VRN1_ROOT 都過)"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN2_ReportRows_v0101.py": {
+   "sha256": "861744148ca1868e2700aad40575257b96073ac96dec9b4d958b77dc12b536dd",
+   "vs_v0103": "NEW",
+   "numbers": [
+    {
+     "code": "VIA-VRN-MDL336",
+     "version": "v0101",
+     "issued_at": "2026-11-10 12:23:16 +0000"
+    }
+   ],
+   "last_commit": "8d74830c5 2026-11-10T12:23:16+00:00 fix(vrn-2): Codex #626 — ReportRows v0101 報告身分不撞(P1)· 空上游不冒充綠(P2)",
+   "selftest": {
+    "rc": 0,
+    "last": "[PASS] VRN2_ReportRows v0101 selftest · 12/12"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ReportLaneCheck_v0100.py": {
+   "sha256": "2275a469c1483c410a366fa80cbfc6fb0dbdf249196f287bc227ffee0a440d94",
+   "vs_v0103": "NEW",
+   "numbers": [
+    {
+     "code": "VIA-VRN-MDL334",
+     "version": "v0100",
+     "issued_at": "2026-11-09 16:29:15 +0000"
+    }
+   ],
+   "last_commit": "7db115120 2026-11-09T16:44:42+00:00 chore(vcgc): 閘鏈 — CGC_MDL237 發號 8 支(+130 列 · audit 遺失 0 改身分 0 重號 0 IMMUT 0)· registry-sync 撞號 0 · 工作流步碼 ",
+   "selftest": {
+    "rc": 0,
+    "last": "[PASS] VRN_ReportLaneCheck v0100 selftest · 10/10"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG083_VerifiedMatrix_v0120.py": {
+   "sha256": "80900c0903bbb0937d4e04b587a8d5916b5207474ac114bc6fe0b4bd9814f0f8",
+   "vs_v0103": "NEW",
+   "numbers": [
+    {
+     "code": "VIA-VRN-ENG308",
+     "version": "v0120",
+     "issued_at": "2026-09-29 06:58:45 +0000"
+    }
+   ],
+   "last_commit": "74898e996 2026-09-29T06:58:45+00:00 側線 2026-09-29 d:整條重跑的 go 輪再抓到兩件 —— 驗證矩陣 v0120 · 中央邏輯庫 v0111 · 驗證器 v0102 加 FINDING 追因",
+   "selftest": {
+    "rc": 0,
+    "last": "  [計] 58 檢 OK 58 · FAIL 0"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG049_ContentReconcile_v0103.py": {
+   "sha256": "1f89f74dd8504400b479e83e2b31bb0e3b5f0c41573a70c196b1b7d796ed7112",
+   "vs_v0103": "NEW",
+   "numbers": [
+    {
+     "code": "VIA-VRN-ENG011",
+     "version": "v0103",
+     "issued_at": "2026-09-28 11:12:38 +0000"
+    }
+   ],
+   "last_commit": "c91d2568c 2026-09-28T11:12:38+00:00 R18a-3: selftest gates for seven more VRN nodes; logic book follows the tails",
+   "selftest": {
+    "rc": 0,
+    "last": "  [計] VRN_ENG049_ContentReconcile v0103 自測 5/5 · PASS"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/ssot/VRN2_BorrowBook_v0100.json": {
+   "sha256": "1787a2524aa739dd83f1db2bf13c054cb56473e6ecc6ca76d44cc600a0dac82c",
+   "vs_v0103": "NEW",
+   "numbers": null,
+   "last_commit": "9830a5193 2026-11-08T01:23:23+00:00 VRN2_PeerBridge v0100:VRN-2 為主,缺的能力向 VRN-1 借來用(只讀)· 整合閘擋住未完成的整合"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/ssot/VRN2_IntegrationBook_v0100.json": {
+   "sha256": "2ee96cccdb0930171e0fea5147795b1061482857b137b21a0c566e3e34b6ff3e",
+   "vs_v0103": "NEW",
+   "numbers": null,
+   "last_commit": "55f96b708 2026-11-10T14:49:40+00:00 feat(vrn-2): PeerBridge v0101 薄尾 · VRN-1/VRN-2 能力整合冊 v0100(23 項 · 不丟失 0 · 不重複 0)"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VRN/ssot/VRN2_ToolManifest_v0100.json": {
+   "sha256": "01f370907483d49a0e030bf943aa1f2de68f1af0da3d3118852d4285bfe6167b",
+   "vs_v0103": "NEW",
+   "numbers": null,
+   "last_commit": "9830a5193 2026-11-08T01:23:23+00:00 VRN2_PeerBridge v0100:VRN-2 為主,缺的能力向 VRN-1 借來用(只讀)· 整合閘擋住未完成的整合"
+  },
+  "VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0179/VRN2_RoundAll_v0135.py": {
+   "sha256": "89adba80ba2b758981cc92108f88a65f8a84566277eb04e68d34455c80d64114",
+   "vs_v0103": "NEW",
+   "numbers": null,
+   "last_commit": "08e00e3ad 2026-11-03T19:04:59+00:00 VRN-2 v0179 · 四系統收尾:RoundAll v0135(⑥e 提示只在 last_error.txt 在時指它 · --confirm 指令單獨一格 · 連提示字貼上只記代碼 · ⑥ 收尾 KP",
+   "selftest": {
+    "rc": 1,
+    "last": "[FAIL] VRN2_RoundAll v0135 --selftest · 111 項 · 不過 2"
+   },
+   "note": "同上:倉內 FAIL 2 · 倉外 111/111 PASS(容器實測;v0179 驗證冊亦記 111 · 不過 0)"
+  },
+  "VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0179/VRN2_HandleAll_v0127.md": {
+   "sha256": "771b155a6d594ccb58c0d24a18c4a4dc0b4dec9b9bde214883152abac8642840",
+   "vs_v0103": "NEW",
+   "numbers": null,
+   "last_commit": "08e00e3ad 2026-11-03T19:04:59+00:00 VRN-2 v0179 · 四系統收尾:RoundAll v0135(⑥e 提示只在 last_error.txt 在時指它 · --confirm 指令單獨一格 · 連提示字貼上只記代碼 · ⑥ 收尾 KP"
+  },
+  "VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0179/VRN2_HandleAll_v0127_boot.txt": {
+   "sha256": "fcd3e1b359f8abc51e0a86f91d60e4354a1f7380ed4ac4a082851b5f25be4a4d",
+   "vs_v0103": "NEW",
+   "numbers": null,
+   "last_commit": "08e00e3ad 2026-11-03T19:04:59+00:00 VRN-2 v0179 · 四系統收尾:RoundAll v0135(⑥e 提示只在 last_error.txt 在時指它 · --confirm 指令單獨一格 · 連提示字貼上只記代碼 · ⑥ 收尾 KP"
+  },
+  "VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0179/VRN2_Release_v0179.json": {
+   "sha256": "30bcbb2d9e0158fefb4ec845c4d01c1b869529352a6d8428f764f72aaafbe127",
+   "vs_v0103": "NEW",
+   "numbers": null,
+   "last_commit": "08e00e3ad 2026-11-03T19:04:59+00:00 VRN-2 v0179 · 四系統收尾:RoundAll v0135(⑥e 提示只在 last_error.txt 在時指它 · --confirm 指令單獨一格 · 連提示字貼上只記代碼 · ⑥ 收尾 KP"
+  }
+ },
+ "tree_untouched_by_selftests": true,
+ "check_status": "容器:倉內 VRN-2 尾版自測 12 支 rc 0;RoundAll v0126 / v0135 倉外 PASS(倉內 2 項為測試位置);ENG062 測試不在倉;UIAction 無自測入口",
+ "closeout_state": "REVIEW",
+ "open_items": [
+  {
+   "item": "借用 8 支 VRN-1 工具實跑",
+   "owner": "操作員(桌機)",
+   "how": "python \"VeritasIntelligenceAnalytics\\functional modules\\VRN\\VRN2_PeerBridge_v0101.py\" prove",
+   "why": "容器內執行 VRN-1 程式被權限擋下(未繞過)"
+  },
+  {
+   "item": "UIAction v0107 / ENG062 套件測試",
+   "owner": "操作員(桌機)",
+   "how": "ActivateVRN-2 一輪(產生 UIAction Config · 套件內 test_summary*)"
+  },
+  {
+   "item": "ThreeDayLock 未鎖 5 案(DESKTOP 2 · ENV_PKG 3)",
+   "owner": "桌機 / VCGC InstallGate",
+   "how": "照 v0103 not_locked 的 block_evidence"
+  },
+  {
+   "item": "R4 啟動器版本分岔(本機 ActivateVRN-2 v0178+ 未上傳)",
+   "owner": "操作員",
+   "how": "上傳本機最新 ActivateVRN-2 與 vrn2_work 清單"
+  }
+ ],
+ "per_owner": {
+  "VRN-2": 0,
+  "VCGC": 0,
+  "操作員(桌機)": 4
+ },
+ "check_message": "版本凍結 + 容器實測,不是驗收。燈照實:倉內可測的全綠;桌機項 4 件未跑前收尾仍是 REVIEW。"
+}
