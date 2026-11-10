@@ -161,3 +161,22 @@ PR #624 已併入 main(04:00Z),分支併回(7598b4146)。新引擎 **`docs/hando
 
 登冊:盤點 **v0220**(+C-lake-console-v0101;WKF038-STP001 → v0101;+WKF039 覆蓋)· 需求 **v0244**(+VCGC-REQ216 COVERED)· 工作流 **v0145**(+VCGC-WKF039 five_system_activate)· 交接冊 +1 案 VERIFIED(handoff test rc 0 · marker)。編號 +23(遺失 0 · 改身分 0 · 重號 0 · IMMUT 0 · DUPREG 0)· registry-sync 撞號 0。
 桌機:`python3 "docs/handoff/ai/VIA_LakeConsole_v0101.py" serve`(自動開頁)→ 按「五系統並行實測 + 矩陣」。
+
+## 12. VQG 產出進 TEMP 增量 Parquet 庫(操作員「VQG 產出的數據到 TEMP 存放 增量更新去重維護 用 PARQUET 一樣 刪除機制未定 先維持現況」)
+
+`functional modules/VQG/VQG_AllInOne_v0110.py`(v0109 薄尾 · v0109 一字不動 · SHA 釘住)。儲存用五系統共用套件 `supportive modules/VIA_ParquetLake_v0101.py`(main 上;Parquet zstd 分片 · `_manifest.jsonl` 只增 · DuckDB `VQG_catalog.duckdb` 每表一個 VIEW 取最新)。
+
+| 項 | 內容 |
+|---|---|
+| 位置 | TEMP 根 = `VIA_TEMP_ROOT` > Windows `%LOCALAPPDATA%\VIA_TEMP` > 系統 temp/VIA_TEMP(同 VDF ActivateVDF)→ `<TEMP 根>/VIA_Lake/VQG/`;`VIA_VQG_STORE_ROOT` 或 `--store-root` 可換 |
+| 九表與去重鍵 | series(ticker, date)· indicators(ticker, observation_date)· indicator_results(ticker, observation_date, indicator_id, window_n, solution_id)· quant_analysis(ticker, observation_date)· backtest_curve(ticker, date)· backtest_summary(ticker, strategy)· factor_ic(date)· stats(ticker)· return_corr(ticker);另 store_runs 每次一列 |
+| 去重 | 每列內容指紋 `vqg_row_sha`:新鍵 → 新增;同鍵同值 → 跳過;同鍵值變 → 追加新版本(VIEW 取最新,舊版本留在舊分片)。as_of · request_key · input_sha256 · engine_version · engine · formula_engine · link_id · source_files 每輪會變,不算進指紋 |
+| 刪除 | 不刪(機制未定 · 維持現況);入庫程式碼沒有任何刪除呼叫(自測 ⑩ 以 AST 檢查) |
+| 接法 | `export-vap` 跑完自動入庫(`--no-store` 不入);`store [--export-dir D]` 單獨入庫;`store status` 看各表原始列 / 鍵數 / 分片 |
+
+驗證(容器):自測本版 11/11 + 前版鏈 v0109 14/14 · CLI 實跑 4 票夾具:第一次入庫 2543 列 · 同一匯出再入 0 新增 · 第二次匯出(新夾 · 同資料)0 新增 0 更新 · 值變 1 列 → 新版本 1 · 新一天 → 新增 1。
+
+**注意**:REQ214 原定湖根是 `<VIA_DATA_HOME>/<SYS>`;VQG 依本令改放 TEMP,所以五系統湖矩陣(LakeMatrix)預設看不到 VQG 這座湖。要讓矩陣看到,把 `VIA_VQG_STORE_ROOT` 指到資料家目錄即可。系統暫存清理工具若清 TEMP,庫會跟著消失;刪除與保留機制待操作員決定。
+
+登冊:需求 v0244 +`VCGC-REQ218` COVERED · 工作流 v0145 +`VCGC-WKF040` vqg_temp_store(3 步)· 盤點 v0220 +C-vqg-v0110 · 交接冊 +case + work item VERIFIED。
+桌機:`python "functional modules/VQG/VQG_AllInOne_v0110.py" export-vap --root <VDF 庫>` → `... store status`。

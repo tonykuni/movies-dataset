@@ -4,7 +4,7 @@
  "subsystem": "VCGC",
  "zh": "中央治理 · 中樞工作流",
  "batch": "五系統啟動 via HTML U/I → VIA_LakeConsole v0101(操作員 2026-11-10「activate 5 system via html u/i and run」)",
- "ts": "2026-11-10T04:10:00Z",
+ "ts": "2026-11-10T06:30:00Z",
  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
  "sdd": {
   "layers": [
@@ -3528,6 +3528,80 @@
      }
     }
    ]
+  },
+  {
+   "code": "VCGC-WKF040",
+   "alias": "vqg_temp_store",
+   "name": "VQG 產出進 TEMP 增量 Parquet 庫:自測 → export-vap 自動入庫 → store status",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-10T06:30:00Z",
+   "spec": {
+    "goal": "VQG 每次匯出的數據表進 TEMP 下自己的增量 Parquet 庫(共用套件 · 只增 · 去重 · 不刪),VIEW 取最新版本。",
+    "requirements": [
+     "VCGC-REQ218",
+     "VCGC-REQ214"
+    ],
+    "acceptance": [
+     "自測 本版 11/11 + 前版鏈 v0109(乾淨子行程)",
+     "同一份匯出再入庫 0 新增 0 更新",
+     "值變 → 新版本追加 · VIEW 取最新 · 舊分片留著",
+     "as_of / engine_version / input_sha256 變不算更新",
+     "入庫程式碼無刪除呼叫",
+     "套件缺 → 黃燈 · 匯出不受影響"
+    ],
+    "entry": "python3 \"functional modules/VQG/VQG_AllInOne_v0110.py\" export-vap --root <VDF 庫> | store [--export-dir D] | store status",
+    "evidence": "VIA_Reports/vqg/VQG_Store_latest.json · docs/handoff/evidence/C-vqg-v0110.json",
+    "books": []
+   },
+   "plan": {
+    "enter": "VQG",
+    "exit": "TEMP/VIA_Lake/VQG",
+    "order": "selftest → export-vap(自動入庫)→ store status"
+   },
+   "steps": [
+    {
+     "code": "VCGC-WKF040-STP001",
+     "alias": "vqg_v0110_selftest",
+     "name": "VQG v0110 自測(11 項 + v0109 鏈)",
+     "what": "庫根規則 · 旗標 · 自動入庫九表 · 冪等 · 增量更新 · 每輪會變的欄 · VIEW 最新 · 不刪 · 無刪除呼叫 · 套件缺黃燈",
+     "engine": "functional modules/VQG/VQG_AllInOne_v0110.py",
+     "verb": "selftest",
+     "inside": "VCGC run",
+     "evidence": "self:VQG_AllInOne",
+     "evidence_file": "docs/handoff/evidence/C-vqg-v0110.json"
+    },
+    {
+     "code": "VCGC-WKF040-STP002",
+     "alias": "export_store",
+     "name": "export-vap 跑完自動入 TEMP 庫",
+     "what": "v0109 匯出 + 量化分析 → 九表入 <TEMP>/VIA_Lake/VQG",
+     "engine": "functional modules/VQG/VQG_AllInOne_v0110.py",
+     "verb": "export-vap",
+     "inside": "VQG",
+     "evidence": "step:VCGC-WKF040-STP001",
+     "evidence_file": "VIA_Reports/vqg/VQG_Store_latest.json"
+    },
+    {
+     "code": "VCGC-WKF040-STP003",
+     "alias": "store_status",
+     "name": "store status(各表原始列 / 鍵數 / 分片)",
+     "what": "讀庫狀態 · 原始列 − 鍵數 = 保留的舊版本",
+     "engine": "functional modules/VQG/VQG_AllInOne_v0110.py",
+     "verb": "store status",
+     "inside": "VQG",
+     "evidence": "step:VCGC-WKF040-STP002",
+     "evidence_file": "VIA_Reports/vqg/VQG_Store_latest.json"
+    }
+   ],
+   "tests": {
+    "self": "handoff test C-vqg-v0110",
+    "cross": [
+     "X-REQ-BACK",
+     "再入庫 0 新增"
+    ],
+    "real": "容器實跑 export-vap → 入庫 → 再入庫 → store status"
+   }
   }
  ],
  "prior": "VIA_Workflow_VCGC_SSOT_v0144.json",

@@ -2,7 +2,7 @@
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0244",
  "batch": "五系統啟動 via HTML U/I → VIA_LakeConsole v0101(操作員 2026-11-10「activate 5 system via html u/i and run」)",
- "ts": "2026-11-10T04:10:00Z",
+ "ts": "2026-11-10T06:30:00Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -139,7 +139,7 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 24,
-  "COVERED": 137,
+  "COVERED": 138,
   "PARTIAL": 103,
   "MISSING": 1
  },
@@ -7016,6 +7016,26 @@
    "next": "桌機:同一視窗先 $env:VIA_NET_CONSENT='YES'(操作員親手)→ python docs/handoff/ai/VIA_DesktopFourBlocks_v0101.py --blocks 4 --mode live --jobs 5 → 貼回 DESKTOP_FOUR_BLOCKS.md",
    "hand": "operator",
    "why_homes": "DesktopFourBlocks 是 VCGC 的桌機工具;族群由 VDF 自己的冊決定(L123)"
+  },
+  {
+   "code": "VCGC-REQ218",
+   "subsystem": "VQG",
+   "topic": "VQG 產出進 TEMP 增量 Parquet 庫:VQG v0110 薄尾(v0109 一字不動)· 共用套件 VIA_ParquetLake v0101(和其他系統同一套:分片 zstd · manifest 只增 · DuckDB VIEW 最新勝)· 位置 VIA_TEMP_ROOT > %LOCALAPPDATA%\\VIA_TEMP > 系統 temp/VIA_TEMP 下 VIA_Lake/VQG · 九表各有去重鍵 · 內容指紋去重(同值跳過 · 值變追加新版本 · 新鍵新增)· 每輪會變的欄不算更新 · 不刪(刪除機制未定)· export-vap 自動入庫 · store / store status",
+   "requirement": "操作員 2026-11-10:「VQG 產出的數據到 TEMP 存放 增量更新去重維護 用 PARQUET 一樣 刪除機制未定 先維持現況」",
+   "status": "COVERED",
+   "homes": [
+    "functional modules/VQG/VQG_AllInOne_v0110.py",
+    "supportive modules/VIA_ParquetLake_v0101.py",
+    "VIA_Workflow_VCGC_SSOT_v0145.json"
+   ],
+   "workflow": "VCGC-WKF040",
+   "modules": [
+    "functional modules/VQG/VQG_AllInOne_v0110.py"
+   ],
+   "evidence": "2026-11-10 容器:VQG v0110 自測 本版 11/11 + 前版鏈 v0109 14/14(乾淨子行程)· CLI 實跑(4 票夾具 · VIA_TEMP_ROOT 指沙盒):export-vap → 自動入 <TEMP>/VIA_Lake/VQG 九表 新增 2543 · 同一匯出再入 0 新增 0 更新 2543 跳過 · 第二次匯出(新匯出夾 · 同資料)0 新增 0 更新 · 值變 1 列 → 新版本 1(VIEW 取最新 · 原始列 = 鍵數 + 1)· 新一天 → 新增 1 · as_of / engine_version / input_sha256 變不算更新 · 分片只增(12 片)· 入庫程式碼無刪除呼叫 · store status 九表 + store_runs · 套件缺 → 黃燈不建庫",
+   "next": "桌機:python \"functional modules/VQG/VQG_AllInOne_v0110.py\" export-vap --root <VDF 庫>(自動入庫)· store status 看各表列數;刪除機制待操作員決定",
+   "hand": "AI",
+   "why_homes": "VQG 自己的入口與自己的湖(L123);套件是共用工具不是入口;位置照操作員令放 TEMP(REQ214 原寫 <VIA_DATA_HOME>/<SYS>,VQG 依本令改 TEMP · 可用 VIA_VQG_STORE_ROOT 指回)"
   }
  ],
  "non_requirements": [

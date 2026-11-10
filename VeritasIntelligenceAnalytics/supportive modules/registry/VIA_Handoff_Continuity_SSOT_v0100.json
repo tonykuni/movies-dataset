@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-10T04:45:00Z",
+ "updated_at": "2026-11-10T06:30:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4606,6 +4606,25 @@
    "updated_at": "2026-11-10T04:45:00Z",
    "timeout_seconds": 1800,
    "registered_at": "2026-11-10T04:45:00Z"
+  },
+  "C-vqg-v0110": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VQG/VQG_AllInOne_v0110.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VQG v0110 selftest · 本版 11/11 · 前版鏈 v0109 PASS",
+   "scope": "VQG v0110:產出進 TEMP 增量 Parquet 庫(庫根規則 · 自動入庫九表 · 冪等 · 增量更新 · 每輪會變的欄不算 · VIEW 最新 · 不刪 · 套件缺黃燈)+ v0109 鏈",
+   "dependencies": [
+    "functional modules/VQG/VQG_AllInOne_v0110.py",
+    "functional modules/VQG/VQG_AllInOne_v0109.py",
+    "supportive modules/VIA_ParquetLake_v0101.py"
+   ],
+   "version": "v0110",
+   "updated_at": "2026-11-10T06:30:00Z",
+   "timeout_seconds": 1800,
+   "registered_at": "2026-11-10T06:30:00Z"
   }
  },
  "work_items": [
@@ -9585,6 +9604,17 @@
    "next": "桌機:開同意閘後跑 v0101 --blocks 4 --mode live --jobs 5,貼回 DESKTOP_FOUR_BLOCKS.md",
    "receipt": "docs/handoff/evidence/C-desktop-four-blocks-v0101.json",
    "updated_at": "2026-11-10T04:50:00Z"
+  },
+  {
+   "id": "VCGC-REQ218:C-vqg-v0110",
+   "requirement": "VCGC-REQ218",
+   "case": "C-vqg-v0110",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-10:「VQG 產出的數據到 TEMP 存放 增量更新去重維護 用 PARQUET 一樣 刪除機制未定 先維持現況」 → VQG v0110 薄尾;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "桌機 export-vap 實跑自動入庫 · 刪除機制待操作員",
+   "receipt": "docs/handoff/evidence/C-vqg-v0110.json",
+   "updated_at": "2026-11-10T06:30:00Z"
   }
  ]
 }
