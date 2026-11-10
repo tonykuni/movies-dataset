@@ -119,3 +119,12 @@ python3 "docs/handoff/ai/VIA_DailyBackup_v0100.py" check && python3 "docs/handof
 | 自測抓到並修的真 bug | ① 混型來源(jsonl 的 `3` vs csv 的 `"3"`)入同表 → pyarrow 炸 → 套件 `_arrow_from_rows` 逐欄推型、字串退路(跨分片 DuckDB union_by_name 升 VARCHAR 實測)· 套件自測 10 → **11**;② 處理器例外默默斷線 → 一律 JSON 500(見證要看得到錯);③ 容器 HTTPS_PROXY 會攔 127.0.0.1 → 自測用無代理 opener |
 | 登冊 | 盤點 **v0217**(+C-lake-console · WKF038 三步)· 需求 **v0241**(+VCGC-REQ215 COVERED)· 工作流 **v0142**(+WKF038 lake_console)· 交接冊 +1 案 |
 | 桌機開法 | `python3 "docs/handoff/ai/VIA_LakeConsole_v0100.py" serve --open`(之後可掛進 CGC_MDL095 DeckServer 當 `/lake` 路由,同一套權杖律) |
+
+## 9. Codex PR #623 兩項 P2 → `VIA_LakeMatrix_v0101`(薄尾 · v0100 已在 main 不動)
+
+| 發現 | 修法 | 驗證 |
+|---|---|---|
+| 五系統 × 日 只拿每表 first / last 兩個時間點:中間日漏算、單分片算兩次 | 逐分片:每個 `part-<UTC>-<sha8>.parquet` 檔名戳一片一計;既有資產照舊以檔案更新日計 | 自測 ⓑ 三天三片 → 1 / 1 / 2;實跑 VCGC 11-07 3 · 11-10 10 |
+| 一表好一表壞仍 GREEN,壞表不出現在報表 | 任何壞表非綠(部分 YELLOW · 全壞 RED),說明點名,壞表列進資產明細(類 `lake(壞)` · 狀態 錯:…) | 自測 ⓐ YELLOW + 明細列 · ⓒ md / html 有壞表 · ⓓ 全壞 RED |
+
+本版 4/4 + 前版鏈 12/12。登冊:盤點 v0218(+C-lake-matrix-v0101 · WKF037-STP002 → v0101)· 需求 v0242(REQ214 evidence)· 工作流 v0143 · 交接案。操作台 `VIA_LakeConsole` 的動作 glob `VIA_LakeMatrix_v*.py` 自動選到 v0101。
