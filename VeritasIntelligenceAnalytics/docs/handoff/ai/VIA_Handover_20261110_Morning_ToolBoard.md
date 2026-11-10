@@ -137,4 +137,4 @@ python3 "docs/handoff/ai/VIA_DailyBackup_v0100.py" check && python3 "docs/handof
 | P2 `_inbox` 同名檔(`a/data.csv` · `b/data.csv` 同秒)互相覆蓋 | 目的檔 = `<微秒戳>-<內容 sha8>-<路徑消毒>`,`open("xb")` 絕不覆蓋,同名加序號;清單記來源路徑 | 自測 ⓜ2:同名不同夾 + 同檔再送 → 三個不同檔都在 |
 | P2 見證燈只看 rc(引擎自報 YELLOW 仍 GREEN) | `step_lamp()`:本輪收據 JSON 的 lamp > stdout 首個 `[GREEN|YELLOW|RED|GRAY|PASS|FAIL]` > rc;行程失敗不可能綠 / 黃;整件 = 各步最差 | 自測 ⓗ:rc 0 + 收據 YELLOW → 步 YELLOW · 整件 YELLOW;ⓗ2 `[PASS]` → GREEN |
 
-登冊:盤點 v0219(+C-parquet-lake-v0101 · C-parquet-lake 回 10 項 · C-lake-console 19 項 · WKF037-STP001 → v0101)· 需求 v0243 · 工作流 v0144 · 交接冊。操作台使用者測試重跑(新碼 · 埠 8767)。
+登冊:盤點 v0219(+C-parquet-lake-v0101 · C-parquet-lake 回 10 項 · C-lake-console 19 項 · WKF037-STP001 → v0101)· 需求 v0243 · 工作流 v0144 · 交接冊。操作台使用者測試重跑(新碼 · 埠 8767):Playwright 三視窗 **39 步 0 失敗 0 pageerror · GREEN**(2026-11-10T03:19:56Z · `VIA_Reports/lake/CONSOLE_UserTest_latest.{json,md}`;下拉自測 → 矩陣真跑收據連結 → 拖曳兩檔預覽 / 勾主鍵 / 入湖 VCGC → 選檔 VDF 落 `_inbox` → 選資料夾 → 無權杖 403 / 非白名單 400)。三串 Codex 已回覆並 resolve(8cf4d1b94);編號冊 +23 已提交(fa50dbae4)。
