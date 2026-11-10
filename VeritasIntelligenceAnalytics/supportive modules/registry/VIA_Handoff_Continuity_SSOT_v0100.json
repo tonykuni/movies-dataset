@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-10T06:30:00Z",
+ "updated_at": "2026-11-10T07:00:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4625,6 +4625,41 @@
    "updated_at": "2026-11-10T06:30:00Z",
    "timeout_seconds": 1800,
    "registered_at": "2026-11-10T06:30:00Z"
+  },
+  "C-nearcomplete-lock": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_NearCompleteLock_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_NearCompleteLock v0100 selftest · 8/8",
+   "scope": "VIA_NearCompleteLock v0100:近完工里程碑鎖定與重驗(8 項)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_NearCompleteLock_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-10T07:00:00Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-10T07:00:00Z"
+  },
+  "C-bridge-sweeper-v0104": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/via_bridge_sweeper_v0104.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] via_bridge_sweeper v0104 selftest · 本版 4/4 · 前版鏈 v0103 PASS",
+   "scope": "雙橋稽核 v0104(量尺對齊 · 活樹 100%)",
+   "dependencies": [
+    "supportive modules/registry/via_bridge_sweeper_v0104.py",
+    "supportive modules/registry/via_bridge_sweeper_v0103.py"
+   ],
+   "version": "v0104",
+   "updated_at": "2026-11-10T07:00:00Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-10T07:00:00Z"
   }
  },
  "work_items": [
@@ -9615,6 +9650,39 @@
    "next": "桌機 export-vap 實跑自動入庫 · 刪除機制待操作員",
    "receipt": "docs/handoff/evidence/C-vqg-v0110.json",
    "updated_at": "2026-11-10T06:30:00Z"
+  },
+  {
+   "id": "VCGC-REQ219:C-nearcomplete-lock",
+   "requirement": "VCGC-REQ219",
+   "case": "C-nearcomplete-lock",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "近完工狀態鎖定 + 實測;等 handoff test 收據 → rc 0 · marker true",
+   "next": "操作員項見需求 next",
+   "receipt": "docs/handoff/evidence/C-nearcomplete-lock.json",
+   "updated_at": "2026-11-10T07:00:00Z"
+  },
+  {
+   "id": "VCGC-REQ220:C-bridge-sweeper-v0104",
+   "requirement": "VCGC-REQ220",
+   "case": "C-bridge-sweeper-v0104",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "雙橋 100%(活樹);等 handoff test 收據",
+   "next": "VDF 對外擷取真抓驗證 = 操作員",
+   "receipt": "docs/handoff/evidence/C-bridge-sweeper-v0104.json",
+   "updated_at": "2026-11-10T07:00:00Z"
+  },
+  {
+   "id": "VCGC-REQ220:vdf-live-fetch",
+   "requirement": "VCGC-REQ220",
+   "case": null,
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "收尾條件:VDF 對外擷取引擎真抓並驗證無誤;容器不開同意閘(紅線)",
+   "next": "桌機 $env:VIA_NET_CONSENT='YES' → DesktopFourBlocks v0101 --blocks 4 --mode live → 貼回 → 驗證",
+   "receipt": null,
+   "updated_at": "2026-11-10T07:00:00Z"
   }
  ]
 }

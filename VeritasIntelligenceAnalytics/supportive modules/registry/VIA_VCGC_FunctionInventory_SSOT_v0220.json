@@ -2,7 +2,7 @@
  "schema": "VIA.VCGC.FunctionInventory.v1",
  "version": "v0220",
  "batch": "五系統啟動 via HTML U/I → VIA_LakeConsole v0101(操作員 2026-11-10「activate 5 system via html u/i and run」)",
- "ts": "2026-11-10T06:30:00Z",
+ "ts": "2026-11-10T07:00:00Z",
  "prior": "VIA_VCGC_FunctionInventory_SSOT_v0219.json",
  "req": "VCGC-REQ207",
  "why": "v0212 → v0213:+站 C-vqg-v0108(操作員 2026-11-09「VQG VAP VCGC 一併順勢完成 · VQG 可能有增加指標 · 量化分析內容以增加」)。只增不減,其餘一字不動。 ｜ 2026-11-09 +站 C-workbench-lock-v0101(操作員「ICON 優雅 · LOGO 第二行放大」)。 ｜ 2026-11-09 coverage.workflow +WKF030 / WKF031 六步(Codex #621 P1:需求要有工作流正主)。",
@@ -5354,6 +5354,41 @@
    ],
    "version": "v0110",
    "updated_at": "2026-11-10T06:30:00Z"
+  },
+  {
+   "id": "C-nearcomplete-lock",
+   "name": "VIA_NearCompleteLock v0100 自測(近完工里程碑鎖:commit · tree · 入口 blob;check 重驗;漂移黃 · 歷史改寫 / 鎖檔被改紅;只用標準庫 · 不 import 系統模組 · 不用 TA-Lib;8 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_NearCompleteLock_v0100.py",
+    "--selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "docs/handoff/ai/VIA_NearCompleteLock_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-10T07:00:00Z"
+  },
+  {
+   "id": "C-bridge-sweeper-v0104",
+   "name": "via_bridge_sweeper v0104 自測(v0103 薄尾:豁免補 原件收容 / 凍結發行 / 不進倉 四夾 · 只增不減;真樹活樹 加速缺 0 · 網路缺 0;4 項 + v0103 鏈)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/registry/via_bridge_sweeper_v0104.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [
+    "supportive modules/registry/via_bridge_sweeper_v0104.py",
+    "supportive modules/registry/via_bridge_sweeper_v0103.py"
+   ],
+   "version": "v0104",
+   "updated_at": "2026-11-10T07:00:00Z"
   }
  ],
  "coverage": {
@@ -6403,6 +6438,14 @@
    "C-vqg-v0110": {
     "state": "COVERED",
     "by": "C-vqg-v0110"
+   },
+   "C-nearcomplete-lock": {
+    "state": "COVERED",
+    "by": "C-nearcomplete-lock"
+   },
+   "C-bridge-sweeper-v0104": {
+    "state": "COVERED",
+    "by": "C-bridge-sweeper-v0104"
    }
   },
   "workflow": {
@@ -6986,6 +7029,19 @@
     "state": "COVERED",
     "by": "C-vqg-v0110",
     "note": "自測 ⑧ 呼叫 store status(原始列 = 鍵數 + 舊版本)"
+   },
+   "VCGC-WKF041-STP001": {
+    "state": "COVERED",
+    "by": "C-nearcomplete-lock"
+   },
+   "VCGC-WKF041-STP002": {
+    "state": "COVERED",
+    "by": "C-nearcomplete-lock",
+    "note": "自測 ④–⑦ 跑 check;實鎖檔由 check 動詞重驗"
+   },
+   "VCGC-WKF041-STP003": {
+    "state": "COVERED",
+    "by": "C-bridge-sweeper-v0104"
    }
   },
   "ps": {

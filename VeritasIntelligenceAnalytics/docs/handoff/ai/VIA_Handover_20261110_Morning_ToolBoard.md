@@ -180,3 +180,30 @@ PR #624 已併入 main(04:00Z),分支併回(7598b4146)。新引擎 **`docs/hando
 
 登冊:需求 v0244 +`VCGC-REQ218` COVERED · 工作流 v0145 +`VCGC-WKF040` vqg_temp_store(3 步)· 盤點 v0220 +C-vqg-v0110 · 交接冊 +case + work item VERIFIED。
 桌機:`python "functional modules/VQG/VQG_AllInOne_v0110.py" export-vap --root <VDF 庫>` → `... store status`。
+
+## 13. 近完工狀態鎖定 · 卡點清單 · VDF / VRN-2 實測 · 雙橋 100%(操作員「CLAUDE / MANUS / GITHUB … 很多次幾乎完工 … 建立紀錄鎖定 · 臨門一腳抓出來 · 缺工具去 VCGC 裝 · VDF VRN 實測跳 U/I」「不可使用 TALIB · 各自獨立」「全景除錯 · 注入 AST 加速器 100% · 網路工具只增不減去重不衝突 · VDF 對外擷取實測驗證無誤才算收尾」)
+
+**來源**:GitHub 兩倉可讀(movies-dataset · VIA-VDF-VRN 只讀);桌機兩根與 Downloads 未經 Remote Control 供出(清單空);Manus 連結是登入後才顯示的 app 頁,抓到只有標題。
+
+**鎖定**:`VIA_NearCompleteLock_v0100.py`(只用標準庫 + git · 不 import 任何系統模組 · 不用 TA-Lib)→ `VIA_NearCompleteLock_v0100.json / .md`。67 個近完工里程碑(VCGC 19 · VDF 19 · VRN-2 21 · VRN-1 8)全部鎖:main 上的 commit · 整倉 tree 雜湊 · 當時入口 blob 雜湊。`check` 重驗 67 · 壞 0 · 漂移 0(GREEN)。歷史被改寫或鎖檔被手改 = RED;入口往前換版只算漂移。
+盤點結論:三系統從未有過 GREEN 驗收收尾;最好狀態是 YELLOW / REVIEW / DATA_GAP;11-09 RC-1 W0 / W1 都是 NO-GO。
+
+**今天實測(各走自己入口)**
+
+| 系統 | 項目 | 結果 |
+|---|---|---|
+| VDF | 入口 VDF_SystemManager v0168 自測 | 本版 6/6 · 前版鏈 PASS · rc 0 |
+| VDF | 全族群夾具實跑(零網路)| 18 支:綠 3 · 同意閘拒跑 13(設計)· e077 缺宇宙 1 · 011d 缺 akshare 1 |
+| VDF | akshare 經 VCGC 安裝閘 | 閘要求先開同意閘才下載 → 停(紅線不代設) |
+| VRN-2 | 入口 VRN_SystemManager v0262 自測 | 5/5 · 前版鏈 rc 0 |
+| VRN-2 | RoundAll v0135 自測 | 111/111(倉外);倉內 2 項不過 = 先找到本倉 VIA 根,測試環境差異 |
+| VRN-2 | 13 份真實 PDF 車道 | 個股 8 READY · 非個股 5 BLOCKED(缺 NON_STOCK_CORE)|
+| VRN-2 | 收尾套件 v0178 雜湊 | 11/11 |
+
+**雙橋**:VCGC 正式量尺 CGC_MDL124 v0111 四系統 100%;清掃器 v0103 另報加速缺 33 · 網路缺 8 → 真缺 7 支已補標記塊(+146 行 −0 行 · 自測 / 回傳碼與原檔一致),其餘 34 件屬原件收容 / 凍結發行 / 不進倉 → `via_bridge_sweeper_v0104.py` 補進豁免(只增不減)→ 活樹 加速 1127/1127 · 網路 61/61。
+**獨立性**:VDF 101 支尾版只有 1 支硬載 VCGC 模組(ENG090 → CGC_MDL142 名冊;找不到時誠實回空);VRN-2 76 支 0 支。
+
+**收尾條件未達(照實)**:操作員要的「VDF 對外擷取引擎實測驗證無誤」要開 VIA_NET_CONSENT 真抓 —— 容器不開(紅線)。REQ220 = PARTIAL,work item `vdf-live-fetch` PENDING(owner 操作員)。
+
+**臨門一腳(操作員 / 桌機)**:同意閘 → akshare 經 VCGC 安裝閘 → DesktopFourBlocks v0101 `--blocks 4 --mode live --jobs 5` 真抓 → 貼回驗證;e115 / e116 經 Invoke-VIAPython;MQ-1560 四點 12 項 `--confirm`;上傳 NON_STOCK_CORE;衝突冊 OPEN 6 裁決;VQG / VAP 登 L122。
+登冊:需求 v0244 +REQ219(COVERED)· +REQ220(PARTIAL)· 工作流 v0145 +WKF041(3 步)· 盤點 v0220 +2 站 · 交接冊 +2 案 + 3 work item。U/I:Artifact「VDF · VRN-2 近完工鎖定」。

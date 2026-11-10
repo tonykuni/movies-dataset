@@ -4,7 +4,7 @@
  "subsystem": "VCGC",
  "zh": "中央治理 · 中樞工作流",
  "batch": "五系統啟動 via HTML U/I → VIA_LakeConsole v0101(操作員 2026-11-10「activate 5 system via html u/i and run」)",
- "ts": "2026-11-10T06:30:00Z",
+ "ts": "2026-11-10T07:00:00Z",
  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
  "sdd": {
   "layers": [
@@ -3601,6 +3601,76 @@
      "再入庫 0 新增"
     ],
     "real": "容器實跑 export-vap → 入庫 → 再入庫 → store status"
+   }
+  },
+  {
+   "code": "VCGC-WKF041",
+   "alias": "nearcomplete_lock",
+   "name": "近完工狀態鎖定:全景找里程碑 → build 鎖 → check 重驗 → VDF / VRN-2 實測 U/I",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-10T07:00:00Z",
+   "spec": {
+    "goal": "把各系統歷次近完工狀態鎖在 git 歷史(tree + 入口 blob),隨時可重驗;卡點列清誰的手。",
+    "requirements": [
+     "VCGC-REQ219",
+     "VCGC-REQ220"
+    ],
+    "acceptance": [
+     "自測 8/8(鎖 · 未鎖照實 · 漂移黃 · 歷史改寫紅 · 鎖檔被改紅 · 只用標準庫)",
+     "check GREEN 或只有入口漂移",
+     "VDF / VRN-2 入口自測 rc 0"
+    ],
+    "entry": "python3 \"docs/handoff/ai/VIA_NearCompleteLock_v0100.py\" check --vrn1 <VIA-VDF-VRN 倉>",
+    "evidence": "docs/handoff/ai/VIA_NearCompleteLock_v0100.json · docs/handoff/evidence/C-nearcomplete-lock.json",
+    "books": []
+   },
+   "plan": {
+    "enter": "VCGC 全景",
+    "exit": "鎖檔 + U/I",
+    "order": "milestones → build → check → U/I"
+   },
+   "steps": [
+    {
+     "code": "VCGC-WKF041-STP001",
+     "alias": "lock_selftest",
+     "name": "鎖定工具自測 8 項",
+     "what": "鎖 · 未鎖 · 漂移 · 歷史改寫 · 指紋 · 獨立",
+     "engine": "docs/handoff/ai/VIA_NearCompleteLock_v0100.py",
+     "verb": "--selftest",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_NearCompleteLock",
+     "evidence_file": "docs/handoff/evidence/C-nearcomplete-lock.json"
+    },
+    {
+     "code": "VCGC-WKF041-STP002",
+     "alias": "lock_check",
+     "name": "重驗鎖檔(check)",
+     "what": "每個里程碑 commit / tree / 入口 blob 一字不差",
+     "engine": "docs/handoff/ai/VIA_NearCompleteLock_v0100.py",
+     "verb": "check",
+     "inside": "VCGC run",
+     "evidence": "step:VCGC-WKF041-STP001",
+     "evidence_file": "docs/handoff/ai/VIA_NearCompleteLock_v0100.json"
+    },
+    {
+     "code": "VCGC-WKF041-STP003",
+     "alias": "bridge_audit",
+     "name": "雙橋覆蓋稽核(via_bridge_sweeper v0104 · 活樹 100%)",
+     "what": "加速 / 網路橋缺件 0 · 豁免照算",
+     "engine": "supportive modules/registry/via_bridge_sweeper_v0104.py",
+     "verb": "--audit",
+     "inside": "VCGC run",
+     "evidence": "self:via_bridge_sweeper",
+     "evidence_file": "docs/handoff/evidence/C-bridge-sweeper-v0104.json"
+    }
+   ],
+   "tests": {
+    "self": "handoff test C-nearcomplete-lock",
+    "cross": [
+     "X-REQ-BACK"
+    ],
+    "real": "容器 build + check 實跑"
    }
   }
  ],

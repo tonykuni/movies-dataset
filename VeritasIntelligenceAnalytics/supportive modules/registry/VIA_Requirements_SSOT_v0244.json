@@ -2,7 +2,7 @@
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0244",
  "batch": "五系統啟動 via HTML U/I → VIA_LakeConsole v0101(操作員 2026-11-10「activate 5 system via html u/i and run」)",
- "ts": "2026-11-10T06:30:00Z",
+ "ts": "2026-11-10T07:00:00Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -139,8 +139,8 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 24,
-  "COVERED": 138,
-  "PARTIAL": 103,
+  "COVERED": 139,
+  "PARTIAL": 104,
   "MISSING": 1
  },
  "requirements": [
@@ -7036,6 +7036,45 @@
    "next": "桌機:python \"functional modules/VQG/VQG_AllInOne_v0110.py\" export-vap --root <VDF 庫>(自動入庫)· store status 看各表列數;刪除機制待操作員決定",
    "hand": "AI",
    "why_homes": "VQG 自己的入口與自己的湖(L123);套件是共用工具不是入口;位置照操作員令放 TEMP(REQ214 原寫 <VIA_DATA_HOME>/<SYS>,VQG 依本令改 TEMP · 可用 VIA_VQG_STORE_ROOT 指回)"
+  },
+  {
+   "code": "VCGC-REQ219",
+   "subsystem": "VCGC",
+   "topic": "歷次近完工狀態紀錄鎖定 + 臨門一腳清單 + VDF / VRN-2 實測 U/I:VIA_NearCompleteLock v0100(只用標準庫 + git · 不 import 任何系統模組 · 不用 TA-Lib)把 VCGC / VDF / VRN-2 / VRN-1 歷次近完工里程碑的 commit · 整倉 tree 雜湊 · 入口 blob 雜湊鎖成 json / md,check 重驗(歷史改寫 / 鎖檔被改 = RED · 入口往前換版 = 漂移);VDF / VRN-2 各走自己入口實測;卡點分 操作員 / 桌機 / AI;缺工具經 VCGC 安裝閘(要同意閘的照實停)",
+   "requirement": "操作員 2026-11-10:「CLAUDE / MANUS / GITHUB 應該都有 VCGC / VRN / VDF 很多次幾乎完工的狀態 · 透過 VCGC 全景式分析找出來 · 現在進度維持 · 檢視其他為何沒完成 · 以目前狀態將先前的跟先前快完成的版本狀態都建立紀錄鎖定 · 臨門一腳 AI 搞不了 抓出來檢查 · 若要新安裝工具去 VCGC 幫忙安裝 · 將 VDF VRN 完成實測結果驗證成功跳出 U/I」「不可使用 TALIB · 各自獨立 · VRN VDF 完善化即使 VCGC 改動大對他們影響有限」",
+   "status": "COVERED",
+   "homes": [
+    "docs/handoff/ai/VIA_NearCompleteLock_v0100.py",
+    "docs/handoff/ai/VIA_NearCompleteLock_v0100.json",
+    "VIA_Workflow_VCGC_SSOT_v0145.json"
+   ],
+   "workflow": "VCGC-WKF041",
+   "modules": [
+    "docs/handoff/ai/VIA_NearCompleteLock_v0100.py"
+   ],
+   "evidence": "2026-11-10 容器:鎖定工具自測 8/8 · build 67/67(VCGC 19 · VDF 19 · VRN-2 21 · VRN-1 8)· check GREEN(重驗 67 · 壞 0 · 漂移 0)· VDF 入口 v0168 自測 6/6 · VRN-2 入口 v0262 自測 5/5 · RoundAll v0135 111/111 · 13 份真實 PDF 車道 個股 8 READY / 非個股 5 BLOCKED · v0178 套件雜湊 11/11 · VDF 夾具 18 支 綠 3 / 同意閘 13 / 宇宙 1 / akshare 1 · akshare 經 VCGC 安裝閘被同意閘擋(紅線)· VDF 尾版 1 支硬載 VCGC(找不到時誠實回空)· VRN-2 0 支",
+   "next": "操作員:同意閘 → akshare 經 VCGC 安裝閘 → DesktopFourBlocks v0101 真抓;MQ-1560 四點 --confirm;上傳 NON_STOCK_CORE;衝突冊 OPEN 6 裁決",
+   "hand": "operator",
+   "why_homes": "鎖定工具放 docs/handoff(中立紀錄);不依 VCGC 模組,VCGC 改動不影響 VDF / VRN-2 的鎖(操作員令)"
+  },
+  {
+   "code": "VCGC-REQ220",
+   "subsystem": "VCGC",
+   "topic": "加速器橋 / 網路工具橋全覆蓋 100%(只增不減 · 去重不衝突):兩支量尺範圍對齊(via_bridge_sweeper v0104 豁免補四類夾)· 活樹真缺 7 支補標記塊(原碼一字不動)",
+   "requirement": "操作員 2026-11-10:「用 VCGC 節省 TOKEN 工具去完成全景式全面性除錯 · 注入 AST 加速器 · 加入深透到全部覆蓋率 100% · 網路工具合併後只增不減 去重不衝突 · 也要導入 VDF 引擎向外擷取資料的引擎實測結果驗證無誤才算成功收尾」",
+   "status": "PARTIAL",
+   "homes": [
+    "supportive modules/registry/via_bridge_sweeper_v0104.py",
+    "VIA_Workflow_VCGC_SSOT_v0145.json"
+   ],
+   "workflow": "VCGC-WKF041",
+   "modules": [
+    "supportive modules/registry/via_bridge_sweeper_v0104.py"
+   ],
+   "evidence": "2026-11-10 容器:VCGC 正式量尺 CGC_MDL124 v0111 --subsystems ALL/accel 1807/1807 · VDF/net 149/149;清掃器 v0103 報加速缺 33 · 網路缺 8 → 真缺 7 支已補(WorkbenchLock v0102 · MutualMonitor v0100 · VRN_ENG112 · 非個股引擎 v0310 加速;VRN2_UIAction v0107 · AgentOS v0102 · LakeConsole v0101 網路;只插標記塊 · +146 行 −0 行 · 雙 ast.parse;自測 / 回傳碼與原檔一致)· 其餘 34 件屬原件收容 / 凍結發行 / 不進倉 → v0104 補進 EXEMPT_INTAKE(只增不減)→ 活樹 加速 1127/1127 · 網路 61/61 · 自測 4/4 + v0103 鏈",
+   "next": "收尾條件「VDF 對外擷取引擎實測驗證無誤」要桌機開同意閘真抓(AI 不代設)→ 貼回後驗證才轉 COVERED",
+   "hand": "operator",
+   "why_homes": "橋是全樹政策(L103);量尺歸 VCGC;VDF / VRN-2 檔只插標記塊,行為不變"
   }
  ],
  "non_requirements": [
