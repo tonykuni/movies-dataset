@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-10T01:53:30Z",
+ "updated_at": "2026-11-10T02:38:30Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4478,6 +4478,41 @@
    "updated_at": "2026-11-10T01:51:29Z",
    "timeout_seconds": 300,
    "registered_at": "2026-11-10T01:51:29Z"
+  },
+  "C-parquet-lake": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/VIA_ParquetLake_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_ParquetLake v0100 selftest · 10/10",
+   "scope": "VIA_ParquetLake:<root>/<SYS>/<table>/part-*.parquet(zstd)+ _manifest.jsonl 只增 + <SYS>_catalog.duckdb VIEW;同主鍵增量跳過;五系統名閘",
+   "dependencies": [
+    "supportive modules/VIA_ParquetLake_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-10T02:35:35Z",
+   "timeout_seconds": 300,
+   "registered_at": "2026-11-10T02:35:35Z"
+  },
+  "C-lake-matrix": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_LakeMatrix_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_LakeMatrix v0100 selftest · 12/12",
+   "scope": "VIA_LakeMatrix:VCGC 七帳本入湖 · 五系統只讀盤點 · 工具活動報告矩陣 · HTML U/I;只寫 <root>/VCGC 與 VIA_Reports/lake",
+   "dependencies": [
+    "docs/handoff/ai/VIA_LakeMatrix_v0100.py",
+    "supportive modules/VIA_ParquetLake_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-10T02:35:35Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-10T02:35:35Z"
   }
  },
  "work_items": [
@@ -9358,6 +9393,39 @@
    "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
    "receipt": "docs/handoff/evidence/C-vcgc-toolboard.json",
    "updated_at": "2026-11-10T01:53:30Z"
+  },
+  {
+   "id": "VCGC-REQ214:C-parquet-lake",
+   "requirement": "VCGC-REQ214",
+   "case": "C-parquet-lake",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-10:「全部完工了嗎?五個獨立系統即一個資料庫以 parquet 為格式增量維護 · 以 duckdb 為工具來管理 · 工具活動報告矩陣 · 啟動測試及使用者測試修正直到完善 · 跳出 HTML U/I」 → 套件;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
+   "receipt": "docs/handoff/evidence/C-parquet-lake.json",
+   "updated_at": "2026-11-10T02:38:30Z"
+  },
+  {
+   "id": "VCGC-REQ214:C-lake-matrix",
+   "requirement": "VCGC-REQ214",
+   "case": "C-lake-matrix",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-10:「全部完工了嗎?五個獨立系統即一個資料庫以 parquet 為格式增量維護 · 以 duckdb 為工具來管理 · 工具活動報告矩陣 · 啟動測試及使用者測試修正直到完善 · 跳出 HTML U/I」 → 矩陣引擎;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
+   "receipt": "docs/handoff/evidence/C-lake-matrix.json",
+   "updated_at": "2026-11-10T02:38:30Z"
+  },
+  {
+   "id": "VCGC-REQ214:systems-adopt-lake",
+   "requirement": "VCGC-REQ214",
+   "case": null,
+   "state": "OPEN",
+   "owner": "operator",
+   "reason": "VDF / VRN-2 / VQG / VAP 各自接湖是各系統的手(L123);容器只讀盤點 8 / 3 / 12 / 1 組既有資產",
+   "next": "各系統入口尾版 import VIA_ParquetLake 把既有 duckdb / parquet append 進 <VIA_DATA_HOME>/<SYS>",
+   "receipt": null,
+   "updated_at": "2026-11-10T02:35:35Z"
   }
  ]
 }
