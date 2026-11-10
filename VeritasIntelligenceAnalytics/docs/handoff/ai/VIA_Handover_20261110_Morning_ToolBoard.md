@@ -141,3 +141,23 @@ python3 "docs/handoff/ai/VIA_DailyBackup_v0100.py" check && python3 "docs/handof
 
 閘鏈第 16 輪(修後):`test --quick` **YELLOW**(站 9 綠 2 黃 0 紅 · case 267/267 · workflow 164/164 · 紀錄 +3)。`handoff check` **RED 143 → 141**:本輪兩項已清(C-vcgc-toolboard 收據重生,因 seat_path 修在收據之後;REQ214 systems-adopt-lake OPEN 不是合法態 → PENDING)。
 **更正**:前幾輪交接文件寫的「handoff check 16 紅」是擷取只留尾 18 行的誤記;真實基線是 11-09 的 139 紅(EVIDENCE_INVALID 52 全為 11-06 席位冊 `VIA_VCGC_SubsystemSeat_v0100` 變更後的連鎖:chain / backup / numbering 等舊收據失效 → 其相依模組落成 CHANGED_CODE_WITHOUT_TEST 81),不是本輪新紅;要清要在桌機 `handoff test chain` / `backup` / `numbering` 重跑舊案後 `handoff checkpoint`。新案(lake · console · parquet v0101 · toolboard)紅 0。
+
+## 11. 五系統啟動 via HTML U/I(操作員「PR 已合併 繼續併回 main 收尾 activate 5 system via html u/i and run」)
+
+PR #624 已併入 main(04:00Z),分支併回(7598b4146)。新引擎 **`docs/handoff/ai/VIA_LakeConsole_v0101.py`**(v0100 薄尾,v0100 一字不動):
+
+| 項 | 內容 |
+|---|---|
+| 白名單 +6 | `five_systems`(= `VIA_FiveSystemConstitution run --apply`:VCGC · VDF · VRN-2 · VQG · VAP 各走自己的入口並行實測 · 記進度帳 · 矩陣)· `activate_vcgc / vdf / vrn2 / vqg / vap`(單系統走它自己的入口 selftest)· 鏈 `activate_all`(逐一)。VRN-1 外部倉只讀,不在白名單(L123) |
+| 燈 +6 盞 | 五系統總燈(憲法矩陣)+ 每系統一盞:實測燈 · 入口版 · 號 · 憲法性 · 進度(綠 / 跑 · 連綠)· 本台啟動比矩陣新就改用本台 |
+| 頁面 | 「五系統啟動」按鈕列 7 顆(一鍵 = 下拉選好 + 執行;純滑鼠)· 仍是同一支 script · 見證表每步燈改用引擎自報 step lamp |
+| 收據 | 矩陣正本仍在 `docs/handoff/ai/VIA_FiveSystemConstitution_{latest.json,latest.md,UI.html}`;本台把本輪新產的複製到 `VIA_Reports/lake/FIVE_SYSTEMS_latest.*` 給 `/files` 開;只看不寫 → 去 `--apply` 不記進度帳、不拿舊收據的燈 |
+| 子行程 | 逾時依動作(五系統 1800 · VCGC 1500 · VDF / VRN-2 / VQG 900 · VAP 600)· `VIA_FROM_VCGC=YES` · 帳每步帶燈 |
+
+**自測** 本版 11/11 + 前版鏈 v0100 19/19(前版鏈改走乾淨子行程:行程內 v0100 的 ACTIONS / lamps 已被換成五系統版)。
+**容器實跑**(`serve --port 8768 --no-open`)· Playwright 三視窗 **31 步 0 失敗 0 pageerror · GREEN**(`VIA_Reports/lake/CONSOLE_UserTest_v0101_latest.{json,md}` + 三張截圖):燈 10 盞 → 按「五系統並行實測 + 矩陣」→ DONE 172.6s + 收據可開 → 按「啟動 VAP」「啟動 VRN-2」→ DONE GREEN → 系統盞改用本台 → 403 / 400。
+**五系統各走自己入口 5/5 綠**:VCGC v0192 47.4s · VDF v0168 159.6s · VRN-2 v0262 6.9s · VQG v0109 170.0s · VAP v0100 0.1s;進度帳 +5(`VIA_FiveSystem_Progress_v0100.jsonl` 25 列)。
+**誠實**:矩陣總燈 **RED** 不是實跑紅,是憲法性基線(11-09 已知):衝突冊 OPEN 6 項點到 VCGC / VDF / VRN-2(`CONFLICT_OPEN`)· VQG / VAP 未登 L122 治理冊(`NOT_IN_L122_GOVERNOR`)→ 憲法性 0/5;裁衝突 / 登治理冊是操作員的手。見證面板照實顯示 RED rc 1。
+
+登冊:盤點 **v0220**(+C-lake-console-v0101;WKF038-STP001 → v0101;+WKF039 覆蓋)· 需求 **v0244**(+VCGC-REQ216 COVERED)· 工作流 **v0145**(+VCGC-WKF039 five_system_activate)· 交接冊 +1 案 VERIFIED(handoff test rc 0 · marker)。編號 +23(遺失 0 · 改身分 0 · 重號 0 · IMMUT 0 · DUPREG 0)· registry-sync 撞號 0。
+桌機:`python3 "docs/handoff/ai/VIA_LakeConsole_v0101.py" serve`(自動開頁)→ 按「五系統並行實測 + 矩陣」。
