@@ -10,7 +10,7 @@
   · 每個動作 = 子行程跑倉內引擎(逐段 log 落盤 · rc · 秒 · 收據路徑)→ 頁面輪詢 → 見證面板亮燈;單通道(同時只跑一件)。
   · 入湖只寫 VCGC 自己的湖;選了他系統 → 落 <root>/_inbox/<SYS>/ 暫存 + 清單,由該系統自己接(L123 不代寫)。
   · 檔案瀏覽只供 VIA_Reports/** 與湖根下的收據(白名單夾 · 越夾 404)。
-用法:serve [--port 0] [--root] [--open] · --selftest
+用法:serve [--port 0] [--root] [--no-open](預設啟動後自動跳出 HTML U/I)· --selftest
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -712,14 +712,15 @@ def main(argv=None) -> int:
     ap.add_argument("--port", type=int, default=0, help="0 = 隨機空埠(預設);桌機可指定如 8766")
     ap.add_argument("--root", default=None)
     ap.add_argument("--via", default=None)
-    ap.add_argument("--open", action="store_true")
+    ap.add_argument("--open", action="store_true", help="(預設即開)啟動後自動跳出 HTML U/I")
+    ap.add_argument("--no-open", action="store_true", help="不自動開瀏覽器(CI / 容器 / 背景服務用)")
     a = ap.parse_args(argv)
     if a.selftest or a.verb == "selftest":
         return selftest()
     via = Path(a.via).resolve() if a.via else VIA
     if (via / "VeritasIntelligenceAnalytics").is_dir():
         via = via / "VeritasIntelligenceAnalytics"
-    serve(via, a.root, a.port, a.open)
+    serve(via, a.root, a.port, open_after=not a.no_open)  # 操作員 2026-11-10:「啟動後自動跳出 HTML U/I」→ 預設開
     return 0
 
 

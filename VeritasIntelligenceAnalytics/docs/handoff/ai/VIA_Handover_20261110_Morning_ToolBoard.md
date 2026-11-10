@@ -118,7 +118,7 @@ python3 "docs/handoff/ai/VIA_DailyBackup_v0100.py" check && python3 "docs/handof
 | 使用者測試(滑鼠) | Playwright 1440 / 900 / 390 × 13 步 = **39 步 0 失敗 0 pageerror**:下拉選套件自測 → 勾只看不寫 → 執行 → GREEN;下拉選資料湖矩陣 → 執行 → 收據連結;拖曳兩檔 → 預覽 2 檔 3 欄主鍵預勾 → 入湖 VCGC 新入;選檔案 → VDF → _inbox;選資料夾 → 預覽;頁內無權杖 POST 403;非白名單 400 → `VIA_Reports/lake/CONSOLE_UserTest_latest.{json,md}` + `console_shot_{pc,tablet,phone}.png` |
 | 自測抓到並修的真 bug | ① 混型來源(jsonl 的 `3` vs csv 的 `"3"`)入同表 → pyarrow 炸 → 套件 `_arrow_from_rows` 逐欄推型、字串退路(跨分片 DuckDB union_by_name 升 VARCHAR 實測)· 套件自測 10 → **11**;② 處理器例外默默斷線 → 一律 JSON 500(見證要看得到錯);③ 容器 HTTPS_PROXY 會攔 127.0.0.1 → 自測用無代理 opener |
 | 登冊 | 盤點 **v0217**(+C-lake-console · WKF038 三步)· 需求 **v0241**(+VCGC-REQ215 COVERED)· 工作流 **v0142**(+WKF038 lake_console)· 交接冊 +1 案 |
-| 桌機開法 | `python3 "docs/handoff/ai/VIA_LakeConsole_v0100.py" serve --open`(之後可掛進 CGC_MDL095 DeckServer 當 `/lake` 路由,同一套權杖律) |
+| 桌機開法 | `python3 "docs/handoff/ai/VIA_LakeConsole_v0100.py" serve`(操作員 2026-11-10「啟動後自動跳出 HTML U/I」→ 預設即開瀏覽器;`--no-open` 給 CI / 背景;之後可掛進 CGC_MDL095 DeckServer 當 `/lake` 路由,同一套權杖律) |
 
 ## 9. Codex PR #623 兩項 P2 → `VIA_LakeMatrix_v0101`(薄尾 · v0100 已在 main 不動)
 
