@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "VIA.SignedEnvelope/1.0"
+    },
+    "kind": {
+      "enum": [
+        "LICENSE",
+        "LEASE",
+        "REVOCATION",
+        "PACKAGE",
+        "TRUST"
+      ]
+    },
+    "kid": {
+      "type": "string",
+      "pattern": "^[A-Z0-9][A-Z0-9_-]{5,95}$"
+    },
+    "alg": {
+      "const": "Ed25519"
+    },
+    "payload_b64url": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "signature_b64url": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{86}$"
+    }
+  },
+  "required": [
+    "schema",
+    "kind",
+    "kid",
+    "alg",
+    "payload_b64url",
+    "signature_b64url"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:via:commercial-review:1.0:envelope"
+}

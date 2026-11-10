@@ -1,0 +1,66 @@
+{
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "VIA.Revocation/1.0"
+    },
+    "environment": {
+      "enum": [
+        "TEST",
+        "PRODUCTION"
+      ]
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "issued_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "format": "date-time"
+    },
+    "valid_until": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "format": "date-time"
+    },
+    "revoked_license_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z0-9][A-Z0-9_-]{5,95}$"
+      },
+      "uniqueItems": true
+    },
+    "revoked_device_keys": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "uniqueItems": true
+    },
+    "revoked_signer_kids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z0-9][A-Z0-9_-]{5,95}$"
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema",
+    "environment",
+    "sequence",
+    "issued_at",
+    "valid_until",
+    "revoked_license_ids",
+    "revoked_device_keys",
+    "revoked_signer_kids"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:via:commercial-review:1.0:revocation"
+}

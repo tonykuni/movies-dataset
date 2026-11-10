@@ -1,0 +1,327 @@
+{
+  "schema": "VIA.IsolationTestSpec/1.0",
+  "status": "SPECIFICATION_NOT_EXECUTION",
+  "all_tests_not_run": true,
+  "tests": [
+    {
+      "test_id": "CAND-LIC01",
+      "scenario": "正常 TEST 離線簽章，裝置、權益與版本皆匹配",
+      "expected": "ALLOW",
+      "required_scope": "CRYPTO_FIXTURE",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC02",
+      "scenario": "payload 改一 byte，簽章不變",
+      "expected": "SIGNATURE_INVALID",
+      "required_scope": "CRYPTO_FIXTURE",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC03",
+      "scenario": "未知 kid／不准的 alg／TEST key 用於 production",
+      "expected": "TRUST_REJECTED",
+      "required_scope": "CRYPTO_FIXTURE",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC04",
+      "scenario": "重複 JSON key、NaN、未知欄、錯誤 base64url",
+      "expected": "MALFORMED",
+      "required_scope": "SCHEMA_FIXTURE",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC05",
+      "scenario": "now == expires_at；或 now < not_before",
+      "expected": "EXPIRED_OR_NOT_YET_VALID",
+      "required_scope": "CRYPTO_FIXTURE",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC06",
+      "scenario": "複製 token 到另一裝置；無原裝置私鑰",
+      "expected": "DEVICE_MISMATCH",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC07",
+      "scenario": "只購 VDF 呼叫 VRN2；或不具所需 feature",
+      "expected": "FEATURE_DENIED",
+      "required_scope": "CRYPTO_FIXTURE",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC08",
+      "scenario": "發行序號大於權益 max_release_sequence",
+      "expected": "VERSION_DENIED",
+      "required_scope": "CRYPTO_FIXTURE",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC09",
+      "scenario": "已知撤銷 license／device／kid",
+      "expected": "REVOKED",
+      "required_scope": "CRYPTO_FIXTURE",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC10",
+      "scenario": "較舊授權 sequence 或撤銷快照 replay",
+      "expected": "REPLAY_REJECTED",
+      "required_scope": "CRYPTO_FIXTURE",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC11",
+      "scenario": "撤銷快照過期／不足 license.minimum_revocation_sequence",
+      "expected": "REVOCATION_STALE",
+      "required_scope": "CRYPTO_FIXTURE",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC12",
+      "scenario": "時鐘倒退超容差；重開機／VM snapshot 還原",
+      "expected": "CLOCK_ROLLBACK_OR_REVIEW",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC13",
+      "scenario": "online mock 中斷但 lease 未到期；到期後再試",
+      "expected": "ALLOW_CACHED_THEN_LEASE_EXPIRED",
+      "required_scope": "LINUX_SANDBOX",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC14",
+      "scenario": "啟用 nonce 重用、重複 request_id、並行搶最後席次",
+      "expected": "NO_DOUBLE_SEAT_ALLOCATION",
+      "required_scope": "LINUX_SANDBOX",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC15",
+      "scenario": "issuer 換鑰／撤 signer／離線 root trust 更新",
+      "expected": "VALIDATED_TRUST_CHAIN_ONLY",
+      "required_scope": "CRYPTO_FIXTURE",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-LIC16",
+      "scenario": "授權失效時匯出既有資料與唯讀診斷",
+      "expected": "ALLOW_EXISTING_DATA_ONLY",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP01",
+      "scenario": "空白 Windows 11 x64，無 Python／Git／PS7；標準使用者",
+      "expected": "NO_HIDDEN_PREREQUISITE",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP02",
+      "scenario": "winget 缺席、proxy、離線、重啟 pending",
+      "expected": "EXPLICIT_PLAN_OR_BLOCKED",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP03",
+      "scenario": "任一步非零退出、repo merge conflict、磁碟不足",
+      "expected": "STOP_DEPENDENT_STEPS",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP04",
+      "scenario": "中文／空白／單引號路徑，OneDrive 鎖檔",
+      "expected": "SAFE_PATH_OR_PRECHECK_BLOCK",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP05",
+      "scenario": "竄改 manifest／檔案／多出 .pyc／缺少 native DLL",
+      "expected": "REJECT_BEFORE_EXECUTION",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP06",
+      "scenario": "ZIP traversal、symlink、junction、大小寫重複、ADS、超大壓縮展開",
+      "expected": "REJECT_BEFORE_EXTRACTION",
+      "required_scope": "LINUX_SANDBOX",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP07",
+      "scenario": "安裝中斷電／程序 crash，每個 journal checkpoint 注入故障",
+      "expected": "OLD_OR_NEW_COMPLETE_NO_MIX",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP08",
+      "scenario": "升級後 smoke fail；有資料 schema 變更",
+      "expected": "RESTORE_POINTER_AND_COW_DATA",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP09",
+      "scenario": "執行同一安裝計畫兩次／resume",
+      "expected": "IDEMPOTENT_NO_DUPLICATE_DATA",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP10",
+      "scenario": "解除安裝或停止 VCGC，VDF／VRN2 各自有合法 token",
+      "expected": "PEER_MAIN_STILL_WORKS",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP11",
+      "scenario": "產品一個失敗，其餘 main／DB／授權狀態比對",
+      "expected": "NO_CROSS_PRODUCT_MUTATION",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP12",
+      "scenario": "VDF 固定官方樣本→Parquet／CSV，增量、去重、ADJ 欄與當沖欄",
+      "expected": "GOLDEN_RESULT_MATCH",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP13",
+      "scenario": "VRN2 固定合法樣本：個股年度數據／25欄／原文重點／非個股阻擋",
+      "expected": "EXPECTED_VALUES_AND_LANES",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP14",
+      "scenario": "實體 Windows 工作站 Defender／SmartScreen／CNG／TPM／字型／OCR",
+      "expected": "HARDWARE_ACCEPTANCE",
+      "required_scope": "PHYSICAL_WINDOWS",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-DEP15",
+      "scenario": "dependencies／AST／importlib／wheel／DLL 中出現 TA-Lib",
+      "expected": "BLOCKED_FORBIDDEN_DEPENDENCY",
+      "required_scope": "STATIC",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-MCP01",
+      "scenario": "initialize 版本協商→initialized→tools/list→call→EOF",
+      "expected": "VALID_LIFECYCLE_CLEAN_EXIT",
+      "required_scope": "LINUX_SANDBOX",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-MCP02",
+      "scenario": "shell／任意 path／HTTP／未知工具／activate／revoke／install 請求",
+      "expected": "DENIED_NO_SIDE_EFFECT",
+      "required_scope": "LINUX_SANDBOX",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-MCP03",
+      "scenario": "receipt stale、source hash 改變、fixture scope、缺少收據",
+      "expected": "UNKNOWN_OR_STALE_NOT_GREEN",
+      "required_scope": "LINUX_SANDBOX",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-MCP04",
+      "scenario": "超大輸入、錯誤 schema、notification 無 id、未知 id、timeout",
+      "expected": "BOUNDED_PROTOCOL_ERRORS",
+      "required_scope": "LINUX_SANDBOX",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-MCP05",
+      "scenario": "Windows MCP client 實際呼叫與關閉，stdout 不混日誌",
+      "expected": "CLIENT_INTEROP_RECEIPT",
+      "required_scope": "WINDOWS_VM",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-SDD01",
+      "scenario": "需求→契約→實作→測試→輸出證據→版本 hash 任一斷鏈",
+      "expected": "RELEASE_BLOCKED",
+      "required_scope": "STATIC",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-SDD02",
+      "scenario": "未改來源 etag 相同／只有某一產品變更",
+      "expected": "REUSE_VALID_EVIDENCE_ONLY",
+      "required_scope": "STATIC",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-SDD03",
+      "scenario": "跨產品收據／自測 PASS 冒充工作站 PASS",
+      "expected": "SCOPE_MISMATCH_BLOCKED",
+      "required_scope": "STATIC",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "test_id": "CAND-SEC01",
+      "scenario": "套件＋客戶端查找 issuer 私鑰／客戶密碼／測試私鑰",
+      "expected": "ZERO_ISSUER_OR_CUSTOMER_SECRET",
+      "required_scope": "STATIC",
+      "execution_status": "NOT_RUN",
+      "receipt": null
+    }
+  ]
+}

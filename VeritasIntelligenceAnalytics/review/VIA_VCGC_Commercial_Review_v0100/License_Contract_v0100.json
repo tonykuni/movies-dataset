@@ -1,0 +1,165 @@
+{
+  "schema": "VIA.CommercialContractReview/1.0",
+  "version": "v0100",
+  "owner": "VCGC",
+  "status": "REVIEW_ONLY_NOT_COMMERCIAL_READY",
+  "production_enabled": false,
+  "network_license_enabled": false,
+  "formal_ssot_registration": false,
+  "policies": {
+    "peer_independent_main": true,
+    "vcgc_required_for_peer_execution": false,
+    "forbidden_dependencies": [
+      "TA-Lib",
+      "talib",
+      "ta_lib"
+    ],
+    "serial_is_secret": false,
+    "serial_is_authorization": false,
+    "customer_secrets_in_package": false
+  },
+  "signing": {
+    "algorithm": "Ed25519",
+    "public_key_bytes": 32,
+    "signature_bytes": 64,
+    "envelope": "schemas/envelope.schema.json",
+    "message": "ASCII(\"VIA-COMMERCIAL/1.0|\" + kind + \"|\" + kid + \"\\n\") || strict_base64url_decode(payload_b64url)",
+    "payload_encoding": "Original UTF-8 bytes, no BOM; no reserialization before verification",
+    "base64url": "Unpadded; re-encode must exactly match supplied value",
+    "key_roles": "Issuer LICENSE/LEASE, REVOCATION, PACKAGE and TRUST keys are separate; role/environment/purpose allowlisted locally",
+    "issuer_private_key": "Issuer-only; never inside any client, repository, MCP tool, fixture delivery or customer machine"
+  },
+  "limits": {
+    "envelope_max_bytes": 65536,
+    "decoded_payload_max_bytes": 49152,
+    "json_max_depth": 12,
+    "clock_rollback_tolerance_seconds": 300,
+    "offline_max_seconds_proposed": 2592000,
+    "online_lease_max_seconds_proposed": 259200,
+    "seat_limit_mvp": 1,
+    "all_durations": "Proposed engineering defaults; no customer policy activated"
+  },
+  "serial": {
+    "generation": "CSPRNG 128 bits, unpadded Base32 uppercase -> 26 characters, prefix VIA-",
+    "issuer_ledger": "Unique constraint with retry; customer_ref + license_id + device_public_key_hash + state + sequence + audit event",
+    "legacy_combo_serial": "Display alias only; never proof of purchase or permission"
+  },
+  "verification_order": [
+    "size/UTF-8/duplicate-key/depth checks",
+    "envelope schema and strict base64url",
+    "trusted kid + role + environment + Ed25519 signature over exact domain-separated bytes",
+    "payload strict parse and schema",
+    "signed package identity and bounded entitlement/product/features/release sequence",
+    "time validity and saved trusted-time anchor",
+    "latest trusted revocation sequence, expiry, revoked license/device/kid",
+    "license and lease monotonic sequence; same sequence requires byte-identical digest",
+    "local device key proof of possession",
+    "if ONLINE_LEASE verify correlated signed lease and nonce; lease expiry <= license expiry",
+    "emit scoped decision receipt; only ALLOW starts paid operation"
+  ],
+  "semantics": [
+    "Times UTC RFC3339 seconds Z; issued_at <= not_before < expires_at; now is accepted only when not_before <= now < expires_at. Offline expires_at - issued_at <= proposed offline cap.",
+    "Unique product_id across entitlements; unique normalized paths across package files; entrypoint must be in files; package release_sequence must not exceed matching entitlement maximum.",
+    "Revocation snapshot valid_until > now and sequence >= saved high-water mark and minimum_revocation_sequence; imported lower sequence rejected. Same sequence with different bytes rejected. Deny both revoked license and device and signer.",
+    "Lease matches license_id, license_sequence, device hash, environment and request nonce; issued/expires within license; duration <= signed max_lease_seconds; a nonce is used once at issuer.",
+    "Device binding is SHA256 of DER SPKI for a locally held CNG ECDSA P-256 key. Runtime challenge is 32 random bytes, signed with ECDSA SHA256; signature transport is fixed 64-byte r||s, no ambiguous DER signature format.",
+    "TPM_NONEXPORTABLE must be attested/verified by issuer before granting that protection tier; caller assertion alone is insufficient. SOFTWARE_USER_KEY is visibly lower assurance. Machine hash / MAC alone is insufficient.",
+    "Trusted-time anchor and monotonic counters are atomically persisted; missing or corrupted protected state requires revalidation. A local administrator or full VM rollback cannot be perfectly resisted offline.",
+    "Expired or stale license stops NEW paid jobs; current job ends at documented safe checkpoint. Read-only diagnosis and export of already-owned data remain accessible; no erase, encryption or peer process kill.",
+    "Revoke offline licenses at next signed snapshot import or bounded expiration. No promise of immediate revocation without communication. Online lease bounds outage/revocation delay; offline recovery never silently bypasses validation.",
+    "Client package manifest must reject absolute/UNC/drive/ADS/.. paths, links/junctions, Windows reserved names, case collisions, extra executable content and missing files. A hash without trusted signature is not publisher authentication.",
+    "Normal updates cannot decrease release_sequence. Rollback must reference a prior verified manifest and allowed rollback sequence, remain within current entitlement and revocation policy; database restore uses copy-on-write checkpoint.",
+    "Trust rotation is threshold-authorized by current offline root and new root; test/production roots are separate. If root compromise cannot be authenticated in-band, require separately approved recovery installer. No TRUST endpoint implemented in this review."
+  ],
+  "online_api_proposal": {
+    "status": "NOT_IMPLEMENTED_NOT_ENABLED",
+    "base_url": null,
+    "activate": {
+      "method": "POST",
+      "path": "/v1/activate",
+      "request": [
+        "request_id",
+        "license_id",
+        "one_time_activation_code",
+        "device_public_key_spki",
+        "nonce",
+        "device_proof"
+      ],
+      "auth": "Single-use code delivered out of band; hashed at rest; never serial only",
+      "response": [
+        "signed_license",
+        "signed_lease",
+        "signed_revocation_snapshot"
+      ]
+    },
+    "renew": {
+      "method": "POST",
+      "path": "/v1/lease",
+      "auth": "device-signed server nonce and current license",
+      "transaction": "unique request_id plus atomic seat ledger; identical retry returns same result"
+    },
+    "revoke": {
+      "path": "issuer-admin-only",
+      "client_mcp_exposed": false,
+      "audit": "reason + actor + time + monotonic sequence; immutable audit"
+    },
+    "transfer": "Retire old seat; issue new device-bound certificate; preserve both audit events; no guarantee old offline device stops immediately"
+  },
+  "state_machine": {
+    "UNLICENSED": [
+      "REQUEST_READY"
+    ],
+    "REQUEST_READY": [
+      "VALID_OFFLINE",
+      "VALID_ONLINE"
+    ],
+    "VALID_OFFLINE": [
+      "EXPIRED",
+      "REVOKED_KNOWN",
+      "CLOCK_REVIEW"
+    ],
+    "VALID_ONLINE": [
+      "CACHED_LEASE",
+      "EXPIRED",
+      "REVOKED_KNOWN",
+      "CLOCK_REVIEW"
+    ],
+    "CACHED_LEASE": [
+      "VALID_ONLINE",
+      "LEASE_EXPIRED",
+      "REVOKED_KNOWN"
+    ],
+    "EXPIRED": [
+      "REQUEST_READY"
+    ],
+    "LEASE_EXPIRED": [
+      "VALID_ONLINE",
+      "REQUEST_READY"
+    ],
+    "REVOKED_KNOWN": [
+      "REQUEST_READY"
+    ],
+    "CLOCK_REVIEW": [
+      "REQUEST_READY"
+    ]
+  },
+  "result_codes": [
+    "ALLOW",
+    "MALFORMED",
+    "SIGNATURE_INVALID",
+    "TRUST_REJECTED",
+    "NOT_YET_VALID",
+    "EXPIRED",
+    "DEVICE_MISMATCH",
+    "FEATURE_DENIED",
+    "VERSION_DENIED",
+    "REVOKED",
+    "REVOCATION_STALE",
+    "REPLAY_REJECTED",
+    "CLOCK_ROLLBACK",
+    "LEASE_EXPIRED",
+    "INTEGRITY_FAILED",
+    "STATE_RECOVERY_REQUIRED"
+  ],
+  "scope_note": "This is a reviewable protocol specification and schemas, not an issued license, activation client, enforcement SDK or production service."
+}

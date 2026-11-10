@@ -1,0 +1,213 @@
+{
+  "schema": "VIA.DeploymentGapReview/1.0",
+  "commit": "8fc49fff06fe5860f52a63720f6f98c91f1fda83",
+  "columns": [
+    "id",
+    "capability",
+    "status",
+    "evidence",
+    "gap_and_reuse",
+    "sources",
+    "priority"
+  ],
+  "rows": [
+    [
+      "G01",
+      "新機 PS7／Git 引導",
+      "已實作；工作站未測",
+      "FreshPC v0100 使用 winget、clone／merge；PR #621 明說容器無 Windows 未實跑。",
+      "重用探測想法；商業包預設不要求 Git。增加 Python／內嵌 runtime 與 winget 缺席分支。",
+      "E01,E22",
+      "P0"
+    ],
+    [
+      "G02",
+      "新機失敗即停止",
+      "未完整實作；靜態缺陷",
+      "ErrorActionPreference=Continue；clone/merge 及三段 python 呼叫未逐步檢查退出碼。指南稱衝突會停，片段未落實該保證。",
+      "加入明確依賴圖、退出碼閘與可恢復 journal；任何必要步驟失敗不得開成功頁。",
+      "E01",
+      "P0"
+    ],
+    [
+      "G03",
+      "環境布建／衝突檢查",
+      "已實作；夾具自測設計；工作站未測",
+      "DesktopFourBlocks 呼叫 EnvManager／EnvGovernance；--install 才 apply。全新入口本身需要 python。",
+      "重用 inventory、conflicts 與資源策略；客戶包使用獨立、固定版 runtime／wheel lock，禁止 pip --user。",
+      "E02",
+      "P0"
+    ],
+    [
+      "G04",
+      "MCP 設定與實際連線",
+      "已實作一部分；自測／附件沙盒證據",
+      "FreshPC 沒帶 --mcp-write，預設只產設定片段且 YELLOW。原生 MDL279 v0102 與附件 adapter 都是 stdio 路線。",
+      "加受控 client adapter 與 Windows initialize→list→call→EOF 驗收；保留原生及附件各自身分。",
+      "E02,E11,A02",
+      "P1"
+    ],
+    [
+      "G05",
+      "獨立 VDF 啟動／資料檢核",
+      "已實作；Windows CI；客戶 E2E 未測",
+      "ActivateVDF 有自己 main；MDL013 v0116、SystemManager v0168 為薄尾鏈；另有 DB／fetch verify／健康收據。",
+      "重用本系統 manager、fixture、輸出驗算；不以 VCGC 燈號替代 VDF 結果。",
+      "E13,E14,E15,E24",
+      "P0"
+    ],
+    [
+      "G06",
+      "VRN-2 部署與驗證",
+      "已實作；自測＋部分舊桌機證據；新機未測",
+      "v0179 文件仍指 v0178 ZIP／runtime v0167，RoundAll v0135 有 111 項自測紀錄；桌機資料仍有待人工項。",
+      "重用包清單、雜湊與驗算；同一交付 SHA 需再做空白 Windows 全流程。VRN-1 未在本倉，不納入結論。",
+      "E16,E17,E18",
+      "P0"
+    ],
+    [
+      "G07",
+      "VRN-2 非個股車道",
+      "阻擋；未達交付",
+      "PR #622：NON_STOCK_CORE 缺席；LaneCheck 的 READY 只表示入口等存在，並非結果正確。",
+      "未補齊核心、樣本驗證前，SKU 不宣稱可處理非個股報告。",
+      "E16,E23",
+      "P0"
+    ],
+    [
+      "G08",
+      "獨立引擎打包",
+      "已實作原始檔 ZIP／manifest；商業二進位未見",
+      "MDL256 v0101→v0100 複製原始檔與依賴布局，生成 SHA-256 manifest／ZIP；可驗完整性。",
+      "重用檔案閉包、版本與中央編號資料；新增受控 Windows build/export adapter。",
+      "E04,E05",
+      "P0"
+    ],
+    [
+      "G09",
+      "原始碼保護",
+      "未在核對部署鏈找到實作",
+      "FreshPC clone 原始倉；SubsystemBundle 原樣 copy；未見可驗收的受保護發行包。",
+      "Nuitka standalone 作隔離可行性驗證；自有商業核心不帶 .py/.pyc；動態載入薄尾須固定閉包。",
+      "E01,E04,E15",
+      "P0"
+    ],
+    [
+      "G10",
+      "商品號／機器識別",
+      "已實作簡易識別；安全授權未實作",
+      "Install-VIA-Product v0101 產 machine_id 及 VIA-C- 組合號；資料寫本機 VIA_Instance.json。",
+      "只可作舊實例別名；新增隨機產品序號、issuer ledger 與簽章授權，不沿用 hash 當密鑰。",
+      "E03",
+      "P0"
+    ],
+    [
+      "G11",
+      "簽章／防偽／權益驗證",
+      "未在核對部署鏈找到實作",
+      "機器 hash 與一般 SHA manifest 均無發行者簽章；VCGC MDL237 是元件治理發號。",
+      "獨立 issuer／public-key verifier；每個產品各自驗 feature、版本、裝置與期限。",
+      "E03,E10",
+      "P0"
+    ],
+    [
+      "G12",
+      "客戶綁定／席次／換機",
+      "只有本機機器識別；其餘未見",
+      "舊 machine_id 依 MachineGuid＋電腦名，缺少客戶帳本、proof-of-possession 與席次交易。",
+      "客戶不具名 reference＋裝置公鑰；每機一證，換機撤舊重發，不採 MAC 位址單因子。",
+      "E03",
+      "P0"
+    ],
+    [
+      "G13",
+      "離線授權",
+      "尚未實作安全流程",
+      "未見簽章 challenge-response 匯入、到期與撤銷快照驗證。",
+      "MVP 採人工離線簽發與有限期 token；承認離線無法即時撤銷。",
+      "E03,E23",
+      "P0"
+    ],
+    [
+      "G14",
+      "線上授權／撤銷",
+      "尚未實作",
+      "未見授權服務、nonce／lease／撤銷版本帳本。",
+      "先定契約與 mock 規格；線上網域、身份、權限、SLA 需另案批准才啟用。",
+      "E23",
+      "P1"
+    ],
+    [
+      "G15",
+      "版本升級",
+      "已實作開發版 merge／glob 尾版；客戶升級未見",
+      "新機取 mutable main；VDF／VCGC 由磁碟最大版號載入；VRN 有固定 ZIP hash。",
+      "簽章 release manifest 固定各系統完整版本閉包；side-by-side staging→驗證→原子切換。",
+      "E01,E09,E13,E17",
+      "P0"
+    ],
+    [
+      "G16",
+      "簽署安裝與供應鏈",
+      "有一般 hash；簽章／完整性拒跑不足",
+      "舊 installer 既存 hash 不符只計數，註解稱版本前進；新複製未見同段逐檔驗後硬閘，最後 exit 0。",
+      "新增可信發行簽章、完整檔案清單、拒絕未列內容、SBOM／license notices、每步非零退出。",
+      "E03,E04",
+      "P0"
+    ],
+    [
+      "G17",
+      "安裝後功能驗證",
+      "有自測／Windows CI；新機結果驗證欠缺",
+      "最新 main 三個 CI jobs 成功，涵蓋 VDF／VRN manager contracts 及 Chromium UAT；不是完整 FreshPC。",
+      "客戶 SKU 自帶乾淨固定輸入與 expected output；無網先驗，live 資料另經同意。",
+      "E21,E24",
+      "P0"
+    ],
+    [
+      "G18",
+      "備份／失敗恢復",
+      "治理備份已實作；產品交易式回復未見",
+      "DailyBackup 備治理冊、收據與工具鎖；明示不備大檔及 VRN2 運行副本。",
+      "重用 manifest／校驗；另加安裝 journal、資料一致性快照、舊 runtime 與經測 restore。",
+      "E19",
+      "P0"
+    ],
+    [
+      "G19",
+      "VCGC SDD／互監",
+      "已實作；新商業需求尚未正式登冊",
+      "既有收據契約可分系統／scope／stale；HANDOFF_latest 是 10/03 台北舊快照，不能沿用 GREEN 宣稱今日完成。",
+      "本包用暫定 CAND-VCGC-COM- 編號；正式 ID 由批准後的中央發號流程核定。",
+      "E09,E10,E12,E20",
+      "P0"
+    ],
+    [
+      "G20",
+      "附件 Atlas／工作台整合",
+      "候選已實作；沙盒證據；正式未接入",
+      "附件 manifest production_deployment=false、native_runtime=NOT_RUN；stdio smoke Windows=NOT_RUN。",
+      "加法整合，只讀摘要／schema adapter；不全包覆蓋、不繼承歷史 PASS。",
+      "A01,A02,A03",
+      "P1"
+    ],
+    [
+      "G21",
+      "TA-Lib 禁用",
+      "政策存在；整份附件未完成可交付依賴排除",
+      "附件說明指出 VAP candidate 尚有可呼叫 TA-Lib helper；不把候選全包認證為合規。",
+      "發行閉包 AST import／動態載入／lock／wheel／DLL 多層 deny gate；缺替代依賴即 BLOCKED。",
+      "A03",
+      "P0"
+    ],
+    [
+      "G22",
+      "正式商業交付",
+      "尚未具備驗收證據",
+      "PackagingGate／ProductGate／AutoDeploy 是既有資格／計畫工具，沒有涵蓋完整授權、簽章與復原驗收。",
+      "所有 P0 完成且同一 SHA 的 Windows VM＋實體工作站證據齊全，才評估 RELEASE_CANDIDATE。",
+      "E06,E07,E08,E24",
+      "P0"
+    ]
+  ]
+}
