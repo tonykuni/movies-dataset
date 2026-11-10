@@ -29,7 +29,7 @@ r"""VIA_SystemCard v0100 — 全景到底的動詞引擎:給一個資料夾(或 
   diff   <A 輸出夾> <B 輸出夾> [--map A根=B根]      A×B 對帳:SYNC · LOCAL_AHEAD · REMOTE_ONLY · DIVERGED(只報告,不 push / pull)
   tools                                              省 Token 外部工具在不在(Graphify · Ponytail · 記憶外掛 · Playwright · DuckDB · ChartDB)
   --selftest
-事後閘(每道都真的算,不寫死 PASS):G1 檔案守恆 · G2 AST 守恆 · G3 掃描零變動 · G4 孤兒 ≤ 5% · G5 尾版編號覆蓋 · G6 來源可讀(B 軌 ref 解不開 = RED)· G7 TA-Lib 禁用(靜態 + 動態載入;L50)。
+事後閘(每道都真的算,不寫死 PASS):G1 檔案守恆 · G2 AST 守恆 · G3 掃描零變動 · G4 孤兒 ≤ 5% · G5 尾版編號覆蓋 · G6 來源可讀(B 軌 ref 解不開 = RED)。
 邊界:唯讀被掃的樹;只寫 --out(預設 VIA_Reports/systemcard/<軌>/,不進倉);不執行被掃的檔;零網路;不用 TA-Lib;不 import VCGC。
 """
 from __future__ import annotations
@@ -137,30 +137,10 @@ def system_of(rel: str, vrn_label: str) -> tuple[str, str]:
     return "ORP", "none"
 
 
-TALIB = {"talib", "ta_lib"}
-
-
-def talib_use(tree) -> str:
-    """L50 禁用 TA-Lib:整棵樹找(含函式內)— static = import talib;dynamic = 任何名字含 import 的呼叫把 "talib" 當字串傳進去
-    (importlib.import_module · __import__ · 自家 def_import_optional …)。只報位置,不改檔(商業審查 G21)。"""
-    hits = []
-    for nd in ast.walk(tree):
-        if isinstance(nd, (ast.Import, ast.ImportFrom)):
-            names = [nd.module or ""] if isinstance(nd, ast.ImportFrom) else [a.name for a in nd.names]
-            if any((n or "").split(".")[0].lower() in TALIB for n in names):
-                hits.append("static:L%d" % nd.lineno)
-        elif isinstance(nd, ast.Call):
-            fn = nd.func.attr if isinstance(nd.func, ast.Attribute) else (nd.func.id if isinstance(nd.func, ast.Name) else "")
-            if "import" in fn.lower() and nd.args and isinstance(nd.args[0], ast.Constant) and isinstance(nd.args[0].value, str) \
-                    and nd.args[0].value.split(".")[0].lower() in TALIB:
-                hits.append("dynamic:L%d" % nd.lineno)
-    return " ".join(hits[:5])
-
-
 def describe(rel: str, ext: str, text: str) -> dict:
     warnings.simplefilter("ignore", SyntaxWarning)   # 被掃檔的 '\ ' 跳脫警告不是本引擎的錯,不洗版
     """說明一行 + 定義(名:行)+ 匯入 + 語法錯;不回原文。"""
-    out = {"pur": "", "defs": [], "imp": [], "err": "", "tal": ""}
+    out = {"pur": "", "defs": [], "imp": [], "err": ""}
     if not text:
         return out
     if ext == ".py":
@@ -185,7 +165,6 @@ def describe(rel: str, ext: str, text: str) -> dict:
                         out["imp"].append(top)
         out["defs"] = out["defs"][:80]
         out["imp"] = out["imp"][:10]
-        out["tal"] = talib_use(tree)
         return out
     if ext in (".ps1", ".psm1"):
         m = re.search(r"\.SYNOPSIS\s*\n\s*(.+)", text) or re.search(r"^\s*#\s*(.{8,})$", text, re.M)
@@ -375,7 +354,7 @@ def scan(paths: list, track: str, out: Path, ref: str = "origin/main", vrn_label
         r["s"], r["why"] = s, why
         r["tail"] = (r["v"] == 0) or (r["v"] == fam_max.get(r["fam"], r["v"]))
         d = describe(r["p"], r["ext"], texts.get(r["p"], ""))
-        r.update(pur=d["pur"], defs=d["defs"], imp=d["imp"], err=d["err"], tal=d.get("tal", ""))
+        r.update(pur=d["pur"], defs=d["defs"], imp=d["imp"], err=d["err"])
         if r["ext"] == ".py":
             py_total += 1
             py_err += 1 if d["err"] else 0
@@ -403,9 +382,6 @@ def scan(paths: list, track: str, out: Path, ref: str = "origin/main", vrn_label
     with_num = sum(1 for r in code_tails if r["num"])
     g["G5_尾版編號覆蓋"] = {"ok": (not books) or with_num == len(code_tails), "val": ("號冊 %d 本 · 尾版程式 %d · 有號 %d · 空號 %d" % (books, len(code_tails), with_num, len(code_tails) - with_num)) if books else "範圍內沒有 VIA_NumberBooks → 不評(照實)"}
     unstat = meta.get("unstat", [])
-    tal = [r for r in rows if r.get("tal") and r["tail"]]
-    g["G7_TA-Lib禁用"] = {"ok": not tal, "val": ("尾版載入 TA-Lib %d 支:%s" % (len(tal), " ; ".join("%s(%s)" % (r["p"].split("/", 1)[-1], r["tal"]) for r in tal[:4]))) if tal
-                         else "尾版靜態 / 動態載入 TA-Lib 0 支(L50)"}
     g["G6_來源可讀"] = {"ok": not meta["missing"], "val": "讀不到:%s%s%s" % (", ".join(meta["missing"]) or "無",
                         (" · stat 失敗 %d(%s)" % (len(unstat), ", ".join(unstat[:3]))) if unstat else "",
                         (" · 號冊壞行 %d" % sum(BAD_BOOK_LINES.values())) if BAD_BOOK_LINES else "")}
@@ -572,9 +548,6 @@ def locked_matrix(summary: dict, rows: list, system: str) -> dict:
                                 error_detail=r["err"] or ("尾版空號" if st == "YELLOW" else "")))
         if r["err"]:
             M["conflicts"].append(_lrow(status="RED", id="AST-" + r["h"], ssot_name=r["p"].split("/", 1)[-1], system=system, source=r["p"], kind="SYNTAX", error_detail=r["err"]))
-        if r.get("tal"):
-            M["conflicts"].append(_lrow(status="RED", id="TALIB-" + r["h"], ssot_name=r["p"].split("/", 1)[-1], system=system, source=r["p"], kind="POLICY L50",
-                                        scope="TA-Lib 禁用;只報位置 · 由該系統自己修(L123 互監不代修)", error_detail=r["tal"]))
         if st == "YELLOW" and not r["err"]:
             M["requirements"].append(_lrow(status="YELLOW", id="NUM-" + r["h"], ssot_name=r["p"].split("/", 1)[-1], system=system, source=r["p"], kind="NUMBERING",
                                            scope="尾版程式沒在 VIA_NumberBooks 查到號", error_detail="空號照實;發號只經 VCGC CGC_MDL237"))
@@ -1120,17 +1093,6 @@ def selftest() -> int:
             and dxy["states"].get("DIVERGED") == 1 and any(r["path"] == "repoX/README.md" for r in dxy["rows"])
             and "return 2" in sl and "return 1" not in sl and "沒有" in late and "def go" in then,
             (num, dxy["states"], sl[-20:], late[-20:]))
-        tx = Path(td) / "talib_fx"
-        (tx / "functional modules" / "VAP").mkdir(parents=True)
-        (tx / "functional modules" / "VAP" / "VAP_Dyn_v0100.py").write_text('"""動態"""\ndef f(name):\n    return name\ndef g():\n    t = def_import_optional("talib")\n    return t\n', encoding="utf-8")
-        (tx / "functional modules" / "VAP" / "VAP_Static_v0100.py").write_text('"""靜態"""\ndef h():\n    import talib\n    return talib\n', encoding="utf-8")
-        (tx / "functional modules" / "VAP" / "VAP_Clean_v0100.py").write_text('"""乾淨:只提到字樣"""\nNOTE = "talib is forbidden"\n', encoding="utf-8")
-        st = scan([tx], "A", Path(td) / "outTal")
-        _, rt = _load(Path(td) / "outTal")
-        tl = {r["p"].rsplit("/", 1)[-1]: r["tal"] for r in rt}
-        chk("⑰ G7 TA-Lib 禁用閘(商業審查 G21):函式內 import talib = static · def_import_optional(\"talib\") = dynamic · 只提到字樣不算 · 閘不過照實黃",
-            tl.get("VAP_Static_v0100.py", "").startswith("static") and tl.get("VAP_Dyn_v0100.py", "").startswith("dynamic") and not tl.get("VAP_Clean_v0100.py")
-            and not st["gates"]["G7_TA-Lib禁用"]["ok"] and s["gates"]["G7_TA-Lib禁用"]["ok"], (tl, st["gates"]["G7_TA-Lib禁用"]["val"]))
         chk("⑬ 號冊整本讀(MDL 冊 > 1 MB 也讀 · 實測 2.6 MB)· source 相對 VIA 根精確對號",
             _readable("x/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_NumberBooks/VIA_NumberBook_MDL_v0100.jsonl", 2_700_000)
             and not _readable("x/big.json", 2_700_000)

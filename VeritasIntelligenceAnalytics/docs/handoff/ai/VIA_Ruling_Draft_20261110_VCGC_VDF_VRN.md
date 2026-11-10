@@ -17,7 +17,7 @@
 | CGC_MDL205 TalibBan | GREEN · 尾版 688 · import 0 · 提到 115(不算)· 未安裝 · 替代 VDF_ENG086_QuantGuardOneBridge 在 |
 | CGC_MDL243 TalibCommandScan | 鎖成功 · 歷史保留 |
 | CGC_MDL206 TalibPolicy | **YELLOW:missing code** —— 元件冊 `feature\|policy/L50`(VIA-FNT-0182)2026-09-28 被 registry-sync 標 RETIRED(來源冊 VIA_Policy_TalibBan_v0100 已有 v0101 尾版)。**點名漂移,不解鎖、不改號**(裁定 R5) |
-| VIA_SystemCard G7(新:靜態 + 動態載入)| 兩倉尾版 3 支:**VAP 2**(AllInOne v0302 `def_import_optional("talib")` · v025 runtime L430)· **VRN-1 外倉 1**(engine/…FactorLibrary L686)。**VCGC / VDF / VRN-2 本倉 0** |
+| VIA_SystemCard v0101 G7(新:靜態 + 動態載入;v0100 已併 main 不就地改)| 兩倉尾版 3 支:**VAP 2**(AllInOne v0302 `def_import_optional("talib")` · v025 runtime L430)· **VRN-1 外倉 1**(engine/…FactorLibrary L686)。**VCGC / VDF / VRN-2 本倉 0** |
 
 → 今日範圍(VCGC · VDF · VRN-2)TA-Lib 使用 = 0。VAP 依今日令「其他先免」只登 CONFLICT-00013;VRN-1 只讀回報。
 
