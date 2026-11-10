@@ -128,3 +128,13 @@ python3 "docs/handoff/ai/VIA_DailyBackup_v0100.py" check && python3 "docs/handof
 | 一表好一表壞仍 GREEN,壞表不出現在報表 | 任何壞表非綠(部分 YELLOW · 全壞 RED),說明點名,壞表列進資產明細(類 `lake(壞)` · 狀態 錯:…) | 自測 ⓐ YELLOW + 明細列 · ⓒ md / html 有壞表 · ⓓ 全壞 RED |
 
 本版 4/4 + 前版鏈 12/12。登冊:盤點 v0218(+C-lake-matrix-v0101 · WKF037-STP002 → v0101)· 需求 v0242(REQ214 evidence)· 工作流 v0143 · 交接案。操作台 `VIA_LakeConsole` 的動作 glob `VIA_LakeMatrix_v*.py` 自動選到 v0101。
+
+## 10. Codex PR #624 三項(P1 ×1 · P2 ×2)
+
+| 發現 | 修法 | 驗證 |
+|---|---|---|
+| **P1** 套件 `VIA_ParquetLake_v0100` 已在 main(PR #623)卻被就地改(混型推型 · 微秒戳)→ 違反 AGENTS L10 add-only | v0100 還原成 main 版本一字不動;新行為出 **`VIA_ParquetLake_v0101`**;消費者改取尾版 glob:`VIA_LakeMatrix_v0101`(覆寫 `_lake_module`)· `VIA_LakeConsole`(本來就 glob)| v0100 10/10 · v0101 11/11 · 矩陣 v0101 4/4 + 鏈 · 操作台 19/19 |
+| P2 `_inbox` 同名檔(`a/data.csv` · `b/data.csv` 同秒)互相覆蓋 | 目的檔 = `<微秒戳>-<內容 sha8>-<路徑消毒>`,`open("xb")` 絕不覆蓋,同名加序號;清單記來源路徑 | 自測 ⓜ2:同名不同夾 + 同檔再送 → 三個不同檔都在 |
+| P2 見證燈只看 rc(引擎自報 YELLOW 仍 GREEN) | `step_lamp()`:本輪收據 JSON 的 lamp > stdout 首個 `[GREEN|YELLOW|RED|GRAY|PASS|FAIL]` > rc;行程失敗不可能綠 / 黃;整件 = 各步最差 | 自測 ⓗ:rc 0 + 收據 YELLOW → 步 YELLOW · 整件 YELLOW;ⓗ2 `[PASS]` → GREEN |
+
+登冊:盤點 v0219(+C-parquet-lake-v0101 · C-parquet-lake 回 10 項 · C-lake-console 19 項 · WKF037-STP001 → v0101)· 需求 v0243 · 工作流 v0144 · 交接冊。操作台使用者測試重跑(新碼 · 埠 8767)。

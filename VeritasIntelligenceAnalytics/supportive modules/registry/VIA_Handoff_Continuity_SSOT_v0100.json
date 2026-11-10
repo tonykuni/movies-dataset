@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-10T03:04:57Z",
+ "updated_at": "2026-11-10T03:19:58Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4486,13 +4486,13 @@
     "supportive modules/VIA_ParquetLake_v0100.py",
     "--selftest"
    ],
-   "success_marker": "[PASS] VIA_ParquetLake v0100 selftest · 11/11",
+   "success_marker": "[PASS] VIA_ParquetLake v0100 selftest · 10/10",
    "scope": "VIA_ParquetLake:<root>/<SYS>/<table>/part-*.parquet(zstd)+ _manifest.jsonl 只增 + <SYS>_catalog.duckdb VIEW;同主鍵增量跳過;五系統名閘",
    "dependencies": [
     "supportive modules/VIA_ParquetLake_v0100.py"
    ],
    "version": "v0100",
-   "updated_at": "2026-11-10T02:55:38Z",
+   "updated_at": "2026-11-10T03:17:05Z",
    "timeout_seconds": 300,
    "registered_at": "2026-11-10T02:35:35Z"
   },
@@ -4521,14 +4521,14 @@
     "docs/handoff/ai/VIA_LakeConsole_v0100.py",
     "--selftest"
    ],
-   "success_marker": "[PASS] VIA_LakeConsole v0100 selftest · 17/17",
+   "success_marker": "[PASS] VIA_LakeConsole v0100 selftest · 19/19",
    "scope": "VIA_LakeConsole:本機橋(127.0.0.1 隨機埠 · 同源權杖 · 白名單動作 · 單通道子行程 · 見證)· 入湖 VCGC / 他系統 _inbox · /files 白名單",
    "dependencies": [
     "docs/handoff/ai/VIA_LakeConsole_v0100.py",
-    "supportive modules/VIA_ParquetLake_v0100.py"
+    "supportive modules/VIA_ParquetLake_v0101.py"
    ],
    "version": "v0100",
-   "updated_at": "2026-11-10T02:55:38Z",
+   "updated_at": "2026-11-10T03:17:05Z",
    "timeout_seconds": 600,
    "registered_at": "2026-11-10T02:55:38Z"
   },
@@ -4544,12 +4544,30 @@
    "dependencies": [
     "docs/handoff/ai/VIA_LakeMatrix_v0101.py",
     "docs/handoff/ai/VIA_LakeMatrix_v0100.py",
-    "supportive modules/VIA_ParquetLake_v0100.py"
+    "supportive modules/VIA_ParquetLake_v0100.py",
+    "supportive modules/VIA_ParquetLake_v0101.py"
    ],
    "version": "v0101",
-   "updated_at": "2026-11-10T03:03:15Z",
+   "updated_at": "2026-11-10T03:17:05Z",
    "timeout_seconds": 600,
    "registered_at": "2026-11-10T03:03:15Z"
+  },
+  "C-parquet-lake-v0101": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/VIA_ParquetLake_v0101.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_ParquetLake v0101 selftest · 11/11",
+   "scope": "VIA_ParquetLake v0101:v0100 一字不動;混型來源逐欄推型 · 微秒戳 + 檔名次序;一系統一湖 · 同主鍵增量跳過 · DuckDB VIEW",
+   "dependencies": [
+    "supportive modules/VIA_ParquetLake_v0101.py"
+   ],
+   "version": "v0101",
+   "updated_at": "2026-11-10T03:17:05Z",
+   "timeout_seconds": 300,
+   "registered_at": "2026-11-10T03:17:05Z"
   }
  },
  "work_items": [
@@ -9485,6 +9503,28 @@
    "next": "閘鏈 → 推 → 回 Codex",
    "receipt": "docs/handoff/evidence/C-lake-matrix-v0101.json",
    "updated_at": "2026-11-10T03:04:57Z"
+  },
+  {
+   "id": "VCGC-REQ214:C-parquet-lake-v0101",
+   "requirement": "VCGC-REQ214",
+   "case": "C-parquet-lake-v0101",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "Codex PR #624:P1 套件 v0100 已在 main 卻被就地改 → 還原 v0100 一字不動 · 新行為出 VIA_ParquetLake_v0101(混型來源逐欄推型 · 微秒戳 · 自測 11);消費者 LakeMatrix v0101 / LakeConsole 改取尾版 glob。P2 ① _inbox 同名檔(a/data.csv · b/data.csv)互相覆蓋 → 路徑消毒 + 內容 sha8 命名 · xb 絕不覆蓋;P2 ② 見證燈只看 rc(引擎自報 YELLOW 仍 GREEN)→ 收據 lamp > stdout 標籤 > rc。 等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈 → 推 → 回 Codex",
+   "receipt": "docs/handoff/evidence/C-parquet-lake-v0101.json",
+   "updated_at": "2026-11-10T03:19:58Z"
+  },
+  {
+   "id": "VCGC-REQ215:C-lake-console:codex624",
+   "requirement": "VCGC-REQ215",
+   "case": "C-lake-console",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "Codex #624 P2 ×2 修正後重測 19/19;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈 → 推 → 回 Codex",
+   "receipt": "docs/handoff/evidence/C-lake-console.json",
+   "updated_at": "2026-11-10T03:19:58Z"
   }
  ]
 }

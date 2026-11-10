@@ -6,7 +6,8 @@
    每個 part-<UTC>-<sha8>.parquet 的檔名戳就是入湖日,一片一計;既有資產照舊以檔案更新日計。
 ② 湖內部分壞表:v0100 只有「全壞」才 RED,一表好一表壞仍 GREEN,且壞表不出現在報表 → 本版任何壞表 = 非綠
    (全壞 RED · 部分壞 YELLOW),壞表列進資產明細(類 lake(壞)· 狀態 錯:…),說明也點名。
-其餘(入湖 · 盤點 · 工具活動 · HTML / md · 自測 12 項)照 v0100,本版自測 = 前版鏈 + 本版 3 項。
+③ 套件改取尾版 glob(VIA_ParquetLake_v0101 起:混型來源 · 微秒戳;Codex #624 P1 要求 v0100 不就地改)。
+其餘(入湖 · 盤點 · 工具活動 · HTML / md · 自測 12 項)照 v0100,本版自測 = 前版鏈 + 本版 4 項。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -41,6 +42,22 @@ sys.modules["VIA_LakeMatrix_v0100"] = P
 _spec.loader.exec_module(P)
 _prior_system_cards = P.system_cards
 _prior_activity = P.activity
+_prior_lake_module = P._lake_module
+
+
+def _lake_module():
+    """套件取尾版(VIA_ParquetLake_v*.py 最高版號;Codex #624 P1:v0100 不就地改,新行為在 v0101)。"""
+    import glob as _glob
+    hits = sorted(_glob.glob(str(P.VIA / "supportive modules" / "VIA_ParquetLake_v*.py")))
+    if not hits:
+        return _prior_lake_module()
+    spec = importlib.util.spec_from_file_location("VIA_ParquetLake_tail", hits[-1])
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+P._lake_module = _lake_module
 _PART_RX = re.compile(r"^part-(\d{8})T\d{6}")
 
 
@@ -114,7 +131,9 @@ def selftest() -> int:
     with tempfile.TemporaryDirectory(prefix="via_lakematrix101_") as td:
         via = Path(td) / "VeritasIntelligenceAnalytics"
         (via / "supportive modules").mkdir(parents=True)
-        (via / "supportive modules" / "VIA_ParquetLake_v0100.py").write_text((P.VIA / "supportive modules" / "VIA_ParquetLake_v0100.py").read_text(encoding="utf-8"), encoding="utf-8")
+        import glob as _glob
+        for kp in sorted(_glob.glob(str(P.VIA / "supportive modules" / "VIA_ParquetLake_v*.py"))):
+            (via / "supportive modules" / Path(kp).name).write_text(Path(kp).read_text(encoding="utf-8"), encoding="utf-8")
         root = via / P.OUT_DIR
         good = root / "VCGC" / "good"
         good.mkdir(parents=True)

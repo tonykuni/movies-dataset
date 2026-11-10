@@ -10,6 +10,7 @@
   · 每個動作 = 子行程跑倉內引擎(逐段 log 落盤 · rc · 秒 · 收據路徑)→ 頁面輪詢 → 見證面板亮燈;單通道(同時只跑一件)。
   · 入湖只寫 VCGC 自己的湖;選了他系統 → 落 <root>/_inbox/<SYS>/ 暫存 + 清單,由該系統自己接(L123 不代寫)。
   · 檔案瀏覽只供 VIA_Reports/** 與湖根下的收據(白名單夾 · 越夾 404)。
+  · 見證燈 = 引擎自報(收據 lamp > stdout 標籤 > rc);_inbox 收件以 路徑消毒 + 內容 sha8 命名、xb 絕不覆蓋(Codex #624 P2 ×2)。
 用法:serve [--port 0] [--root] [--no-open](預設啟動後自動跳出 HTML U/I)· --selftest
 """
 from __future__ import annotations
@@ -147,6 +148,37 @@ def receipts(via: Path) -> list[dict]:
 
 
 # ───────────────────────── 執行(子行程 · 單通道 · 見證) ─────────────────────────
+_TAG_RX = re.compile(r"^\[(GREEN|YELLOW|RED|GRAY|PASS|FAIL)\]", re.M)
+_RECEIPT_LAMP = {  # 收據 → 燈在哪
+    "VIA_Reports/backup/CHECK_latest.json": lambda d: d.get("lamp"),
+    "VIA_Reports/vcgc/TOOLBOARD_latest.html": lambda d: None,
+    "VIA_Reports/lake/LAKE_MATRIX_latest.html": lambda d: None,
+}
+_RECEIPT_JSON = {"VIA_Reports/vcgc/TOOLBOARD_latest.html": ("VIA_Reports/vcgc/TOOLBOARD_latest.json", lambda d: (d.get("overall") or {}).get("lamp")),
+                 "VIA_Reports/lake/LAKE_MATRIX_latest.html": ("VIA_Reports/lake/LAKE_MATRIX_latest.json", lambda d: (d.get("overall") or {}).get("lamp")),
+                 "VIA_Reports/backup/CHECK_latest.json": ("VIA_Reports/backup/CHECK_latest.json", lambda d: d.get("lamp"))}
+
+
+def step_lamp(via: Path, step: str, rc: int | None, out: str, receipt: str | None) -> str:
+    """一步的燈 = 引擎自報:① 本輪產出的收據 JSON 的 lamp;② stdout 首個 [GREEN|YELLOW|RED|GRAY|PASS|FAIL] 標籤;③ 都沒有才看 rc。
+    rc 0 但引擎說 YELLOW 就是 YELLOW(備份過期 · 湖部分壞 …)— 不假綠。"""
+    lamp = None
+    if receipt and receipt in _RECEIPT_JSON:
+        jp, pick = _RECEIPT_JSON[receipt]
+        d = _load(via / jp)
+        if isinstance(d, dict):
+            lamp = pick(d)
+    if not lamp:
+        m = _TAG_RX.search(out or "")
+        if m:
+            lamp = {"PASS": "GREEN", "FAIL": "RED"}.get(m.group(1), m.group(1))
+    if not lamp:
+        lamp = "GREEN" if rc == 0 else "RED"
+    if rc not in (0, None) and lamp in ("GREEN", "YELLOW"):
+        lamp = "RED"  # 行程失敗不可能是綠 / 黃
+    return lamp if lamp in ORDER else "GRAY"
+
+
 class Runner:
     def __init__(self, via: Path, root: Path):
         self.via, self.root = via, root
@@ -189,7 +221,7 @@ class Runner:
                 st = {"step": s, "zh": zh, "rc": None, "secs": None, "tail": "", "receipt": None}
                 rec["steps"].append(st)
                 if argv is None:
-                    st["rc"], st["tail"] = 127, zh
+                    st["rc"], st["tail"], st["lamp"] = 127, zh, "RED"
                     worst = 3
                     log.write("## %s · %s\n%s\n" % (s, zh, zh))
                     continue
@@ -213,10 +245,11 @@ class Runner:
                 if rp and (self.via / rp).exists():
                     st["receipt"] = rp
                     rec["receipts"].append(rp)
-                worst = max(worst, 0 if st["rc"] == 0 else (1 if st["rc"] in (1,) and s.endswith(("_check", "toolboard", "lake_matrix")) else 3))
+                st["lamp"] = step_lamp(self.via, s, st["rc"], out, rp)  # 引擎自報的燈,不只看 rc(Codex #624 P2)
+                worst = max(worst, ORDER.get(st["lamp"], 2))
         rec["ended"] = _now()
         rec["rc"] = max((s["rc"] or 0) for s in rec["steps"]) if rec["steps"] else 1
-        rec["lamp"] = ["GREEN", "YELLOW", "GRAY", "RED"][worst]
+        rec["lamp"] = ["GREEN", "YELLOW", "GRAY", "RED"][worst]  # 整件 = 各步燈最差(GRAY 排在黃後)
         rec["state"] = "DONE"
         with open(self.ledger, "a", encoding="utf-8") as f:
             f.write(json.dumps({"at": rec["ended"], "run_id": run_id, "action": rec["action"], "rc": rec["rc"], "lamp": rec["lamp"], "steps": [(s["step"], s["rc"], s["secs"]) for s in rec["steps"]], "options": rec["options"]}, ensure_ascii=False) + "\n")
@@ -310,11 +343,21 @@ def ingest(via: Path, root: Path, system: str, files: list[dict], table: str, ke
         inbox.mkdir(parents=True, exist_ok=True)
         saved = []
         for f in files:
-            name = Path(str(f.get("name", "f"))).name[:200]
+            rel = re.sub(r"[^A-Za-z0-9_.\-]+", "_", str(f.get("name", "f")).replace("\\", "/").strip("/"))[:160] or "f"  # 相對路徑消毒(a/data.csv ≠ b/data.csv)
             data = base64.b64decode(f.get("b64", ""))
-            dest = inbox / ("%s-%s" % (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"), name))
-            dest.write_bytes(data)
-            saved.append({"file": str(dest.relative_to(root)), "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()})
+            sha = hashlib.sha256(data).hexdigest()
+            stem = "%s-%s-%s" % (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ"), sha[:8], rel)
+            dest = inbox / stem
+            n = 0
+            while True:  # 絕不覆蓋既有收件:同名就加序號(Codex #624 P2)
+                try:
+                    with dest.open("xb") as fh:
+                        fh.write(data)
+                    break
+                except FileExistsError:
+                    n += 1
+                    dest = inbox / ("%s.%d" % (stem, n))
+            saved.append({"file": str(dest.relative_to(root)), "source": str(f.get("name", "")), "bytes": len(data), "sha256": sha})
         with (inbox / "_inbox.jsonl").open("a", encoding="utf-8") as fh:
             fh.write(json.dumps({"at": _now(), "system": system, "table": table, "keys": keys, "files": saved}, ensure_ascii=False) + "\n")
         return {"ok": True, "mode": "inbox", "system": system, "saved": saved, "note": "VCGC 不代寫 %s 的湖(L123);檔案已落 _inbox/%s,由 %s 自己 import VIA_ParquetLake 接入" % (LABEL[system], system, LABEL[system])}
@@ -630,7 +673,8 @@ def selftest() -> int:
         via = Path(td) / "VeritasIntelligenceAnalytics"
         (via / "supportive modules").mkdir(parents=True)
         (via / "docs/handoff/ai").mkdir(parents=True)
-        (via / "supportive modules" / "VIA_ParquetLake_v0100.py").write_text((VIA / "supportive modules" / "VIA_ParquetLake_v0100.py").read_text(encoding="utf-8"), encoding="utf-8")
+        kit = tail_glob(VIA, "supportive modules/VIA_ParquetLake_v*.py")
+        (via / "supportive modules" / kit.name).write_text(kit.read_text(encoding="utf-8"), encoding="utf-8")
         (via / "docs/handoff/ai" / "VIA_DailyBackup_v0100.py").write_text("import sys\nprint('[YELLOW] fake backup check')\nsys.exit(0)\n", encoding="utf-8")
         (via / "VIA_Reports/backup").mkdir(parents=True)
         (via / "VIA_Reports/backup/CHECK_latest.json").write_text(json.dumps({"lamp": "YELLOW", "at": "2026-11-10T01:00:00Z", "meaning": "fixture"}), encoding="utf-8")
@@ -664,8 +708,18 @@ def selftest() -> int:
                 if st.get("state") == "DONE":
                     break
                 time.sleep(0.1)
-            chk("ⓗ 子行程跑完:rc 0 · GREEN · 收據 CHECK_latest.json · log 落盤 · 帳 1 行", st["state"] == "DONE" and st["rc"] == 0 and st["lamp"] == "GREEN" and st["receipts"] == ["VIA_Reports/backup/CHECK_latest.json"]
+            chk("ⓗ 子行程跑完:rc 0 但引擎自報 YELLOW(收據 lamp)→ 步 YELLOW · 整件 YELLOW(不假綠)· 收據 CHECK_latest.json · log 落盤 · 帳 1 行",
+                st["state"] == "DONE" and st["rc"] == 0 and st["lamp"] == "YELLOW" and st["steps"][0]["lamp"] == "YELLOW" and st["receipts"] == ["VIA_Reports/backup/CHECK_latest.json"]
                 and Path(st["log"]).exists() and (via / OUT_DIR / "console_ledger.jsonl").exists(), {k: st[k] for k in ("rc", "lamp")})
+            (via / "docs/handoff/ai" / "VIA_VCGCToolBoard_v0100.py").write_text("import sys\nprint('[PASS] fake toolboard selftest')\nsys.exit(0)\n", encoding="utf-8")
+            code, d = req(url + "run", "POST", {"action": "toolboard_selftest"}, good)
+            rid3 = d.get("run_id")
+            for _ in range(60):
+                _, st3 = req(url + "status?run=" + rid3)
+                if st3.get("state") == "DONE":
+                    break
+                time.sleep(0.1)
+            chk("ⓗ2 自測類無收據:stdout [PASS] → GREEN", st3["state"] == "DONE" and st3["lamp"] == "GREEN" and st3["steps"][0]["lamp"] == "GREEN")
             code, d = req(url + "run", "POST", {"action": "lake_matrix"}, good)
             chk("ⓘ 引擎不在(矩陣未放入夾具)→ 202 後步 rc 127 · 整件 RED(不假綠)", code == 202 or True)
             rid2 = d.get("run_id")
@@ -687,6 +741,12 @@ def selftest() -> int:
             code, d = req(url + "ingest", "POST", {"system": "VDF", "files": files, "table": "ledger", "keys": ["id"], "dedupe": True}, good)
             root = resolve_root(via)[0]
             chk("ⓜ 他系統(VDF)入湖 → 不代寫:落 _inbox/VDF 2 檔 + 清單 · VDF 湖夾不建", code == 200 and d["mode"] == "inbox" and len(d["saved"]) == 2 and (root / "_inbox" / "VDF" / "_inbox.jsonl").exists() and not (root / "VDF").exists())
+            same = [{"name": "a/data.csv", "b64": base64.b64encode(b"id,n\nx,1\n").decode()}, {"name": "b/data.csv", "b64": base64.b64encode(b"id,n\ny,2\n").decode()}, {"name": "a/data.csv", "b64": base64.b64encode(b"id,n\nx,1\n").decode()}]
+            code, d = req(url + "ingest", "POST", {"system": "VQG", "files": same, "table": "data", "keys": ["id"], "dedupe": True}, good)
+            paths_saved = [s_["file"] for s_ in d["saved"]]
+            chk("ⓜ2 同名不同夾(a/data.csv · b/data.csv)+ 同檔再送 → 三個不同目的檔 · 全都在 · 不覆蓋(xb)",
+                code == 200 and len(set(paths_saved)) == 3 and all((root / p_).exists() for p_ in paths_saved) and all("a_data.csv" in p_ or "b_data.csv" in p_ for p_ in paths_saved)
+                and {(root / p_).read_bytes() for p_ in paths_saved} == {b"id,n\nx,1\n", b"id,n\ny,2\n"}, paths_saved)
             code, d = req(url + "files/VIA_Reports/backup/CHECK_latest.md")
             code2, d2 = req(url + "files/../../etc/passwd")
             code3, _ = req(url + "files/VIA_Reports/../../supportive%20modules/VIA_ParquetLake_v0100.py")

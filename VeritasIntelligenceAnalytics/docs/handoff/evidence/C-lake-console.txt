@@ -32,7 +32,7 @@
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · VIA_LakeConsole_v0100.py(家族 core)
-[GREEN] VIA_LakeConsole v0100 · http://127.0.0.1:37315/ · 湖根 /tmp/via_console_37r4asex/VeritasIntelligenceAnalytics/VIA_Reports/lake(repo_default)· Ctrl+C 停
+[GREEN] VIA_LakeConsole v0100 · http://127.0.0.1:40491/ · 湖根 /tmp/via_console_j5jn87z0/VeritasIntelligenceAnalytics/VIA_Reports/lake(repo_default)· Ctrl+C 停
   [OK] ⓐ GET / 回頁:權杖注入 · 下拉(動作 · 系統)· 勾選 · 拖曳區 · 選檔 / 選資料夾(webkitdirectory)· 見證面板 · 一支 script
   [OK] ⓑ GET /lamps:四盞(備份 YELLOW · 看板 GRAY · 矩陣 GRAY · VCGC 湖 GRAY)+ 收據 1 份
   [OK] ⓒ POST 無同源 / 權杖 → 403
@@ -40,18 +40,20 @@
   [OK] ⓔ 動作不在白名單 → 400
   [OK] ⓕ 多餘欄位 → 400(嚴格 body)
   [OK] ⓖ 白名單動作 → 202 + run_id
-  [OK] ⓗ 子行程跑完:rc 0 · GREEN · 收據 CHECK_latest.json · log 落盤 · 帳 1 行 · {'rc': 0, 'lamp': 'GREEN'}
+  [OK] ⓗ 子行程跑完:rc 0 但引擎自報 YELLOW(收據 lamp)→ 步 YELLOW · 整件 YELLOW(不假綠)· 收據 CHECK_latest.json · log 落盤 · 帳 1 行 · {'rc': 0, 'lamp': 'YELLOW'}
+  [OK] ⓗ2 自測類無收據:stdout [PASS] → GREEN
   [OK] ⓘ 引擎不在(矩陣未放入夾具)→ 202 後步 rc 127 · 整件 RED(不假綠)
   [OK] ⓘ(補判)引擎不在 → rc 127 · RED
   [OK] ⓙ /preview:jsonl 2 列 · csv 1 列 · 欄 ts/id/n · 建議主鍵 ts,id · 表名由檔名
-  [OK] ⓚ /ingest VCGC:3 列入湖 · 視圖 v_ledger · 視圖列 3 · {'table': 'ledger', 'added': 3, 'skipped': 0, 'file': 'ledger/part-20261110T025612710719Z-542cca88.parquet', 'at': '2026-11-10T02:56:12.710719Z'}
+  [OK] ⓚ /ingest VCGC:3 列入湖 · 視圖 v_ledger · 視圖列 3 · {'table': 'ledger', 'added': 3, 'skipped': 0, 'file': 'ledger/part-20261110T031812109819Z-db8bd7b5.parquet', 'at': '2026-11-10T03:18:12.109819Z'}
   [OK] ⓛ 同檔再入 → 增量 0 新入 3 跳過
   [OK] ⓜ 他系統(VDF)入湖 → 不代寫:落 _inbox/VDF 2 檔 + 清單 · VDF 湖夾不建
+  [OK] ⓜ2 同名不同夾(a/data.csv · b/data.csv)+ 同檔再送 → 三個不同目的檔 · 全都在 · 不覆蓋(xb) · ['_inbox/VQG/20261110T031812757643Z-1f736a4e-a_data.csv', '_inbox/VQG/20261110T031812757869Z-736551ce-b_data.csv', '_inbox/VQG/20261110T031812758012Z-1f736a4e-a_data.csv']
   [OK] ⓝ /files 白名單:收據可讀 · .. 擋 400 · 越夾 404
   [OK] ⓞ 入湖後燈:VCGC 湖 GREEN(1 表)
   [OK] ⓟ CONSOLE_latest.json 落檔 · url 只在 127.0.0.1
   [OK] ⓠ 邊界:只綁 127.0.0.1 · 不直連外(無 requests / socket 匯入)· 子行程只跑白名單引擎(sys.executable + 倉內尾版 · 無 shell)
-[PASS] VIA_LakeConsole v0100 selftest · 17/17
-  [同步] SDD 驗證 RED:X-COL VDF-WKF016 欄位不齊:tests, tests.self, tests.cross, tests.real, VDF-WKF016-STP001.ve | X-COL VDF-WKF017 欄位不齊:tests, tests.self, tests.cross, tests.real, VDF-WKF017-STP001.ve | X-COL VRN-WKF010 欄位不齊:tests, tests.self, tests.cross, tests.real, VRN-WKF010-STP001.ve | X-REG 未註冊 ['VIA_LakeConsole_v0100.py'] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_LibsInv → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 38, 'changed': 11, 'stale': 0, 'expected': 21004, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 6089 · 觸碰 run --family · 交接閘 RED · 落後 464 提交 · 快照 917.7h · 未登 2371 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[PASS] VIA_LakeConsole v0100 selftest · 19/19
+  [同步] SDD 驗證 RED:X-COL VDF-WKF016 欄位不齊:tests, tests.self, tests.cross, tests.real, VDF-WKF016-STP001.ve | X-COL VDF-WKF017 欄位不齊:tests, tests.self, tests.cross, tests.real, VDF-WKF017-STP001.ve | X-COL VRN-WKF010 欄位不齊:tests, tests.self, tests.cross, tests.real, VRN-WKF010-STP001.ve | X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_LibsInventory_v0100.py(冊上 VIA_Lib → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 1, 'changed': 62, 'stale': 0, 'expected': 21006, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 6089 · 觸碰 run --family · 交接閘 RED · 落後 469 提交 · 快照 918.1h · 未登 2371 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

@@ -32,18 +32,17 @@
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · VIA_ParquetLake_v0100.py(家族 core)
-  [OK] ⓐ 首次 append 3 列 · 巢狀欄轉 JSON 字串 · 分片 + manifest + 管家 duckdb 都在 · {'table': 'prices', 'added': 3, 'skipped': 0, 'file': 'prices/part-20261110T025632802456Z-391e6439.parquet', 'at': '2026-11-10T02:56:32.802456Z'}
-  [OK] ⓑ 增量:同主鍵 1 列跳過 · 新 1 列入 · manifest 2 行 · {'table': 'prices', 'added': 1, 'skipped': 1, 'file': 'prices/part-20261110T025633049106Z-e39aa629.parquet', 'at': '2026-11-10T02:56:33.049106Z'}
+  [OK] ⓐ 首次 append 3 列 · 巢狀欄轉 JSON 字串 · 分片 + manifest + 管家 duckdb 都在 · {'table': 'prices', 'added': 3, 'skipped': 0, 'file': 'prices/part-20261110T031749627289Z-6e1ef6a2.parquet', 'at': '2026-11-10T03:17:49.627289Z'}
+  [OK] ⓑ 增量:同主鍵 1 列跳過 · 新 1 列入 · manifest 2 行 · {'table': 'prices', 'added': 1, 'skipped': 1, 'file': 'prices/part-20261110T031749873387Z-10ebcb83.parquet', 'at': '2026-11-10T03:17:49.873387Z'}
   [OK] ⓒ dedupe=False 允許覆寫分片 · VIEW 主鍵去重最新勝(2330/11-08 = 1012;微秒戳 + 檔名次序 · 同一秒也分先後)· 原始列 5 · 視圖列 4 · [('2317', '2026-11-08', 200.5), ('2330', '2026-11-07', 1000.0), ('2330', '2026-11-08', 1012.0), ('2330', '2026-11-09', 1020.0)]
-  [OK] ⓓ status:表 prices · parts 3 · rows_raw 5 · rows_view 4 · keys · first/last ingest · bytes > 0 · view 名 · {'table': 'prices', 'parts': 3, 'rows_raw': 5, 'rows_view': 4, 'cols': 5, 'first_ingest': '2026-11-10T02:56:32.802456Z', 'last_ingest': '2026-11-10T02:56:33.104938Z', 'bytes': 4544, 'view': 'v_prices'}
+  [OK] ⓓ status:表 prices · parts 3 · rows_raw 5 · rows_view 4 · keys · first/last ingest · bytes > 0 · view 名 · {'table': 'prices', 'parts': 3, 'rows_raw': 5, 'rows_view': 4, 'cols': 5, 'first_ingest': '2026-11-10T03:17:49.627289Z', 'last_ingest': '2026-11-10T03:17:49.913683Z', 'bytes': 4544, 'view': 'v_prices'}
   [OK] ⓔ 空批不落檔 · 回 added 0
   [OK] ⓕ 表名 / 欄名消毒(a b-c → a_b_c · 數字開頭加 t_)
   [OK] ⓖ 另一系統另一夾 · 互不可見(VQG 0 表 · VDF 1 表)
   [OK] ⓗ 非五系統名拒絕 · 連字號正規化 VRN-2 → VRN2
   [OK] ⓘ 沒有湖:status exists False · 0 表 · 不炸
-  [OK] ⓚ 來源混型(jsonl 的 3 vs csv 的 '3' · 巢狀欄)仍入同一表 · 跨分片升 VARCHAR · 視圖可讀 2 列 · ([('a', '1', 1.5, 'true', None), ('b', '3', 2.0, 'yes', '{"k": 1}')], ['VARCHAR', 'VARCHAR', 'DOUBLE', 'VARCHAR', 'VARCHAR', 'VARCHAR'])
   [OK] ⓙ 邊界:不開網路 / 不開子行程 / 不寫冊
-[PASS] VIA_ParquetLake v0100 selftest · 11/11
-  [同步] SDD 驗證 RED:X-COL VDF-WKF016 欄位不齊:tests, tests.self, tests.cross, tests.real, VDF-WKF016-STP001.ve | X-COL VDF-WKF017 欄位不齊:tests, tests.self, tests.cross, tests.real, VDF-WKF017-STP001.ve | X-COL VRN-WKF010 欄位不齊:tests, tests.self, tests.cross, tests.real, VRN-WKF010-STP001.ve | X-REG 未註冊 ['VIA_LakeConsole_v0100.py'] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_SkillEx → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 38, 'changed': 11, 'stale': 0, 'expected': 21004, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 6089 · 觸碰 run --family · 交接閘 RED · 落後 464 提交 · 快照 917.7h · 未登 2371 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[PASS] VIA_ParquetLake v0100 selftest · 10/10
+  [同步] SDD 驗證 RED:X-COL VDF-WKF016 欄位不齊:tests, tests.self, tests.cross, tests.real, VDF-WKF016-STP001.ve | X-COL VDF-WKF017 欄位不齊:tests, tests.self, tests.cross, tests.real, VDF-WKF017-STP001.ve | X-COL VRN-WKF010 欄位不齊:tests, tests.self, tests.cross, tests.real, VRN-WKF010-STP001.ve | X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_SkillExport_v0100.py(冊上 VIA_Skill → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 1, 'changed': 62, 'stale': 0, 'expected': 21006, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 6089 · 觸碰 run --family · 交接閘 RED · 落後 469 提交 · 快照 918.1h · 未登 2371 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
