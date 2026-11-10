@@ -1,0 +1,136 @@
+{
+  "schema": "VIA.MCPCandidateDescriptor.v0105",
+  "candidate_id": "VIA-MCP-GOVERNANCE-CANDIDATE-v0105",
+  "name": "VIA Governance MCP local candidate adapter",
+  "version": "0.1.5",
+  "transport": "stdio",
+  "protocol": {
+    "jsonrpc": "2.0",
+    "protocol_version": "2025-06-18",
+    "wire_format": "UTF-8 newline-delimited JSON-RPC 2.0",
+    "stdout": "MCP responses only",
+    "stderr": "diagnostic logs only",
+    "batch": false,
+    "latest_alias_supported": false,
+    "full_conformance": false,
+    "http": false,
+    "oauth": false,
+    "sampling": false,
+    "resources": false,
+    "prompts": false
+  },
+  "registration": {
+    "candidate_only": true,
+    "registration_performed": false,
+    "manus_connector_installed": false,
+    "vcgc_host_or_client_registered": false,
+    "formal_status": "REQUIRES_REAL_ENDPOINT_AND_OWNER_APPROVAL"
+  },
+  "source_policy": {
+    "inventory_path": "data/governance_inventory_v0105.json",
+    "inventory_access": "fixed relative path under caller package_root; caller inventory_sha required",
+    "token_engine_path": "engines/tooling/via_agent_os_unified_readonly_hardened.py",
+    "token_engine_sha256": "ca3c38ee00d2d7df5af71bcaea59ab7e7c73a15ec1d1f7b03218127efaf62af5",
+    "inventory_rows": "candidate/local static evidence, not live",
+    "arbitrary_paths": false,
+    "provider_calls": 0,
+    "repository_writes": false
+  },
+  "limits": {
+    "max_requests_per_process": 1000,
+    "max_line_bytes": 2097152,
+    "max_response_bytes": 4194304,
+    "inventory_max_rows": 50,
+    "token_input_max_bytes": 1048576,
+    "token_max_lines": 400
+  },
+  "tools": [
+    {
+      "name": "via_status",
+      "purpose": "Return static candidate status and protocol limitations.",
+      "input": {
+        "type": "object",
+        "required": [],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "fields": ["status", "registration_status", "formal_status", "transport", "protocol_version", "limitations"]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "idempotentHint": true
+      }
+    },
+    {
+      "name": "via_inventory_query",
+      "purpose": "Query only the fixed governance inventory after SHA-256 verification.",
+      "input": {
+        "type": "object",
+        "required": ["package_root", "inventory_sha"],
+        "properties": {
+          "package_root": {"type": "string", "absolute": true},
+          "inventory_sha": {"type": "string", "format": "sha256-lowercase"},
+          "query": {"type": "string", "default": null},
+          "filters": {
+            "type": "object",
+            "properties": {
+              "status": {"type": "string"},
+              "system": {"type": "string"},
+              "kind": {"type": "string"},
+              "classification": {"type": "string"},
+              "source": {"type": "string"}
+            },
+            "additionalProperties": false
+          },
+          "offset": {"type": "integer", "minimum": 0, "default": 0},
+          "limit": {"type": "integer", "minimum": 1, "maximum": 50, "default": 50}
+        },
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "fields": ["source", "source_sha256", "evidence_scope", "total_matching", "offset", "limit", "returned", "has_more", "rows"],
+        "row_cap": 50,
+        "source_path_policy": "portable relative paths only"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "idempotentHint": true
+      }
+    },
+    {
+      "name": "via_token_prepare",
+      "purpose": "Run the pinned local TokenEngine on caller-supplied text through a subprocess.",
+      "input": {
+        "type": "object",
+        "required": ["text"],
+        "properties": {
+          "text": {"type": "string", "max_bytes": 1048576, "source": "caller input only"},
+          "allow_lossy": {"type": "boolean", "default": false},
+          "query": {"type": "string", "default": null},
+          "max_lines": {"type": "integer", "minimum": 1, "maximum": 400, "default": 120}
+        },
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "fields": ["prepared_text", "chars_before", "chars_after", "tokens_before_est", "tokens_after_est", "source_hash", "measurement", "redaction_note", "risk_note"],
+        "content_persisted": false,
+        "provider_billing": false,
+        "risk": "TokenEngine original redaction is partial; caller must provide non-sensitive data."
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "idempotentHint": true
+      }
+    }
+  ]
+}

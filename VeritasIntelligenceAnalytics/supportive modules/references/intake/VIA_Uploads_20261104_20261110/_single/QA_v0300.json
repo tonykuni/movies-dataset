@@ -1,0 +1,92 @@
+{
+  "engine_id": "VIA-NON-STOCK-SUMMARIZER-INTEGRATED-001",
+  "version": "v0300",
+  "gate": "PASS",
+  "compile": "PASS",
+  "selftest": "5/5 PASS",
+  "network_allowed": false,
+  "source_mutation": false,
+  "reused_vrn2": {
+    "layout": "VRN_M03_PDF_Layout_JSON_v3",
+    "text_repair": "VRN_MDL003_TableRestorer.TextRepairEngine",
+    "nlp": "VRN_M07_Summarizer.extractive_summary_fallback"
+  },
+  "real_test": {
+    "files": 6,
+    "all_pass": true,
+    "runs": [
+      {
+        "file": "20260916兆豐台灣產業專題-AI末日論？假的.pdf",
+        "status": "PASS",
+        "report_id": "RPT-66DC802E",
+        "topics": 15,
+        "companies": 3,
+        "evidence": 97,
+        "backend": "VRN2_M03_LAYOUT+MDL003_REPAIR"
+      },
+      {
+        "file": "20260916兆豐台灣產業專題-航太產業.pdf",
+        "status": "PASS",
+        "report_id": "RPT-802B75E7",
+        "topics": 19,
+        "companies": 6,
+        "evidence": 117,
+        "backend": "VRN2_M03_LAYOUT+MDL003_REPAIR"
+      },
+      {
+        "file": "20251205兆豐晨會報告(二)-公司訪談摘要.pdf",
+        "status": "PASS",
+        "report_id": "RPT-2B746DCD",
+        "topics": 6,
+        "companies": 5,
+        "evidence": 63,
+        "backend": "VRN2_M03_LAYOUT+MDL003_REPAIR"
+      },
+      {
+        "file": "20251208_台新台股盤勢分析.pdf",
+        "status": "PASS",
+        "report_id": "RPT-5D370F3F",
+        "topics": 13,
+        "companies": 16,
+        "evidence": 64,
+        "backend": "VRN2_M03_LAYOUT+MDL003_REPAIR"
+      },
+      {
+        "file": "【中信｜債券ETF周報】油價攀升壓抑債市，利率高檔震盪_CTBC260915.pdf",
+        "status": "PASS",
+        "report_id": "RPT-7FAF513D",
+        "topics": 32,
+        "companies": 0,
+        "evidence": 107,
+        "backend": "VRN2_M03_LAYOUT+MDL003_REPAIR"
+      },
+      {
+        "file": "TEST MESSAGE.txt",
+        "status": "PASS",
+        "report_id": "RPT-C81A858C",
+        "topics": 58,
+        "companies": 33,
+        "evidence": 2068,
+        "backend": "text"
+      }
+    ]
+  },
+  "dataframes": {
+    "report_rows": 6,
+    "topic_rows": 143,
+    "company_rows": 63,
+    "evidence_rows": 2516
+  },
+  "checks": {
+    "one_report_one_row": true,
+    "pdf_backend_is_vrn2": true,
+    "messenger_source_multi": true,
+    "ai_report_four_points": true
+  },
+  "known_limits": [
+    "This environment cannot directly read the user Windows path C:\\測試樣本報告; v0300 was regression-tested against six samples already available in this conversation/container.",
+    "Image-only JPG/PNG is not included in this v0300 regression; VRN_M03 contains a PaddleOCR hook but local model availability must be verified on the workstation.",
+    "VRN_M07 is deliberately used only through its extractive local path; transformer model auto-download is not used.",
+    "Full Story/Industry SSOT mapping remains append-only and should be supplied by the existing VIA/VRN registry on the workstation."
+  ]
+}

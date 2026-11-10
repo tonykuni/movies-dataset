@@ -1,0 +1,90 @@
+{
+  "schema": "VIA.SixSystemIntegrationTestMatrix.v1",
+  "generated_at_local": "2026-11-05T19:40:00+08:00",
+  "status": "BLOCKED_FOR_LIVE_INTEGRATION",
+  "visual_lock": {
+    "header": "VIA · ARCHITECTURE BASELINE · 2026-11-05 · ENGINE v0103",
+    "title": "VIA System Architecture & Integration Blueprint",
+    "badge": "ENG049 v0102 VISUAL LOCK",
+    "palette_source": "VRN_ENG049_ContentReconcile_v0102.py",
+    "colors_ordered": ["#f2f1ec", "#33403f", "#dcdad3", "#1b1a17", "#6b6860", "#3d7a52", "#fff", "#dbd9d3", "#ebe9e3", "#e6efec", "#2c4f4a", "#f2ecdd", "#6f5c31", "#f3e7e6", "#9e2b25"],
+    "font_sizes": {"title": "19px", "body": "11px", "base": "clamp(9.5px,1.05vw,11px)", "numeric": "9.5px", "label": "9px", "status": "8px"},
+    "font_families": {"cjk_body": "Microsoft JhengHei, Segoe UI, sans-serif", "display": "Cormorant Garamond, Georgia, serif", "monospace": "Consolas, monospace"}
+  },
+  "environment": {
+    "current": "Linux Manus Sandbox",
+    "tony_nb": "UNAVAILABLE / target_unavailable",
+    "local_vcgc_reachable": false,
+    "live_vcgc_calls": 0,
+    "windows_tests": "NOT_RUN",
+    "network_or_database_calls": 0,
+    "writes_to_vcgc_windows_github_ssot": false
+  },
+  "offline_test_evidence": {
+    "governance_schema_pack": {"status": "PASS", "count": 26},
+    "governance_valid_synthetic_bundle": {"status": "PASS", "count": 1},
+    "governance_invalid_synthetic_fixtures": {"status": "PASS_EXPECTED_REJECTION", "passed": 7, "total": 7},
+    "governance_unittest": {"status": "PASS", "passed": 15, "total": 15},
+    "error_catalog": {"status": "PASS", "count": 28, "matches_validator_source": true},
+    "six_system_static_contract_unittest": {"status": "PASS", "passed": 18, "total": 18, "activation": "OFF"},
+    "vap_v027_isolated_unittest": {"status": "PASS", "passed": 18, "total": 18},
+    "vap_node_core_test": "PASS",
+    "vap_vdf_manifest_readonly": "PASS",
+    "vap_javascript_syntax": {"status": "PASS", "checked": 7},
+    "atlas_blueprint_v0103_existing_browser_uat": {"status": "PASS", "passed": 29, "total": 29, "external_requests": 0, "page_errors": 0, "scope": "offline standalone UI; not system runtime"},
+    "vap_browser_uat": {"status": "NOT_RUN", "reason": "Node Playwright absent; no dependency installation"},
+    "vap_zip_verifier": {"status": "FORMAT_MISMATCH", "crc": "PASS", "path_safety": "PASS", "reason": "Required central ui/VIA-UI-Standalone-NoServer.html package root is absent"}
+  },
+  "contracts": {"total": 15, "enabled_true": 0, "enabled_false": 15, "activation_allowed": false},
+  "systems": [
+    {
+      "id": "VCGC",
+      "status": "RED/BLOCKED",
+      "subtest_status": "GRAY/NOT_RUN",
+      "evidence": ["Tony-NB unavailable; no reachable local VCGC coordinator or checkout.", "Candidate registry is not registered; registration/login times are null.", "EnvManager freeze-lock hash and source/target paths were previously identified as stale; do not change the authoritative installer engine or existing lock."],
+      "test_gates": ["Verify exact local VCGC root, owner, current commit, engine version and SHA read-only.", "Use only the VCGC engine's owner-documented inventory/dry-run interface after confirming its side effects; no guessed CLI.", "Isolated copy + approved plan + explicit owner approval before any apply."],
+      "stop_conditions": ["Tony-NB/root/engine/owner unknown", "stale or mismatched hash/path/lock", "inventory or plan writes not isolated", "any SSOT write, VRN issuance, or unapproved activation"]
+    },
+    {
+      "id": "VDF",
+      "status": "RED/BLOCKED",
+      "subtest_status": "GRAY/NOT_RUN",
+      "evidence": ["Canonical status CONFLICT; manifest-declared intake path returned 404 in pinned audit.", "Version and copy drift; some outbound requests remain; workstation-specific DB home."],
+      "test_gates": ["Owner-approved canonical root/version/commit/path/blob SHA and per-system dependency lock.", "Synthetic ingestion/schema/lineage checks in an isolated copy.", "Only after owner approval, immutable versioned artifact handoff with source before/after hash."],
+      "stop_conditions": ["404 path or unresolved source copy/version conflict", "live-source/DB write, unapproved network or enabled=false contract", "hash or rollback mismatch"]
+    },
+    {
+      "id": "VRN",
+      "status": "RED/BLOCKED",
+      "subtest_status": "GRAY/NOT_RUN",
+      "evidence": ["Canonical status CONFLICT; OneDrive/functional modules/tmp/home paths and runtime versions disagree.", "Parquet/DuckDB direction conflict; v0178 desktop acceptance not run."],
+      "test_gates": ["Owner-approved canonical root, version, dependency lock and data direction.", "Isolated synthetic extraction/report test; verify output containment and rollback.", "Read-only hash-pinned handoff only after VDF/Database/VQG owners approve."],
+      "stop_conditions": ["path/version/data direction unresolved", "output outside VRN-owned scratch", "database write or contract activation"]
+    },
+    {
+      "id": "VQG",
+      "status": "RED/BLOCKED",
+      "subtest_status": "GRAY/NOT_RUN",
+      "evidence": ["Owner and canonical root UNKNOWN; QuantGuard remains intake under VDF references.", "VCGC source binding and real VDF-owned DB read-only test absent; Polars declarations conflict."],
+      "test_gates": ["Owner confirms independent VQG identity/root and pinned version/lock.", "Synthetic gates in isolated runtime; input only VDF immutable artifact or Database vdf_certified_read.", "Owner-approved read-only canary with before/after source hashes equal; no writeback."],
+      "stop_conditions": ["VQG ownership/source binding unknown", "input outside VDF/Database allowlist or namespace", "any VDF/DB/VCGC write or unresolved lock"]
+    },
+    {
+      "id": "VAP",
+      "status": "RED/BLOCKED",
+      "subtest_status": "PARTIAL_GREEN_WITH_BROWSER_GRAY",
+      "evidence": ["VAP v027 archive CRC/path safety and internal 30/30 file hashes passed.", "Isolated Python tests 18/18, Node core test, VDF manifest read-only and 7 JS syntax checks passed.", "Playwright browser UAT not run; canonical manifest/engine path and version conflict remains."],
+      "test_gates": ["Resolve canonical path/version, owner and exact dependency lock.", "Run browser UAT only in approved isolated package/runtime; do not install browser dependencies automatically.", "Read-only source artifacts in; output only in VAP-owned scratch."],
+      "stop_conditions": ["manifest/path/hash drift", "Playwright not available but UAT claimed PASS", "network request or upstream write", "output outside VAP-owned directory"]
+    },
+    {
+      "id": "Database",
+      "status": "RED/BLOCKED",
+      "subtest_status": "GRAY/NOT_RUN",
+      "evidence": ["Owner/canonical root/schema version UNKNOWN; migration/rollback contract absent.", "VDF datasets, VRN reports, VAP cache and VQG derived data are distinct owners/namespaces."],
+      "test_gates": ["Owner assigns canonical instance/schema/namespaces and least-privilege grants.", "Synthetic/isolated backup and read-only view tests; no DDL or live writes.", "Owner-approved VDF snapshot read-only canary with before/after hashes and rollback evidence."],
+      "stop_conditions": ["owner/grants/schema/backup/rollback unknown", "write permission or namespace leak", "hash mismatch or contract activation"]
+    }
+  ],
+  "release_gate": {"state": "BLOCKED", "activation_allowed": false, "required": ["Tony-NB reachable", "owner-approved canonical roots and commits for all six systems", "per-system dependency locks", "DB owner/schema/grants/backup/rollback", "isolated start-stop/failure/checkpoint-resume/rollback receipts", "Windows UAT", "read-only canary with hash pins and unchanged upstream hashes", "exact command/exit/hash/changed-file receipts"]}
+}

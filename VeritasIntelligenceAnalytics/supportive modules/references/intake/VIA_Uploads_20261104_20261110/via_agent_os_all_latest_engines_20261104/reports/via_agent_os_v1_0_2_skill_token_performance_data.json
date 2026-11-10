@@ -1,0 +1,331 @@
+{
+  "schema": "VIA_SKILL_TOKEN_PERFORMANCE_VISUALIZATION/1.0",
+  "version": "1.0.2",
+  "generated_at": "2026-11-04T13:31:45+08:00",
+  "source_sha256": "ca3c38ee00d2d7df5af71bcaea59ab7e7c73a15ec1d1f7b03218127efaf62af5",
+  "test_status": {
+    "selftests": 48,
+    "skill_acceptance": 27,
+    "remote_preflight_offline_tests": 20
+  },
+  "skills": [
+    {
+      "skill_id": "via-planner",
+      "cases_passed": 2,
+      "cases_total": 2,
+      "status": "PASS",
+      "measured_token_savings": null,
+      "measured_usage_rows": 0,
+      "token_savings_status": "NO_PAIRED_PROVIDER_USAGE"
+    },
+    {
+      "skill_id": "via-architect",
+      "cases_passed": 3,
+      "cases_total": 3,
+      "status": "PASS",
+      "measured_token_savings": null,
+      "measured_usage_rows": 0,
+      "token_savings_status": "NO_PAIRED_PROVIDER_USAGE"
+    },
+    {
+      "skill_id": "via-decision-log",
+      "cases_passed": 2,
+      "cases_total": 2,
+      "status": "PASS",
+      "measured_token_savings": null,
+      "measured_usage_rows": 0,
+      "token_savings_status": "NO_PAIRED_PROVIDER_USAGE"
+    },
+    {
+      "skill_id": "via-factor-builder",
+      "cases_passed": 2,
+      "cases_total": 2,
+      "status": "PASS",
+      "measured_token_savings": null,
+      "measured_usage_rows": 0,
+      "token_savings_status": "NO_PAIRED_PROVIDER_USAGE"
+    },
+    {
+      "skill_id": "via-factor-validator",
+      "cases_passed": 5,
+      "cases_total": 5,
+      "status": "PASS",
+      "measured_token_savings": null,
+      "measured_usage_rows": 0,
+      "token_savings_status": "NO_PAIRED_PROVIDER_USAGE"
+    },
+    {
+      "skill_id": "via-strategy-builder",
+      "cases_passed": 3,
+      "cases_total": 3,
+      "status": "PASS",
+      "measured_token_savings": null,
+      "measured_usage_rows": 0,
+      "token_savings_status": "NO_PAIRED_PROVIDER_USAGE"
+    },
+    {
+      "skill_id": "via-code-review",
+      "cases_passed": 3,
+      "cases_total": 3,
+      "status": "PASS",
+      "measured_token_savings": null,
+      "measured_usage_rows": 0,
+      "token_savings_status": "NO_PAIRED_PROVIDER_USAGE"
+    },
+    {
+      "skill_id": "via-memory-manager",
+      "cases_passed": 7,
+      "cases_total": 7,
+      "status": "PASS",
+      "measured_token_savings": null,
+      "measured_usage_rows": 0,
+      "token_savings_status": "NO_PAIRED_PROVIDER_USAGE"
+    }
+  ],
+  "token_fixtures": [
+    {
+      "fixture_id": "json_lossless_compaction",
+      "scope": "SYNTHETIC_TEST_ONLY",
+      "mode": "json_lossless_semantic_compact",
+      "lossy": false,
+      "before_chars": 171,
+      "after_chars": 107,
+      "before_tokens_est": 43,
+      "after_tokens_est": 27,
+      "saved_tokens_est": 16,
+      "saving_percent_est": 37.21,
+      "semantic_roundtrip": true
+    },
+    {
+      "fixture_id": "plain_text_safe_passthrough",
+      "scope": "SYNTHETIC_TEST_ONLY",
+      "mode": "passthrough",
+      "lossy": false,
+      "before_chars": 11999,
+      "after_chars": 11999,
+      "before_tokens_est": 3000,
+      "after_tokens_est": 3000,
+      "saved_tokens_est": 0,
+      "saving_percent_est": 0.0,
+      "semantic_roundtrip": null
+    },
+    {
+      "fixture_id": "query_extraction_lossy_opt_in",
+      "scope": "SYNTHETIC_TEST_ONLY",
+      "mode": "query_line_extraction",
+      "lossy": true,
+      "before_chars": 25247,
+      "after_chars": 1510,
+      "before_tokens_est": 6312,
+      "after_tokens_est": 378,
+      "saved_tokens_est": 5934,
+      "saving_percent_est": 94.01,
+      "semantic_roundtrip": null
+    }
+  ],
+  "performance": {
+    "run_count": 3,
+    "aggregation": "median across three independent runs of per-run medians",
+    "measurements": {
+      "estimate_ascii_1m": {
+        "before_median_ms": 121.212,
+        "after_median_ms": 0.0,
+        "improvement_percent": null,
+        "improvement_note": "below_timer_resolution; percentage_not_reported",
+        "output_equal": true
+      },
+      "estimate_cjk_125k": {
+        "before_median_ms": 15.721,
+        "after_median_ms": 16.364,
+        "improvement_percent": -4.090070606195539,
+        "improvement_note": null,
+        "output_equal": true
+      },
+      "token_prepare_ascii_1m": {
+        "before_median_ms": 331.553,
+        "after_median_ms": 76.269,
+        "improvement_percent": 76.99643797522567,
+        "improvement_note": null,
+        "output_equal": true
+      },
+      "scan_source_800_functions": {
+        "before_median_ms": 161.928,
+        "after_median_ms": 115.37,
+        "improvement_percent": 28.75228496615779,
+        "improvement_note": null,
+        "output_equal": true
+      },
+      "read_metric_log_10000_rows": {
+        "before_median_ms": 157.854,
+        "after_median_ms": 145.501,
+        "improvement_percent": 7.825585667768956,
+        "improvement_note": null,
+        "output_equal": true
+      },
+      "topology_wide_15000": {
+        "before_median_ms": 43.653,
+        "after_median_ms": 25.798,
+        "improvement_percent": 40.902114402217485,
+        "improvement_note": null,
+        "output_equal": true
+      }
+    }
+  },
+  "same_input_tracemalloc": {
+    "estimate_ascii_1m": {
+      "before_peak_bytes": 112,
+      "after_peak_bytes": 64,
+      "reduction_percent": 42.857142857142854
+    },
+    "estimate_cjk_125k": {
+      "before_peak_bytes": 232,
+      "after_peak_bytes": 232,
+      "reduction_percent": 0.0
+    },
+    "token_prepare_ascii_1m": {
+      "before_peak_bytes": 1001443,
+      "after_peak_bytes": 1001411,
+      "reduction_percent": 0.003195389053595661
+    },
+    "scan_source_800_functions": {
+      "before_peak_bytes": 11469799,
+      "after_peak_bytes": 11469815,
+      "reduction_percent": -0.00013949677758084514
+    },
+    "read_metric_log_10000_rows": {
+      "before_peak_bytes": 29946564,
+      "after_peak_bytes": 5629601,
+      "reduction_percent": 81.20117887314218
+    },
+    "topology_wide_15000": {
+      "before_peak_bytes": 2371872,
+      "after_peak_bytes": 2371528,
+      "reduction_percent": 0.014503312151751865
+    }
+  },
+  "current_profile": [
+    {
+      "name": "selftest_current",
+      "repeats": 5,
+      "median_ms": 50.19,
+      "min_ms": 49.761,
+      "max_ms": 62.638,
+      "tracemalloc_current_bytes": 84720,
+      "tracemalloc_peak_bytes": 3557425,
+      "result_summary": true
+    },
+    {
+      "name": "skill_acceptance_27_cases",
+      "repeats": 7,
+      "median_ms": 4.513,
+      "min_ms": 4.452,
+      "max_ms": 5.121,
+      "tracemalloc_current_bytes": 5085,
+      "tracemalloc_peak_bytes": 141035,
+      "result_summary": 27
+    },
+    {
+      "name": "token_fixture_benchmarks_3",
+      "repeats": 9,
+      "median_ms": 3.808,
+      "min_ms": 3.745,
+      "max_ms": 4.518,
+      "tracemalloc_current_bytes": 3322,
+      "tracemalloc_peak_bytes": 132630,
+      "result_summary": 3
+    },
+    {
+      "name": "estimate_tokens_ascii_1MB",
+      "repeats": 9,
+      "median_ms": 0.0,
+      "min_ms": 0.0,
+      "max_ms": 0.002,
+      "tracemalloc_current_bytes": 32,
+      "tracemalloc_peak_bytes": 64,
+      "result_summary": 250000
+    },
+    {
+      "name": "estimate_tokens_cjk_125k",
+      "repeats": 7,
+      "median_ms": 17.043,
+      "min_ms": 15.808,
+      "max_ms": 18.457,
+      "tracemalloc_current_bytes": 32,
+      "tracemalloc_peak_bytes": 232,
+      "result_summary": 187500
+    },
+    {
+      "name": "token_prepare_plain_text_1MB",
+      "repeats": 5,
+      "median_ms": 76.513,
+      "min_ms": 74.308,
+      "max_ms": 79.55,
+      "tracemalloc_current_bytes": 254,
+      "tracemalloc_peak_bytes": 1001007,
+      "result_summary": 250000
+    },
+    {
+      "name": "scan_source_current_py",
+      "repeats": 5,
+      "median_ms": 354.727,
+      "min_ms": 315.525,
+      "max_ms": 368.328,
+      "tracemalloc_current_bytes": 49969,
+      "tracemalloc_peak_bytes": 21792213,
+      "result_summary": "AST_OK"
+    },
+    {
+      "name": "scan_project_1_file_current",
+      "repeats": 5,
+      "median_ms": 326.033,
+      "min_ms": 320.237,
+      "max_ms": 349.442,
+      "tracemalloc_current_bytes": 43570,
+      "tracemalloc_peak_bytes": 23364938,
+      "result_summary": 1
+    },
+    {
+      "name": "read_metric_log_10000_rows_synthetic",
+      "repeats": 3,
+      "median_ms": 142.971,
+      "min_ms": 137.917,
+      "max_ms": 156.839,
+      "tracemalloc_current_bytes": 57308,
+      "tracemalloc_peak_bytes": 5630482,
+      "result_summary": 10000
+    },
+    {
+      "name": "dashboard_command_end_to_end_empty_metrics",
+      "repeats": 3,
+      "median_ms": 404.809,
+      "min_ms": 374.674,
+      "max_ms": 426.463,
+      "tracemalloc_current_bytes": 80923,
+      "tracemalloc_peak_bytes": 23440325,
+      "result_summary": 66921
+    }
+  ],
+  "preflight_boundaries": {
+    "offline_config_checks": [
+      "strict JSON/duplicate keys/size/depth/nodes",
+      "exact HTTPS endpoint host allowlist",
+      "OAuth issuer/resource and read-only scope subset",
+      "enabled=false, TLS verify true, redirects/write tools/private-network constraints",
+      "credential-like key names and placeholders rejected",
+      "data scope and exact unique read-only tool names",
+      "CA file path regular/non-symlink; certificate SHA-256 pin has 64-hex format"
+    ],
+    "offline_network_requests": 0,
+    "credential_values_sent": false,
+    "offline_certificate_limit": "offline validation does not parse or authenticate the live certificate chain; checks CA-file path and pin syntax only",
+    "tls_check": "opt-in DNS/TCP/TLS certificate and hostname verification; no HTTP/OAuth/MCP/tool call; network activity occurs",
+    "tools_json": "local exact tool-name comparison only; no tool call and no semantic read-only proof"
+  },
+  "limitations": [
+    "Synthetic token fixtures are not per-Skill savings and are not production/provider measurements.",
+    "Current data contains no actual provider usage or matched baseline/post pairs for any of the eight Skills.",
+    "The profile is not a full 1,500-file/128-MiB repository stress test.",
+    "tracemalloc peak is not process RSS/PSS.",
+    "ASCII microbenchmark after-time is below timer resolution; its speedup percentage is intentionally not reported."
+  ]
+}

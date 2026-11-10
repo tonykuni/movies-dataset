@@ -1,0 +1,684 @@
+{
+  "schema": "VIA_HARDENED_PROFILE/1.0",
+  "generated_at": "2026-11-04T13:13:10+08:00",
+  "source_path": "via_agent_os_unified_readonly_hardened.py",
+  "source_bytes": 266514,
+  "source_sha256": "ca3c38ee00d2d7df5af71bcaea59ab7e7c73a15ec1d1f7b03218127efaf62af5",
+  "unified_version": "1.0.2",
+  "measurement_type": "local synthetic benchmark; not production workload",
+  "python": "3.12.3",
+  "platform": "Linux-6.18.38+-x86_64-with-glibc2.39",
+  "limits": {
+    "MAX_SCAN_FILES": 1500,
+    "MAX_SCAN_DIRS": 10000,
+    "MAX_SOURCE_BYTES": 2097152,
+    "MAX_SCAN_TOTAL_SOURCE_BYTES": 134217728,
+    "MAX_AST_NODES": 50000,
+    "MAX_SDD_SCAN_NODES": 50000,
+    "MAX_SDD_SCAN_DEPTH": 64,
+    "MAX_SDD_LIST_ITEMS": 500,
+    "MAX_CONTEXT_BYTES": 8388608,
+    "MAX_METRICS_BYTES": 16777216,
+    "MAX_METRIC_EVENTS": 10000,
+    "MCP_MAX_LINE_BYTES": 1048576,
+    "MCP_MAX_OUTPUT_BYTES": 1048576,
+    "MCP_MAX_MESSAGES": 300,
+    "MCP_MAX_TOOL_CALLS": 30,
+    "MCP_MAX_RUNTIME_SECONDS": 300
+  },
+  "operations": [
+    {
+      "name": "selftest_current",
+      "repeats": 5,
+      "median_ms": 50.19,
+      "min_ms": 49.761,
+      "max_ms": 62.638,
+      "tracemalloc_current_bytes": 84720,
+      "tracemalloc_peak_bytes": 3557425,
+      "result_summary": true
+    },
+    {
+      "name": "skill_acceptance_27_cases",
+      "repeats": 7,
+      "median_ms": 4.513,
+      "min_ms": 4.452,
+      "max_ms": 5.121,
+      "tracemalloc_current_bytes": 5085,
+      "tracemalloc_peak_bytes": 141035,
+      "result_summary": 27
+    },
+    {
+      "name": "token_fixture_benchmarks_3",
+      "repeats": 9,
+      "median_ms": 3.808,
+      "min_ms": 3.745,
+      "max_ms": 4.518,
+      "tracemalloc_current_bytes": 3322,
+      "tracemalloc_peak_bytes": 132630,
+      "result_summary": 3
+    },
+    {
+      "name": "estimate_tokens_ascii_1MB",
+      "repeats": 9,
+      "median_ms": 0.0,
+      "min_ms": 0.0,
+      "max_ms": 0.002,
+      "tracemalloc_current_bytes": 32,
+      "tracemalloc_peak_bytes": 64,
+      "result_summary": 250000
+    },
+    {
+      "name": "estimate_tokens_cjk_125k",
+      "repeats": 7,
+      "median_ms": 17.043,
+      "min_ms": 15.808,
+      "max_ms": 18.457,
+      "tracemalloc_current_bytes": 32,
+      "tracemalloc_peak_bytes": 232,
+      "result_summary": 187500
+    },
+    {
+      "name": "token_prepare_plain_text_1MB",
+      "repeats": 5,
+      "median_ms": 76.513,
+      "min_ms": 74.308,
+      "max_ms": 79.55,
+      "tracemalloc_current_bytes": 254,
+      "tracemalloc_peak_bytes": 1001007,
+      "result_summary": 250000
+    },
+    {
+      "name": "scan_source_current_py",
+      "repeats": 5,
+      "median_ms": 354.727,
+      "min_ms": 315.525,
+      "max_ms": 368.328,
+      "tracemalloc_current_bytes": 49969,
+      "tracemalloc_peak_bytes": 21792213,
+      "result_summary": "AST_OK"
+    },
+    {
+      "name": "scan_project_1_file_current",
+      "repeats": 5,
+      "median_ms": 326.033,
+      "min_ms": 320.237,
+      "max_ms": 349.442,
+      "tracemalloc_current_bytes": 43570,
+      "tracemalloc_peak_bytes": 23364938,
+      "result_summary": 1
+    },
+    {
+      "name": "read_metric_log_10000_rows_synthetic",
+      "repeats": 3,
+      "median_ms": 142.971,
+      "min_ms": 137.917,
+      "max_ms": 156.839,
+      "tracemalloc_current_bytes": 57308,
+      "tracemalloc_peak_bytes": 5630482,
+      "result_summary": 10000
+    },
+    {
+      "name": "dashboard_command_end_to_end_empty_metrics",
+      "repeats": 3,
+      "median_ms": 404.809,
+      "min_ms": 374.674,
+      "max_ms": 426.463,
+      "tracemalloc_current_bytes": 80923,
+      "tracemalloc_peak_bytes": 23440325,
+      "result_summary": 66921
+    }
+  ],
+  "synthetic_metrics_file_bytes": 14730000,
+  "estimator_candidate_comparison": [
+    {
+      "fixture": "ascii_1m",
+      "characters": 1000000,
+      "loop_median_ms": 86.023,
+      "regex_finditer_median_ms": 3.27,
+      "outputs_equal": true
+    },
+    {
+      "fixture": "cjk_100k",
+      "characters": 125000,
+      "loop_median_ms": 15.452,
+      "regex_finditer_median_ms": 25.137,
+      "outputs_equal": true
+    }
+  ],
+  "comparison": {
+    "schema": "VIA_PERF_COMPARISON_ROLLUP/1.0",
+    "measurement_type": "same-process, same-fixture before/after; synthetic local only",
+    "run_count": 3,
+    "aggregation": "median of per-run medians; memory peaks also median across independent runs",
+    "optimized_source_bytes": 266514,
+    "optimized_source_sha256": "ca3c38ee00d2d7df5af71bcaea59ab7e7c73a15ec1d1f7b03218127efaf62af5",
+    "selftest_summary": {
+      "ok": true,
+      "base_tests_run": 28,
+      "integration_tests_run": 20,
+      "tests_run": 48,
+      "failures": 0,
+      "errors": 0,
+      "details": [],
+      "executed_at": "2026-11-04T05:10:30.485475+00:00",
+      "target_repo_writes": 0,
+      "data_fetch_started": false,
+      "processes_spawned": 0
+    },
+    "metrics_fixture_bytes": 14730000,
+    "comparisons": {
+      "estimate_ascii_1m": {
+        "input_chars": 1000000,
+        "output_equal": true,
+        "before": {
+          "median_ms": 121.212,
+          "traced_current_bytes": 32,
+          "traced_peak_bytes": 112,
+          "min_ms": 114.308,
+          "max_ms": 219.659
+        },
+        "after": {
+          "median_ms": 0.0,
+          "traced_current_bytes": 32,
+          "traced_peak_bytes": 64,
+          "min_ms": 0.0,
+          "max_ms": 0.003
+        }
+      },
+      "estimate_cjk_125k": {
+        "input_chars": 125000,
+        "output_equal": true,
+        "before": {
+          "median_ms": 15.721,
+          "traced_current_bytes": 32,
+          "traced_peak_bytes": 232,
+          "min_ms": 15.232,
+          "max_ms": 21.979
+        },
+        "after": {
+          "median_ms": 16.364,
+          "traced_current_bytes": 32,
+          "traced_peak_bytes": 232,
+          "min_ms": 15.629,
+          "max_ms": 32.316
+        }
+      },
+      "token_prepare_ascii_1m": {
+        "input_chars": 1000000,
+        "output_equal": true,
+        "before": {
+          "median_ms": 331.553,
+          "traced_current_bytes": 923,
+          "traced_peak_bytes": 1001443,
+          "min_ms": 307.635,
+          "max_ms": 507.327
+        },
+        "after": {
+          "median_ms": 76.269,
+          "traced_current_bytes": 891,
+          "traced_peak_bytes": 1001411,
+          "min_ms": 73.669,
+          "max_ms": 87.369
+        }
+      },
+      "scan_source_800_functions": {
+        "input_chars": 73555,
+        "node_limit": 50000,
+        "returned_symbols": 250,
+        "output_equal": true,
+        "before": {
+          "median_ms": 161.928,
+          "traced_current_bytes": 141971,
+          "traced_peak_bytes": 11469799,
+          "min_ms": 154.874,
+          "max_ms": 276.991
+        },
+        "after": {
+          "median_ms": 115.37,
+          "traced_current_bytes": 131555,
+          "traced_peak_bytes": 11469815,
+          "min_ms": 105.628,
+          "max_ms": 131.066
+        }
+      },
+      "read_metric_log_10000_rows": {
+        "returned_events": 10000,
+        "malformed": 0,
+        "output_equal": true,
+        "before": {
+          "median_ms": 157.854,
+          "traced_current_bytes": 5092586,
+          "traced_peak_bytes": 29946564,
+          "min_ms": 145.77,
+          "max_ms": 177.07
+        },
+        "after": {
+          "median_ms": 145.501,
+          "traced_current_bytes": 5091935,
+          "traced_peak_bytes": 5629601,
+          "min_ms": 136.436,
+          "max_ms": 163.019
+        }
+      },
+      "topology_wide_15000": {
+        "nodes": 15000,
+        "output_equal": true,
+        "before": {
+          "median_ms": 43.653,
+          "traced_current_bytes": 121544,
+          "traced_peak_bytes": 2371872,
+          "min_ms": 41.781,
+          "max_ms": 68.691
+        },
+        "after": {
+          "median_ms": 25.798,
+          "traced_current_bytes": 121784,
+          "traced_peak_bytes": 2371528,
+          "min_ms": 23.92,
+          "max_ms": 34.404
+        }
+      }
+    },
+    "raw_runs": [
+      {
+        "measurement_type": "same-process, same-fixture before/after; synthetic local only",
+        "comparisons": {
+          "estimate_ascii_1m": {
+            "input_chars": 1000000,
+            "before": {
+              "median_ms": 117.55,
+              "min_ms": 114.308,
+              "max_ms": 124.834,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 112
+            },
+            "after": {
+              "median_ms": 0.0,
+              "min_ms": 0.0,
+              "max_ms": 0.003,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 64
+            },
+            "output_equal": true
+          },
+          "estimate_cjk_125k": {
+            "input_chars": 125000,
+            "before": {
+              "median_ms": 15.482,
+              "min_ms": 15.232,
+              "max_ms": 21.979,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 232
+            },
+            "after": {
+              "median_ms": 24.12,
+              "min_ms": 18.356,
+              "max_ms": 32.316,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 232
+            },
+            "output_equal": true
+          },
+          "token_prepare_ascii_1m": {
+            "input_chars": 1000000,
+            "before": {
+              "median_ms": 331.553,
+              "min_ms": 310.442,
+              "max_ms": 507.327,
+              "traced_current_bytes": 876,
+              "traced_peak_bytes": 1001396
+            },
+            "after": {
+              "median_ms": 76.269,
+              "min_ms": 75.669,
+              "max_ms": 77.619,
+              "traced_current_bytes": 891,
+              "traced_peak_bytes": 1001411
+            },
+            "output_equal": true
+          },
+          "scan_source_800_functions": {
+            "input_chars": 73555,
+            "node_limit": 50000,
+            "returned_symbols": 250,
+            "before": {
+              "median_ms": 161.928,
+              "min_ms": 160.392,
+              "max_ms": 276.991,
+              "traced_current_bytes": 141944,
+              "traced_peak_bytes": 11469799
+            },
+            "after": {
+              "median_ms": 115.37,
+              "min_ms": 113.303,
+              "max_ms": 124.707,
+              "traced_current_bytes": 129558,
+              "traced_peak_bytes": 11469815
+            },
+            "output_equal": true
+          },
+          "read_metric_log_10000_rows": {
+            "returned_events": 10000,
+            "malformed": 0,
+            "before": {
+              "median_ms": 156.428,
+              "min_ms": 151.122,
+              "max_ms": 170.687,
+              "traced_current_bytes": 5091406,
+              "traced_peak_bytes": 29946564
+            },
+            "after": {
+              "median_ms": 145.501,
+              "min_ms": 136.7,
+              "max_ms": 163.019,
+              "traced_current_bytes": 5091935,
+              "traced_peak_bytes": 5629601
+            },
+            "output_equal": true
+          },
+          "topology_wide_15000": {
+            "nodes": 15000,
+            "before": {
+              "median_ms": 42.268,
+              "min_ms": 41.781,
+              "max_ms": 51.6,
+              "traced_current_bytes": 121544,
+              "traced_peak_bytes": 2371912
+            },
+            "after": {
+              "median_ms": 25.798,
+              "min_ms": 25.604,
+              "max_ms": 26.094,
+              "traced_current_bytes": 121784,
+              "traced_peak_bytes": 2371528
+            },
+            "output_equal": true
+          }
+        },
+        "metrics_fixture_bytes": 14730000,
+        "optimized_source_bytes": 266514,
+        "selftest_summary": {
+          "ok": true,
+          "base_tests_run": 28,
+          "integration_tests_run": 20,
+          "tests_run": 48,
+          "failures": 0,
+          "errors": 0,
+          "details": [],
+          "executed_at": "2026-11-04T05:06:32.210328+00:00",
+          "target_repo_writes": 0,
+          "data_fetch_started": false,
+          "processes_spawned": 0
+        }
+      },
+      {
+        "measurement_type": "same-process, same-fixture before/after; synthetic local only",
+        "comparisons": {
+          "estimate_ascii_1m": {
+            "input_chars": 1000000,
+            "before": {
+              "median_ms": 134.933,
+              "min_ms": 115.954,
+              "max_ms": 219.659,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 112
+            },
+            "after": {
+              "median_ms": 0.0,
+              "min_ms": 0.0,
+              "max_ms": 0.003,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 64
+            },
+            "output_equal": true
+          },
+          "estimate_cjk_125k": {
+            "input_chars": 125000,
+            "before": {
+              "median_ms": 15.809,
+              "min_ms": 15.262,
+              "max_ms": 17.736,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 232
+            },
+            "after": {
+              "median_ms": 16.364,
+              "min_ms": 16.106,
+              "max_ms": 17.574,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 232
+            },
+            "output_equal": true
+          },
+          "token_prepare_ascii_1m": {
+            "input_chars": 1000000,
+            "before": {
+              "median_ms": 360.476,
+              "min_ms": 328.729,
+              "max_ms": 486.751,
+              "traced_current_bytes": 923,
+              "traced_peak_bytes": 1001443
+            },
+            "after": {
+              "median_ms": 77.377,
+              "min_ms": 75.488,
+              "max_ms": 87.369,
+              "traced_current_bytes": 891,
+              "traced_peak_bytes": 1001411
+            },
+            "output_equal": true
+          },
+          "scan_source_800_functions": {
+            "input_chars": 73555,
+            "node_limit": 50000,
+            "returned_symbols": 250,
+            "before": {
+              "median_ms": 169.423,
+              "min_ms": 161.776,
+              "max_ms": 193.64,
+              "traced_current_bytes": 142301,
+              "traced_peak_bytes": 11469799
+            },
+            "after": {
+              "median_ms": 115.965,
+              "min_ms": 112.357,
+              "max_ms": 128.929,
+              "traced_current_bytes": 138937,
+              "traced_peak_bytes": 11469815
+            },
+            "output_equal": true
+          },
+          "read_metric_log_10000_rows": {
+            "returned_events": 10000,
+            "malformed": 0,
+            "before": {
+              "median_ms": 157.854,
+              "min_ms": 145.77,
+              "max_ms": 167.096,
+              "traced_current_bytes": 5092921,
+              "traced_peak_bytes": 29946564
+            },
+            "after": {
+              "median_ms": 140.904,
+              "min_ms": 136.436,
+              "max_ms": 147.187,
+              "traced_current_bytes": 5092455,
+              "traced_peak_bytes": 5630121
+            },
+            "output_equal": true
+          },
+          "topology_wide_15000": {
+            "nodes": 15000,
+            "before": {
+              "median_ms": 49.373,
+              "min_ms": 47.479,
+              "max_ms": 68.691,
+              "traced_current_bytes": 121544,
+              "traced_peak_bytes": 2371864
+            },
+            "after": {
+              "median_ms": 30.134,
+              "min_ms": 29.789,
+              "max_ms": 34.404,
+              "traced_current_bytes": 121784,
+              "traced_peak_bytes": 2371528
+            },
+            "output_equal": true
+          }
+        },
+        "metrics_fixture_bytes": 14730000,
+        "optimized_source_bytes": 266514,
+        "selftest_summary": {
+          "ok": true,
+          "base_tests_run": 28,
+          "integration_tests_run": 20,
+          "tests_run": 48,
+          "failures": 0,
+          "errors": 0,
+          "details": [],
+          "executed_at": "2026-11-04T05:10:15.978623+00:00",
+          "target_repo_writes": 0,
+          "data_fetch_started": false,
+          "processes_spawned": 0
+        }
+      },
+      {
+        "measurement_type": "same-process, same-fixture before/after; synthetic local only",
+        "comparisons": {
+          "estimate_ascii_1m": {
+            "input_chars": 1000000,
+            "before": {
+              "median_ms": 121.212,
+              "min_ms": 117.136,
+              "max_ms": 127.957,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 112
+            },
+            "after": {
+              "median_ms": 0.0,
+              "min_ms": 0.0,
+              "max_ms": 0.003,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 64
+            },
+            "output_equal": true
+          },
+          "estimate_cjk_125k": {
+            "input_chars": 125000,
+            "before": {
+              "median_ms": 15.721,
+              "min_ms": 15.476,
+              "max_ms": 16.049,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 232
+            },
+            "after": {
+              "median_ms": 15.967,
+              "min_ms": 15.629,
+              "max_ms": 16.608,
+              "traced_current_bytes": 32,
+              "traced_peak_bytes": 232
+            },
+            "output_equal": true
+          },
+          "token_prepare_ascii_1m": {
+            "input_chars": 1000000,
+            "before": {
+              "median_ms": 329.152,
+              "min_ms": 307.635,
+              "max_ms": 348.64,
+              "traced_current_bytes": 923,
+              "traced_peak_bytes": 1001443
+            },
+            "after": {
+              "median_ms": 74.126,
+              "min_ms": 73.669,
+              "max_ms": 77.146,
+              "traced_current_bytes": 891,
+              "traced_peak_bytes": 1001411
+            },
+            "output_equal": true
+          },
+          "scan_source_800_functions": {
+            "input_chars": 73555,
+            "node_limit": 50000,
+            "returned_symbols": 250,
+            "before": {
+              "median_ms": 155.436,
+              "min_ms": 154.874,
+              "max_ms": 163.415,
+              "traced_current_bytes": 141971,
+              "traced_peak_bytes": 11469799
+            },
+            "after": {
+              "median_ms": 115.282,
+              "min_ms": 105.628,
+              "max_ms": 131.066,
+              "traced_current_bytes": 131555,
+              "traced_peak_bytes": 11469815
+            },
+            "output_equal": true
+          },
+          "read_metric_log_10000_rows": {
+            "returned_events": 10000,
+            "malformed": 0,
+            "before": {
+              "median_ms": 172.857,
+              "min_ms": 165.006,
+              "max_ms": 177.07,
+              "traced_current_bytes": 5092586,
+              "traced_peak_bytes": 29946564
+            },
+            "after": {
+              "median_ms": 148.765,
+              "min_ms": 138.51,
+              "max_ms": 153.383,
+              "traced_current_bytes": 5085173,
+              "traced_peak_bytes": 5622839
+            },
+            "output_equal": true
+          },
+          "topology_wide_15000": {
+            "nodes": 15000,
+            "before": {
+              "median_ms": 43.653,
+              "min_ms": 43.577,
+              "max_ms": 54.419,
+              "traced_current_bytes": 121544,
+              "traced_peak_bytes": 2371872
+            },
+            "after": {
+              "median_ms": 25.587,
+              "min_ms": 23.92,
+              "max_ms": 25.937,
+              "traced_current_bytes": 121784,
+              "traced_peak_bytes": 2371528
+            },
+            "output_equal": true
+          }
+        },
+        "metrics_fixture_bytes": 14730000,
+        "optimized_source_bytes": 266514,
+        "selftest_summary": {
+          "ok": true,
+          "base_tests_run": 28,
+          "integration_tests_run": 20,
+          "tests_run": 48,
+          "failures": 0,
+          "errors": 0,
+          "details": [],
+          "executed_at": "2026-11-04T05:10:30.485475+00:00",
+          "target_repo_writes": 0,
+          "data_fetch_started": false,
+          "processes_spawned": 0
+        }
+      }
+    ]
+  },
+  "caveats": [
+    "tracemalloc peaks are not process RSS/PSS",
+    "all benchmark inputs are deterministic synthetic fixtures",
+    "not a full 1,500-file/128-MiB repository stress run",
+    "no live VCGC/provider usage or network requests"
+  ]
+}
