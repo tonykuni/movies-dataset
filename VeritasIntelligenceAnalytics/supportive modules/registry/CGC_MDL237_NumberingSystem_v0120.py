@@ -123,16 +123,25 @@ def book_rows(book_dir: Path | None = None) -> dict:
     return out
 
 
+SUB_RX = re.compile(r"-FNC\d{3,}(?:-FNC\d{3,})*$")      # 函式子號(FNC 冊:code · q · api · line)
+
+
 def changed(before: dict, after: dict) -> list:
-    """新代碼 → kind=new;同代碼換版 → kind=version;其餘不算(只刷新時間的不發收據)。"""
-    res = []
+    """新代碼 → kind=new;同代碼換版 → kind=version;其餘不算(只刷新時間的不發收據)。
+    函式子號不單發收據(去重):併入母號收據的 functions(本輪新增子號數)。"""
+    res, subs = [], {}
     for k, r in after.items():
+        if SUB_RX.search(r["code"]):
+            if k not in before:
+                parent = SUB_RX.sub("", r["code"])
+                subs[parent] = subs.get(parent, 0) + 1
+            continue
         old = before.get(k)
         if old is None:
             res.append((k, r, "new"))
         elif str(old.get("version") or "") != str(r.get("version") or ""):
             res.append((k, r, "version"))
-    return res
+    return [(k, dict(r, _functions=subs.get(r["code"], 0)), kind) for k, r, kind in res]
 
 
 def file_facts(source: str, root: Path | None = None) -> dict:
@@ -148,6 +157,8 @@ def make_receipt(book: str, row: dict, kind: str, operator: str, at: str | None 
            "registered_at": minute(at), "uuid": str(uuid.uuid4()), "operator": operator}
     rec.update(file_facts(row.get("source"), root))
     rec.update({"kind": kind, "engine": f"{_STEM} {VERSION}"})
+    if row.get("_functions"):
+        rec["functions"] = row["_functions"]                # 本輪新增函式子號數(子號不另發收據)
     return rec
 
 
@@ -300,6 +311,12 @@ def selftest(deep: bool = False) -> int:
         ch = changed(before, after)
         chk("比對:新號 = new · 換版 = version", sorted(k for _k, _r, k in ch) == ["new", "version"], [k for _k, _r, k in ch])
         chk("只刷新不發", changed(after, after) == [])
+        fnc = {("FNC.jsonl", "VIA-X-ENG002-FNC001"): {"code": "VIA-X-ENG002-FNC001", "q": "main"},
+               ("FNC.jsonl", "VIA-X-ENG002-FNC001-FNC001"): {"code": "VIA-X-ENG002-FNC001-FNC001", "q": "main._v"}}
+        ch2 = changed(before, {**after, **fnc})
+        chk("函式子號不單發 · 併入母號 functions", len(ch2) == 2
+            and make_receipt(bk.name, [r for _k, r, _x in ch2 if r["code"] == "VIA-X-ENG002"][0], "new", "AI", None, root)
+            .get("functions") == 2)
         rec = make_receipt(bk.name, new, "new", "AI", None, root)
         chk("收據欄齊(uuid · operator · 分鐘 · bytes · format · sha256)",
             all(rec.get(f) not in (None, "") for f in FIELDS) and rec["bytes"] == 14 and rec["format"] == "py"
