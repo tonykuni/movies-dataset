@@ -7079,7 +7079,7 @@
   {
    "code": "VRN-REQ019",
    "subsystem": "VRN",
-   "topic": "VRN-2 報告一行一單位 = 轉接層(不是第三條平行路):個股一行一報告取 VRN-2 主線冊(VRN2_Summary POINT_1–4 + BasicInfo 評等 / 目標價 / 收盤;主線驗證器已逐值驗);非個股取操作員的非個股摘要器 v0310(topic_detail 一主題一行 · company_detail 晨會一家一行 · 依 INDUSTRY 一產業一行);兩者沒有這份時才用 v0100 抽取暫代,每行標 source 與原因",
+   "topic": "VRN-2 報告一行一單位:個股一行一報告 · 產業一行一產業 · 其他一行一主題(多行一報告);擷取還原(字距 / 疊字 / 模板殘字 / 兩欄側欄分開 / 斷行接回)+ 抽取式重點摘要(每句回原文驗證)+ 關鍵數字 + 提到的個股;VRN-1 摘要器規則整併(只讀照搬 · VRN-1 倉不動)",
    "requirement": "操作員 2026-11-10:「VRN-2 為主,缺乏的功能 VRN-1 整併進來 · 使股票報告及多種非股票報告皆能擷取還原資料抓重要資料摘要 · 個股報告是一行一報告 · 產業報告是一行一產業 · 其他一行一主題 · 多行一報告 · 輸出調整優化」",
    "status": "PARTIAL",
    "homes": [
@@ -7099,7 +7099,8 @@
    "next": "桌機:主線冊在 VIA_Reports/vrn2/output(或 --vrn2-books)→ 個股走主線;上傳 NON_STOCK_CORE_v0200.py(SHA 92f53d82…)或 --nonstock-out 指 v0310 輸出 → 非個股走 v0310;掃描檔 OCR",
    "hand": "operator",
    "why_homes": "VRN-2 底座夾(functional modules/VRN)· 分類用 VRN-2 自己的車道判準(VRN_ReportLaneCheck v0100 → v0231 _SK_EXCL);不 import VCGC / VRN-1",
-   "why_rework": "v0100 誤當成缺功能另寫一套(沒先 chain 查既有引擎);v0101 改回接既有成功的引擎,v0100 只留作暫代與擷取還原"
+   "why_rework": "v0100 誤當成缺功能另寫一套(沒先 chain 查既有引擎);v0101 改回接既有成功的引擎,v0100 只留作暫代與擷取還原",
+   "realization_v0101": "VRN-2 報告一行一單位 = 轉接層(不是第三條平行路):個股一行一報告取 VRN-2 主線冊(VRN2_Summary POINT_1–4 + BasicInfo 評等 / 目標價 / 收盤;主線驗證器已逐值驗);非個股取操作員的非個股摘要器 v0310(topic_detail 一主題一行 · company_detail 晨會一家一行 · 依 INDUSTRY 一產業一行);兩者沒有這份時才用 v0100 抽取暫代,每行標 source 與原因"
   }
  ],
  "non_requirements": [
