@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-09T15:02:35Z",
+ "updated_at": "2026-11-10T01:53:30Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4320,6 +4320,164 @@
    "timeout_seconds": 900,
    "marker_note": "標記釘「本版 8/8 · 前版 v0100 PASS」",
    "registered_at": "2026-11-09T14:55:05Z"
+  },
+  "V-vdf-macro-hierarchy": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VDF_MDL015_MacroHierarchy v0100 selftest · 14/14",
+   "scope": "VDF MDL015:讀 VDF_MacroKeyword_SSOT 九家族 · 總經 SSOT 點分碼 → 家族 / 一階 / 二階;FRED categories/children/series/search 假網路;web 關鍵字抽取;候選 jsonl 只增;閘關 SKIP 不碰 environ;鑰永不外洩",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0100.py",
+    "functional modules/VDF/VDF_MacroKeyword_SSOT_v0100.json",
+    "functional modules/VDF/VDF_USMacro_Tree_v0100.json",
+    "supportive modules/network/via_net_unified_v0101.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-09T16:19:09Z",
+   "timeout_seconds": 600,
+   "marker_note": "標記釘「[PASS] VQG v0108 selftest · 本版 13/13 · 前版鏈 v0107 PASS」",
+   "registered_at": "2026-11-09T14:26:12Z"
+  },
+  "V-vdf-macro-crosscheck": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VDF_MDL016_MacroCrossCheck v0100 selftest · 16/16",
+   "scope": "VDF MDL016:最新 n 筆 AGREE / PERIOD_LABEL_SHIFT / UNIT_SCALE / OFFICIAL_LAGGING / AKSHARE_STALE / AKSHARE_SUSPECT / NODATA;官方為正本;只警告不改資料;Codex #622:重疊同值 + AKShare 多一期 → OFFICIAL_LAGGING · 官方缺中間期 → AGREE 列缺期(16 項)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0100.py",
+    "functional modules/VDF/VDF_MacroCrossCheck_Pairs_SSOT_v0100.json",
+    "supportive modules/network/via_net_unified_v0101.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-09T16:19:09Z",
+   "timeout_seconds": 600,
+   "marker_note": "標記釘「[PASS] VQG v0108 selftest · 本版 13/13 · 前版鏈 v0107 PASS」",
+   "registered_at": "2026-11-09T14:26:12Z"
+  },
+  "V-vrn-lanecheck": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_ReportLaneCheck_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VRN_ReportLaneCheck v0100 selftest · 10/10",
+   "scope": "VRN ReportLaneCheck:個股車道(啟動器 v0178 · 管理器 v0262 · 分類器)· 非個股車道(v0310 引擎在 · NON_STOCK_CORE 缺 = BLOCKED 照實)· 樣本 13 份分類",
+   "dependencies": [
+    "functional modules/VRN/VRN_ReportLaneCheck_v0100.py",
+    "functional modules/VRN/VRN_SystemManager_v0231.py",
+    "functional modules/VRN/nonstock_v0310/REUSE_MANIFEST_v0310.json"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-09T16:19:09Z",
+   "timeout_seconds": 300,
+   "marker_note": "標記釘「[PASS] VQG v0108 selftest · 本版 13/13 · 前版鏈 v0107 PASS」",
+   "registered_at": "2026-11-09T14:26:12Z"
+  },
+  "C-mutual-monitor": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_MutualMonitor_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_MutualMonitor v0100 selftest · 9/9",
+   "scope": "VIA_MutualMonitor:只讀 VIA_SystemReceipt_Contract_SSOT 列的自報收據 → 正規化燈表 · 契約符合度 · 互動表;VCGC 不代寫他系統",
+   "dependencies": [
+    "docs/handoff/ai/VIA_MutualMonitor_v0100.py",
+    "supportive modules/registry/VIA_SystemReceipt_Contract_SSOT_v0100.json"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-09T16:19:09Z",
+   "timeout_seconds": 300,
+   "marker_note": "標記釘「[PASS] VQG v0108 selftest · 本版 13/13 · 前版鏈 v0107 PASS」",
+   "registered_at": "2026-11-09T14:26:12Z"
+  },
+  "C-daily-backup": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_DailyBackup_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_DailyBackup v0100 selftest · 12/12",
+   "scope": "VIA_DailyBackup:backup → VIA_Reports/backup/<時戳>/ + docs/handoff/backup/BACKUP_MANIFEST_latest.json;check 對倉內 sha 與 zip;隔天「檢查備份」一指令",
+   "dependencies": [
+    "docs/handoff/ai/VIA_DailyBackup_v0100.py",
+    "docs/handoff/backup/BACKUP_MANIFEST_latest.json"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-09T16:19:09Z",
+   "timeout_seconds": 600,
+   "marker_note": "標記釘「[PASS] VQG v0108 selftest · 本版 13/13 · 前版鏈 v0107 PASS」",
+   "registered_at": "2026-11-09T14:26:12Z"
+  },
+  "C-vqg-v0109": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VQG/VQG_AllInOne_v0109.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VQG v0109 selftest · 本版 14/14 · 前版鏈 v0108 PASS",
+   "scope": "VQG v0109:第一部分(計算定義 v0104 + v0108 十指標)不動;第二部分 catalog / quant(backtest · factor_ic · stats)登 VAP(INDICATOR_RESULT / RISK_QUALITY);Codex #622:統計報酬的日期與值一起過濾(缺價不錯位 · 14 項)",
+   "dependencies": [
+    "functional modules/VQG/VQG_AllInOne_v0109.py",
+    "functional modules/VQG/VQG_AllInOne_v0108.py",
+    "functional modules/VQG/VQG_AllInOne_v0107.py",
+    "functional modules/VQG/VQG_AllInOne_v0105.py",
+    "functional modules/VQG/VQG_AllInOne_v0104.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-09T16:19:09Z",
+   "timeout_seconds": 1800,
+   "marker_note": "標記釘「[PASS] VQG v0108 selftest · 本版 13/13 · 前版鏈 v0107 PASS」",
+   "registered_at": "2026-11-09T14:26:12Z"
+  },
+  "C-workbench-lock-v0102": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_WorkbenchLock_v0102.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_WorkbenchLock_v0102 selftest · 本版 7/7 · 前版鏈 v0101 PASS",
+   "scope": "WorkbenchLock v0102:響應式覆蓋層(一支 style · 鎖站不動)· 注入冪等 · css sha check · 篡改紅 · 7 項 + v0101 鏈",
+   "dependencies": [
+    "docs/handoff/ai/VIA_WorkbenchLock_v0102.py",
+    "docs/handoff/ai/VIA_WorkbenchLock_v0101.py"
+   ],
+   "timeout_seconds": 1200,
+   "marker_note": "標記釘「本版 8/8 · 前版 v0100 PASS」",
+   "registered_at": "2026-11-09T14:55:05Z",
+   "version": "v0100",
+   "updated_at": "2026-11-09T16:27:53Z"
+  },
+  "C-vcgc-toolboard": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_VCGCToolBoard_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_VCGCToolBoard v0100 selftest · 10/10",
+   "scope": "VIA_VCGCToolBoard:只讀 CHECK / TEST / TEST_STATE / token / GATE / HANDOFF / MUTUAL / 鎖冊 / 盤點冊 / 必用卡 → 燈號條(最前)+ 工具分類 × 串測燈 + 卡上工具;json/md/html + 只增帳",
+   "dependencies": [
+    "docs/handoff/ai/VIA_VCGCToolBoard_v0100.py",
+    "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-10T01:51:29Z",
+   "timeout_seconds": 300,
+   "registered_at": "2026-11-10T01:51:29Z"
   }
  },
  "work_items": [
@@ -9112,6 +9270,94 @@
    "next": "桌機貼 VIA_FreshPC_Boot_v0100.txt 貼回;Veritas 原字型檔若有請上傳,第二行可完全同字",
    "receipt": "docs/handoff/evidence/C-workbench-lock-v0101.json",
    "updated_at": "2026-11-09T15:02:35Z"
+  },
+  {
+   "id": "VDF-REQ023:V-vdf-macro-hierarchy",
+   "requirement": "VDF-REQ023",
+   "case": "V-vdf-macro-hierarchy",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-09 晚六項令 / 今日收尾 → 新引擎 + 冊;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
+   "receipt": "docs/handoff/evidence/V-vdf-macro-hierarchy.json",
+   "updated_at": "2026-11-09T16:29:14Z"
+  },
+  {
+   "id": "VDF-REQ024:V-vdf-macro-crosscheck",
+   "requirement": "VDF-REQ024",
+   "case": "V-vdf-macro-crosscheck",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-09 晚六項令 / 今日收尾 → 新引擎 + 冊;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
+   "receipt": "docs/handoff/evidence/V-vdf-macro-crosscheck.json",
+   "updated_at": "2026-11-09T16:29:14Z"
+  },
+  {
+   "id": "VRN-REQ018:V-vrn-lanecheck",
+   "requirement": "VRN-REQ018",
+   "case": "V-vrn-lanecheck",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-09 晚六項令 / 今日收尾 → 新引擎 + 冊;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
+   "receipt": "docs/handoff/evidence/V-vrn-lanecheck.json",
+   "updated_at": "2026-11-09T16:29:14Z"
+  },
+  {
+   "id": "VCGC-REQ209:C-mutual-monitor",
+   "requirement": "VCGC-REQ209",
+   "case": "C-mutual-monitor",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-09 晚六項令 / 今日收尾 → 新引擎 + 冊;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
+   "receipt": "docs/handoff/evidence/C-mutual-monitor.json",
+   "updated_at": "2026-11-09T16:29:14Z"
+  },
+  {
+   "id": "VCGC-REQ210:C-daily-backup",
+   "requirement": "VCGC-REQ210",
+   "case": "C-daily-backup",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-09 晚六項令 / 今日收尾 → 新引擎 + 冊;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
+   "receipt": "docs/handoff/evidence/C-daily-backup.json",
+   "updated_at": "2026-11-09T16:29:14Z"
+  },
+  {
+   "id": "VCGC-REQ211:C-vqg-v0109",
+   "requirement": "VCGC-REQ211",
+   "case": "C-vqg-v0109",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-09 晚六項令 / 今日收尾 → 新引擎 + 冊;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
+   "receipt": "docs/handoff/evidence/C-vqg-v0109.json",
+   "updated_at": "2026-11-09T16:29:14Z"
+  },
+  {
+   "id": "VCGC-REQ212:workbench-responsive-v0102",
+   "requirement": "VCGC-REQ212",
+   "case": "C-workbench-lock-v0102",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-09 晚:響應式 · 固定共用 header · Claude 字級 → v0102;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
+   "receipt": "docs/handoff/evidence/C-workbench-lock-v0102.json",
+   "updated_at": "2026-11-09T16:29:14Z"
+  },
+  {
+   "id": "VCGC-REQ213:C-vcgc-toolboard",
+   "requirement": "VCGC-REQ213",
+   "case": "C-vcgc-toolboard",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-10:「檢查備份 · 讀取備份 · 並顯示 VCGC 有些功能工具 · 分類顯示 · 狀態燈號放一開始」 → 新引擎 + 四冊;等 handoff test 收據 → handoff test rc 0 · marker true",
+   "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
+   "receipt": "docs/handoff/evidence/C-vcgc-toolboard.json",
+   "updated_at": "2026-11-10T01:53:30Z"
   }
  ]
 }

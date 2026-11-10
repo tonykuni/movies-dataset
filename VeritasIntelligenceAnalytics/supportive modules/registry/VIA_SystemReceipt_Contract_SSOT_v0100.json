@@ -1,0 +1,367 @@
+{
+ "schema": "VIA-SYSTEM-RECEIPT-CONTRACT/1.0",
+ "version": "v0100",
+ "ts": "2026-11-09",
+ "owner": "VCGC",
+ "law": "L120 / L123 四(五)系統對等獨立 · 互相只讀監控:看對方自報的燈與收據,只攤開不代修;VCGC 的 closeout_lamp 不寫成任何子系統的成功,子系統的燈也不寫成 VCGC 的驗收。",
+ "rule": "操作員 2026-11-09:「VDF VRN VQG VAP 系統獨立架構可運作、獨立開發完成;但互動關係要與 VCGC 的相互監控協助先建構完美,因為 VCGC 可能會持續更強化以面對未來擴張必要」→ 互動只走本冊:每系統自報收據(路徑 · 燈欄 · 時間欄 · 版本欄);VCGC 只讀本冊列的檔;新系統 = 本冊加一節(出新版號),不改任何系統程式。",
+ "lamps": [
+  "GREEN",
+  "YELLOW",
+  "RED",
+  "GRAY"
+ ],
+ "normalized_fields": [
+  "system",
+  "receipt",
+  "present",
+  "lamp",
+  "at",
+  "version",
+  "age_hours",
+  "stale",
+  "missing_required",
+  "note"
+ ],
+ "stale_hours": 48,
+ "lamp_maps": {
+  "vrn2_closeout_state": {
+   "PASS": "GREEN",
+   "REVIEW": "YELLOW",
+   "DATA_GAP": "YELLOW",
+   "BLOCKED": "YELLOW",
+   "OPEN": "RED"
+  },
+  "vdf_overall": {
+   "GREEN": "GREEN",
+   "YELLOW": "YELLOW",
+   "RED": "RED",
+   "NODATA": "GRAY",
+   "STALE": "YELLOW"
+  },
+  "vqg_lamp": {
+   "GREEN": "GREEN",
+   "YELLOW": "YELLOW",
+   "RED": "RED"
+  }
+ },
+ "systems": {
+  "VCGC": {
+   "zh": "中央治理主控台",
+   "entry_glob": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+   "receipts": [
+    {
+     "id": "test",
+     "path": "VIA_Reports/vcgc/TEST_latest.json",
+     "lamp_key": "lamp",
+     "at_keys": [
+      "at"
+     ],
+     "version_keys": [
+      "console"
+     ],
+     "required": [
+      "lamp",
+      "at",
+      "console",
+      "counts"
+     ],
+     "zh": "全功能串測"
+    },
+    {
+     "id": "systems",
+     "path": "VIA_Reports/vcgc/SYSTEMS_latest.json",
+     "lamp_key": null,
+     "at_keys": [
+      "ts",
+      "at"
+     ],
+     "version_keys": [],
+     "required": [],
+     "zh": "systems 動詞(只讀他系統 collect)",
+     "optional": true
+    }
+   ]
+  },
+  "VDF": {
+   "zh": "資料擷取",
+   "entry_glob": "functional modules/VDF/VDF_SystemManager_v*.py",
+   "receipts": [
+    {
+     "id": "health",
+     "path": "VIA_Reports/vdf/HEALTH_latest.json",
+     "lamp_key": "lamp",
+     "at_keys": [
+      "ts"
+     ],
+     "version_keys": [
+      "sub"
+     ],
+     "required": [
+      "lamp",
+      "ts",
+      "summary"
+     ],
+     "zh": "健康總檢"
+    },
+    {
+     "id": "activate",
+     "path": "VIA_Reports/vdf/activate/VDF_ACTIVATE_latest.json",
+     "lamp_key": "overall",
+     "lamp_map": "vdf_overall",
+     "at_keys": [
+      "ts"
+     ],
+     "version_keys": [
+      "engine"
+     ],
+     "required": [
+      "overall",
+      "ts",
+      "engine",
+      "steps"
+     ],
+     "zh": "啟動收據"
+    },
+    {
+     "id": "macro_hierarchy",
+     "path": "VIA_Reports/vdf/macro/VDF_MacroHierarchy_latest.json",
+     "lamp_key": "lamp",
+     "at_keys": [
+      "at"
+     ],
+     "version_keys": [
+      "engine"
+     ],
+     "required": [
+      "lamp",
+      "at",
+      "plan"
+     ],
+     "zh": "總經階層(MDL015)",
+     "optional": true
+    },
+    {
+     "id": "macro_crosscheck",
+     "path": "VIA_Reports/vdf/macro/VDF_MacroCrossCheck_latest.json",
+     "lamp_key": "lamp",
+     "at_keys": [
+      "at"
+     ],
+     "version_keys": [
+      "engine"
+     ],
+     "required": [
+      "lamp",
+      "at",
+      "pairs"
+     ],
+     "zh": "AKShare × 官方交叉比對(MDL016)",
+     "optional": true
+    }
+   ]
+  },
+  "VRN2": {
+   "zh": "券商報告(第二團隊)",
+   "entry_glob": "functional modules/VRN/VRN_SystemManager_v*.py",
+   "receipts": [
+    {
+     "id": "closeout",
+     "path": "VIA_Reports/vrn2/VRN2_CloseoutUI_latest.json",
+     "lamp_key": "state",
+     "lamp_map": "vrn2_closeout_state",
+     "at_keys": [
+      "at",
+      "ts",
+      "generated_at"
+     ],
+     "version_keys": [
+      "tool"
+     ],
+     "required": [
+      "state",
+      "per_owner",
+      "counts"
+     ],
+     "zh": "RoundAll 收尾"
+    },
+    {
+     "id": "activate",
+     "path": "VIA_Reports/vrn2/VRN2_Activate_latest.json",
+     "lamp_key": "lamp",
+     "at_keys": [
+      "at",
+      "ts"
+     ],
+     "version_keys": [
+      "version"
+     ],
+     "required": [
+      "lamp",
+      "version"
+     ],
+     "zh": "啟動器收據"
+    },
+    {
+     "id": "lanes",
+     "path": "VIA_Reports/vrn2/VRN2_LaneCheck_latest.json",
+     "lamp_key": "lamp",
+     "at_keys": [
+      "at"
+     ],
+     "version_keys": [
+      "engine"
+     ],
+     "required": [
+      "lamp",
+      "stock_lane",
+      "non_stock_lane"
+     ],
+     "zh": "個股 / 非個股車道(ReportLaneCheck)",
+     "optional": true
+    }
+   ]
+  },
+  "VQG": {
+   "zh": "量化",
+   "entry_glob": "functional modules/VQG/VQG_AllInOne_v*.py",
+   "receipts": [
+    {
+     "id": "export_vap",
+     "path": "VIA_Reports/vqg/VQG_ExportVAP_latest.json",
+     "lamp_key": "lamp",
+     "lamp_map": "vqg_lamp",
+     "at_keys": [
+      "at"
+     ],
+     "version_keys": [
+      "engine"
+     ],
+     "required": [
+      "lamp",
+      "at",
+      "engine",
+      "tables",
+      "vap_sources"
+     ],
+     "zh": "export-vap"
+    },
+    {
+     "id": "vap_latest",
+     "path": "VIA_Reports/vqg/vap_export/latest.json",
+     "lamp_key": "lamp",
+     "at_keys": [
+      "at"
+     ],
+     "version_keys": [],
+     "required": [
+      "lamp",
+      "export_dir",
+      "vap_sources"
+     ],
+     "zh": "給 VAP 的最新匯出指標",
+     "consistency_with": "export_vap"
+    },
+    {
+     "id": "closeout",
+     "path": "VIA_Reports/vqg/VQG_Closeout_latest.json",
+     "lamp_key": "lamp",
+     "at_keys": [
+      "at"
+     ],
+     "version_keys": [
+      "engine"
+     ],
+     "required": [
+      "lamp",
+      "at",
+      "engine"
+     ],
+     "zh": "收尾",
+     "optional": true
+    }
+   ]
+  },
+  "VAP": {
+   "zh": "視覺分析平台",
+   "entry_glob": "functional modules/VAP/intake/allinone_v0300/VAP_AllInOne_v*.py",
+   "receipts": [
+    {
+     "id": "health",
+     "path": "VIA_Reports/vap/VAP_Health_latest.json",
+     "lamp_key": "lamp",
+     "at_keys": [
+      "at"
+     ],
+     "version_keys": [
+      "version"
+     ],
+     "required": [
+      "lamp",
+      "at",
+      "version"
+     ],
+     "zh": "VAP 自報(/api/health 落地)",
+     "note": "VAP v0302 只在 loopback /api/health 回報、不落檔 → 本冊要求的落檔收據目前 ABSENT(GRAY 照實);VAP 下一版加落檔即接上,VCGC 不代寫"
+    }
+   ],
+   "upstream_evidence": {
+    "path": "VIA_Reports/vqg/vap_export/VAP_AllInOne_v0300.config.json",
+    "zh": "VQG 給的 config(VAP 正式輸入 = VQG)"
+   }
+  }
+ },
+ "interactions": [
+  {
+   "from": "VCGC",
+   "to": "VDF",
+   "mode": "read_only",
+   "what": "health · activate · macro 收據",
+   "never": "改 VDF 冊 / 檔 / 號"
+  },
+  {
+   "from": "VCGC",
+   "to": "VRN2",
+   "mode": "read_only",
+   "what": "closeout · activate · lanes",
+   "never": "改 VRN-2 套件"
+  },
+  {
+   "from": "VCGC",
+   "to": "VQG",
+   "mode": "read_only",
+   "what": "export_vap · vap_latest · closeout",
+   "never": "改 VQG 公式"
+  },
+  {
+   "from": "VCGC",
+   "to": "VAP",
+   "mode": "read_only",
+   "what": "health(落檔後)· 上游 config",
+   "never": "改 VAP 運行"
+  },
+  {
+   "from": "VDF",
+   "to": "VQG",
+   "mode": "data_read_only",
+   "what": "VQG 只讀 VDF 庫(parquet)",
+   "never": "VQG 寫 VDF 夾"
+  },
+  {
+   "from": "VQG",
+   "to": "VAP",
+   "mode": "manifest",
+   "what": "vqg_connection_manifest(AUTHORIZED · 指紋)",
+   "never": "VAP 直連 VDF"
+  },
+  {
+   "from": "VRN2",
+   "to": "VCGC",
+   "mode": "number_request",
+   "what": "contract/VRN2_NUMBER_REQUEST_latest.json(編號申請)",
+   "never": "VRN-2 自己發號"
+  }
+ ],
+ "why_v0100": "之前互監散在 SettleAll / HealthMatrix / MCPServer 各自硬編碼路徑與燈欄;本冊把「誰自報什麼 · 在哪 · 燈怎麼對」寫成一本,VCGC 只讀本冊;VCGC 將來強化(新站 · 新系統)只改冊不改各系統。",
+ "numbering_rule": "操作員 2026-11-09:所有編號都要有版本與時間;檔名帶版本號(_vNNNN);自動隨時登錄於各子系統(各系統自己的冊 + VCGC 數冊);系統階層獨立;衝突只由操作員與 AI 合作裁定,引擎不自裁。"
+}
