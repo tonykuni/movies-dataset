@@ -1,0 +1,281 @@
+name: VIA HTML UI Optimizer CI
+
+on:
+  push:
+    branches: [main, master, develop]
+    paths:
+      - 'VIA_HTML_UI/ui/**'
+      - 'VIA_HTML_UI/profiles/**'
+      - 'VIA_HTML_UI/ui-auto-optimizer/**'
+      - '.github/workflows/via-html-ui-ci.yml'
+  pull_request:
+    branches: [main, master, develop]
+    paths:
+      - 'VIA_HTML_UI/ui/**'
+      - 'VIA_HTML_UI/profiles/**'
+      - 'VIA_HTML_UI/ui-auto-optimizer/**'
+      - '.github/workflows/via-html-ui-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+  PYTHON_VERSION: '3.12'
+  OPTIMIZER_DIR: VIA_HTML_UI/ui-auto-optimizer
+  OUTPUT_DIR: VIA_HTML_UI/ui-auto-optimizer/output
+
+concurrency:
+  group: via-html-ui-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  optimize:
+    name: Optimize HTML + Matrix Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: VIA_HTML_UI/ui-auto-optimizer/requirements.txt
+
+      - name: Install optimizer dependencies
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: python -m pip install -r requirements.txt
+
+      - name: Optimize canonical VIA HTML
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: python optimizer.py --input ../ui/VIA-UI-Standalone-NoServer.html --output output
+
+      - name: Validate standalone build and optimizer outputs
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: |
+          test -s output/optimized.html
+          test -s output/optimized.css
+          test -s output/VIA-SYNCHRONIZER-Standalone.html
+          test -s output/report.json
+          test -s output/matrix-report.json
+          python -m json.tool output/report.json >/dev/null
+          python -m json.tool output/matrix-report.json >/dev/null
+          node --check scripts/check-score.js
+          node --check scripts/build-report.js
+
+      - name: Upload optimizer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: optimizer-output
+          path: |
+            VIA_HTML_UI/ui-auto-optimizer/output/optimized.html
+            VIA_HTML_UI/ui-auto-optimizer/output/optimized.css
+            VIA_HTML_UI/ui-auto-optimizer/output/VIA-SYNCHRONIZER-Standalone.html
+            VIA_HTML_UI/ui-auto-optimizer/output/report.json
+            VIA_HTML_UI/ui-auto-optimizer/output/matrix-report.json
+          if-no-files-found: error
+          retention-days: 14
+
+  playwright:
+    name: Playwright Visual + Responsive + Density + Accessibility
+    needs: optimize
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: VIA_HTML_UI/ui-auto-optimizer/package-lock.json
+
+      - name: Download optimizer result
+        uses: actions/download-artifact@v4
+        with:
+          name: optimizer-output
+          path: VIA_HTML_UI/ui-auto-optimizer/output
+
+      - name: Install locked test dependencies
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: npx playwright install --with-deps chromium
+
+      - name: Run one-browser responsive and density matrix
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: npm run test:ui
+
+      - name: Upload Playwright report, matrix, screenshots, traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: |
+            VIA_HTML_UI/ui-auto-optimizer/output/playwright-report.json
+            VIA_HTML_UI/ui-auto-optimizer/output/responsive-matrix.json
+            VIA_HTML_UI/ui-auto-optimizer/output/visual-report.json
+            VIA_HTML_UI/ui-auto-optimizer/output/screenshots/
+            VIA_HTML_UI/ui-auto-optimizer/playwright-report/
+            VIA_HTML_UI/ui-auto-optimizer/test-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+  lighthouse:
+    name: Lighthouse + Quality Gate
+    needs: optimize
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: VIA_HTML_UI/ui-auto-optimizer/package-lock.json
+
+      - name: Download optimizer result
+        uses: actions/download-artifact@v4
+        with:
+          name: optimizer-output
+          path: VIA_HTML_UI/ui-auto-optimizer/output
+
+      - name: Install locked Lighthouse and wait-on dependencies
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: npm ci
+
+      - name: Install Chromium for Lighthouse
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: npx playwright install --with-deps chromium
+
+      - name: Start output server
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: |
+          node scripts/serve.mjs output 3000 > output/lighthouse-server.log 2>&1 &
+          echo $! > output/lighthouse-server.pid
+
+      - name: Wait for optimized page
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: npx wait-on --timeout 120000 --interval 500 http://127.0.0.1:3000/optimized.html
+
+      - name: Run Lighthouse against the same optimized artifact
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: npm run lighthouse
+
+      - name: Enforce Lighthouse score and report-file gates
+        if: always()
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: |
+          test -s output/lighthouse.json
+          node scripts/check-score.js output/lighthouse.json
+
+      - name: Upload Lighthouse and gate outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: |
+            VIA_HTML_UI/ui-auto-optimizer/output/lighthouse.json
+            VIA_HTML_UI/ui-auto-optimizer/output/quality-gate.json
+            VIA_HTML_UI/ui-auto-optimizer/output/lighthouse-server.log
+          if-no-files-found: warn
+          retention-days: 14
+
+  report:
+    name: Build Unified HTML Report
+    needs: [optimize, playwright, lighthouse]
+    if: ${{ always() && needs.optimize.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Download optimizer output
+        uses: actions/download-artifact@v4
+        with:
+          name: optimizer-output
+          path: VIA_HTML_UI/ui-auto-optimizer/output
+
+      - name: Download Playwright outputs
+        if: ${{ needs.playwright.result != 'cancelled' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-results
+          path: VIA_HTML_UI/ui-auto-optimizer/artifacts/playwright
+
+      - name: Download Lighthouse outputs
+        if: ${{ needs.lighthouse.result != 'cancelled' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: lighthouse-results
+          path: VIA_HTML_UI/ui-auto-optimizer/artifacts/lighthouse
+
+      - name: Build unified report
+        working-directory: ${{ env.OPTIMIZER_DIR }}
+        run: node scripts/build-report.js
+
+      - name: Upload unified report site
+        uses: actions/upload-artifact@v4
+        with:
+          name: via-ui-unified-report
+          path: |
+            VIA_HTML_UI/ui-auto-optimizer/output/
+            VIA_HTML_UI/ui-auto-optimizer/artifacts/
+          if-no-files-found: error
+          retention-days: 30
+
+  pages:
+    name: Publish Gated Report to GitHub Pages
+    needs: [optimize, playwright, lighthouse, report]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.optimize.result == 'success' && needs.playwright.result == 'success' && needs.lighthouse.result == 'success' && needs.report.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Download unified report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: via-ui-unified-report
+          path: site
+
+      - name: Set report landing page
+        run: |
+          test -s site/output/optimization-report.html
+          cat > site/index.html <<'HTML'
+          <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=./output/optimization-report.html"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VIA UI CI Report</title></head><body><p><a href="./output/optimization-report.html">Open the VIA HTML UI optimization report</a></p></body></html>
+          HTML
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
