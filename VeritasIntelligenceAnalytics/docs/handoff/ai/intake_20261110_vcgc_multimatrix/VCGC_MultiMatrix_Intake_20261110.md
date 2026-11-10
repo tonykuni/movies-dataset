@@ -71,3 +71,16 @@ QA_*.json(Selftest / Integration / Resilience / UI)是對方環境自報,本倉*
 
 - 決定 B1–B4 的修法 → VCGC 出 v0195 薄尾;或先在本機跑第 5 點的三個指令把收據傳回。
 - 本分支(`claude/practical-pasteur-p67i78`)比 main 舊;合併前要先接上 main(main 2026-11-10 `8fc49fff`)。
+
+## 8 · 操作員本機實跑回報(2026-11-10 08:52–08:54 UTC · 照貼原文,未在本倉重現)
+
+在 `C:\Users\tonyk\Downloads\mm194`(v0194 zip 解壓)以 `py -3` 執行:
+
+| 指令 | 結果 | 範圍(引擎自述) |
+|---|---|---|
+| `matrix selftest`(兩次) | **45 / 45 PASS** · 12.7 s / 12.0 s | isolated fixtures;不證明 Windows VIA 正式環境 · `production_systems: NOT_RUN` · PS AST `AVAILABLE_NOT_CERTIFIED` |
+| `matrix resilience-test`(兩次) | **22 / 22 PASS** · 2.2 s · `engine_sha256 66e83333…`(= 上傳件) | 合成故障注入;沒有 Windows 部署、沒有 VDF 實網驗證 · `production_systems: NOT_RUN` |
+| `matrix install --roots "$HOME\OneDrive\Documents\movies-dataset"`(只出計畫) | **停:`UNSUPPORTED_NATIVE_PRIOR; known v0192/v0193 only, no blind upgrade`** | 本機倉的主控台尾版不是 v0192 / v0193 → 它拒絕升級(設計如此,不是故障) |
+
+更新:B6 部分解除(引擎自帶測試在本機綠);B1–B4 不變(那是設計問題,自帶測試不涵蓋);B5 之前就先停在版本檢查。
+下一步:查本機尾版是哪一版、本機倉在哪個分支、落後 / 超前 main 多少,再決定 v0195 要接哪一版。
