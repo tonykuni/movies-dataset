@@ -139,7 +139,7 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 24,
-  "COVERED": 136,
+  "COVERED": 137,
   "PARTIAL": 103,
   "MISSING": 1
  },
@@ -6997,6 +6997,25 @@
    "next": "桌機:python3 docs/handoff/ai/VIA_LakeConsole_v0101.py serve(自動開頁)→ 按「五系統並行實測 + 矩陣」;VRN-1 外部倉只讀不啟動(L123)",
    "hand": "ai",
    "why_homes": "操作台是 VCGC 的本機橋(照 DeckServer 鐵則縮小版);入湖經共用套件"
+  },
+  {
+   "code": "VCGC-REQ217",
+   "subsystem": "VCGC",
+   "topic": "桌機一行抓資料(DesktopFourBlocks ④)可以真的起跑:預設族群取 VDF 自己的族群冊(ALL),不寫死不存在的名字;容器實測看道 + 夾具真跑把擋點分成 同意閘(操作員)/ 中央入口標記(Invoke-VIAPython)/ 環境缺件(akshare)/ 庫缺(先跑寫入者)",
+   "requirement": "操作員 2026-11-10:「全景式檢視上方 10 天內對話 VRN VDF 應該都該完工了 發生甚麼事 · 先把他們兩個實測完工 我現在要抓資料」",
+   "status": "COVERED",
+   "homes": [
+    "docs/handoff/ai/VIA_DesktopFourBlocks_v0101.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0108.py"
+   ],
+   "workflow": null,
+   "modules": [
+    "docs/handoff/ai/VIA_DesktopFourBlocks_v0101.py"
+   ],
+   "evidence": "2026-11-10 容器:v0100 ④ 看道 rc 1(KeyError 無此族群 TW_EQUITY)· v0101 自測 3/3 + 前版鏈 19/19 · v0101 ④ 看道 ALL rc 0(14 族群 · 6 道 · 16 引擎)· 夾具真跑 18 支:006 綠;其餘擋點 = 同意閘未開 11(設計如此 · 操作員親手開)· 中央入口標記 2(e115 / e116 只准經 Invoke-VIAPython)· akshare 未裝 1(011d)· 庫缺 / 宇宙缺 3(e082 / e077 / e078 依賴前段寫入者)",
+   "next": "桌機:同一視窗先 $env:VIA_NET_CONSENT='YES'(操作員親手)→ python docs/handoff/ai/VIA_DesktopFourBlocks_v0101.py --blocks 4 --mode live --jobs 5 → 貼回 DESKTOP_FOUR_BLOCKS.md",
+   "hand": "operator",
+   "why_homes": "DesktopFourBlocks 是 VCGC 的桌機工具;族群由 VDF 自己的冊決定(L123)"
   }
  ],
  "non_requirements": [
