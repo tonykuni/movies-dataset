@@ -84,3 +84,10 @@ QA_*.json(Selftest / Integration / Resilience / UI)是對方環境自報,本倉*
 
 更新:B6 部分解除(引擎自帶測試在本機綠);B1–B4 不變(那是設計問題,自帶測試不涵蓋);B5 之前就先停在版本檢查。
 下一步:查本機尾版是哪一版、本機倉在哪個分支、落後 / 超前 main 多少,再決定 v0195 要接哪一版。
+
+## 9 · 本機倉體檢(操作員貼回 · 2026-11-10)
+
+- 本機倉 `C:\Users\tonyk\OneDrive\Documents\movies-dataset`:`main...origin/main [ahead 2, behind 404]`;追蹤檔改動 8 個;未追蹤件大量(多在 `functional modules/VRN`、`VRN2/`、`VDF` 資料夾、`supportive modules/VCGC_Matrix/`、`graphify-out/`、`_git_conflict/`)。
+- 本機主控台尾版:`CGC_MDL149_…_v0189`(15,340 B)· `v0190`(9,511 B)· **`v0191`(5,161 B,2026-10-11)** → v0194 install 停在 `UNSUPPORTED_NATIVE_PRIOR` 的原因確認(要 v0192 / v0193)。
+- 結論:本機 main 要先接上 origin/main(落後 404)才會有 v0192;接上的方式要保住 2 個本機提交與 8 個改動(AllInOne 的 SYNC 段規矩:先備份、只 stash 追蹤檔、只 `--ff-only`、分岔就停)。未追蹤件多屬 VRN-2 / VDF,VCGC 不代動(L123)。
+- 腳本取得:`git show … | Set-Content` 會被 PowerShell 用主控台編碼(繁中 Windows 為 cp950)轉碼,中文腳本可能變亂碼 → 改用 `git archive`(位元組原樣)。
