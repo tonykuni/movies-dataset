@@ -203,6 +203,19 @@ def append_receipts(recs: list, path: Path | None = None) -> dict:
     return {"added": len(added), "duplicate": dup, "conflict": conflict}
 
 
+def is_file_source(source) -> bool:
+    """來源像檔案路徑(有副檔名)才要求 format;函式庫列(例:python stdlib)不是檔,不編格式。"""
+    return bool(source) and bool(re.search(r"\.[A-Za-z0-9]{1,8}$", str(source).strip()))
+
+
+def receipt_complete(r: dict) -> bool:
+    if not all(r.get(f) not in (None, "") for f in ("uuid", "operator", "registered_at")):
+        return False
+    if not re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2} [+-]\d{2}:\d{2}$", str(r.get("registered_at") or "")):
+        return False
+    return r.get("format") not in (None, "") or not is_file_source(r.get("source"))
+
+
 def strict_rows(rows: dict) -> dict:
     return {k: r for k, r in rows.items() if str(r.get("numbered_at") or "")[:10] >= STRICT_FROM}
 
@@ -213,9 +226,7 @@ def check(rows: dict | None = None, receipts: list | None = None) -> dict:
     have = {(r.get("code"), str(r.get("version") or "")) for r in receipts}
     strict = strict_rows(rows)
     missing = sorted(r["code"] for r in strict.values() if (r["code"], str(r.get("version") or "")) not in have)
-    incomplete = sorted(r.get("code") for r in receipts
-                        if not all(r.get(f) not in (None, "") for f in ("uuid", "operator", "registered_at", "format"))
-                        or not re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2} [+-]\d{2}:\d{2}$", str(r.get("registered_at") or "")))
+    incomplete = sorted(r.get("code") for r in receipts if not receipt_complete(r))
     lamp = "GREEN" if not missing and not incomplete else "YELLOW"
     return {"lamp": lamp, "strict_from": STRICT_FROM, "strict_rows": len(strict), "receipts": len(receipts),
             "missing": missing, "incomplete": incomplete,
@@ -344,6 +355,9 @@ def selftest(deep: bool = False) -> int:
             and got[0]["registered_at"] == "2026-11-10 16:28 +00:00")
         chk("補發後 GREEN", check(after, got)["lamp"] == "GREEN")
         chk("欄不全的收據 → YELLOW", check(after, [dict(got[0], registered_at="2026-11-10")])["lamp"] == "YELLOW")
+        lib = {"uuid": "u", "operator": "AI", "registered_at": "2026-11-10 16:52 +00:00", "source": "python stdlib", "format": None}
+        chk("函式庫列(非檔)不要求格式 · 檔案列缺格式才算不全", receipt_complete(lib)
+            and not receipt_complete(dict(lib, source="a/b_v0100.py")))
         chk("號冊一字不動", bk.read_text(encoding="utf-8") == json.dumps(bump) + "\n" + json.dumps(new) + "\n")
     os.environ.pop("VIA_OPERATOR", None)
     chk("operator:--operator 優先,否則 AI", _operator(["x", "--operator", "Tony"]) == ("Tony", ["x"]) and _operator(["x"]) == ("AI", ["x"]))
