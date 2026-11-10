@@ -108,3 +108,14 @@ python3 "docs/handoff/ai/VIA_DailyBackup_v0100.py" check && python3 "docs/handof
 | 登冊 | 盤點 **v0216**(+C-parquet-lake · C-lake-matrix · WKF037 四步)· 需求 **v0240**(+VCGC-REQ214 **PARTIAL**)· 工作流 **v0141**(+WKF037 five_system_lake · tests / what / evidence 齊)· 交接冊 +2 案 + 操作員項 systems-adopt-lake OPEN |
 
 **誠實邊界(L123)**:VCGC 不代建、不代寫他系統的湖。套件已給,VDF / VRN-2 / VQG / VAP 把既有 duckdb / parquet `append` 進自己的 `<VIA_DATA_HOME>/<SYS>` 是各系統的手;接上後矩陣燈自動轉綠。所以 REQ214 是 PARTIAL,不寫成完工。
+
+## 8. 第三輪(操作員「實測自設自修正輸出 · 輸出見證 · HTML U/I 可操作 · 高自動化高整合 · 只有必要項目才用輸入 · 滑鼠動作:Windows I/O · 拖曳 · 下拉 · 勾選」)
+
+| 件 | 結果 |
+|---|---|
+| `docs/handoff/ai/VIA_LakeConsole_v0100.py`(VCGC 本機橋操作台) | 只綁 127.0.0.1(預設隨機埠 · 桌機可 `--port 8766`)· 頁面注入當次權杖 · 副作用 POST 要同源 Origin + Sec-Fetch-Site + X-VIA-CSRF · 嚴格 JSON body · 白名單動作(檢查備份 · 工具看板 · 資料湖矩陣 · 四支自測 · 自修正鏈 · 全部自測鏈)· 子行程跑倉內尾版(單通道 · log 落盤)· 見證面板(每步 rc · 秒 · 收據連結 · 輸出尾段 · 燈)· 入湖:拖曳 / 選檔案 / 選資料夾(webkitdirectory)→ 預覽(格式 · 列 · 欄)→ 下拉表名 · 勾主鍵 · 勾增量 → VCGC 湖;他系統 → `_inbox/<SYS>`(L123 不代寫)· `/files` 只供 VIA_Reports 與湖根 |
+| 自測(真橋) | **17/17**:403 / 400 / 202 / rc 127 RED / 入湖 3 列 · 再入 0 / _inbox / `..` 擋 / 燈轉綠 / 邊界 |
+| 使用者測試(滑鼠) | Playwright 1440 / 900 / 390 × 13 步 = **39 步 0 失敗 0 pageerror**:下拉選套件自測 → 勾只看不寫 → 執行 → GREEN;下拉選資料湖矩陣 → 執行 → 收據連結;拖曳兩檔 → 預覽 2 檔 3 欄主鍵預勾 → 入湖 VCGC 新入;選檔案 → VDF → _inbox;選資料夾 → 預覽;頁內無權杖 POST 403;非白名單 400 → `VIA_Reports/lake/CONSOLE_UserTest_latest.{json,md}` + `console_shot_{pc,tablet,phone}.png` |
+| 自測抓到並修的真 bug | ① 混型來源(jsonl 的 `3` vs csv 的 `"3"`)入同表 → pyarrow 炸 → 套件 `_arrow_from_rows` 逐欄推型、字串退路(跨分片 DuckDB union_by_name 升 VARCHAR 實測)· 套件自測 10 → **11**;② 處理器例外默默斷線 → 一律 JSON 500(見證要看得到錯);③ 容器 HTTPS_PROXY 會攔 127.0.0.1 → 自測用無代理 opener |
+| 登冊 | 盤點 **v0217**(+C-lake-console · WKF038 三步)· 需求 **v0241**(+VCGC-REQ215 COVERED)· 工作流 **v0142**(+WKF038 lake_console)· 交接冊 +1 案 |
+| 桌機開法 | `python3 "docs/handoff/ai/VIA_LakeConsole_v0100.py" serve --open`(之後可掛進 CGC_MDL095 DeckServer 當 `/lake` 路由,同一套權杖律) |

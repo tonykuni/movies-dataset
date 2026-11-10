@@ -80,6 +80,25 @@ def _flatten(row: dict) -> dict:
     return out
 
 
+
+def _arrow_from_rows(pa, rows: list[dict], cols: list[str]):
+    """逐欄推型:全是 bool → bool;全是 int → int64;int/float 混 → float64;其餘(含 str 混數字)→ 全轉字串。
+    來源不同(jsonl 的 3 vs csv 的 "3")也能入同一表;跨分片型別不同時 DuckDB union_by_name 會升成 VARCHAR(實測)。"""
+    data = {}
+    for c in cols:
+        vals = [r.get(c) for r in rows]
+        nn = [v for v in vals if v is not None]
+        if nn and all(isinstance(v, bool) for v in nn):
+            data[c] = pa.array(vals, type=pa.bool_())
+        elif nn and all(isinstance(v, int) and not isinstance(v, bool) for v in nn):
+            data[c] = pa.array(vals, type=pa.int64())
+        elif nn and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in nn):
+            data[c] = pa.array([None if v is None else float(v) for v in vals], type=pa.float64())
+        else:
+            data[c] = pa.array([None if v is None else (v if isinstance(v, str) else json.dumps(v, ensure_ascii=False) if isinstance(v, (dict, list)) else str(v)) for v in vals], type=pa.string())
+    return pa.table(data)
+
+
 class Lake:
     def __init__(self, root: Path | str, system: str):
         system = str(system).upper().replace("-", "")
@@ -127,7 +146,7 @@ class Lake:
             for k in r:
                 if k not in cols:
                     cols.append(k)
-        arrow = pa.Table.from_pylist([{c: r.get(c) for c in cols} for r in flat])
+        arrow = _arrow_from_rows(pa, flat, cols)
         payload = json.dumps([[r.get(c) for c in cols] for r in flat], ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
         sha8 = hashlib.sha256(payload).hexdigest()[:8]
         fname = "part-%s-%s.parquet" % (stamp.replace(":", "").replace("-", "").replace(".", ""), sha8)
@@ -267,6 +286,18 @@ def selftest() -> int:
         chk("ⓗ 非五系統名拒絕 · 連字號正規化 VRN-2 → VRN2", bad and Lake(td, "VRN-2").system == "VRN2")
         gone = Lake(td, "VAP").status()
         chk("ⓘ 沒有湖:status exists False · 0 表 · 不炸", not gone["exists"] and gone["tables"] == [])
+    with tempfile.TemporaryDirectory(prefix="via_lake_") as td:
+        lk = Lake(td, "VCGC")
+        r1 = lk.append("mixed", [{"id": "a", "n": 1, "f": 1.5, "b": True}], keys=["id"])
+        r2 = lk.append("mixed", [{"id": "b", "n": "3", "f": 2, "b": "yes", "extra": {"k": 1}}], keys=["id"])
+        con = duckdb.connect(str(lk.catalog), read_only=True)
+        try:
+            rows = con.execute("select id, n, f, b, extra from v_mixed order by id").fetchall()
+            types = [t[1] for t in con.execute("describe v_mixed").fetchall()]
+        finally:
+            con.close()
+        chk("ⓚ 來源混型(jsonl 的 3 vs csv 的 '3' · 巢狀欄)仍入同一表 · 跨分片升 VARCHAR · 視圖可讀 2 列",
+            r1["added"] == 1 and r2["added"] == 1 and len(rows) == 2 and rows[1][1] == "3" and rows[1][4] == '{"k": 1}' and "VARCHAR" in types, (rows, types))
     src = Path(__file__).read_text(encoding="utf-8")
     chk("ⓙ 邊界:不開網路 / 不開子行程 / 不寫冊", not re.search(r"^\s*(import|from)\s+(urllib|socket|requests|http\b|subprocess)", src, re.M) and "registry" not in src.split("class Lake")[1].split("def selftest")[0])
     bad = len(ok) - sum(ok)

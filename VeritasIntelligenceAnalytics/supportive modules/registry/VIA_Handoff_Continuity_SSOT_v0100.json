@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-10T02:38:30Z",
+ "updated_at": "2026-11-10T02:57:07Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4486,13 +4486,13 @@
     "supportive modules/VIA_ParquetLake_v0100.py",
     "--selftest"
    ],
-   "success_marker": "[PASS] VIA_ParquetLake v0100 selftest · 10/10",
+   "success_marker": "[PASS] VIA_ParquetLake v0100 selftest · 11/11",
    "scope": "VIA_ParquetLake:<root>/<SYS>/<table>/part-*.parquet(zstd)+ _manifest.jsonl 只增 + <SYS>_catalog.duckdb VIEW;同主鍵增量跳過;五系統名閘",
    "dependencies": [
     "supportive modules/VIA_ParquetLake_v0100.py"
    ],
    "version": "v0100",
-   "updated_at": "2026-11-10T02:35:35Z",
+   "updated_at": "2026-11-10T02:55:38Z",
    "timeout_seconds": 300,
    "registered_at": "2026-11-10T02:35:35Z"
   },
@@ -4513,6 +4513,24 @@
    "updated_at": "2026-11-10T02:35:35Z",
    "timeout_seconds": 600,
    "registered_at": "2026-11-10T02:35:35Z"
+  },
+  "C-lake-console": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_LakeConsole_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_LakeConsole v0100 selftest · 17/17",
+   "scope": "VIA_LakeConsole:本機橋(127.0.0.1 隨機埠 · 同源權杖 · 白名單動作 · 單通道子行程 · 見證)· 入湖 VCGC / 他系統 _inbox · /files 白名單",
+   "dependencies": [
+    "docs/handoff/ai/VIA_LakeConsole_v0100.py",
+    "supportive modules/VIA_ParquetLake_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-10T02:55:38Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-10T02:55:38Z"
   }
  },
  "work_items": [
@@ -9426,6 +9444,17 @@
    "next": "各系統入口尾版 import VIA_ParquetLake 把既有 duckdb / parquet append 進 <VIA_DATA_HOME>/<SYS>",
    "receipt": null,
    "updated_at": "2026-11-10T02:35:35Z"
+  },
+  {
+   "id": "VCGC-REQ215:C-lake-console",
+   "requirement": "VCGC-REQ215",
+   "case": "C-lake-console",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-10:「實測自設自修正輸出 · 輸出見證 · HTML U/I 可操作 · 高自動化高整合 · 只有必要的項目才用輸入 · 介面都是滑鼠動作:Windows I/O · 拖曳式 · 下拉選單 · 勾選」 → 操作台引擎;等 handoff test 收據 → handoff test rc 0 · marker true · Playwright 39 步綠",
+   "next": "閘鏈 → 推 → PR",
+   "receipt": "docs/handoff/evidence/C-lake-console.json",
+   "updated_at": "2026-11-10T02:57:07Z"
   }
  ]
 }
