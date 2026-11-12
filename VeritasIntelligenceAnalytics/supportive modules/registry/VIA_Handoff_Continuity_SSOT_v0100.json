@@ -5193,6 +5193,44 @@
    "updated_at": "2026-11-12T21:00:00Z",
    "timeout_seconds": 1500,
    "registered_at": "2026-11-12T21:00:00Z"
+  },
+  "C-vcgc-agentos-hub-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL280_VCGCAgentOSHub_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] CGC_MDL280_VCGCAgentOSHub v0100 selftest · 12/12",
+   "scope": "CGC_MDL280:Agent OS 27 工具靜態盤點 · 整合冊 + 中央冊只增冪等 · 啟用矩陣 · Graphify 偵測",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL280_VCGCAgentOSHub_v0100.py",
+    "supportive modules/agent_os/VIA_AgentOS_v0102.py",
+    "docs/handoff/ai/VIA_SkillExport_v0101.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-12T22:30:00Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-12T22:30:00Z"
+  },
+  "C-vcgc-console-v0196": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0196.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] CGC_MDL149_VeritasCentralGovernanceConsole v0196 selftest · 9/9",
+   "scope": "主控台 v0196:agentos / graphify 兩扇門 · 其餘原樣轉交 v0195 · TAILAPI",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0196.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0195.py",
+    "supportive modules/registry/CGC_MDL280_VCGCAgentOSHub_v0100.py"
+   ],
+   "version": "v0196",
+   "updated_at": "2026-11-12T22:30:00Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-12T22:30:00Z"
   }
  },
  "work_items": [
@@ -10304,6 +10342,50 @@
    "next": "桌機經 VCGC InstallGate 建 via_rapidocr(最輕)→ 圖片列由 ABSENT 轉 PASS",
    "receipt": null,
    "updated_at": "2026-11-12T21:00:00Z"
+  },
+  {
+   "id": "VCGC-REQ223:C-vcgc-agentos-hub-v0100",
+   "requirement": "VCGC-REQ223",
+   "case": "C-vcgc-agentos-hub-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 12/12 · activate 綠 57 黃 0 紅 0;等 handoff test 收據",
+   "next": "—",
+   "receipt": "docs/handoff/evidence/C-vcgc-agentos-hub-v0100.json",
+   "updated_at": "2026-11-12T22:30:00Z"
+  },
+  {
+   "id": "VCGC-REQ223:C-vcgc-console-v0196",
+   "requirement": "VCGC-REQ223",
+   "case": "C-vcgc-console-v0196",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 9/9 · token 經 v0196 轉交 rc 0;等 handoff test 收據",
+   "next": "—",
+   "receipt": "docs/handoff/evidence/C-vcgc-console-v0196.json",
+   "updated_at": "2026-11-12T22:30:00Z"
+  },
+  {
+   "id": "VCGC-REQ223:graphify-venv",
+   "requirement": "VCGC-REQ223",
+   "case": null,
+   "state": "BLOCKED",
+   "owner": "operator",
+   "reason": "容器建 Graphify 隔離 venv 被自動權限擋(外部程式碼);graphify 門照實 ABSENT",
+   "next": "桌機貼 via_graphify_v0101 一行(VIA_NET_CONSENT 由操作員開)→ via-vcgc graphify run",
+   "receipt": null,
+   "updated_at": "2026-11-12T22:30:00Z"
+  },
+  {
+   "id": "VCGC-REQ223:tools27-interpretation",
+   "requirement": "VCGC-REQ223",
+   "case": null,
+   "state": "REVIEW",
+   "owner": "operator",
+   "reason": "倉內沒有 27 項清單;AI 解讀 27 = 8 Skill + 9 MCP + 10 slash",
+   "next": "操作員確認或給清單 → 整合冊出下一版",
+   "receipt": null,
+   "updated_at": "2026-11-12T22:30:00Z"
   }
  ]
 }
