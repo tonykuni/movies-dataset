@@ -5136,6 +5136,63 @@
    "version": "v0263",
    "updated_at": "2026-11-10T19:15:02Z",
    "timeout_seconds": 900
+  },
+  "C-vrn2-nonstock-core-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_NonStockCore_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VRN2_NonStockCore v0100 selftest · 18/18",
+   "scope": "VRN2_NonStockCore v0100:v0310 CORE 介面 16 名 · 抽取式 Claim · 排版斷行接回 · 表格 / 表單列不成句 · txt(Big5)/ html / docx / json 訊息 / LINE / eml / PDF / 圖片(OCR ABSENT 照實)",
+   "dependencies": [
+    "functional modules/VRN/VRN2_NonStockCore_v0100.py",
+    "supportive modules/registry/via_ocr_super_v0102.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-12T21:00:00Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-12T21:00:00Z"
+  },
+  "C-vrn2-nonstock-summarizer-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_NonStockSummarizer_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VRN2_NonStockSummarizer v0100 selftest · 18/18",
+   "scope": "VRN2_NonStockSummarizer v0100:v0310 SHA 釘 · 原件 / 暫代核心 · 多格式 → 一檔一列矩陣 · 原句驗證 · 個股車道分流 · 誠實五態",
+   "dependencies": [
+    "functional modules/VRN/VRN2_NonStockSummarizer_v0100.py",
+    "functional modules/VRN/VRN2_NonStockCore_v0100.py",
+    "functional modules/VRN/nonstock_v0310/engine/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310.py",
+    "functional modules/VRN/VRN_ReportLaneCheck_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-12T21:00:00Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-12T21:00:00Z"
+  },
+  "C-vrn2-reportrows-v0102": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_ReportRows_v0102.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VRN2_ReportRows v0102 selftest · 8/8",
+   "scope": "VRN2_ReportRows v0102:非個股 PDF 經 VRN2_NonStockSummarizer(不再整份暫代)· 夾內非 PDF 進矩陣 · v0101 鏈",
+   "dependencies": [
+    "functional modules/VRN/VRN2_ReportRows_v0102.py",
+    "functional modules/VRN/VRN2_ReportRows_v0101.py",
+    "functional modules/VRN/VRN2_NonStockSummarizer_v0100.py"
+   ],
+   "version": "v0102",
+   "updated_at": "2026-11-12T21:00:00Z",
+   "timeout_seconds": 1500,
+   "registered_at": "2026-11-12T21:00:00Z"
   }
  },
  "work_items": [
@@ -10199,10 +10256,54 @@
    "case": null,
    "state": "PENDING",
    "owner": "operator",
-   "reason": "v0310 hard gate 要 internal/NON_STOCK_CORE_v0200.py(SHA 92f53d82…);本倉 / VRN-1 / 容器都沒有",
-   "next": "操作員上傳或 --nonstock-out 指桌機 v0310 輸出夾",
+   "reason": "v0310 hard gate 要 internal/NON_STOCK_CORE_v0200.py(SHA 92f53d82…);2026-11-12 起 VRN-2 自建核心 VRN2_NonStockCore v0100 暫代(每列標「暫代」),原件仍缺",
+   "next": "操作員上傳原件 → VRN2_NonStockSummarizer 自動改用原件(ORIGINAL)· 不用改程式",
    "receipt": null,
-   "updated_at": "2026-11-10T10:05:00Z"
+   "updated_at": "2026-11-12T21:00:00Z"
+  },
+  {
+   "id": "VRN-REQ020:C-vrn2-nonstock-core-v0100",
+   "requirement": "VRN-REQ020",
+   "case": "C-vrn2-nonstock-core-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 18/18;等 handoff test 收據",
+   "next": "原件核心到了改 ORIGINAL",
+   "receipt": "docs/handoff/evidence/C-vrn2-nonstock-core-v0100.json",
+   "updated_at": "2026-11-12T21:00:00Z"
+  },
+  {
+   "id": "VRN-REQ020:C-vrn2-nonstock-summarizer-v0100",
+   "requirement": "VRN-REQ020",
+   "case": "C-vrn2-nonstock-summarizer-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 18/18 · 真 PDF 非個股 5/5 PASS(原句 4/4)· 個股 14 分流;等 handoff test 收據",
+   "next": "桌機實跑(有 fitz → v0310 版面鏈)",
+   "receipt": "docs/handoff/evidence/C-vrn2-nonstock-summarizer-v0100.json",
+   "updated_at": "2026-11-12T21:00:00Z"
+  },
+  {
+   "id": "VRN-REQ020:C-vrn2-reportrows-v0102",
+   "requirement": "VRN-REQ020",
+   "case": "C-vrn2-reportrows-v0102",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 8/8 + v0101 12/12;等 handoff test 收據",
+   "next": "—",
+   "receipt": "docs/handoff/evidence/C-vrn2-reportrows-v0102.json",
+   "updated_at": "2026-11-12T21:00:00Z"
+  },
+  {
+   "id": "VRN-REQ020:ocr-lane",
+   "requirement": "VRN-REQ020",
+   "case": null,
+   "state": "PENDING",
+   "owner": "VCGC",
+   "reason": "圖片 / 掃描 PDF 要 OCR 隔離境;容器 rapidocr NO_ENV · tesseract NO_BIN · paddle NO_ENV · surya NO_ENV",
+   "next": "桌機經 VCGC InstallGate 建 via_rapidocr(最輕)→ 圖片列由 ABSENT 轉 PASS",
+   "receipt": null,
+   "updated_at": "2026-11-12T21:00:00Z"
   }
  ]
 }
