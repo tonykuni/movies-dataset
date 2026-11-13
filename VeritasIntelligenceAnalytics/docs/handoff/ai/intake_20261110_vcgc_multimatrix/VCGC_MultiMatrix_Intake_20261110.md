@@ -125,3 +125,25 @@ QA_*.json(Selftest / Integration / Resilience / UI)是對方環境自報,本倉*
 
 修正(v0195 就地修;它只在 intake、尚未裝進任何 registry,舊內容在 git 歷史):`resilience-test` 與 `selftest` 一樣以 **v0194 原函式**跑 v0194 原套件,
 再跑本版自測;本版自測加 `F03'`(registry 尾版 v0196 → `NEWER_NATIVE` 停)→ 假 v0194 環境 13 / 13 PASS。
+
+## 12 · 主線已整合 v0193–v0196 → 改出 v0197 候選(2026-11-13)
+
+- 操作員本機 2026-11-13 實跑(WorkbenchLocal v0104):v0195 selftest 45/45 + 13/13、resilience 22/22 + 13/13 **全綠**;install 停 `NEWER_NATIVE_CONSOLE_PRESENT`
+  —— 本機 registry 尾版已是 **v0194 · v0195(26,703 B)· v0196(9,434 B)**。
+- 來源:VCGC 主線分支 `claude/optimistic-goodall-yhalc5`(27f875b9 · 2026-11-13)已把 v0193 / v0194(= 上傳件位元組)放進 registry,另有自己的
+  **v0195 標準 System Manager**(26,186 B)與 **v0196 AgentOS / Graphify 兩扇門**(9,237 B)。main(9ed1bb13)仍止於 v0192。
+- **本 intake 的 v0195 與主線 v0195 撞名 → 不採用**(保留作紀錄),改出 **`v0197/CGC_MDL149_…_v0197.py`** 接主線 v0196。
+- 主線 v0195 / v0196 未處理 B1–B4(非標準動詞原樣子行程轉交 v0194;install / register 仍是 v0194 原碼)→ v0197 照本冊第 10 節同法修,差別:
+  其他動詞(help · version · health · agentos · graphify · token …)以子行程原樣轉交 v0196;`matrix` 單獨 / `--family` → 原生 ≤ v0192(子行程)。
+  install 只接尾版 v0196 / v0197;registry 已有 v0198+ → `NEWER_NATIVE` 停。
+
+驗證(本倉容器,主線分支的真檔):
+| 項目 | 結果 |
+|---|---|
+| `matrix selftest`(真 v0194 + v0197) | v0194 原套件 45 / 45 · v0197 13 / 13 PASS |
+| `matrix resilience-test` | v0194 原套件 22 / 22 · v0197 13 / 13 PASS |
+| 路由 | `version` → v0196 → v0195 ✓ · `mmatrix doctor` → v0194 ✓ · `matrix --family vdf`(影子 registry,真原生鏈)→ 原生主控台正常起跑 ✓ |
+| `matrix install`(只出計畫 · 假倉:真 v0192 + 主線 v0193–v0196 + 三本冊真尾版) | `PLAN_READY` · 需求 / 工作流 code 留白 · v0192 正規化 SHA 相符 · 寫入 5 檔(離線頁 · 三本冊新版號 · v0197 最後)· 假倉未被寫入 |
+
+WorkbenchLocal v0105:本機尾版 v0196 → S17 自動走 v0197(本機 v0192–v0196 **複本**放專用夾,registry 不動)+ 路由煙測;`-InstallV0197` 才 `--apply`(先原生六檢)。
+本機若已出現 v0197+ → 判撞號停。真正寫進 registry / 冊的是操作員本機或主線分支;本分支只交候選。
