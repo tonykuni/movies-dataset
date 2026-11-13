@@ -140,7 +140,7 @@
  "tally": {
   "RECORDED": 26,
   "COVERED": 148,
-  "PARTIAL": 116,
+  "PARTIAL": 117,
   "MISSING": 1
  },
  "requirements": [
@@ -7489,6 +7489,24 @@
    "hand": "AI",
    "version": "v0100",
    "updated_at": "2026-11-13T19:39:51Z"
+  },
+  {
+   "code": "VCGC-REQ244",
+   "subsystem": "VCGC",
+   "topic": "跨系統 SSOT 一致性唯讀稽核(代號三型 · 主動 ETF · 期間正規化 · 同義字 · 會計科目)→ 發現登錄待辦、交各系統自修",
+   "requirement": "操作員 2026-11-13:「SSOT REGEX 同義字根據過去紀錄有完善化嗎 財報中的會計科目SSOT是否有完善化 VRN VDF VAP VQG是否有一致性更新 台股三種代碼 主動式台股ETF 相關SSOT 包含輸入 輸出 參數 日期 … 擷取後標準化無前後綴」「過去都有紀錄不要重工」「遵守獨立系統原則」「登錄待辦 交各系統自修 整合去重優化測試無誤收尾VCGC」",
+   "status": "PARTIAL",
+   "homes": [
+    "CGC_MDL247_SSOTPanorama(ssot panorama)",
+    "VRN_FieldRules_SSOT_v0101.json",
+    "functional modules/VDF/VDF_InputUniverse_SSOT_v0104.json",
+    "VIA_DataFrameContract_SSOT_v0100.json(DF04)"
+   ],
+   "evidence": "容器實測 2026-11-13:VRN-2 ENG084 代號 2330.TW / 2330 TT / 00981A → 無前後綴正典碼 ✅;期間 2Q26 / 26Q2 / 2026Q2 / FY26Q2 → 2026-Q2,20260630 / 115-06-30 → 2026-06-30 ✅;6488.TWO 被讀成 .TW · 判上市 ❌;SSOT 全景 正則綠 · 同義字黃 · 上下連結紅",
+   "next": "見交接待辦 VCGC-REQ244:*(各系統自修;VCGC 只攤開不代修,L123)",
+   "hand": "各系統(VRN-2 · VAP · VQG)/ 操作員",
+   "version": "v0100",
+   "updated_at": "2026-11-13T20:26:25Z"
   }
  ],
  "non_requirements": [

@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-13T19:53:46Z",
+ "updated_at": "2026-11-13T20:26:25Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -9933,10 +9933,10 @@
    "case": "C-mcp-server-v0104",
    "state": "PENDING",
    "owner": "operator",
-   "reason": "容器與倉內 .mcp.json 已接 v0104;桌機 Claude Desktop 要重新載入,遠端 ChatGPT / Manus / Copilot web 要 parity --write + HTTPS 隧道",
+   "reason": "容器與倉內 .mcp.json 已接 v0104;桌機 Claude Desktop 要重新載入,遠端 ChatGPT / Manus / Copilot web 要 parity --write + HTTPS 隧道 ‖ 2026-11-13 容器 parity --platforms manus:YELLOW · remote · via-systemcard / via-vcgc 走 supergateway(8900/8901)· omniroute 原生 HTTP · 三條都需 HTTPS 隧道(建議有存取控制,勿公開)",
    "next": "桌機重開 MCP;VIA_MCP_Engine parity --write(操作員)",
    "receipt": null,
-   "updated_at": "2026-11-13T16:57:08Z"
+   "updated_at": "2026-11-13T20:26:25Z"
   },
   {
    "id": "UPLOAD-20261113:pc-files",
@@ -10179,6 +10179,83 @@
    "next": "各系統自補;VIA_HTML_UI 歸屬待操作員定;唯讀件列豁免冊",
    "receipt": null,
    "updated_at": "2026-11-13T19:39:51Z"
+  },
+  {
+   "id": "VCGC-REQ244:vrn2-two-suffix",
+   "requirement": "VCGC-REQ244",
+   "case": "",
+   "state": "PENDING",
+   "owner": "VRN-2(VRN_SystemManager)",
+   "reason": "VRN_FieldRules_SSOT_v0101 ticker.TW_YF_TICKER `\\.(TW|TWO)` 被 ENG084 去掉 ^$ 後 TW 先中:實測 6488.TWO → raw 6488.TW · market TWSE(上市),應為 TPEX(上櫃)",
+   "next": "VRN-2 自修:交替改 (TWO|TW) 或補 \\b,加 6488.TWO 夾具;VCGC 下次 ssot panorama 只讀複驗",
+   "receipt": null,
+   "updated_at": "2026-11-13T20:26:25Z"
+  },
+  {
+   "id": "VCGC-REQ244:vrn2-ticker-two-heads",
+   "requirement": "VCGC-REQ244",
+   "case": "",
+   "state": "PENDING",
+   "owner": "VRN-2(VRN_SystemManager)",
+   "reason": "代號規則兩顆頭:knowledge/VRN_TickerDate_Regex_v0100(2026-09-20,無主動 ETF 型,0050 / 00878 / 00981A 不中)與 VRN_FieldRules_SSOT_v0101 ticker(批628 九型含主動 ETF)",
+   "next": "VRN-2 自行整合去重成一本(只增不減,舊冊留差異紀錄),引擎改讀同一本",
+   "receipt": null,
+   "updated_at": "2026-11-13T20:26:25Z"
+  },
+  {
+   "id": "VCGC-REQ244:vrn2-synonym-yellow",
+   "requirement": "VCGC-REQ244",
+   "case": "",
+   "state": "PENDING",
+   "owner": "VRN-2 / 操作員裁定",
+   "reason": "SSOT 全景同義字黃:VRN 收容件對樞紐漂移 8 列 · 拒絕清單真漏口 8 · 券商冊 27 未過拒絕閘;VCGC 側兩本網域冊 NONCANONICAL 1(jpmorgan.com 拼法)",
+   "next": "VRN-2 自修漂移 / 漏口;網域拼法與券商別名由操作員裁定後各冊自更;VCGC 只讀複驗",
+   "receipt": null,
+   "updated_at": "2026-11-13T20:26:25Z"
+  },
+  {
+   "id": "VCGC-REQ244:vrn2-number-gap",
+   "requirement": "VCGC-REQ244",
+   "case": "",
+   "state": "PENDING",
+   "owner": "VRN-2(VRN_SystemManager)",
+   "reason": "SSOT 全景自動編號黃:VRN 尾版 127 · 缺號 1(VRN_M03_PDF_Layout_JSON_v3.py)",
+   "next": "VRN-2 經自己管理器 table/fn number pull 補號;VCGC 只發號不代寫",
+   "receipt": null,
+   "updated_at": "2026-11-13T20:26:25Z"
+  },
+  {
+   "id": "VCGC-REQ244:vrn2-finstatement-review",
+   "requirement": "VCGC-REQ244",
+   "case": "",
+   "state": "PENDING",
+   "owner": "VRN-2 / 操作員",
+   "reason": "會計科目冊 VRN_FinStatement_Synonym_v0100(7 表 · 141 科目)與 VRN_FinData_Synonym_v0100(195 · 待裁 0)自 2026-09-20 後無新版;沒有後續擴充紀錄",
+   "next": "VRN-2 自查是否有新科目 / 同義字未入冊(只增);無則轉 VERIFIED 帶理由",
+   "receipt": null,
+   "updated_at": "2026-11-13T20:26:25Z"
+  },
+  {
+   "id": "VCGC-REQ244:vap-vqg-rulebook",
+   "requirement": "VCGC-REQ244",
+   "case": "",
+   "state": "PENDING",
+   "owner": "VAP / VQG(各自 SystemManager)",
+   "reason": "代號 / 期間正規化規則冊引用:VDF 9 · VRN-2 75 · VAP 0 · VQG 0;主動 ETF / 輸入宇宙:VDF 27 · 其餘 0",
+   "next": "VAP / VQG 各自決定是否改讀 VRN_FieldRules / VDF_InputUniverse(不抄第二份);不需要則轉 VERIFIED 帶理由",
+   "receipt": null,
+   "updated_at": "2026-11-13T20:26:25Z"
+  },
+  {
+   "id": "VCGC-REQ244:vrn2-success-branch",
+   "requirement": "VCGC-REQ244",
+   "case": "",
+   "state": "PENDING",
+   "owner": "VRN-2 / 操作員",
+   "reason": "會話「VRN 成功版本與分支對照」的分支 claude/amazing-hawking-tjzssr 不在 GitHub、未併 main;VCGC 看不到也不代併(L123)",
+   "next": "VRN-2 會話推上 GitHub 並由 VRN-2 自己合併;合併後 VCGC 只讀複驗",
+   "receipt": null,
+   "updated_at": "2026-11-13T20:26:25Z"
   }
  ]
 }
