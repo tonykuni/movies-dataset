@@ -24,7 +24,7 @@ E=$(python3 -c "import json;print(json.load(open('VeritasIntelligenceAnalytics/s
 | 4b | AUTO SYNC(全景監控同步 · 同步檢查)| `VIA_FROM_VCGC=YES python3 "$V" monitor sync` · `… sync-check` |
 | 5 | 串測(全部 VCGC 工具 · 自動重出矩陣) | `VIA_FROM_VCGC=YES python3 "$V" test --quick` |
 | 6 | 工具矩陣(兩大功能 · 收斂 · 覆蓋率 · 發行冊) | `VIA_FROM_VCGC=YES python3 "$V" run VIA_VCGC_MDL258_ToolMatrix build` |
-| 7 | 支援工具發行冊有沒有新版待核 | `VIA_FROM_VCGC=YES python3 "$V" run VIA_VCGC_MDL258_ToolMatrix release`(乾跑;新版經操作員與 AI 協調、測試無誤才 `--apply`,L130 ④) |
+| 7 | 支援工具發行冊有沒有新版待核 | `VIA_FROM_VCGC=YES python3 "$V" run VIA_VCGC_MDL258_ToolMatrix release`(乾跑;新版經操作員與 AI 協調、測試無誤才 `--apply`,L134 ④) |
 | 8 | Graphify 車道 | `python3 VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_GraphifyLane_v0100.py` |
 | 9 | OmniRoute / MCP(只讀探測;金鑰與隧道是操作員的手) | `VIA_FROM_VCGC=YES python3 "$V" mcp doctor` · `VIA_FROM_VCGC=YES python3 "$V" mcp probe <平台>` |
 | 10 | 五系統各走自己入口並行實測(VCGC · VDF · VRN · VQG · VAP;只寫各自收據與進度帳) | `python3 VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_FiveSystemConstitution_v0100.py run --apply` |

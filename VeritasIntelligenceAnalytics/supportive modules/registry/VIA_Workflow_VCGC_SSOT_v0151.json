@@ -1,6 +1,6 @@
 {
  "schema": "VIA.Workflow.SDD.v1",
- "version": "v0147",
+ "version": "v0151",
  "subsystem": "VCGC",
  "zh": "中央治理 · 中樞工作流",
  "batch": "影子整併 + MCP 讀檔三動詞(操作員 2026-11-13「接進 VCGC 並補上 MCP 的 read slice digest」)",
@@ -2955,7 +2955,7 @@
      "code": "VCGC-WKF032-STP002",
      "alias": "mcp_expose",
      "name": "MCP v0102 露互監 / 備份 / 六項令收據(只讀)",
-     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0104.py",
+     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0105.py",
      "verb": "--serve",
      "inside": "VCGC MCP",
      "evidence": "step:VCGC-WKF032-STP001",
@@ -3753,7 +3753,7 @@
      "alias": "mcp_file_verbs",
      "name": "MCP 讀檔三動詞(read · slice · digest 委派鎖版 token 工具)",
      "what": "倉內路徑閘(先判倉內外、倉外不透露存在)· .git/ private/ .env* 金鑰檔拒讀 · 鎖冊 sha 不符即停 · rc 0/1/3 是答案",
-     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0104.py",
+     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0105.py",
      "verb": "--selftest",
      "inside": "VCGC run",
      "evidence": "self:CGC_MDL279_MCPServer",
@@ -3780,7 +3780,7 @@
    "spec": {
     "goal": "兩支舊版引擎先複製進影子區(原檔 sha 前後一致)· 逐定義分 SAME / DOC_ONLY / SAME_SIG_DIFF_BODY / DIFF_SIG / ONLY_A / ONLY_B · 合併候選只寫影子區 · 未遷有理由才可能 PROVEN_ZERO_LOSS;證不出零損失的群不准遷(L75)",
     "requirements": [
-     "VCGC-REQ223"
+     "VCGC-REQ245"
     ],
     "acceptance": [
      "CGC_MDL281 自測 13/13",
@@ -3920,7 +3920,7 @@
     {
      "code": "VCGC-WKF044-STP005",
      "alias": "converge_prune",
-     "name": "單檔收斂:驗證後刪舊版(L130)",
+     "name": "單檔收斂:驗證後刪舊版(L134)",
      "what": "只挑 READY(尾版單檔 · 舊版無人點名)且實測帳 GREEN 對到尾版 sha;刪前 / 刪後各跑尾版自測,不過即還原;刪除帳只增",
      "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
      "verb": "prune --apply",
@@ -4030,7 +4030,7 @@
      {
       "code": "F11",
       "risk": "合成檔漏加速器橋 / 外抓模組漏網路橋",
-      "detect": "覆蓋率實量(L103 · L132)",
+      "detect": "覆蓋率實量(L103 · L136)",
       "fix": "檔頭帶 ACCEL-BRIDGE;外抓帶 NET-BRIDGE;覆蓋率 100%",
       "step": "STP010"
      },
@@ -4045,7 +4045,7 @@
       "code": "F13",
       "risk": "VCGC 動到他系統的檔(違反獨立性)",
       "detect": "system_of 歸屬 · 命名衝突檢",
-      "fix": "只收斂 VCGC 自己的家族;他系統只攤開就緒度(L123 · L130 ③)",
+      "fix": "只收斂 VCGC 自己的家族;他系統只攤開就緒度(L123 · L134 ③)",
       "step": "STP006"
      },
      {
@@ -4185,7 +4185,7 @@
      "alias": "no_gap",
      "name": "註冊避免缺漏",
      "what": "SDD X-REG / X-NUM · 交接 UNREGISTERED 都要 0",
-     "engine": "supportive modules/registry/CGC_MDL245_SDDValidator_v0108.py",
+     "engine": "supportive modules/registry/CGC_MDL245_SDDValidator_v0109.py",
      "verb": "check",
      "inside": "VCGC run",
      "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
@@ -4608,7 +4608,7 @@
    ]
   }
  ],
- "prior": "VIA_Workflow_VCGC_SSOT_v0146.json",
+ "prior": "VIA_Workflow_VCGC_SSOT_v0150.json",
  "why_v0101": "VCGC-WKF008/009 的已知未綠移除:唯一接觸口 CGC_MDL157 v0106 沿命令冊 dot-source 鏈讀 + 撞號以編號系統唯一碼為準 + 補 15 支缺梭 → 29/29 GREEN",
  "why_v0103": "側線 i:+VCGC-WKF001-STP007 SSOT 全景(CGC_MDL247);需求回指補齊(REQ072→WKF001 · REQ073→WKF004,SDD v0104 X-REQ-BACK 量到的單向);新需求 REQ077–082 掛上;其餘步與工作流一字不動",
  "why_v0104": "側線 2026-09-30 a:VCGC-REQ084 回指(WKF001 · WKF003)· STP005 / WKF003-STP006 記只登本批與註冊完整性稽核;代碼 · 步序 · 正主一律不動",
@@ -4651,6 +4651,6 @@
  "why_v0144": "WKF037-STP001 → ParquetLake v0101;WKF038 自測 19。Codex PR #624:P1 套件 v0100 已在 main 卻被就地改 → 還原 v0100 一字不動 · 新行為出 VIA_ParquetLake_v0101(混型來源逐欄推型 · 微秒戳 · 自測 11);消費者 LakeMatrix v0101 / LakeConsole 改取尾版 glob。P2 ① _inbox 同名檔(a/data.csv · b/data.csv)互相覆蓋 → 路徑消毒 + 內容 sha8 命名 · xb 絕不覆蓋;P2 ② 見證燈只看 rc(引擎自報 YELLOW 仍 GREEN)→ 收據 lamp > stdout 標籤 > rc。",
  "why_v0145": "+WKF039 five_system_activate(五系統啟動 via HTML U/I;REQ216)。操作員 2026-11-10「activate 5 system via html u/i and run」→ VIA_LakeConsole v0101 薄尾:白名單 +6 動作(five_systems · activate_vcgc/vdf/vrn2/vqg/vap)+ 鏈 activate_all · 燈號 +6 盞 · 按鈕列 · 矩陣收據複製 · 逾時依系統。",
  "why_v0146": "只增:+VCGC-WKF042(SystemCard 全景卡 · 自建平台管理者版 · MCP parity);操作員 2026-11-10 四令合一。",
- "why_v0147": "只增:+VCGC-WKF043 shadow_merge(REQ223);WKF042 +REQ224 · +STP004 mcp_file_verbs(步碼只增)。v0146 一字不動。 WKF042 補 tests 欄與 STP001 verb/inside(SDD X-COL)。 WKF029 acceptance[6] 改寫字面(語意不變:發號走 CGC_MDL237 · audit 三零):原句「只經 VCGC run …」講的是發號工具不是入口,卻被 X-PEER-TEXT 當唯一入口舊字判黃,連帶 SDD v0106 自測 ④ FAIL;原句全文留 spec.acceptance_before_v0147(版史欄,L120 ①)。 WKF042 STP001–003 補 verb / inside / evidence:STP002 的頁與 Hub 由 scan() 內 render_locked() 產出(查碼確認,非推測);STP003 = VIA_MCP_Engine parity(VCGC mcp)。 WKF032-STP002(mcp_expose)引擎 v0102 → v0103:本批出了 MCP 薄尾 v0103(v0102 一字不動,收據資源全數沿用),步釘舊版會被 X-REG 判「註冊冊不是尾版」;舊值留 engine_before_v0147。",
+ "why_v0147": "只增:+VCGC-WKF043 shadow_merge(REQ245);WKF042 +REQ224 · +STP004 mcp_file_verbs(步碼只增)。v0146 一字不動。 WKF042 補 tests 欄與 STP001 verb/inside(SDD X-COL)。 WKF029 acceptance[6] 改寫字面(語意不變:發號走 CGC_MDL237 · audit 三零):原句「只經 VCGC run …」講的是發號工具不是入口,卻被 X-PEER-TEXT 當唯一入口舊字判黃,連帶 SDD v0106 自測 ④ FAIL;原句全文留 spec.acceptance_before_v0147(版史欄,L120 ①)。 WKF042 STP001–003 補 verb / inside / evidence:STP002 的頁與 Hub 由 scan() 內 render_locked() 產出(查碼確認,非推測);STP003 = VIA_MCP_Engine parity(VCGC mcp)。 WKF032-STP002(mcp_expose)引擎 v0102 → v0103:本批出了 MCP 薄尾 v0103(v0102 一字不動,收據資源全數沿用),步釘舊版會被 X-REG 判「註冊冊不是尾版」;舊值留 engine_before_v0147。",
  "why_v0147_b": "就地只增(本分支未發佈):+VCGC-WKF044 tool_matrix(REQ227–229);WKF032-STP002 · WKF042-STP004 引擎改 MDL279 v0104(L25 撞號升版)。 +VCGC-WKF045 family_converge(13 步 + 20 種失敗可能與解法;操作員 2026-11-13「這個流程很重要 未來常用」)。 +VCGC-WKF046 daily_close · +VCGC-WKF047 daily_open(斜線工具 /vcgc-daily-close · /vcgc-daily-open)。"
 }

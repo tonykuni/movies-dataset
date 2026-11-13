@@ -4,7 +4,7 @@
 
 操作員 2026-11-13 原文(節):「矩陣顯示目前VCGC本身中央控管功能及節省TOKEN工具所有工具即被整合進來的所有工具
 為了將自動隨時更新於HTML矩陣化管理來進行使用」「VCGC節省或支援工具VIA_VCGC_SUP001_ VCGC本身中央管理VIA_VCGC_MDL001
-相同要有版本號 依照命名規定」「將我指令視覺鎖定模板整合進來併用它來顯示VCGC進行VCGC收尾」(政策 L129)
+相同要有版本號 依照命名規定」「將我指令視覺鎖定模板整合進來併用它來顯示VCGC進行VCGC收尾」(政策 L133)
 
 畫面一律走操作員的視覺鎖定 U/I(docs/handoff/ai/VIA_VisualLock_v* 尾版:token 從鎖定正本抽、不手抄),
 出頁後當場過鎖定閘(token sha · 不寫死色 · 0 外連 · 手機側邊槽);閘紅 = 本頁不算完成。
@@ -779,7 +779,7 @@ def render_html(rep: dict, kit: str) -> str:
     for x in rl.values():
         d0 = grp_rel.setdefault(x.get("group") or "—", [0, 0])
         d0[0 if x.get("status") == "RELEASED" else 1] += 1
-    h.append('<div class="vl-panel" data-span="6"><div class="vl-head"><h2>支援工具發行(L130 ④)</h2></div>%s</div>' % svg_bars(
+    h.append('<div class="vl-panel" data-span="6"><div class="vl-head"><h2>支援工具發行(L134 ④)</h2></div>%s</div>' % svg_bars(
         [(g0, [(v[0], "--vl-success"), (v[1], "--vl-warning-ink")]) for g0, v in sorted(grp_rel.items())], [("RELEASED", "--vl-success"), ("CANDIDATE", "--vl-warning-ink")]))
     h.append('</div></section>')
 
@@ -798,8 +798,8 @@ def render_html(rep: dict, kit: str) -> str:
             '<td class="vl-num">%s</td>' % t(x) for x in (g["n"], g["issued"], g["lamps"]["GREEN"], g["lamps"]["YELLOW"], g["lamps"]["RED"],
                                                        g["accel"], g["station"], g["tested"], g["single"], g["ready"], g["flatten"], g["blocked"])),
             t(" · ".join(g["used_by"]) or "—")))
-    h.append('</tbody></table></div><p class="vl-note">單檔 = 只有一版 · 可刪舊版 = 尾版不載前版且舊版無人點名(驗證後刪,L130)· 待合成 = 薄尾鏈要先合成單檔並證零遺失 ·'
-             ' 他系統在用 = VDF / VRN-2 / VQG / VAP 的尾版直接載入這組支援工具(L130 ④:應改為各存一份同版副本)</p></div></section>')
+    h.append('</tbody></table></div><p class="vl-note">單檔 = 只有一版 · 可刪舊版 = 尾版不載前版且舊版無人點名(驗證後刪,L134)· 待合成 = 薄尾鏈要先合成單檔並證零遺失 ·'
+             ' 他系統在用 = VDF / VRN-2 / VQG / VAP 的尾版直接載入這組支援工具(L134 ④:應改為各存一份同版副本)</p></div></section>')
     cols = ["燈", "分組", "名碼", "名碼狀態", "家族(現名)", "尾版", "版數", "收斂", "中央編號", "編號時間", "最後提交", "實測帳", "測站",
             "加速器", "AST", "TA-Lib", "他系統載入", "指令"]
 
@@ -834,10 +834,10 @@ def render_html(rep: dict, kit: str) -> str:
                [r for r in rows if r["cls"] == "MDL"])
     tool_table("sup", "tb-sup", "VIA 支援工具(Token-Saving 與其他工具組)",
                "SUP = 省 Token(read · slice · digest · MCP · NLP brief)與其他工具組(加速器 · 網路 · NLP / Layout / OCR · AI 平台 · 整併 / 資料);"
-               "「他系統載入」的「在用」= 他系統尾版直接載入本支(L130 ④ 應改為各存一份同版副本)",
+               "「他系統載入」的「在用」= 他系統尾版直接載入本支(L134 ④ 應改為各存一份同版副本)",
                sorted([r for r in rows if r["cls"] == "SUP"], key=lambda r: (r["super"] != SUPER["TOKEN"], r["group_label"], r["family"])))
     fl = rep.get("flatten") or {}
-    h.append('<section data-pane="flat" hidden><div class="vl-panel"><div class="vl-head"><h2>單檔收斂(L130:全部薄尾家族合成單檔 · 驗證後刪舊版)</h2>'
+    h.append('<section data-pane="flat" hidden><div class="vl-panel"><div class="vl-head"><h2>單檔收斂(L134:全部薄尾家族合成單檔 · 驗證後刪舊版)</h2>'
              '<span class="vl-why">只收斂 VCGC 自己的家族;VDF · VRN-2 · VQG · VAP 各自收斂(L123)· 凍結件與收容原件不動</span></div><div class="vl-grid">')
     for k2, label in (("SINGLE", "已是單檔"), ("READY", "可刪舊版(家族)"), ("old_files_ready", "可刪的舊版檔"), ("NEEDS_FLATTEN", "薄尾待合成"),
                       ("BLOCKED_REF", "舊版仍被點名"), ("EXEMPT", "凍結不收斂")):
@@ -853,7 +853,7 @@ def render_html(rep: dict, kit: str) -> str:
         h.append('<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>' % (t(x.get("code")), t(x.get("risk")), t(x.get("detect")), t(x.get("fix")), t(x.get("step"))))
     h.append('</tbody></table></div></div>')
     cv = rep.get("coverage") or {}
-    h.append('<div class="vl-panel"><div class="vl-head"><h2>加速器 / 網路橋覆蓋率(活樹尾版 · L103 · L132)</h2><span class="vl-why">他系統的缺口只攤開、各系統自補(L123)</span></div>'
+    h.append('<div class="vl-panel"><div class="vl-head"><h2>加速器 / 網路橋覆蓋率(活樹尾版 · L103 · L136)</h2><span class="vl-why">他系統的缺口只攤開、各系統自補(L123)</span></div>'
              '<div class="vl-scroll"><table><thead><tr><th>系統</th><th>.py 尾版</th><th>帶加速器橋</th><th>外抓模組</th><th>帶網路橋</th></tr></thead><tbody>')
     for sysname, b in sorted((cv.get("by_sys") or {}).items()):
         h.append('<tr><td>%s</td><td class="vl-num">%d</td><td class="vl-num">%d</td><td class="vl-num">%d</td><td class="vl-num">%d</td></tr>' % (t(sysname), b[0], b[1], b[2], b[3]))
@@ -904,7 +904,7 @@ def render_html(rep: dict, kit: str) -> str:
 
     # ⑤ TA-Lib
     tl = rep["talib"]
-    h.append('<section data-pane="talib" hidden><div class="vl-panel"><div class="vl-head"><h2>TA-Lib:不可用、不可出現(L50 · L129)</h2>'
+    h.append('<section data-pane="talib" hidden><div class="vl-panel"><div class="vl-head"><h2>TA-Lib:不可用、不可出現(L50 · L133)</h2>'
              '<span class="vl-why">尾版程式使用 %d 處(紅)· 舊版版史 %d 處(黃:只增不減不能刪,出新版時拿掉)· 守門檔內樣本 %d 處 · '
              '文字出現 %d 檔(守門 / 法條必要提及 %d 檔)· 收容夾不掃(L03)</span></div>'
              % (tl["use"], tl.get("use_history", 0), tl["use_in_guard"], tl["files"], tl["guard_files"]))
@@ -994,7 +994,7 @@ def group_of(cls: str, fam: str, seat: str = "") -> tuple:
 
 
 def readiness(fam: str, info: dict, refs: dict, via: Path = VIA) -> tuple:
-    """單檔收斂就緒度(L130):SINGLE 已單檔 · READY 可刪舊版 · NEEDS_FLATTEN 薄尾鏈先合成單檔 · BLOCKED_REF 舊版仍被點名 · EXEMPT 凍結。"""
+    """單檔收斂就緒度(L134):SINGLE 已單檔 · READY 可刪舊版 · NEEDS_FLATTEN 薄尾鏈先合成單檔 · BLOCKED_REF 舊版仍被點名 · EXEMPT 凍結。"""
     files = [f for f in info.get("files", []) if f]
     tail = info.get("tail")
     if len(files) <= 1 or tail is None:
@@ -1139,7 +1139,7 @@ def collect(via: Path = VIA, ast: bool = True) -> dict:
                   "use_history": sum(x["use"] for x in tl_rows if not x["guard"] and not x["tail"]),
                   "use_in_guard": sum(x["use"] for x in tl_rows if x["guard"]),
                   "by_sys": by_sys},
-        "register_view": register_view(via), "receipts": receipts(via), "policy": policy_law("L129", via),
+        "register_view": register_view(via), "receipts": receipts(via), "policy": policy_law("L133", via),
         "scan": {"files": tree["files"], "skipped_big": tree["skipped_big"],
                  "ast": "error: " + ast_rows["__error__"] if "__error__" in ast_rows else ("on" if ast else "off")},
         "sources": [fi_name, "VIA_NumberBook_MDL_v0100.jsonl", "VIA_VCGC_FunctionLedger_v0100.jsonl", "VIA_ToolVersion_Lock_v0100.json",
@@ -1248,7 +1248,7 @@ def _selftest_of(path: Path, tag: str) -> int:
 
 
 def prune_plan(via: Path = VIA) -> list:
-    """L130 ②:只挑 READY(尾版單檔 · 舊版無人點名)且實測帳 GREEN 對到現在尾版 sha 的家族。"""
+    """L134 ②:只挑 READY(尾版單檔 · 舊版無人點名)且實測帳 GREEN 對到現在尾版 sha 的家族。"""
     rep = collect(via, ast=False)
     fams, _sk, _ex = discover(via)
     led = ledger_last(via)
@@ -1290,7 +1290,7 @@ def prune_apply(plan: list, ledger: Path, via: Path = VIA) -> list:
             recs.append({"ts": now, "event": "pruned", "family": item["family"], "file": rel(f, via), "sha256": hashlib.sha256(b).hexdigest(),
                          "bytes": len(b), "tail": tail.name, "tail_version": "v%04d" % vnum(tail),
                          "proof": {"ledger": item["why"], "selftest_before": before, "selftest_after": after, "refs": 0, "thin": False},
-                         "law": "L130", "by": "%s %s" % (NAME, VERSION)})
+                         "law": "L134", "by": "%s %s" % (NAME, VERSION)})
     if recs:
         with open(ledger, "a", encoding="utf-8") as fh:
             for x in recs:
@@ -1336,7 +1336,7 @@ def release_latest(via: Path = VIA) -> dict:
 
 
 def release_cmd(apply: bool, via: Path = VIA) -> int:
-    """支援工具發行冊(L130 ④ · 操作員 2026-11-13 核可格式):一族一個發行版(版號 + sha256 + 使用系統);只增。
+    """支援工具發行冊(L134 ④ · 操作員 2026-11-13 核可格式):一族一個發行版(版號 + sha256 + 使用系統);只增。
     RELEASED = 實測帳 GREEN 對到這支尾版的 sha;其餘 CANDIDATE。他系統的副本由他系統自存(VCGC 不代寫)。"""
     rep = collect(via, ast=False)
     fams, _sk, _ex = discover(via)
@@ -1355,7 +1355,7 @@ def release_cmd(apply: bool, via: Path = VIA) -> int:
         new.append({"ts": utc_now(), "event": "release", "family": r["family"], "code": r["name_code"], "group": r["group_label"],
                     "version": "v%04d" % vnum(tail) if vnum(tail) >= 0 else "—", "file": rel(tail, via), "sha256": sha, "status": st,
                     "consumers": r.get("sup_use", {}), "consumer_copy": "未自存(他系統直接載入 VCGC 活檔)" if r.get("sup_use") else "—",
-                    "rule": "他系統各存一份與本列 sha256 相同的副本;換版經操作員與 AI 協調、測試無誤才換(L130 ④)", "by": "%s %s" % (NAME, VERSION)})
+                    "rule": "他系統各存一份與本列 sha256 相同的副本;換版經操作員與 AI 協調、測試無誤才換(L134 ④)", "by": "%s %s" % (NAME, VERSION)})
     print("[%s release] 支援工具 %d 族 · 新列 %d(RELEASED %d · CANDIDATE %d)· 他系統直接載入 %d 族" % (
         NAME, sum(1 for r in rep["tools"] if r["cls"] == "SUP"), len(new), sum(1 for x in new if x["status"] == "RELEASED"),
         sum(1 for x in new if x["status"] == "CANDIDATE"), sum(1 for r in rep["tools"] if r["cls"] == "SUP" and r.get("sup_use"))), flush=True)
@@ -1471,7 +1471,7 @@ def selftest() -> int:
         and classify("ToolMatrix", "", "MDL") == ("MDL", "檔名自帶類別(新命名)")
         and classify("NetUnified", family="SUP_MDL740_NetUnified")[0] == "SUP" and classify("Panorama", family="VIA_Panorama")[0] == "MDL")
     chk("③b 版號:_v0225.json · _v0100.jsonl · _v0117.py 都認得;沒版號 = -1",
-        vnum("VIA_VCGC_FunctionInventory_SSOT_v0225.json") == 225 and vnum("X_v0100.jsonl") == 100 and vnum("CGC_MDL1_A_v0117.py") == 117
+        vnum("VIA_VCGC_FunctionInventory_SSOT_v0244.json") == 225 and vnum("X_v0100.jsonl") == 100 and vnum("CGC_MDL1_A_v0117.py") == 117
         and vnum("CGC_MDL023_AutoCodeRegistryEngine.py") == -1)
     chk("③ 英文名:CGC_MDL158_VIAPanoramaAuditRepair → VIAPanoramaAuditRepair · VIA_VCGC_SUP002_Foo → Foo",
         english_of("CGC_MDL158_VIAPanoramaAuditRepair") == "VIAPanoramaAuditRepair" and english_of("VIA_VCGC_SUP002_Foo") == "Foo")
@@ -1599,7 +1599,7 @@ def selftest() -> int:
                 tok.get("group") == "TOKEN" and con.get("group") == "CONSOLE" and con.get("ready") == "NEEDS_FLATTEN" and rep["two"]
                 and sum(rep["flatten"][k3] for k3 in ("SINGLE", "READY", "NEEDS_FLATTEN", "BLOCKED_REF", "EXEMPT")) == k["tools"],
                 (tok.get("group"), con.get("group"), con.get("ready"), rep["flatten"]))
-            chk("⑫b 真樹:盤點冊尾版讀得到(token 工具對到測站 C-token)· 政策冊尾版讀得到 L129",
+            chk("⑫b 真樹:盤點冊尾版讀得到(token 工具對到測站 C-token)· 政策冊尾版讀得到 L133",
                 "C-token" in tok.get("stations", []) and rep["policy"]["status"] == "ACTIVE", (tok.get("stations"), rep["policy"]["status"]))
         after = {str(p): (p.read_bytes() if p.is_file() else None) for p in watch_files}
         chk("⑬ 唯讀:build 不動命名帳 / 號冊 / 工具鎖冊", before == after)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CGC_MDL224_TestAuto v0107 — 薄尾:串測的家族掃描認得新命名 VIA_VCGC_<MDL|SUP>###_*(政策 L129 ⑦)
+"""CGC_MDL224_TestAuto v0107 — 薄尾:串測的家族掃描認得新命名 VIA_VCGC_<MDL|SUP>###_*(政策 L133 ⑦)
 
 操作員 2026-11-13:「VCGC節省或支援工具VIA_VCGC_SUP001_ VCGC本身中央管理VIA_VCGC_MDL001 相同要有版本號 依照命名規定」。
 v0101 本體 TAIL_RX 只認 CGC_MDL###_* / CGC_SystemManager → 依新命名出的新家族(第一支:VIA_VCGC_MDL258_ToolMatrix)
@@ -98,7 +98,7 @@ def selftest() -> int:
              "CGC_SystemManager_v0101.py": "CGC_SystemManager",
              "VIA_VCGC_MDL258_ToolMatrix_v0100.py": "VIA_VCGC_MDL258_ToolMatrix",
              "VIA_VCGC_SUP001_Foo_Bar_v0101.py": "VIA_VCGC_SUP001_Foo_Bar",
-             "VIA_VCGC_FunctionInventory_SSOT_v0225.json": None, "VIA_VCGC_FunctionLedger_v0100.jsonl": None,
+             "VIA_VCGC_FunctionInventory_SSOT_v0244.json": None, "VIA_VCGC_FunctionLedger_v0100.jsonl": None,
              "VIA_VCGC_Matrix_v0100.py": None, "VIA_VCGC_MDL001_NoVer.py": None, "VDF_ENG001_A_v0100.py": None}
     got = {n: (TAIL_RX.match(n).group("fam") if TAIL_RX.match(n) else None) for n in cases}
     chk("② 家族名:舊兩種照認 · VIA_VCGC_MDL / SUP 新名認得 · .json / .jsonl 冊、沒類碼、沒版號、他系統檔不算", got == cases, got)

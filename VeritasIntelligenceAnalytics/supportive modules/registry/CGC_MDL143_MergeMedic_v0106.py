@@ -7,7 +7,7 @@
   兩條 AI 分支互合時那三條律會丟東西 —— 實測 upbeat-feynman × optimistic-goodall:
     · 同版號雙物 6 族(政策冊 v0118 · 需求冊 v0249 · 工作流冊 v0147 · 盤點冊 v0225 · MCP v0103 · SDD v0108)取遠端 = 本分支內容全丟
     · 交接冊 / 元件冊 / 編號冊 / 座位冊兩邊都改 → 取遠端 = 本分支待辦(REQ224–244)全丟
-    · 律號 L129–L132、需求 VCGC-REQ223 兩邊各發給不同東西(同號異物)
+    · 律號 L133–L136、需求 VCGC-REQ245 兩邊各發給不同東西(同號異物)
     · 號冊 VIA_NumberBooks/*.jsonl 同號異身分 600+ 列(兩邊從同一基準各自往下發)
 本版只加一個動詞 branch-merge(其餘 status / plan / sync / resolve / 自測 全照 v0105 → v0104):
   ① 預檢:工作樹乾淨 · 取 merge-base
@@ -441,7 +441,7 @@ def rewrite_text(text: str, vplans: list, crenames: list, moved_self: dict | Non
         for r in crenames:
             rx, bx, _ = _code_rx(r["old"])
             table[r["old"]] = (rx, bx, r["new"])
-        # 先換成佔位再換回,避免 L129→L133 後又被別條吃到
+        # 先換成佔位再換回,避免 L133→L133 後又被別條吃到
         holders = {}
         for i, (old, (rx, bx, new)) in enumerate(table.items()):
             h = f"\u0000MM{i}\u0000"
@@ -719,7 +719,7 @@ def selftest() -> int:
         G("commit", "-q", "-m", "base")
         G("checkout", "-q", "-b", "theirs")
         W(reg / "FAM_MDL900_Tool_v0103.py", "import importlib\nPRIOR = 'FAM_MDL900_Tool_v0102.py'\nVERSION = 'v0103'\ndef feats():\n    return ['base', 'theirs']\n")
-        Jw(reg / "VIA_Policy_Laws_SSOT_v0118.json", {"version": "v0118", "prior": "VIA_Policy_Laws_SSOT_v0117.json",
+        Jw(reg / "VIA_Policy_Laws_SSOT_v0125.json", {"version": "v0118", "prior": "VIA_Policy_Laws_SSOT_v0117.json",
                                                     "laws": [{"id": "L1", "zh": "一"}, {"id": "L2", "zh": "他方二"}]})
         Jw(reg / "VIA_Handoff_Continuity_SSOT_v0100.json", {"work_items": [{"id": "W1", "state": "VERIFIED"}, {"id": "WT", "state": "PENDING"}],
                                                            "test_cases": {"c1": {"m": "a"}, "ct": {"m": "t"}}, "watch": ["x", "t"]})
@@ -733,7 +733,7 @@ def selftest() -> int:
         G("checkout", "-q", "-b", "ours")
         W(reg / "FAM_MDL900_Tool_v0103.py", "PRIOR = 'FAM_MDL900_Tool_v0102.py'\nVERSION = 'v0103'\ndef feats():\n    return ['base', 'ours']\n")
         W(reg / "FAM_MDL900_Tool_v0104.py", "PRIOR = 'glob'\nVERSION = 'v0104'  # 疊在 v0103 上\n")
-        Jw(reg / "VIA_Policy_Laws_SSOT_v0118.json", {"version": "v0118", "prior": "VIA_Policy_Laws_SSOT_v0117.json",
+        Jw(reg / "VIA_Policy_Laws_SSOT_v0125.json", {"version": "v0118", "prior": "VIA_Policy_Laws_SSOT_v0117.json",
                                                     "laws": [{"id": "L1", "zh": "一"}, {"id": "L2", "zh": "我方二(見 L2)"}]})
         Jw(reg / "VIA_Handoff_Continuity_SSOT_v0100.json", {"work_items": [{"id": "W1", "state": "PENDING"}, {"id": "WO", "state": "PENDING", "why": "依 L2"}],
                                                            "test_cases": {"c1": {"m": "a"}, "co": {"m": "o"}}, "watch": ["x", "o"]})
@@ -769,7 +769,7 @@ def selftest() -> int:
         pol = json.loads((reg / "VIA_Policy_Laws_SSOT_v0119.json").read_text(encoding="utf-8")) if (reg / "VIA_Policy_Laws_SSOT_v0119.json").exists() else {}
         ids = [x["id"] for x in pol.get("laws", [])]
         chk("⑦ 搬過的冊 = 他方全部 + 我方新增(L1 · 他方 L2 · 我方改號 L3)· version / prior 指對",
-            ids == ["L1", "L2", "L3"] and pol.get("version") == "v0119" and pol.get("prior") == "VIA_Policy_Laws_SSOT_v0118.json"
+            ids == ["L1", "L2", "L3"] and pol.get("version") == "v0119" and pol.get("prior") == "VIA_Policy_Laws_SSOT_v0125.json"
             and "他方二" in json.dumps(pol, ensure_ascii=False) and "我方二(見 L3)" in json.dumps(pol, ensure_ascii=False), ids)
         ho = json.loads((reg / "VIA_Handoff_Continuity_SSOT_v0100.json").read_text(encoding="utf-8"))
         chk("⑧ 兩邊都改的冊 = 三方鍵聯集(W1 取他方新態 · WT + WO 都在 · 我方 why 跟著改號 · test_cases 三鍵 · watch 聯集)",

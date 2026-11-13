@@ -1,7 +1,7 @@
 # VCGC 影子整併 + MCP 讀檔三動詞(2026-11-13)
 
 > 操作員令:「接進 VCGC 並補上 MCP 的 read slice digest」(前文:「整合要先複製不影響舊的 … 合併去重測試」「VCGC TOKEN SAVING 工具看要如何整合 搭配 GRAPHIFY OMNIROUTE」)
-> 需求 VCGC-REQ223(PARTIAL)· VCGC-REQ224(COVERED)· 工作流 VCGC-WKF043 · WKF042-STP004
+> 需求 VCGC-REQ245(PARTIAL)· VCGC-REQ224(COVERED)· 工作流 VCGC-WKF043 · WKF042-STP004
 
 ## 一、先量再寫(L116)
 
@@ -26,13 +26,13 @@ VIA_FROM_VCGC=YES python3 "$V" run CGC_MDL281_ShadowMerge compare <A.py> <B.py> 
 - 證明:parse + compile · A 全數原樣 · B 每個定義原樣在或列「未遷」附理由。全對 = PROVEN_ZERO_LOSS(rc 0),否則 BLOCKED_NEEDS_RULING(rc 1)。
 - LibCST:本境沒裝,AI 不裝套件 → 走標準庫 ast(判準相同)。有 LibCST 時只拿來取帶前置註解的原文;**這條路沒實測**。
 
-**CGC_MDL279_MCPServer v0103**(薄尾;`.mcp.json` 原本還停在 v0101,已指到 v0103)
+**CGC_MDL279_MCPServer v0104**(薄尾;`.mcp.json` 原本還停在 v0101,已指到 v0103)
 
 - `vcgc_read {path, depth?, if_etag?}` · `vcgc_slice {path, name}` · `vcgc_digest {path}`,全部委派鎖版 token 工具(鎖冊 sha 不符即停)。
 - 路徑:先判倉內外(倉外一律拒,不透露存在與否)· `.git/` `private/` `.env*` 金鑰檔拒讀 · 參數照 argv 傳不經殼。
 - rc 0 / 1(紅日誌)/ 3(NODATA)是答案不是錯。
 
-**CGC_MDL245_SDDValidator v0108**(順手修的既有故障)
+**CGC_MDL245_SDDValidator v0109**(順手修的既有故障)
 
 - 自 2026-11-10(REQ222 把 `../VIA_MCP_Engine/…` 登進 WKF042)起,SDD 在 v0100 `rel()` 丟 ValueError 整支炸 → closeout 停在 ⑥,沒有人能 checkpoint。乾淨 main 上重現。
 - v0108 只換 `rel()`:VIA 根內同 v0100;倉根內 VIA 根外回 `../<相對倉根>`;倉外照舊丟錯。`sdd` 交接案回到 rc 0(尾版鏈 v0108→v0100 全 PASS)。
@@ -60,5 +60,5 @@ VIA_FROM_VCGC=YES python3 "$V" run CGC_MDL281_ShadowMerge compare <A.py> <B.py> 
 
 ## 五、待操作員
 
-- **VCGC-REQ223:rulings**:指定要整併的家族 → `compare` → 逐群裁定 BLOCKED 的群,才出新版正典(L75 · L61)。
+- **VCGC-REQ245:rulings**:指定要整併的家族 → `compare` → 逐群裁定 BLOCKED 的群,才出新版正典(L75 · L61)。
 - **VCGC-REQ224:remote-platforms**:桌機 Claude Desktop 重新載入 MCP;遠端 ChatGPT / Manus / Copilot web 走 `VIA_MCP_Engine parity --write` + HTTPS 隧道。

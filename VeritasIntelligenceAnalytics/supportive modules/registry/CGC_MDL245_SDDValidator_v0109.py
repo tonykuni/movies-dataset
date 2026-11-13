@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CGC_MDL245_SDDValidator v0108 — 薄尾:倉根內、VIA 根外的引擎路徑(../VIA_MCP_Engine/…)不再讓 SDD 整支炸
+"""CGC_MDL245_SDDValidator v0109 — 薄尾:倉根內、VIA 根外的引擎路徑(../VIA_MCP_Engine/…)不再讓 SDD 整支炸
 
 2026-11-13 VCGC closeout 量到:SDD 檢查在 v0100 本體 rel() 丟 ValueError
   '/…/VIA_MCP_Engine/VIA_MCP_Engine_v0103.py' is not in the subpath of '/…/VeritasIntelligenceAnalytics'
