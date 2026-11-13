@@ -180,7 +180,8 @@ def classify(english: str, seat: str = "", declared: str = "") -> tuple:
 
 # ---------------------------------------------------------------- 來源(全部只讀)
 def number_book(via: Path = VIA) -> dict:
-    """中央編號 MDL 冊(CGC_MDL237):家族 → 最新版那一列的號 · 版本 · 時間。"""
+    """中央編號 MDL 冊(CGC_MDL237):家族 → 這一族在冊上的每一列(版本 · 來源 · 號 · 時間)。
+    挑號用 reg_for():**尾版實際路徑**那一列優先 —— 收容夾 / 別處同名高版本的副本不能冒充活樹那支的號。"""
     out = {}
     for row in read_jsonl(via / "supportive modules" / "registry" / "VIA_NumberBooks" / "VIA_NumberBook_MDL_v0100.jsonl"):
         name = row.get("name") or ""
@@ -188,11 +189,25 @@ def number_book(via: Path = VIA) -> dict:
             continue
         fam = re.sub(r"_v\d{3,4}$", "", name)
         v = vnum(name) if vnum(name) >= 0 else vnum("x_" + str(row.get("version", "")))
-        cur = out.get(fam)
-        if cur is None or v >= cur["_v"]:
-            out[fam] = {"code": row["code"], "version": row.get("version") or ("v%04d" % v if v >= 0 else ""),
-                        "updated_at": row.get("updated_at", ""), "lamp": row.get("lamp", ""), "_v": v}
+        src = str(row.get("source") or "").split(" · ")[0].strip()
+        out.setdefault(fam, []).append({"code": row["code"], "version": row.get("version") or ("v%04d" % v if v >= 0 else ""),
+                                        "updated_at": row.get("updated_at", ""), "lamp": row.get("lamp", ""), "_v": v, "source": src})
     return out
+
+
+def reg_for(fam: str, tail, numbers: dict, via: Path = VIA) -> dict:
+    rows = numbers.get(fam) or []
+    if not rows:
+        return {}
+    r_tail = rel(tail, via) if tail else ""
+    exact = [x for x in rows if r_tail and x["source"] == r_tail]
+    if exact:
+        return max(exact, key=lambda x: x["_v"])
+    same = [x for x in rows if tail and x["_v"] == vnum(tail) and not any(e in "/" + x["source"] for e in EXCL_PARTS)]
+    if same:
+        return max(same, key=lambda x: x["_v"])
+    live = [x for x in rows if not any(e in "/" + x["source"] for e in EXCL_PARTS) and "/intake" not in x["source"]]
+    return max(live, key=lambda x: x["_v"]) if live else {}
 
 
 def register_view(via: Path = VIA) -> dict:
@@ -465,7 +480,7 @@ def naming_plan(fams: dict, numbers: dict, ledger_rows: list, via: Path = VIA) -
         if info.get("unversioned"):
             plan[fam] = {"status": "PENDING", "why": "檔名沒有版本號(L126 ②)→ 先出帶 _vNNNN 的新版才發名"}
             continue
-        if fam not in numbers:
+        if not reg_for(fam, tail, numbers, via):
             plan[fam] = {"status": "PENDING", "why": "還沒有中央編號(CGC_MDL237)→ 名碼留白(L125 ②)"}
             continue
         cls, why = classify(english_of(fam), info.get("seat", ""))
@@ -475,7 +490,7 @@ def naming_plan(fams: dict, numbers: dict, ledger_rows: list, via: Path = VIA) -
         used[cls].add(seq)
         plan[fam] = {"status": "PROPOSED", "code": "VIA_VCGC_%s%03d" % (cls, seq), "cls": cls, "class_why": why}
     for fam, p in plan.items():
-        if p["status"] == "DECLARED" and fam not in numbers:
+        if p["status"] == "DECLARED" and not reg_for(fam, fams[fam].get("tail"), numbers, via):
             p["why"] = "檔名已帶名碼;等 CGC_MDL237 編號後才發(L125 ②)"
     return {"issued": issued, "plan": plan, "conflicts": conflicts}
 
@@ -490,17 +505,18 @@ def naming_apply(fams: dict, numbers: dict, ledger: Path, via: Path = VIA) -> li
     new_lines, now = [], utc_now()
     for fam in sorted(np_["plan"]):
         p = np_["plan"][fam]
-        if p["status"] not in ("PROPOSED", "DECLARED") or fam not in numbers:
-            continue
         info = fams[fam]
+        reg = reg_for(fam, info.get("tail"), numbers, via)
+        if p["status"] not in ("PROPOSED", "DECLARED") or not reg:
+            continue
         cls = p.get("cls") or classify(english_of(fam), info.get("seat", ""))[0]
         why = p.get("class_why") or classify(english_of(fam), info.get("seat", ""), cls if NEW_RX.match(fam) else "")[1]
         tail = info.get("tail")
         new_lines.append({
             "ts": now, "event": "issued", "code": p["code"], "cls": cls, "family": fam,
             "new_stem": fam if NEW_RX.match(fam) else "%s_%s" % (p["code"], english_of(fam)),
-            "english": english_of(fam), "class_why": why, "reg_code": numbers[fam]["code"],
-            "reg_version": numbers[fam]["version"], "tail": tail.name if tail else "",
+            "english": english_of(fam), "class_why": why, "reg_code": reg["code"],
+            "reg_version": reg["version"], "tail": tail.name if tail else "",
             "tail_version": "v%04d" % vnum(tail) if tail else "", "book_version": BOOK_VERSION,
             "updated_at": now, "by": "%s %s" % (NAME, VERSION)})
     if new_lines:
@@ -821,7 +837,7 @@ def collect(via: Path = VIA, ast: bool = True) -> dict:
             cls, why = (pl.get("cls"), pl.get("class_why")) if pl.get("cls") else classify(english_of(fam), info.get("seat", ""), m.group(1) if m else "")
             code, status = pl.get("code", ""), pl.get("status", "PENDING")
             why = why or pl.get("why", "")
-        num = numbers.get(fam, {})
+        num = reg_for(fam, tail, numbers, via)
         a = ast_rows.get(fam) or {}
         tl = talib_by_file.get(r_tail, {"use": 0, "mention": 0, "guard": False})
         in_pin = sum(len(v & tree["tails"]) for v in tree["in_pin"].get(fam, {}).values())
@@ -1038,6 +1054,9 @@ def selftest() -> int:
         nb = [{"code": "VIA-VCGC-MDL%04d" % i, "name": n, "version": "v0100", "updated_at": "2026-11-13T00:00:00Z", "sub": "VCGC"}
               for i, n in enumerate(["CGC_MDL001_Alpha_v0101", "CGC_MDL158_VIAPanoramaAuditRepair_v0117", "CGC_MDL002_Beta_v0100",
                                      "VIA_VCGC_MDL005_Gamma_v0100"], 1)]
+        nb[2]["source"] = "supportive modules/registry/CGC_MDL002_Beta_v0100.py"
+        nb.append({"code": "VIA-VCGC-MDL9999", "name": "CGC_MDL002_Beta_v0195", "version": "v0195", "updated_at": "2026-11-13T00:00:00Z",
+                   "sub": "VCGC", "source": "docs/handoff/ai/intake_x/v0195/CGC_MDL002_Beta_v0195.py"})   # 收容副本:版號較高,不能冒充
         (reg / "VIA_NumberBooks" / "VIA_NumberBook_MDL_v0100.jsonl").write_text("\n".join(json.dumps(x) for x in nb) + "\n", encoding="utf-8")
         (reg / "VIA_ToolVersion_Lock_v0100.json").write_text(json.dumps({"token": {"path": "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0117.py"}}), encoding="utf-8")
         fams, _sk, _ex = discover(via)
@@ -1048,6 +1067,9 @@ def selftest() -> int:
             pl["CGC_MDL001_Alpha"]["code"] == "VIA_VCGC_MDL001" and pl["CGC_MDL002_Beta"]["code"] == "VIA_VCGC_MDL002"
             and pl["CGC_MDL158_VIAPanoramaAuditRepair"]["code"] == "VIA_VCGC_SUP001" and pl["CGC_MDL003_NoNumber"]["status"] == "PENDING"
             and pl["VIA_VCGC_MDL005_Gamma"]["status"] == "DECLARED" and fams["CGC_MDL001_Alpha"]["versions"] == 2, pl)
+        rb = reg_for("CGC_MDL002_Beta", fams["CGC_MDL002_Beta"]["tail"], numbers, via)
+        chk("⑦b 對號:收容夾裡同名更高版(v0195)的編號不冒充活樹尾版 —— 取尾版實際路徑那一列",
+            rb.get("code") == "VIA-VCGC-MDL0003", rb)
         led = reg / LEDGER_NAME
         first = naming_apply(fams, numbers, led, via)
         second = naming_apply(fams, numbers, led, via)
