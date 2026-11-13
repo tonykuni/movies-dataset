@@ -58,4 +58,4 @@
 - practical-pasteur 第二輪合入:MDL237 v0122 · MDL278 v0101 · TestAuto(他的 v0107 → v0108,本分支 v0107 先推)。
 - 兩大每日流程:VCGC-WKF046 每日收尾(13 步)· VCGC-WKF047 每天第一步(12 步);本倉斜線工具 `/vcgc-daily-close` · `/vcgc-daily-open`(.claude/skills)。
 - 照 `/vcgc-daily-close` 實跑一輪 = 本次 VCGC 收尾:check(TA-Lib 0 · 衝突 0)· Graphify NODATA(容器無隔離境)· MCP doctor · 編號 / 稽核 0/0/0 · registry-sync 新 0 變 0 退 0 · closeout 重測 9 案綠(activation 案標記由 v0106 改對現行尾版 v0109 後 rc 0)· 備份 + 自查 · 矩陣重出 · 推送。
-- 仍未驗收:交接閘 RED(快照 10-02 起 checkpoint 被擋)· SDD RED(VDF-WKF016/017 · VRN-WKF010 為他系統冊)。一鍵布建 REQ234 擱置。待辦:與 optimistic-goodall 合併(後合者升版,L 條 L133–L136 → L136–L135 · REQ245 → REQ239)· WKF045 逐族收斂 134 族薄尾。
+- 仍未驗收:交接閘 RED(快照 10-02 起 checkpoint 被擋)· SDD RED(VDF-WKF016/017 · VRN-WKF010 為他系統冊)。一鍵布建 REQ234 擱置。待辦:與 optimistic-goodall 合併(後合者升版,L 條 L133–L136 → L136–L135 · REQ239 → REQ239)· WKF045 逐族收斂 134 族薄尾。

@@ -1,7 +1,7 @@
 # VCGC 影子整併 + MCP 讀檔三動詞(2026-11-13)
 
 > 操作員令:「接進 VCGC 並補上 MCP 的 read slice digest」(前文:「整合要先複製不影響舊的 … 合併去重測試」「VCGC TOKEN SAVING 工具看要如何整合 搭配 GRAPHIFY OMNIROUTE」)
-> 需求 VCGC-REQ245(PARTIAL)· VCGC-REQ224(COVERED)· 工作流 VCGC-WKF043 · WKF042-STP004
+> 需求 VCGC-REQ239(PARTIAL)· VCGC-REQ224(COVERED)· 工作流 VCGC-WKF043 · WKF042-STP004
 
 ## 一、先量再寫(L116)
 
@@ -60,5 +60,5 @@ VIA_FROM_VCGC=YES python3 "$V" run CGC_MDL281_ShadowMerge compare <A.py> <B.py> 
 
 ## 五、待操作員
 
-- **VCGC-REQ245:rulings**:指定要整併的家族 → `compare` → 逐群裁定 BLOCKED 的群,才出新版正典(L75 · L61)。
+- **VCGC-REQ239:rulings**:指定要整併的家族 → `compare` → 逐群裁定 BLOCKED 的群,才出新版正典(L75 · L61)。
 - **VCGC-REQ224:remote-platforms**:桌機 Claude Desktop 重新載入 MCP;遠端 ChatGPT / Manus / Copilot web 走 `VIA_MCP_Engine parity --write` + HTTPS 隧道。
