@@ -1,11 +1,12 @@
 # 給 AI 的讀檔規則(批707;L65 Token 撙節律)
 
-**四系統對等獨立(政策 L123 修訂 L120;操作員 2026-10-19 令「VRN-1 VRN-2 VDF VCGC 都是獨立系統 互不干涉」「分開命名」)**:
-VRN-1 · VRN-2 · VDF · VCGC 四個系統對等,各是自己系統的入口(VCGC = `CGC_MDL149` 主控台 · VDF = `VDF_SystemManager` 尾版 ·
-VRN-2 = `ActivateVRN-2.py` → VRN-2 SystemManager 尾版(本倉 `VRN_SystemManager` / `VRN_ENG*` 是它的底座)· VRN-1 = 另一團隊的倉,不在本倉、只讀),
+**系統對等獨立(政策 L123 修訂 L120 · L128 VRN 統稱 · L129 各自註冊;操作員 2026-11-13 令「VRN-2 為主 VRN-1 為輔 整合後通稱 VRN」「VRN VDF VCGC 獨立系統 各自註冊」)**:
+VRN · VDF · VCGC(另有 VQG · VAP)各是獨立系統,各是自己系統的入口(VCGC = `CGC_MDL149` 主控台 · VDF = `VDF_SystemManager` 尾版 ·
+VRN = `VRN_SystemManager` 尾版 / `ActivateVRN-2.py`:VRN-2 為主體,VRN-1(另一團隊的倉,不在本倉、只讀)為輔,經 `VRN2_PeerBridge` 借用補強),
 互不干涉(不改他系統的正本 / 冊 / 號 / 檔)、互相只讀監控(看對方自報的燈與收據,只攤開不代修)、各自獨立運作。
-提到他系統一律分開寫 VRN-1 / VRN-2 / VDF / VCGC,不寫籠統的「VRN」(分不出時寫「VRN(未分辨)」)。
-下文的 VCGC 指令是 **VCGC 自己的** 工具與檢查(省 Token 卡、交接、串測),不是 VRN-1 / VRN-2 / VDF 的唯一入口或閘門。
+系統名稱寫 VRN / VDF / VCGC / VQG / VAP;只有談來源、借用或倉位細節時才分開寫 VRN-1 / VRN-2(L123 ② 對系統名稱一項由 L128 取代)。
+各系統各自以自己的代碼註冊(VIA-VRN-* · VIA-VDF-* · VIA-VCGC-* · VIA-VQG-* · VIA-VAP-*),尾版帶編號 · 版本 · 註冊時間(L129)。
+下文的 VCGC 指令是 **VCGC 自己的** 工具與檢查(省 Token 卡、交接、串測),不是 VRN / VDF 的唯一入口或閘門。
 
 **第一步(操作員 2026-09-29 令 · 政策 TOKEN-1):先過 VCGC 的省 Token 步,照它給的卡讀檔。**
 
