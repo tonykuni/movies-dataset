@@ -28,7 +28,7 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 696 · import 0 · 提及 128 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 696 · import 0 · 提及 127 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · CGC_MDL124_BridgeSweeper_v0111.py(家族 core)
@@ -37,10 +37,10 @@
   [OK] ③ 沙盒注入真跑(ACCEL→NET 順序;原碼保留;compile 通;壞檔 SKIP 原檔未動) 
   [OK] ④ 排除冊(獨立工具不可動/凍結群/收容原件/退役/vendor) 
   [OK] ⑮ v0108 閘唯讀冊(ENG112 正本)與版史檔(ENG110 v0103)排除;尾版不因這兩條被排除 (ENG112 閘唯讀冊(py_readonly;CGC_MDL183 基線冊) · v0103 閘唯讀冊(py_readonly;CGC_MDL183 基線冊) · 尾 VRN_ENG110_TabReport_v0116.py 可注)
-  [OK] ⑤ dry-run 零寫(VDF 全掃 mtime 不變;報告落盤) (掃 618 · 已掛 149 · 缺 1)
+  [OK] ⑤ dry-run 零寫(VDF 全掃 mtime 不變;報告落盤) (掃 620 · 已掛 148 · 缺 2)
   [OK] ⑥ 紀律宣告(只增不減/graceful/dry-run 預設/不可動/py_compile 雙驗) 
   [OK] ⑪ 批626 唯讀正典 SSOT 不得進計畫:`_excluded()` 要回得出理由(覆蓋率差的那 0.1% 不是欠帳,是不准動的東西;不講清楚就會有人去補它) (唯讀正典 SSOT(批626;操作員律,不得注入))
-  [OK] ⑦ git 在冊律(在冊集合非空;VIA_Reports/rollback/未在冊件 EXCLUDED;在冊現役件放行) (在冊 6631 件)
+  [OK] ⑦ git 在冊律(在冊集合非空;VIA_Reports/rollback/未在冊件 EXCLUDED;在冊現役件放行) (在冊 6634 件)
   [OK] ⑧ PS-ACCEL 注入律(正典塊=在庫啟動器逐字;param 塊後插入;無 param=檔首註解後;dry-run 零寫) 
   [OK] ⑨ --net-callers 律(直呼=擷取/字串註解 docstring 不算/本機 socket 不算/工具本體與 vendored(相對匯入/pip._vendor/SPDX)排除) 
   [OK] ⑩ 雜湊冊凍結夾律(批597):夾裡有點名自己 .py 的雜湊冊=不得注入;尺只看本夾**不往祖先長**(太寬會把整棵樹關掉,跟太窄一樣壞) b514=雜湊冊凍結夾(VIA_CentralGovernanceFamily_b514/MANIFEST_b514.json)
@@ -60,10 +60,11 @@
   [OK] ① v0110 自測過(連 v0109 本體鏈)
   [OK] ② `_sha` + 12 位十六進位 = 存證副本 → 排除(具名理由);`_sha256_util.py` 這類一般檔名不算
   [OK] ③ 補丁打在 scan 真正查名的全域(本體),不是只換本版的名字
-  [FAIL] ④ 真樹 VDF 網路橋:_sha 存證副本全部 EXCLUDED、帶本條理由;缺 0(現役引擎照掃) · 缺 ['functional modules/VDF/engine/VDF_ENG238_InstHoldingPct_v0102.py'] · 副本 8
+  [FAIL] ④ 真樹 VDF 網路橋:_sha 存證副本全部 EXCLUDED、帶本條理由;缺 0(現役引擎照掃) · 缺 ['functional modules/VDF/VDF_SystemManager_v0172.py', 'functional modules/VDF/engine/VDF_ENG238_InstHoldingPct_v0102.py'] · 副本 8
   [OK] ⑤ 現役檔照舊算(不是靠排除把分母掃空)
   [OK] ⑥ 加速器橋在(__future__ 之後);不碰 TA-Lib
   [計] CGC_MDL124_BridgeSweeper v0111 本版 5/6 · v0110 PASS · 合計 FAIL
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VRN2_PeerBridge_v0103.py(冊上 VRN2_Peer | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VRN_SystemManager_v0266.py'] | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):29 個,例 ['VDF-WKF015', 'VDF-WKF016', → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 25, 'changed': 24, 'stale': 0, 'expected': 20069, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 2699 · 觸碰 run CGC_MDL124_BridgeSweeper · 交接閘 RED · 落後 1032 提交 · 快照 1002.6h · 未推 4 · 未登 180 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL149_Integrate · CGC_MDL186_EnvGovernance_8Hub …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VRN_ENG062_SummarizerV1_v0114.py(冊上 V | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):22 個,例 ['VDF-WKF015', 'VDF-WKF016', → via-vcgc sdd check
+  [教訓] 重複出錯:run CGC_MDL124_BridgeSweeper · rc=1 · (無例外訊息) · 第 5 次 · 帳本 CGC_MDL058(via-lessons)
+  [沿用] sync_check · 鑰匙 2903f5f48a9a8ac8 · 3s 前算的(--fresh 強制重算)
+[監控] 背景全景監控中 pid 2699 · 觸碰 run CGC_MDL124_BridgeSweeper · 交接閘 RED · 落後 1037 提交 · 快照 1003.2h · 未登 180 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL149_Integrate · CGC_MDL186_EnvGovernance_8Hub …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
