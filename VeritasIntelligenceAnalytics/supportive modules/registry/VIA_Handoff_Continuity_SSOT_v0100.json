@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-13T22:06:35Z",
+ "updated_at": "2026-11-13T22:22:39Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -11470,6 +11470,54 @@
    "state": "VERIFIED",
    "case": "C-ssot-consistency-v0100",
    "receipt": "docs/handoff/evidence/C-ssot-consistency-v0100.json"
+  },
+  {
+   "id": "VCGC-REQ246:scc-rulings",
+   "owner": "操作員(裁定)",
+   "what": "SSOT 一致性案帳 7 案待裁:SCC-0F3B606E74(tw_stock_ticker 提案 vs LOCKED:提案多收字尾 1000A、LOCKED 多收 0 開頭四碼與非 ASCII 數字)· SCC-8B5C907CBB(yfinance 三鍵)· SCC-0D4CABA4EB / SCC-16707F5BA1(bloomberg 提案 vs 兩支 LOCKED)· SCC-6166A7B6A9(兩支 LOCKED 彭博式不等價:\\s* 對 \\s+)· SCC-97AD98B39A(36 支驗證式的 \\d \\s 在 Python 收非 ASCII 字元)· SCC-39A351919E(評等 10 個詞各掛兩鍵)",
+   "reason": "衝突由操作員與 AI 裁定(操作員 2026-11-13);引擎不自己裁定,LOCKED 冊不動",
+   "next": "python VIA_VCGC_MDL262_SSOTConsistencyEngine_v0100.py rule <案號> --decision <KEEP_GOLDEN|ADOPT_NEW|SCOPE_SPLIT|ALIAS|WAIVE> --order \"<操作員原話>\" --apply → 冊的主人出新版 → check 複驗結案",
+   "requirement": "VCGC-REQ246",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-13T22:22:39Z"
+  },
+  {
+   "id": "VCGC-REQ246:req-number-shift",
+   "owner": "操作員(裁定)+ AI",
+   "what": "需求冊 v0253 起 VCGC-REQ239 跳號,中央編號照順序發,整段錯一位:冊 REQ240→號 239 · 241→240 · 242→241 · 243→242 · 245→243 · 246→245(244 相符);SDD X-NUM / X-REQ 紅",
+   "reason": "號已發不能改(只增);要讓冊服從號就得改 6 個已推上分支的需求代碼及其引用(工作流冊 · 交接項 · 技能文件),屬身分變更,不在本批自行處理",
+   "next": "操作員裁定:冊改從中央號(出需求冊 / 工作流冊新版並同步引用),或接受錯位並在 SDD 登記對照表",
+   "requirement": "VCGC-REQ246",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-13T22:22:39Z"
+  },
+  {
+   "id": "VCGC-REQ246:panorama-vdf-collect",
+   "owner": "AI(VCGC)",
+   "what": "ssot panorama「註冊@VCGC」RED:CGC_MDL247_SSOTPanorama 呼叫 VDF_SystemManager.collect,VDF 管理器今天重寫成單檔後沒有這個名稱 → AttributeError",
+   "reason": "VCGC 讀他系統自報應該降級成 NODATA 而不是炸掉;要出 CGC_MDL247 薄尾,本批沒做",
+   "next": "chain CGC_MDL247_SSOTPanorama → 薄尾:取不到 collect 時記 NODATA 並指路 VDF 管理器 → 自測 → 編號 / 註冊",
+   "requirement": "VCGC-REQ246",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-13T22:22:39Z"
+  },
+  {
+   "id": "VCGC-REQ246:closeout-red",
+   "owner": "AI(VCGC)/ 操作員(桌機)",
+   "what": "closeout 乾跑 RED:handoff check 1,017 筆(改了沒重測 511 · 證據過期 368 · 需求變更 127),313 個交接案要重測;停在 manager 案(VRN_SystemManager v0266 自測 rc 0、印「薄尾 7/7 PASS」,冊上標記寫 8/8)",
+   "reason": "今天三條線合計數百檔改動尚未重測;容器缺 polars / reportlab / PIL 的站在這裡過不了(不裝套件 L19);整輪 test 需約 30 分鐘且先前實測 67 紅",
+   "next": "逐案 handoff test(相依有變的)→ manager 案標記改成尾版實際印的字 → 桌機補跑缺套件的站 → closeout 轉綠後才 checkpoint / 鎖定",
+   "requirement": "VCGC-REQ246",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-13T22:22:39Z"
   }
  ]
 }
