@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-13T22:22:39Z",
+ "updated_at": "2026-11-13T22:37:44Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -11518,6 +11518,30 @@
    "state": "PENDING",
    "receipt": null,
    "updated_at": "2026-11-13T22:22:39Z"
+  },
+  {
+   "id": "VCGC-REQ222:omniroute-apply-20261113",
+   "requirement": "VCGC-REQ222",
+   "owner": "操作員(桌機)",
+   "what": "OmniRoute 套用(操作員 2026-11-13「Apply omniroute and graphify」):倉內 .mcp.json +omniroute(npx -y omniroute@3.8.53 --mcp · 不全域安裝);容器用這一筆真握手 initialize → tools/list 過 · 工具 110;VIA_MCP_Engine v0103 parity --probe:本機 5 平台 × 3 MCP 全綠,遠端 3 平台黃(要 HTTPS 隧道)",
+   "reason": "供應商金鑰與 HTTPS 隧道是操作員的手(引擎不代裝、不碰金鑰);桌機 Node 要 22.22.2–22.x 或 24–26,否則這筆 MCP 起不來;mcp doctor 的 omniroute found=false 是因為沒有全域安裝(走 npx)",
+   "next": "桌機拉分支後重開 Claude Code 核准 omniroute 這筆 MCP → OmniRoute 儀表板設供應商金鑰 → python VIA_MCP_Engine/VIA_MCP_Engine_v0103.py parity --probe;其他平台(Desktop / Codex / Gemini / VS Code)在桌機跑 parity --write(寫本機設定檔,不入倉)",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-13T22:37:44Z"
+  },
+  {
+   "id": "VCGC-REQ222:graphify-apply-20261113",
+   "requirement": "VCGC-REQ222",
+   "owner": "操作員(桌機)",
+   "what": "Graphify 套用:容器隔離境 ~/envs/via_graphify 裝 graphifyy 0.9.100(wheel SHA-256 64c5ed6f2dcc… 相符 · 主 Python 套件清單前後一致);照 via_graphify_v0101 ④ 的參數(--code-only · GRAPHIFY_BACKEND=none · 離線 · 一系統一圖)建圖:VRN 共用夾 32,215 節點 / 69,830 連線 · VDF 16,571 / 37,540 · VCGC 47,959 / 118,173;三張圖都沒有 import 循環;VIA_GraphifyLane v0100 GREEN(隔離境 + 收據 + 三張圖)",
+   "reason": "VIA_Reports 不入倉,容器建的圖到不了桌機;functional modules/VRN2 不在倉(運行副本)→ VRN 那張灰;車道讀 <系統>/graph.json、發布段寫 <系統>/graphify-out/graph.json,兩邊路徑與系統名對不上(容器裡用複製補上,車道本身沒改)",
+   "next": "桌機貼 via_graphify_v0101 的 boot 行(第一次要操作員設 VIA_NET_CONSENT=YES);車道出 v0101 讀 graphify-out/ 與 VRN / VRN_Shared 兩個名字",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-13T22:37:44Z"
   }
  ]
 }
