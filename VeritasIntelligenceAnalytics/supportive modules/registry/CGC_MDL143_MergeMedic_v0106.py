@@ -85,7 +85,10 @@ def __getattr__(name: str):
 MISSING = object()
 VER_RX = re.compile(r"^(?P<stem>.+)_v(?P<v>\d{4})\.(?P<ext>[A-Za-z0-9]+)$")
 SKIP_REWRITE_RX = re.compile(r"(\.jsonl$|_Ledger_|/docs/handoff/evidence/|^docs/handoff/evidence/|VIA_Reports/|/backup/|/intake|/references/)")
-TEXT_EXT = {".py", ".json", ".md", ".txt", ".ps1", ".psm1", ".cmd", ".bat", ".html", ".yml", ".yaml", ".toml", ".cfg", ".ini", ""}
+TEXT_EXT = {".py", ".json", ".md", ".txt", ".html", ".yml", ".yaml", ".toml", ".cfg", ".ini", ""}
+NO_TOUCH_EXT = {".ps1", ".psm1", ".psd1", ".cmd", ".bat"}          # L70:.ps1 等殼腳本一字不改(引用只列不改)
+# 獨立系統律(L123):只改 VCGC 自己的地盤;他系統(functional modules/ 等)只列不改
+VCGC_OWNED_RX = re.compile(r"^(VeritasIntelligenceAnalytics/supportive modules/|VeritasIntelligenceAnalytics/docs/|supportive modules/|docs/|reg/|\.claude/|CLAUDE\.md$|AGENTS\.md$|\.mcp\.json$|NOTE\.md$)")
 EVIDENCE_RX = re.compile(r"(^|/)docs/handoff/evidence/")
 NUMBERBOOK_RX = re.compile(r"(^|/)VIA_NumberBooks/[^/]+\.jsonl$")
 SHORT_RX = re.compile(r"^((?:[A-Z]+_)+?[A-Z]+\d+)_")
@@ -106,6 +109,21 @@ def g(root: Path, *args, check=False) -> subprocess.CompletedProcess:
     if check and r.returncode != 0:
         raise RuntimeError("git " + " ".join(args[:3]) + " → " + (r.stderr or r.stdout).strip()[:300])
     return r
+
+
+def gadd(root: Path, *paths: str) -> None:
+    """git add,遇 index.lock(背景監控同時碰 git)退避重試;仍失敗才拋。"""
+    import time
+    last = ""
+    for i in range(10):
+        r = g(root, "add", "--", *paths)
+        if r.returncode == 0:
+            return
+        last = (r.stderr or r.stdout).strip()
+        if "index.lock" not in last:
+            break
+        time.sleep(min(0.3 * (2 ** i), 8))
+    raise RuntimeError("git add → " + last[:300])
 
 
 def gbytes(root: Path, spec: str) -> bytes | None:
@@ -485,6 +503,11 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
     for r in crenames:
         rep["code_renames"].append(r)
         step("代碼改號 " + r["book"] + "." + r["coll"], "PLAN" if not apply else "RUN", r["old"] + " → " + r["new"])
+    foreign = [m["family"] for m in rep["version_moves"] if not VCGC_OWNED_RX.search(m["family"])]
+    if foreign:
+        rep["state"] = "STOP"
+        step("停:同版號雙物在他系統地盤(L123 VCGC 不代改;交該系統自己合)", "STOP", ", ".join(foreign[:5]))
+        return rep
     if not apply:
         rep["state"] = "PLAN"
         step("乾跑結束(--apply 才寫)", "PLAN")
@@ -505,9 +528,23 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
         for old, new in p["map"].items():
             targets.discard((p["dir"] + "/" if p["dir"] else "") + f"{p['stem']}_v{old}.{p['ext']}")
     targets |= set(moved)
+    rep["refs_left"] = []
     for rel in sorted(targets):
         fp = root / rel
-        if not fp.is_file() or Path(rel).suffix.lower() not in TEXT_EXT:
+        if not fp.is_file():
+            continue
+        why = ("L70 殼腳本不改" if Path(rel).suffix.lower() in NO_TOUCH_EXT
+               else ("L123 他系統地盤不改" if not VCGC_OWNED_RX.search(rel) else ""))
+        if why:
+            try:
+                t0 = fp.read_text(encoding="utf-8")
+            except (UnicodeDecodeError, OSError):
+                continue
+            _t1, hits = rewrite_text(t0, vplans, crenames, None)
+            if hits:
+                rep["refs_left"].append({"file": rel, "hits": hits, "why": why})
+            continue
+        if Path(rel).suffix.lower() not in TEXT_EXT:
             continue
         if SKIP_REWRITE_RX.search("/" + rel) and rel not in moved:
             continue
@@ -518,14 +555,15 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
         new, n = rewrite_text(txt, vplans, crenames, moved.get(rel))
         if n and new != txt:
             fp.write_text(new, encoding="utf-8")
-            g(root, "add", "--", rel)
+            gadd(root, rel)
             nfiles += 1
             nsubs += n
     if vplans or crenames:
         msg = (f"chore(vcgc): 合併前改號(L25 後合者升版 · {Path(__file__).stem} branch-merge {ref})\n\n"
                + "".join(f"- 版號 {m['family']}: {m['map']}\n" for m in rep["version_moves"])
                + "".join(f"- 代碼 {r['book']}.{r['coll']}: {r['old']} → {r['new']}\n" for r in crenames)
-               + f"- 引用改寫 {nfiles} 檔 · {nsubs} 處(只動本分支改過的檔;帳本 / 證據 / 凍結不動)\n" + (("\n" + trailer) if trailer else ""))
+               + f"- 引用改寫 {nfiles} 檔 · {nsubs} 處(只動本分支改過、VCGC 地盤的檔;帳本 / 證據 / 凍結 / .ps1 / 他系統不動)\n"
+               + "".join(f"- 只列不改 {x['file']}({x['why']} · {x['hits']} 處)\n" for x in rep["refs_left"]) + (("\n" + trailer) if trailer else ""))
         c = g(root, "commit", "-q", "-m", msg)
         step("改號提交", "OK" if c.returncode == 0 else "FAIL", f"搬 {len(moved)} 檔 · 改寫 {nfiles} 檔 {nsubs} 處")
         if c.returncode != 0:
@@ -577,7 +615,7 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
                 if do_print:
                     print("  [MANUAL] " + path)
                 continue
-            g(root, "add", "--", path, check=True)
+            gadd(root, path)
             rep["resolved"].append(ent)
             if do_print:
                 print("  [OK] " + path[-80:] + " · " + ent["how"])
@@ -614,12 +652,12 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
             merged["merge_" + newv] = (f"{Path(__file__).stem} branch-merge {ref}:本版 = 他方尾版 {os.path.basename(tp)} 全部 + 本分支新增"
                                        f"(L25 後合者升版;本分支原版號 v{[k for k, v in p['map'].items() if 'v' + v == newv][0]})")
         (root / dst).write_bytes(jdump(merged, ob))
-        g(root, "add", "--", dst)
+        gadd(root, dst)
         rep["leaf_conflicts"] += [dict(x, file=dst) for x in log]
         step("搬過的冊三方聯集 " + os.path.basename(dst), "OK", f"基準 {os.path.basename(bp or '-')} · 他方 {os.path.basename(tp)} · 葉子取捨 {len(log)}")
 
     rec = _write_record(root, rep)
-    g(root, "add", "--", rec)
+    gadd(root, rec)
     msg = (f"Merge {ref} → {g(root, 'rev-parse', '--abbrev-ref', 'HEAD').stdout.strip()}({Path(__file__).stem} branch-merge · L25 後合者升版 · 只增聯集)\n\n"
            f"- 衝突 {len(un)} 件全解:" + ", ".join(f"{k} {v}" for k, v in Counter(e['how'].split(' ')[0] for e in rep['resolved']).items()) + "\n"
            f"- 版號搬家 {len(rep['version_moves'])} 族 · 代碼改號 {len(rep['code_renames'])} · 葉子取捨 {len(rep['leaf_conflicts'])}\n"
@@ -705,6 +743,8 @@ def selftest() -> int:
         W(ev / "e.txt", "ours\n")
         W(R / "NOTE.md", "本分支新律 L2;工具 FAM_MDL900_Tool_v0104 · FAM_MDL900 v0103;L20 不動;MDL2 不動\n")
         Jw(R / ".mcp.json", {"mcpServers": {"v": {"args": ["reg/FAM_MDL900_Tool_v0104.py", "--serve"]}}})
+        W(R / "Invoke-X-v0100.ps1", "# 依 L2 · FAM_MDL900_Tool_v0104\n")
+        W(R / "functional modules" / "VRN" / "x.md", "VRN 自己的檔提到 L2\n")
         G("add", "-A")
         G("commit", "-q", "-m", "ours")
 
@@ -749,6 +789,11 @@ def selftest() -> int:
         log = G("log", "--format=%B", "-2").stdout
         chk("⑫ 差異紀錄入倉 · 兩個提交(改號 · 合併)都帶 trailer", len(recs) == 1 and log.count("Selftest-Trailer: yes") == 2
             and not G("status", "--porcelain").stdout.strip(), recs[0].name if recs else "無紀錄")
+        chk("⑮ L70 · L123:.ps1 與他系統檔一字不改、只列(refs_left)",
+            (R / "Invoke-X-v0100.ps1").read_text(encoding="utf-8") == "# 依 L2 · FAM_MDL900_Tool_v0104\n"
+            and (R / "functional modules" / "VRN" / "x.md").read_text(encoding="utf-8") == "VRN 自己的檔提到 L2\n"
+            and sorted(x["file"] for x in rep.get("refs_left", [])) == ["Invoke-X-v0100.ps1", "functional modules/VRN/x.md"],
+            json.dumps(rep.get("refs_left"), ensure_ascii=False)[:160])
         G("checkout", "-q", "-b", "dirty")
         W(R / "NOTE.md", "改了沒提交\n")
         st = branch_merge(R, "theirs", apply=True, do_print=False)
