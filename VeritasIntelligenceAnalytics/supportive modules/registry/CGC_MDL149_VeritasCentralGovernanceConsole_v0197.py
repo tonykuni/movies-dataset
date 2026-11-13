@@ -12,6 +12,15 @@
 版號說明(L25 多 AI 交會):v0193–v0196 已由並行分支 claude/optimistic-goodall-yhalc5 使用(不同內容),本版跳號取 v0197,
 不與之同號。本分支 glob 前版 = v0192;兩支合併後 glob 前版 = 那條的 v0196,本版疊在其上,鏈不斷、排除照樣生效。
 其餘動詞一字不改,照 v0192 → PRIOR 鏈。VIA_FROM_VCGC=YES 才放行(同前版)。零網路;不碰 TA-Lib;不代設同意閘。
+
+合併後補(2026-11-13 · CGC_MDL143_MergeMedic v0106 branch-merge optimistic-goodall 之後實測):主線 v0196 把動詞以**子行程**轉交 v0195
+(`_call(_prior_path(), args)`),本版在本行程改的 SCAN_EXCLUDE 到不了子行程 → 自測 ② ③ 紅。修法(行為照 v0196,只多裝排除):
+  · agentos / graphify / 單獨 selftest 照交 v0196(同前);
+  · 其餘動詞照 v0196 的轉交法(同一支前版 v0195 · 同一份 _env() · 子行程 · 參數 / rc 不變),只在子孫行程經執行期暫存 sitecustomize(PYTHONPATH 前置 · 跑完即刪 · 不進倉 · 串接原有 sitecustomize)裝一個載入鉤:
+    主控台家族任何模組載入後若自己定義 SCAN_EXCLUDE,就只增本條並清 _TAIL_CACHE(冪等)。
+  · 前版不是 v0196 型(沒有 _prior_path / _env)= 退回舊作法(本行程 install + PRIOR.main)。
+同名提醒:收容夾另有一支候選 docs/handoff/ai/intake_20261110_vcgc_multimatrix/v0197/(待操作員批准,不在 registry);
+本條排除正好讓它不冒充活樹尾版。它的安裝器見到 registry 已有 v0197 會照它自己的設計誠實停 —— 由操作員裁定是否改號裝入。
 """
 from __future__ import annotations
 
@@ -34,6 +43,9 @@ except Exception:
 import contextlib
 
 import importlib.util
+import json
+import os
+import subprocess
 import re
 import sys
 from pathlib import Path
@@ -98,12 +110,109 @@ def install(on: bool = True) -> int:
 install(True)
 
 
+_SITE = r'''
+# VCGC v0197 執行期產生(暫存夾 · 跑完即刪 · 不進倉):子行程(含孫行程)載入主控台家族模組後,只增收容夾排除
+import os, sys, json
+def _v0197_install():
+    ex, fam = os.environ.get("VIA_V0197_INTAKE_EXCLUDE"), os.environ.get("VIA_V0197_FAM")
+    if not ex or not fam:
+        return
+    EX = tuple(json.loads(ex))
+    import importlib._bootstrap_external as be
+    if getattr(be.SourceFileLoader.exec_module, "_v0197", False):
+        return
+    orig = be.SourceFileLoader.exec_module
+    def hook(self, module):
+        orig(self, module)
+        try:
+            d = vars(module)
+            lst = d.get("SCAN_EXCLUDE")
+            if fam in str(d.get("__file__", "")) and isinstance(lst, list):
+                if not any(f == EX[0] for f, _w in lst):
+                    lst.append(EX)
+                c = d.get("_TAIL_CACHE")
+                if isinstance(c, dict):
+                    c.clear()
+                if os.environ.get("VIA_V0197_PROBE") == "1":
+                    sys.stderr.write("[v0197] 收容夾排除已裝 · " + os.path.basename(str(d.get("__file__"))) + "\n")
+        except Exception:
+            pass
+    hook._v0197 = True
+    be.SourceFileLoader.exec_module = hook
+try:
+    _v0197_install()
+except Exception:
+    pass
+_here = os.path.dirname(os.path.abspath(__file__))
+for _p in list(sys.path):                      # 串接原本就有的 sitecustomize(不遮蔽)
+    try:
+        if _p and os.path.abspath(_p) != _here and os.path.isfile(os.path.join(_p, "sitecustomize.py")):
+            import importlib.util as _iu
+            _sp = _iu.spec_from_file_location("_v0197_chained_sitecustomize", os.path.join(_p, "sitecustomize.py"))
+            _m = _iu.module_from_spec(_sp)
+            _sp.loader.exec_module(_m)
+            break
+    except Exception:
+        break
+'''
+
+
+def forward(args: list, capture: bool = False, extra_env: dict | None = None):
+    """照 v0196 轉交(同一支前版 · 同一份 _env() · 子行程 · 參數 / rc 不變);子孫行程經暫存 sitecustomize 只增排除。"""
+    import shutil
+    import tempfile
+    pp = PRIOR._prior_path()
+    if pp is None:
+        print("[v0197] ABSENT · 要轉交的前版不在")
+        return 3
+    d = tempfile.mkdtemp(prefix="vcgc_v0197_")
+    try:
+        Path(d, "sitecustomize.py").write_text(_SITE, encoding="utf-8")
+        env = dict(PRIOR._env(), **(extra_env or {}))
+        env["PYTHONPATH"] = d + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+        env["VIA_V0197_INTAKE_EXCLUDE"] = json.dumps(list(INTAKE_EXCLUDE), ensure_ascii=False)
+        env["VIA_V0197_FAM"] = _STEM
+        cmd = [sys.executable, str(pp), *args]
+        if capture:
+            return subprocess.run(cmd, env=env, capture_output=True, text=True, timeout=1800)
+        return subprocess.run(cmd, env=env).returncode
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+
+
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
-    rc = PRIOR.main(argv)
-    if args[:1] == ["help"]:
+    if not (hasattr(PRIOR, "_prior_path") and hasattr(PRIOR, "_env")):      # 前版不是 v0196 型 → 舊作法
+        rc = PRIOR.main(argv)
+        if args[:1] == ["help"]:
+            print("  [v0197] 掃描面排除收容夾 /intake_(收容副本不冒充活樹尾版;registry-sync · live_components · scan_face 同一份清單)")
+        return rc
+    if args and (args[0] in ("agentos", "graphify") or (args[0] in ("--selftest", "selftest") and "--legacy" not in args)):
+        return PRIOR.main(argv)
+    if not args or args[0] == "help":
+        rc = forward(args or ["help"])
+        PRIOR.help_extra()
         print("  [v0197] 掃描面排除收容夾 /intake_(收容副本不冒充活樹尾版;registry-sync · live_components · scan_face 同一份清單)")
-    return rc
+        return rc
+    return forward([a for a in args if a != "--legacy"] if args[0] in ("selftest", "--selftest") else args)
+
+
+def _body_direct():
+    """在本行程直接載入「自己定義 SCAN_EXCLUDE 的本體」(自測用;版號最大者)。"""
+    for f in sorted(HERE.glob(_STEM + "_v*.py"), key=_vnum, reverse=True):
+        if _vnum(f) >= _vnum(__file__):
+            continue
+        try:
+            if not re.search(r"^SCAN_EXCLUDE\s*[:=]", f.read_text(encoding="utf-8"), re.M):
+                continue
+        except OSError:
+            continue
+        sp = importlib.util.spec_from_file_location(_STEM + "_body_for_v0197_selftest", f)
+        m = importlib.util.module_from_spec(sp)
+        sys.modules[sp.name] = m
+        sp.loader.exec_module(m)
+        return m
+    return None
 
 
 def selftest() -> int:
@@ -121,12 +230,26 @@ def selftest() -> int:
         print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)) if note else ''}")
 
     chk("① 前版鏈自測過(v0192 → … ;合併後 v0196 → …)", prior_rc == 0, f"rc {prior_rc}")
-    install(True)                                     # 前版自測途中另載的同族模組(例:TA-Lib 禁用檢查的副本)也補上本條(冪等)
-    owners = scan_owners()
-    entries = [sum(1 for f, _ in vars(m)["SCAN_EXCLUDE"] if f == INTAKE_EXCLUDE[0]) for m in owners]
-    chk("② 找到定義 SCAN_EXCLUDE 的模組 · 本條各只出現一次 · 因由不空", owners and all(n == 1 for n in entries) and INTAKE_EXCLUDE[1].strip(),
-        f"{len(owners)} 支 · {[getattr(m, '__name__', '?')[-24:] for m in owners]}")
-    body = owners[0] if owners else None
+    if hasattr(PRIOR, "_prior_path"):
+        r = forward(["registry-sync"], capture=True, extra_env={"VIA_V0197_PROBE": "1"})
+        marks = [ln for ln in (r.stderr or "").splitlines() if ln.startswith("[v0197] 收容夾排除已裝")]
+        chk("② 子行程轉交(照 v0196:同前版 · 同環境 · rc 照傳)裡排除鉤真的裝上 · registry-sync 乾跑 rc 0/2",
+            r.returncode in (0, 2) and marks, f"rc {r.returncode}(乾跑 PLAN = 2) · 裝上 {len(marks)} 支 · {marks[:1]}")
+        body = _body_direct()
+        if body is not None:
+            install_into = [body]
+            for m in install_into:
+                if not any(f == INTAKE_EXCLUDE[0] for f, _ in m.SCAN_EXCLUDE):
+                    m.SCAN_EXCLUDE.append(INTAKE_EXCLUDE)
+                if isinstance(getattr(m, "_TAIL_CACHE", None), dict):
+                    m._TAIL_CACHE.clear()
+    else:
+        install(True)                                 # 前版自測途中另載的同族模組也補上本條(冪等)
+        owners = scan_owners()
+        entries = [sum(1 for f, _ in vars(m)["SCAN_EXCLUDE"] if f == INTAKE_EXCLUDE[0]) for m in owners]
+        chk("② 找到定義 SCAN_EXCLUDE 的模組 · 本條各只出現一次 · 因由不空", owners and all(n == 1 for n in entries) and INTAKE_EXCLUDE[1].strip(),
+            f"{len(owners)} 支 · {[getattr(m, '__name__', '?')[-24:] for m in owners]}")
+        body = owners[0] if owners else None
     if body is not None:
         why = body._excuse("docs/handoff/ai/intake_20261110_vcgc_multimatrix/v0195/" + _STEM + "_v0195.py")
         live = body._excuse("supportive modules/registry/" + _STEM + "_v0197.py")

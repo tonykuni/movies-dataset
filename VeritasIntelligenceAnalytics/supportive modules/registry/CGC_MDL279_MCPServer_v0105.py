@@ -15,6 +15,8 @@
   · rc 0 = GREEN · rc 1 = digest 判紅日誌(是答案,不是錯)· rc 3 = NODATA / ABSENT(照實,不是錯);其他 rc 才標 isError。
 其餘(協定 · stdio · 主控台動詞白名單 · 拒寫 · 收據資源 · v0104 的 uploads/latest)全部沿用前版;--client-config 的 command 指到本檔。
 用法同前版:--serve [--root] · --client-config [--root] · --selftest(先 v0104 → v0102 鏈再本版)。
+合併註(2026-11-13 · CGC_MDL143_MergeMedic v0106 branch-merge optimistic-goodall):那條另有自己的 v0103(Agent OS / 桌機收據)先發 →
+  practical-pasteur 那支(上傳收據)v0103→v0104、本支 v0104→v0105;鏈 = v0102 → goodall v0103 → pasteur v0104 → 本支。上面版號字樣已照搬家表換過。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====

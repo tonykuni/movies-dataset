@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CGC_MDL279_MCPServer v0105 — 薄尾(v0102 一字不動):MCP 露出「上傳檔整合」收據(只讀 · 零寫入 · 零網路)。
+"""CGC_MDL279_MCPServer v0104 — 薄尾(v0102 一字不動):MCP 露出「上傳檔整合」收據(只讀 · 零寫入 · 零網路)。
 
 操作員 2026-11-10:「activate vcgc mcp to files」。本版只加資源,不加動詞、不改協定:
   uploads/latest     上傳檔整合收據(VIA_UploadsWorkbench 尾版寫出;Invoke-VIA-UploadsWorkbench-v0100.ps1 複製到此)

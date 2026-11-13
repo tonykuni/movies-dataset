@@ -7,7 +7,7 @@
   兩條 AI 分支互合時那三條律會丟東西 —— 實測 upbeat-feynman × optimistic-goodall:
     · 同版號雙物 6 族(政策冊 v0118 · 需求冊 v0249 · 工作流冊 v0147 · 盤點冊 v0225 · MCP v0103 · SDD v0108)取遠端 = 本分支內容全丟
     · 交接冊 / 元件冊 / 編號冊 / 座位冊兩邊都改 → 取遠端 = 本分支待辦(REQ224–244)全丟
-    · 律號 L133–L136、需求 VCGC-REQ245 兩邊各發給不同東西(同號異物)
+    · 律號 L129–L132、需求 VCGC-REQ223 兩邊各發給不同東西(同號異物)
     · 號冊 VIA_NumberBooks/*.jsonl 同號異身分 600+ 列(兩邊從同一基準各自往下發)
 本版只加一個動詞 branch-merge(其餘 status / plan / sync / resolve / 自測 全照 v0105 → v0104):
   ① 預檢:工作樹乾淨 · 取 merge-base
@@ -418,30 +418,37 @@ def _code_rx(old: str):
 
 def rewrite_text(text: str, vplans: list, crenames: list, moved_self: dict | None = None) -> tuple[str, int]:
     n = 0
+    slots = []                       # 單趟:每處換成佔位、最後一次換回 —— 換過的字不會再被下一條吃到(v0103→v0104→v0105 連鎖)
+
+    def hold(val: str) -> str:
+        slots.append(val)
+        return "\u0000V" + chr(0x4E00 + len(slots) - 1) + "\u0000"
     for p in vplans:
         stem = p["stem"]
         sm = SHORT_RX.match(stem + "_")
         for old, new in sorted(p["map"].items(), key=lambda kv: -int(kv[0])):
             for pat in (re.escape(stem) + r"_v" + old, re.escape(stem) + r" v" + old) + ((re.escape(sm.group(1)) + r" v" + old,) if sm else ()):
-                text, k = re.subn(r"(?<![A-Za-z0-9_])" + pat + r"(?!\d)", lambda mm: mm.group(0)[:-4] + new, text)
+                text, k = re.subn(r"(?<![A-Za-z0-9_])" + pat + r"(?!\d)", lambda mm: hold(mm.group(0)[:-4] + new), text)
                 n += k
     if moved_self:
-        # 搬過的檔自己:釘名前版改指他方尾版;裸版號照對照表(一次替換,避免連鎖)
+        # 搬過的檔自己:釘名前版改指他方尾版;裸版號照對照表
         mp = moved_self["map"]
         if moved_self.get("prior_old"):
             text, k = re.subn(r"(?<![A-Za-z0-9_])" + re.escape(moved_self["stem"]) + r"_v" + moved_self["prior_old"] + r"(?!\d)",
-                              moved_self["stem"] + "_v" + moved_self["prior_new"], text)
+                              lambda mm: hold(moved_self["stem"] + "_v" + moved_self["prior_new"]), text)
             n += k
         if mp:
             rx = re.compile(r"(?<![A-Za-z0-9_])v(" + "|".join(sorted(mp, key=lambda x: -int(x))) + r")(?!\d)")
-            text, k = rx.subn(lambda mm: "v" + mp[mm.group(1)], text)
+            text, k = rx.subn(lambda mm: hold("v" + mp[mm.group(1)]), text)
             n += k
+    for i, val in enumerate(slots):
+        text = text.replace("\u0000V" + chr(0x4E00 + i) + "\u0000", val)
     if crenames:
         table = {}
         for r in crenames:
             rx, bx, _ = _code_rx(r["old"])
             table[r["old"]] = (rx, bx, r["new"])
-        # 先換成佔位再換回,避免 L133→L133 後又被別條吃到
+        # 先換成佔位再換回,避免 L129→L133 後又被別條吃到
         holders = {}
         for i, (old, (rx, bx, new)) in enumerate(table.items()):
             h = f"\u0000MM{i}\u0000"
@@ -548,6 +555,8 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
             continue
         if SKIP_REWRITE_RX.search("/" + rel) and rel not in moved:
             continue
+        if fp.resolve() == Path(__file__).resolve() or Path(rel).name.startswith(_STEM + "_v"):
+            continue   # 引擎自己(含自測夾具裡的示範號)不改:2026-11-13 實跑抓到改號步改到自己的夾具
         try:
             txt = fp.read_text(encoding="utf-8")
         except (UnicodeDecodeError, OSError):
@@ -719,7 +728,7 @@ def selftest() -> int:
         G("commit", "-q", "-m", "base")
         G("checkout", "-q", "-b", "theirs")
         W(reg / "FAM_MDL900_Tool_v0103.py", "import importlib\nPRIOR = 'FAM_MDL900_Tool_v0102.py'\nVERSION = 'v0103'\ndef feats():\n    return ['base', 'theirs']\n")
-        Jw(reg / "VIA_Policy_Laws_SSOT_v0125.json", {"version": "v0118", "prior": "VIA_Policy_Laws_SSOT_v0117.json",
+        Jw(reg / "VIA_Policy_Laws_SSOT_v0118.json", {"version": "v0118", "prior": "VIA_Policy_Laws_SSOT_v0117.json",
                                                     "laws": [{"id": "L1", "zh": "一"}, {"id": "L2", "zh": "他方二"}]})
         Jw(reg / "VIA_Handoff_Continuity_SSOT_v0100.json", {"work_items": [{"id": "W1", "state": "VERIFIED"}, {"id": "WT", "state": "PENDING"}],
                                                            "test_cases": {"c1": {"m": "a"}, "ct": {"m": "t"}}, "watch": ["x", "t"]})
@@ -731,9 +740,9 @@ def selftest() -> int:
         G("commit", "-q", "-m", "theirs")
         G("checkout", "-q", "main")
         G("checkout", "-q", "-b", "ours")
-        W(reg / "FAM_MDL900_Tool_v0103.py", "PRIOR = 'FAM_MDL900_Tool_v0102.py'\nVERSION = 'v0103'\ndef feats():\n    return ['base', 'ours']\n")
+        W(reg / "FAM_MDL900_Tool_v0103.py", "PRIOR = 'FAM_MDL900_Tool_v0102.py'\nVERSION = 'v0103'\n# FAM_MDL900_Tool v0103 本支\ndef feats():\n    return ['base', 'ours']\n")
         W(reg / "FAM_MDL900_Tool_v0104.py", "PRIOR = 'glob'\nVERSION = 'v0104'  # 疊在 v0103 上\n")
-        Jw(reg / "VIA_Policy_Laws_SSOT_v0125.json", {"version": "v0118", "prior": "VIA_Policy_Laws_SSOT_v0117.json",
+        Jw(reg / "VIA_Policy_Laws_SSOT_v0118.json", {"version": "v0118", "prior": "VIA_Policy_Laws_SSOT_v0117.json",
                                                     "laws": [{"id": "L1", "zh": "一"}, {"id": "L2", "zh": "我方二(見 L2)"}]})
         Jw(reg / "VIA_Handoff_Continuity_SSOT_v0100.json", {"work_items": [{"id": "W1", "state": "PENDING"}, {"id": "WO", "state": "PENDING", "why": "依 L2"}],
                                                            "test_cases": {"c1": {"m": "a"}, "co": {"m": "o"}}, "watch": ["x", "o"]})
@@ -762,6 +771,8 @@ def selftest() -> int:
         o5 = (reg / "FAM_MDL900_Tool_v0105.py").read_text(encoding="utf-8") if (reg / "FAM_MDL900_Tool_v0105.py").exists() else ""
         chk("④ 同版號雙物:他方留原號 · 我方往上搬(v0103→v0104 · v0104→v0105)· 版號字樣跟著改",
             "'theirs'" in t3 and "'ours'" in o4 and "VERSION = 'v0104'" in o4 and "VERSION = 'v0105'" in o5)
+        chk("⑯ 連鎖搬家單趟換:我方 v0103 檔內「FAM_MDL900_Tool v0103」→ v0104(不被下一條再推成 v0105)",
+            "FAM_MDL900_Tool v0104 本支" in o4 and "v0105" not in o4, [l for l in o4.splitlines() if "本支" in l])
         chk("⑤ 搬過的檔釘名前版改指他方尾版(鏈 = 他方 v0103 → 我方 v0104)", "FAM_MDL900_Tool_v0103.py" in o4 and "v0102" not in o4, o4.splitlines()[0])
         note = (R / "NOTE.md").read_text(encoding="utf-8")
         chk("⑥ 引用改寫只動我方檔、只動撞號(L2→L3 · 檔名 v0104→v0105 · 短名 v0103→v0104;L20 / MDL2 不動)",
@@ -769,7 +780,7 @@ def selftest() -> int:
         pol = json.loads((reg / "VIA_Policy_Laws_SSOT_v0119.json").read_text(encoding="utf-8")) if (reg / "VIA_Policy_Laws_SSOT_v0119.json").exists() else {}
         ids = [x["id"] for x in pol.get("laws", [])]
         chk("⑦ 搬過的冊 = 他方全部 + 我方新增(L1 · 他方 L2 · 我方改號 L3)· version / prior 指對",
-            ids == ["L1", "L2", "L3"] and pol.get("version") == "v0119" and pol.get("prior") == "VIA_Policy_Laws_SSOT_v0125.json"
+            ids == ["L1", "L2", "L3"] and pol.get("version") == "v0119" and pol.get("prior") == "VIA_Policy_Laws_SSOT_v0118.json"
             and "他方二" in json.dumps(pol, ensure_ascii=False) and "我方二(見 L3)" in json.dumps(pol, ensure_ascii=False), ids)
         ho = json.loads((reg / "VIA_Handoff_Continuity_SSOT_v0100.json").read_text(encoding="utf-8"))
         chk("⑧ 兩邊都改的冊 = 三方鍵聯集(W1 取他方新態 · WT + WO 都在 · 我方 why 跟著改號 · test_cases 三鍵 · watch 聯集)",

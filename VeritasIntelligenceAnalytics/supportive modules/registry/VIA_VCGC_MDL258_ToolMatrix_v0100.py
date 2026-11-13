@@ -1471,7 +1471,7 @@ def selftest() -> int:
         and classify("ToolMatrix", "", "MDL") == ("MDL", "檔名自帶類別(新命名)")
         and classify("NetUnified", family="SUP_MDL740_NetUnified")[0] == "SUP" and classify("Panorama", family="VIA_Panorama")[0] == "MDL")
     chk("③b 版號:_v0225.json · _v0100.jsonl · _v0117.py 都認得;沒版號 = -1",
-        vnum("VIA_VCGC_FunctionInventory_SSOT_v0244.json") == 225 and vnum("X_v0100.jsonl") == 100 and vnum("CGC_MDL1_A_v0117.py") == 117
+        vnum("VIA_VCGC_FunctionInventory_SSOT_v0225.json") == 225 and vnum("X_v0100.jsonl") == 100 and vnum("CGC_MDL1_A_v0117.py") == 117
         and vnum("CGC_MDL023_AutoCodeRegistryEngine.py") == -1)
     chk("③ 英文名:CGC_MDL158_VIAPanoramaAuditRepair → VIAPanoramaAuditRepair · VIA_VCGC_SUP002_Foo → Foo",
         english_of("CGC_MDL158_VIAPanoramaAuditRepair") == "VIAPanoramaAuditRepair" and english_of("VIA_VCGC_SUP002_Foo") == "Foo")
