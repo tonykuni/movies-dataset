@@ -5319,6 +5319,98 @@
    "updated_at": "2026-11-13T13:40:00Z",
    "timeout_seconds": 1200,
    "registered_at": "2026-11-13T13:00:00Z"
+  },
+  "C-vdf-eng053-v0103": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VDF/engine/VDF_ENG053_ParamEngineMap_v0103.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_ENG053 v0103 薄尾 6/6 · 合計 PASS",
+   "scope": "ENG053 v0103:車道源碼實證看穿薄尾(cnyes_consensus 在 ENG050 v0101 本體)· v0102 十一檢全過",
+   "dependencies": [
+    "functional modules/VDF/engine/VDF_ENG053_ParamEngineMap_v0103.py",
+    "functional modules/VDF/engine/VDF_ENG053_ParamEngineMap_v0102.py",
+    "functional modules/VDF/engine/VDF_ENG050_OrderFetch_v0102.py",
+    "functional modules/VDF/engine/VDF_ENG050_OrderFetch_v0101.py"
+   ],
+   "version": "v0103",
+   "updated_at": "2026-11-13T15:00:00Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-13T15:00:00Z"
+  },
+  "C-vdf-eng236-v0102": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VDF/engine/VDF_ENG236_FetchMatrixUI_v0102.py",
+    "--selftest"
+   ],
+   "success_marker": "④ 密封 OK · 合計 PASS",
+   "scope": "ENG236 v0102:④ 讀庫失敗 → 快取 改空庫家密封重驗(機器有沒有庫都一樣)",
+   "dependencies": [
+    "functional modules/VDF/engine/VDF_ENG236_FetchMatrixUI_v0102.py",
+    "functional modules/VDF/engine/VDF_ENG236_FetchMatrixUI_v0101.py"
+   ],
+   "version": "v0102",
+   "updated_at": "2026-11-13T15:00:00Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-13T15:00:00Z"
+  },
+  "C-sup-mdl744-v0103": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0103.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] SUP_MDL744 v0103 薄尾 7/7 · 合計 PASS",
+   "scope": "NLP Hub v0103:v1.9.0 詞庫退路(embedded_sources/legacy)→ TextProcessor 正掛 · nfkc 走正主 · 證據型摘要 OK;①② 動態",
+   "dependencies": [
+    "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0103.py",
+    "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py"
+   ],
+   "version": "v0103",
+   "updated_at": "2026-11-13T15:00:00Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-13T15:00:00Z"
+  },
+  "C-vrn-eng087-v0101": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] 十一檢 OK 11 · FAIL 0",
+   "scope": "ENG087 v0101(不出版):相依 NLP Hub 換 v0103 後 TextProcessor 正規化 + 證據型摘要綠",
+   "dependencies": [
+    "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py",
+    "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0103.py"
+   ],
+   "version": "v0101",
+   "updated_at": "2026-11-13T15:00:00Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-13T15:00:00Z"
+  },
+  "C-vrn-eng088-v0101": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_ENG088_SsotAdditiveBridge_v0101.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VRN_ENG088_SsotAdditiveBridge v0101 selftest · 6/6",
+   "scope": "ENG088 v0101:收容夾冊外檔不計 Python __pycache__/*.pyc(數量照列;真冊外檔照紅)",
+   "dependencies": [
+    "functional modules/VRN/VRN_ENG088_SsotAdditiveBridge_v0101.py",
+    "functional modules/VRN/VRN_ENG088_SsotAdditiveBridge_v0100.py"
+   ],
+   "version": "v0101",
+   "updated_at": "2026-11-13T15:00:00Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-13T15:00:00Z"
   }
  },
  "work_items": [
@@ -10555,24 +10647,28 @@
   {
    "id": "VDF-REQ025:eng053-unmapped-lane",
    "requirement": "VDF-REQ025",
-   "case": null,
-   "state": "PENDING",
+   "case": "C-vdf-eng053-v0103",
+   "state": "VERIFIED",
    "owner": "AI",
    "reason": "ENG053 ⑦ 實樹:READY 車道有 1 條沒映到引擎源碼(既有 · 冊 / 引擎對應)",
    "next": "查是哪條車道 → 補映射或標規格車道",
-   "receipt": null,
-   "updated_at": "2026-11-13T13:00:00Z"
+   "receipt": "docs/handoff/evidence/C-vdf-eng053-v0103.json",
+   "updated_at": "2026-11-13T15:20:00Z",
+   "prior_state": "PENDING",
+   "resolution": "未映車道 = cnyes_consensus;不是沒人接,是 ENG050 尾版 v0102 為薄尾、字面在前版 v0101 本體,ENG053 只掃尾版原文 → v0103 薄尾接前版本體一起比(VIA-VDF-ENG365)"
   },
   {
    "id": "VDF-REQ025:eng236-cache-test",
    "requirement": "VDF-REQ025",
-   "case": null,
-   "state": "PENDING",
+   "case": "C-vdf-eng236-v0102",
+   "state": "VERIFIED",
    "owner": "operator",
    "reason": "ENG236 ④ 快取自測在有 VDF_Universe.duckdb 的樹上不封閉(讀到真庫 → 沒走快取分支)",
    "next": "出新版自測改用暫存庫路徑",
-   "receipt": null,
-   "updated_at": "2026-11-13T13:00:00Z"
+   "receipt": "docs/handoff/evidence/C-vdf-eng236-v0102.json",
+   "updated_at": "2026-11-13T15:20:00Z",
+   "prior_state": "PENDING",
+   "resolution": "ENG236 v0102 用空暫存夾當庫家密封重驗 ④a/④b(VIA-VDF-ENG366);本機真庫讀表照印不判燈"
   },
   {
    "id": "VDF-REQ025:eng082-yfinance",
@@ -10599,24 +10695,28 @@
   {
    "id": "VRN-REQ021:eng087-nfkc",
    "requirement": "VRN-REQ021",
-   "case": null,
-   "state": "PENDING",
+   "case": "C-vrn-eng087-v0101",
+   "state": "VERIFIED",
    "owner": "AI",
    "reason": "ENG087 TextProcessor 正規化:NLP Hub nfkc 輸出「買進,需求」跟期望「買進, 需求」差一個空格(SUP_MDL744 行為 vs 測試期望)",
    "next": "查 SUP_MDL744 尾版 nfkc 是否改過 → 對齊期望或出新版",
-   "receipt": null,
-   "updated_at": "2026-11-13T13:00:00Z"
+   "receipt": "docs/handoff/evidence/C-vrn-eng087-v0101.json",
+   "updated_at": "2026-11-13T15:20:00Z",
+   "prior_state": "PENDING",
+   "resolution": "根因在 NLP Hub:v1.9.0 詞庫在 embedded_sources/legacy/data/lexicon,v0102 只找 data/lexicon → TextProcessor 建不起來 → 退 stdlib NFKC。SUP_MDL744 v0103 補包內退路(VIA-SUP-MDL1203;七份詞庫 sha256 全同)→ ENG087 十一檢全綠,ENG087 不出版"
   },
   {
    "id": "VRN-REQ021:eng088-containment",
    "requirement": "VRN-REQ021",
-   "case": null,
-   "state": "PENDING",
+   "case": "C-vrn-eng088-v0101",
+   "state": "VERIFIED",
    "owner": "AI",
    "reason": "ENG088 ⑦ 收容夾 bee8a683c(工作站側枝重收)後多了 _upload 原件 zip,清冊對不上(5 件)",
    "next": "出新版:_upload/ 原件列另一態(L25 原件保存),其餘照清冊",
-   "receipt": null,
-   "updated_at": "2026-11-13T13:00:00Z"
+   "receipt": "docs/handoff/evidence/C-vrn-eng088-v0101.json",
+   "updated_at": "2026-11-13T15:20:00Z",
+   "prior_state": "PENDING",
+   "resolution": "原因更正:多出的 5 件不是 _upload zip,是 Python __pycache__/*.pyc(.gitignore 已忽略);manifest 30 件逐件 sha256 全對。ENG088 v0101 冊外檔比對排除位元組碼快取(數量照列;VIA-VRN-ENG334)"
   },
   {
    "id": "VRN-REQ021:fitz-8",
