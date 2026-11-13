@@ -21,6 +21,7 @@ E=$(python3 -c "import json;print(json.load(open('VeritasIntelligenceAnalytics/s
 | 2 | 必用功能卡 | `VIA_FROM_VCGC=YES python3 "$V" functions` |
 | 3 | 讀昨日備份(逐檔 sha 對倉 · 幾小時前 · HEAD 前進沒) | `python3 VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_DailyBackup_v0100.py check` |
 | 4 | 交接檢查(昨天的待辦 · 相依變更;不從記憶推定已完成) | `VIA_FROM_VCGC=YES python3 "$V" handoff check` |
+| 4b | AUTO SYNC(全景監控同步 · 同步檢查)| `VIA_FROM_VCGC=YES python3 "$V" monitor sync` · `… sync-check` |
 | 5 | 串測(全部 VCGC 工具 · 自動重出矩陣) | `VIA_FROM_VCGC=YES python3 "$V" test --quick` |
 | 6 | 工具矩陣(兩大功能 · 收斂 · 覆蓋率 · 發行冊) | `VIA_FROM_VCGC=YES python3 "$V" run VIA_VCGC_MDL258_ToolMatrix build` |
 | 7 | 支援工具發行冊有沒有新版待核 | `VIA_FROM_VCGC=YES python3 "$V" run VIA_VCGC_MDL258_ToolMatrix release`(乾跑;新版經操作員與 AI 協調、測試無誤才 `--apply`,L130 ④) |

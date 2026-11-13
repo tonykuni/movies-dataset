@@ -4,7 +4,7 @@
 
 ## 貼回包
 ```
-[計] vcgc registry govern(dry-run 不寫號) · 表 269(紅 0 黃 229 綠 40 發 0)· 功 20723(紅 0 黃 6690 綠 14013 發 490)· YELLOW
+[計] vcgc registry govern --apply · 表 269(紅 0 黃 229 綠 40 發 0)· 功 20723(紅 0 黃 6690 綠 14013 發 490)· YELLOW
 [計] 黃燈提醒分類 · F3=7973 · T5=147 · T6=198
   [YEL] 表 VCGC|via_activationgateway_v02_hotfix_manifest|77346f5e095960a6 · 同欄名異型(跨表):Time,Value | 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:Action;非snake:Metric;數字存字串:Value;非
   [YEL] 表 VCGC|via_activationgateway_v03_stablehotfix_manifest|77346f5e095960a6 · 同欄名異型(跨表):Time,Value | 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:Action;非snake:Metric;數字存字串:Value;非
