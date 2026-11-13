@@ -599,6 +599,9 @@ EXTRA_CSS = """
 .vm-filter input[type="search"]{flex:1 1 200px}
 .vm-filter label{color:var(--vl-muted);font-size:var(--vl-size-label)}
 th[data-sort]{cursor:pointer}
+.vm-chart{width:100%;height:auto;display:block}
+.vl-cell .vl-note{display:block;overflow-wrap:anywhere;word-break:break-word}
+.vl-cell{min-width:0}
 .vm-mono,code{font-family:var(--vl-font-mono);word-break:break-all}
 .vm-dim{color:var(--vl-muted)}
 [hidden]{display:none !important}
@@ -613,8 +616,8 @@ JS = """
     try{localStorage.setItem('vcgc_toolmatrix_tab',name);}catch(e){}
   }
   tabs.forEach(function(b){b.addEventListener('click',function(){show(b.dataset.tab);});});
-  var start='two'; try{start=localStorage.getItem('vcgc_toolmatrix_tab')||'two';}catch(e){}
-  if(!document.querySelector('[data-pane="'+start+'"]')){start='two';}
+  var start='home'; try{start=localStorage.getItem('vcgc_toolmatrix_tab')||'home';}catch(e){}
+  if(!document.querySelector('[data-pane="'+start+'"]')){start='home';}
   show(start);
   document.querySelectorAll('[data-filter]').forEach(function(box){
     var tb=document.getElementById(box.dataset.filter); if(!tb){return;}
@@ -657,6 +660,35 @@ JS = """
 """
 
 
+def svg_bars(rows, legend, width=520) -> str:
+    """圖像式:水平堆疊長條(只用 var(--vl-*) 色,不寫死色 · 0 外連)。rows = [(標籤, [(值, token), …])]。"""
+    rows = [r for r in rows if sum(v for v, _c in r[1]) > 0]
+    if not rows:
+        return '<p class="vl-note">(沒有資料)</p>'
+    top = max(sum(v for v, _c in segs) for _l, segs in rows) or 1
+    lab, bar, rh = 150, width - 150 - 50, 20
+    h = len(rows) * rh + 24
+    out = ['<svg class="vm-chart" viewBox="0 0 %d %d" role="img" aria-label="%s">' % (width, h, t(" · ".join(x[0] for x in legend)))]
+    for i, (label, segs) in enumerate(rows):
+        y = i * rh + 2
+        out.append('<text x="%d" y="%d" text-anchor="end" style="fill:var(--vl-ink);font-size:9px">%s</text>' % (lab - 6, y + 12, t(label[:22])))
+        x = lab
+        out.append('<rect x="%d" y="%d" width="%d" height="14" style="fill:var(--vl-row)"/>' % (lab, y + 2, bar))
+        for v, tok in segs:
+            w = bar * v / top
+            if w > 0:
+                out.append('<rect x="%.1f" y="%d" width="%.1f" height="14" style="fill:var(%s)"><title>%s %d</title></rect>' % (x, y + 2, w, tok, t(label), v))
+            x += w
+        out.append('<text x="%.1f" y="%d" style="fill:var(--vl-muted);font-size:9px">%d</text>' % (x + 4, y + 13, sum(v for v, _c in segs)))
+    lx = lab
+    for name, tok in legend:
+        out.append('<rect x="%d" y="%d" width="10" height="10" style="fill:var(%s)"/><text x="%d" y="%d" style="fill:var(--vl-muted);font-size:9px">%s</text>'
+                   % (lx, h - 12, tok, lx + 13, h - 3, t(name)))
+        lx += 14 + 9 * len(name) + 10
+    out.append('</svg>')
+    return "".join(out)
+
+
 def render_html(rep: dict, kit: str) -> str:
     rows, k = rep["tools"], rep["kpi"]
     rc = rep["receipts"]
@@ -677,7 +709,7 @@ def render_html(rep: dict, kit: str) -> str:
              '<label><input type="checkbox" id="vm-auto" checked> 每 5 分鐘自動重整</label></p>'
              % (t(NAME), t(VERSION), t(rep["at"]), t(rep["visual_lock"].get("tool", "—")),
                 t(rep["visual_lock"].get("count", "—")), t(str(rep["visual_lock"].get("sha256", ""))[:16])))
-    tabs = [("two", "兩大功能"), ("mdl", "VIA 中央管理工具"), ("sup", "VIA 支援工具"), ("flat", "單檔收斂"),
+    tabs = [("home", "總覽"), ("two", "兩大功能"), ("mdl", "VIA 中央管理工具"), ("sup", "VIA 支援工具"), ("flat", "單檔收斂"),
             ("close", "VCGC 收尾"), ("int", "整合進來 INT"), ("indep", "獨立性 / 衝突"),
             ("talib", "TA-Lib"), ("reg", "各系統登錄"), ("rule", "命名與政策")]
     h.append('<nav class="vm-tabs" role="tablist">' + "".join(
@@ -708,9 +740,51 @@ def render_html(rep: dict, kit: str) -> str:
              '交接快照時間若很舊,代表 checkpoint 一直被交接閘擋住(照實顯示,不刷新假綠)。</p></div>')
     h.append('</div></section>')
 
-    # ② 兩大功能矩陣 + 中央管理工具 / 支援工具兩表 + 單檔收斂
+    # ① 總覽:卡片式 · 矩陣式 · 圖像式(視覺鎖定)
     two = rep.get("two") or []
-    h.append('<section data-pane="two"><div class="vl-panel"><div class="vl-head"><h2>VCGC 兩大功能</h2>'
+    cv, fl0, rl = rep.get("coverage") or {}, rep.get("flatten") or {}, rep.get("releases") or {}
+    cards = [("VCGC 工具家族", k["tools"], None), ("VIA 中央管理工具", k["mdl"], None), ("VIA 支援工具", k["sup"], None),
+             ("已發名碼", k["issued"], "GREEN" if not k["conflicts"] else "RED"), ("命名衝突", k["conflicts"], "GREEN" if not k["conflicts"] else "RED"),
+             ("TA-Lib 程式使用", k["talib_use"], "GREEN" if not k["talib_use"] else "RED"),
+             ("他系統釘 VCGC 版", k["in_pin_files"], "GREEN" if not k["in_pin_files"] else "YELLOW"),
+             ("加速器覆蓋", "%d / %d" % (cv.get("accel_ok", 0), cv.get("accel_n", 0)), "GREEN" if cv.get("accel_ok") == cv.get("accel_n") else "YELLOW"),
+             ("外抓網路橋", "%d / %d" % (cv.get("net_ok", 0), cv.get("net_n", 0)), "GREEN" if cv.get("net_ok") == cv.get("net_n") else "YELLOW"),
+             ("支援工具發行", "%d / %d" % (sum(1 for x in rl.values() if x.get("status") == "RELEASED"), len(rl)), None),
+             ("已是單檔", fl0.get("SINGLE", 0), None), ("薄尾待合成", fl0.get("NEEDS_FLATTEN", 0), "YELLOW" if fl0.get("NEEDS_FLATTEN") else "GREEN"),
+             ("視覺鎖定閘", rep["visual_lock"].get("gate", "—"), rep["visual_lock"].get("gate"))]
+    h.append('<section data-pane="home"><div class="vl-board"><div class="vl-panel" data-span="12"><div class="vl-head"><h2>VCGC 總覽</h2>'
+             '<span class="vl-why">卡片 · 矩陣 · 圖像;只讀他系統,只顯示 VCGC 自己的控管狀態</span></div><div class="vl-grid">')
+    for label, val, lamp in cards:
+        h.append('<div class="vl-cell"><span class="vl-label">%s</span><span class="vl-value">%s %s</span></div>' % (t(label), t(val), pill(lamp) if lamp else ""))
+    h.append('</div></div>')
+    co0 = rep["receipts"]["closeout"]
+    h.append('<div class="vl-panel" data-span="12"><div class="vl-head"><h2>VCGC 收尾(卡片)</h2><span class="vl-why">%s · rc %s</span></div><div class="vl-grid">'
+             % (t(co0.get("at") or "還沒有收據"), t(co0.get("rc"))))
+    for st0 in co0.get("steps") or []:
+        h.append('<div class="vl-cell"><span class="vl-label">%s %s</span><span class="vl-value">%s</span><span class="vl-note">%s</span></div>'
+                 % (t(st0.get("step")), t(st0.get("name")), pill(st0.get("lamp")), t(str(st0.get("note") or "")[:90])))
+    h.append('</div></div>')
+    LG = [("綠", "--vl-success"), ("黃", "--vl-warning-ink"), ("紅", "--vl-danger-ink")]
+    h.append('<div class="vl-panel" data-span="6"><div class="vl-head"><h2>兩大功能 × 燈號</h2></div>%s</div>' % svg_bars(
+        [(g["label"], [(g["lamps"]["GREEN"], "--vl-success"), (g["lamps"]["YELLOW"], "--vl-warning-ink"), (g["lamps"]["RED"], "--vl-danger-ink")]) for g in two], LG))
+    h.append('<div class="vl-panel" data-span="6"><div class="vl-head"><h2>單檔收斂 × 分組</h2></div>%s</div>' % svg_bars(
+        [(g["label"], [(g["single"], "--vl-success"), (g["ready"], "--vl-ink"), (g["flatten"], "--vl-warning-ink"), (g["blocked"], "--vl-danger-ink")]) for g in two],
+        [("單檔", "--vl-success"), ("可刪舊版", "--vl-ink"), ("待合成", "--vl-warning-ink"), ("被點名", "--vl-danger-ink")]))
+    h.append('<div class="vl-panel" data-span="6"><div class="vl-head"><h2>加速器 / 網路橋覆蓋(各系統)</h2></div>%s%s</div>' % (svg_bars(
+        [("加速器 · " + sn, [(b[1], "--vl-success"), (b[0] - b[1], "--vl-danger-ink")]) for sn, b in sorted((cv.get("by_sys") or {}).items())],
+        [("有橋", "--vl-success"), ("缺", "--vl-danger-ink")]), svg_bars(
+        [("網路橋 · " + sn, [(b[3], "--vl-success"), (b[2] - b[3], "--vl-danger-ink")]) for sn, b in sorted((cv.get("by_sys") or {}).items())],
+        [("外抓有橋", "--vl-success"), ("外抓缺橋", "--vl-danger-ink")])))
+    grp_rel = {}
+    for x in rl.values():
+        d0 = grp_rel.setdefault(x.get("group") or "—", [0, 0])
+        d0[0 if x.get("status") == "RELEASED" else 1] += 1
+    h.append('<div class="vl-panel" data-span="6"><div class="vl-head"><h2>支援工具發行(L130 ④)</h2></div>%s</div>' % svg_bars(
+        [(g0, [(v[0], "--vl-success"), (v[1], "--vl-warning-ink")]) for g0, v in sorted(grp_rel.items())], [("RELEASED", "--vl-success"), ("CANDIDATE", "--vl-warning-ink")]))
+    h.append('</div></section>')
+
+    # ② 兩大功能矩陣 + 中央管理工具 / 支援工具兩表 + 單檔收斂
+    h.append('<section data-pane="two" hidden><div class="vl-panel"><div class="vl-head"><h2>VCGC 兩大功能</h2>'
              '<span class="vl-why">VIA 中央管理工具(MDL)· VIA 支援工具(SUP:Token-Saving 與其他工具組);分組依名稱 / 席位,只影響顯示,不影響名碼</span></div>')
     h.append('<div class="vl-scroll"><table><thead><tr>' + "".join('<th data-sort>%s</th>' % t(c) for c in (
         "大類", "分組", "家族", "已發名碼", "綠", "黃", "紅", "加速器 OK", "有測站", "有實測", "單檔", "可刪舊版", "待合成", "舊版被點名", "他系統在用"))
@@ -1467,7 +1541,7 @@ def selftest() -> int:
         rep = collect(via, ast=False)
         html_text = render_html(dict(rep, visual_lock={"gate": "—"}), ":root{--vl-bg:x}")
         chk("⑪ 出頁:十個分頁(兩大功能 · 中央管理工具 · 支援工具 · 單檔收斂 · 收尾 …)都在 · 表格有資料 · 0 外連 · 沒有寫死 # 色",
-            all('data-pane="%s"' % p in html_text for p in ("two", "mdl", "sup", "flat", "close", "int", "indep", "talib", "reg", "rule"))
+            all('data-pane="%s"' % p in html_text for p in ("home", "two", "mdl", "sup", "flat", "close", "int", "indep", "talib", "reg", "rule"))
             and "VIA_VCGC_SUP001" in html_text and "http" not in html_text.replace("http-equiv", "")
             and not re.search(r"(?<![\w-])#[0-9a-fA-F]{3,8}\b", html_text))
         shutil.rmtree(out, ignore_errors=True)
