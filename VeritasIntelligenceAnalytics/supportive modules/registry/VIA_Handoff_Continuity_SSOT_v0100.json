@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-10T10:05:00Z",
+ "updated_at": "2026-11-13T14:38:33Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -148,7 +148,9 @@
   "supportive modules/registry/CGC_MDL249_DataFrameLock_v0101.py",
   "functional modules/VDF/VDF_SystemManager_v0157.py",
   "functional modules/VQG/VQG_AllInOne_v0104.py",
-  "functional modules/VQG/VQG_AllInOne_v0105.py"
+  "functional modules/VQG/VQG_AllInOne_v0105.py",
+  "supportive modules/registry/CGC_MDL281_ShadowMerge_v0100.py",
+  "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py"
  ],
  "frozen_sources": {
   "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -4750,6 +4752,49 @@
    "version": "v0101",
    "updated_at": "2026-11-10T14:49:40Z",
    "timeout_seconds": 600
+  },
+  "C-shadow-merge-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL281_ShadowMerge_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] CGC_MDL281_ShadowMerge v0100 --selftest · 13/13",
+   "scope": "VCGC 影子整併 v0100:影子副本唯讀 · 原檔 sha 前後一致 · 含常數完整 AST 去重(遮字串近似只提示)· L75 不准遷 · ONLY_B 環繞斷言注入 · RISK 不搬 · 零遺失證明 · 薄尾問鎖版 token 工具 chain",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL281_ShadowMerge_v0100.py",
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0117.py",
+    "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0100.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0102.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-13T14:38:33Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-13T14:38:33Z"
+  },
+  "C-mcp-server-v0103": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] CGC_MDL279_MCPServer v0103 --selftest · 本版 10 項 · 不過 0(v0102 鏈 rc 0)",
+   "scope": "via-vcgc MCP v0103:+vcgc_read · vcgc_slice · vcgc_digest 委派鎖版 token 工具;倉內路徑閘 · 拒讀清單 · 參數閘 · 鎖冊 sha 不符即停;前版 16 動詞與收據沿用",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0100.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0101.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0102.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0117.py",
+    "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+   ],
+   "version": "v0103",
+   "updated_at": "2026-11-13T14:38:33Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-13T14:38:33Z"
   }
  },
  "work_items": [
@@ -9817,6 +9862,28 @@
    "next": "操作員上傳或 --nonstock-out 指桌機 v0310 輸出夾",
    "receipt": null,
    "updated_at": "2026-11-10T10:05:00Z"
+  },
+  {
+   "id": "VCGC-REQ223:rulings",
+   "requirement": "VCGC-REQ223",
+   "case": "C-shadow-merge-v0100",
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "工具已在;任何家族的實際整併,BLOCKED_NEEDS_RULING 的群(簽章同本體不同 · 模組層常數差異 · RISK)都要操作員裁定才可出新版正典(L75 · L61)",
+   "next": "指定要整併的家族 → run CGC_MDL281_ShadowMerge compare → 逐群裁定",
+   "receipt": null,
+   "updated_at": "2026-11-13T14:38:33Z"
+  },
+  {
+   "id": "VCGC-REQ224:remote-platforms",
+   "requirement": "VCGC-REQ224",
+   "case": "C-mcp-server-v0103",
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "容器與倉內 .mcp.json 已接 v0103;桌機 Claude Desktop 要重新載入,遠端 ChatGPT / Manus / Copilot web 要 parity --write + HTTPS 隧道",
+   "next": "桌機重開 MCP;VIA_MCP_Engine parity --write(操作員)",
+   "receipt": null,
+   "updated_at": "2026-11-13T14:38:33Z"
   }
  ]
 }
