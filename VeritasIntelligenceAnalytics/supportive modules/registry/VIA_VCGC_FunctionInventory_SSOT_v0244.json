@@ -1,10 +1,10 @@
 {
  "schema": "VIA.VCGC.FunctionInventory.v1",
  "version": "v0244",
- "batch": "影子整併 CGC_MDL281 + MCP 讀檔三動詞(操作員 2026-11-13)",
- "ts": "2026-11-13T14:38:33Z",
+ "batch": "VRN / VDF 工具矩陣(2026-11-13 晚):+1 站",
+ "ts": "2026-11-13T21:00:00Z",
  "prior": "VIA_VCGC_FunctionInventory_SSOT_v0243.json",
- "req": "VCGC-REQ245",
+ "req": "VCGC-REQ075 · SUP-REQ001",
  "why": "v0212 → v0213:+站 C-vqg-v0108(操作員 2026-11-09「VQG VAP VCGC 一併順勢完成 · VQG 可能有增加指標 · 量化分析內容以增加」)。只增不減,其餘一字不動。 ｜ 2026-11-09 +站 C-workbench-lock-v0101(操作員「ICON 優雅 · LOGO 第二行放大」)。 ｜ 2026-11-09 coverage.workflow +WKF030 / WKF031 六步(Codex #621 P1:需求要有工作流正主)。",
  "measured": "2026-09-30 容器乾淨工作樹逐支經 VCGC 實跑 64 支:rc 0 55 · rc 2(黃,待裁或無資料)8 · workflow 單獨跑 rc 1;寫已追蹤檔 0",
  "rules": [
@@ -5478,6 +5478,750 @@
    "updated_at": "2026-11-10T15:20:00Z"
   },
   {
+   "id": "C-vdf-eng051-v0104",
+   "name": "VDF_ENG051_ActiveTWETF_Holdings v0104 自測(DuckDB 2.x register 前先取完未完結果 · v0103 本體自測經包裝 all_pass;8 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v0104.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-visualspeclock-v0100",
+   "name": "VIA_VisualSpecLock v0100 自測(色盤 · 字級 · 間距 · 圓角 · 斷點抽取 · lock 只增 · check 變了就紅;15 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_VisualSpecLock_v0100.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf-mdl009-v0103",
+   "name": "VDF_MDL009_TWStockList v0103 自測(T1 欄 · ISIN 官方 / 演算 · V9 · collect 內快取;20 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_MDL009_TWStockList_v0103.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf-eng238-v0100",
+   "name": "VDF_ENG238_InstHoldingPct v0100 自測(累積淨買賣超 ÷ 股數 · 官方外資優先 · 缺股數留空;13 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/engine/VDF_ENG238_InstHoldingPct_v0100.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vcgc-console-v0194-matrix",
+   "name": "VCGC 主控台 v0194 matrix selftest(45 項 · 隔離夾具)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0194.py",
+    "matrix",
+    "selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-cgc237-v0120-receipts",
+   "name": "CGC_MDL237 v0120 註冊收據自測(uuid · operator · 分鐘時間 · bytes · format · sha256 · 重複 / 衝突 · 子號併母號;20 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0120.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-cgc237-v0121-gate",
+   "name": "CGC_MDL237 v0121 檔名規則閘(P2):N1 檔名 <族>_v<NNNN> · N2 撞同族 · N3 版號只增(--allow-gap)· 擋下",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0121.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf-mdl008-v0108",
+   "name": "VDF_MDL008 v0108 + 擷取冊 v0108:MDL009 改指 v0103(其餘 36 列不變 · 不把 014 拉進 fetch · 冊不在照舊",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0108.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf-eng238-v0101",
+   "name": "VDF_ENG238 v0101:空值列補值 · NULL 型別欄改 DOUBLE · 不刪列不重複 · 重現桌機全空庫;10 項(+ v0100 13 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/engine/VDF_ENG238_InstHoldingPct_v0101.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf-eng238-v0102",
+   "name": "VDF_ENG238 v0102:股數也讀 MDL009 latest.parquet(清單庫同日重跑補不到)· 自測判準改「非 DOUBLE」(桌機 INTE",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/engine/VDF_ENG238_InstHoldingPct_v0102.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vrn2-peerbridge-v0102",
+   "name": "VRN2_PeerBridge v0102:prove 0 項講原因(VRN-1 HEAD · 指紋依 0993c2d · borrow_why_not · g",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_PeerBridge_v0102.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-via-downloadssync-v0100",
+   "name": "VIA_DownloadsSync v0100:自適應 Downloads 同步器(規則由倉推出 · zip 成員比對 · 只增收件 ≤1MB · 個人檔只計數",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/sync/VIA_DownloadsSync_v0100.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-visualspeclock-v0101",
+   "name": "VIA_VisualSpecLock v0101:Manus 線上站為最高權威 · theme(元件跟鎖)· audit(鎖外色 / 字體 RED)· 真快照驗",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_VisualSpecLock_v0101.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-via-downloadssync-v0101",
+   "name": "VIA_DownloadsSync v0101:頁面視覺跟鎖(audit GREEN)· 上傳前綴 · 內容判讀 · 多來源 · 上次以來;10 項(+v010",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/sync/VIA_DownloadsSync_v0101.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-sm-vcgc-v0195",
+   "name": "VCGC 主控台 v0195 標準 System Manager(規範 v0100 · 對等 · 標準動詞 · 客製健檢 · 前版轉交 · P5 對等樹不改);",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0195.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-sm-vdf-v0169",
+   "name": "VDF_SystemManager v0169 標準 System Manager(規範 v0100 · 對等 · 標準動詞 · 客製健檢 · 前版轉交 · P",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_SystemManager_v0169.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-sm-vrn-v0263",
+   "name": "VRN_SystemManager v0263 標準 System Manager(規範 v0100 · 對等 · 標準動詞 · 客製健檢 · 前版轉交 · P",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_SystemManager_v0263.py",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "V-health",
+   "name": "標準 health(自檢 · 對等 P3/P4/P7/P8)",
+   "argv": [
+    "health"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "V-version",
+   "name": "標準 version(自身身分)",
+   "argv": [
+    "version"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "V-engines",
+   "name": "標準 engines(只看 VCGC 自己的夾)",
+   "argv": [
+    "engines"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "V-records",
+   "name": "標準 records(VCGC 自己的收據)",
+   "argv": [
+    "records"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "V-peers",
+   "name": "標準 peers(只讀監控 VDF / VRN)",
+   "argv": [
+    "peers"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "V-conform",
+   "name": "標準 conform(依規範自查)",
+   "argv": [
+    "conform"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "C-vqg-v0111",
+   "name": "VQG v0111 自測(v0110 薄尾:indicators 動詞 · 指標登記冊 66 列 · 編號 分類 名稱 公式 參數 時間參數 benchmark pros cons 替代指標 · 冊⇄程式對帳 · 突變 7 種皆 RED · 匯出 CSV/MD;12 項 + v0110 鏈於乾淨子行程)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VQG/VQG_AllInOne_v0111.py",
+    "--selftest"
+   ],
+   "timeout": 1800,
+   "deps": [
+    "functional modules/VQG/VQG_AllInOne_v0110.py",
+    "functional modules/VQG/VQG_IndicatorRegister_SSOT_v0100.json"
+   ],
+   "version": "v0111",
+   "updated_at": "2026-11-11T03:30:00Z"
+  },
+  {
+   "id": "C-vdf-mdl008-v0109",
+   "name": "VDF_MDL008_FetchSystem v0109 自測(子行程改指本版 · 重現 v0108 子行程 = v0107 載舊冊 · 乾淨直譯器子行程載冊 009 → MDL009 v0103 · __file__ 還原;--deep 含 v0108 鏈)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0109.py",
+    "--selftest",
+    "--deep"
+   ],
+   "timeout": 1800,
+   "deps": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0108.py",
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0107.py",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0108.json",
+    "functional modules/VDF/VDF_MDL009_TWStockList_v0103.py"
+   ],
+   "version": "v0109",
+   "updated_at": "2026-11-11T01:10:00Z"
+  },
+  {
+   "id": "C-sm-vdf-v0170",
+   "name": "VDF_SystemManager v0170 自測(test 改本系統逐支跑 · L16 rc 2/3/4 記缺件 · 16 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_SystemManager_v0170.py",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "functional modules/VDF/VDF_SystemManager_v0169.py",
+    "docs/handoff/ai/VIA_SystemManager_Standard_v0100.json"
+   ],
+   "version": "v0170",
+   "updated_at": "2026-11-12T19:30:00Z"
+  },
+  {
+   "id": "C-sm-vrn-v0264",
+   "name": "VRN_SystemManager v0264 自測(test 依 L16 分 PASS / NODATA / ABSENT / GATED / FAIL · 17 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_SystemManager_v0264.py",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "functional modules/VRN/VRN_SystemManager_v0263.py",
+    "docs/handoff/ai/VIA_SystemManager_Standard_v0100.json"
+   ],
+   "version": "v0264",
+   "updated_at": "2026-11-12T19:30:00Z"
+  },
+  {
+   "id": "C-desktop-validate-v0100",
+   "name": "VIA_DesktopValidate v0100 自測(唯讀驗證 VCGC · VDF · VRN 產出 · 夾具 13 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_DesktopValidate_v0100.py",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [],
+   "version": "v0100",
+   "updated_at": "2026-11-12T19:30:00Z"
+  },
+  {
+   "id": "C-vrn2-nonstock-core-v0100",
+   "name": "VRN2_NonStockCore v0100 自測(暫代 NON_STOCK_CORE 介面 · 多格式讀取 18 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_NonStockCore_v0100.py",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [],
+   "version": "v0100",
+   "updated_at": "2026-11-12T21:00:00Z"
+  },
+  {
+   "id": "C-vrn2-nonstock-summarizer-v0100",
+   "name": "VRN2_NonStockSummarizer v0100 自測(v0310 不改 · 多格式 → 矩陣 18 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_NonStockSummarizer_v0100.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0100",
+   "updated_at": "2026-11-12T21:00:00Z"
+  },
+  {
+   "id": "C-vrn2-reportrows-v0102",
+   "name": "VRN2_ReportRows v0102 自測(非個股車道改走入口 · 非 PDF 進矩陣 8 項 + v0101 鏈)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_ReportRows_v0102.py",
+    "--selftest"
+   ],
+   "timeout": 1500,
+   "deps": [],
+   "version": "v0102",
+   "updated_at": "2026-11-12T21:00:00Z"
+  },
+  {
+   "id": "V-agentos",
+   "name": "Agent OS 併入 VCGC(唯讀盤點 27 工具)",
+   "argv": [
+    "agentos",
+    "inventory"
+   ],
+   "quick": true,
+   "timeout": 300,
+   "marker": "工具 27"
+  },
+  {
+   "id": "V-graphify",
+   "name": "Graphify 隔離環境狀態",
+   "argv": [
+    "graphify",
+    "status"
+   ],
+   "timeout": 120,
+   "yellow_rc": [
+    3
+   ]
+  },
+  {
+   "id": "C-vcgc-agentos-hub-v0101",
+   "name": "CGC_MDL280 VCGCAgentOSHub v0101 自測(封閉夾具 15 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL280_VCGCAgentOSHub_v0101.py",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [],
+   "version": "v0101",
+   "updated_at": "2026-11-12T23:00:00Z"
+  },
+  {
+   "id": "C-vcgc-console-v0196",
+   "name": "主控台 v0196 自測(兩扇門 + 原樣轉交 9 項)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0196.py",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [],
+   "version": "v0196",
+   "updated_at": "2026-11-12T22:30:00Z"
+  },
+  {
+   "id": "C-vcgc-mcp-v0103",
+   "name": "CGC_MDL279 MCPServer v0103 自測(+4 資源 · v0102 鏈)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [],
+   "version": "v0103",
+   "updated_at": "2026-11-12T23:40:00Z"
+  },
+  {
+   "id": "C-sm-vdf-v0171",
+   "name": "VDF 管理器 v0171:test 依 L16 判缺第三方套件 ABSENT(自家模組缺仍紅)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_SystemManager_v0171.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0171",
+   "updated_at": "2026-11-13T13:00:00Z"
+  },
+  {
+   "id": "C-sm-vrn-v0265",
+   "name": "VRN 管理器 v0265:test 依 L16 判缺第三方套件 ABSENT(自家模組缺仍紅)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_SystemManager_v0265.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0265",
+   "updated_at": "2026-11-13T13:00:00Z"
+  },
+  {
+   "id": "C-vrn-eng070-v0105",
+   "name": "ENG070 v0105:交易內取價先查表 · 重現 v0104 TransactionException · v0104 九檢換裝後全過",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_ENG070_YahooConsensus_v0105.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0105",
+   "updated_at": "2026-11-13T13:00:00Z"
+  },
+  {
+   "id": "C-vrn-eng062-v0114",
+   "name": "ENG062 v0114:找不到 test_summary*.py → NODATA rc 2(L16)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_ENG062_SummarizerV1_v0114.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0114",
+   "updated_at": "2026-11-13T13:00:00Z",
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "C-vdf-eng089-v0110",
+   "name": "ENG089 v0110:CATALOG 落到本體(v0109 漏帶)+ v0109 ⑬′",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0110.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0110",
+   "updated_at": "2026-11-13T13:40:00Z"
+  },
+  {
+   "id": "C-vdf-eng053-v0103",
+   "name": "ENG053 v0103:車道源碼實證看穿薄尾(cnyes_consensus)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/engine/VDF_ENG053_ParamEngineMap_v0103.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0103",
+   "updated_at": "2026-11-13T15:30:00Z"
+  },
+  {
+   "id": "C-vdf-eng236-v0102",
+   "name": "ENG236 v0102:④ 快取分支密封重驗",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/engine/VDF_ENG236_FetchMatrixUI_v0102.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0102",
+   "updated_at": "2026-11-13T15:30:00Z"
+  },
+  {
+   "id": "C-sup-mdl744-v0103",
+   "name": "NLP Hub v0103:v1.9.0 詞庫退路 · TextProcessor 正掛",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0103.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0103",
+   "updated_at": "2026-11-13T15:30:00Z"
+  },
+  {
+   "id": "C-vrn-eng087-v0101",
+   "name": "ENG087 v0101:相依 Hub v0103 後正規化 + 摘要綠",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0101",
+   "updated_at": "2026-11-13T15:30:00Z"
+  },
+  {
+   "id": "C-vrn-eng088-v0101",
+   "name": "ENG088 v0101:冊外檔不計 __pycache__",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_ENG088_SsotAdditiveBridge_v0101.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0101",
+   "updated_at": "2026-11-13T15:30:00Z"
+  },
+  {
+   "id": "C-vcgc-integrate-v0101",
+   "name": "Integrate v0101:Hub / ENG085 取家族尾版(NLP 新舊版整合)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL149_Integrate_v0101.py",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [],
+   "version": "v0101",
+   "updated_at": "2026-11-13T16:00:00Z"
+  },
+  {
+   "id": "C-vrn-eng049-v0104",
+   "name": "VRN 輸出驗證矩陣:個股 BASIC INFO + SUMMARY · 非個股新矩陣 · 唯讀零落庫",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_ENG049_ContentReconcile_v0104.py",
+    "--selftest"
+   ],
+   "timeout": 1500,
+   "deps": [],
+   "version": "v0104",
+   "updated_at": "2026-11-13T19:00:00Z"
+  },
+  {
+   "id": "C-vrn2-peerbridge-v0103",
+   "name": "PeerBridge v0103:補標準加速器橋(L103)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN2_PeerBridge_v0103.py",
+    "--selftest"
+   ],
+   "timeout": 1500,
+   "deps": [],
+   "version": "v0103",
+   "updated_at": "2026-11-13T19:00:00Z"
+  },
+  {
+   "id": "C-vcgc-sdd-v0108",
+   "name": "SDD v0108:rel() 碰 VIA 樹外引擎不炸(慢性 LINK 假紅根因)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0108.py",
+    "--selftest"
+   ],
+   "timeout": 1500,
+   "deps": [],
+   "version": "v0108",
+   "updated_at": "2026-11-13T19:00:00Z"
+  },
+  {
+   "id": "C-sm-vrn-v0266",
+   "name": "VRN 管理器 v0266:缺第三方套件判讀認別名 + 實查有沒有裝",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_SystemManager_v0266.py",
+    "--selftest"
+   ],
+   "timeout": 1500,
+   "deps": [],
+   "version": "v0266",
+   "updated_at": "2026-11-13T19:00:00Z"
+  },
+  {
+   "id": "C-sm-vdf-v0172",
+   "name": "VDF 管理器 v0172:缺第三方套件判讀(ENG082 yfinance)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_SystemManager_v0172.py",
+    "--selftest"
+   ],
+   "timeout": 1500,
+   "deps": [],
+   "version": "v0172",
+   "updated_at": "2026-11-13T19:00:00Z"
+  },
+  {
+   "id": "C-vdf-ssotsync-v0101",
+   "name": "VDF_SSOTSync v0101:同義字收割看穿薄尾(ENG053 v0103 回歸修正)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_SSOTSync_v0101.py",
+    "--selftest"
+   ],
+   "timeout": 1500,
+   "deps": [],
+   "version": "v0101",
+   "updated_at": "2026-11-13T19:00:00Z"
+  },
+  {
+   "id": "C-vrn-eng049-v0105",
+   "name": "VRN 報告矩陣:個股統一矩陣 · 非個股依類別分組 · 唯讀零落庫",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_ENG049_ContentReconcile_v0105.py",
+    "--selftest"
+   ],
+   "timeout": 1500,
+   "deps": [],
+   "version": "v0105",
+   "updated_at": "2026-11-13T20:00:00Z"
+  },
+  {
+   "id": "C-vcgc-toolboard-v0101",
+   "name": "VRN / VDF 工具矩陣(ToolBoard v0101 vrnvdf)· 只讀不刪",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_VCGCToolBoard_v0101.py",
+    "--selftest"
+   ],
+   "timeout": 1500,
+   "deps": [],
+   "version": "v0101",
+   "updated_at": "2026-11-13T21:00:00Z"
+  },
+  {
    "id": "C-shadow-merge-v0100",
    "name": "CGC_MDL281 影子整併 v0100 自測(影子副本唯讀 · 原檔 sha 不變 · 六類分類 · 遮字串近似不去重負控 · ONLY_B 注入避開 __main__ · RISK 不搬 · 環繞斷言會咬 · 正控 A×A PROVEN · 真樹 chain 整合;13 項)",
    "argv": [
@@ -5726,6 +6470,36 @@
    },
    "mcp": {
     "station": "V-mcp"
+   },
+   "health": {
+    "station": "V-health"
+   },
+   "version": {
+    "station": "V-version"
+   },
+   "engines": {
+    "station": "V-engines"
+   },
+   "records": {
+    "station": "V-records"
+   },
+   "peers": {
+    "station": "V-peers"
+   },
+   "conform": {
+    "station": "V-conform"
+   },
+   "agentos": {
+    "station": "V-agentos"
+   },
+   "graphify": {
+    "station": "V-graphify"
+   },
+   "register": {
+    "exempt": "不是主控台頂層動詞:agentos 的子動詞(v0196 help 列出 agentos inventory | register | activate);由 V-agentos 與 C-vcgc-agentos-hub-v0101 驗"
+   },
+   "activate": {
+    "exempt": "不是主控台頂層動詞:agentos 的子動詞(v0196 help 列出 agentos inventory | register | activate);由 V-agentos 與 C-vcgc-agentos-hub-v0101 驗"
    }
   },
   "seat": {
@@ -6658,6 +7432,173 @@
    },
    "C-vrn2-peerbridge-v0101": {
     "station": "C-vrn2-peerbridge-v0101"
+   },
+   "C-vdf-eng051-v0104": {
+    "station": "C-vdf-eng051-v0104"
+   },
+   "C-visualspeclock-v0100": {
+    "station": "C-visualspeclock-v0100"
+   },
+   "C-vdf-mdl009-v0103": {
+    "station": "C-vdf-mdl009-v0103"
+   },
+   "C-vdf-eng238-v0100": {
+    "station": "C-vdf-eng238-v0100"
+   },
+   "C-vcgc-console-v0194-matrix": {
+    "station": "C-vcgc-console-v0194-matrix"
+   },
+   "C-cgc237-v0120-receipts": {
+    "station": "C-cgc237-v0120-receipts"
+   },
+   "C-cgc237-v0121-gate": {
+    "station": "C-cgc237-v0121-gate"
+   },
+   "C-vdf-mdl008-v0108": {
+    "station": "C-vdf-mdl008-v0108"
+   },
+   "C-vdf-eng238-v0101": {
+    "station": "C-vdf-eng238-v0101"
+   },
+   "C-vdf-eng238-v0102": {
+    "station": "C-vdf-eng238-v0102"
+   },
+   "C-vrn2-peerbridge-v0102": {
+    "station": "C-vrn2-peerbridge-v0102"
+   },
+   "C-via-downloadssync-v0100": {
+    "station": "C-via-downloadssync-v0100"
+   },
+   "C-visualspeclock-v0101": {
+    "station": "C-visualspeclock-v0101"
+   },
+   "C-via-downloadssync-v0101": {
+    "station": "C-via-downloadssync-v0101"
+   },
+   "C-sm-vcgc-v0195": {
+    "station": "C-sm-vcgc-v0195"
+   },
+   "C-sm-vdf-v0169": {
+    "station": "C-sm-vdf-v0169"
+   },
+   "C-sm-vrn-v0263": {
+    "station": "C-sm-vrn-v0263"
+   },
+   "C-vqg-v0111": {
+    "state": "COVERED",
+    "by": "C-vqg-v0111"
+   },
+   "C-vdf-mdl008-v0109": {
+    "state": "COVERED",
+    "by": "C-vdf-mdl008-v0109"
+   },
+   "C-sm-vdf-v0170": {
+    "state": "COVERED",
+    "by": "C-sm-vdf-v0170"
+   },
+   "C-sm-vrn-v0264": {
+    "state": "COVERED",
+    "by": "C-sm-vrn-v0264"
+   },
+   "C-desktop-validate-v0100": {
+    "state": "COVERED",
+    "by": "C-desktop-validate-v0100"
+   },
+   "C-vrn2-nonstock-core-v0100": {
+    "state": "COVERED",
+    "by": "C-vrn2-nonstock-core-v0100"
+   },
+   "C-vrn2-nonstock-summarizer-v0100": {
+    "state": "COVERED",
+    "by": "C-vrn2-nonstock-summarizer-v0100"
+   },
+   "C-vrn2-reportrows-v0102": {
+    "state": "COVERED",
+    "by": "C-vrn2-reportrows-v0102"
+   },
+   "C-vcgc-agentos-hub-v0101": {
+    "state": "COVERED",
+    "by": "C-vcgc-agentos-hub-v0101"
+   },
+   "C-vcgc-console-v0196": {
+    "state": "COVERED",
+    "by": "C-vcgc-console-v0196"
+   },
+   "C-vcgc-mcp-v0103": {
+    "state": "COVERED",
+    "by": "C-vcgc-mcp-v0103"
+   },
+   "C-sm-vdf-v0171": {
+    "state": "COVERED",
+    "by": "C-sm-vdf-v0171"
+   },
+   "C-sm-vrn-v0265": {
+    "state": "COVERED",
+    "by": "C-sm-vrn-v0265"
+   },
+   "C-vrn-eng070-v0105": {
+    "state": "COVERED",
+    "by": "C-vrn-eng070-v0105"
+   },
+   "C-vdf-eng089-v0110": {
+    "state": "COVERED",
+    "by": "C-vdf-eng089-v0110"
+   },
+   "C-vdf-eng053-v0103": {
+    "state": "COVERED",
+    "by": "C-vdf-eng053-v0103"
+   },
+   "C-vdf-eng236-v0102": {
+    "state": "COVERED",
+    "by": "C-vdf-eng236-v0102"
+   },
+   "C-sup-mdl744-v0103": {
+    "state": "COVERED",
+    "by": "C-sup-mdl744-v0103"
+   },
+   "C-vrn-eng087-v0101": {
+    "state": "COVERED",
+    "by": "C-vrn-eng087-v0101"
+   },
+   "C-vrn-eng088-v0101": {
+    "state": "COVERED",
+    "by": "C-vrn-eng088-v0101"
+   },
+   "C-vcgc-integrate-v0101": {
+    "state": "COVERED",
+    "by": "C-vcgc-integrate-v0101"
+   },
+   "C-vrn-eng049-v0104": {
+    "state": "COVERED",
+    "by": "C-vrn-eng049-v0104"
+   },
+   "C-vrn2-peerbridge-v0103": {
+    "state": "COVERED",
+    "by": "C-vrn2-peerbridge-v0103"
+   },
+   "C-vcgc-sdd-v0108": {
+    "state": "COVERED",
+    "by": "C-vcgc-sdd-v0108"
+   },
+   "C-sm-vrn-v0266": {
+    "state": "COVERED",
+    "by": "C-sm-vrn-v0266"
+   },
+   "C-sm-vdf-v0172": {
+    "state": "COVERED",
+    "by": "C-sm-vdf-v0172"
+   },
+   "C-vdf-ssotsync-v0101": {
+    "state": "COVERED",
+    "by": "C-vdf-ssotsync-v0101"
+   },
+   "C-vrn-eng049-v0105": {
+    "state": "COVERED",
+    "by": "C-vrn-eng049-v0105"
+   },
+   "C-vcgc-toolboard-v0101": {
+    "state": "COVERED",
+    "by": "C-vcgc-toolboard-v0101"
    },
    "C-shadow-merge-v0100": {
     "station": "C-shadow-merge-v0100"
@@ -7616,5 +8557,18 @@
  "why_v0221": "只增:VRN-REQ019 改指回既有引擎 —— 操作員 2026-11-10「先前有成過 為何重工」→ YES:VRN2_ReportRows 降為轉接層 v0101(個股取 VRN-2 主線冊 · 非個股取操作員的 v0310 · 兩者沒有時才 v0100 暫代並標來源);前版一字不動",
  "why_v0222": "只增:+V-systemcard-v0100(操作員 2026-11-10「新增一個引擎協助 AI 節省 TOKEN · 全景式分析到底 · 動詞引擎 · 與 AI 充分互動」+「視覺鎖定為 U/I 模板 · 自建構省 TOKEN」+「VCGC 卡片式管理:TOKEN 節省工具 · 中央管理工具 · 支援工具 加速器 / 網路工具 / NLP / LAYOUT」);VIA_MCP_Engine v0103(v0102 薄尾:via-systemcard · via-vcgc · omniroute 入目錄 + parity 動詞,同一組 MCP 給 Claude / ChatGPT / Manus / Gemini / Copilot)由既有 V-mcp-selftest 涵蓋(主控台 mcp 取尾版 glob;selftest = v0102 66 + v0103 10)。WKF042 三步覆蓋。",
  "why_v0223": "只增:+V-systemcard-v0101(G7 TA-Lib 禁用閘;操作員 2026-11-10「不可有 TA-LIB」· v0100 已併 main 不就地改)。",
- "change_v0225": "+C-shadow-merge-v0100(CGC_MDL281 · 13 項)· +C-mcp-server-v0103(MCP 讀檔三動詞 · 本版 10 項 + 前版鏈);覆蓋 +WKF042-STP004 · +WKF043-STP001/002 · +兩個交接案。操作員 2026-11-13「接進 VCGC 並補上 MCP 的 read slice digest」。v0224 一字不動。 +C-sdd_validator_v0108(SDD 自 2026-11-10 起在 ../VIA_MCP_Engine 引擎上 ValueError 整支炸,closeout 停在 ⑥;本版修 rel)。 +C-tool-matrix-v0100(VIA_VCGC_MDL258 自測 20 項)· +C-tool-matrix-build(quick:每輪 test --quick 重出 HTML 矩陣);覆蓋 +WKF044-STP001–004 · +交接案;C-mcp-server-v0103 → C-mcp-server-v0104(讀檔三動詞版 L25 撞號升版;本冊未發佈,id 就地改)。操作員 2026-11-13「矩陣顯示 … 自動隨時更新於HTML」。"
+ "why_v0232": "只增:+站 C-vqg-v0111(VQG v0111 薄尾只加 indicators 動詞 · 冊 VQG_IndicatorRegister_SSOT_v0100.json 66 列 · 冊⇄程式對帳)。其餘一字不動。",
+ "why_v0233": "只增:+站 C-vdf-mdl008-v0109(MDL008 v0109 薄尾:子行程也用本版 → 冊 v0108 的 009 → MDL009 v0103 在子行程生效)。其餘一字不動。",
+ "why_v0234": "只增:VDF v0169 test 轉交到沒有 test 的前版(rc 2)→ v0170 本系統跑;v0263 把引擎 rc 2 記成失敗 → v0264 依 L16 分類;+唯讀驗證 VIA_DesktopValidate v0100。其餘一字不動。",
+ "why_v0235": "只增:VRN-2 非個股車道三站(自建核心 · 入口 · ReportRows v0102 薄尾)。其餘一字不動。",
+ "why_v0236": "只增:主控台 v0196 新動詞 agentos / graphify 登站(V-agentos 唯讀盤點 quick;V-graphify 只在整輪跑 · 缺件 rc 3 照實黃)+ 兩支自測站。其餘一字不動。 coverage:+5 交接案(VRN-2 三 · VCGC 二)COVERED · register / activate 為 agentos 子動詞豁免(串測從 help 解析到)。",
+ "why_v0237": "只增:CGC_MDL279 MCPServer v0103(+4 收據資源:agentos/activation · agentos/register · vrn2/nonstock-matrix · validate/desktop)自測站;.mcp.json 改指 v0103 並加 via-agentos · via-systemcard。其餘一字不動。",
+ "why_v0238": "只增:VDF 管理器 v0171 · VRN 管理器 v0265 · VRN ENG070 v0105 · ENG062 v0114 · VDF ENG089 v0110(v0109 漏帶 CATALOG 同步 → ENG093 紅 → v0110 補) 自測站。其餘一字不動。",
+ "why_v0239": "只增:VDF ENG053 v0103(薄尾源碼實證)· ENG236 v0102(④ 密封)· SUP_MDL744 v0103(詞庫退路)· VRN ENG087 v0101(相依 Hub 換版)· ENG088 v0101(冊外檔不計 __pycache__)自測站。其餘一字不動。",
+ "why_v0240": "只增:CGC_MDL149_Integrate v0101(Hub / ENG085 不寫死,取家族尾版)自測站。其餘一字不動。",
+ "why_v0241": "只增:VRN ENG049 v0104 · PeerBridge v0103 · SDD v0108 · VRN 管理器 v0266 · VDF 管理器 v0172 · VDF_SSOTSync v0101 自測站。其餘一字不動。",
+ "why_v0242": "只增:VRN ENG049 v0105(matrix 動詞)自測站。其餘一字不動。",
+ "why_v0243": "只增:ToolBoard v0101(vrnvdf 動詞)自測站。其餘一字不動。",
+ "change_v0225": "+C-shadow-merge-v0100(CGC_MDL281 · 13 項)· +C-mcp-server-v0103(MCP 讀檔三動詞 · 本版 10 項 + 前版鏈);覆蓋 +WKF042-STP004 · +WKF043-STP001/002 · +兩個交接案。操作員 2026-11-13「接進 VCGC 並補上 MCP 的 read slice digest」。v0224 一字不動。 +C-sdd_validator_v0108(SDD 自 2026-11-10 起在 ../VIA_MCP_Engine 引擎上 ValueError 整支炸,closeout 停在 ⑥;本版修 rel)。 +C-tool-matrix-v0100(VIA_VCGC_MDL258 自測 20 項)· +C-tool-matrix-build(quick:每輪 test --quick 重出 HTML 矩陣);覆蓋 +WKF044-STP001–004 · +交接案;C-mcp-server-v0103 → C-mcp-server-v0104(讀檔三動詞版 L25 撞號升版;本冊未發佈,id 就地改)。操作員 2026-11-13「矩陣顯示 … 自動隨時更新於HTML」。",
+ "merge_v0244": "CGC_MDL143_MergeMedic_v0106 branch-merge origin/claude/optimistic-goodall-yhalc5:本版 = 他方尾版 VIA_VCGC_FunctionInventory_SSOT_v0243.json 全部 + 本分支新增(L25 後合者升版;本分支原版號 v0225)"
 }

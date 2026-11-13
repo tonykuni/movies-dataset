@@ -1,0 +1,383 @@
+{
+ "freeze_status": "FREEZE_OK",
+ "system": "VDF",
+ "independent": true,
+ "lock": "VDF_FreezeLock_v0100",
+ "prior": null,
+ "locked_at": "2026-11-10T15:28:31Z",
+ "branch_commit_at_measure": "f9452d5bbc7cc980388f01a933080512e0293735",
+ "locked_by": "操作員 2026-11-10 令「同樣邏輯 VDF 找到全台股清單生成器 全主動式台股ETF生成器 後面多引擎同步實測優化輸出驗證收尾」+「檢視紀錄確認加速器網路工具最新版有版本號 · 繼續 VDF 鎖定存檔 + 視覺鎖定 · 授權開閘一切 · 完成VDF」",
+ "hash_rule": "sha256 of file bytes with CRLF normalized to LF(同 VRN2_FreezeLock)",
+ "compared_locks": {
+  "VDF 版本鎖": "無(本檔是 VDF 第一本版本鎖)",
+  "VIA_NearCompleteLock_v0100 (2026-11-10)": "VDF 里程碑 19(commit/tree/blob);入口 VDF_SystemManager_v0168(sha 與本鎖相同)",
+  "VIA_ThreeDayLock_v0103 (2026-11-08)": "VDF 交接案鎖住部分見該冊;本鎖補「生成器家族 · 逐檔編號 · 容器自測」"
+ },
+ "generators": {
+  "全台股清單": {
+   "family": "VDF_MDL009_TWStockList",
+   "tail": "v0102",
+   "entry": "python \"functional modules/VDF/VDF_SystemManager_v0168.py\" fetch run MDL009 --apply",
+   "sources": [
+    "TWSE OpenAPI STOCK_DAY_ALL",
+    "TWSE t187ap03_L",
+    "TPEX mainboard_daily_close_quotes",
+    "TPEX mopsfin_t187ap03_O"
+   ],
+   "output": "Parquet / CSV / 驗證報告 + DuckDB 增量(date + ticker 反連接);驗證紅只寫報告不覆寫最新"
+  },
+  "主動式台股 ETF": {
+   "families": {
+    "宇宙": "VDF_ENG077_ActiveETFUniverse v0106",
+    "持股歷史": "VDF_ENG078_ActiveETFHoldingsHistory v0113",
+    "持股": "VDF_ENG051_ActiveTWETF_Holdings v0104(本輪)",
+    "規模 / 資金流": "VDF_ENG094_ActiveETFActivity v0101"
+   },
+   "align": "VDF_ENG081_UniverseAlign v0103(交易資訊 × 籌碼 數量對齊與清單更新)"
+  }
+ },
+ "tool_chain": {
+  "accelerator": {
+   "bridge": "VIA_SuperAccel_Module.py(VIA-SUP-MDL385 v0100 · 相容轉接 · 動態取正典尾版)",
+   "canonical": "SUP_MDL737_SuperAccelModule_v0110(VIA-SUP-MDL1189 · 2026-10-03)",
+   "lock_book": "VeritasCeleritas_v1141(VIA-SUP-ENG013 · 2026-09-25 · 鎖冊 sha 相符)"
+  },
+  "network": {
+   "bridge": "via_net_unified_v0101(VIA-SUP-MDL1003 · 相容轉接 · 動態取正典尾版)",
+   "canonical": "SUP_MDL740_NetUnified_v0119(VIA-SUP-MDL1195 · 2026-10-12 · Big5 / 亂碼解碼)",
+   "lock_book": "VeritasAegisNexus_v1652(VIA-SUP-ENG019 · 2026-09-28 · 鎖冊 sha 相符)",
+   "note": "VeritasAegisNexus.py(無版號檔名)= 2026-06-08 成功鎖凍結原件(FREEZE_OK · 編 VIA-SUP-ENG015 v0100),零觸碰;v0116 / v0117 為另一條舊線(09-25 / 09-28),鎖冊指定 v1652"
+  },
+  "consent_gate": "VIA_NET_CONSENT(SUP_MDL740 · via_net_unified 雙閘;永不代設)"
+ },
+ "visual_lock": {
+  "book": "docs/handoff/ai/VIA_VisualSpecLock_v0100.json",
+  "engine": "VIA_VisualSpecLock_v0100.py(VIA-CORE-MDL864)",
+  "fingerprint": "dafca3446834a3f920a08eda61d4aac1765d46c9f250fb463578c5db76163275",
+  "palette": 45,
+  "files": 16
+ },
+ "files": {
+  "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0168.py": {
+   "sha256": "95e25526bd0a86a4e08f2a9f5ba86e3b6eb7c65536d5917dc03ad0ed3f9596d1",
+   "numbers": [
+    {
+     "code": "VIA-VDF-MDL237",
+     "version": "v0168",
+     "issued_at": "2026-11-01 21:08:51 +0000"
+    }
+   ],
+   "last_commit": "a7af721f6 2026-11-01T21:08:51+00:00 [VDF] SystemManager v0168:修 v0167 自測第 ③ 項驗錯欄(色值在 typekit 的 design 段)",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "refill: error: unrecognized arguments: --nope"
+   },
+   "note": "VDF 入口尾版(L120 / L123);自測 rc 0(末行是自測刻意餵錯參數的 argparse 訊息)"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0104.py": {
+   "sha256": "5f8b2b36a794101854704bfd309995ae822fb1d674530fea2d8de958b99a4a1b",
+   "numbers": [
+    {
+     "code": "VIA-VDF-MDL093",
+     "version": "v0104",
+     "issued_at": "2026-09-23 19:28:38 +0000"
+    }
+   ],
+   "last_commit": "a72d7f4a2 2026-09-23T19:28:38+00:00 側線 2026-09-23:VDF 更新 · MDL002/003/006 治理版 · VCGC v0126 SSOT 正則·同義字連動口",
+   "role": "vdf",
+   "selftest": {
+    "rc": 1,
+    "last": "  [計] 31 檢 OK 29 · FAIL 2(檢數現場計,不寫死)"
+   },
+   "note": "本體(68 版鏈的定義最多版);本體自測 29/31 —— FAIL 2 項量的是「現在」的冊 / 同意閘狀態(⑱ 冊上有無 via-vdfsys · ㉚ 尾版寫死同意字面),尾版 v0168 自測 rc 0 為準;本體一字不改"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL009_TWStockList_v0102.py": {
+   "sha256": "df645824fb320087b156063e43c747d6b3fd7e484ec12ed1e06aff56b02d9646",
+   "numbers": [
+    {
+     "code": "VIA-VDF-MDL180",
+     "version": "v0102",
+     "issued_at": "2026-10-03 21:04:48 +0000"
+    }
+   ],
+   "last_commit": "c9c005883 2026-10-03T21:04:48+00:00 PR #444 Codex P2 x2: MDL009 v0102 version tag, PS launcher fallback timeout",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "  [計] VDF_MDL009_TWStockList v0102 本版 5/5 · v0101 PASS · 合計 PASS"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL009_TWStockList_v0100.py": {
+   "sha256": "85c182e1db053b2075cbe6329466a5f2b5756793f6d010bad29a7721a535d3fd",
+   "numbers": [
+    {
+     "code": "VIA-VDF-MDL172",
+     "version": "v0100",
+     "issued_at": "2026-10-03 17:35:11 +0000"
+    }
+   ],
+   "last_commit": "10e87f559 2026-10-03T17:35:11+00:00 VDF 獨立運作:VDF System Manager 總控(v0128)· 第一步兩支清單引擎(MDL009 全台股 · MDL010 主動式 ETF)· 五組來源 ",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "  [計] VDF_MDL009_TWStockList v0100 7/7 PASS"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL009_TWStockList_v0101.py": {
+   "sha256": "f93829b7ce0ce16c49efe43486173fc8b479b704ca168fa9e1c12da2dd61935c",
+   "numbers": [
+    {
+     "code": "VIA-VDF-MDL177",
+     "version": "v0101",
+     "issued_at": "2026-10-03 19:02:55 +0000"
+    }
+   ],
+   "last_commit": "112ac66f5 2026-10-03T19:02:55+00:00 MDL009 v0101: write the column union of all rows (Codex P1 on #443)",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "  [計] VDF_MDL009_TWStockList v0101 本版 9/9 · v0100 PASS · 合計 PASS"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0106.py": {
+   "sha256": "aed545575b18adb864d3a6f670306782d4c4485a080916b76737558f77618621",
+   "numbers": [
+    {
+     "code": "VIA-VDF-ENG347",
+     "version": "v0106",
+     "issued_at": "2026-10-20 10:08:02 +0000"
+    }
+   ],
+   "last_commit": "eae5b8e3c 2026-10-28T23:44:07+00:00 修復 9e494a2a(VRN-2 auto-merge conflicts→local)蓋掉的 68 檔:VDF 程式 10 支 · 交接收據 32 檔 · 共用冊 ",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "  [計] VDF_ENG077_ActiveETFUniverse v0106 薄尾 10/10 · PASS"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0101.py": {
+   "sha256": "89600ebf87aaffe153c6fb92247b92930dae6f6d1e825b4fa3b4b8642e98a221",
+   "numbers": [
+    {
+     "code": "VIA-VDF-ENG188",
+     "version": "v0101",
+     "issued_at": "2026-09-25 10:00:20 +0800"
+    }
+   ],
+   "last_commit": "9dc585ec6 2026-09-25T10:00:20+08:00 Repair VIA daily completion, universe coverage and incremental source capture",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "  [計] 八檢 OK 8 · FAIL 0"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0113.py": {
+   "sha256": "1ca3df3f244554ea888bbf082be02c02468d1def303aea75223a73ddd540a0b3",
+   "numbers": [
+    {
+     "code": "VIA-VDF-ENG206",
+     "version": "v0113",
+     "issued_at": "2026-09-28 05:11:58 +0000"
+    }
+   ],
+   "last_commit": "fb21faa16 2026-09-28T05:11:58+00:00 vcgc R16-2: ENG078 v0113 forwards the v0111 surface without bypassing the scrape gat",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "  [OK] 本體自測"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0110.py": {
+   "sha256": "7b9989cd303d3533619b29427034147f7b987071b5d491b337f63eeceedb7d2c",
+   "numbers": [
+    {
+     "code": "VIA-VDF-ENG203",
+     "version": "v0110",
+     "issued_at": "2026-09-24 16:13:54 +0000"
+    }
+   ],
+   "last_commit": "422016822 2026-09-24T16:13:54+00:00 側線 2026-09-24 第十段:去重寫入全族收正典(掉球 Z191)· 私有去重寫入普查",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "  [計] 三十檢 OK 30 · FAIL 0"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v0103.py": {
+   "sha256": "8988ba27026b1365d0acf86a10dd67a375f77f4dee437770bdc8cc793c76b39d",
+   "numbers": [
+    {
+     "code": "VIA-VDF-ENG021",
+     "version": "v0103",
+     "issued_at": "2026-09-23 23:56:46 +0000"
+    }
+   ],
+   "last_commit": "4f58dedf8 2026-09-23T23:56:46+00:00 側線 2026-09-23 第三段 續二:問參數頁改版(無上限 · 起始日 · 截止=今天 · 要抓的資料矩陣 · 逐一引擎自測)· 逐一引擎測修 · 最高政策 L10",
+   "role": "vdf",
+   "selftest": {
+    "rc": 3,
+    "last": "_duckdb.ResourceInUseException: Resource In Use Error: connection has an unfinished result from execute(); call complete() or abort(), or fetch until a fetch re"
+   },
+   "note": "容器 duckdb 2.0.0 自測 rc 3(unfinished result)→ 由 v0104 薄尾修(不改本檔)"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0101.py": {
+   "sha256": "ad0b52ee2cd1f78dea2cb00a0dba738ee673ef735f0050110dac6a0b1862f613",
+   "numbers": [
+    {
+     "code": "VIA-VDF-ENG308",
+     "version": "v0101",
+     "issued_at": "2026-09-30 20:49:02 +0000"
+    }
+   ],
+   "last_commit": "06b042bc5 2026-09-30T20:49:02+00:00 fix(CI): ENG094 v0101 routes build's analyze through the tail so test_via_etf_activi",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "[VDF_ENG094 v0101] 24/24 OK"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0103.py": {
+   "sha256": "908561aa5ab7796c5cf4630433463ba91a1ff706e25931a587500ea7f1a74a12",
+   "numbers": [
+    {
+     "code": "VIA-VDF-ENG303",
+     "version": "v0103",
+     "issued_at": "2026-09-29 03:15:18 +0000"
+    }
+   ],
+   "last_commit": "b5b2a4f14 2026-09-29T03:15:18+00:00 側線 2026-09-29 c 收尾:併 main 後補編號 · 薄尾兩讀者補修 · 元件冊退役歸零",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "  VDF_ENG081_UniverseAlign_v0103 薄尾 3/3 PASS · 前一版 rc=0"
+   }
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0102.py": {
+   "sha256": "1f98e2899a2a1191d53f207e4fcf509f1dafac055951bf5005acbb0bc01ae4ff",
+   "numbers": [
+    {
+     "code": "VIA-VDF-ENG213",
+     "version": "v0102",
+     "issued_at": "2026-09-24 17:22:41 +0000"
+    }
+   ],
+   "last_commit": "ef047d260 2026-09-24T17:22:41+00:00 側線 2026-09-24 第十一段:關聯層去重寫入收正典(掉球 Z194)· 私有份普查歸零 · ENG079 兩個舊洞",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "  [計] 十三檢 OK 13 · FAIL 0"
+   }
+  },
+  "VeritasIntelligenceAnalytics/supportive modules/network/via_net_unified_v0101.py": {
+   "sha256": "b7354bced1c825a3541c477cefdfbe03691142131f98f8b7413c71c833473704",
+   "numbers": [
+    {
+     "code": "VIA-SUP-MDL1003",
+     "version": "v0101",
+     "issued_at": "2026-08-30 21:59:43 +0000"
+    }
+   ],
+   "last_commit": "0f293f736 2026-08-30T21:59:43+00:00 批255:加速器全覆蓋——py 1,784/PS 689 全樹橋接(MDL103)",
+   "role": "tool_chain"
+  },
+  "VeritasIntelligenceAnalytics/supportive modules/network/SUP_MDL740_NetUnified_v0119.py": {
+   "sha256": "1cb9c5652508598522cb1077e4bb061d988ee458d93f78dd65ace3dace83c4ba",
+   "numbers": [
+    {
+     "code": "VIA-SUP-MDL1195",
+     "version": "v0119",
+     "issued_at": "2026-10-12 09:27:25 +0000"
+    }
+   ],
+   "last_commit": "ea827d550 2026-10-12T09:27:25+00:00 Mojibake decoder for the VDF fetch/import path + repair engine for the tw__/gl__ par",
+   "role": "tool_chain"
+  },
+  "VeritasIntelligenceAnalytics/supportive modules/network/VeritasAegisNexus_v1652.py": {
+   "sha256": "c2f401071adfde3c8e1eb903a3ef7923ce3974b6b5eb40960b9ea345ac4181ab",
+   "numbers": [
+    {
+     "code": "VIA-SUP-ENV052",
+     "version": "v1652",
+     "issued_at": "2026-09-28 14:13:36 +0000"
+    }
+   ],
+   "last_commit": "c882dcfb0 2026-09-28T14:13:36+00:00 R20c: VeritasAegisNexus 1.65.1 integrated as v1652, pinned by the lock, activated on",
+   "role": "tool_chain"
+  },
+  "VeritasIntelligenceAnalytics/supportive modules/VIA_SuperAccel_Module.py": {
+   "sha256": "9ac8ded2ad86836b637e4c389203b664bc364ba7e4c46dddb6c8e675010779b8",
+   "numbers": [
+    {
+     "code": "VIA-SUP-MDL385",
+     "version": "v0100",
+     "issued_at": "2026-08-24 19:22:23 +0000"
+    }
+   ],
+   "last_commit": "5edd86940 2026-08-24T19:22:23+00:00 批124:VAP 驗收八項完善+網路工具統包整合正名 SUP_MDL740+加速器正名 SUP_MDL737",
+   "role": "tool_chain"
+  },
+  "VeritasIntelligenceAnalytics/supportive modules/SUP_MDL737_SuperAccelModule_v0110.py": {
+   "sha256": "dc56ab6a8a6a7abc1204ebe0636393ce86603f92402be965afc7ba6bf7ca19ef",
+   "numbers": [
+    {
+     "code": "VIA-SUP-MDL1189",
+     "version": "v0110",
+     "issued_at": "2026-10-03 17:58:44 +0000"
+    }
+   ],
+   "last_commit": "97001dd73 2026-10-03T17:58:44+00:00 PR #442 審查三條 P1:凍結網路檔原樣還原 · 鎖版改新版 SUP_MDL737 v0110 導向 · v0116/v0117 還原 · 下載包依賴清單與 pr",
+   "role": "tool_chain"
+  },
+  "VeritasIntelligenceAnalytics/supportive modules/VeritasCeleritas_v1141.py": {
+   "sha256": "ddcb5460bf64b0d8d773a8878cca1b4e642eac977f2d7aa2b0e267745d1ecea5",
+   "numbers": [
+    {
+     "code": "VIA-SUP-ENG013",
+     "version": "v1141",
+     "issued_at": "2026-09-25 06:51:03 +0000"
+    }
+   ],
+   "last_commit": "3c3e4a10a 2026-09-25T06:51:03+00:00 側線第十六段 b:TA-Lib 全拔 · 擊斃閘許可冊 · 最佳還原點(L105)· 驗證鎖定冊",
+   "role": "tool_chain"
+  },
+  "VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v0104.py": {
+   "sha256": "ce6c1381105d67e124640898dc346d9f5a9be05c784b2225fe4f8fe8fb44487f",
+   "numbers": [
+    {
+     "code": "VIA-VDF-ENG359",
+     "version": "v0104",
+     "issued_at": "2026-11-10 15:21:16 +0000"
+    }
+   ],
+   "last_commit": "d158232d1 2026-11-10T15:21:16+00:00 fix(vdf): VDF_ENG051_ActiveTWETF_Holdings v0104 薄尾 — DuckDB 2.x「unfinished result」(r",
+   "role": "vdf",
+   "selftest": {
+    "rc": 0,
+    "last": "[計] VDF_ENG051_ActiveTWETF_Holdings v0104 薄尾 8/8 · PASS"
+   },
+   "note": "本輪新出:register 前先取完未完結果;v0103 本體自測經包裝 all_pass"
+  }
+ },
+ "check_status": "容器離線自測:rc 0 共 12 支;非 0:['VDF_SystemManager_v0104.py:1', 'VDF_ENG051_ActiveTWETF_Holdings_v0103.py:3'](SystemManager v0104 本體量現況 2 項 · 尾版 v0168 rc 0 為準;ENG051 v0103 由 v0104 修 8/8)",
+ "closeout_state": "REVIEW",
+ "open_items": [
+  {
+   "item": "實抓:全台股清單 + 主動式 ETF(TWSE / TPEX)",
+   "owner": "操作員(桌機)",
+   "why": "容器內代開 VIA_NET_CONSENT 被權限擋下(未繞過);容器網路可達 TWSE / TPEX(HTTP 200 已測)",
+   "how": "$env:VIA_NET_CONSENT=\"YES\"; python \"VeritasIntelligenceAnalytics\\functional modules\\VDF\\VDF_SystemManager_v0168.py\" fetch run MDL009 --apply;再依序 ENG077 · ENG078 · ENG094"
+  },
+  {
+   "item": "多引擎同步實測(清單 × 主動 ETF × 對齊 ENG081)輸出驗證",
+   "owner": "操作員(桌機)",
+   "how": "實抓後跑 VDF 管理器 verify / closeout(VDF 自己的入口)"
+  }
+ ],
+ "per_owner": {
+  "VDF": 0,
+  "VCGC": 0,
+  "操作員(桌機)": 2
+ },
+ "check_message": "版本凍結 + 容器離線實測,不是驗收。資料面要實抓後才算。"
+}

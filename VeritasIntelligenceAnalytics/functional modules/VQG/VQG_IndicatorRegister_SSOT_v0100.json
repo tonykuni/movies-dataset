@@ -1,0 +1,1685 @@
+{
+ "schema": "via.vqg.indicator_register/1",
+ "system": "VQG",
+ "version": "v0100",
+ "issued_at": "2026-11-11",
+ "issued_by": "操作員 + AI(VQG 自己的冊 · 不寫他系統)",
+ "why": "操作員 2026-11-11:「WE ONLY ADD INDICATORS AND FORMULA AND REGISTER THEM IN VQG」· 欄位「編號 分類 指標名稱 公式 參數 時間參數 benchmark pros & cons 替代指標」",
+ "columns": {
+  "no": "編號(冊內流水)",
+  "stable_id": "穩定代碼(程式與輸出用)",
+  "category": "分類",
+  "name_zh": "指標名稱",
+  "formula": "公式",
+  "params": "參數",
+  "time_params": "時間參數",
+  "benchmark": "benchmark",
+  "pros": "pros",
+  "cons": "cons",
+  "alternatives": "替代指標"
+ },
+ "rules": [
+  "新增指標 = 加程式公式 + 在本冊加一列(出新版號冊 v0101 …)· 舊列不刪不改(只增不減)",
+  "技術指標的 stable_id 與 formula 必須與程式一字相同(VQG v0111 indicators --check 對帳)",
+  "每個輸出欄(量化分析 · 回測 · 因子 · 統計)都要被一列登記;中繼欄另列 meta_columns",
+  "門檻原則:定義性常數(0 · 50 · 價 vs 均線)可用;高低判斷用自身歷史分布,不設靜態門檻",
+  "不用 TA-Lib;公式全在 VQG 自己的程式內"
+ ],
+ "meta_columns": {
+  "quant_analysis": [
+   "ticker",
+   "observation_date",
+   "points",
+   "adj_close",
+   "engine",
+   "formula_engine",
+   "lamp",
+   "missing_inputs",
+   "rules"
+  ],
+  "backtest_summary": [
+   "ticker",
+   "strategy",
+   "n_days",
+   "sharpe_rf",
+   "periods_per_year",
+   "threshold_rule",
+   "signal_lag"
+  ],
+  "factor_summary": [
+   "n_dates",
+   "state"
+  ],
+  "stats": [
+   "ticker",
+   "n",
+   "state",
+   "periods_per_year"
+  ]
+ },
+ "counts": {
+  "total": 66,
+  "indicator": 19,
+  "analysis": 11,
+  "strategy": 4,
+  "backtest_metric": 9,
+  "factor": 8,
+  "factor_metric": 5,
+  "stat": 10
+ },
+ "entries": [
+  {
+   "stable_id": "VQG.IND.SUMMARY",
+   "category": "價格統計",
+   "name_zh": "價格摘要",
+   "name_en": "Price Summary",
+   "formula": "latest, min, max, mean, pstdev of finite adj_close",
+   "params": [
+    "S1 strict_finite:只納入有限正價格；空集合回 null",
+    "S2 median_level:用 median / MAD 描述位置，降低跳空影響",
+    "S3 last_valid_only:只報告最後有效價與有效筆數，不做分布"
+   ],
+   "time_params": "全序列(as-of 之前)",
+   "benchmark": "無(自身)",
+   "pros": "最基本的位置描述,無參數、可重現",
+   "cons": "受跳空 / 極端值影響(S2 改用 median / MAD)",
+   "alternatives": [
+    "VQG.IND.ZSCORE",
+    "VQG.IND.DRAWDOWN"
+   ],
+   "kind": "indicator",
+   "code_key": "summary",
+   "default_export": false,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-001"
+  },
+  {
+   "stable_id": "VQG.IND.RETURNS",
+   "category": "價格統計",
+   "name_zh": "報酬率",
+   "name_en": "Returns",
+   "formula": "simple = p_t/p_{t-1}-1 ; log = ln(p_t/p_{t-1})",
+   "params": [
+    "S1 simple_strict:只對相鄰有效交易日計算；缺日兩側都 null",
+    "S2 log_strict:同樣相鄰約束下取對數報酬",
+    "S3 gap_aware_hold:缺日不填價；跨缺日報酬另欄 gap_return，不混入連續報酬"
+   ],
+   "time_params": "1 個交易日(相鄰有效日)",
+   "benchmark": "無(自身)",
+   "pros": "所有風險 / 績效指標的基礎;S3 把跨缺日報酬分開,不混入連續報酬",
+   "cons": "單日雜訊大;缺日需另行處理",
+   "alternatives": [
+    "VQG.IND.ROC"
+   ],
+   "kind": "indicator",
+   "code_key": "returns",
+   "default_export": false,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-002"
+  },
+  {
+   "stable_id": "VQG.IND.SMA",
+   "category": "趨勢",
+   "name_zh": "簡單移動平均",
+   "name_en": "Simple Moving Average",
+   "formula": "SMA_n(t) = mean(p_{t-n+1..t})",
+   "params": [
+    "S1 strict_window:未滿 n 或視窗內有 null 則 null",
+    "S2 expanding_flagged:未滿 n 用擴張均值並標記 partial=true，滿窗後等同 S1",
+    "S3 clean_remap:先剔除 null 再算滿窗 SMA，映回原時間軸；coverage < 1 則標記"
+   ],
+   "time_params": "n 預設 20;匯出 n ∈ {5,10,20,60,120,240}",
+   "benchmark": "無(自身)",
+   "pros": "直觀、無遞迴、可重現",
+   "cons": "落後;對視窗起點價格與終點同權",
+   "alternatives": [
+    "VQG.IND.EMA",
+    "VQG.IND.SLOPE"
+   ],
+   "kind": "indicator",
+   "code_key": "sma",
+   "default_export": true,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-003"
+  },
+  {
+   "stable_id": "VQG.IND.EMA",
+   "category": "趨勢",
+   "name_zh": "指數移動平均",
+   "name_en": "Exponential Moving Average",
+   "formula": "EMA_t = alpha*p_t + (1-alpha)*EMA_{t-1}, alpha=2/(n+1)",
+   "params": [
+    "alpha = 2/(n+1)",
+    "S1 sma_seed:前 n 根 SMA 當種子，之前 null",
+    "S2 first_price_seed:第一有效價當種子，標記 seed=first_price",
+    "S3 wilder_alpha:alpha=1/n 的 Wilder 平滑；未滿 n 為 null"
+   ],
+   "time_params": "n 預設 20",
+   "benchmark": "無(自身)",
+   "pros": "比 SMA 反應快、近期權重高",
+   "cons": "遞迴依賴起點與種子選法,短序列結果不穩",
+   "alternatives": [
+    "VQG.IND.SMA"
+   ],
+   "kind": "indicator",
+   "code_key": "ema",
+   "default_export": false,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-004"
+  },
+  {
+   "stable_id": "VQG.IND.VOLATILITY",
+   "category": "波動",
+   "name_zh": "歷史波動率",
+   "name_en": "Historical Volatility",
+   "formula": "stdev of simple returns over n",
+   "params": [
+    "日頻 · 未年化",
+    "S1 sample_simple:簡單報酬樣本標準差，未滿窗 null，不年化",
+    "S2 population_simple:母體標準差；與 S1 的理論比為 sqrt(n/(n-1))",
+    "S3 log_or_robust:對數報酬樣本標準差；若高低價齊備改 Parkinson，否則維持 log"
+   ],
+   "time_params": "n 預設 20;匯出 n ∈ {5,10,20,60,120,240}",
+   "benchmark": "無(自身)",
+   "pros": "風險衡量標準作法,可跨標的比較",
+   "cons": "對稱看待上下波動;厚尾時低估尾部風險",
+   "alternatives": [
+    "VQG.IND.ATR",
+    "VQG.ANA.VOL_REGIME"
+   ],
+   "kind": "indicator",
+   "code_key": "volatility",
+   "default_export": true,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-005"
+  },
+  {
+   "stable_id": "VQG.IND.ZSCORE",
+   "category": "波動",
+   "name_zh": "價格 Z 分數",
+   "name_en": "Price Z-Score",
+   "formula": "(p_t - mean_n) / stdev_n",
+   "params": [
+    "S1 sample_null_if_flat:樣本標準差；std=0 回 null",
+    "S2 population_zero_if_flat:母體標準差；價格等於均值且 std=0 回 0 並標記 flat",
+    "S3 mad_robust:0.6745*(p-median)/MAD；MAD=0 回 null"
+   ],
+   "time_params": "n 預設 20",
+   "benchmark": "無(自身)",
+   "pros": "把偏離程度標準化,跨價位可比",
+   "cons": "假設近似常態;趨勢市中持續偏高 / 偏低",
+   "alternatives": [
+    "VQG.IND.BOLLINGER"
+   ],
+   "kind": "indicator",
+   "code_key": "zscore",
+   "default_export": false,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-006"
+  },
+  {
+   "stable_id": "VQG.IND.RSI",
+   "category": "動能",
+   "name_zh": "相對強弱指標",
+   "name_en": "Relative Strength Index",
+   "formula": "RSI = 100 - 100/(1+avg_gain/avg_loss)",
+   "params": [
+    "S1 wilder:Wilder 平滑；損失為 0 且有漲幅時 100，全平回 null",
+    "S2 cutler_sma:增益與損失取 SMA，不滿窗 null",
+    "S3 explicit_null_on_saturation:同 Cutler，但損失為 0 或全平時回 null，不輸出 100/50 冒充訊號"
+   ],
+   "time_params": "n = 14",
+   "benchmark": "無(自身)",
+   "pros": "有界 0–100,方便比較;常見、易溝通",
+   "cons": "強趨勢中長時間停在高 / 低區,鈍化;70/30 靜態門檻不適用所有個股(VQG 分析改用自身歷史百分位)",
+   "alternatives": [
+    "VQG.IND.ROC",
+    "VQG.ANA.RSI_STATE"
+   ],
+   "kind": "indicator",
+   "code_key": "rsi",
+   "default_export": true,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-007"
+  },
+  {
+   "stable_id": "VQG.IND.MACD",
+   "category": "動能",
+   "name_zh": "指數平滑異同移動平均",
+   "name_en": "MACD",
+   "formula": "MACD = EMA12-EMA26 ; signal = EMA9(MACD)",
+   "params": [
+    "S1 ema_12_26_9:標準 EMA MACD，未滿 26+信號暖機則 signal null",
+    "S2 sma_12_26_9:SMA 差與 SMA 信號，定義不同，只供分歧檢測",
+    "S3 withhold_if_short:樣本不足或三解分歧超公差則整組 null，不外推"
+   ],
+   "time_params": "快 12 · 慢 26 · 訊號 9(登記視窗 26)",
+   "benchmark": "無(自身)",
+   "pros": "兼具趨勢與動能;柱狀圖過零為定義性訊號",
+   "cons": "落後;盤整時頻繁翻號",
+   "alternatives": [
+    "VQG.IND.EMA",
+    "VQG.ANA.MACD_STREAK"
+   ],
+   "kind": "indicator",
+   "code_key": "macd",
+   "default_export": true,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-008"
+  },
+  {
+   "stable_id": "VQG.IND.BOLLINGER",
+   "category": "波動",
+   "name_zh": "布林通道",
+   "name_en": "Bollinger Bands",
+   "formula": "mid = SMA_n ; band = mid +/- k*stdev",
+   "params": [
+    "k = 2(BAND_K)",
+    "S1 sample_k2:SMA 與樣本標準差，k=2，未滿窗 null",
+    "S2 population_k2:改用母體標準差，寬度略窄",
+    "S3 robust_mad:中位數 +/- 2*1.4826*MAD；MAD=0 回 null"
+   ],
+   "time_params": "n 預設 20",
+   "benchmark": "無(自身)",
+   "pros": "同時表達位置與波動",
+   "cons": "k 為慣例常數;厚尾時通道外並不罕見",
+   "alternatives": [
+    "VQG.IND.ZSCORE",
+    "VQG.IND.ATR"
+   ],
+   "kind": "indicator",
+   "code_key": "bollinger",
+   "default_export": false,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-009"
+  },
+  {
+   "stable_id": "VQG.IND.ROC",
+   "category": "動能",
+   "name_zh": "變動率",
+   "name_en": "Rate of Change",
+   "formula": "ROC_n = p_t/p_{t-n}-1",
+   "params": [
+    "S1 simple_fixed_lag:只在恰好 n 根前有有效價時計算",
+    "S2 log_fixed_lag:同 lag 的對數報酬",
+    "S3 reject_stale_base:基期缺失即 null，禁止改抓更早價格"
+   ],
+   "time_params": "n 預設 20",
+   "benchmark": "無(自身)",
+   "pros": "最直接的 n 日動能",
+   "cons": "只看兩個端點,對端點雜訊敏感",
+   "alternatives": [
+    "VQG.IND.RSI",
+    "VQG.IND.SLOPE"
+   ],
+   "kind": "indicator",
+   "code_key": "roc",
+   "default_export": false,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-010"
+  },
+  {
+   "stable_id": "VQG.IND.SLOPE",
+   "category": "趨勢",
+   "name_zh": "迴歸斜率",
+   "name_en": "Regression Slope",
+   "formula": "OLS slope of adj_close on 0..n-1",
+   "params": [
+    "S1 ols_price:等距交易日 OLS；視窗內有缺日則 null",
+    "S2 ols_log:對 ln(price) 做 OLS，單位改為對數斜率",
+    "S3 theil_sen:兩兩斜率中位數；少於 3 點 null"
+   ],
+   "time_params": "n 預設 20",
+   "benchmark": "無(自身)",
+   "pros": "用全部 n 點估趨勢,比端點法穩",
+   "cons": "價格單位,跨標的比較要先對數化(S2)",
+   "alternatives": [
+    "VQG.IND.SMA",
+    "VQG.IND.ROC"
+   ],
+   "kind": "indicator",
+   "code_key": "slope",
+   "default_export": false,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-011"
+  },
+  {
+   "stable_id": "VQG.IND.DRAWDOWN",
+   "category": "風險",
+   "name_zh": "回撤",
+   "name_en": "Drawdown",
+   "formula": "p_t/running_peak - 1, peak causal",
+   "params": [
+    "S1 causal_peak:峰值只含當下與過去有效價",
+    "S2 window_peak_20:只在近 20 個有效價內取峰值",
+    "S3 reset_on_gap:價格缺日後峰值重設，不跨缺口沿用"
+   ],
+   "time_params": "匯出 n ∈ {5,10,20,60,120,240}(n = 視窗高點範圍)",
+   "benchmark": "無(自身)",
+   "pros": "直接描述距高點的損失,投資人易懂",
+   "cons": "路徑相依;不反映恢復速度",
+   "alternatives": [
+    "VQG.BT.MAX_DRAWDOWN",
+    "VQG.IND.VOLATILITY"
+   ],
+   "kind": "indicator",
+   "code_key": "drawdown",
+   "default_export": true,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-012"
+  },
+  {
+   "stable_id": "VQG.IND.VOLUME_ZSCORE",
+   "category": "量能",
+   "name_zh": "成交量 Z 分數",
+   "name_en": "Volume Z-Score",
+   "formula": "zscore of clean_volume",
+   "params": [
+    "乾淨量 = 量 − 當沖量",
+    "S1 clean_sample_z:台股扣當沖；壞列 null；樣本 z",
+    "S2 log1p_z:對 log1p(clean_volume) 做樣本 z，減輕右偏",
+    "S3 robust_or_null:MAD z；全零或壞列比例過高則整窗 null"
+   ],
+   "time_params": "n 預設 20",
+   "benchmark": "無(自身)",
+   "pros": "扣掉當沖後看真實量能異常",
+   "cons": "需要 daytrade_volume 欄;量分布右偏(S2 對數化)",
+   "alternatives": [
+    "VQG.IND.OBV",
+    "VQG.IND.CLEAN_FLOW_RATIO"
+   ],
+   "kind": "indicator",
+   "code_key": "volume_zscore",
+   "default_export": false,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-013"
+  },
+  {
+   "stable_id": "VQG.IND.BETA",
+   "category": "風險",
+   "name_zh": "Beta 係數",
+   "name_en": "Beta",
+   "formula": "beta = cov(r, r_b) / var(r_b)",
+   "params": [
+    "S1 aligned_ols:僅在兩邊都有有效報酬的日期計算",
+    "S2 downside_beta:只取基準報酬 < 0 的子集；子集 < 5 則 null",
+    "S3 withhold_if_no_benchmark:無基準或市場錯配則 null，禁止用美股填台股"
+   ],
+   "time_params": "n 預設 20",
+   "benchmark": "benchmark_adj_close(大盤;欄 benchmark_market 標示市場)",
+   "pros": "衡量對市場的系統性曝險",
+   "cons": "短視窗估計不穩;需要乾淨對齊的基準序列",
+   "alternatives": [
+    "VQG.IND.REL_STRENGTH"
+   ],
+   "kind": "indicator",
+   "code_key": "beta",
+   "default_export": false,
+   "since": "v0104",
+   "where": "VQG_AllInOne_v0104 CORE",
+   "no": "VQG-014"
+  },
+  {
+   "stable_id": "VQG.IND.OBV",
+   "category": "量能",
+   "name_zh": "能量潮",
+   "name_en": "On-Balance Volume",
+   "formula": "OBV_n = sum_{t-n+1..t} sign(p_t - p_{t-1}) * v_t ; S2 = OBV_n / sum v ; S3 用乾淨量(扣當沖)",
+   "params": [
+    "S1 obv_delta_shares:n 日 OBV 增量(股數);缺價 / 缺量那天不計",
+    "S2 obv_normalized:增量除以 n 日總量 → −1..1;總量 0 = null",
+    "S3 obv_clean_volume:同 S2 但用 net_series 乾淨量(volume − daytrade_volume);沒當沖欄 = null"
+   ],
+   "time_params": "n = 20",
+   "benchmark": "無(自身)",
+   "pros": "把量與價格方向結合,看資金流向",
+   "cons": "平盤日處理、量的單位影響大(S2 正規化)",
+   "alternatives": [
+    "VQG.IND.CLEAN_FLOW_RATIO",
+    "VQG.IND.VOLUME_ZSCORE"
+   ],
+   "kind": "indicator",
+   "code_key": "obv",
+   "default_export": true,
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 NEW_CORE",
+   "no": "VQG-015"
+  },
+  {
+   "stable_id": "VQG.IND.ATR",
+   "category": "波動",
+   "name_zh": "平均真實波幅",
+   "name_en": "Average True Range",
+   "formula": "TR = max(h−l, |h−c_{t-1}|, |l−c_{t-1}|) ; ATR_n = Wilder(TR, n)",
+   "params": [
+    "需要 high / low 欄",
+    "S1 wilder:alpha=1/n 的 Wilder 平滑 · 前 n 根 SMA 種子",
+    "S2 simple_mean:TR 的 n 日簡單均;未滿 n = null",
+    "S3 atr_pct_of_close:S2 / 收盤(fraction);要 high / low 欄"
+   ],
+   "time_params": "n = 14(Wilder 需整段歷史)",
+   "benchmark": "無(自身)",
+   "pros": "納入跳空的波動衡量;S3 百分比可跨價位比較",
+   "cons": "價格單位(S1/S2);需要高低價",
+   "alternatives": [
+    "VQG.IND.VOLATILITY",
+    "VQG.ANA.ATR_PCT"
+   ],
+   "kind": "indicator",
+   "code_key": "atr",
+   "default_export": true,
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 NEW_CORE",
+   "no": "VQG-016"
+  },
+  {
+   "stable_id": "VQG.IND.CLEAN_FLOW_RATIO",
+   "category": "量能",
+   "name_zh": "乾淨量比",
+   "name_en": "Clean Flow Ratio",
+   "formula": "CFR_n = mean(clean_v_{t-n+1..t}) / mean(clean_v_{t-2n+1..t-n}) ; clean_v = v − daytrade_v",
+   "params": [
+    "S1 clean_volume_ratio:乾淨量 n 日均 / 前 n 日均;當沖欄缺 = null(不猜)",
+    "S2 clean_turnover_ratio:同 S1 用乾淨成交值(turnover − daytrade_turnover)",
+    "S3 clean_volume_median_ratio:n 日中位數 / 前 n 日中位數(抗極端值)"
+   ],
+   "time_params": "n = 20(比較近 n 與前 n 期)",
+   "benchmark": "無(自身前期)",
+   "pros": "扣當沖後看量能是否放大,台股適用",
+   "cons": "需要當沖量欄(VDF 線出);缺欄照實為空",
+   "alternatives": [
+    "VQG.IND.VOLUME_ZSCORE",
+    "VQG.IND.OBV"
+   ],
+   "kind": "indicator",
+   "code_key": "clean_flow_ratio",
+   "default_export": true,
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 NEW_CORE",
+   "no": "VQG-017"
+  },
+  {
+   "stable_id": "VQG.IND.ROLLING_SHARPE",
+   "category": "風險調整",
+   "name_zh": "滾動夏普比率",
+   "name_en": "Rolling Sharpe Ratio",
+   "formula": "SR_n = (mean(r) − rf_d) / std(r) ; rf_d = (1+rf_annual)^(1/ppy) − 1 ; ppy 由序列近 365 天交易日數推",
+   "params": [
+    "ppy 由序列近 365 天交易日數推(不寫死 252)",
+    "S1 excess_over_rf:rf 來自 rf_annual 欄(台債 10y);欄缺或歷史不足一年 = null,不硬編碼 rf",
+    "S2 raw_mean_over_std:mean / std(樣本);不年化",
+    "S3 sortino_raw:mean / sqrt(mean(min(r,0)^2));下檔為 0 = null"
+   ],
+   "time_params": "n = 60",
+   "benchmark": "rf_annual(台債 10 年;S1 需要)",
+   "pros": "報酬與風險一起看",
+   "cons": "短視窗估計誤差大;S1 需要無風險利率欄",
+   "alternatives": [
+    "VQG.ANA.SHARPE_SORTINO",
+    "VQG.BT.SHARPE"
+   ],
+   "kind": "indicator",
+   "code_key": "rolling_sharpe",
+   "default_export": true,
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 NEW_CORE",
+   "no": "VQG-018"
+  },
+  {
+   "stable_id": "VQG.IND.REL_STRENGTH",
+   "category": "相對強弱",
+   "name_zh": "相對強弱(對基準)",
+   "name_en": "Relative Strength vs Benchmark",
+   "formula": "RS_n = (p_t/p_{t-n} − 1) − (b_t/b_{t-n} − 1)",
+   "params": [
+    "S1 excess_return_vs_benchmark:票 n 日報酬 − 基準 n 日報酬;要 benchmark_adj_close + 同市場",
+    "S2 ratio_vs_benchmark:(1+r)/(1+r_b) − 1",
+    "S3 excess_vs_factor_2330:票 n 日報酬 − 因子序列(factor_adj_close · 2330)n 日報酬;缺 = null"
+   ],
+   "time_params": "n = 60",
+   "benchmark": "benchmark_adj_close(大盤);S3 用 factor_adj_close = 2330",
+   "pros": "直接衡量是否跑贏大盤",
+   "cons": "需要基準序列;基準選擇影響結論",
+   "alternatives": [
+    "VQG.IND.BETA",
+    "VQG.ANA.REL_STRENGTH"
+   ],
+   "kind": "indicator",
+   "code_key": "rel_strength",
+   "default_export": true,
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 NEW_CORE",
+   "no": "VQG-019"
+  },
+  {
+   "stable_id": "VQG.ANA.TREND_REGIME",
+   "category": "量化分析快照",
+   "name_zh": "趨勢狀態",
+   "name_en": "Trend Regime",
+   "formula": "對 n ∈ {20,60,120}:price_vs_sma_n = ABOVE if p_t > SMA_n_S1 else BELOW;trend_regime = ALL_ABOVE / ALL_BELOW / MIXED / INSUFFICIENT",
+   "params": [
+    "比較為定義性(無百分比門檻)"
+   ],
+   "time_params": "SMA 20 / 60 / 120;快照日 = 最後觀測日",
+   "benchmark": "無(自身 SMA)",
+   "pros": "三條均線一次看清多空排列",
+   "cons": "只看上下,不看距離;盤整時常為 MIXED",
+   "alternatives": [
+    "VQG.IND.SLOPE",
+    "VQG.IND.MACD"
+   ],
+   "kind": "analysis",
+   "output_columns": [
+    "sma_20",
+    "sma_60",
+    "sma_120",
+    "price_vs_sma_20",
+    "price_vs_sma_60",
+    "price_vs_sma_120",
+    "trend_regime",
+    "trend_used_windows"
+   ],
+   "refs": [
+    "VQG.IND.SMA"
+   ],
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 analyze_ticker → vqg_quant_analysis",
+   "no": "VQG-020"
+  },
+  {
+   "stable_id": "VQG.ANA.RSI_STATE",
+   "category": "量化分析快照",
+   "name_zh": "RSI 狀態",
+   "name_en": "RSI State",
+   "formula": "rsi_14 = RSI_14_S1(t);rsi_14_pct_rank = #{h ≤ rsi_14} / #h(h = 該票 RSI 歷史);rsi_side = 相對 50",
+   "params": [
+    "50 為定義性中線",
+    "高低以自身歷史百分位判斷"
+   ],
+   "time_params": "RSI 14;歷史 = 匯出期間內全部觀測",
+   "benchmark": "自身歷史分布",
+   "pros": "不用 70/30 靜態門檻,依各票自身分布",
+   "cons": "歷史太短時百分位不穩",
+   "alternatives": [
+    "VQG.IND.ROC"
+   ],
+   "kind": "analysis",
+   "output_columns": [
+    "rsi_14",
+    "rsi_14_pct_rank",
+    "rsi_side"
+   ],
+   "refs": [
+    "VQG.IND.RSI"
+   ],
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 analyze_ticker → vqg_quant_analysis",
+   "no": "VQG-021"
+  },
+  {
+   "stable_id": "VQG.ANA.MACD_STREAK",
+   "category": "量化分析快照",
+   "name_zh": "MACD 柱連續日數",
+   "name_en": "MACD Histogram Streak",
+   "formula": "macd_hist = MACD_26_S1_histogram(t);macd_hist_streak = 最後同號(相對 0)連續觀測日數",
+   "params": [
+    "0 為定義性門檻"
+   ],
+   "time_params": "MACD 12/26/9",
+   "benchmark": "無(自身)",
+   "pros": "看動能延續多久",
+   "cons": "不看柱的大小",
+   "alternatives": [
+    "VQG.IND.ROC"
+   ],
+   "kind": "analysis",
+   "output_columns": [
+    "macd_hist",
+    "macd_hist_streak"
+   ],
+   "refs": [
+    "VQG.IND.MACD"
+   ],
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 analyze_ticker → vqg_quant_analysis",
+   "no": "VQG-022"
+  },
+  {
+   "stable_id": "VQG.ANA.VOL_REGIME",
+   "category": "量化分析快照",
+   "name_zh": "波動狀態",
+   "name_en": "Volatility Regime",
+   "formula": "volatility_20 = VOLATILITY_20_S1(t);pct_rank = 自身歷史百分位;quintile = ceil(rank × 5)(1–5)",
+   "params": [
+    "五分位"
+   ],
+   "time_params": "波動視窗 20",
+   "benchmark": "自身歷史分布",
+   "pros": "把波動高低變成 1–5 級,直觀",
+   "cons": "歷史太短時分位不穩",
+   "alternatives": [
+    "VQG.ANA.ATR_PCT"
+   ],
+   "kind": "analysis",
+   "output_columns": [
+    "volatility_20",
+    "volatility_20_pct_rank",
+    "volatility_quintile"
+   ],
+   "refs": [
+    "VQG.IND.VOLATILITY"
+   ],
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 analyze_ticker → vqg_quant_analysis",
+   "no": "VQG-023"
+  },
+  {
+   "stable_id": "VQG.ANA.DRAWDOWN_60",
+   "category": "量化分析快照",
+   "name_zh": "60 日回撤",
+   "name_en": "Drawdown 60",
+   "formula": "drawdown_60 = DRAWDOWN_60_S1(t)",
+   "params": [],
+   "time_params": "視窗 60",
+   "benchmark": "無(自身)",
+   "pros": "快照日距近期高點多遠",
+   "cons": "同 VQG.IND.DRAWDOWN",
+   "alternatives": [
+    "VQG.BT.MAX_DRAWDOWN"
+   ],
+   "kind": "analysis",
+   "output_columns": [
+    "drawdown_60"
+   ],
+   "refs": [
+    "VQG.IND.DRAWDOWN"
+   ],
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 analyze_ticker → vqg_quant_analysis",
+   "no": "VQG-024"
+  },
+  {
+   "stable_id": "VQG.ANA.ATR_PCT",
+   "category": "量化分析快照",
+   "name_zh": "ATR 佔價比與百分位",
+   "name_en": "ATR % and Rank",
+   "formula": "atr_pct_14 = ATR_14_S3(t)(ATR / 收盤);atr_pct_14_pct_rank = 自身歷史百分位",
+   "params": [],
+   "time_params": "ATR 14",
+   "benchmark": "自身歷史分布",
+   "pros": "跨價位可比的真實波幅",
+   "cons": "需要高低價欄",
+   "alternatives": [
+    "VQG.ANA.VOL_REGIME"
+   ],
+   "kind": "analysis",
+   "output_columns": [
+    "atr_pct_14",
+    "atr_pct_14_pct_rank"
+   ],
+   "refs": [
+    "VQG.IND.ATR"
+   ],
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 analyze_ticker → vqg_quant_analysis",
+   "no": "VQG-025"
+  },
+  {
+   "stable_id": "VQG.ANA.OBV_DIRECTION",
+   "category": "量化分析快照",
+   "name_zh": "OBV 方向",
+   "name_en": "OBV Direction",
+   "formula": "obv_20_normalized = OBV_20_S2(t);obv_direction = INFLOW (>0) / OUTFLOW (<0) / FLAT",
+   "params": [
+    "0 為定義性門檻"
+   ],
+   "time_params": "OBV 20",
+   "benchmark": "無(自身)",
+   "pros": "資金流向一眼看出",
+   "cons": "只看符號",
+   "alternatives": [
+    "VQG.ANA.CLEAN_FLOW"
+   ],
+   "kind": "analysis",
+   "output_columns": [
+    "obv_20_normalized",
+    "obv_direction"
+   ],
+   "refs": [
+    "VQG.IND.OBV"
+   ],
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 analyze_ticker → vqg_quant_analysis",
+   "no": "VQG-026"
+  },
+  {
+   "stable_id": "VQG.ANA.CLEAN_FLOW",
+   "category": "量化分析快照",
+   "name_zh": "乾淨量比快照",
+   "name_en": "Clean Flow Snapshot",
+   "formula": "clean_flow_ratio_20 = CLEAN_FLOW_RATIO_20_S1(t);缺當沖欄 → 空並記 DAYTRADE_SERIES_MISSING",
+   "params": [],
+   "time_params": "視窗 20",
+   "benchmark": "無(自身前期)",
+   "pros": "台股扣當沖的量能訊號",
+   "cons": "依賴 VDF 提供當沖量",
+   "alternatives": [
+    "VQG.ANA.OBV_DIRECTION"
+   ],
+   "kind": "analysis",
+   "output_columns": [
+    "clean_flow_ratio_20"
+   ],
+   "refs": [
+    "VQG.IND.CLEAN_FLOW_RATIO"
+   ],
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 analyze_ticker → vqg_quant_analysis",
+   "no": "VQG-027"
+  },
+  {
+   "stable_id": "VQG.ANA.SHARPE_SORTINO",
+   "category": "量化分析快照",
+   "name_zh": "夏普 / Sortino 快照",
+   "name_en": "Sharpe / Sortino Snapshot",
+   "formula": "sharpe_60_excess_rf = ROLLING_SHARPE_60_S1(t);sharpe_60_raw = S2;sortino_60_raw = S3;缺 rf 記 RF_SERIES_MISSING",
+   "params": [],
+   "time_params": "視窗 60",
+   "benchmark": "rf_annual(台債 10 年;僅 S1)",
+   "pros": "三種風險調整報酬並列",
+   "cons": "短視窗估計誤差大",
+   "alternatives": [
+    "VQG.BT.SHARPE"
+   ],
+   "kind": "analysis",
+   "output_columns": [
+    "sharpe_60_excess_rf",
+    "sharpe_60_raw",
+    "sortino_60_raw"
+   ],
+   "refs": [
+    "VQG.IND.ROLLING_SHARPE"
+   ],
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 analyze_ticker → vqg_quant_analysis",
+   "no": "VQG-028"
+  },
+  {
+   "stable_id": "VQG.ANA.REL_STRENGTH",
+   "category": "量化分析快照",
+   "name_zh": "相對強弱快照",
+   "name_en": "Relative Strength Snapshot",
+   "formula": "rel_strength_60 = REL_STRENGTH_60_S1(t);rel_strength_60_vs_factor_2330 = S3;缺基準記 BENCHMARK_SERIES_MISSING",
+   "params": [],
+   "time_params": "視窗 60",
+   "benchmark": "benchmark_adj_close;factor_adj_close = 2330",
+   "pros": "對大盤與對權值股兩個角度",
+   "cons": "需要基準序列",
+   "alternatives": [
+    "VQG.IND.BETA"
+   ],
+   "kind": "analysis",
+   "output_columns": [
+    "rel_strength_60",
+    "rel_strength_60_vs_factor_2330"
+   ],
+   "refs": [
+    "VQG.IND.REL_STRENGTH"
+   ],
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 analyze_ticker → vqg_quant_analysis",
+   "no": "VQG-029"
+  },
+  {
+   "stable_id": "VQG.ANA.CORE_COVERAGE",
+   "category": "資料品質",
+   "name_zh": "核心欄位覆蓋數",
+   "name_en": "Core Fields Present",
+   "formula": "core_fields_present = Σ 1[趨勢 · RSI · MACD 柱 · 波動 · 回撤 · ATR% · OBV 有值](0–7)",
+   "params": [],
+   "time_params": "快照日",
+   "benchmark": "無",
+   "pros": "一個數字看出快照完整度",
+   "cons": "不分輕重",
+   "alternatives": [],
+   "kind": "analysis",
+   "output_columns": [
+    "core_fields_present"
+   ],
+   "refs": [],
+   "since": "v0108",
+   "where": "VQG_AllInOne_v0108 analyze_ticker → vqg_quant_analysis",
+   "no": "VQG-030"
+  },
+  {
+   "stable_id": "VQG.BT.STRAT.BUY_HOLD",
+   "category": "回測策略",
+   "name_zh": "買進持有",
+   "name_en": "BUY_HOLD",
+   "formula": "pos_t = 1",
+   "params": [],
+   "time_params": "整段;訊號延遲 1 日",
+   "benchmark": "—",
+   "pros": "比較基準,零交易成本假設下的上限參考",
+   "cons": "不控風險",
+   "alternatives": [],
+   "kind": "strategy",
+   "strategy_key": "BUY_HOLD",
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 STRATEGIES / backtest",
+   "no": "VQG-031"
+  },
+  {
+   "stable_id": "VQG.BT.STRAT.SMA_TREND",
+   "category": "回測策略",
+   "name_zh": "均線趨勢",
+   "name_en": "SMA_TREND",
+   "formula": "pos_t = 1 if p_t > SMA_20_S1(t) else 0",
+   "params": [
+    "門檻定義性(價 vs 均線)"
+   ],
+   "time_params": "SMA 20;訊號延遲 1 日",
+   "benchmark": "BUY_HOLD(同期買進持有)",
+   "pros": "規則簡單、避開長空頭",
+   "cons": "盤整時來回被洗",
+   "alternatives": [
+    "VQG.BT.STRAT.MACD_HIST"
+   ],
+   "kind": "strategy",
+   "strategy_key": "SMA_TREND",
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 STRATEGIES / backtest",
+   "no": "VQG-032"
+  },
+  {
+   "stable_id": "VQG.BT.STRAT.RSI_MEANREV",
+   "category": "回測策略",
+   "name_zh": "RSI 均值回歸",
+   "name_en": "RSI_MEANREV",
+   "formula": "pct_t = RSI_14_S1 自身擴張百分位(只用到 t);pct ≤ 0.2 進場 · pct ≥ 0.8 出場 · 其餘維持",
+   "params": [
+    "LOW_PCT = 0.2",
+    "HIGH_PCT = 0.8(位置定義性,門檻值來自自身分布)"
+   ],
+   "time_params": "RSI 14;訊號延遲 1 日",
+   "benchmark": "BUY_HOLD(同期買進持有)",
+   "pros": "不偷看未來(擴張百分位)",
+   "cons": "強趨勢中逆勢進場",
+   "alternatives": [
+    "VQG.BT.STRAT.SMA_TREND"
+   ],
+   "kind": "strategy",
+   "strategy_key": "RSI_MEANREV",
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 STRATEGIES / backtest",
+   "no": "VQG-033"
+  },
+  {
+   "stable_id": "VQG.BT.STRAT.MACD_HIST",
+   "category": "回測策略",
+   "name_zh": "MACD 柱",
+   "name_en": "MACD_HIST",
+   "formula": "pos_t = 1 if MACD_26_S1_histogram(t) > 0 else 0",
+   "params": [
+    "0 為定義性門檻"
+   ],
+   "time_params": "MACD 12/26/9;訊號延遲 1 日",
+   "benchmark": "BUY_HOLD(同期買進持有)",
+   "pros": "趨勢跟隨,規則清楚",
+   "cons": "落後、翻號頻繁",
+   "alternatives": [
+    "VQG.BT.STRAT.SMA_TREND"
+   ],
+   "kind": "strategy",
+   "strategy_key": "MACD_HIST",
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 STRATEGIES / backtest",
+   "no": "VQG-034"
+  },
+  {
+   "stable_id": "VQG.BT.TOTAL_RETURN",
+   "category": "回測績效",
+   "name_zh": "總報酬",
+   "name_en": "total_return",
+   "formula": "eq_T − 1;eq_t = Π(1 + pos_{t−1} · r_t)",
+   "params": [],
+   "time_params": "整段回測期;訊號延遲 1 日",
+   "benchmark": "無",
+   "pros": "最直接",
+   "cons": "不同期間長度不可比",
+   "alternatives": [
+    "VQG.BT.CAGR"
+   ],
+   "kind": "backtest_metric",
+   "output_columns": [
+    "total_return"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 backtest → backtest/vqg_backtest_summary",
+   "no": "VQG-035"
+  },
+  {
+   "stable_id": "VQG.BT.CAGR",
+   "category": "回測績效",
+   "name_zh": "年化報酬",
+   "name_en": "cagr",
+   "formula": "eq_T^(ppy / n) − 1",
+   "params": [
+    "ppy = 序列近 365 天交易日數(不寫死 252)"
+   ],
+   "time_params": "整段回測期;訊號延遲 1 日",
+   "benchmark": "無",
+   "pros": "不同期間可比",
+   "cons": "短期間年化會放大",
+   "alternatives": [
+    "VQG.BT.TOTAL_RETURN"
+   ],
+   "kind": "backtest_metric",
+   "output_columns": [
+    "cagr"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 backtest → backtest/vqg_backtest_summary",
+   "no": "VQG-036"
+  },
+  {
+   "stable_id": "VQG.BT.VOL_ANNUAL",
+   "category": "回測績效",
+   "name_zh": "年化波動",
+   "name_en": "vol_annual",
+   "formula": "std(r_strategy) × sqrt(ppy)",
+   "params": [
+    "ppy = 序列近 365 天交易日數(不寫死 252)"
+   ],
+   "time_params": "整段回測期;訊號延遲 1 日",
+   "benchmark": "無",
+   "pros": "策略風險標準量",
+   "cons": "對稱看待上下波動",
+   "alternatives": [
+    "VQG.IND.VOLATILITY"
+   ],
+   "kind": "backtest_metric",
+   "output_columns": [
+    "vol_annual"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 backtest → backtest/vqg_backtest_summary",
+   "no": "VQG-037"
+  },
+  {
+   "stable_id": "VQG.BT.SHARPE",
+   "category": "回測績效",
+   "name_zh": "夏普比率",
+   "name_en": "sharpe",
+   "formula": "mean(r − rf_d) / std(r − rf_d) × sqrt(ppy);無 rf → 原始報酬(sharpe_rf 欄標示)",
+   "params": [
+    "ppy = 序列近 365 天交易日數(不寫死 252)"
+   ],
+   "time_params": "整段回測期;訊號延遲 1 日",
+   "benchmark": "rf_annual(台債 10 年;缺則標 NONE(RF_SERIES_MISSING))",
+   "pros": "報酬風險比,業界通用",
+   "cons": "厚尾 / 偏態時失真",
+   "alternatives": [
+    "VQG.IND.ROLLING_SHARPE"
+   ],
+   "kind": "backtest_metric",
+   "output_columns": [
+    "sharpe"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 backtest → backtest/vqg_backtest_summary",
+   "no": "VQG-038"
+  },
+  {
+   "stable_id": "VQG.BT.MAX_DRAWDOWN",
+   "category": "回測績效",
+   "name_zh": "最大回撤",
+   "name_en": "max_drawdown",
+   "formula": "min_t(eq_t / max_{s≤t} eq_s − 1)",
+   "params": [],
+   "time_params": "整段回測期;訊號延遲 1 日",
+   "benchmark": "無",
+   "pros": "最壞路徑損失",
+   "cons": "只看一次最壞事件",
+   "alternatives": [
+    "VQG.IND.DRAWDOWN"
+   ],
+   "kind": "backtest_metric",
+   "output_columns": [
+    "max_drawdown"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 backtest → backtest/vqg_backtest_summary",
+   "no": "VQG-039"
+  },
+  {
+   "stable_id": "VQG.BT.HIT_RATE",
+   "category": "回測績效",
+   "name_zh": "勝率",
+   "name_en": "hit_rate",
+   "formula": "#{r_t > 0 且 pos_{t−1} = 1} / #{pos_{t−1} = 1 且 r_t 有值}",
+   "params": [],
+   "time_params": "整段回測期;訊號延遲 1 日",
+   "benchmark": "無",
+   "pros": "直觀",
+   "cons": "不看賺賠大小",
+   "alternatives": [
+    "VQG.BT.TOTAL_RETURN"
+   ],
+   "kind": "backtest_metric",
+   "output_columns": [
+    "hit_rate"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 backtest → backtest/vqg_backtest_summary",
+   "no": "VQG-040"
+  },
+  {
+   "stable_id": "VQG.BT.EXPOSURE",
+   "category": "回測績效",
+   "name_zh": "在場比例",
+   "name_en": "exposure",
+   "formula": "Σ pos_{0..T−1} / n",
+   "params": [],
+   "time_params": "整段回測期;訊號延遲 1 日",
+   "benchmark": "無",
+   "pros": "看策略多常持倉",
+   "cons": "不是績效本身",
+   "alternatives": [],
+   "kind": "backtest_metric",
+   "output_columns": [
+    "exposure"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 backtest → backtest/vqg_backtest_summary",
+   "no": "VQG-041"
+  },
+  {
+   "stable_id": "VQG.BT.TURNOVER",
+   "category": "回測績效",
+   "name_zh": "換手率",
+   "name_en": "turnover",
+   "formula": "Σ |pos_t − pos_{t−1}| / n",
+   "params": [],
+   "time_params": "整段回測期;訊號延遲 1 日",
+   "benchmark": "無",
+   "pros": "交易成本的代理",
+   "cons": "未扣實際成本",
+   "alternatives": [],
+   "kind": "backtest_metric",
+   "output_columns": [
+    "turnover"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 backtest → backtest/vqg_backtest_summary",
+   "no": "VQG-042"
+  },
+  {
+   "stable_id": "VQG.BT.VS_BUY_HOLD",
+   "category": "回測績效",
+   "name_zh": "相對買進持有",
+   "name_en": "vs_buy_hold",
+   "formula": "total_return(策略) − total_return(BUY_HOLD)",
+   "params": [],
+   "time_params": "整段回測期;訊號延遲 1 日",
+   "benchmark": "BUY_HOLD 策略",
+   "pros": "直接看策略是否勝過持有",
+   "cons": "只比較總報酬,不調整風險",
+   "alternatives": [
+    "VQG.IND.REL_STRENGTH"
+   ],
+   "kind": "backtest_metric",
+   "output_columns": [
+    "vs_buy_hold"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 backtest → backtest/vqg_backtest_summary",
+   "no": "VQG-043"
+  },
+  {
+   "stable_id": "VQG.FAC.RSI_14",
+   "category": "因子",
+   "name_zh": "因子:RSI 14",
+   "name_en": "RSI_14_S1",
+   "formula": "RSI_14_S1",
+   "params": [
+    "截面至少 3 票"
+   ],
+   "time_params": "觀測日 d;未來報酬 h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "沿用已登記指標,公式不另造",
+   "cons": "票數少時截面 IC 不可得(INSUFFICIENT_TICKERS)",
+   "alternatives": [
+    "VQG.IND.RSI"
+   ],
+   "kind": "factor",
+   "factor_key": "RSI_14_S1",
+   "refs": [
+    "VQG.IND.RSI"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 FACTOR_COLS",
+   "no": "VQG-044"
+  },
+  {
+   "stable_id": "VQG.FAC.SMA20_DEV",
+   "category": "因子",
+   "name_zh": "因子:偏離 SMA 20",
+   "name_en": "SMA20_DEV",
+   "formula": "p_t / SMA_20_S1(t) − 1",
+   "params": [
+    "截面至少 3 票"
+   ],
+   "time_params": "觀測日 d;未來報酬 h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "沿用已登記指標,公式不另造",
+   "cons": "票數少時截面 IC 不可得(INSUFFICIENT_TICKERS)",
+   "alternatives": [
+    "VQG.IND.SMA"
+   ],
+   "kind": "factor",
+   "factor_key": "SMA20_DEV",
+   "refs": [
+    "VQG.IND.SMA"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 FACTOR_COLS",
+   "no": "VQG-045"
+  },
+  {
+   "stable_id": "VQG.FAC.VOLATILITY_20",
+   "category": "因子",
+   "name_zh": "因子:波動 20",
+   "name_en": "VOLATILITY_20_S1",
+   "formula": "VOLATILITY_20_S1",
+   "params": [
+    "截面至少 3 票"
+   ],
+   "time_params": "觀測日 d;未來報酬 h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "沿用已登記指標,公式不另造",
+   "cons": "票數少時截面 IC 不可得(INSUFFICIENT_TICKERS)",
+   "alternatives": [
+    "VQG.IND.VOLATILITY"
+   ],
+   "kind": "factor",
+   "factor_key": "VOLATILITY_20_S1",
+   "refs": [
+    "VQG.IND.VOLATILITY"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 FACTOR_COLS",
+   "no": "VQG-046"
+  },
+  {
+   "stable_id": "VQG.FAC.OBV_20",
+   "category": "因子",
+   "name_zh": "因子:OBV 20 正規化",
+   "name_en": "OBV_20_S2",
+   "formula": "OBV_20_S2",
+   "params": [
+    "截面至少 3 票"
+   ],
+   "time_params": "觀測日 d;未來報酬 h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "沿用已登記指標,公式不另造",
+   "cons": "票數少時截面 IC 不可得(INSUFFICIENT_TICKERS)",
+   "alternatives": [
+    "VQG.IND.OBV"
+   ],
+   "kind": "factor",
+   "factor_key": "OBV_20_S2",
+   "refs": [
+    "VQG.IND.OBV"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 FACTOR_COLS",
+   "no": "VQG-047"
+  },
+  {
+   "stable_id": "VQG.FAC.DRAWDOWN_20",
+   "category": "因子",
+   "name_zh": "因子:回撤 20",
+   "name_en": "DRAWDOWN_20_S1",
+   "formula": "DRAWDOWN_20_S1",
+   "params": [
+    "截面至少 3 票"
+   ],
+   "time_params": "觀測日 d;未來報酬 h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "沿用已登記指標,公式不另造",
+   "cons": "票數少時截面 IC 不可得(INSUFFICIENT_TICKERS)",
+   "alternatives": [
+    "VQG.IND.DRAWDOWN"
+   ],
+   "kind": "factor",
+   "factor_key": "DRAWDOWN_20_S1",
+   "refs": [
+    "VQG.IND.DRAWDOWN"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 FACTOR_COLS",
+   "no": "VQG-048"
+  },
+  {
+   "stable_id": "VQG.FAC.REL_STRENGTH_60",
+   "category": "因子",
+   "name_zh": "因子:相對強弱 60",
+   "name_en": "REL_STRENGTH_60_S1",
+   "formula": "REL_STRENGTH_60_S1",
+   "params": [
+    "截面至少 3 票"
+   ],
+   "time_params": "觀測日 d;未來報酬 h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "沿用已登記指標,公式不另造",
+   "cons": "票數少時截面 IC 不可得(INSUFFICIENT_TICKERS)",
+   "alternatives": [
+    "VQG.IND.REL_STRENGTH"
+   ],
+   "kind": "factor",
+   "factor_key": "REL_STRENGTH_60_S1",
+   "refs": [
+    "VQG.IND.REL_STRENGTH"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 FACTOR_COLS",
+   "no": "VQG-049"
+  },
+  {
+   "stable_id": "VQG.FAC.MACD_HIST",
+   "category": "因子",
+   "name_zh": "因子:MACD 柱",
+   "name_en": "MACD_26_S1_histogram",
+   "formula": "MACD_26_S1_histogram",
+   "params": [
+    "截面至少 3 票"
+   ],
+   "time_params": "觀測日 d;未來報酬 h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "沿用已登記指標,公式不另造",
+   "cons": "票數少時截面 IC 不可得(INSUFFICIENT_TICKERS)",
+   "alternatives": [
+    "VQG.IND.MACD"
+   ],
+   "kind": "factor",
+   "factor_key": "MACD_26_S1_histogram",
+   "refs": [
+    "VQG.IND.MACD"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 FACTOR_COLS",
+   "no": "VQG-050"
+  },
+  {
+   "stable_id": "VQG.FAC.ATR_PCT_14",
+   "category": "因子",
+   "name_zh": "因子:ATR% 14",
+   "name_en": "ATR_14_S3",
+   "formula": "ATR_14_S3",
+   "params": [
+    "截面至少 3 票"
+   ],
+   "time_params": "觀測日 d;未來報酬 h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "沿用已登記指標,公式不另造",
+   "cons": "票數少時截面 IC 不可得(INSUFFICIENT_TICKERS)",
+   "alternatives": [
+    "VQG.IND.ATR"
+   ],
+   "kind": "factor",
+   "factor_key": "ATR_14_S3",
+   "refs": [
+    "VQG.IND.ATR"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 FACTOR_COLS",
+   "no": "VQG-051"
+  },
+  {
+   "stable_id": "VQG.FAC.IC",
+   "category": "因子檢定",
+   "name_zh": "資訊係數(每日)",
+   "name_en": "ic",
+   "formula": "IC_d = Spearman(factor_{i,d}, r_{i,d→d+h});i 為當日有值的票(≥ 3)",
+   "params": [
+    "Spearman 排序相關"
+   ],
+   "time_params": "h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "無分布假設的排序相關",
+   "cons": "票數少時雜訊大",
+   "alternatives": [
+    "VQG.FAC.TOP_MINUS_BOTTOM"
+   ],
+   "kind": "factor_metric",
+   "output_columns": [
+    "ic"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 factor_ic → factor/",
+   "no": "VQG-052"
+  },
+  {
+   "stable_id": "VQG.FAC.MEAN_IC",
+   "category": "因子檢定",
+   "name_zh": "平均 IC",
+   "name_en": "mean_ic",
+   "formula": "mean_d(IC_d)",
+   "params": [],
+   "time_params": "h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "因子預測力總結",
+   "cons": "不看穩定度",
+   "alternatives": [
+    "VQG.FAC.IC_IR"
+   ],
+   "kind": "factor_metric",
+   "output_columns": [
+    "mean_ic"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 factor_ic → factor/",
+   "no": "VQG-053"
+  },
+  {
+   "stable_id": "VQG.FAC.IC_IR",
+   "category": "因子檢定",
+   "name_zh": "IC 資訊比",
+   "name_en": "ic_ir",
+   "formula": "mean(IC) / std(IC)",
+   "params": [],
+   "time_params": "h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "兼顧預測力與穩定度",
+   "cons": "IC 日數少時不穩",
+   "alternatives": [
+    "VQG.FAC.MEAN_IC"
+   ],
+   "kind": "factor_metric",
+   "output_columns": [
+    "ic_ir"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 factor_ic → factor/",
+   "no": "VQG-054"
+  },
+  {
+   "stable_id": "VQG.FAC.IC_HIT_RATE",
+   "category": "因子檢定",
+   "name_zh": "IC 勝率",
+   "name_en": "hit_rate",
+   "formula": "#{IC_d > 0} / #IC",
+   "params": [],
+   "time_params": "h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "直觀",
+   "cons": "不看 IC 大小",
+   "alternatives": [
+    "VQG.FAC.MEAN_IC"
+   ],
+   "kind": "factor_metric",
+   "output_columns": [
+    "hit_rate"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 factor_ic → factor/",
+   "no": "VQG-055"
+  },
+  {
+   "stable_id": "VQG.FAC.TOP_MINUS_BOTTOM",
+   "category": "因子檢定",
+   "name_zh": "多空價差",
+   "name_en": "top_minus_bottom_fwd",
+   "formula": "mean_d( mean(r_fwd | 因子前半) − mean(r_fwd | 因子後半) );每日 ≥ 4 票",
+   "params": [],
+   "time_params": "h = 5 個觀測日",
+   "benchmark": "截面其他票",
+   "pros": "可交易性的直觀代理",
+   "cons": "二分法粗糙;未扣成本",
+   "alternatives": [
+    "VQG.FAC.MEAN_IC"
+   ],
+   "kind": "factor_metric",
+   "output_columns": [
+    "top_minus_bottom_fwd"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 factor_ic → factor/",
+   "no": "VQG-056"
+  },
+  {
+   "stable_id": "VQG.STAT.MEAN",
+   "category": "報酬統計",
+   "name_zh": "平均日報酬",
+   "name_en": "mean",
+   "formula": "mean(r)",
+   "params": [],
+   "time_params": "整段日報酬(n ≥ 10)",
+   "benchmark": "無",
+   "pros": "基本",
+   "cons": "受極端值影響",
+   "alternatives": [
+    "VQG.BT.CAGR"
+   ],
+   "kind": "stat",
+   "output_columns": [
+    "mean"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 stats_rows → stats/",
+   "no": "VQG-057"
+  },
+  {
+   "stable_id": "VQG.STAT.STD",
+   "category": "報酬統計",
+   "name_zh": "日報酬標準差",
+   "name_en": "std",
+   "formula": "std(r)(母體 ddof = 0)",
+   "params": [],
+   "time_params": "整段日報酬(n ≥ 10)",
+   "benchmark": "無",
+   "pros": "基本風險量",
+   "cons": "厚尾低估",
+   "alternatives": [
+    "VQG.IND.VOLATILITY"
+   ],
+   "kind": "stat",
+   "output_columns": [
+    "std"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 stats_rows → stats/",
+   "no": "VQG-058"
+  },
+  {
+   "stable_id": "VQG.STAT.SKEW",
+   "category": "報酬統計",
+   "name_zh": "偏態",
+   "name_en": "skew",
+   "formula": "E[(r − m)^3] / sd^3",
+   "params": [],
+   "time_params": "整段日報酬(n ≥ 10)",
+   "benchmark": "無",
+   "pros": "看尾部不對稱",
+   "cons": "對極端值極敏感",
+   "alternatives": [],
+   "kind": "stat",
+   "output_columns": [
+    "skew"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 stats_rows → stats/",
+   "no": "VQG-059"
+  },
+  {
+   "stable_id": "VQG.STAT.EXCESS_KURTOSIS",
+   "category": "報酬統計",
+   "name_zh": "超額峰態",
+   "name_en": "excess_kurtosis",
+   "formula": "E[(r − m)^4] / sd^4 − 3",
+   "params": [],
+   "time_params": "整段日報酬(n ≥ 10)",
+   "benchmark": "無",
+   "pros": "看厚尾",
+   "cons": "樣本小時不穩",
+   "alternatives": [],
+   "kind": "stat",
+   "output_columns": [
+    "excess_kurtosis"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 stats_rows → stats/",
+   "no": "VQG-060"
+  },
+  {
+   "stable_id": "VQG.STAT.JARQUE_BERA",
+   "category": "報酬統計",
+   "name_zh": "JB 常態檢定量",
+   "name_en": "jarque_bera",
+   "formula": "n/6 × (skew^2 + kurt^2 / 4)",
+   "params": [],
+   "time_params": "整段日報酬(n ≥ 10)",
+   "benchmark": "無",
+   "pros": "一個數字檢定常態",
+   "cons": "大樣本幾乎必拒絕",
+   "alternatives": [
+    "VQG.STAT.SKEW",
+    "VQG.STAT.EXCESS_KURTOSIS"
+   ],
+   "kind": "stat",
+   "output_columns": [
+    "jarque_bera"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 stats_rows → stats/",
+   "no": "VQG-061"
+  },
+  {
+   "stable_id": "VQG.STAT.ACF",
+   "category": "報酬統計",
+   "name_zh": "自相關",
+   "name_en": "acf_1/acf_5",
+   "formula": "ACF_k = Σ (r_i − m)(r_{i+k} − m) / Σ (r_i − m)^2;k ∈ {1,5}",
+   "params": [],
+   "time_params": "整段日報酬(n ≥ 10)",
+   "benchmark": "無",
+   "pros": "看報酬是否有慣性 / 反轉",
+   "cons": "單一落後期,不是完整檢定",
+   "alternatives": [
+    "VQG.STAT.VARIANCE_RATIO"
+   ],
+   "kind": "stat",
+   "output_columns": [
+    "acf_1",
+    "acf_5"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 stats_rows → stats/",
+   "no": "VQG-062"
+  },
+  {
+   "stable_id": "VQG.STAT.VARIANCE_RATIO",
+   "category": "報酬統計",
+   "name_zh": "變異數比",
+   "name_en": "variance_ratio_2/variance_ratio_5",
+   "formula": "VR_q = Var(q 日報酬) / (q × Var(1 日報酬));q ∈ {2,5}(不重疊)",
+   "params": [],
+   "time_params": "整段日報酬(n ≥ 10)",
+   "benchmark": "無",
+   "pros": "隨機漫步檢定(≈1)",
+   "cons": "不重疊切段樣本少",
+   "alternatives": [
+    "VQG.STAT.ACF"
+   ],
+   "kind": "stat",
+   "output_columns": [
+    "variance_ratio_2",
+    "variance_ratio_5"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 stats_rows → stats/",
+   "no": "VQG-063"
+  },
+  {
+   "stable_id": "VQG.STAT.POSITIVE_PCT",
+   "category": "報酬統計",
+   "name_zh": "上漲日比例",
+   "name_en": "positive_pct",
+   "formula": "#{r > 0} / n",
+   "params": [],
+   "time_params": "整段日報酬(n ≥ 10)",
+   "benchmark": "無",
+   "pros": "直觀",
+   "cons": "不看幅度",
+   "alternatives": [
+    "VQG.BT.HIT_RATE"
+   ],
+   "kind": "stat",
+   "output_columns": [
+    "positive_pct"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 stats_rows → stats/",
+   "no": "VQG-064"
+  },
+  {
+   "stable_id": "VQG.STAT.RANGE",
+   "category": "報酬統計",
+   "name_zh": "最大 / 最小日報酬",
+   "name_en": "max/min",
+   "formula": "max(r) · min(r)",
+   "params": [],
+   "time_params": "整段日報酬(n ≥ 10)",
+   "benchmark": "無",
+   "pros": "極端日一眼看出",
+   "cons": "單點",
+   "alternatives": [
+    "VQG.STAT.EXCESS_KURTOSIS"
+   ],
+   "kind": "stat",
+   "output_columns": [
+    "max",
+    "min"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 stats_rows → stats/",
+   "no": "VQG-065"
+  },
+  {
+   "stable_id": "VQG.STAT.RETURN_CORR",
+   "category": "報酬統計",
+   "name_zh": "報酬相關矩陣",
+   "name_en": "return_corr",
+   "formula": "Pearson(r_a, r_b) 於共同日期(≥ 10 日)",
+   "params": [],
+   "time_params": "整段日報酬(n ≥ 10)",
+   "benchmark": "無",
+   "pros": "看分散效果",
+   "cons": "線性、隨時間變",
+   "alternatives": [
+    "VQG.IND.BETA"
+   ],
+   "kind": "stat",
+   "output_columns": [
+    "return_corr"
+   ],
+   "since": "v0109",
+   "where": "VQG_AllInOne_v0109 stats_rows → stats/",
+   "no": "VQG-066"
+  }
+ ]
+}

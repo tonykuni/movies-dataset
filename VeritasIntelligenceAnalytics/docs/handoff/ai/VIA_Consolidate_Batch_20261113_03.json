@@ -1,0 +1,1039 @@
+{
+ "schema": "via.consolidate.batch/1",
+ "batch": "20261113_03",
+ "law": "L130(a–e)· 操作員 2026-11-13「VDF 太多重複項目 一口氣整合完畢 刪除所有舊的僅留紀錄」",
+ "systems": [
+  "VDF"
+ ],
+ "method": "每家族尾版 --selftest 實跑 + audit hook 記本家族被讀的版本(= 執行時鏈)→ 鏈外舊版;活引用只算尾版冊 / 現行程式 / 交接冊 / 工作流冊(舊版冊 · 快照 · 鎖定紀錄 · 命名冊 = 歷史紀錄,不擋);刪後重探:尾版自測 rc 與讀檔集合必須和刪前相同,不同的家族整族還原;刪前刪後 VDF 管理器整輪測試逐列相同、SDD 燈號相同。",
+ "count": 0,
+ "rows": [],
+ "restored_after_reprobe": {
+  "families": [
+   "VDF_ENG074_FredMacroSSOT",
+   "VDF_ENG078_ActiveETFHoldingsHistory",
+   "VDF_ENG087_MarketListGovernance",
+   "VDF_ENG110_USMacroProbe",
+   "VDF_ENG113_MacroMethod",
+   "VDF_ENG115_SentimentFetch",
+   "VDF_ENG116_AAIIWorkbook",
+   "VDF_ENG230_ForwardValuation"
+  ],
+  "why": "刪後尾版自測失敗(尾版經 glob / 讀原始碼等方式用到舊版,audit hook 沒記到)→ 整族還原,零淨刪"
+ },
+ "held_back": {
+  "pointer_blocked": {
+   "count": 125,
+   "why": "現行冊仍指名(交接冊 · 需求冊尾版 · 盤點冊尾版 · 引擎目錄 · 輸入台規格 · 函式矩陣 · 期間規則 …);要先出新版冊改指尾版才能刪",
+   "files": [
+    "VDF_ENG045_OutputHub_v0100.py",
+    "VDF_ENG045_OutputHub_v0101.py",
+    "VDF_ENG050_OrderFetch_v0101.py",
+    "VDF_ENG051_ActiveTWETF_Holdings_v0102.py",
+    "VDF_ENG051_ActiveTWETF_Holdings_v0103.py",
+    "VDF_ENG052_MegaFetch_v0101.py",
+    "VDF_ENG052_MegaFetch_v0102.py",
+    "VDF_ENG052_MegaFetch_v0103.py",
+    "VDF_ENG053_ParamEngineMap_v0101.py",
+    "VDF_ENG054_TWDailyBackfill_v0100.py",
+    "VDF_ENG054_TWDailyBackfill_v0104.py",
+    "VDF_ENG054_TWDailyBackfill_v0105.py",
+    "VDF_ENG054_TWDailyBackfill_v0108.py",
+    "VDF_ENG054_TWDailyBackfill_v0109.py",
+    "VDF_ENG054_TWDailyBackfill_v0110.py",
+    "VDF_ENG055_OmniFetch_v0105.py",
+    "VDF_ENG055_OmniFetch_v0106.py",
+    "VDF_ENG055_OmniFetch_v0109.py",
+    "VDF_ENG055_OmniFetch_v0111.py",
+    "VDF_ENG055_OmniFetch_v0112.py",
+    "VDF_ENG055_OmniFetch_v0113.py",
+    "VDF_ENG056_ChipBackfill_v0102.py",
+    "VDF_ENG057_TradingValueBackfill_v0101.py",
+    "VDF_ENG059_EstimateBands_v0100.py",
+    "VDF_ENG063_MonthlyRevenue_v0100.py",
+    "VDF_ENG063_MonthlyRevenue_v0104.py",
+    "VDF_ENG063_MonthlyRevenue_v0105.py",
+    "VDF_ENG063_MonthlyRevenue_v0106.py",
+    "VDF_ENG064_HistoryBackfill_v0109.py",
+    "VDF_ENG064_HistoryBackfill_v0111.py",
+    "VDF_ENG065_DbImport_v0100.py",
+    "VDF_ENG066_GlobalUniverse_v0100.py",
+    "VDF_ENG066_GlobalUniverse_v0101.py",
+    "VDF_ENG068_ETFConsensusAnalysis_v0104.py",
+    "VDF_ENG069_RevenueConsensusAnalysis_v0108.py",
+    "VDF_ENG070_GroupClassificationIndex_v0111.py",
+    "VDF_ENG074_FredMacroSSOT_v0102.py",
+    "VDF_ENG075_MonthlyRevenueBackfill_v0102.py",
+    "VDF_ENG076_ETFRevenueMomentum_v0100.py",
+    "VDF_ENG077_ActiveETFUniverse_v0100.py",
+    "VDF_ENG078_ActiveETFHoldingsHistory_v0107.py",
+    "VDF_ENG078_ActiveETFHoldingsHistory_v0108.py",
+    "VDF_ENG079_LocalDbConsolidate_v0100.py",
+    "VDF_ENG079_LocalDbConsolidate_v0101.py",
+    "VDF_ENG079_LocalDbConsolidate_v0104.py",
+    "VDF_ENG081_UniverseAlign_v0100.py",
+    "VDF_ENG085_VatetfBridge_v0104.py",
+    "VDF_ENG086_QuantGuardOneBridge_v0100.py",
+    "VDF_ENG086_QuantGuardOneBridge_v0101.py",
+    "VDF_ENG087_MarketListGovernance_v0100.py",
+    "VDF_ENG087_MarketListGovernance_v0101.py",
+    "VDF_ENG087_MarketListGovernance_v0102.py",
+    "VDF_ENG087_MarketListGovernance_v0105.py",
+    "VDF_ENG087_MarketListGovernance_v0106.py",
+    "VDF_ENG088_ConsensusFusionBridge_v0103.py",
+    "VDF_ENG089_IncrementalFetchGate_v0101.py",
+    "VDF_ENG089_IncrementalFetchGate_v0109.py",
+    "VDF_ENG090_DataCoverageGate_v0105.py",
+    "VDF_ENG093_LaunchConsole_v0102.py",
+    "VDF_ENG094_ActiveETFActivity_v0100.py",
+    "VDF_ENG110_USMacroProbe_v0101.py",
+    "VDF_ENG117_ForwardVintage_v0100.py",
+    "VDF_ENG117_ForwardVintage_v0101.py",
+    "VDF_ENG117_ForwardVintage_v0102.py",
+    "VDF_ENG119_StartTestRegister_v0101.py",
+    "VDF_ENG229_CNNFearGreedHistory_v0100.py",
+    "VDF_ENG234_UiLauncher_v0100.py",
+    "VDF_ENG238_InstHoldingPct_v0100.py",
+    "VDF_ENG238_InstHoldingPct_v0101.py",
+    "VDF_MDL008_FetchSystem_v0100.py",
+    "VDF_MDL008_FetchSystem_v0101.py",
+    "VDF_MDL008_FetchSystem_v0102.py",
+    "VDF_MDL008_FetchSystem_v0103.py",
+    "VDF_MDL008_FetchSystem_v0104.py",
+    "VDF_MDL008_FetchSystem_v0105.py",
+    "VDF_MDL008_FetchSystem_v0106.py",
+    "VDF_MDL008_FetchSystem_v0107.py",
+    "VDF_MDL008_FetchSystem_v0108.py",
+    "VDF_MDL011_AkshareFetcher_v0100.py",
+    "VDF_MDL011_AkshareFetcher_v0101.py",
+    "VDF_MDL011_AkshareFetcher_v0102.py",
+    "VDF_MDL012_FetchGroups_v0100.py",
+    "VDF_MDL012_FetchGroups_v0101.py",
+    "VDF_MDL012_FetchGroups_v0102.py",
+    "VDF_MDL012_FetchGroups_v0103.py",
+    "VDF_MDL012_FetchGroups_v0104.py",
+    "VDF_SystemManager_v0100.py",
+    "VDF_SystemManager_v0104.py",
+    "VDF_SystemManager_v0105.py",
+    "VDF_SystemManager_v0107.py",
+    "VDF_SystemManager_v0113.py",
+    "VDF_SystemManager_v0114.py",
+    "VDF_SystemManager_v0118.py",
+    "VDF_SystemManager_v0121.py",
+    "VDF_SystemManager_v0122.py",
+    "VDF_SystemManager_v0123.py",
+    "VDF_SystemManager_v0124.py",
+    "VDF_SystemManager_v0125.py",
+    "VDF_SystemManager_v0126.py",
+    "VDF_SystemManager_v0127.py",
+    "VDF_SystemManager_v0128.py",
+    "VDF_SystemManager_v0129.py",
+    "VDF_SystemManager_v0130.py",
+    "VDF_SystemManager_v0132.py",
+    "VDF_SystemManager_v0136.py",
+    "VDF_SystemManager_v0144.py",
+    "VDF_SystemManager_v0149.py",
+    "VDF_SystemManager_v0150.py",
+    "VDF_SystemManager_v0151.py",
+    "VDF_SystemManager_v0152.py",
+    "VDF_SystemManager_v0153.py",
+    "VDF_SystemManager_v0154.py",
+    "VDF_SystemManager_v0155.py",
+    "VDF_SystemManager_v0156.py",
+    "VDF_SystemManager_v0157.py",
+    "VDF_SystemManager_v0158.py",
+    "VDF_SystemManager_v0159.py",
+    "VDF_SystemManager_v0160.py",
+    "VDF_SystemManager_v0161.py",
+    "VDF_SystemManager_v0162.py",
+    "VDF_SystemManager_v0163.py",
+    "VDF_SystemManager_v0167.py",
+    "VDF_SystemManager_v0168.py",
+    "VDF_SystemManager_v0169.py",
+    "VDF_SystemManager_v0170.py"
+   ]
+  },
+  "runtime_chain_members": "94 支(尾版執行時讀的前版鏈;要先把薄尾家族攤平成單檔才能刪)",
+  "families_selftest_not_clean": [
+   "VDF_ENG058_IndustryUnifiedMap",
+   "VDF_ENG060_AdjPriceLayer",
+   "VDF_ENG061_FeatureStore",
+   "VDF_ENG062_GroupFeatureLayer",
+   "VDF_ENG071_GroupBacktest",
+   "VDF_ENG072_StoryRotationBridge",
+   "VDF_ENG082_FinStatements"
+  ]
+ },
+ "record": "被刪檔的全文仍在 git 歷史(本批提交前的任何一筆都可取回);sha256 每列都記。",
+ "reverted_rows": [
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG051_ActiveTWETF_Holdings",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v0104.py",
+   "sha256": "c4f7c1dd2d124ba6e72815dee449df89c451ccc250b71476e3d6dde13303f028"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG052_MegaFetch_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG052_MegaFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG052_MegaFetch_v0104.py",
+   "sha256": "920ffb48c275582e69e22809b0cbb7aa14e7dab2054b20c8bc81057cf759091e"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG053_ParamEngineMap_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG053_ParamEngineMap",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG053_ParamEngineMap_v0103.py",
+   "sha256": "85a429285cdb89f66787c8df2fd57958bb34fedfbe1b368c035cd0adf1e526ee"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG054_TWDailyBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0111.py",
+   "sha256": "2eb1b63274c08350b23baed1e0e1d3bb623c676db02e71d9a4b31206b558e353"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG054_TWDailyBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0111.py",
+   "sha256": "e81ee4f29a1a7e1c49351bc7898508e76bc4f6127da99e18f25055d813a63399"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG054_TWDailyBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0111.py",
+   "sha256": "ef0bef16a9da2aaf800825da6892a2115141e0908573cb5df5dd78fb1ec1a6a0"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0106.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG054_TWDailyBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0111.py",
+   "sha256": "d5c529bb2a01cd5edeb61b7d1d02133802458e6c29b3c81473dd42273641c7b9"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0107.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG054_TWDailyBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0111.py",
+   "sha256": "d6fe001192317985d6e54b5ad55a10b888da7414fac4b322f466e935b9bc7d2e"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "0f2c33dbf314db78b6a6a58030e6be15c18352cba9d547f14a64d50f1b074805"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "ab40a7abf7a4d7f3ee59c1938f1cbff160e91dc28195b25705e731cf4b878568"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "27ca84a5df6ad4fb59ad7c9a1538395cd7fc79d3a0e95f48d622a5da6502eb11"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "9778e68dd6165b94b72785b536204f8a11bfde0014c1db49ddda7d3874e5bfd2"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0104.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "3ab06f96de1383eda0c02ea6ebd9d8e036736b6f9af7a6c8afd38f7f4327785c"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0107.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "c8045ed85da314d42be95eb5ff9d2ce1dda99999a4cabe19940bd8b5d272c70b"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0108.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "9673e4d72b533e19f206e2b73a7fc24b1f2d9fb25684b4451380a8823d4d18bd"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0110.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "0b8cf9db3161f0d399b9c44c70ed7d09b930ac7aff3ad03277dcd1de178dd400"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0114.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "561dd6554124dc5e11d17cc2ff75f89e82fdd7f43d6d4858f8db5b7b835b4a79"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0115.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "ea8b75d971a4b9fea288e95e51b5c35bb9ed1ee1b904ee54617a2274b16cece7"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0116.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "2a66779a220fd311a7b322e1c184d226f3f901f79ec72876bfb60b175f8465bc"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0117.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG055_OmniFetch",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0123.py",
+   "sha256": "6d0477fafb4496b99cdc0965659d57f31e944811220aeac54506a2a4eb58ee67"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG056_ChipBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0108.py",
+   "sha256": "636ed809d048381a29bbc4efca93851799bc72c7aaa348d5d2c11ae41d1e4efa"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG056_ChipBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0108.py",
+   "sha256": "7e8acf97befba1763fb02505a6422b14418d8a98bd84d0a16a81a5879d9fb86c"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG056_ChipBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0108.py",
+   "sha256": "e1caa13b1c9ba1f053facbce747b96b1b7c27e5b2c4c683e51b909ec077b2e5f"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG057_TradingValueBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0111.py",
+   "sha256": "b40691fbdb38505f4511f096cf9b04e4215ceb3f79c2f7dd2b3bbb23e2baa703"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG057_TradingValueBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0111.py",
+   "sha256": "18a33536170660f0a2f41bbd69a19c507d02a769d548b8d24c66c40926865648"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG057_TradingValueBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0111.py",
+   "sha256": "acad8e6409ac274d7bfcde21f68a6d70b56e82820d681c68dc1bf7c73ccbfb63"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0104.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG057_TradingValueBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0111.py",
+   "sha256": "7c97ac0858f7cf5a6473ea516dce78ad022253ff3b4aec753966b43b981badcf"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0105.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG057_TradingValueBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0111.py",
+   "sha256": "5cade52d1725c48f71c1e90beeaf5a567017f1897afa875b4f403bb95ce21919"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0106.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG057_TradingValueBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0111.py",
+   "sha256": "fab1ba22ba794650a634315afa9346b8cebf36ff3b42d4386b0b456fd4425bb6"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG063_MonthlyRevenue",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0107.py",
+   "sha256": "582190b8a8582dc2a90cd135613bfd061a124806932284584b72f347aec854a5"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG063_MonthlyRevenue",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0107.py",
+   "sha256": "7f7cd8284c61a115ffd05c11de75246bc2306964c97259a1c17f478e7c3c6e5e"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG063_MonthlyRevenue",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0107.py",
+   "sha256": "4dd3ba63c18cf4d4ea93af3a3ca585b71db23c27327b8562dfe08ff444d59ef5"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG064_HistoryBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+   "sha256": "3fe56b89cd65c6596c1069e2575a957a42a8f6efb1aa84a1572f7ded7d3e433b"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG064_HistoryBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+   "sha256": "ee55f25a61a520da99b183a391513efa0904815bfd098c464c76ce29b48c5f9b"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG064_HistoryBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+   "sha256": "7c8166dce1a3561fccb0267a773cb439484dcdb0c020e0a416bf1a3589baefcf"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG064_HistoryBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+   "sha256": "e950e4858fe0cc62b806e7994938513db4e5166ce15ddd15488a8051ab470820"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0104.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG064_HistoryBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+   "sha256": "7dc41a078b41b7413f3d7a8274f4622047a7e2adbc590f989d5bc028152b5278"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0105.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG064_HistoryBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+   "sha256": "175ede92da90661c6cfb148d6b0016a2133bf864f6a16803d249e95dd071b4ca"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0106.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG064_HistoryBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+   "sha256": "2ac0e89e07feb2ec91efc14b261c3d625afa0db64ba64d5f5b240d64e36d54d2"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0107.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG064_HistoryBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+   "sha256": "e7ca360dbe3d0be909f3b305d7c7249e1a00ddd20f663916c7365e6ed9427ef9"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0108.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG064_HistoryBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+   "sha256": "d57b1d6d3fb1d1281b39637d9803296cbbd8988227f8b8a1878db3f08fb81d07"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0110.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG064_HistoryBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+   "sha256": "45c6eda7002ce22908957d14fdff0f42b03d53e2da64b742a8630ca96c78022d"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG068_ETFConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v0106.py",
+   "sha256": "b3bb82f00c74e1807b0edb741f8124578d5e5eefcb3bbb633db139769209c3ab"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG068_ETFConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v0106.py",
+   "sha256": "8ef6252af75767a8067e537ccd63016f931d6ba27a49cbf10491b47c49a626ae"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG068_ETFConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v0106.py",
+   "sha256": "05556b741c13609d0548a360e40f2fc5595d0cc180a44e999a52c0af40d52857"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG068_ETFConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v0106.py",
+   "sha256": "6f7568718dfd287b300e1b3c23602f2ac16fdc4c97af5c3cace17d6af6f1d861"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v0105.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG068_ETFConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v0106.py",
+   "sha256": "943ea3636742b38bc0dff7b359d696b4225c9cb4ae1e727a1ad9dcda570efa0d"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG069_RevenueConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0110.py",
+   "sha256": "702a59d9b7d74b7b75447e7224bc40278dfc2a95730efd6da80552c1453490fb"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG069_RevenueConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0110.py",
+   "sha256": "77f4d52a235f76aadafc9828271e77ced18e0af9febf3af3c8c6547126aa3595"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG069_RevenueConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0110.py",
+   "sha256": "ce4919d327eed399553aaf4bb7a57324dc760d2af4392a03ca88a831cd57a700"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG069_RevenueConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0110.py",
+   "sha256": "2a80761bd7e3a6cc1f24ec847dc416385c2edaccc40cd9163f3b296cd13ed469"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0104.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG069_RevenueConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0110.py",
+   "sha256": "cd75327da5aa8053a416eab066585b306505e958971ae99c9bbff175d218737a"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0105.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG069_RevenueConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0110.py",
+   "sha256": "8dc8b67ababf567c133f4d2f71881a3ec3432ac3bb943038411f4b83bd1a1188"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0106.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG069_RevenueConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0110.py",
+   "sha256": "ecc15dd2132ba33c865b76c705bb4663f05ac79911fe4a754c43d5524da06bbd"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0107.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG069_RevenueConsensusAnalysis",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0110.py",
+   "sha256": "4cb01a1d15c58d3f79fbfc75a170d69311ebc424bb0a8519f3ed014b78bfefae"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG070_GroupClassificationIndex",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0113.py",
+   "sha256": "668526276fe532b79318b875ac633c9060bca851423b2670e49e810e9a2940b9"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG070_GroupClassificationIndex",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0113.py",
+   "sha256": "0c0bc44451fcdb3c4f3b1e2fa976983c2a7dbd2f2e79953691f1d025345fb34a"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG070_GroupClassificationIndex",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0113.py",
+   "sha256": "349d2e1816085696d837b7748a6ca96af097982a0e13c8b8cce7405ccadb502f"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG070_GroupClassificationIndex",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0113.py",
+   "sha256": "7e345d71bab7a3a3758ab50c8260d735cca6bc748e0bfde529c0fcb986faf8ca"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0104.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG070_GroupClassificationIndex",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0113.py",
+   "sha256": "efb5a1dd53740e5e7dd2def2abd56565be4b06273a40c9dc8f7de9faae6c3de3"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0105.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG070_GroupClassificationIndex",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0113.py",
+   "sha256": "8d8387ffc999e2979afcaa24c62f44b5ca29120b513f7de0d63f12f6815f5a5e"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0106.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG070_GroupClassificationIndex",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0113.py",
+   "sha256": "ad11223f51e08c89f92c4050c08f1777b1479ff19fc680bdd7f5b1cb50c7606a"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0107.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG070_GroupClassificationIndex",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0113.py",
+   "sha256": "bd700348452417d3484e96a5310ff3bf2d2167c2eff5b1c7f061710462b794e5"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0108.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG070_GroupClassificationIndex",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0113.py",
+   "sha256": "de276a09c989e9d0d3aa31d326ad5407bfb9b7eb6884378ff748b797839cdb44"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0109.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG070_GroupClassificationIndex",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0113.py",
+   "sha256": "00421b5646a95a17993608f1ada71c089ee1598435a565585787bf6da216f15d"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0110.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG070_GroupClassificationIndex",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0113.py",
+   "sha256": "7f40c7204d53df5a6485b55df1d5cf91b85f196e4452a0ecd1336a7fc0669197"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG075_MonthlyRevenueBackfill",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0107.py",
+   "sha256": "aeb17cf2fcdd30fe476311d5c8df177756df17ce9a92a85250643d18b0754494"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG076_ETFRevenueMomentum_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG076_ETFRevenueMomentum",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG076_ETFRevenueMomentum_v0102.py",
+   "sha256": "6d311462064cad3a0f95846bad8bb11814344ff5e34988feb0be6734adbd42bf"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG079_LocalDbConsolidate",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0105.py",
+   "sha256": "1521d499c7e420dd8d2109cc70c18063256e1022ef5facb6917d92c5cac8d1a5"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG081_UniverseAlign",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0103.py",
+   "sha256": "1127b06e3b5b2edb9077e9a0eca30889aa38ab99dd6a2b205fbfe3a5014a1cae"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG085_VatetfBridge",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0106.py",
+   "sha256": "5e429dd8f58f138a218e3e3119f63083c8316e1a7e230df24c9b02a011fc86d5"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG085_VatetfBridge",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0106.py",
+   "sha256": "8d70e71e6341c1436519708116d469acf8686d447b4834aecd4b400a81c6ee0e"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG085_VatetfBridge",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0106.py",
+   "sha256": "89586dfb387e859b8282431149c799e8b8547cdda9d3244ef6b7e0ce6aabe293"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG085_VatetfBridge",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0106.py",
+   "sha256": "9bb793cf964725c9475f4a2fa9fb397d5d986a80cbae20e6ef84da0524f89f15"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG088_ConsensusFusionBridge",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0105.py",
+   "sha256": "734c599755f379994e638ea5bac3fbe191aaa1e184993b2e17e7656ff74d8df5"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG088_ConsensusFusionBridge",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0105.py",
+   "sha256": "009207a81d3e6f90dd6e63ee82ee70588c9b1872aa4a83dd62daf5c2b4423b52"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG088_ConsensusFusionBridge",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0105.py",
+   "sha256": "0e73a37bc7d4abfbdb13442b8258fb5180a8b125bb96ec9483263d8fdcb7fb2e"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG089_IncrementalFetchGate",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0110.py",
+   "sha256": "7693732466ce8c47c7ac6f68743546d7dd8702d6af9a7ef516481cf1c681e873"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG089_IncrementalFetchGate",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0110.py",
+   "sha256": "2d44a36922a99031c42524a68d4eec82f882e39bb86ba08683f8c8d36053daf3"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG089_IncrementalFetchGate",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0110.py",
+   "sha256": "f4b98d8d11e9ad073310dd8708ca835e30411126f96171d688658a20f341f441"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0104.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG089_IncrementalFetchGate",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0110.py",
+   "sha256": "d302029e30a675e2cdab1eca45842bfb4225eaabf55369be1baefb2f6f32d418"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0105.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG089_IncrementalFetchGate",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0110.py",
+   "sha256": "7bc4484bdf31c3418a432d4c5f67fadc04feb3bb80ead22f0ce4030d38a4c51d"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG090_DataCoverageGate",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v0106.py",
+   "sha256": "3514a93eb78fb8633663ef24322b81a7e839a90b9caed421106474d236aab644"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG090_DataCoverageGate",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v0106.py",
+   "sha256": "590dfb45e9234e22b29e2c2271915f3534943b4ee16e9c6c44f7311fe0171f6f"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG090_DataCoverageGate",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v0106.py",
+   "sha256": "8cb6a208da8e521b498398d63b00058cfce96c84b47d3c74cd798c0a1ccfb9a1"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v0104.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG090_DataCoverageGate",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v0106.py",
+   "sha256": "9ec62d56ba5ab7b2eb46a4404471e8811215441c95b94d289758172568a34fbe"
+  },
+  {
+   "path": "functional modules/VDF/VDF_ENG093_LaunchConsole_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG093_LaunchConsole",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_ENG093_LaunchConsole_v0105.py",
+   "sha256": "cfc5ee43c4a4fdd4d8d10fb12f6b4c18bb98cf2e3825a8dafc67811102543990"
+  },
+  {
+   "path": "functional modules/VDF/VDF_ENG093_LaunchConsole_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG093_LaunchConsole",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_ENG093_LaunchConsole_v0105.py",
+   "sha256": "ccfa5a67f716f9b3bf117a57bf3ea573cead3f751cf1cfd815512fbba71c2d36"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG117_ForwardVintageDoor_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG117_ForwardVintageDoor",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG117_ForwardVintageDoor_v0101.py",
+   "sha256": "0ef04260c6ed5b2bdfb7fa982defb31590c6908078824c1bb06ad20027e28c3f"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG119_StartTestRegister_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG119_StartTestRegister",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG119_StartTestRegister_v0102.py",
+   "sha256": "2a2fbd74eddd0df2456506c95139ba73dedc1bae695359d658c82eec0e02ea0b"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG231_GlobalListings_v0100.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG231_GlobalListings",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG231_GlobalListings_v0102.py",
+   "sha256": "8ed1a0a37bd550de0ee3275774cb659bc252513034c274f0fd4f2d71ed3bb66f"
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG231_GlobalListings_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_ENG231_GlobalListings",
+   "system": "VDF",
+   "keep": "functional modules/VDF/engine/VDF_ENG231_GlobalListings_v0102.py",
+   "sha256": "ded82c3fa8801457e2e899f21113c98033e552bb45808c5ec575a2f332c7d53f"
+  },
+  {
+   "path": "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_MDL011_AkshareFetcher",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0104.py",
+   "sha256": "3c62dad5118f0bcfe4bcd552138131aa76f1fbdc3c032c42acab5f9c550687f2"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0101.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "161e1d0608c822e7592eaca8477d6e77e13bf0dd2867cd0205bbd333f072eb03"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0102.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "bc4a15d4a31ecb508d53d460e712b8d09e2c9463c29316c3248abc95ec2190fa"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0103.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "5f4a2fd9245965b493da22400ac6165c8e8ad95dc15d3c6ec050327914413553"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0106.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "e01048df32bba6ae7604c1825a9dbc69f4b0c35b3a9b9822433dc76aa92ced25"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0108.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "23af0f2c8b6c40eaaced7e814d52b7fa690b2ed8a8de1139b815fe3dbb793f11"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0109.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "cc846c3fa6638526a164adab5c3619a058636a0ba98287cca15db3edc10dd317"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0110.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "5b4e918d7a10eab012f6f08791f8e864f2d9b4b7eb77be5a665ba4dce47a7e42"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0111.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "2a2530a99c454f8c9a59e5b5c00ea3dcbb23ae1dc31b16a64c944cd7dc51db83"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0112.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "880dfa2496db3f02682269ea7d662468dd9f0352aa4a60092b63e701fb12a5f4"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0115.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "440789b054afaa7b41374081b9fae16843c0d7cec85fea2a60fb3da232d1480d"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0116.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "f158abfdacedc7a56ae9aadcb59fadb1291a02a778103fe40418fc81f5b77731"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0117.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "eca4104cec126b1be186bfc094d49dd04f5cf5b5b86af00f5f5437a9b3e98820"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0119.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "2f8fa50fb5640fefe3b14a1354ef2084765113b5c51d4e2883a5d7a2b9941e9d"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0120.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "d9995baed725f0f42b53908b8ecd400321de7916d7fea1c14227f6f2f35a4b19"
+  },
+  {
+   "path": "functional modules/VDF/VDF_SystemManager_v0166.py",
+   "kind": "舊版(尾版自測實跑時沒讀到 · 只在歷史紀錄冊出現 · 零活引用)",
+   "family": "VDF_SystemManager",
+   "system": "VDF",
+   "keep": "functional modules/VDF/VDF_SystemManager_v0172.py",
+   "sha256": "f9f6f9f34b2ea3aa1942581ca898ec418404989d240765908df01dc69336e301"
+  }
+ ],
+ "reverted": {
+  "at": "2026-11-13",
+  "why": "刪後發現 VDF_SystemManager v0118 在 status / main 才延遲載入 v0117(自測 / audit hook 走不到)→ 管理器 status 炸;探測法對延遲載入不可靠 → 整批 108 支還原,零淨刪。改走操作員令:不適合的引擎重寫成新的單檔(不再依賴舊版鏈),新單檔實測通過後才刪舊版。",
+  "desktop": "本批 rows 已清空:Invoke-VIA-ConsolidateDelete 跑本批不會刪任何檔"
+ }
+}

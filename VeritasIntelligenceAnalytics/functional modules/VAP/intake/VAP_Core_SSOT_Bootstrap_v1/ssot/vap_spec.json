@@ -1,0 +1,334 @@
+{
+  "$schema": "VIA-VAP-SPEC/1.0",
+  "meta": {
+    "code": "VIA-SSOT-VAPSPEC",
+    "seal": "觀 · VIA-SEAL-GUAN",
+    "name": "VeritasAutoPlot 繪圖規範 SSOT",
+    "version": "1.0.0",
+    "updated": "2026-08-02",
+    "authority": "本檔為唯一真相。頁面不得寫死數值,一律讀取此檔。",
+    "policy": "只增不減 · 修改需升版並保留 changelog"
+  },
+  "line": {
+    "width": 1,
+    "widthRange": [
+      0.5,
+      6
+    ],
+    "widthStep": 0.5,
+    "opacity": 0.9,
+    "dashForSecondary": "5 3",
+    "note": "折線一律線粗 1;虛線僅用於期貨/對比序列"
+  },
+  "fill": {
+    "areaUnderLine": 0.75,
+    "areaUnderLineWithShadow": 0.5,
+    "barFace": 0.6,
+    "barFaceDense": 0.8,
+    "eventBand": 0.3,
+    "note": "折線下方區域 0.75;若下方另有陰影則降為 0.5;事件區間陰影 0.3"
+  },
+  "bar": {
+    "gapFactor": {
+      "seamless": 1,
+      "tight": 0.86,
+      "normal": 0.8,
+      "grouped": 0.44
+    },
+    "edge": {
+      "width": 0.8,
+      "style": "solid",
+      "opacity": 1
+    },
+    "edgeRule": "有框者:edgecolor=color, lw=0.8, 不透明;框內 facecolor=rgba(color, 0.8)",
+    "stackedGapMin": true
+  },
+  "axis": {
+    "tickStepMultiples": [
+      2,
+      2.5,
+      5,
+      10
+    ],
+    "sameTickCountBothSides": true,
+    "decimalUnify": true,
+    "decimalExamples": {
+      "0.2": "0.20",
+      "0.25": "0.25"
+    },
+    "thousandsSeparator": true,
+    "headroomTicks": 1,
+    "rangeWrapsData": true,
+    "dualAxisAligned": true,
+    "note": "左右軸間隔數相同 → 格線對齊;間距值為 2/2.5/5/10 倍數;上方留一格給圖示"
+  },
+  "timeAxis": {
+    "mode": "tradingDaySequence",
+    "dropEmptyDates": true,
+    "normalizeBase": "startDate",
+    "stackAlignment": "absolute",
+    "mixedFrequencyRule": "日×月混用時自動對齊;價格類空值取前一交易日;成交量不得補值",
+    "dataStart": "1920-01-01",
+    "displayStart": "2007-01-01",
+    "zoomable": true
+  },
+  "referenceLines": {
+    "benchmarkHorizontal": {
+      "width": 0.8,
+      "style": "solid",
+      "opacity": 0.8,
+      "color": "grey"
+    },
+    "eventVertical": {
+      "width": 0.8,
+      "style": "dash",
+      "opacity": 0.8,
+      "colorOrder": [
+        "red",
+        "grey"
+      ]
+    },
+    "zeroAxis": {
+      "width": 1,
+      "style": "solid",
+      "color": "#c96b5a"
+    },
+    "noHorizontalOnEventMatrix": true
+  },
+  "palette": {
+    "default": "via",
+    "locked": true,
+    "combos": {
+      "via": [
+        "#c96b5a",
+        "#c4943a",
+        "#5a9e6f",
+        "#439a9a",
+        "#4c78a8",
+        "#7a6daa"
+      ],
+      "deep": [
+        "#4c78a8",
+        "#e45756",
+        "#f58518",
+        "#72b7b2",
+        "#54a24b",
+        "#b279a2"
+      ],
+      "set2": [
+        "#66c2a5",
+        "#fc8d62",
+        "#8da0cb",
+        "#e78ac3",
+        "#a6d854",
+        "#ffd92f"
+      ],
+      "tab10": [
+        "#1f77b4",
+        "#ff7f0e",
+        "#2ca02c",
+        "#d62728",
+        "#9467bd",
+        "#8c564b"
+      ],
+      "paired": [
+        "#a6cee3",
+        "#1f78b4",
+        "#b2df8a",
+        "#33a02c",
+        "#fb9a99",
+        "#e31a1c"
+      ],
+      "muted": [
+        "#4878d0",
+        "#ee854a",
+        "#6acc64",
+        "#d65f5f",
+        "#956cb4",
+        "#8c613c"
+      ],
+      "pastel": [
+        "#a1c9f4",
+        "#ffb482",
+        "#8de5a1",
+        "#ff9f9b",
+        "#d0bbff",
+        "#debb9b"
+      ],
+      "cb": [
+        "#0173b2",
+        "#de8f05",
+        "#029e73",
+        "#d55e00",
+        "#cc78bc",
+        "#ca9161"
+      ]
+    },
+    "semantic": {
+      "up": "#c96b5a",
+      "down": "#5a9e6f",
+      "neutral": "#9c9890",
+      "benchmark": "#9c9890",
+      "note": "漲紅跌綠(亞洲慣例)"
+    },
+    "correlation": {
+      "mask": "lowerTriangle",
+      "zmid": 0,
+      "scale": [
+        [
+          0,
+          "#3f7f93"
+        ],
+        [
+          0.071,
+          "#5890a1"
+        ],
+        [
+          0.143,
+          "#72a1b0"
+        ],
+        [
+          0.214,
+          "#8cb3bf"
+        ],
+        [
+          0.286,
+          "#a7c5cf"
+        ],
+        [
+          0.357,
+          "#c0d6dd"
+        ],
+        [
+          0.429,
+          "#dae8ec"
+        ],
+        [
+          0.5,
+          "#f2f2f2"
+        ],
+        [
+          0.571,
+          "#f7d7d9"
+        ],
+        [
+          0.643,
+          "#f2bcc0"
+        ],
+        [
+          0.714,
+          "#eda3a9"
+        ],
+        [
+          0.786,
+          "#e8888f"
+        ],
+        [
+          0.857,
+          "#e36e76"
+        ],
+        [
+          0.929,
+          "#de535e"
+        ],
+        [
+          1,
+          "#d93a46"
+        ]
+      ],
+      "gap": 1,
+      "heatmapContrast": "波動區間內加大紅黃綠色差"
+    }
+  },
+  "typography": {
+    "families": {
+      "display": "Syne",
+      "text": "DM Sans",
+      "mono": "DM Mono",
+      "cjk": "Noto Sans TC"
+    },
+    "scale": {
+      "eyebrow": 9,
+      "en": 9,
+      "badge": 9.5,
+      "hint": 11,
+      "tab": 13,
+      "brand": 16,
+      "chartTitle": 12,
+      "axisTitle": 10,
+      "tick": 9.5,
+      "legend": 10
+    },
+    "slideMin": 24,
+    "printMinPt": 12
+  },
+  "layout": {
+    "margin": {
+      "top": 30,
+      "right": 20,
+      "bottom": 34,
+      "left": 56
+    },
+    "stackStandardHeight": 280,
+    "chartsPerRow": 2,
+    "fullBleed": true,
+    "cardRadius": 9,
+    "borderColor": "#dbd9d3",
+    "gridColor": "#ecebe6",
+    "paper": "#f5f4f0",
+    "plot": "#ffffff",
+    "noOverlap": "物件不可重疊(含數據備註)· 標籤固定間距 ≥ 9px 堆疊"
+  },
+  "price": {
+    "useAdjClose": true,
+    "adjustAllPrices": true,
+    "splitAdjustVolume": true,
+    "missingPrice": "previousTradingDay",
+    "missingVolume": "doNotFill",
+    "sourcePriority": [
+      "adjClose",
+      "close"
+    ],
+    "fallbackWhenNoAdj": "close",
+    "rule": "有 Adj 價格者一律以 Adj 價格為主(股票 · 股票指數 · ETF · 含息還原);無 Adj 欄位者(期貨 · 現貨 · 匯率 · 利率 · 商品 · 總經指標)以一般價格為主",
+    "labelSuffix": {
+      "adj": " (adj)",
+      "raw": ""
+    },
+    "mixedSeriesRule": "同一圖內若部分序列有 Adj 部分無,各自取其優先來源,並於圖註標明哪些序列為 adj"
+  },
+  "interaction": {
+    "zoom": true,
+    "brushMeasure": [
+      "high",
+      "low",
+      "maxDD",
+      "duration",
+      "recoveryTime"
+    ],
+    "hover": "x unified",
+    "collapsible": true
+  },
+  "export": {
+    "png": {
+      "background": "white",
+      "scale": 4
+    },
+    "html": {
+      "interactive": true
+    },
+    "pdf": {
+      "engine": "print-based"
+    },
+    "pptx": {
+      "mode": "editable"
+    }
+  },
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-08-02",
+      "note": "自 Builder DEFAULTS / Spec v4 / 對話規範抽出建檔"
+    }
+  ]
+}
