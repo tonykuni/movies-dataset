@@ -10,7 +10,13 @@
 | `VCGC_Test_Closeout_v0100.zip` ×2(同 sha `f6901309…`) | 倉內 **沒有**(16 檔 sha 全不在 main 與任一遠端分支,僅 native/VCGC v0194 與 `optimistic-goodall-yhalc5` 分支同 sha)| 原樣收容 `supportive modules/references/intake/VIA_Uploads_20261113/VCGC_Test_Closeout_v0100/`;自帶 SHA256SUMS 16/16 對上;拋棄式副本自測 17 項:16 ok · 1 skipped(選配 `mcp==1.29.0` 不在,AI 不代裝)|
 | `wl0104.zip` | 與 `practical-pasteur-p67i78` 分支 `Invoke-VIA-WorkbenchLocal-v0104.ps1` **內容相同只差換行**;main 沒有 WorkbenchLocal | 原樣收容(CRLF 保留,intake 為 -text)|
 
+| `VIA_AgentOS_VCGC_AllInOne_v0300.zip`(第二輪)| 倉內與全部遠端分支 **沒有**(倉內只有 SIE v1.0 收容包,84 KB,sha 不同)| 原樣收容 `VIA_Uploads_20261113/VIA_AgentOS_VCGC_AllInOne_v0300/`;自帶 QA 記的 sha256 與檔案相符;拋棄式自測 `--self-test` 32 項 30 ok · 2 error(容器無 fastapi)· `--agent-self-test` 12/12 |
+| `VCGC_Test_Closeout_v0100_1.zip`(第二輪)| 與第一輪同 sha `f6901309…` → **已收容** | 不重收 |
+
 **為什麼只收容、不啟用**:Test Closeout 與 VCGC 既有的 `closeout` 動詞、`CGC_MDL224` 自動測試、SDD 重疊(L116 一功能一主),它依賴的 VCGC v0194 不在 main;要接成現役引擎,需操作員先定:以它取代哪一段、或只當 F21–F30 的規格來源。
+
+**AgentOS v0300 靜態檢查**:網路只有兩處(探測預設關、白名單 HTTPS、只送 HEAD、擋跨站轉址;另一處只連 loopback 測試夾具)· 外部程式只有本機 Lighthouse(限 127.0.0.1)· zlib/base85 解出的是內嵌 HTML/README 資料、不執行 · `pip install` 只是提示字。token 工具報 2 處同名覆蓋(`main` · `create_app`),只報不改。
+**為什麼不啟用**:要 fastapi / uvicorn(L19 操作員裝);頁 11「VCGC Registry & Conflicts」、頁 12「Panoramic AST」與 VCGC 既有 `ssot panorama`、token 工具重疊;`optimistic-goodall-yhalc5` 分支的 CGC_MDL280 整合的是 `supportive modules/agent_os` 那一套,不是這支單檔控制台。
 
 ## 二、PC 上的檔(只有檔名 → 只比得到名字)
 

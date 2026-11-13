@@ -1,0 +1,103 @@
+{
+  "product": "VIA Agent OS + VCGC + System Integration Engine",
+  "version": "3.0.0",
+  "created_at_utc": "2026-11-06T20:25:21.083739+00:00",
+  "sha256": "97ca853d253ea58194a2938762899624852f8651c9853fa3224d93d46855f304",
+  "file_bytes": 2752636,
+  "single_python_with_embedded_html": true,
+  "python_existing_tests": {
+    "passed": 32,
+    "total": 32,
+    "status": "PASS"
+  },
+  "python_new_agent_tests": {
+    "passed": 12,
+    "total": 12,
+    "status": "PASS"
+  },
+  "python_total": {
+    "passed": 44,
+    "total": 44,
+    "status": "PASS"
+  },
+  "node_inline_javascript": {
+    "status": "SYNTAX_PASS",
+    "test": "node --check extracted inline JavaScript"
+  },
+  "fastapi_authenticated_routes": {
+    "status": "PASS",
+    "observed": {
+      "api_results": {
+        "/api/agent/catalog": [
+          200,
+          null,
+          6441
+        ],
+        "/api/agent/vcgc": [
+          200,
+          "PENDING_VCGC_APPROVAL",
+          708
+        ],
+        "/api/agent/panorama": [
+          200,
+          "SCAN_COMPLETE",
+          621
+        ]
+      },
+      "skills": 8,
+      "vcgc_gate": "PENDING",
+      "memory_append": "PASS",
+      "report": "PASS",
+      "html_bytes": 76026
+    }
+  },
+  "smoke": {
+    "local_workflow_verdict": "APPROVED",
+    "audit_chain": "PASS",
+    "scope": "local mock DAG only"
+  },
+  "chromium_offline_visual": {
+    "passed": 12,
+    "total": 12,
+    "navigation": "set_content; offline only",
+    "browser_http_e2e": "NOT_EXECUTED",
+    "cause": "browser-managed navigation policy blocked file/http access"
+  },
+  "strict_governance": {
+    "tests": 63,
+    "passed": 60,
+    "failed": [
+      {
+        "stage": 3,
+        "case": "Parquet export + full roundtrip",
+        "reason": "ValueError: 缺少 pyarrow；請執行 python -m pip install pyarrow"
+      },
+      {
+        "stage": 3,
+        "case": "Checkpoint resume + corruption detection",
+        "reason": "ValueError: 缺少 pyarrow"
+      },
+      {
+        "stage": 4,
+        "case": "Artifact manifest / SHA256",
+        "reason": "ValueError: 無已驗證輸出"
+      }
+    ],
+    "status": "FAIL",
+    "pyarrow": "MISSING",
+    "go_live": false
+  },
+  "external_connectors": {
+    "VCGC": "NOT_CONNECTED_REAL",
+    "Graphify": "NOT_CONNECTED",
+    "agentmemory": "NOT_CONNECTED",
+    "Ponytail": "NOT_CONNECTED",
+    "OmniRoute": "NOT_CONNECTED",
+    "AI_MODELS": "NOT_CONNECTED"
+  },
+  "production_go_live": {
+    "status": "BLOCKED",
+    "reason": "No verified real VCGC approval, Windows integration, backend browser E2E or required Parquet gate"
+  },
+  "source_modification": "NONE; generated separate artifacts only"
+}
