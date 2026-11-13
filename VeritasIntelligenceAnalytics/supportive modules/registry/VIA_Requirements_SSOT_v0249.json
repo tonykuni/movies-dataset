@@ -140,7 +140,7 @@
  "tally": {
   "RECORDED": 24,
   "COVERED": 143,
-  "PARTIAL": 112,
+  "PARTIAL": 114,
   "MISSING": 1
  },
  "requirements": [
@@ -7228,7 +7228,7 @@
     "../docs/handoff/ai/VIA_VisualLock_v0100.py",
     "CGC_MDL253_ToolingInventory_v0103.py"
    ],
-   "evidence": "自測 16/16(含真樹出頁 + 視覺鎖定閘 GREEN + 唯讀);盤點冊站 C-tool-matrix-build(quick)每輪 test --quick 重出 VIA_Reports/vcgc/VCGC_ToolMatrix_latest.html;頁內每 5 分鐘自動重整;watch 動詞給本機背景",
+   "evidence": "自測 19/19(含真樹出頁 + 視覺鎖定閘 GREEN + 唯讀);盤點冊站 C-tool-matrix-build(quick)每輪 test --quick 重出 VIA_Reports/vcgc/VCGC_ToolMatrix_latest.html;頁內每 5 分鐘自動重整;watch 動詞給本機背景",
    "next": "操作員桌機跑 via-vcgc test --quick 或 run VIA_VCGC_MDL258_ToolMatrix build 後開頁",
    "hand": "AI",
    "version": "v0100",
@@ -7303,6 +7303,39 @@
    "hand": "operator",
    "version": "v0100",
    "updated_at": "2026-11-13T16:56:20Z"
+  },
+  {
+   "code": "VCGC-REQ232",
+   "subsystem": "VCGC",
+   "topic": "全部薄尾家族合併成單檔 · 驗證後刪舊版(VCGC 自己的家族;他系統自行)",
+   "requirement": "操作員 2026-11-13:「繼續 全部薄尾家族合併成單檔 驗證後刪舊版」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "VIA_VCGC_PruneLedger_v0100.jsonl",
+    "VIA_Policy_Laws_SSOT_v0118.json"
+   ],
+   "evidence": "政策 L130;就緒度(VCGC 307 家族):單檔 138 · 可刪舊版 3 · 薄尾待合成 133 · 舊版被點名 33;可刪的 3 族驗證後刪(刪除帳)",
+   "next": "133 族薄尾鏈逐族合成單檔 + CGC_MDL281 零遺失證明 + 自測等價後才刪;33 族先改掉點名舊版的地方",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T17:49:06Z"
+  },
+  {
+   "code": "VCGC-REQ233",
+   "subsystem": "VCGC",
+   "topic": "支援工具(NLP · Layout …)一個發行版 · 他系統各存一份位元組相同副本 · 協調 + 測試後才換版",
+   "requirement": "操作員 2026-11-13:「若請VCGC的工具來支援如NLP LAYOUT工具則 兩者必須相同且整合為一版本相同內容相同個存一個 … VDF VRN VQG VAP若有使用支援工具都在第存一個 避免VCGC升級失敗其他系統全數癱瘓」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "VIA_Policy_Laws_SSOT_v0118.json"
+   ],
+   "evidence": "政策 L130 ④;矩陣「VIA 支援工具」列出他系統直接載入的支援工具(VRN-2 · VDF 載入加速器 / 網路橋 · VRN-2 載入 SUP_MDL749)",
+   "next": "VCGC 出支援工具發行冊(版號 + sha256);各系統各自存副本並改用自己那份(VCGC 不代改他系統檔);換版走協調 + 測試",
+   "hand": "operator",
+   "version": "v0100",
+   "updated_at": "2026-11-13T17:49:06Z"
   }
  ],
  "non_requirements": [

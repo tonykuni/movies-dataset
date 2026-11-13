@@ -3833,19 +3833,21 @@
   {
    "code": "VCGC-WKF044",
    "alias": "tool_matrix",
-   "name": "VCGC 工具矩陣:盤點 → 命名發號 → 獨立性 / TA-Lib 衝突檢 → 視覺鎖定 HTML 顯示收尾",
+   "name": "VCGC 工具矩陣:兩大功能(中央管理工具 · 支援工具)→ 命名發號 → 獨立性 / TA-Lib 衝突檢 → 單檔收斂(驗證後刪舊版)→ 視覺鎖定 HTML 顯示收尾",
    "kind": "procedure",
    "version": "v0100",
-   "updated_at": "2026-11-13T16:57:08Z",
+   "updated_at": "2026-11-13T17:50:56Z",
    "spec": {
     "goal": "VCGC 自己的工具(中央管理 MDL · 省 Token / 支援 SUP)與整合進來的收容批一頁看完;每一列帶 名碼 · 中央編號 · 版本 · 時間 · 實測 · 加速器 · AST · TA-Lib · 他系統載入;畫面走操作員視覺鎖定 U/I,閘紅不算完成",
     "requirements": [
      "VCGC-REQ227",
      "VCGC-REQ228",
-     "VCGC-REQ229"
+     "VCGC-REQ229",
+     "VCGC-REQ232",
+     "VCGC-REQ233"
     ],
     "acceptance": [
-     "VIA_VCGC_MDL258_ToolMatrix 自測 16/16",
+     "VIA_VCGC_MDL258_ToolMatrix 自測 19/19",
      "真樹出頁視覺鎖定閘 GREEN",
      "naming --apply 只增、第二次 0 列",
      "check 照實紅(他系統釘 VCGC 版 · 不代改)"
@@ -3911,6 +3913,17 @@
      "what": "讀 VIA_Reports/closeout/CLOSEOUT_latest.json · TEST_latest.json · HANDOFF_latest.json,收尾分頁逐步列燈;交接快照舊就照實顯示",
      "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
      "verb": "build",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF044-STP005",
+     "alias": "converge_prune",
+     "name": "單檔收斂:驗證後刪舊版(L130)",
+     "what": "只挑 READY(尾版單檔 · 舊版無人點名)且實測帳 GREEN 對到尾版 sha;刪前 / 刪後各跑尾版自測,不過即還原;刪除帳只增",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "prune --apply",
      "inside": "VCGC run",
      "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
      "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"

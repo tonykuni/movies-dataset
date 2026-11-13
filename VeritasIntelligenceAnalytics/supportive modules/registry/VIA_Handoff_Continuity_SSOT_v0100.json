@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-13T17:03:13Z",
+ "updated_at": "2026-11-13T17:50:56Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4809,7 +4809,7 @@
     "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
     "--selftest"
    ],
-   "success_marker": "[PASS] VIA_VCGC_MDL258_ToolMatrix v0100 --selftest · 16/16",
+   "success_marker": "[PASS] VIA_VCGC_MDL258_ToolMatrix v0100 --selftest · 19/19",
    "scope": "VCGC 工具矩陣 v0100:MDL / SUP / INT · 命名只增發名 · 獨立性 / TA-Lib 衝突檢 · 視覺鎖定 U/I 收尾頁 · 唯讀",
    "dependencies": [
     "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
@@ -10054,6 +10054,28 @@
    "next": "—",
    "receipt": "VIA_Component_Inventory_SSOT_v0100.json(registry-sync APPLIED)",
    "updated_at": "2026-11-13T17:43:02Z"
+  },
+  {
+   "id": "VCGC-REQ232:flatten-thin-chains",
+   "requirement": "VCGC-REQ232",
+   "case": "C-tool-matrix-v0100",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "VCGC 薄尾待合成 133 族(執行期載入前版)· 舊版被點名 33 族;合成單檔要逐族證零遺失(CGC_MDL281)+ 自測等價,不能一次機械合併",
+   "next": "由小到大逐族:合成 → compare PROVEN_ZERO_LOSS → 自測 → prune",
+   "receipt": null,
+   "updated_at": "2026-11-13T17:50:56Z"
+  },
+  {
+   "id": "VCGC-REQ233:support-release",
+   "requirement": "VCGC-REQ233",
+   "case": "C-tool-matrix-v0100",
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "支援工具還沒有發行冊;VRN-2 · VDF 尾版直接載入 VCGC 活檔(加速器 · 網路橋 · SUP_MDL749)—— VCGC 一升級即連動",
+   "next": "操作員核可發行冊格式 → VCGC 出發行冊(版號 + sha256)→ 各系統自存副本並改用自己那份(他系統自己改)",
+   "receipt": null,
+   "updated_at": "2026-11-13T17:50:56Z"
   }
  ]
 }
