@@ -1,0 +1,66 @@
+
+觀
+VERITAS INTELLIGENCE ANALYTICS · VAP · SSOT
+VAP 規範 SSOT · Spec & Library JSON
+🔒 SINGLE SOURCE OF TRUTH · 只增不減
+ssot/vap_spec.json · ssot/vap_chartlib.json
+VeritasAutoPlot 圖庫定義 SSOT
+VIA-SSOT-VAPLIB · v1.0.0 · 規範來源 ssot/vap_spec.json
+維護原則:只增不減 · 每型唯一(同主題去重)· 新增圖型須配 VAP-CH 代碼
+CODE	圖型	EN	軸	資料型態	必要欄位	用途 / 規則
+單軸 · Single-Axis — 5 型
+VAP-CH-01	折線圖	Line	1	series[]	date, value	水準/指數趨勢
+VAP-CH-02	面積折線	Area	1	series	date, value	單一序列強調量體
+override: {"fill.areaUnderLine":0.75}
+VAP-CH-03	直條圖	Bar	1	categorical	label, value	分項比較
+VAP-CH-04	橫條圖	H-Bar	1	categorical	label, value	長標籤分項(CPI 分項左負右正)
+VAP-CH-05	散點圖	Scatter	1	xy	x, y	兩變數關係
+堆疊 · Stacked — 3 型
+VAP-CH-06	堆疊面積	Stacked Area	1	series[]	date, value, group	組成消長
+VAP-CH-07	堆疊直條	Stacked Bar	1	categorical[]	label, value, group	財政收支結構(間隙最小化)
+override: {"bar.gapFactor":"tight"}
+VAP-CH-08	百分比堆疊	100% Stacked	1	categorical[]	label, value, group	占比結構
+個別 · Small Multiples — 2 型
+VAP-CH-09	個別小圖	Small Multiples	1	series[]	date, value, panel	多標的同軸比較
+override: {"grid":"2x2"}
+VAP-CH-10	並列直條	Grouped Bar	1	categorical[]	label, value, group	官方×民間數據對照
+雙軸 · Dual-Axis — 2 型
+VAP-CH-11	底色面積 × 對比折線	Area × Line	2	series×2	date, left, right	一邊底色一邊折線(信心指數 × 零售年增率)
+底色序列置右軸 α0.75;折線置左軸 lw1
+VAP-CH-12	條 + 線 雙軸	Bar × Line	2	mixed	date, bar, line	非農新增(條) × 失業率(線)
+進階 · Advanced — 4 型
+VAP-CH-13	事件矩陣	Event Matrix	1	series+events	date, value, events[]	危機事件對照
+垂直虛線 0.8/0.8 · 區間陰影 0.3 · 無水平線
+VAP-CH-14	相關熱力圖	Masked Corr	0	matrix	corr	資產相關性
+下三角遮罩 · zmid 0 · seaborn 15 級色階
+VAP-CH-15	區間量測	Brush Measure	1	series	date, value	拉選區間求高低/MaxDD/耗時
+VAP-CH-16	地圖 × 數據	Map	0	geo	region, value, change	全球/美國/歐洲/東亞/台灣
+漲跌以上下三角標示
+engine: leaflet
+滾動績效 · Rolling Performance — 8 型
+VAP-CH-17	滾動報酬	Rolling Returns	1	series	date, return	期間績效穩定度
+VAP-CH-18	滾動相關	Rolling Correlation	1	series×2	date, a, b	關係變化
+VAP-CH-19	移動夏普	Trailing Sharpe	1	series	date, sharpe	風險調整後報酬
+VAP-CH-20	Sharpe × Sortino 比較	Sharpe × Sortino	2	series×2	date, sharpe, sortino	下行風險與總波動對照
+左軸 Sharpe · 右軸 Sortino · 同等格數
+VAP-CH-21	風險雷達	Risk Radar	0	radial	metric, value, benchmark	多維風險輪廓(波動·MaxDD·Beta·集中度·流動性)
+基準線為外圈虛線 · 填色 α0.3
+VAP-CH-22	Alpha 策略	Alpha Strategy	2	series×3	date, strategy, benchmark, excess	策略 vs 基準 + 超額報酬
+累積績效置左軸 · 超額報酬置右軸直條(漇2跌綣) · 0 軸紅線
+VAP-CH-23	經濟日曆	Economic Calendar	0	events	date, event, importance, actual, forecast, previous	重要數據發布時程與預期落差
+重要度以紅黃綠三階 · 實際優於預期標紅
+VAP-CH-25	回測驗證	Backtest Validation	2	matrix+series	lag, rankIC, tStat, pValue	Rank-IC 衰減 × 顯著性
+左軸 Rank-IC 直條 · 右軸 t 統計量折線 · |t|=1.96 水平基準線 0.8
+技術分析 · Technical — 3 型
+VAP-CH-26	當日走勢 + 成交量	Intraday + Volume	2	ohlcv	time, price, volume	當日盤勢
+rows=2 · row_heights [.72,.28] · shared_xaxes
+VAP-CH-27	K線 × SMA/EMA/BB × Volume	Candlestick TA	2	ohlcv	date, open, high, low, close, volume	技術分析
+adj price · split 調整
+VAP-CH-28	現貨 × 期貨	Spot × Futures	1	series[]	date, spot, futures	BRENT / WTI / GOLD 基差
+現貨實線 · 期貨虛線 · 基差標籤堆疊 ≥9px
+基本面 · Consensus — 1 型
+VAP-CH-24	共識總覽	Consensus Overview	1	table	dilutedEPS, targetPrice, rating, analystCount, forwardPER, forwardPBR	yfinance / FactSet 共識
+綠黃紅 spectrum · 目標價取左右最長
+資料來源 Data Sources
+VDF 契約
+TWSE 台灣證交所 · TPEX 櫃買中心 · SITCA 投信投顧公會 · MOPS 公開資訊觀測站 · yfinance · FactSet (keyed) · FRED · EPFR · HKEX 港交所
