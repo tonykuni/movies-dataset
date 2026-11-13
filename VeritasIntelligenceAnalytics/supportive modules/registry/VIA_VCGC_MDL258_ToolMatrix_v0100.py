@@ -329,7 +329,8 @@ def scan_tree(via: Path = VIA, sup_stems=()) -> dict:
             if p.suffix == ".py":
                 res["live_stems"].add(re.sub(r"_v\d{3,4}$", "", p.stem))
             try:
-                if p.stat().st_size > MAX_BYTES:
+                big_ok = r.startswith("supportive modules/registry/") and p.stat().st_size <= 8 * MAX_BYTES   # VCGC 冊夾的大冊照讀(不留盲點)
+                if p.stat().st_size > MAX_BYTES and not big_ok:
                     res["skipped_big"] += 1
                     continue
                 text = p.read_text(encoding="utf-8", errors="replace")
@@ -878,7 +879,7 @@ MDL_GROUPS = [
 ]
 SUPER = {"MDL": "VIA 中央管理工具", "TOKEN": "VIA 支援工具 · Token-Saving", "OTHER": "VIA 支援工具 · 其他工具組"}
 FROZEN_SEATS = {"accelerator", "network"}               # 批345 不可動(VeritasCeleritas / VeritasAegisNexus 本體)
-DEP_SKIP_RX = re.compile(r"VIA_NumberBooks/|VIA_Component_Inventory|VIA_VCGC_FunctionLedger|VIA_Numbering_SSOT|VIA_VCGC_ToolNaming"
+DEP_SKIP_RX = re.compile(r"VIA_NumberBooks/|VIA_Component_Inventory|VIA_VCGC_FunctionLedger|VIA_Numbering_SSOT|VIA_VCGC_ToolNaming|VCGC_FunctionMatrix_v"
                          r"|VIA_RegistryNumbers|docs/handoff/evidence/|/history/|VIA_EngineVersion_Register|\.md$|\.txt$|\.html$|\.jsonl$")
 OLDREF_RX = re.compile(r"\b([A-Za-z][A-Za-z0-9_]*_v\d{4}\.py)\b")
 
