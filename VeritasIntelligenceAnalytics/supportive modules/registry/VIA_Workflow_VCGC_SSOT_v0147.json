@@ -2955,13 +2955,14 @@
      "code": "VCGC-WKF032-STP002",
      "alias": "mcp_expose",
      "name": "MCP v0102 露互監 / 備份 / 六項令收據(只讀)",
-     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
+     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0104.py",
      "verb": "--serve",
      "inside": "VCGC MCP",
      "evidence": "step:VCGC-WKF032-STP001",
      "evidence_file": "via://mutual/latest · via://backup/check",
      "what": "MCP v0102 露互監 / 備份 / 六項令收據(只讀)",
-     "engine_before_v0147": "supportive modules/registry/CGC_MDL279_MCPServer_v0102.py"
+     "engine_before_v0147": "supportive modules/registry/CGC_MDL279_MCPServer_v0102.py",
+     "engine_note_20261113b": "讀檔三動詞版改 v0104(L25 撞號升版)"
     },
     {
      "code": "VCGC-WKF032-STP003",
@@ -3752,11 +3753,12 @@
      "alias": "mcp_file_verbs",
      "name": "MCP 讀檔三動詞(read · slice · digest 委派鎖版 token 工具)",
      "what": "倉內路徑閘(先判倉內外、倉外不透露存在)· .git/ private/ .env* 金鑰檔拒讀 · 鎖冊 sha 不符即停 · rc 0/1/3 是答案",
-     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
+     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0104.py",
      "verb": "--selftest",
      "inside": "VCGC run",
      "evidence": "self:CGC_MDL279_MCPServer",
-     "evidence_file": "docs/handoff/evidence/C-mcp-server-v0103.json"
+     "evidence_file": "docs/handoff/evidence/C-mcp-server-v0103.json",
+     "engine_note_20261113b": "讀檔三動詞版改 v0104(L25 撞號升版)"
     }
    ],
    "tests": {
@@ -3827,6 +3829,93 @@
      "evidence_file": "docs/handoff/evidence/C-shadow-merge-v0100.json"
     }
    ]
+  },
+  {
+   "code": "VCGC-WKF044",
+   "alias": "tool_matrix",
+   "name": "VCGC 工具矩陣:盤點 → 命名發號 → 獨立性 / TA-Lib 衝突檢 → 視覺鎖定 HTML 顯示收尾",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:57:08Z",
+   "spec": {
+    "goal": "VCGC 自己的工具(中央管理 MDL · 省 Token / 支援 SUP)與整合進來的收容批一頁看完;每一列帶 名碼 · 中央編號 · 版本 · 時間 · 實測 · 加速器 · AST · TA-Lib · 他系統載入;畫面走操作員視覺鎖定 U/I,閘紅不算完成",
+    "requirements": [
+     "VCGC-REQ227",
+     "VCGC-REQ228",
+     "VCGC-REQ229"
+    ],
+    "acceptance": [
+     "VIA_VCGC_MDL258_ToolMatrix 自測 13/13",
+     "真樹出頁視覺鎖定閘 GREEN",
+     "naming --apply 只增、第二次 0 列",
+     "check 照實紅(他系統釘 VCGC 版 · 不代改)"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python3 \"$V\" run VIA_VCGC_MDL258_ToolMatrix build | naming [--apply] | check | watch",
+    "evidence": "docs/handoff/evidence/C-tool-matrix-v0100.json",
+    "books": [
+     "VIA_VCGC_ToolNaming_v0100.jsonl"
+    ]
+   },
+   "plan": {
+    "enter": "VCGC 冊(盤點冊 · 號冊 · 工具鎖冊 · 紀錄冊 · 命名帳)+ 活樹尾版 + closeout / test 收據",
+    "exit": "VIA_Reports/vcgc/VCGC_ToolMatrix_latest.html / .json",
+    "order": "test --quick(站 C-tool-matrix-build 自動重出)→ closeout → build 再出一次顯示收尾"
+   },
+   "tests": {
+    "self": "handoff test C-tool-matrix-v0100",
+    "cross": [
+     "X-REQ-BACK",
+     "視覺鎖定閘(VIA_VisualLock check_page)",
+     "build 前後命名帳 / 號冊 / 工具鎖冊位元組不變"
+    ],
+    "real": "真樹 298 家族 · 鎖定閘 GREEN"
+   },
+   "steps": [
+    {
+     "code": "VCGC-WKF044-STP001",
+     "alias": "matrix_build",
+     "name": "只讀盤點 + 出頁 + 鎖定閘",
+     "what": "registry CGC_MDL / VIA_VCGC_* + 工具鎖冊席位 · CGC_MDL253 掃 AST / 加速器 · 視覺鎖定 kit 內嵌 · 出頁當場 check_page",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "build",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF044-STP002",
+     "alias": "naming_issue",
+     "name": "命名對照只增發名",
+     "what": "VIA_VCGC_<MDL|SUP>### · 號跟家族走 · 沒中央編號 / 沒版本號留白 · 衝突一律不發",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "naming --apply",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF044-STP003",
+     "alias": "independence_check",
+     "name": "獨立性 / TA-Lib / 命名衝突檢",
+     "what": "他系統尾版釘 VCGC 版(紅,點名不代改)· VCGC 釘他系統版(黃)· TA-Lib 尾版程式使用 · 命名衝突",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "check",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF044-STP004",
+     "alias": "closeout_view",
+     "name": "用視覺鎖定 U/I 顯示 VCGC 收尾",
+     "what": "讀 VIA_Reports/closeout/CLOSEOUT_latest.json · TEST_latest.json · HANDOFF_latest.json,收尾分頁逐步列燈;交接快照舊就照實顯示",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "build",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    }
+   ]
   }
  ],
  "prior": "VIA_Workflow_VCGC_SSOT_v0146.json",
@@ -3872,5 +3961,6 @@
  "why_v0144": "WKF037-STP001 → ParquetLake v0101;WKF038 自測 19。Codex PR #624:P1 套件 v0100 已在 main 卻被就地改 → 還原 v0100 一字不動 · 新行為出 VIA_ParquetLake_v0101(混型來源逐欄推型 · 微秒戳 · 自測 11);消費者 LakeMatrix v0101 / LakeConsole 改取尾版 glob。P2 ① _inbox 同名檔(a/data.csv · b/data.csv)互相覆蓋 → 路徑消毒 + 內容 sha8 命名 · xb 絕不覆蓋;P2 ② 見證燈只看 rc(引擎自報 YELLOW 仍 GREEN)→ 收據 lamp > stdout 標籤 > rc。",
  "why_v0145": "+WKF039 five_system_activate(五系統啟動 via HTML U/I;REQ216)。操作員 2026-11-10「activate 5 system via html u/i and run」→ VIA_LakeConsole v0101 薄尾:白名單 +6 動作(five_systems · activate_vcgc/vdf/vrn2/vqg/vap)+ 鏈 activate_all · 燈號 +6 盞 · 按鈕列 · 矩陣收據複製 · 逾時依系統。",
  "why_v0146": "只增:+VCGC-WKF042(SystemCard 全景卡 · 自建平台管理者版 · MCP parity);操作員 2026-11-10 四令合一。",
- "why_v0147": "只增:+VCGC-WKF043 shadow_merge(REQ223);WKF042 +REQ224 · +STP004 mcp_file_verbs(步碼只增)。v0146 一字不動。 WKF042 補 tests 欄與 STP001 verb/inside(SDD X-COL)。 WKF029 acceptance[6] 改寫字面(語意不變:發號走 CGC_MDL237 · audit 三零):原句「只經 VCGC run …」講的是發號工具不是入口,卻被 X-PEER-TEXT 當唯一入口舊字判黃,連帶 SDD v0106 自測 ④ FAIL;原句全文留 spec.acceptance_before_v0147(版史欄,L120 ①)。 WKF042 STP001–003 補 verb / inside / evidence:STP002 的頁與 Hub 由 scan() 內 render_locked() 產出(查碼確認,非推測);STP003 = VIA_MCP_Engine parity(VCGC mcp)。 WKF032-STP002(mcp_expose)引擎 v0102 → v0103:本批出了 MCP 薄尾 v0103(v0102 一字不動,收據資源全數沿用),步釘舊版會被 X-REG 判「註冊冊不是尾版」;舊值留 engine_before_v0147。"
+ "why_v0147": "只增:+VCGC-WKF043 shadow_merge(REQ223);WKF042 +REQ224 · +STP004 mcp_file_verbs(步碼只增)。v0146 一字不動。 WKF042 補 tests 欄與 STP001 verb/inside(SDD X-COL)。 WKF029 acceptance[6] 改寫字面(語意不變:發號走 CGC_MDL237 · audit 三零):原句「只經 VCGC run …」講的是發號工具不是入口,卻被 X-PEER-TEXT 當唯一入口舊字判黃,連帶 SDD v0106 自測 ④ FAIL;原句全文留 spec.acceptance_before_v0147(版史欄,L120 ①)。 WKF042 STP001–003 補 verb / inside / evidence:STP002 的頁與 Hub 由 scan() 內 render_locked() 產出(查碼確認,非推測);STP003 = VIA_MCP_Engine parity(VCGC mcp)。 WKF032-STP002(mcp_expose)引擎 v0102 → v0103:本批出了 MCP 薄尾 v0103(v0102 一字不動,收據資源全數沿用),步釘舊版會被 X-REG 判「註冊冊不是尾版」;舊值留 engine_before_v0147。",
+ "why_v0147_b": "就地只增(本分支未發佈):+VCGC-WKF044 tool_matrix(REQ227–229);WKF032-STP002 · WKF042-STP004 引擎改 MDL279 v0104(L25 撞號升版)。"
 }

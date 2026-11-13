@@ -1,7 +1,7 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0249",
- "batch": "VCGC 影子整併 CGC_MDL281 + MCP 讀檔三動詞 CGC_MDL279 v0103(操作員 2026-11-13)",
+ "batch": "VCGC 影子整併 CGC_MDL281 + MCP 讀檔三動詞 CGC_MDL279 v0103(操作員 2026-11-13) · +REQ227–231 工具矩陣 / 命名 / 政策 L129 / 整合會話 / 商業化檢查(2026-11-13 b)",
  "ts": "2026-11-13T14:38:33Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
@@ -139,8 +139,8 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 24,
-  "COVERED": 140,
-  "PARTIAL": 110,
+  "COVERED": 143,
+  "PARTIAL": 112,
   "MISSING": 1
  },
  "requirements": [
@@ -7172,7 +7172,7 @@
    "requirement": "操作員 2026-11-13:「VCGC已經有很多工具可用可擷取使用不用從頭 整理一下VCGC TOKEN SAVING工具看要如何整合 搭配GRAPHIFY OMNIROUTE」→「接進 VCGC 並補上 MCP 的 read slice digest」",
    "status": "COVERED",
    "homes": [
-    "CGC_MDL279_MCPServer_v0103.py",
+    "CGC_MDL279_MCPServer_v0104.py",
     "VIA_Workflow_VCGC_SSOT_v0147.json"
    ],
    "workflow": "VCGC-WKF042",
@@ -7184,7 +7184,8 @@
    "hand": "operator",
    "quotes": [
     "操作員 2026-11-13:「VCGC已經有很多工具可用可擷取使用不用從頭 整理一下VCGC TOKEN SAVING工具看要如何整合 搭配GRAPHIFY OMNIROUTE」→「接進 VCGC 並補上 MCP 的 read slice digest」"
-   ]
+   ],
+   "note_20261113b": "MCP 讀檔三動詞版改 v0104(與 practical-pasteur 分支的 v0103 uploads/latest 撞號,L25 後合者升版)"
   },
   {
    "code": "VCGC-REQ225",
@@ -7208,12 +7209,100 @@
    "status": "PARTIAL",
    "homes": [
     "../VIA_MCP_Engine/VIA_MCP_Engine_v0103.py",
-    "CGC_MDL279_MCPServer_v0103.py",
+    "CGC_MDL279_MCPServer_v0104.py",
     "../docs/handoff/ai/VIA_UploadIntake_20261113.md"
    ],
    "evidence": "現況已在倉:filesystem(本機讀寫)· GitHub MCP(唯讀 PAT)· 8 平台設定 · supergateway 橋 + OmniRoute · via-vcgc read/slice/digest(REQ224);ChatGPT 分享頁讀不到內容",
    "next": "撞號定案後:CGC_MDL279 下一版 --files-root(遠端平台唯讀 PC 工作夾全景讀取)· 橋接驗證金鑰;通道 / Access / 金鑰是操作員的手;操作員指名要抓的 GitHub 倉 / 資料引擎",
-   "hand": "operator"
+   "hand": "operator",
+   "note_20261113b": "MCP 讀檔三動詞版改 v0104(與 practical-pasteur 分支的 v0103 uploads/latest 撞號,L25 後合者升版)"
+  },
+  {
+   "code": "VCGC-REQ227",
+   "subsystem": "VCGC",
+   "topic": "VCGC 工具矩陣 HTML:中央管理 MDL · 省 Token / 支援 SUP · 整合進來 INT · 收尾,隨時自動重出,用操作員視覺鎖定 U/I 顯示",
+   "requirement": "操作員 2026-11-13:「矩陣顯示目前VCGC本身中央控管功能及節省TOKEN工具所有工具即被整合進來的所有工具 為旯將自動隨時更新於HTML矩陣化管理來進行使用」「將我指令視覺鎖定模板整合進來併用它來顯示VCGC進行VCGC收尾」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "../docs/handoff/ai/VIA_VisualLock_v0100.py",
+    "CGC_MDL253_ToolingInventory_v0103.py"
+   ],
+   "evidence": "自測 13/13(含真樹出頁 + 視覺鎖定閘 GREEN + 唯讀);盤點冊站 C-tool-matrix-build(quick)每輪 test --quick 重出 VIA_Reports/vcgc/VCGC_ToolMatrix_latest.html;頁內每 5 分鐘自動重整;watch 動詞給本機背景",
+   "next": "操作員桌機跑 via-vcgc test --quick 或 run VIA_VCGC_MDL258_ToolMatrix build 後開頁",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:56:20Z"
+  },
+  {
+   "code": "VCGC-REQ228",
+   "subsystem": "VCGC",
+   "topic": "命名規定:VIA_<系統>_<類>###_<英文名>_vNNNN · VCGC 中央管理 VIA_VCGC_MDL### · 省 Token / 支援 VIA_VCGC_SUP### · 版本號 · 登錄時間",
+   "requirement": "操作員 2026-11-13:「註冊要求名稱依照規定VIA_VRN_MDL001_FetchingTWSETPEXData_v001.py這是範例不是真的 要依規定命名有版本號有登錄時間避免混亂 VCGC節省或支援工具VIA_VCGC_SUP001_ VCGC本身中央管理VIA_VCGC_MDL001 相同要有版本號 依照命名規定」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "VIA_VCGC_ToolNaming_v0100.jsonl",
+    "CGC_MDL224_TestAuto_v0107.py",
+    "VIA_Policy_Laws_SSOT_v0118.json"
+   ],
+   "evidence": "政策 L129 ⑦;命名帳只增發名(號跟家族走 · 衝突不發 · 沒中央編號 / 沒版本號留白);新家族第一支 VIA_VCGC_MDL258_ToolMatrix;串測 CGC_MDL224 v0107 認得新命名家族",
+   "next": "舊家族不改檔名(L02 · L04 · 薄尾 glob 鏈);主控台經命名帳雙向解析新舊名之前,改用新檔名要操作員逐家族裁定",
+   "hand": "operator",
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:56:20Z"
+  },
+  {
+   "code": "VCGC-REQ229",
+   "subsystem": "VCGC",
+   "topic": "政策強硬化:四(五)系統獨立互不干涉 · VCGC 升級不連動 · 協助性衝突檢 · 操作員與 AI 修法權 · 無衝突出號具法律性 · TA-Lib 不可用不可出現 · 子系統自行註冊 VCGC 檢視登錄",
+   "requirement": "操作員 2026-11-13:「VCGC政策規範強硬化要求所有系統的獨立性互不干涉 VCGC的協助性檢查衝突能力 我跟AI有修政權 當VCGC經過修正無衝突並顯現編號十具法律性 … VCGC升級是為了更方便更強大不是為了更麻煩 故創造獨立性要求 不可用且不可出現任何TA-LIB 被成功使用的引擎模組註冊由子系統自行註冊 VCGC檢視登陸」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Policy_Laws_SSOT_v0118.json",
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py"
+   ],
+   "evidence": "政策 v0118 +L129(政策閘 rc 0);ToolMatrix check:尾版 TA-Lib 程式使用 0 · 命名衝突 0 · 他系統尾版釘 VCGC 版 4 檔(點名不代改)· VCGC 釘他系統 53 家族(黃,VCGC 自己的債)",
+   "next": "他系統(VDF · VRN-2)出新版時拿掉釘 VCGC 版號;VCGC 自己 53 家族出新版時改讀收據 / 走對方 manager",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:56:20Z"
+  },
+  {
+   "code": "VCGC-REQ230",
+   "subsystem": "VCGC",
+   "topic": "整合兩個會話:VCGC 工囊工具列表(claude/practical-pasteur-p67i78)· MCP 架構設計與多 AI 整合(PR #594)",
+   "requirement": "操作員 2026-11-13:「https://claude.ai/code/cshk_01542cbM1czafs7jZH5exynB… https://claude.ai/code/cshk_01542cbLJUivCLvkr4EpMWnt… 整合進來」",
+   "status": "COVERED",
+   "homes": [
+    "CGC_MDL279_MCPServer_v0103.py",
+    "CGC_MDL279_MCPServer_v0104.py",
+    "CGC_MDL233_ToolActivate_v0109.py",
+    "../docs/handoff/ai/VIA_UploadsWorkbench_v0102.py"
+   ],
+   "evidence": "分享連結本身 403 讀不到;對到會話 → MCP 那條 PR #594 早已在 main;工囊那條分支 12 提交 merge 進本分支(聯集);撞號 MDL279 v0103 → 那支留 v0103、讀檔三動詞改 v0104,自測鏈 v0104 → v0100 全 PASS",
+   "next": "本分支合回 main 時,optimistic-goodall-yhalc5 仍另有一支 MDL279 v0103 與主控台 v0193–v0196 撞號(操作員定合併順序)",
+   "hand": "operator",
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:56:20Z"
+  },
+  {
+   "code": "VCGC-REQ231",
+   "subsystem": "VCGC",
+   "topic": "商業化產品號封裝管理模組:有無被整合進 VCGC",
+   "requirement": "操作員 2026-11-13:「檢差商業化產品號封裝管理模組有無被整合」",
+   "status": "PARTIAL",
+   "homes": [
+    "CGC_MDL174_PackagingGate_v0101.py",
+    "CGC_MDL133_ProductGate_v0102.py",
+    "CGC_MDL072_ProductUi_v0100.py",
+    "CGC_MDL036_BuildPkgPointers_v0101.py"
+   ],
+   "evidence": "四個家族都有中央編號(MDL1145 · MDL830 · MDL544 · MDL047)且在工具矩陣裡;但沒有 VCGC 測站、沒有主控台動詞、沒有工作流;最近一次實測帳只有 2026-09-30 基線;Commercial Review 解開版在 review/VIA_VCGC_Commercial_Review_v0100/,8 條候選需求 CAND-VCGC-COM-001…008 仍 PROPOSED_NOT_APPROVED;40 條隔離測試 NOT_RUN;PKG-### 產品號沒有中央發號(號冊沒有 PKG 類);簽章授權未實作",
+   "next": "操作員核准 CAND-VCGC-COM 候選 → 登測站 / 工作流 → 實測;產品號是否立 PKG 類由操作員定",
+   "hand": "operator",
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:56:20Z"
   }
  ],
  "non_requirements": [

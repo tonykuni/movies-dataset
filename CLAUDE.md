@@ -35,8 +35,10 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
   (SYNTAX/DUPDEF/UNREACH/BAREEXC/SWALLOW/MUTDEF;v0114 起 +COMPILE(ast 過、compile 不過,例:橋注在 `from __future__` 前)+TAILAPI(尾版比前版少公開名稱又沒轉接);PowerShell:PSDUPFN/PSDOCSTR)。全都只報位置,不自動改。
 - 先 `read` 看定義樹 → 用 `slice` 或帶 offset/limit 的讀檔只取要改的那一段。
 - 操作員端同一個功能:`via-panorama read <路徑>` / `via-panorama slice <檔> <名>`;整張卡 `via-vcgc token`。
-- MCP(`.mcp.json` 的 `vcgc` = CGC_MDL279 v0103)同一組三招:`vcgc_read` · `vcgc_slice` · `vcgc_digest`(委派鎖版工具 · 只收倉內路徑 · `.git/` `private/` 拒讀)。
+- MCP(`.mcp.json` 的 `vcgc` = CGC_MDL279 v0104)同一組三招:`vcgc_read` · `vcgc_slice` · `vcgc_digest`(委派鎖版工具 · 只收倉內路徑 · `.git/` `private/` 拒讀)。
 - 兩支引擎要整併前:`VIA_FROM_VCGC=YES python3 "$V" run CGC_MDL281_ShadowMerge compare <A.py> <B.py>`(影子區比對 · 原檔不動 · 證不出零損失 = BLOCKED,照 L75 不准遷)。
+- VCGC 工具一覽:`VIA_FROM_VCGC=YES python3 "$V" run VIA_VCGC_MDL258_ToolMatrix build` → `VIA_Reports/vcgc/VCGC_ToolMatrix_latest.html`(操作員視覺鎖定 U/I;`test --quick` 每輪自動重出)· `check` = 獨立性 / TA-Lib / 命名衝突。
+- 新檔命名(政策 L129):`VIA_<系統>_<類>###_<英文名>_vNNNN.py`;VCGC 中央管理 `VIA_VCGC_MDL###`、省 Token / 支援 `VIA_VCGC_SUP###`;名碼只經 `run VIA_VCGC_MDL258_ToolMatrix naming --apply` 只增發出,舊檔不改名。
 
 **不要**為了看說明而跑 `CGC_MDL064_SelftestGrid_v*.py --help`:它不吃 `--help`,會把整張格子跑起來並重寫已追蹤的檔(批707 實錄 21 檔)。單站用 `--only <站名子字串>`。
 

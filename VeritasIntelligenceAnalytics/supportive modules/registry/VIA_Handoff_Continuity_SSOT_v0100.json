@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-13T16:15:18Z",
+ "updated_at": "2026-11-13T16:57:08Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -151,7 +151,10 @@
   "functional modules/VQG/VQG_AllInOne_v0105.py",
   "supportive modules/registry/CGC_MDL281_ShadowMerge_v0100.py",
   "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
-  "supportive modules/registry/CGC_MDL245_SDDValidator_v0108.py"
+  "supportive modules/registry/CGC_MDL245_SDDValidator_v0108.py",
+  "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+  "supportive modules/registry/CGC_MDL224_TestAuto_v0107.py",
+  "supportive modules/registry/CGC_MDL279_MCPServer_v0104.py"
  ],
  "frozen_sources": {
   "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -4775,27 +4778,49 @@
    "timeout_seconds": 600,
    "registered_at": "2026-11-13T14:38:33Z"
   },
-  "C-mcp-server-v0103": {
+  "C-mcp-server-v0104": {
    "argv": [
     "--family",
     "core",
-    "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0104.py",
     "--selftest"
    ],
-   "success_marker": "[PASS] CGC_MDL279_MCPServer v0103 --selftest · 本版 10 項 · 不過 0(v0102 鏈 rc 0)",
-   "scope": "via-vcgc MCP v0103:+vcgc_read · vcgc_slice · vcgc_digest 委派鎖版 token 工具;倉內路徑閘 · 拒讀清單 · 參數閘 · 鎖冊 sha 不符即停;前版 16 動詞與收據沿用",
+   "success_marker": "[PASS] CGC_MDL279_MCPServer v0104 --selftest · 本版 10 項 · 不過 0(v0103 鏈 rc 0)",
+   "scope": "via-vcgc MCP v0104:+vcgc_read · vcgc_slice · vcgc_digest 委派鎖版 token 工具;倉內路徑閘 · 拒讀清單 · 參數閘 · 鎖冊 sha 不符即停;前版 16 動詞與收據沿用(L25 撞號:practical-pasteur 的 v0103 uploads/latest 為前版)",
    "dependencies": [
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0117.py",
     "supportive modules/registry/CGC_MDL279_MCPServer_v0100.py",
     "supportive modules/registry/CGC_MDL279_MCPServer_v0101.py",
     "supportive modules/registry/CGC_MDL279_MCPServer_v0102.py",
     "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
-    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0117.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0104.py",
     "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
    ],
-   "version": "v0103",
-   "updated_at": "2026-11-13T14:38:33Z",
+   "version": "v0104",
+   "updated_at": "2026-11-13T16:57:08Z",
    "timeout_seconds": 900,
    "registered_at": "2026-11-13T14:38:33Z"
+  },
+  "C-tool-matrix-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_VCGC_MDL258_ToolMatrix v0100 --selftest · 13/13",
+   "scope": "VCGC 工具矩陣 v0100:MDL / SUP / INT · 命名只增發名 · 獨立性 / TA-Lib 衝突檢 · 視覺鎖定 U/I 收尾頁 · 唯讀",
+   "dependencies": [
+    "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "docs/handoff/ai/VIA_VisualLock_v0100.py",
+    "supportive modules/registry/CGC_MDL253_ToolingInventory_v0103.py",
+    "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+    "review/VIA_Atlas_LocalSite_v0100/index.html"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:57:08Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-13T16:57:08Z"
   }
  },
  "work_items": [
@@ -9878,13 +9903,13 @@
   {
    "id": "VCGC-REQ224:remote-platforms",
    "requirement": "VCGC-REQ224",
-   "case": "C-mcp-server-v0103",
+   "case": "C-mcp-server-v0104",
    "state": "PENDING",
    "owner": "operator",
-   "reason": "容器與倉內 .mcp.json 已接 v0103;桌機 Claude Desktop 要重新載入,遠端 ChatGPT / Manus / Copilot web 要 parity --write + HTTPS 隧道",
+   "reason": "容器與倉內 .mcp.json 已接 v0104;桌機 Claude Desktop 要重新載入,遠端 ChatGPT / Manus / Copilot web 要 parity --write + HTTPS 隧道",
    "next": "桌機重開 MCP;VIA_MCP_Engine parity --write(操作員)",
    "receipt": null,
-   "updated_at": "2026-11-13T14:38:33Z"
+   "updated_at": "2026-11-13T16:57:08Z"
   },
   {
    "id": "UPLOAD-20261113:pc-files",
@@ -9910,14 +9935,14 @@
   },
   {
    "id": "UPLOAD-20261113:branch-collision",
-   "reason": "與 optimistic-goodall-yhalc5 撞:MCP v0103 · 需求冊 v0249 · VCGC-REQ223 · 盤點冊 v0225 · 交接/元件/編號冊",
+   "reason": "與 optimistic-goodall-yhalc5 撞:MCP v0103 · 需求冊 v0249 · VCGC-REQ223 · 盤點冊 v0225 · 交接/元件/編號冊 · 2026-11-13 b:practical-pasteur 已 merge 進本分支(MDL279 v0103 撞號解:那支留 v0103、讀檔三動詞改 v0104);optimistic-goodall 仍另有 MDL279 v0103 · 主控台 v0193–v0196 · 政策 v0118(L128)",
    "next": "操作員定合併先後;後合併者依 L25 取聯集、程式檔高版號另起",
    "requirement": "VCGC-REQ225",
    "case": null,
    "state": "PENDING",
    "owner": "operator",
    "receipt": "docs/handoff/ai/VIA_UploadIntake_20261113.md",
-   "updated_at": "2026-11-13T16:07:52Z"
+   "updated_at": "2026-11-13T16:57:08Z"
   },
   {
    "id": "MCP-20261113:pcfiles-github",
@@ -9942,15 +9967,15 @@
    "updated_at": "2026-11-13T16:07:52Z"
   },
   {
-   "id": "VCGC-REQ224:C-mcp-server-v0103",
+   "id": "VCGC-REQ224:C-mcp-server-v0104",
    "requirement": "VCGC-REQ224",
-   "case": "C-mcp-server-v0103",
-   "state": "VERIFIED",
+   "case": "C-mcp-server-v0104",
+   "state": "PENDING",
    "owner": "AI",
-   "reason": "本批新模組;handoff test 收據 rc 0 · 成功標記吻合",
+   "reason": "讀檔三動詞版改 v0104(L25 撞號升版);等 handoff test 新收據",
    "next": "相依變更才重測",
-   "receipt": "docs/handoff/evidence/C-mcp-server-v0103.json",
-   "updated_at": "2026-11-13T16:07:52Z"
+   "receipt": null,
+   "updated_at": "2026-11-13T16:57:08Z"
   },
   {
    "id": "UPLOAD-20261113:agentos-v0300-activate",
@@ -9962,6 +9987,61 @@
    "next": "操作員定:要不要啟用、取代哪一段;裝件走 L19;合併順序定案後再對照 CGC_MDL280",
    "receipt": "docs/handoff/ai/VIA_UploadIntake_20261113.md",
    "updated_at": "2026-11-13T16:15:18Z"
+  },
+  {
+   "id": "VCGC-REQ227:C-tool-matrix-v0100",
+   "requirement": "VCGC-REQ227",
+   "case": "C-tool-matrix-v0100",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "本批新模組;等 handoff test 收據",
+   "next": "handoff test C-tool-matrix-v0100",
+   "receipt": null,
+   "updated_at": "2026-11-13T16:57:08Z"
+  },
+  {
+   "id": "VCGC-REQ228:legacy-rename",
+   "requirement": "VCGC-REQ228",
+   "case": "C-tool-matrix-v0100",
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "舊家族不改檔名(L02 · L04 · 薄尾 glob 鏈);命名帳已給新名;主控台雙向解析新舊名之前,改用新檔名要逐家族裁定",
+   "next": "操作員指定要改新檔名的家族",
+   "receipt": null,
+   "updated_at": "2026-11-13T16:57:08Z"
+  },
+  {
+   "id": "VCGC-REQ229:other-system-pins",
+   "requirement": "VCGC-REQ229",
+   "case": "C-tool-matrix-v0100",
+   "state": "PENDING",
+   "owner": "VDF · VRN-2(各自系統)",
+   "reason": "他系統尾版 4 檔釘 VCGC 版號(VDF_ENG093 v0105 · VDF_MDL014 v0102 · VRN2_RoundAll v0135 · VRN_ENG090 v0103);VCGC 只攤開不代改(L123)",
+   "next": "各系統出新版時改走 via-vcgc 指令 / 收據",
+   "receipt": null,
+   "updated_at": "2026-11-13T16:57:08Z"
+  },
+  {
+   "id": "VCGC-REQ229:vcgc-out-pins",
+   "requirement": "VCGC-REQ229",
+   "case": "C-tool-matrix-v0100",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "VCGC 自己 53 家族尾版釘他系統檔的版號(黃)——對方升級時 VCGC 會停在舊版",
+   "next": "逐家族出新版:改讀對方自報收據 / 走對方 manager",
+   "receipt": null,
+   "updated_at": "2026-11-13T16:57:08Z"
+  },
+  {
+   "id": "VCGC-REQ231:commercial",
+   "requirement": "VCGC-REQ231",
+   "case": "",
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "商業化 / 封裝 / 產品閘四家族有中央編號但沒有 VCGC 測站 · 動詞 · 工作流;CAND-VCGC-COM-001…008 未核准;40 條隔離測試 NOT_RUN;PKG 產品號沒有中央發號",
+   "next": "操作員核准候選需求 → 登站實測",
+   "receipt": null,
+   "updated_at": "2026-11-13T16:57:08Z"
   }
  ]
 }
