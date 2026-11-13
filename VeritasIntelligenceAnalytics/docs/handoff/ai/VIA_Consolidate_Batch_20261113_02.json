@@ -7,8 +7,90 @@
   "VDF"
  ],
  "method": "每家族尾版 --selftest 實跑 + audit hook 記錄本家族被打開的版本檔(= 執行時鏈);鏈外且無活引用的舊版刪除",
- "count": 67,
- "rows": [
+ "count": 0,
+ "rows": [],
+ "held_back": {
+  "live_refs": 330,
+  "families_selftest_not_clean": [
+   [
+    "VDF_ENG058_IndustryUnifiedMap",
+    "2"
+   ],
+   [
+    "VDF_ENG060_AdjPriceLayer",
+    "2"
+   ],
+   [
+    "VDF_ENG061_FeatureStore",
+    "2"
+   ],
+   [
+    "VDF_ENG062_GroupFeatureLayer",
+    "2"
+   ],
+   [
+    "VDF_ENG071_GroupBacktest",
+    "2"
+   ],
+   [
+    "VDF_ENG072_StoryRotationBridge",
+    "2"
+   ],
+   [
+    "VDF_ENG082_FinStatements",
+    "1"
+   ],
+   [
+    "VRN2_UIAction",
+    "2"
+   ],
+   [
+    "VRN_ENG056_PdfForensics",
+    "2"
+   ],
+   [
+    "VRN_ENG057_ScanOcrRescue",
+    "2"
+   ],
+   [
+    "VRN_ENG062_SummarizerV1",
+    "2"
+   ],
+   [
+    "VRN_ENG067_MindMapSSOT",
+    "2"
+   ],
+   [
+    "VRN_ENG068_DailyBrief",
+    "2"
+   ],
+   [
+    "VRN_ENG072_FirstPageText",
+    "none"
+   ],
+   [
+    "VRN_ENG073_ReportStructuredDB",
+    "2"
+   ],
+   [
+    "VRN_ENG074_FinancialPages",
+    "none"
+   ],
+   [
+    "VRN_ENG109_TabStore",
+    "1"
+   ],
+   [
+    "VRN_ENG393_DocClassVerify",
+    "1"
+   ],
+   [
+    "VRN_ENG394_LayoutRestore",
+    "none"
+   ]
+  ]
+ },
+ "reverted_rows": [
   {
    "path": "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0107.py",
    "kind": "舊版(尾版自測實跑時沒讀到 · 零活引用)",
@@ -546,85 +628,8 @@
    "sha256": "6100460b53f8e3ee597d19a30bed9310168724edf1a413b71813e6bb23ab6633"
   }
  ],
- "held_back": {
-  "live_refs": 330,
-  "families_selftest_not_clean": [
-   [
-    "VDF_ENG058_IndustryUnifiedMap",
-    "2"
-   ],
-   [
-    "VDF_ENG060_AdjPriceLayer",
-    "2"
-   ],
-   [
-    "VDF_ENG061_FeatureStore",
-    "2"
-   ],
-   [
-    "VDF_ENG062_GroupFeatureLayer",
-    "2"
-   ],
-   [
-    "VDF_ENG071_GroupBacktest",
-    "2"
-   ],
-   [
-    "VDF_ENG072_StoryRotationBridge",
-    "2"
-   ],
-   [
-    "VDF_ENG082_FinStatements",
-    "1"
-   ],
-   [
-    "VRN2_UIAction",
-    "2"
-   ],
-   [
-    "VRN_ENG056_PdfForensics",
-    "2"
-   ],
-   [
-    "VRN_ENG057_ScanOcrRescue",
-    "2"
-   ],
-   [
-    "VRN_ENG062_SummarizerV1",
-    "2"
-   ],
-   [
-    "VRN_ENG067_MindMapSSOT",
-    "2"
-   ],
-   [
-    "VRN_ENG068_DailyBrief",
-    "2"
-   ],
-   [
-    "VRN_ENG072_FirstPageText",
-    "none"
-   ],
-   [
-    "VRN_ENG073_ReportStructuredDB",
-    "2"
-   ],
-   [
-    "VRN_ENG074_FinancialPages",
-    "none"
-   ],
-   [
-    "VRN_ENG109_TabStore",
-    "1"
-   ],
-   [
-    "VRN_ENG393_DocClassVerify",
-    "1"
-   ],
-   [
-    "VRN_ENG394_LayoutRestore",
-    "none"
-   ]
-  ]
+ "reverted": {
+  "at": "2026-11-13",
+  "why": "探測法(尾版自測 + audit hook)抓不到延遲載入的前版:批 02 刪 VRN_SystemManager_v0261 → v0262 匯入即 FileNotFoundError,VRN 管理器啟動即崩。整批還原;rows 清空,桌機刪除腳本跑本批不會刪任何檔。改走操作員令:引擎重寫成新的單檔,實測通過後才退役舊鏈。"
  }
 }

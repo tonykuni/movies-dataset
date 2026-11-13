@@ -1,0 +1,449 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""VDF_SystemManager v0131 — 薄尾:表頭自創自管(L114 ①③ · 操作員令 2026-10-06 DataFrame 標準化:子系統有創造管理權 · 母系統顯示衝突 · 裁後母系統發號 · 號出現子系統紀錄並遵守)。
+  table register [--apply]   掃 VDF 自己的 registry/ SSOT/ knowledge/ 冊 + VDF 夾頂層 json/jsonl/csv → 每張表推欄名/型別/主鍵 → 登記 registry/VDF_TableHeader_v0100.json(table_no 留白)
+                             只增:同頭不動;改頭未編號 → 更新+history;改頭已編號 → 原列鎖死,另開 <tid>_h2 留白(遵守既發號)
+  table number pull          依鍵 VDF|<tid>|<header_sha> 從母系統 VIA_TableNumbers_v*.json 讀號填回(只填留白)
+  table status               列表頭冊:表數 · 留白 · 已號 · 漂移
+在本行程呼叫(不另起 python、不經 VCGC 也能跑);其餘動詞照 v0130。不碰 TA-Lib、不出網。
+沙盒鍵:VIA_VDF_HOME(VDF 夾)· VIA_VDF_CENTRAL(中央 registry,讀號用);VIA_SKIP_PRIOR_SELFTEST=1 = 沙盒無前版冊時跳過前版鏈自測(誠實印出)。
+"""
+from __future__ import annotations
+
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: F401
+except ImportError:
+    VIA_ACCEL = None
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+
+import importlib.util
+import os
+import re
+import shutil
+import sys
+import tempfile
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+_STEM = "VDF_SystemManager"
+TAG = f"{_STEM} v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
+
+
+def _vnum_v0131(path) -> int:
+    m = re.search(r"_v(\d{4})$", Path(path).stem)
+    return int(m.group(1)) if m else -1
+
+
+def _load_v0131(path: Path, name: str):
+    if name not in sys.modules:
+        spec = importlib.util.spec_from_file_location(name, path)
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[name] = mod
+        spec.loader.exec_module(mod)
+    return sys.modules[name]
+
+
+PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum_v0131(p) < _vnum_v0131(__file__)), key=_vnum_v0131)
+PRIOR = _load_v0131(PRIOR_PATH, _STEM + "_prior_for_" + Path(__file__).stem)
+
+
+def __getattr__(name):
+    return getattr(PRIOR, name)
+
+
+# ===== [VIA:TABLE-HEADER:v0100] 表頭登記共用段(子系統自創自管;VCGC 只讀;三系統各帶一份,零相依)=====
+_TH_EXCL = {"references", "intake", "_superseded", "VIA_RetiredEngines", "_quarantine_pip_vendor", "__pycache__", "_df", "_quarantine", "VIA_NumberBooks"}
+_TH_ISO = __import__("re").compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?)?")
+_TH_NUM = __import__("re").compile(r"^-?\d+(\.\d+)?$")
+
+
+def _th_vnum(name):
+    import re as _re
+    m = _re.search(r"_v(\d{2,4})[A-Za-z0-9]*(?:\.[A-Za-z0-9]+)?$", name)
+    return int(m.group(1)) if m else -1
+
+
+def _th_family(name):
+    import re as _re
+    from pathlib import Path as _P
+    return _re.sub(r"_v\d{2,4}[A-Za-z0-9]*$", "", _re.sub(r"_sha[0-9a-f]{8,}$", "", _P(name).stem))
+
+
+def _th_read(p):
+    raw = p.read_bytes()
+    for enc in ("utf-8-sig", "utf-16", "cp950"):
+        try:
+            return raw.decode(enc)
+        except UnicodeDecodeError:
+            continue
+    return ""
+
+
+def _th_uniform(dcts):
+    sizes = sorted(len(d) for d in dcts)
+    if not sizes:
+        return False
+    med = sizes[len(sizes) // 2] or 1
+    union = set()
+    for d in dcts:
+        union |= set(d.keys())
+    return len(union) <= 3 * med
+
+
+def _th_tables(obj):
+    """物件 → {表名: rows};list-of-dict / dict-of-dict(鍵進 key 欄)/ 巢狀底下的同類;映射與純設定不當表。"""
+    if isinstance(obj, list):
+        return {"rows": obj} if obj and all(isinstance(x, dict) for x in obj) and _th_uniform(obj) else {}
+    if not isinstance(obj, dict):
+        return {}
+    vals = list(obj.values())
+    if vals and all(isinstance(v, dict) for v in vals) and len(obj) >= 2:
+        return {"rows": [dict({"key": k}, **v) for k, v in obj.items()]} if _th_uniform(vals) else {}
+    out = {}
+    for k, v in obj.items():
+        if isinstance(v, list) and v and all(isinstance(x, dict) for x in v) and _th_uniform(v):
+            out[k] = v
+        elif isinstance(v, dict) and len(v) >= 2 and all(isinstance(x, dict) for x in v.values()) and _th_uniform(list(v.values())):
+            out[k] = [dict({"key": kk}, **vv) for kk, vv in v.items()]
+    return out
+
+
+def _th_load_tables(p):
+    import csv as _csv
+    import io as _io
+    import json as _json
+    txt = _th_read(p)
+    ext = p.suffix.lower()
+    if ext == ".jsonl":
+        rows = [_json.loads(ln) for ln in txt.splitlines() if ln.strip()]
+        return {"rows": rows} if rows and all(isinstance(r, dict) for r in rows) else {}
+    if ext == ".csv":
+        rows = list(_csv.DictReader(_io.StringIO(txt)))
+        return {"rows": rows} if rows else {}
+    return _th_tables(_json.loads(txt))
+
+
+def _th_profile(rows):
+    """→ (columns[{name,dtype,required,pk}], keys, issues)"""
+    import re as _re
+    from collections import Counter as _C
+    n = len(rows)
+    cols = {}
+    for r in rows:
+        for k, v in r.items():
+            c = cols.setdefault(k, {"t": _C(), "nulls": 0, "numstr": 0, "datestr": 0, "nested": 0, "vals": set(), "dup": False})
+            if v is None or v == "":
+                c["nulls"] += 1
+                continue
+            if isinstance(v, bool):
+                t = "bool"
+            elif isinstance(v, int):
+                t = "int"
+            elif isinstance(v, float):
+                t = "float"
+            elif isinstance(v, (dict, list)):
+                t = "json"
+                c["nested"] += 1
+            else:
+                t = "str"
+                s = str(v).strip()
+                if _TH_NUM.match(s):
+                    c["numstr"] += 1
+                elif _TH_ISO.match(s):
+                    c["datestr"] += 1
+            c["t"][t] += 1
+            if t != "json":
+                if v in c["vals"]:
+                    c["dup"] = True
+                c["vals"].add(v)
+    columns, keys, issues = [], [], []
+    for k, c in cols.items():
+        kinds = set(c["t"])
+        if {"int", "float"} <= kinds:
+            kinds.discard("int")
+        major = c["t"].most_common(1)[0][0] if c["t"] else "str"
+        dtype = "date" if (major == "str" and c["datestr"] and c["datestr"] == c["t"]["str"]) else major
+        if len(kinds) > 1:
+            issues.append("混型:%s" % k)
+        if c["numstr"]:
+            issues.append("數字存字串:%s" % k)
+        if c["nested"]:
+            issues.append("格內巢狀:%s" % k)
+        if not _re.match(r"^[a-z0-9_]+$", str(k)):
+            issues.append("非snake:%s" % k)
+        unique = (n > 0 and c["nulls"] == 0 and not c["dup"] and dtype in ("str", "int", "date"))
+        if unique:
+            keys.append(k)
+        columns.append({"name": k, "dtype": dtype, "required": c["nulls"] == 0, "pk": False})
+    if keys:
+        for col in columns:
+            if col["name"] == keys[0]:
+                col["pk"] = True
+    else:
+        issues.append("無主鍵候選")
+    return columns, keys[:3], issues
+
+
+def _th_sha(columns):
+    import hashlib as _h
+    import json as _json
+    return _h.sha256(_json.dumps([[c["name"], c["dtype"]] for c in columns], ensure_ascii=False).encode("utf-8")).hexdigest()[:16]
+
+
+def _th_tid(family, table):
+    import re as _re
+    return _re.sub(r"[^a-z0-9_]+", "_", (family + ("" if table == "rows" else "_" + table)).lower()).strip("_")
+
+
+def _th_register(sub, sources, book_dir, now, apply=True, rel_root=None):
+    """掃 sources(檔列表)→ 登記進 book_dir/<sub>_TableHeader_v####.json(只增:同 sha 不動;改頭且未編號 → 更新 + history;改頭且已編號 → 不動原列,另開 <tid>_h2 留白 = 遵守既發號)。"""
+    import json as _json
+    from pathlib import Path as _P
+    hits = sorted(_P(book_dir).glob(sub + "_TableHeader_v*.json"), key=lambda q: _th_vnum(q.name))
+    if hits:
+        book = _json.loads(_th_read(hits[-1]))
+        fp = hits[-1]
+    else:
+        fp = _P(book_dir) / (sub + "_TableHeader_v0100.json")
+        book = {"schema": "VIA.TableHeader.v1", "sub": sub, "version": "v0100", "rule": "子系統自創自管(L114 ①③);table_no 留白待母系統發號;已發號的表頭鎖死,改頭另開 _h2;只增不減", "created_at": now, "tables": {}}
+    tables = book.setdefault("tables", {})
+    counts = {"NEW": 0, "SAME": 0, "UPDATED": 0, "LOCKED_NEW_H": 0, "SKIP": 0}
+    rows_out = []
+    for p in sources:
+        try:
+            tbs = _th_load_tables(p)
+        except Exception:  # noqa: BLE001 — 壞冊:登記為不可讀,交人
+            counts["SKIP"] += 1
+            rows_out.append({"source": str(p), "status": "UNREADABLE"})
+            continue
+        if not tbs:
+            counts["SKIP"] += 1
+            continue
+        src = (p.relative_to(rel_root).as_posix() if rel_root else p.as_posix())
+        for t, rows in tbs.items():
+            columns, keys, issues = _th_profile(rows)
+            sha = _th_sha(columns)
+            tid = _th_tid(_th_family(p.name), t)
+            ent = tables.get(tid)
+            if ent is None:
+                tables[tid] = {"tid": tid, "sub": sub, "source": src, "table": t, "columns": columns, "keys": keys, "header_sha": sha, "rows_seen": len(rows),
+                               "issues": issues, "status": "ACTIVE", "table_no": "", "registered_at": now, "history": []}
+                counts["NEW"] += 1
+                st = "NEW"
+            elif ent.get("header_sha") == sha:
+                ent["rows_seen"] = len(rows)
+                ent["issues"] = issues
+                ent["source"] = src
+                counts["SAME"] += 1
+                st = "SAME"
+            elif not ent.get("table_no"):
+                ent.setdefault("history", []).append({"header_sha": ent.get("header_sha"), "columns": ent.get("columns"), "until": now})
+                ent.update(columns=columns, keys=keys, header_sha=sha, rows_seen=len(rows), issues=issues, source=src)
+                counts["UPDATED"] += 1
+                st = "UPDATED"
+            else:
+                tid2 = tid + "_h2"
+                if tid2 not in tables:
+                    tables[tid2] = {"tid": tid2, "sub": sub, "source": src, "table": t, "columns": columns, "keys": keys, "header_sha": sha, "rows_seen": len(rows),
+                                    "issues": issues, "status": "ACTIVE", "table_no": "", "registered_at": now, "history": [], "supersedes": tid}
+                    ent["drift"] = {"new_tid": tid2, "seen_at": now}
+                counts["LOCKED_NEW_H"] += 1
+                st = "LOCKED_NEW_H"
+            rows_out.append({"tid": tid, "status": st, "sha": sha, "issues": issues})
+    book["updated_at"] = now
+    if apply:
+        _P(book_dir).mkdir(parents=True, exist_ok=True)
+        fp.write_text(_json.dumps(book, ensure_ascii=False, indent=1), encoding="utf-8")
+    blank = sum(1 for e in tables.values() if not e.get("table_no"))
+    return {"book": fp.name, "tables": len(tables), "blank": blank, "counts": counts, "rows": rows_out}
+
+
+def _th_pull(sub, book_dir, numbers_dir, now, apply=True):
+    """從母系統 VIA_TableNumbers_v*.json 依鍵 <sub>|<tid>|<header_sha> 讀號填進自己的表頭冊(只填留白;填了就鎖頭 = 遵守)。"""
+    import json as _json
+    from pathlib import Path as _P
+    hits = sorted(_P(book_dir).glob(sub + "_TableHeader_v*.json"), key=lambda q: _th_vnum(q.name))
+    if not hits:
+        return {"status": "NO_BOOK", "filled": 0, "already": 0, "pending": 0, "lamp": "GRAY"}
+    book = _json.loads(_th_read(hits[-1]))
+    nb = sorted(_P(numbers_dir).glob("VIA_TableNumbers_v*.json"), key=lambda q: _th_vnum(q.name))
+    table = {}
+    if nb:
+        try:
+            d = _json.loads(_th_read(nb[-1]))
+            table = {e["key"]: e["table_no"] for e in d.get("entries", []) if e.get("key") and e.get("table_no")}
+        except (ValueError, KeyError):
+            pass
+    filled = already = pending = 0
+    for tid, e in book.get("tables", {}).items():
+        if e.get("table_no"):
+            already += 1
+            continue
+        no = table.get("%s|%s|%s" % (sub, tid, e.get("header_sha")))
+        if no:
+            e["table_no"] = no
+            e["numbered_at"] = now
+            filled += 1
+        else:
+            pending += 1
+    if apply and filled:
+        hits[-1].write_text(_json.dumps(book, ensure_ascii=False, indent=1), encoding="utf-8")
+    return {"status": "OK", "book": hits[-1].name, "number_book": (nb[-1].name if nb else None), "filled": filled, "already": already, "pending": pending,
+            "lamp": "GREEN" if (pending == 0 and (filled or already)) else "GRAY"}
+# ===== [VIA:TABLE-HEADER:END] =====
+
+
+def _now_v0131() -> str:
+    import datetime
+    return datetime.datetime.now().isoformat(timespec="seconds")
+
+
+def _roots_v0131() -> dict:
+    home = Path(os.environ.get("VIA_VDF_HOME") or HERE)
+    central = Path(os.environ.get("VIA_VDF_CENTRAL") or (HERE.parents[1] / "supportive modules" / "registry"))
+    return {"home": home, "registry": home / "registry", "central": central}
+
+
+def _sources_v0131(home: Path) -> list:
+    best = {}
+    cands = []
+    for sub in ("registry", "SSOT", "knowledge"):
+        d = home / sub
+        if d.is_dir():
+            cands += [p for p in d.rglob("*") if p.is_file()]
+    cands += [p for p in home.glob("*") if p.is_file()]
+    for p in cands:
+        if p.suffix.lower() not in (".json", ".jsonl", ".csv") or (set(p.relative_to(home).parts[:-1]) & _TH_EXCL):
+            continue
+        if _th_family(p.name).endswith("_TableHeader") or _th_family(p.name).endswith("_NumberRequests"):
+            continue
+        k = (p.parent, _th_family(p.name), p.suffix.lower())
+        v = _th_vnum(p.name)
+        if k not in best or v > best[k][0]:
+            best[k] = (v, p)
+    return sorted((v[1] for v in best.values()), key=lambda q: str(q))
+
+
+def table_register(apply: bool = False) -> dict:
+    r = _roots_v0131()
+    srcs = _sources_v0131(r["home"])
+    res = _th_register("VDF", srcs, r["registry"], _now_v0131(), apply=apply, rel_root=r["home"].parents[1] if len(r["home"].parents) > 1 else r["home"])
+    res.update(verb="table_register", apply=apply, sources=len(srcs), lamp=("YELLOW" if not apply else ("GREEN" if res["counts"]["LOCKED_NEW_H"] == 0 else "YELLOW")))
+    return res
+
+
+def table_number_pull() -> dict:
+    r = _roots_v0131()
+    res = _th_pull("VDF", r["registry"], r["central"], _now_v0131(), apply=True)
+    res["verb"] = "table_number_pull"
+    return res
+
+
+def table_status() -> dict:
+    import json
+    r = _roots_v0131()
+    hits = sorted(r["registry"].glob("VDF_TableHeader_v*.json"), key=lambda q: _th_vnum(q.name))
+    if not hits:
+        return {"verb": "table_status", "book": None, "tables": 0, "blank": 0, "numbered": 0, "drift": 0, "lamp": "GRAY"}
+    b = json.loads(_th_read(hits[-1]))
+    t = b.get("tables", {})
+    return {"verb": "table_status", "book": hits[-1].name, "tables": len(t), "blank": sum(1 for e in t.values() if not e.get("table_no")),
+            "numbered": sum(1 for e in t.values() if e.get("table_no")), "drift": sum(1 for e in t.values() if e.get("drift")),
+            "lamp": "GREEN" if t and all(e.get("table_no") for e in t.values()) else "GRAY"}
+
+
+def _print_v0131(out: dict) -> None:
+    v = out["verb"]
+    if v == "table_register":
+        c = out["counts"]
+        print("[計] table register%s 來源 %d · 冊 %s · 表 %d · 留白 %d · NEW %d SAME %d UPDATED %d 鎖頭另開 %d 略過 %d · %s"
+              % (" --apply" if out["apply"] else "(dry-run)", out["sources"], out["book"], out["tables"], out["blank"], c["NEW"], c["SAME"], c["UPDATED"], c["LOCKED_NEW_H"], c["SKIP"], out["lamp"]))
+    elif v == "table_number_pull":
+        print("[計] table number pull · 冊 %s · 母發號冊 %s · filled %d already %d pending %d · %s" % (out.get("book"), out.get("number_book") or "未建", out["filled"], out["already"], out["pending"], out["lamp"]))
+    elif v == "table_status":
+        print("[計] table status · 冊 %s · 表 %d · 留白 %d · 已號 %d · 漂移 %d · %s" % (out["book"], out["tables"], out["blank"], out["numbered"], out["drift"], out["lamp"]))
+
+
+def main(argv=None) -> int:
+    """table 動詞由本版接;其餘照 v0130(refill · activate · 總控標記 · 未知動詞拒跑)。"""
+    args = list(sys.argv[1:] if argv is None else argv)
+    if "--selftest" in args[:2]:
+        return selftest()
+    if args[:1] != ["table"]:
+        return PRIOR.main(args)
+    sub = args[1] if len(args) > 1 else ""
+    if sub == "register":
+        out = table_register(apply=("--apply" in args))
+    elif sub == "number" and args[2:3] == ["pull"]:
+        out = table_number_pull()
+    elif sub == "status":
+        out = table_status()
+    else:
+        print("[拒跑] table register [--apply] | table number pull | table status")
+        return 2
+    _print_v0131(out)
+    return 0
+
+
+def selftest() -> int:
+    import json
+    if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1":
+        print("  [注] VIA_SKIP_PRIOR_SELFTEST=1:前版鏈自測跳過(沙盒無 VDF 冊);正式環境不設此鍵")
+        prior_rc = 0
+    else:
+        prior_rc = PRIOR.selftest()
+    ok = []
+
+    def chk(name, cond):
+        ok.append(bool(cond))
+        print("  [%s] %s" % ("OK" if cond else "FAIL", name))
+
+    td = Path(tempfile.mkdtemp(prefix="vdfsm131-"))
+    home = td / "functional modules" / "VDF"
+    central = td / "supportive modules" / "registry"
+    saved = {k: os.environ.get(k) for k in ("VIA_VDF_HOME", "VIA_VDF_CENTRAL")}
+    os.environ["VIA_VDF_HOME"] = str(home)
+    os.environ["VIA_VDF_CENTRAL"] = str(central)
+    (home / "registry").mkdir(parents=True)
+    central.mkdir(parents=True)
+    (home / "registry" / "VDF_InputUniverse_SSOT_v0100.json").write_text(json.dumps({"groups": [{"group": "TW_INDEX", "ticker": "^TWII", "src": "yfinance"}, {"group": "US_INDEX", "ticker": "^GSPC", "src": "yfinance"}]}, ensure_ascii=False), encoding="utf-8")
+    (home / "VDF_Lists_v0100.csv").write_text("ticker,name\n2330,TSMC\n2317,HonHai\n", encoding="utf-8")
+    d0 = table_register(apply=False)
+    a1 = table_register(apply=True)
+    bk = json.loads((home / "registry" / "VDF_TableHeader_v0100.json").read_text(encoding="utf-8"))
+    chk("① 表頭自創:dry-run 不寫;--apply 登記 2 表(registry 冊 + 頂層 csv)· 留白 · 主鍵 group / ticker", d0["tables"] == 2 and a1["counts"]["NEW"] == 2 and all(e["table_no"] == "" for e in bk["tables"].values())
+        and bk["tables"]["vdf_inputuniverse_ssot_groups"]["keys"][:1] == ["group"] and bk["tables"]["vdf_lists"]["keys"][:1] == ["ticker"])
+    sha = bk["tables"]["vdf_lists"]["header_sha"]
+    (central / "VIA_TableNumbers_v0100.json").write_text(json.dumps({"entries": [{"key": "VDF|vdf_lists|" + sha, "table_no": "SSOT-VCGC-VDF-TBL0001"}]}), encoding="utf-8")
+    n1 = table_number_pull()
+    (home / "VDF_Lists_v0101.csv").write_text("ticker,name,exchange\n2330,TSMC,TWSE\n", encoding="utf-8")
+    a2 = table_register(apply=True)
+    bk2 = json.loads((home / "registry" / "VDF_TableHeader_v0100.json").read_text(encoding="utf-8"))
+    chk("② 讀號填回 1 · 已號表改頭 → 原列鎖死另開 vdf_lists_h2 留白(遵守既發號)", n1["filled"] == 1 and a2["counts"]["LOCKED_NEW_H"] == 1 and bk2["tables"]["vdf_lists"]["table_no"] == "SSOT-VCGC-VDF-TBL0001"
+        and bk2["tables"]["vdf_lists"]["header_sha"] == sha and bk2["tables"]["vdf_lists_h2"]["table_no"] == "")
+    st = table_status()
+    chk("③ status 表 3 · 已號 1 · 留白 2 · 漂移 1 · 中央只讀(1 冊)", st["tables"] == 3 and st["numbered"] == 1 and st["blank"] == 2 and st["drift"] == 1 and len(list(central.glob("*"))) == 1)
+    body = Path(__file__).read_text(encoding="utf-8")
+    chk("④ 帶加速器橋 · 表頭共用段 · glob 取前版 · 前版鏈 rc %d" % prior_rc, "[VIA:ACCEL-BRIDGE:v0100]" in body and "[VIA:TABLE-HEADER:v0100]" in body and prior_rc == 0)
+    for k, v in saved.items():
+        if v is None:
+            os.environ.pop(k, None)
+        else:
+            os.environ[k] = v
+    shutil.rmtree(td, ignore_errors=True)
+    n_ok = sum(ok)
+    print("[計] VDF_SystemManager_v0131 自測 %d/%d · %s" % (n_ok, len(ok), "PASS" if n_ok == len(ok) else "FAIL"))
+    return 0 if n_ok == len(ok) else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
