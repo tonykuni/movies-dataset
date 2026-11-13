@@ -1,0 +1,220 @@
+{
+ "schema": "VIA.SSOT.ConsistencyEngine.FailureModes.v1",
+ "version": "v0100",
+ "ts": "2026-11-13T00:00:00+00:00",
+ "engine": "VIA_VCGC_MDL262_SSOTConsistencyEngine",
+ "source": "操作員 2026-11-13:「在所有系統獨立性前提政策下建立此系統 高自動化 低風險 想30個潛在失敗因素情境及解決方案完善他」",
+ "rule": "每一項都要有對應的自測(引擎 --selftest 逐項驗;冊上有、自測沒有 = 自測不過)。新增情境 = 出新版號冊 + 引擎新版號。",
+ "modes": [
+  {
+   "id": "F01",
+   "group": "獨立性",
+   "scenario": "引擎把檔寫進別的系統(VDF / VRN / VAP / VQG 的冊或程式)",
+   "guard": "寫入白名單:只准自己的案帳與 VIA_Reports/ssot_consistency;其餘路徑直接拒(PermissionError)",
+   "automation": "全自動"
+  },
+  {
+   "id": "F02",
+   "group": "獨立性",
+   "scenario": "引擎匯入他系統程式或觸網,造成耦合與同意閘問題",
+   "guard": "只讀 JSON、純標準庫;自測用 AST 逐一核對本檔的 import",
+   "automation": "全自動"
+  },
+  {
+   "id": "F03",
+   "group": "獨立性",
+   "scenario": "某系統還沒自報(檔不存在),整輪中斷或被誤報為綠;或它的案被默默結掉",
+   "guard": "該格標 NODATA、其他系統照跑;來源缺席的案不結案,留在帳上",
+   "automation": "全自動"
+  },
+  {
+   "id": "F04",
+   "group": "獨立性",
+   "scenario": "某系統的冊壞了(JSON 壞、編碼不是 UTF-8、形狀不對)拖垮全部",
+   "guard": "逐來源隔離:該來源記 SRC_INVALID(紅),其餘照跑;UTF-8 BOM 照讀;由該系統自己的 manager 修",
+   "automation": "偵測自動;修復歸該系統"
+  },
+  {
+   "id": "F05",
+   "group": "獨立性",
+   "scenario": "帳裡記了本機絕對路徑或反斜線,工作站與容器對不上",
+   "guard": "帳內一律相對 VIA 根的正斜線路徑",
+   "automation": "全自動"
+  },
+  {
+   "id": "F06",
+   "group": "血緣與編號",
+   "scenario": "不同來源的值剛好相同,被併成一筆或併成一個號",
+   "guard": "血緣逐來源各留一列;案號的身分含來源;同值只判 AGREE,不合併",
+   "automation": "全自動"
+  },
+  {
+   "id": "F07",
+   "group": "血緣與編號",
+   "scenario": "兩邊寫法不同但其實等價,被當成衝突(雜訊淹沒真問題)",
+   "guard": "自動機證明語言相等 → 自動視為一致,不開案",
+   "automation": "全自動"
+  },
+  {
+   "id": "F08",
+   "group": "血緣與編號",
+   "scenario": "同一個中央號掛在兩個身分上,或已發號的內容悄悄變了",
+   "guard": "核發冊交叉檢:NUM_DUP_CODE(紅)· NUM_STALE_GRANT(黃);本檔不改號,完整稽核仍走 CGC_MDL237 audit",
+   "automation": "偵測自動;改號歸中央編號"
+  },
+  {
+   "id": "F09",
+   "group": "血緣與編號",
+   "scenario": "新提案直接蓋掉 LOCKED 的式子",
+   "guard": "提案只是位階最低的一個來源;與 LOCKED 不等價就開案待裁,LOCKED 冊一個位元都不動",
+   "automation": "偵測自動;裁定歸操作員"
+  },
+  {
+   "id": "F10",
+   "group": "正則",
+   "scenario": "語法超出檢查能力卻被判成「沒衝突」",
+   "guard": "不可證的一律 UNPROVEN,燈最多黃,不給綠",
+   "automation": "全自動"
+  },
+  {
+   "id": "F11",
+   "group": "正則",
+   "scenario": "子集吞噬:長式被短式整個吃掉(台指期結算 vs 台指期)",
+   "guard": "精確關係 SUBSET / SUPERSET + 最短見證字串",
+   "automation": "全自動"
+  },
+  {
+   "id": "F12",
+   "group": "正則",
+   "scenario": "交叉覆蓋:兩條不同目標的式子有字兩邊都收",
+   "guard": "精確關係 OVERLAP,三種見證(只 A 收 · 只 B 收 · 都收)",
+   "automation": "全自動"
+  },
+  {
+   "id": "F13",
+   "group": "正則",
+   "scenario": "ReDoS:巢狀量詞讓比對指數爆炸,也可能拖垮檢查引擎自己",
+   "guard": "靜態證明重複本體有二義切法(不執行式子);引擎的樣本比對走 NFA 模擬,線性時間不回溯",
+   "automation": "全自動"
+  },
+  {
+   "id": "F14",
+   "group": "正則",
+   "scenario": "同一式在 Python 與 DuckDB / RE2 判法不同(\\d 收全形數字);`$` 放過結尾換行",
+   "guard": "比 Python 語意與 ASCII 語意的語言差,附見證;`$` 結尾另記",
+   "automation": "全自動"
+  },
+  {
+   "id": "F15",
+   "group": "正則",
+   "scenario": "死分支:後面的分支永遠輪不到",
+   "guard": "逐分支證明是否被前面的分支全收",
+   "automation": "全自動"
+  },
+  {
+   "id": "F16",
+   "group": "正則",
+   "scenario": "同範疇裡不同的鍵有字兩邊都收,或新式搶走別人的正例",
+   "guard": "同範疇逐對證明交疊;正例交叉比對(RGX_SCOPE_OVERLAP / RGX_STEAL)",
+   "automation": "偵測自動;裁定歸操作員"
+  },
+  {
+   "id": "F17",
+   "group": "正則",
+   "scenario": "式子跟自己宣告的正反例對不上",
+   "guard": "每式的正反例逐一驗(RGX_EXAMPLE_FAILED,紅)",
+   "automation": "全自動"
+  },
+  {
+   "id": "F18",
+   "group": "正則",
+   "scenario": "式子太大或太多,證明跑不完",
+   "guard": "狀態上限 + 整輪時間預算;超過的照實標 UNPROVEN",
+   "automation": "全自動"
+  },
+  {
+   "id": "F19",
+   "group": "同義字",
+   "scenario": "一詞兩主:同一個詞在不同來源指到不同目標",
+   "guard": "同範疇內逐詞比對(SYN_MULTI_TARGET,紅)",
+   "automation": "偵測自動;裁定歸操作員"
+  },
+  {
+   "id": "F20",
+   "group": "同義字",
+   "scenario": "全形 / 大小寫 / 多餘空白讓同一個詞躲過比對",
+   "guard": "比對前 NFKC + casefold + 空白收斂;原拼法保留不改",
+   "automation": "全自動"
+  },
+  {
+   "id": "F21",
+   "group": "同義字",
+   "scenario": "同義字循環(A 是 B 的別名、B 又是 A 的別名)",
+   "guard": "別名圖找互指(SYN_CYCLE,紅)",
+   "automation": "偵測自動;裁定歸操作員"
+  },
+  {
+   "id": "F22",
+   "group": "同義字",
+   "scenario": "同一個詞在不同範疇本來就各有其主,被誤判成衝突",
+   "guard": "只在同範疇內比;跨範疇只記附記",
+   "automation": "全自動"
+  },
+  {
+   "id": "F23",
+   "group": "案帳與流程",
+   "scenario": "同一個衝突每跑一次就多開一案、多寫一列",
+   "guard": "案號 = 內容定址(身分的雜湊);狀態沒變就 0 列",
+   "automation": "全自動"
+  },
+  {
+   "id": "F24",
+   "group": "案帳與流程",
+   "scenario": "案帳被改字或刪列",
+   "guard": "每列串前一列雜湊 + 連號;對不上就 CHAIN_BROKEN / SEQ_BROKEN(紅)並拒絕新增",
+   "automation": "全自動"
+  },
+  {
+   "id": "F25",
+   "group": "案帳與流程",
+   "scenario": "兩個工作階段同時寫案帳",
+   "guard": "寫鎖(O_EXCL);第二個寫入者直接被擋,帳不動;殘鎖不自動破,請操作員確認",
+   "automation": "偵測自動;殘鎖歸操作員"
+  },
+  {
+   "id": "F26",
+   "group": "案帳與流程",
+   "scenario": "寫到一半當機,留下半列",
+   "guard": "整檔寫暫存檔 → fsync → os.replace(原子);讀到殘尾照實報 TORN 並拒絕新增",
+   "automation": "全自動"
+  },
+  {
+   "id": "F27",
+   "group": "案帳與流程",
+   "scenario": "裁定之後冊又改了,舊裁定被沿用",
+   "guard": "裁定綁當時的證據指紋;指紋變了 → STALE 重開",
+   "automation": "全自動"
+  },
+  {
+   "id": "F28",
+   "group": "案帳與流程",
+   "scenario": "AI 自己替操作員裁定",
+   "guard": "rule 一定要帶操作員原話(--order),沒有就拒(rc 2);引擎沒有自動裁定這條路",
+   "automation": "全自動"
+  },
+  {
+   "id": "F29",
+   "group": "案帳與流程",
+   "scenario": "冊的尾版被刪或回滾",
+   "guard": "來源水位記進帳;尾版比上次低 → SRC_ROLLBACK(紅)",
+   "automation": "全自動"
+  },
+  {
+   "id": "F30",
+   "group": "案帳與流程",
+   "scenario": "黃被報成綠、結束碼說謊;時鐘倒退讓順序錯亂",
+   "guard": "燈的彙總規則固定(有紅即紅、有黃或不可證即黃);非綠 rc 1;時間只記 UTC,順序靠 seq",
+   "automation": "全自動"
+  }
+ ]
+}

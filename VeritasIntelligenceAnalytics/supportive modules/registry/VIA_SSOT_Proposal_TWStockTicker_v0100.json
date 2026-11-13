@@ -1,0 +1,82 @@
+{
+ "schema": "VIA.SSOT.Proposal.v1",
+ "version": "v0100",
+ "ts": "2026-11-13T00:00:00+00:00",
+ "status": "PENDING_RULING",
+ "source": "操作員 2026-11-13 貼文(定義逐步更正後的最終版):「名稱請依照底下: tw_stock_ticker tw_stock_yfinance_ticker tw_stock_bloomberg_ticker」「台股的代碼為四碼數字第一碼不可為零」「Bloomberg 是 TT而已」「Bloomberg後面不用加equity」「如果是同一隻股票前面四個數字相同」「我只要顧台灣股票,不要把ETF也搞進去」「分別屬於ticker yfinance_ticker Bloomberg_ticker三大類之一」",
+ "policy": "提案 = 位階最低的來源。它不改任何 LOCKED 的式子、不發號。VIA_VCGC_MDL262_SSOTConsistencyEngine 拿它跟現行各冊逐一證明關係;不等價的開案,由操作員與 AI 裁定後,才由該冊的主人出新版號冊、走 CGC_MDL278 收件 → CGC_MDL237 發號。",
+ "parents": {
+  "tw_stock_ticker": "ticker",
+  "tw_stock_yfinance_ticker": "yfinance_ticker",
+  "tw_stock_bloomberg_ticker": "bloomberg_ticker"
+ },
+ "rules": [
+  {
+   "id": "same_company_first4",
+   "text": "同一檔股票(同一家發行公司)前四碼數字相同:2881 與 2881A 的 base_company_code 都是 2881",
+   "derive": "tw_stock_ticker[:4]"
+  },
+  {
+   "id": "stock_only",
+   "text": "只收台灣個股;ETF(00 開頭)· ETN(02)· 權證(03–08)都不在這三個鍵的範疇"
+  }
+ ],
+ "open_question": "貼文裡最後一版的式子保留了一個英文字尾([a-zA-Z]?,給特別股 2881A 用);操作員的原話是「四碼數字第一碼不可為零」。要不要收字尾由操作員裁定(見案帳)。",
+ "assets": [
+  {
+   "key": "tw_stock_ticker",
+   "kind": "REGEX",
+   "scope": "tw.stock.identifier",
+   "pattern": "^[1-9][0-9]{3}[a-zA-Z]?$",
+   "positive": [
+    "2330",
+    "1101",
+    "9958",
+    "2881A"
+   ],
+   "negative": [
+    "0050",
+    "00981A",
+    "23301",
+    "233",
+    "2330.TW",
+    "2330 TT"
+   ]
+  },
+  {
+   "key": "tw_stock_yfinance_ticker",
+   "kind": "REGEX",
+   "scope": "tw.stock.identifier",
+   "pattern": "^[1-9][0-9]{3}[a-zA-Z]?\\.(TW|TWO)$",
+   "positive": [
+    "2330.TW",
+    "6223.TWO",
+    "2881A.TW"
+   ],
+   "negative": [
+    "0050.TW",
+    "2330",
+    "2330.tw",
+    "2330.TP"
+   ]
+  },
+  {
+   "key": "tw_stock_bloomberg_ticker",
+   "kind": "REGEX",
+   "scope": "tw.stock.identifier",
+   "pattern": "^[1-9][0-9]{3}[a-zA-Z]? TT$",
+   "positive": [
+    "2330 TT",
+    "5274 TT",
+    "2881A TT"
+   ],
+   "negative": [
+    "2330 TT Equity",
+    "2330 TP",
+    "0050 TT",
+    "2330TT",
+    "2330"
+   ]
+  }
+ ]
+}

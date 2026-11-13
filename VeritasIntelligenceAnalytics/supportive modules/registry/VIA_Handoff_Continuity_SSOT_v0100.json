@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-13T20:26:25Z",
+ "updated_at": "2026-11-13T22:06:35Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -5763,6 +5763,24 @@
    "updated_at": "2026-11-13T19:39:51Z",
    "timeout_seconds": 1200,
    "registered_at": "2026-11-13T19:39:51Z"
+  },
+  "C-ssot-consistency-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/VIA_VCGC_MDL262_SSOTConsistencyEngine_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[VIA_VCGC_MDL262_SSOTConsistencyEngine v0100 自測] 32/32",
+   "scope": "VCGC 多系統 SSOT 一致性引擎 v0100:正則關係精確證明(自動機;與 re 對答案)· 靜態風險(ReDoS · 方言漂移 · `$` 換行 · 死分支)· 多來源血緣(同值不併號)· 內容定址案號帳(只增 · 雜湊鏈 · 寫鎖 · 原子換檔)· 30 個失敗情境逐項自測;對 VDF / VRN / VAP / VQG 只讀",
+   "dependencies": [
+    "supportive modules/registry/VIA_VCGC_MDL262_SSOTConsistencyEngine_v*.py",
+    "supportive modules/registry/VIA_SSOT_ConsistencyEngine_Sources_SSOT_v*.json",
+    "supportive modules/registry/VIA_SSOT_ConsistencyEngine_FailureModes_SSOT_v*.json"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-13T22:06:35Z",
+   "timeout_seconds": 600
   }
  },
  "work_items": [
@@ -11445,6 +11463,13 @@
    "next": "VRN-2 會話推上 GitHub 並由 VRN-2 自己合併;合併後 VCGC 只讀複驗",
    "receipt": null,
    "updated_at": "2026-11-13T20:26:25Z"
+  },
+  {
+   "id": "VCGC-REQ246:C-ssot-consistency-v0100",
+   "requirement": "VCGC-REQ246",
+   "state": "VERIFIED",
+   "case": "C-ssot-consistency-v0100",
+   "receipt": "docs/handoff/evidence/C-ssot-consistency-v0100.json"
   }
  ]
 }
