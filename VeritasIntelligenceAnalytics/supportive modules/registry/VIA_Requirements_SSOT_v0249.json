@@ -140,7 +140,7 @@
  "tally": {
   "RECORDED": 24,
   "COVERED": 140,
-  "PARTIAL": 108,
+  "PARTIAL": 110,
   "MISSING": 1
  },
  "requirements": [
@@ -7185,6 +7185,35 @@
    "quotes": [
     "操作員 2026-11-13:「VCGC已經有很多工具可用可擷取使用不用從頭 整理一下VCGC TOKEN SAVING工具看要如何整合 搭配GRAPHIFY OMNIROUTE」→「接進 VCGC 並補上 MCP 的 read slice digest」"
    ]
+  },
+  {
+   "code": "VCGC-REQ225",
+   "subsystem": "VCGC",
+   "topic": "上傳件與 PC 檔導入檢查:有無導入 · 未導入者原樣收容 · 工具有無整合",
+   "requirement": "操作員 2026-11-13:「檢查有無導入」(3 個上傳 zip + Downloads / OneDrive 34 檔清單)「檢視工具有無整合 若無則擷取整合進去」",
+   "status": "PARTIAL",
+   "homes": [
+    "../supportive modules/references/intake/VIA_Uploads_20261113/MANIFEST_uploads_v0100.json",
+    "../docs/handoff/ai/VIA_UploadIntake_20261113.md"
+   ],
+   "evidence": "2026-11-13 容器:上傳 zip 逐檔 blob+sha256 比對 main 與全部遠端分支 → Test Closeout v0100 原樣收容(SHA256SUMS 16/16 · 拋棄式自測 16 ok 1 skip)· WorkbenchLocal v0104 原樣收容(與 practical-pasteur 分支只差換行);PC 34 檔只得檔名:倉內沒有 24 · 已導入 1 · main 同名 8 · 只在分支 1",
+   "next": "PC 檔上傳後逐檔比對收容;Test Closeout 啟用與否由操作員定(與 VCGC closeout · CGC_MDL224 · SDD 重疊);與 optimistic-goodall 分支撞號由合併者依 L25 取聯集",
+   "hand": "operator"
+  },
+  {
+   "code": "VCGC-REQ226",
+   "subsystem": "VCGC",
+   "topic": "MCP 強化:ChatGPT · Gemini · Claude · Manus 存取 PC 檔(遠端唯讀工作夾 · 驗證 · 通道)· MCP TO GITHUB 抓資料引擎",
+   "requirement": "操作員 2026-11-13:「強化 mcp to chatgpt gemini CLAUDE MANUS PC FILE … 全景式讀取分析及上述功能整合 … MCP TO GITHUB 將資料引擎抓進來」「導入」",
+   "status": "PARTIAL",
+   "homes": [
+    "../VIA_MCP_Engine/VIA_MCP_Engine_v0103.py",
+    "CGC_MDL279_MCPServer_v0103.py",
+    "../docs/handoff/ai/VIA_UploadIntake_20261113.md"
+   ],
+   "evidence": "現況已在倉:filesystem(本機讀寫)· GitHub MCP(唯讀 PAT)· 8 平台設定 · supergateway 橋 + OmniRoute · via-vcgc read/slice/digest(REQ224);ChatGPT 分享頁讀不到內容",
+   "next": "撞號定案後:CGC_MDL279 下一版 --files-root(遠端平台唯讀 PC 工作夾全景讀取)· 橋接驗證金鑰;通道 / Access / 金鑰是操作員的手;操作員指名要抓的 GitHub 倉 / 資料引擎",
+   "hand": "operator"
   }
  ],
  "non_requirements": [
@@ -7576,5 +7605,5 @@
   }
  ],
  "why_v0247": "只增:導入 VIA_VCGC_Commercial_Review_v0100(22 差異 · 40 隔離測試 NOT_RUN)→ 8 條 CAND-VCGC-COM-* 候選需求登冊待批(不發正式號);REQ221 補 G7 證據。",
- "why_v0249": "只增:+VCGC-REQ223(影子整併 CGC_MDL281 · PARTIAL:工具在、各家族實際整併待裁定)· +VCGC-REQ224(MCP 讀檔三動詞 · COVERED)。v0248 一字不動。"
+ "why_v0249": "只增:+VCGC-REQ223(影子整併 CGC_MDL281 · PARTIAL:工具在、各家族實際整併待裁定)· +VCGC-REQ224(MCP 讀檔三動詞 · COVERED)。v0248 一字不動。 +VCGC-REQ225(上傳件導入檢查 · PARTIAL)· +VCGC-REQ226(MCP PC 檔 / GitHub 資料引擎 · PARTIAL)。"
 }
