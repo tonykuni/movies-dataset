@@ -10,7 +10,7 @@
   (ModuleNotFoundError · No module named · 不在 · 缺件 · ABSENT),而且這台用 importlib.util.find_spec 實查確實沒裝」
   → 判 ABSENT,原因寫「缺套件 X(這台沒裝 · 有裝的機器要複驗)」。自家模組(VRN_ / VDF_ / CGC_ …)缺仍算真壞;
   套件其實有裝 → 照實 FAIL(不漂白)。其餘(test / health / conform / 所有動詞)全照 v0265。
-VRN-2 自己的入口(L120 / L123);零網路 · 不用 TA-Lib · 不寫同意閘 · 不裝套件。
+VRN-2 自己的入口(L120 / L123);子程序環境照 v0265 sm_child_env(帶 VIA_FROM_VCGC=YES,引擎自測走 VCGC 閘);零網路 · 不用 TA-Lib · 不寫同意閘 · 不裝套件。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
