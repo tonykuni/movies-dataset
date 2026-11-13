@@ -1323,7 +1323,7 @@ def failure_modes(via: Path = VIA) -> list:
     p = tail_of(via / "supportive modules" / "registry", "VIA_Workflow_VCGC_SSOT_v*.json")
     for w in (load_json(p) or {}).get("workflows", []) if p else []:
         if w.get("code") == "VCGC-WKF045":
-            return w.get("failure_modes") or []
+            return (w.get("spec") or {}).get("failure_modes") or w.get("failure_modes") or []   # 放 spec 內:不改工作流表頭(T3)
     return []
 
 
