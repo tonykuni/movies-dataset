@@ -2696,7 +2696,7 @@
      "進度帳只增:每系統每輪一列,舊列原封不動;矩陣附跑 / 綠 / 連綠",
      "憲法性燈誠實:入口空號 → RED;衝突冊 OPEN 點到本系統 → RED;治理器紅 → RED;有號但留白 / 黃 / 未登記 L122 冊 → YELLOW;全有號 · 紅 0 黃 0 · 留白 0 · 衝突 0 → GREEN",
      "分開命名:VRN-1 / VRN-2 分開列,籠統「VRN」不點名任何一家",
-     "發號不在矩陣:只經 VCGC run CGC_MDL237_NumberingSystem --apply --scope / 治理器 --apply,且 audit 遺失 0 · 改身分 0 · 重號 0"
+     "發號不在矩陣:發號一律走 `VCGC run CGC_MDL237_NumberingSystem` --apply --scope / 治理器 --apply,且 audit 遺失 0 · 改身分 0 · 重號 0"
     ],
     "entry": "python3 \"docs/handoff/ai/VIA_FiveSystemConstitution_v*.py\" run --apply",
     "evidence": "docs/handoff/ai/VIA_FiveSystemConstitution_latest.json · docs/handoff/ai/VIA_FiveSystem_Progress_v0100.jsonl · docs/handoff/evidence/C-fivesystem-constitution-v0100.json",
@@ -2706,6 +2706,15 @@
      "VIA_VCGC_FunctionInventory_SSOT_v0210.json",
      "docs/handoff/ai/VIA_FiveSystemConstitution_latest.json",
      "docs/handoff/ai/VIA_RC1_ConflictRegistry_v0102.json"
+    ],
+    "acceptance_before_v0147": [
+     "L125 在政策冊尾版且 ACTIVE;L122 / L123 帶延伸註,不改原文",
+     "矩陣唯讀五系統:不寫任何系統的冊 / 正本 / 號冊;只寫 VIA_FiveSystemConstitution_v*.json / .md / UI 與進度帳(夾具自測 sha 全同為證)",
+     "五系統各自子程序實測、並行、各自逾時;一個紅不改別人的燈;rc 0 才綠,逾時 124 紅,不冒充",
+     "進度帳只增:每系統每輪一列,舊列原封不動;矩陣附跑 / 綠 / 連綠",
+     "憲法性燈誠實:入口空號 → RED;衝突冊 OPEN 點到本系統 → RED;治理器紅 → RED;有號但留白 / 黃 / 未登記 L122 冊 → YELLOW;全有號 · 紅 0 黃 0 · 留白 0 · 衝突 0 → GREEN",
+     "分開命名:VRN-1 / VRN-2 分開列,籠統「VRN」不點名任何一家",
+     "發號不在矩陣:只經 VCGC run CGC_MDL237_NumberingSystem --apply --scope / 治理器 --apply,且 audit 遺失 0 · 改身分 0 · 重號 0"
     ]
    },
    "plan": {
@@ -2946,12 +2955,13 @@
      "code": "VCGC-WKF032-STP002",
      "alias": "mcp_expose",
      "name": "MCP v0102 露互監 / 備份 / 六項令收據(只讀)",
-     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0102.py",
+     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
      "verb": "--serve",
      "inside": "VCGC MCP",
      "evidence": "step:VCGC-WKF032-STP001",
      "evidence_file": "via://mutual/latest · via://backup/check",
-     "what": "MCP v0102 露互監 / 備份 / 六項令收據(只讀)"
+     "what": "MCP v0102 露互監 / 備份 / 六項令收據(只讀)",
+     "engine_before_v0147": "supportive modules/registry/CGC_MDL279_MCPServer_v0102.py"
     },
     {
      "code": "VCGC-WKF032-STP003",
@@ -3711,21 +3721,31 @@
      "what": "A 本機 / B git ref 分軌 · G1–G6 實算",
      "engine": "docs/handoff/ai/VIA_SystemCard_v0100.py",
      "verb": "scan",
-     "inside": "VCGC run"
+     "inside": "VCGC run",
+     "evidence": "self:VIA_SystemCard",
+     "evidence_file": "docs/handoff/evidence/V-systemcard-v0100.json"
     },
     {
      "code": "VCGC-WKF042-STP002",
      "alias": "systemcard_platform",
      "name": "鎖定模板每系統頁 + 管理者版 Hub(VCGC 工具卡)",
      "what": "鎖站 check · 卡片燈 = 鎖冊 sha 實比",
-     "engine": "docs/handoff/ai/VIA_SystemCard_v0100.py"
+     "engine": "docs/handoff/ai/VIA_SystemCard_v0100.py",
+     "verb": "scan",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_SystemCard",
+     "evidence_file": "docs/handoff/evidence/V-systemcard-v0100.json",
+     "note": "鎖定模板頁與 Hub 由 scan() 內的 render_locked() 產出(VIA_SystemCard_v0100.py 第 401 行)"
     },
     {
      "code": "VCGC-WKF042-STP003",
      "alias": "mcp_parity",
      "name": "同一組 MCP 給所有 AI(parity)",
      "what": "via-systemcard · via-vcgc · omniroute → 8 平台;遠端需 HTTPS 隧道(操作員)",
-     "engine": "../VIA_MCP_Engine/VIA_MCP_Engine_v0103.py"
+     "engine": "../VIA_MCP_Engine/VIA_MCP_Engine_v0103.py",
+     "verb": "parity",
+     "inside": "VCGC mcp",
+     "evidence": "self:VIA_MCP_Engine"
     },
     {
      "code": "VCGC-WKF042-STP004",
@@ -3852,5 +3872,5 @@
  "why_v0144": "WKF037-STP001 → ParquetLake v0101;WKF038 自測 19。Codex PR #624:P1 套件 v0100 已在 main 卻被就地改 → 還原 v0100 一字不動 · 新行為出 VIA_ParquetLake_v0101(混型來源逐欄推型 · 微秒戳 · 自測 11);消費者 LakeMatrix v0101 / LakeConsole 改取尾版 glob。P2 ① _inbox 同名檔(a/data.csv · b/data.csv)互相覆蓋 → 路徑消毒 + 內容 sha8 命名 · xb 絕不覆蓋;P2 ② 見證燈只看 rc(引擎自報 YELLOW 仍 GREEN)→ 收據 lamp > stdout 標籤 > rc。",
  "why_v0145": "+WKF039 five_system_activate(五系統啟動 via HTML U/I;REQ216)。操作員 2026-11-10「activate 5 system via html u/i and run」→ VIA_LakeConsole v0101 薄尾:白名單 +6 動作(five_systems · activate_vcgc/vdf/vrn2/vqg/vap)+ 鏈 activate_all · 燈號 +6 盞 · 按鈕列 · 矩陣收據複製 · 逾時依系統。",
  "why_v0146": "只增:+VCGC-WKF042(SystemCard 全景卡 · 自建平台管理者版 · MCP parity);操作員 2026-11-10 四令合一。",
- "why_v0147": "只增:+VCGC-WKF043 shadow_merge(REQ223);WKF042 +REQ224 · +STP004 mcp_file_verbs(步碼只增)。v0146 一字不動。 WKF042 補 tests 欄與 STP001 verb/inside(SDD X-COL;STP002 的動詞看不出是哪一支產頁,不猜,留給擁有者)。"
+ "why_v0147": "只增:+VCGC-WKF043 shadow_merge(REQ223);WKF042 +REQ224 · +STP004 mcp_file_verbs(步碼只增)。v0146 一字不動。 WKF042 補 tests 欄與 STP001 verb/inside(SDD X-COL)。 WKF029 acceptance[6] 改寫字面(語意不變:發號走 CGC_MDL237 · audit 三零):原句「只經 VCGC run …」講的是發號工具不是入口,卻被 X-PEER-TEXT 當唯一入口舊字判黃,連帶 SDD v0106 自測 ④ FAIL;原句全文留 spec.acceptance_before_v0147(版史欄,L120 ①)。 WKF042 STP001–003 補 verb / inside / evidence:STP002 的頁與 Hub 由 scan() 內 render_locked() 產出(查碼確認,非推測);STP003 = VIA_MCP_Engine parity(VCGC mcp)。 WKF032-STP002(mcp_expose)引擎 v0102 → v0103:本批出了 MCP 薄尾 v0103(v0102 一字不動,收據資源全數沿用),步釘舊版會被 X-REG 判「註冊冊不是尾版」;舊值留 engine_before_v0147。"
 }
