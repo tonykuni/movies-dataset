@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-13T19:27:09Z",
+ "updated_at": "2026-11-13T19:39:51Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -155,7 +155,8 @@
   "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
   "supportive modules/registry/CGC_MDL224_TestAuto_v0107.py",
   "supportive modules/registry/CGC_MDL279_MCPServer_v0104.py",
-  "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0197.py"
+  "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0197.py",
+  "supportive modules/registry/VIA_VCGC_MDL260_ConvergeEngine_v0100.py"
  ],
  "frozen_sources": {
   "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -4825,6 +4826,25 @@
    "updated_at": "2026-11-13T16:57:08Z",
    "timeout_seconds": 900,
    "registered_at": "2026-11-13T16:57:08Z"
+  },
+  "C-converge-engine-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/VIA_VCGC_MDL260_ConvergeEngine_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_VCGC_MDL260_ConvergeEngine v0100 --selftest · 5/5",
+   "scope": "類似功能收斂引擎:全景清點 → 影子區比對 → 零遺失證明 → 視覺鎖定頁",
+   "dependencies": [
+    "supportive modules/registry/VIA_VCGC_MDL260_ConvergeEngine_v0100.py",
+    "supportive modules/registry/CGC_MDL281_ShadowMerge_v0100.py",
+    "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-13T19:39:51Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-13T19:39:51Z"
   }
  },
  "work_items": [
@@ -10112,6 +10132,50 @@
    "next": "逐項解 · 稽核仍須 遺失 0 · 改身分 0 · 重號 0",
    "receipt": null,
    "updated_at": "2026-11-13T18:07:52Z"
+  },
+  {
+   "id": "VCGC-REQ242:C-converge-engine-v0100",
+   "requirement": "VCGC-REQ242",
+   "case": "C-converge-engine-v0100",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "新模組;等 handoff test 收據",
+   "next": "handoff test",
+   "receipt": null,
+   "updated_at": "2026-11-13T19:39:51Z"
+  },
+  {
+   "id": "VCGC-REQ242:clusters-rulings",
+   "requirement": "VCGC-REQ242",
+   "case": "C-converge-engine-v0100",
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "全景 8 類似群全 BLOCKED_NEEDS_RULING(同簽章不同本體 / 只在一邊);最近的 AiVerbBridge MDL256×259:SAME 10 · 差 2",
+   "next": "逐群裁定保留哪個本體;裁定後照 WKF045 升一版、prune",
+   "receipt": null,
+   "updated_at": "2026-11-13T19:39:51Z"
+  },
+  {
+   "id": "VCGC-REQ243:env-conflict-plan",
+   "requirement": "VCGC-REQ243",
+   "case": "",
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "BASE · VIA_CORE · VIA_* 境衝突偵測(清華 / 阿里 / 官方鏡像)與新增計畫要在操作員電腦跑(容器無境 NODATA);工具已在 CGC_MDL135 · CGC_MDL186",
+   "next": "/vcgc-daily-close 第 8d 步在桌機跑 eight-hub;計畫出來後操作員按裝(L19)",
+   "receipt": null,
+   "updated_at": "2026-11-13T19:39:51Z"
+  },
+  {
+   "id": "VCGC-REQ243:bridge-gaps",
+   "requirement": "VCGC-REQ243",
+   "case": "",
+   "state": "PENDING",
+   "owner": "各系統 / 操作員",
+   "reason": "加速器橋 1676/1706:缺口 30 多為 VIA_HTML_UI CI/e2e 腳本 22 · 唯讀正本 SSOT 1(L95 不准動)· VRN 2(他系統);外抓網路橋 55/101",
+   "next": "各系統自補;VIA_HTML_UI 歸屬待操作員定;唯讀件列豁免冊",
+   "receipt": null,
+   "updated_at": "2026-11-13T19:39:51Z"
   }
  ]
 }

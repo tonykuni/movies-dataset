@@ -339,8 +339,13 @@ def build_candidate(a_path: Path, a_sha: str, tree_a, lines_a, defs_a, tree_b, d
 
 
 def prove(merged_src: str, defs_a, defs_b, rows, not_moved) -> dict:
-    tree = ast.parse(merged_src)
-    compile(merged_src, "<merged>", "exec")
+    try:
+        ast.parse(merged_src)
+        compile(merged_src, "<merged>", "exec")
+    except SyntaxError as exc:      # 例:B 的 from __future__ 被注到檔中段(F12)—— 證不出 = 不合,照實回,不炸
+        return {"parse": False, "compile": False, "a_defs_kept": 0, "a_defs": len(defs_a), "a_lost": [], "b_unaccounted": [],
+                "not_moved": len(not_moved), "error": "合併候選編譯不過:%s(第 %s 行)" % (exc.msg, exc.lineno),
+                "verdict": "BLOCKED_NEEDS_RULING"}
     tmp = Path(tempfile.mkstemp(suffix=".py")[1])
     try:
         tmp.write_text(merged_src, encoding="utf-8")

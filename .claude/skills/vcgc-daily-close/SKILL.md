@@ -24,6 +24,9 @@ E=$(python3 -c "import json;print(json.load(open('VeritasIntelligenceAnalytics/s
 | 6 | OmniRoute / MCP 健康(只讀) | `VIA_FROM_VCGC=YES python3 "$V" mcp doctor` |
 | 7 | 有新模組 / 新冊:編號 + 註冊(先提交再編號) | `git add … && git commit …` → `VIA_FROM_VCGC=YES python3 "$V" run CGC_MDL237_NumberingSystem --apply --scope` → `… registry-sync`(乾跑,退役數不合理就停)→ `… registry-sync --apply` |
 | 8 | 稽核(必 遺失 0 · 改身分 0 · 重號 0) | `VIA_FROM_VCGC=YES python3 "$V" run CGC_MDL237_NumberingSystem audit` |
+| 8b | 註冊結果(收尾必看:元件冊新 / 變 / 退役 · 名碼 · 中央號)| `VIA_FROM_VCGC=YES python3 "$V" registry-sync`(看計數)· `… run VIA_VCGC_MDL258_ToolMatrix naming` |
+| 8c | 舊版重複:整合優化驗證後刪除(只 VCGC 自己的)| `… run VIA_VCGC_MDL260_ConvergeEngine all` → `… run VIA_VCGC_MDL258_ToolMatrix prune`(READY 才 `--apply`)|
+| 8d | 環境 / LIB 衝突偵測 → 新增計畫(操作員電腦;容器無境 = NODATA)| `VIA_FROM_VCGC=YES python3 "$V" run CGC_MDL186_EnvGovernance_8Hub eight-hub --env-root <境根> --base-python <BASE python>`(BASE · VIA_CORE · VIA_* 境:清華 / 阿里 / 官方鏡像比對 · 衝突因子移除計畫 · 健康境上再新增 · 反覆驗證 · 只出計畫,安裝是操作員的手 L19)|
 | 9 | 收尾閘(乾跑;只重測相依案) | `VIA_FROM_VCGC=YES python3 "$V" closeout` |
 | 10 | 五系統每日備份(只增 · MANIFEST 入倉) | `python3 VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_DailyBackup_v0100.py backup` |
 | 11 | 備份自查 | `python3 VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_DailyBackup_v0100.py check` |
