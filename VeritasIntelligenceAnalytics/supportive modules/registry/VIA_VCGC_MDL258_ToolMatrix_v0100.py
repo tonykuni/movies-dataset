@@ -315,7 +315,7 @@ def discover(via: Path = VIA) -> tuple:
 def scan_tree(via: Path = VIA, sup_stems=()) -> dict:
     """活樹一次掃完:他系統載入 VCGC(釘版 / 名引)· VCGC 釘他系統版 · TA-Lib 使用與出現 · 活樹家族名。"""
     res = {"files": 0, "skipped_big": 0, "in_pin": {}, "in_name": {}, "out_pin": {}, "talib": [], "live_stems": set(),
-           "pairs": [], "seen": [], "out_pin_files": {}, "refs": {}, "sup_use": {}}
+           "pairs": [], "seen": [], "out_pin_files": {}, "refs": {}, "sup_use": {}, "cov": {}}
     sup_rx = re.compile(r"\b(" + "|".join(sorted((re.escape(x) for x in sup_stems), key=len, reverse=True)) + r")(?:_v\d{3,4}|\b)") if sup_stems else None
     for root, dirs, files in os.walk(via):
         r_root = rel(Path(root), via)
@@ -343,6 +343,8 @@ def scan_tree(via: Path = VIA, sup_stems=()) -> dict:
                     if name != p.name:
                         res["refs"].setdefault(name, set()).add(r)
             if p.suffix == ".py":
+                res["cov"][r] = {"sys": sysname, "accel": "[VIA:ACCEL-BRIDGE" in text,
+                                 "netuse": bool(NETUSE_RX.search(text)), "net": "[VIA:NET-BRIDGE" in text or "VIA_NET_TOOL_PATH" in text}
                 lines = [ln for ln in text.splitlines() if not ln.lstrip().startswith("#")]
                 if sysname in OTHER_SYSTEMS:
                     if sup_rx is not None:
@@ -661,6 +663,8 @@ def render_html(rep: dict, kit: str) -> str:
     kpis = [("工具家族", k["tools"]), ("VIA 中央管理工具", k["mdl"]), ("VIA 支援工具", k["sup"]),
             ("已發名碼", k["issued"]), ("擬發 / 留白", "%d / %d" % (k["proposed"], k["pending"])),
             ("命名衝突", k["conflicts"]), ("TA-Lib 程式使用(尾版)", k["talib_use"]), ("他系統釘 VCGC 版(尾版)", k["in_pin_files"]),
+            ("加速器覆蓋(尾版)", "%d / %d" % (rep["coverage"]["accel_ok"], rep["coverage"]["accel_n"])),
+            ("外抓模組網路橋", "%d / %d" % (rep["coverage"]["net_ok"], rep["coverage"]["net_n"])),
             ("鎖定閘", rep["visual_lock"].get("gate", "—"))]
     h = ['<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">',
          '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">',
@@ -766,7 +770,21 @@ def render_html(rep: dict, kit: str) -> str:
         h.append('<div class="vl-cell"><span class="vl-label">%s</span><span class="vl-value">%s</span></div>' % (t(label), t(fl.get(k2, 0))))
     h.append('</div><p class="vl-note">驗證(缺一不刪):尾版自測通過 · 尾版不在執行期載入舊版 · 活樹程式與冊(交接案相依 · 盤點冊 deps · 工具鎖冊 · 工作流 · 需求)'
              '沒有任何一處點名要刪的舊版檔;薄尾鏈先合成單檔並證零遺失(CGC_MDL281 PROVEN_ZERO_LOSS + 自測等價)。刪除前記刪除帳(檔名 · sha256 · 大小),git 歷史存原文。'
-             '逐家族明細在「VIA 中央管理工具」/「VIA 支援工具」兩表的「收斂」欄(可篩)。</p></div></section>')
+             '逐家族明細在「VIA 中央管理工具」/「VIA 支援工具」兩表的「收斂」欄(可篩)。</p></div>')
+    fm = rep.get("failure_modes") or []
+    h.append('<div class="vl-panel"><div class="vl-head"><h2>收斂工序 VCGC-WKF045 · 失敗可能 %d 種與解法</h2><span class="vl-why">逐家族體檢:'
+             'via-vcgc run VIA_VCGC_MDL258_ToolMatrix converge &lt;家族&gt;</span></div><div class="vl-scroll"><table><thead><tr><th>碼</th><th>失敗可能</th>'
+             '<th>怎麼發現</th><th>解法</th><th>步</th></tr></thead><tbody>' % len(fm))
+    for x in fm:
+        h.append('<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>' % (t(x.get("code")), t(x.get("risk")), t(x.get("detect")), t(x.get("fix")), t(x.get("step"))))
+    h.append('</tbody></table></div></div>')
+    cv = rep.get("coverage") or {}
+    h.append('<div class="vl-panel"><div class="vl-head"><h2>加速器 / 網路橋覆蓋率(活樹尾版 · L103 · L132)</h2><span class="vl-why">他系統的缺口只攤開、各系統自補(L123)</span></div>'
+             '<div class="vl-scroll"><table><thead><tr><th>系統</th><th>.py 尾版</th><th>帶加速器橋</th><th>外抓模組</th><th>帶網路橋</th></tr></thead><tbody>')
+    for sysname, b in sorted((cv.get("by_sys") or {}).items()):
+        h.append('<tr><td>%s</td><td class="vl-num">%d</td><td class="vl-num">%d</td><td class="vl-num">%d</td><td class="vl-num">%d</td></tr>' % (t(sysname), b[0], b[1], b[2], b[3]))
+    h.append('</tbody></table></div><p class="vl-note">缺加速器橋(前 20):%s</p><p class="vl-note">外抓卻缺網路橋(前 20):%s</p></div></section>'
+             % (t(" · ".join(cv.get("accel_miss", [])[:20]) or "無"), t(" · ".join(cv.get("net_miss", [])[:20]) or "無")))
 
     # ③ 整合進來
     it = rep["intake"]
@@ -881,6 +899,7 @@ SUPER = {"MDL": "VIA 中央管理工具", "TOKEN": "VIA 支援工具 · Token-Sa
 FROZEN_SEATS = {"accelerator", "network"}               # 批345 不可動(VeritasCeleritas / VeritasAegisNexus 本體)
 DEP_SKIP_RX = re.compile(r"VIA_NumberBooks/|VIA_Component_Inventory|VIA_VCGC_FunctionLedger|VIA_Numbering_SSOT|VIA_VCGC_ToolNaming|VCGC_FunctionMatrix_v"
                          r"|VIA_RegistryNumbers|docs/handoff/evidence/|/history/|VIA_EngineVersion_Register|\.md$|\.txt$|\.html$|\.jsonl$")
+NETUSE_RX = re.compile(r"^\s*(?:import|from)\s+(?:requests|httpx|aiohttp|urllib\.request|urllib3|http\.client|websocket|ftplib|socket)\b", re.M)
 OLDREF_RX = re.compile(r"\b([A-Za-z][A-Za-z0-9_]*_v\d{4}\.py)\b")
 
 
@@ -1022,10 +1041,19 @@ def collect(via: Path = VIA, ast: bool = True) -> dict:
                     "ready": sum(1 for r in rs if r["ready"] == "READY"), "flatten": sum(1 for r in rs if r["ready"] == "NEEDS_FLATTEN"),
                     "blocked": sum(1 for r in rs if r["ready"] == "BLOCKED_REF"),
                     "used_by": sorted({s2 for r in rs for s2 in r["sup_use"]})})
+    cov_rows = {r2: c for r2, c in tree["cov"].items() if r2 in tree["tails"]}
+    cov = {"accel_n": len(cov_rows), "accel_ok": sum(1 for c in cov_rows.values() if c["accel"]),
+           "net_n": sum(1 for c in cov_rows.values() if c["netuse"]), "net_ok": sum(1 for c in cov_rows.values() if c["netuse"] and c["net"]),
+           "accel_miss": sorted(r2 for r2, c in cov_rows.items() if not c["accel"])[:200],
+           "net_miss": sorted(r2 for r2, c in cov_rows.items() if c["netuse"] and not c["net"])[:200], "by_sys": {}}
+    for r2, c in cov_rows.items():
+        b = cov["by_sys"].setdefault(c["sys"], [0, 0, 0, 0])
+        b[0] += 1; b[1] += c["accel"]; b[2] += c["netuse"]; b[3] += bool(c["netuse"] and c["net"])
     flat = {k2: sum(1 for r in tools if r["ready"] == k2) for k2 in ("SINGLE", "READY", "NEEDS_FLATTEN", "BLOCKED_REF", "EXEMPT")}
     flat["old_files_ready"] = sum(r["versions"] - 1 for r in tools if r["ready"] == "READY")
     rep = {
-        "tool": "%s %s" % (NAME, VERSION), "at": utc_now(), "via": str(via), "secs": None, "two": two, "flatten": flat,
+        "tool": "%s %s" % (NAME, VERSION), "at": utc_now(), "via": str(via), "secs": None, "two": two, "flatten": flat, "coverage": cov,
+        "failure_modes": failure_modes(via), "releases": release_latest(via),
         "kpi": kpi, "tools": tools, "skipped_bad_name": skipped, "seats_excluded": seats_excluded,
         "naming": {"ledger": LEDGER_NAME, "conflicts": np_["conflicts"],
                    "plan": {f: p for f, p in np_["plan"].items()}, "issued": len(np_["issued"])},
@@ -1214,6 +1242,111 @@ def prune_cmd(apply: bool, via: Path = VIA) -> int:
     return 0 if not cnt.get("restored") else 1
 
 
+RELEASE_LEDGER = "VIA_VCGC_SupportRelease_v0100.jsonl"
+
+
+def failure_modes(via: Path = VIA) -> list:
+    p = tail_of(via / "supportive modules" / "registry", "VIA_Workflow_VCGC_SSOT_v*.json")
+    for w in (load_json(p) or {}).get("workflows", []) if p else []:
+        if w.get("code") == "VCGC-WKF045":
+            return w.get("failure_modes") or []
+    return []
+
+
+def release_latest(via: Path = VIA) -> dict:
+    out = {}
+    for row in read_jsonl(via / "supportive modules" / "registry" / RELEASE_LEDGER):
+        if row.get("family"):
+            out[row["family"]] = row
+    return out
+
+
+def release_cmd(apply: bool, via: Path = VIA) -> int:
+    """支援工具發行冊(L130 ④ · 操作員 2026-11-13 核可格式):一族一個發行版(版號 + sha256 + 使用系統);只增。
+    RELEASED = 實測帳 GREEN 對到這支尾版的 sha;其餘 CANDIDATE。他系統的副本由他系統自存(VCGC 不代寫)。"""
+    rep = collect(via, ast=False)
+    fams, _sk, _ex = discover(via)
+    led, have = ledger_last(via), release_latest(via)
+    new = []
+    for r in rep["tools"]:
+        if r["cls"] != "SUP" or not fams.get(r["family"], {}).get("tail"):
+            continue
+        tail = fams[r["family"]]["tail"]
+        sha = hashlib.sha256(tail.read_bytes()).hexdigest()
+        old = have.get(r["family"])
+        if old and old.get("sha256") == sha:
+            continue
+        lg = led.get(r["family"], {})
+        st = "RELEASED" if lg.get("lamp") == "GREEN" and lg.get("sha16") == sha[:16] else "CANDIDATE"
+        new.append({"ts": utc_now(), "event": "release", "family": r["family"], "code": r["name_code"], "group": r["group_label"],
+                    "version": "v%04d" % vnum(tail) if vnum(tail) >= 0 else "—", "file": rel(tail, via), "sha256": sha, "status": st,
+                    "consumers": r.get("sup_use", {}), "consumer_copy": "未自存(他系統直接載入 VCGC 活檔)" if r.get("sup_use") else "—",
+                    "rule": "他系統各存一份與本列 sha256 相同的副本;換版經操作員與 AI 協調、測試無誤才換(L130 ④)", "by": "%s %s" % (NAME, VERSION)})
+    print("[%s release] 支援工具 %d 族 · 新列 %d(RELEASED %d · CANDIDATE %d)· 他系統直接載入 %d 族" % (
+        NAME, sum(1 for r in rep["tools"] if r["cls"] == "SUP"), len(new), sum(1 for x in new if x["status"] == "RELEASED"),
+        sum(1 for x in new if x["status"] == "CANDIDATE"), sum(1 for r in rep["tools"] if r["cls"] == "SUP" and r.get("sup_use"))), flush=True)
+    if apply and new:
+        with open((HERE if via == VIA else via / "supportive modules" / "registry") / RELEASE_LEDGER, "a", encoding="utf-8") as fh:
+            for x in new:
+                fh.write(json.dumps(x, ensure_ascii=False) + "\n")
+        print("  [--apply] 寫入 %d 列 → %s" % (len(new), RELEASE_LEDGER), flush=True)
+    elif not apply:
+        print("  (乾跑;--apply 才只增寫入)", flush=True)
+    return 0
+
+
+def converge_card(fam: str, via: Path = VIA) -> dict:
+    """收斂工序 WKF045 逐家族體檢:AST · 分類 · 編號 · 註冊 · 名碼 · 薄尾 · 點名 · 測試 · 盤點 · 啟動 · 加速器 / 網路橋 · 可刪。只讀。"""
+    import ast as _ast
+    rep = collect(via, ast=True)
+    r = next((x for x in rep["tools"] if x["family"] == fam), None)
+    if r is None:
+        return {"family": fam, "found": False}
+    fams, _sk, _ex = discover(via)
+    tail = fams[fam]["tail"]
+    src = tail.read_text(encoding="utf-8", errors="replace")
+    try:
+        compile(src, str(tail), "exec")
+        tree = _ast.parse(src)
+        boot = any(isinstance(n, _ast.FunctionDef) and n.name in ("main", "selftest") for n in tree.body)
+        boot_why = "可編譯 · 有 main / selftest" if boot else "可編譯 · 沒有 main / selftest 入口"
+    except SyntaxError as exc:
+        boot, boot_why = False, "編譯失敗:%s" % exc
+    inv = load_json(via / "supportive modules" / "registry" / "VIA_Component_Inventory_SSOT_v0100.json") or {}
+    registered = any(x.get("source") == rel(tail, via) and x.get("state") == "ACTIVE" for x in inv.get("records", []))
+    cov = rep["coverage"]
+    steps = [
+        ("STP001 AST 讀卡", not r["ast"] or set(r["ast"]) <= {"SWALLOW", "DUPDEF"}, " ".join("%s%d" % kv for kv in sorted(r["ast"].items())) or "0 問題"),
+        ("STP002 分類(兩大功能)", True, "%s · %s" % (r["super"], r["group_label"])),
+        ("STP003 中央編號", bool(r["reg_code"]), r["reg_code"] or "未編號 → run CGC_MDL237_NumberingSystem --apply --scope"),
+        ("STP004 註冊(元件冊 + 名碼)", registered and r["name_status"] == "ISSUED", "元件冊 %s · 名碼 %s %s" % ("有" if registered else "無", r["name_code"] or "—", r["name_status"])),
+        ("STP005 模組化 / 薄尾鏈", r["ready"] != "NEEDS_FLATTEN", "%d 版 · %s" % (r["versions"], r["ready_why"])),
+        ("STP006 相關模組(他處點名)", r["ready"] != "BLOCKED_REF", "; ".join(r["ready_refs"][:3]) or "無舊版點名"),
+        ("STP007 註冊無缺漏", bool(r["reg_code"]) and registered, "編號 + 元件冊都在" if r["reg_code"] and registered else "補 registry-sync / 編號"),
+        ("STP008 整合去重", r["ready"] in ("SINGLE", "READY"), "單檔" if r["ready"] == "SINGLE" else "合成前跑 run CGC_MDL281_ShadowMerge compare 證零遺失"),
+        ("STP009 測試(唯一最強)", r["test_lamp"] == "GREEN", "實測帳 %s %s" % (r["test_lamp"] or "沒量", r["test_at"][:16])),
+        ("STP010 清點(測站)", bool(r["stations"]), ", ".join(r["stations"][:3]) or "沒有測站 → 登盤點冊"),
+        ("STP011 啟動正常", boot, boot_why),
+        ("STP011b 加速器 / 網路橋", "[VIA:ACCEL-BRIDGE" in src and (not NETUSE_RX.search(src) or "[VIA:NET-BRIDGE" in src or "VIA_NET_TOOL_PATH" in src),
+         "加速器橋 %s · 外抓 %s · 網路橋 %s" % ("有" if "[VIA:ACCEL-BRIDGE" in src else "無", "是" if NETUSE_RX.search(src) else "否",
+                                         "有" if ("[VIA:NET-BRIDGE" in src or "VIA_NET_TOOL_PATH" in src) else "無")),
+        ("STP012 刪舊版", r["ready"] in ("SINGLE", "READY"), "已單檔" if r["ready"] == "SINGLE" else ("可 prune --apply" if r["ready"] == "READY" else "先完成 STP005 / STP006 / STP008")),
+    ]
+    return {"family": fam, "found": True, "tail": tail.name, "steps": steps, "ok": all(s[1] for s in steps),
+            "coverage": "%d/%d · 網路 %d/%d" % (cov["accel_ok"], cov["accel_n"], cov["net_ok"], cov["net_n"])}
+
+
+def converge_cmd(fam: str, via: Path = VIA) -> int:
+    card = converge_card(fam, via)
+    if not card.get("found"):
+        print("[%s converge] 找不到家族 %s(用家族名,不含 _vNNNN)" % (NAME, fam), flush=True)
+        return 3
+    print("[%s converge] %s(尾版 %s)· %s" % (NAME, fam, card["tail"], "全過" if card["ok"] else "有待辦"), flush=True)
+    for name, ok, note in card["steps"]:
+        print("  [%s] %s · %s" % ("✓" if ok else "✗", name, note), flush=True)
+    return 0 if card["ok"] else 1
+
+
 def signature(via: Path = VIA) -> str:
     h = hashlib.sha256()
     reg = via / "supportive modules" / "registry"
@@ -1386,6 +1519,8 @@ def selftest() -> int:
                 "工具 %d · 閘 %s %s" % (k["tools"], gate["lamp"], gate["findings"][:2]))
             tok = next((r for r in rep["tools"] if r["family"] == "CGC_MDL158_VIAPanoramaAuditRepair"), {})
             con = next((r for r in rep["tools"] if r["family"] == "CGC_MDL149_VeritasCentralGovernanceConsole"), {})
+            chk("⑫d 覆蓋率實量:加速器橋 / 外抓模組網路橋都有分子分母 · 分系統列",
+                rep["coverage"]["accel_n"] > 1000 and rep["coverage"]["net_n"] > 0 and rep["coverage"]["by_sys"], (rep["coverage"]["accel_ok"], rep["coverage"]["accel_n"], rep["coverage"]["net_ok"], rep["coverage"]["net_n"]))
             chk("⑫c 兩大功能:token 工具在「Token-Saving」組 · 主控台在「主控台 / 入口」組且薄尾待合成 · 總覽每組有列 · 收斂五態加總 = 家族數",
                 tok.get("group") == "TOKEN" and con.get("group") == "CONSOLE" and con.get("ready") == "NEEDS_FLATTEN" and rep["two"]
                 and sum(rep["flatten"][k3] for k3 in ("SINGLE", "READY", "NEEDS_FLATTEN", "BLOCKED_REF", "EXEMPT")) == k["tools"],
@@ -1414,12 +1549,16 @@ def main(argv=None) -> int:
         return naming_cmd("--apply" in args)
     if verb == "check":
         return check(VIA)
+    if verb == "release":
+        return release_cmd("--apply" in args)
+    if verb == "converge":
+        return converge_cmd(args[1] if len(args) > 1 else "")
     if verb == "prune":
         return prune_cmd("--apply" in args)
     if verb == "watch":
         iv = int(args[args.index("--interval") + 1]) if "--interval" in args else 300
         return watch(iv)
-    print("[%s] 不認得的動詞:%s(build · naming · check · prune · watch · --selftest)" % (NAME, verb), flush=True)
+    print("[%s] 不認得的動詞:%s(build · naming · check · prune · release · converge · watch · --selftest)" % (NAME, verb), flush=True)
     return 2
 
 

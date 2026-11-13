@@ -3847,7 +3847,7 @@
      "VCGC-REQ233"
     ],
     "acceptance": [
-     "VIA_VCGC_MDL258_ToolMatrix 自測 19/19",
+     "VIA_VCGC_MDL258_ToolMatrix 自測 20/20",
      "真樹出頁視覺鎖定閘 GREEN",
      "naming --apply 只增、第二次 0 列",
      "check 照實紅(他系統釘 VCGC 版 · 不代改)"
@@ -3929,6 +3929,334 @@
      "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
     }
    ]
+  },
+  {
+   "code": "VCGC-WKF045",
+   "alias": "family_converge",
+   "name": "家族收斂標準工序:注入 AST → 分類 → 編號 → 註冊 → 模組化簡化 → 相關模組 → 註冊無缺漏 → 整合去重 → 測試成唯一最強 → 清點 → 啟動 → 刪舊 → 收尾",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-13T18:21:16Z",
+   "spec": {
+    "goal": "同一家族收斂成唯一最強的單檔:功能只增不減、不衝突、去重;原內容有紀錄(刪除帳 + git)",
+    "requirements": [
+     "VCGC-REQ238",
+     "VCGC-REQ232"
+    ],
+    "acceptance": [
+     "converge <家族> 13 步全 ✓",
+     "刪前 / 刪後自測 0",
+     "audit 遺失 0 · 改身分 0 · 重號 0",
+     "加速器 / 網路橋覆蓋 100%(該家族)"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python3 \"$V\" run VIA_VCGC_MDL258_ToolMatrix converge <家族>",
+    "evidence": "docs/handoff/evidence/C-tool-matrix-v0100.json",
+    "books": [
+     "VIA_VCGC_PruneLedger_v0100.jsonl",
+     "VIA_VCGC_ToolNaming_v0100.jsonl"
+    ]
+   },
+   "plan": {
+    "enter": "一個 VCGC 家族(他系統的家族由該系統照同工序自做)",
+    "exit": "單檔尾版 · 刪除帳 · 矩陣「單檔收斂」",
+    "order": "STP001 → STP013;任一步 ✗ 就停在那一步修"
+   },
+   "tests": {
+    "self": "handoff test C-tool-matrix-v0100",
+    "cross": [
+     "X-REQ-BACK",
+     "CGC_MDL281 PROVEN_ZERO_LOSS",
+     "刪後自測"
+    ],
+    "real": "首批 CGC_MDL267 / 268 / 270 刪舊 8 檔"
+   },
+   "failure_modes": [
+    {
+     "code": "F01",
+     "risk": "薄尾鏈 monkeypatch 合併後順序錯,函式被前版覆蓋",
+     "detect": "CGC_MDL281 逐定義比對 · 自測不等價",
+     "fix": "照 chain 圖由新到舊取定義;不等價 = BLOCKED 不合",
+     "step": "STP008"
+    },
+    {
+     "code": "F02",
+     "risk": "模組層常數 / 全域狀態不同值,合併後行為變",
+     "detect": "compare 含常數完整 AST(SAME_SIG_DIFF_BODY)",
+     "fix": "常數差異逐條交裁定;不靠遮字串近似去重",
+     "step": "STP008"
+    },
+    {
+     "code": "F03",
+     "risk": "尾版執行期 glob / spec 載入前版,刪後啟動炸",
+     "detect": "readiness 判 NEEDS_FLATTEN · 刪後自測",
+     "fix": "先合成單檔;prune 刪後自測不過自動還原",
+     "step": "STP012"
+    },
+    {
+     "code": "F04",
+     "risk": "他處寫死舊版檔名,刪後 FileNotFound",
+     "detect": "全樹 refs 掃描(程式 · 冊 · PS · cmd)",
+     "fix": "BLOCKED_REF:先改點名處再刪;他系統的點名交該系統",
+     "step": "STP006"
+    },
+    {
+     "code": "F05",
+     "risk": "大檔 / 被排除夾成盲點,漏看參照",
+     "detect": "掃描面體檢(每條排除吃幾支)· 跳過大檔數",
+     "fix": "VCGC 冊夾大冊照讀;排除清單逐條具名有因由",
+     "step": "STP010"
+    },
+    {
+     "code": "F06",
+     "risk": "收容副本冒充活樹尾版(同名高版號)",
+     "detect": "registry-sync 乾跑退役數異常",
+     "fix": "主控台 v0197 排除 /intake_;編號對號取尾版實際路徑",
+     "step": "STP004"
+    },
+    {
+     "code": "F07",
+     "risk": "編號重號 / 改身分 / 遺失",
+     "detect": "CGC_MDL237 audit",
+     "fix": "先提交再 --scope;audit 必 0 / 0 / 0;不同來源不合併編號",
+     "step": "STP003"
+    },
+    {
+     "code": "F08",
+     "risk": "並行分支同號不同內容(版號撞號)",
+     "detect": "git add/add 衝突 · 撞號清單",
+     "fix": "後合者升版或跳號避讓(L25);L 條 id 不重用",
+     "step": "STP013"
+    },
+    {
+     "code": "F09",
+     "risk": "自測只驗前版鏈、沒驗合成檔(假綠)",
+     "detect": "自測檢數 · 交接標記",
+     "fix": "合成檔要有自己的自測且檢數 ≥ 原鏈總和;標記吻合才 VERIFIED",
+     "step": "STP009"
+    },
+    {
+     "code": "F10",
+     "risk": "自測寫到已追蹤檔(副作用污染倉)",
+     "detect": "build / 自測前後位元組比對 · git status",
+     "fix": "自測一律 tempdir;只寫 VIA_Reports(.gitignore)",
+     "step": "STP009"
+    },
+    {
+     "code": "F11",
+     "risk": "合成檔漏加速器橋 / 外抓模組漏網路橋",
+     "detect": "覆蓋率實量(L103 · L132)",
+     "fix": "檔頭帶 ACCEL-BRIDGE;外抓帶 NET-BRIDGE;覆蓋率 100%",
+     "step": "STP010"
+    },
+    {
+     "code": "F12",
+     "risk": "橋注在 from __future__ 前 → COMPILE 錯",
+     "detect": "token 工具 COMPILE 類 · 可編譯檢",
+     "fix": "橋放在 __future__ 之後;converge 啟動檢",
+     "step": "STP011"
+    },
+    {
+     "code": "F13",
+     "risk": "VCGC 動到他系統的檔(違反獨立性)",
+     "detect": "system_of 歸屬 · 命名衝突檢",
+     "fix": "只收斂 VCGC 自己的家族;他系統只攤開就緒度(L123 · L130 ③)",
+     "step": "STP006"
+    },
+    {
+     "code": "F14",
+     "risk": "凍結 / 不可動件被合併或刪(批345)",
+     "detect": "EXEMPT 清單",
+     "fix": "Celeritas / AegisNexus / FROZEN 冊不收斂、不刪",
+     "step": "STP012"
+    },
+    {
+     "code": "F15",
+     "risk": "合併帶進 TA-Lib 舊碼",
+     "detect": "check:尾版 TA-Lib 程式使用",
+     "fix": "必 0;有就不合、照 L50 改 QuantGuard",
+     "step": "STP010"
+    },
+    {
+     "code": "F16",
+     "risk": "交接案相依清單仍指舊版,handoff test 失敗",
+     "detect": "refs 掃描含交接冊 dependencies",
+     "fix": "刪前改相依;刪後重跑相依案",
+     "step": "STP012"
+    },
+    {
+     "code": "F17",
+     "risk": "盤點冊 / 工作流指舊版或尾版換了沒重驗(X-LOCK)",
+     "detect": "SDD X-ENGINE · X-LOCK",
+     "fix": "改指 v* glob 或新尾版;lock 重驗",
+     "step": "STP007"
+    },
+    {
+     "code": "F18",
+     "risk": "元件註冊大量誤退役(掃描面錯)",
+     "detect": "registry-sync 乾跑退役數",
+     "fix": "退役數不合理就停,查因由再 --apply",
+     "step": "STP004"
+    },
+    {
+     "code": "F19",
+     "risk": "刪除不可逆 / 原內容沒紀錄",
+     "detect": "刪除帳 · git 歷史",
+     "fix": "刪除帳只增(sha256 · 大小 · 證據);刪後不過自動還原",
+     "step": "STP012"
+    },
+    {
+     "code": "F20",
+     "risk": "新舊名並存 / 名碼重發造成混亂",
+     "detect": "命名帳衝突檢",
+     "fix": "名碼只增(號跟家族走 · 衝突不發);舊名留作別名",
+     "step": "STP004"
+    }
+   ],
+   "steps": [
+    {
+     "code": "VCGC-WKF045-STP001",
+     "alias": "ast_inject",
+     "name": "注入 AST 讀卡",
+     "what": "骨架卡 · AST 錯誤分類(治理七類 + 通用類)· 不讀整檔",
+     "engine": "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0117.py",
+     "verb": "read",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP002",
+     "alias": "classify",
+     "name": "分類(兩大功能)",
+     "what": "VIA 中央管理工具 / VIA 支援工具(Token-Saving · 其他工具組)· 分組",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "build",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP003",
+     "alias": "number",
+     "name": "編號",
+     "what": "先提交再 CGC_MDL237 --apply --scope;audit 遺失 0 · 改身分 0 · 重號 0",
+     "engine": "supportive modules/registry/CGC_MDL237_NumberingSystem_v0119.py",
+     "verb": "--apply --scope",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP004",
+     "alias": "register",
+     "name": "註冊",
+     "what": "registry-sync 先乾跑(退役數不合理就停)→ --apply;名碼 naming --apply",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "naming --apply",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP005",
+     "alias": "modularize",
+     "name": "模塊化 / 模組化 / 簡化",
+     "what": "chain 看本體與覆寫;薄尾鏈列為待合成;合成檔只留一份定義",
+     "engine": "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0117.py",
+     "verb": "chain",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP006",
+     "alias": "related",
+     "name": "相關模組",
+     "what": "誰點名這一族(程式 · 冊 · 交接相依 · 他系統載入);他系統只攤開",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "converge",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP007",
+     "alias": "no_gap",
+     "name": "註冊避免缺漏",
+     "what": "SDD X-REG / X-NUM · 交接 UNREGISTERED 都要 0",
+     "engine": "supportive modules/registry/CGC_MDL245_SDDValidator_v0108.py",
+     "verb": "check",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP008",
+     "alias": "dedupe",
+     "name": "整合去重",
+     "what": "CGC_MDL281 compare:PROVEN_ZERO_LOSS 才可合;BLOCKED 交操作員裁定",
+     "engine": "supportive modules/registry/CGC_MDL281_ShadowMerge_v0100.py",
+     "verb": "compare",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP009",
+     "alias": "strongest",
+     "name": "測試修正成為唯一最強",
+     "what": "合成檔自測檢數 ≥ 原鏈總和 · handoff test 標記吻合 · 實測帳 GREEN",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "converge",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP010",
+     "alias": "inventory",
+     "name": "清點無遺漏",
+     "what": "工具矩陣 check · 盤點冊站 · 覆蓋率(加速器 / 網路橋)",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "check",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP011",
+     "alias": "boot",
+     "name": "啟動能正常",
+     "what": "可編譯 · 有入口 · run <家族> --selftest · test --quick",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "converge",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP012",
+     "alias": "prune",
+     "name": "刪去舊的",
+     "what": "prune --apply:驗證才刪 · 刪除帳只增 · 刪後自測不過即還原",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "prune --apply",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    },
+    {
+     "code": "VCGC-WKF045-STP013",
+     "alias": "closeout",
+     "name": "收尾",
+     "what": "closeout · 矩陣重出(視覺鎖定)· 推送",
+     "engine": "supportive modules/registry/VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+     "verb": "build",
+     "inside": "VCGC run",
+     "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
+    }
+   ]
   }
  ],
  "prior": "VIA_Workflow_VCGC_SSOT_v0146.json",
@@ -3975,5 +4303,5 @@
  "why_v0145": "+WKF039 five_system_activate(五系統啟動 via HTML U/I;REQ216)。操作員 2026-11-10「activate 5 system via html u/i and run」→ VIA_LakeConsole v0101 薄尾:白名單 +6 動作(five_systems · activate_vcgc/vdf/vrn2/vqg/vap)+ 鏈 activate_all · 燈號 +6 盞 · 按鈕列 · 矩陣收據複製 · 逾時依系統。",
  "why_v0146": "只增:+VCGC-WKF042(SystemCard 全景卡 · 自建平台管理者版 · MCP parity);操作員 2026-11-10 四令合一。",
  "why_v0147": "只增:+VCGC-WKF043 shadow_merge(REQ223);WKF042 +REQ224 · +STP004 mcp_file_verbs(步碼只增)。v0146 一字不動。 WKF042 補 tests 欄與 STP001 verb/inside(SDD X-COL)。 WKF029 acceptance[6] 改寫字面(語意不變:發號走 CGC_MDL237 · audit 三零):原句「只經 VCGC run …」講的是發號工具不是入口,卻被 X-PEER-TEXT 當唯一入口舊字判黃,連帶 SDD v0106 自測 ④ FAIL;原句全文留 spec.acceptance_before_v0147(版史欄,L120 ①)。 WKF042 STP001–003 補 verb / inside / evidence:STP002 的頁與 Hub 由 scan() 內 render_locked() 產出(查碼確認,非推測);STP003 = VIA_MCP_Engine parity(VCGC mcp)。 WKF032-STP002(mcp_expose)引擎 v0102 → v0103:本批出了 MCP 薄尾 v0103(v0102 一字不動,收據資源全數沿用),步釘舊版會被 X-REG 判「註冊冊不是尾版」;舊值留 engine_before_v0147。",
- "why_v0147_b": "就地只增(本分支未發佈):+VCGC-WKF044 tool_matrix(REQ227–229);WKF032-STP002 · WKF042-STP004 引擎改 MDL279 v0104(L25 撞號升版)。"
+ "why_v0147_b": "就地只增(本分支未發佈):+VCGC-WKF044 tool_matrix(REQ227–229);WKF032-STP002 · WKF042-STP004 引擎改 MDL279 v0104(L25 撞號升版)。 +VCGC-WKF045 family_converge(13 步 + 20 種失敗可能與解法;操作員 2026-11-13「這個流程很重要 未來常用」)。"
 }
