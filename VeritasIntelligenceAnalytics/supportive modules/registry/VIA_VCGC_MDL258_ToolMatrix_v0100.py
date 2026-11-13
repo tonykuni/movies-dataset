@@ -63,7 +63,7 @@ MAX_BYTES = 8 * 1024 * 1024
 
 FAM_RX = re.compile(r"^(CGC_MDL\d{3}_[A-Za-z0-9_]+?|VIA_VCGC_(?:MDL|SUP)\d{3,4}_[A-Za-z0-9_]+?)_v(\d{4})\.py$")
 NEW_RX = re.compile(r"^VIA_VCGC_(MDL|SUP)(\d{3,4})_([A-Za-z0-9_]+)$")
-VER_RX = re.compile(r"_v(\d{3,4})(?:\.py)?$")
+VER_RX = re.compile(r"_v(\d{3,4})(?:\.[A-Za-z0-9]+)?$")   # .py / .json / .jsonl 冊都認得版號
 # 他系統載入 VCGC:釘版檔名(升級後對方停在舊版或失效)= 紅;只用家族名且帶載入字樣 = 黃
 PIN_RX = re.compile(r"\b(CGC_MDL\d{3}_[A-Za-z0-9]+(?:_[A-Za-z0-9]+)*?)_v\d{4}\.py")
 NAMEREF_RX = re.compile(r"\b(CGC_MDL\d{3}_[A-Za-z0-9]+)")
@@ -167,11 +167,13 @@ def system_of(r: str) -> str:
     return "共用"
 
 
-def classify(english: str, seat: str = "", declared: str = "") -> tuple:
+def classify(english: str, seat: str = "", declared: str = "", family: str = "") -> tuple:
     if declared:
         return declared, "檔名自帶類別(新命名)"
     if seat:
         return "SUP", "VCGC 工具鎖冊席位 %s" % seat
+    if family.startswith("SUP_MDL"):
+        return "SUP", "支援模組(SUP_MDL 前綴 · VCGC 測站在用)"
     for rx, why in SUP_RULES:
         if rx.search(english):
             return "SUP", why
@@ -483,7 +485,7 @@ def naming_plan(fams: dict, numbers: dict, ledger_rows: list, via: Path = VIA) -
         if not reg_for(fam, tail, numbers, via):
             plan[fam] = {"status": "PENDING", "why": "還沒有中央編號(CGC_MDL237)→ 名碼留白(L125 ②)"}
             continue
-        cls, why = classify(english_of(fam), info.get("seat", ""))
+        cls, why = classify(english_of(fam), info.get("seat", ""), family=fam)
         seq = 1
         while seq in used[cls]:
             seq += 1
@@ -509,8 +511,8 @@ def naming_apply(fams: dict, numbers: dict, ledger: Path, via: Path = VIA) -> li
         reg = reg_for(fam, info.get("tail"), numbers, via)
         if p["status"] not in ("PROPOSED", "DECLARED") or not reg:
             continue
-        cls = p.get("cls") or classify(english_of(fam), info.get("seat", ""))[0]
-        why = p.get("class_why") or classify(english_of(fam), info.get("seat", ""), cls if NEW_RX.match(fam) else "")[1]
+        cls = p.get("cls") or classify(english_of(fam), info.get("seat", ""), family=fam)[0]
+        why = p.get("class_why") or classify(english_of(fam), info.get("seat", ""), cls if NEW_RX.match(fam) else "", family=fam)[1]
         tail = info.get("tail")
         new_lines.append({
             "ts": now, "event": "issued", "code": p["code"], "cls": cls, "family": fam,
@@ -834,7 +836,7 @@ def collect(via: Path = VIA, ast: bool = True) -> dict:
             cls, why, code, status = iss.get("cls", ""), iss.get("class_why", ""), iss.get("code", ""), "ISSUED"
         else:
             m = NEW_RX.match(fam)
-            cls, why = (pl.get("cls"), pl.get("class_why")) if pl.get("cls") else classify(english_of(fam), info.get("seat", ""), m.group(1) if m else "")
+            cls, why = (pl.get("cls"), pl.get("class_why")) if pl.get("cls") else classify(english_of(fam), info.get("seat", ""), m.group(1) if m else "", fam)
             code, status = pl.get("code", ""), pl.get("status", "PENDING")
             why = why or pl.get("why", "")
         num = reg_for(fam, tail, numbers, via)
@@ -849,7 +851,7 @@ def collect(via: Path = VIA, ast: bool = True) -> dict:
         tools.append({
             "lamp": lamp, "cls": cls or "MDL", "class_why": why or "", "name_code": code, "name_status": status,
             "family": fam, "seat": info.get("seat", ""), "src": info.get("src", ""), "path": r_tail,
-            "version": "v%04d" % vnum(tail) if tail else "—", "versions": info.get("versions", 0),
+            "version": "v%04d" % vnum(tail) if tail and vnum(tail) >= 0 else "—", "versions": info.get("versions", 0),
             "reg_code": num.get("code", ""), "reg_at": str(num.get("updated_at", ""))[:19],
             "updated": a.get("updated", "") if a else "", "test_lamp": led.get(fam, {}).get("lamp", ""),
             "test_at": led.get(fam, {}).get("ts", ""), "stations": by_station.get(fam, []),
@@ -1029,7 +1031,11 @@ def selftest() -> int:
     chk("② 分類:token 席位 → SUP · ShadowMerge → SUP · AccelBridge → SUP · NlpLayoutDoor → SUP · 主控台 → MDL · 檔名自帶 → 照檔名",
         classify("X", "token")[0] == "SUP" and classify("ShadowMerge")[0] == "SUP" and classify("AccelBridge")[0] == "SUP"
         and classify("NlpLayoutDoor")[0] == "SUP" and classify("VeritasCentralGovernanceConsole")[0] == "MDL"
-        and classify("ToolMatrix", "", "MDL") == ("MDL", "檔名自帶類別(新命名)"))
+        and classify("ToolMatrix", "", "MDL") == ("MDL", "檔名自帶類別(新命名)")
+        and classify("NetUnified", family="SUP_MDL740_NetUnified")[0] == "SUP" and classify("Panorama", family="VIA_Panorama")[0] == "MDL")
+    chk("③b 版號:_v0225.json · _v0100.jsonl · _v0117.py 都認得;沒版號 = -1",
+        vnum("VIA_VCGC_FunctionInventory_SSOT_v0225.json") == 225 and vnum("X_v0100.jsonl") == 100 and vnum("CGC_MDL1_A_v0117.py") == 117
+        and vnum("CGC_MDL023_AutoCodeRegistryEngine.py") == -1)
     chk("③ 英文名:CGC_MDL158_VIAPanoramaAuditRepair → VIAPanoramaAuditRepair · VIA_VCGC_SUP002_Foo → Foo",
         english_of("CGC_MDL158_VIAPanoramaAuditRepair") == "VIAPanoramaAuditRepair" and english_of("VIA_VCGC_SUP002_Foo") == "Foo")
     txt = 'import talib\nx = talib.SMA(c)\n# 註解 TA-Lib\nsubprocess.run("pip install TA-Lib")\n說明:有人貼了 pip install TA-Lib 的舊區塊\n'
@@ -1121,6 +1127,9 @@ def selftest() -> int:
                 and any(r["family"] == "CGC_MDL158_VIAPanoramaAuditRepair" and r["cls"] == "SUP" for r in rep["tools"])
                 and any(r["family"] == "CGC_MDL149_VeritasCentralGovernanceConsole" and r["cls"] == "MDL" for r in rep["tools"]),
                 "工具 %d · 閘 %s %s" % (k["tools"], gate["lamp"], gate["findings"][:2]))
+            tok = next((r for r in rep["tools"] if r["family"] == "CGC_MDL158_VIAPanoramaAuditRepair"), {})
+            chk("⑫b 真樹:盤點冊尾版讀得到(token 工具對到測站 C-token)· 政策冊尾版讀得到 L129",
+                "C-token" in tok.get("stations", []) and rep["policy"]["status"] == "ACTIVE", (tok.get("stations"), rep["policy"]["status"]))
         after = {str(p): (p.read_bytes() if p.is_file() else None) for p in watch_files}
         chk("⑬ 唯讀:build 不動命名帳 / 號冊 / 工具鎖冊", before == after)
     bad = len(ok) - sum(ok)
