@@ -1,0 +1,201 @@
+{
+  "schema": "via.closeout.profile/1",
+  "id": "repair-demo",
+  "source": ".",
+  "inputs": [
+    "fixtures/needs_repair.json",
+    "fixtures/build_fixture.py",
+    "fixtures/actual.csv",
+    "fixtures/expected.csv"
+  ],
+  "requirements": {
+    "fixture": [
+      "UNIT",
+      "SYSTEM",
+      "RESULT_VERIFICATION"
+    ],
+    "governance": [
+      "UNIT",
+      "INTEGRATION",
+      "CLOSE_OUT"
+    ]
+  },
+  "checks": [
+    {
+      "id": "source-ast",
+      "stage": "UNIT",
+      "kind": "python_ast",
+      "path": "fixtures/build_fixture.py",
+      "requirements": [
+        "fixture"
+      ]
+    },
+    {
+      "id": "input-contract",
+      "stage": "UNIT",
+      "kind": "json",
+      "path": "fixtures/needs_repair.json",
+      "assertions": [
+        {
+          "path": [
+            "schema"
+          ],
+          "equals": "via.closeout.fixture/1"
+        },
+        {
+          "path": [
+            "ready"
+          ],
+          "equals": true
+        }
+      ],
+      "requirements": [
+        "fixture"
+      ]
+    },
+    {
+      "id": "native-selftest",
+      "stage": "UNIT",
+      "kind": "native_matrix",
+      "action": "selftest",
+      "requirements": [
+        "governance"
+      ]
+    },
+    {
+      "id": "native-faults",
+      "stage": "INTEGRATION",
+      "kind": "native_matrix",
+      "action": "resilience-test",
+      "requirements": [
+        "governance"
+      ]
+    },
+    {
+      "id": "generate",
+      "stage": "SYSTEM",
+      "kind": "command",
+      "argv": [
+        "python",
+        "fixtures/build_fixture.py",
+        "fixtures/needs_repair.json",
+        "outputs/result.json"
+      ],
+      "format": "json",
+      "output": "outputs/result.json",
+      "assertions": [
+        {
+          "path": [
+            "schema"
+          ],
+          "equals": "via.closeout.fixture/1"
+        },
+        {
+          "path": [
+            "rows"
+          ],
+          "equals": 1
+        },
+        {
+          "path": [
+            "version"
+          ],
+          "equals": 1
+        },
+        {
+          "path": [
+            "repaired"
+          ],
+          "equals": true
+        }
+      ],
+      "depends": [
+        "source-ast",
+        "input-contract"
+      ],
+      "watch": [
+        "fixtures/needs_repair.json"
+      ],
+      "replay_safe": true,
+      "requirements": [
+        "fixture"
+      ]
+    },
+    {
+      "id": "result-contract",
+      "stage": "RESULT_VERIFICATION",
+      "kind": "json",
+      "path": "outputs/result.json",
+      "assertions": [
+        {
+          "path": [
+            "schema"
+          ],
+          "equals": "via.closeout.fixture/1"
+        },
+        {
+          "path": [
+            "rows"
+          ],
+          "equals": 1
+        },
+        {
+          "path": [
+            "version"
+          ],
+          "equals": 1
+        },
+        {
+          "path": [
+            "repaired"
+          ],
+          "equals": true
+        }
+      ],
+      "depends": [
+        "generate"
+      ],
+      "requirements": [
+        "fixture"
+      ]
+    },
+    {
+      "id": "csv-reconciliation",
+      "stage": "RESULT_VERIFICATION",
+      "kind": "csv_equal",
+      "path": "fixtures/actual.csv",
+      "reference": "fixtures/expected.csv",
+      "key": [
+        "id"
+      ],
+      "requirements": [
+        "fixture"
+      ]
+    },
+    {
+      "id": "seal",
+      "stage": "CLOSE_OUT",
+      "kind": "closeout",
+      "depends": [
+        "native-selftest",
+        "native-faults",
+        "result-contract",
+        "csv-reconciliation"
+      ],
+      "requirements": [
+        "governance"
+      ]
+    }
+  ],
+  "repairs": [
+    {
+      "id": "declare-fixture-ready",
+      "trigger": "input-contract",
+      "path": "fixtures/needs_repair.json",
+      "key": "ready",
+      "value": true,
+      "op": "add_missing",
+      "expected_sha256": "7a71bb39b5a78a10a7ec8cedfe9571c2f60b0efad7b3e1a8e72e5ecd8f135dad"
+    }
+  ]
+}
