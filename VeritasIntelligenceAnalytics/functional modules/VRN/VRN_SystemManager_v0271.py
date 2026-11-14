@@ -18,7 +18,7 @@ r"""VRN-2 SystemManager v0271 — 薄尾:extract 加速(多行程平行)· 逐�
   ④ 與上次比:開跑前先讀帳上每個檔名的最後一筆;跑完列出狀態有變的檔(例 READ → REVIEW),變成 REVIEW 的附上哪幾張表、什麼算術問題。
 注意:同一份 PDF 以兩個檔名同時出現在夾裡時,兩個子行程可能同時寫同一個 <sha8> 夾(內容相同);要完全避開就用 --workers 1。
 號:前版 v0270(main);桌機 VRN-2 線到 v0269,本版取下一個空號 v0271。零網路 · 不碰 TA-Lib · 不讀寫同意閘。
-用法:python VRN_SystemManager_v0271.py extract --dir <夾> [--workers N] · 自測 python VRN_SystemManager_v0271.py --selftest(本版 9 項 + 前版 v0270 自測)。
+用法:python VRN_SystemManager_v0271.py extract --dir <夾> [--workers N] · 自測 python VRN_SystemManager_v0271.py --selftest(本版 10 項 + 前版 v0270 自測)。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -408,7 +408,7 @@ def main(argv=None) -> int:
 
 # ────────────────── 自測 ──────────────────
 def selftest() -> int:
-    print("[計] %s %s 自測開始(本版 9 項 · 再前版 %s)" % (DISPLAY_NAME, TAG, PRIOR_PATH.name), flush=True)
+    print("[計] %s %s 自測開始(本版 10 項 · 再前版 %s)" % (DISPLAY_NAME, TAG, PRIOR_PATH.name), flush=True)
     ok = []
 
     def chk(name, cond, note=""):
@@ -493,6 +493,11 @@ def selftest() -> int:
         chk("⑦ extract 接線:交給前版鏈時 extract 已換成平行版、印表換成全列版、已先讀帳 · --workers 不往下傳 · 跑完兩個函式都還原",
             rc == 2 and seen.get("argv") == ["extract", "--dir", str(td / "empty")] and seen.get("wrapped") and seen.get("printer")
             and seen.get("prev") and P.extract is orig and P._print_v0127 is _STATE["print_prev"] and _STATE["prev"] is None, (rc, seen))
+        ghosts, lines = [td / "ghost_a.pdf", td / "ghost_b.pdf"], []
+        recs, crash = run_parallel(ghosts, ("pdfplumber",), 2, emit=lambda m, **kw: lines.append(m))
+        chk("⑧ 子行程來回(不靠 PDF 套件,各平台都真的開行程):2 個子行程各回 1 檔 · 不在的檔照實記 ERROR / NODATA · 沒有檔掉失 · 進度 2 行",
+            sorted(recs) == sorted(map(str, ghosts)) and not crash and all(r.get("status") in ("ERROR", "NODATA") for r in recs.values())
+            and sum(1 for m in lines if "[進度 " in m) == 2, (recs, crash, lines))
     finally:
         for k, v in keep_env.items():
             if v is None:
@@ -501,13 +506,13 @@ def selftest() -> int:
                 os.environ[k] = v
         shutil.rmtree(td, ignore_errors=True)
     text = Path(__file__).read_text(encoding="utf-8")
-    chk("⑧ 檔面:def main / def selftest / def collect · 第 3 行加速器標記 · __main__ provenance 守門在 --selftest 之前 · 子行程不經 shell · 零 TA-Lib · 不寫同意閘",
+    chk("⑨ 檔面:def main / def selftest / def collect · 第 3 行加速器標記 · __main__ provenance 守門在 --selftest 之前 · 子行程不經 shell · 零 TA-Lib · 不寫同意閘",
         "\ndef main(" in text and "\ndef selftest(" in text and "\ndef collect(" in text and text.splitlines()[2].strip() == "# [VIA:ACCEL-BRIDGE:v0111]"
         and text.index('sys.argv[1:2] == ["provenance"]') < text.index('"--selftest" in sys.argv:') and "shell=" + "True" not in text
         and "import " + "talib" not in text and "environ[\"VIA_NET" + "_CONSENT\"] =" not in text)
     print("  ── 前版 %s 自測(本版只在 extract 期間掛平行,平時不改前版)──" % PRIOR_PATH.name, flush=True)
     prior_rc = int(PRIOR.selftest() or 0)
-    chk("⑨ 前版 %s 自測照過" % PRIOR_PATH.name, prior_rc == 0, prior_rc)
+    chk("⑩ 前版 %s 自測照過" % PRIOR_PATH.name, prior_rc == 0, prior_rc)
     n = sum(ok)
     print("[計] %s %s(%s_%s.py)自測 %d/%d · %s" % (DISPLAY_NAME, TAG, FAMILY, TAG, n, len(ok), "PASS" if n == len(ok) else "FAIL"), flush=True)
     return 0 if n == len(ok) else 1
