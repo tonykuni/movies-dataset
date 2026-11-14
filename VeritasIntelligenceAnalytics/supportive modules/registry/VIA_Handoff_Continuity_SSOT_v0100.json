@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-13T22:37:44Z",
+ "updated_at": "2026-11-14T00:31:30Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -275,15 +275,16 @@
     "VRN_SystemManager",
     "--selftest"
    ],
-   "success_marker": "[計] VRN_SystemManager v0266 薄尾 8/8 PASS",
+   "success_marker": "[計] VRN_SystemManager v0266 薄尾 7/7 PASS",
    "scope": "VRN Manager 保持原路由與來源入口",
    "dependencies": [
     "functional modules/VRN/VRN_SystemManager_v*.py"
    ],
    "timeout_seconds": 180,
-   "marker_note": "標記原為 [VRN 來源入口] fail=0,尾版 v0262 已不印那行;改用只有全鏈過才印的「· PASS · 前版鏈 rc 0」(2026-11-08 容器實測)",
+   "marker_note": "標記原為 [VRN 來源入口] fail=0,尾版 v0262 已不印那行;改用只有全鏈過才印的「· PASS · 前版鏈 rc 0」(2026-11-08 容器實測) ‖ 2026-11-14:尾版 v0266 自測實際印「薄尾 7/7 PASS」(rc 0),冊上標記寫 8/8 對不上 → 改成實際印的字(容器實測)",
    "success_marker_before_v0266": "· PASS · 前版鏈 rc 0",
-   "updated_at": "2026-11-13T22:00:00Z"
+   "updated_at": "2026-11-14T00:31:30Z",
+   "success_marker_before_20261114": "[計] VRN_SystemManager v0266 薄尾 8/8 PASS"
   },
   "sdd": {
    "argv": [
@@ -11487,25 +11488,25 @@
    "id": "VCGC-REQ246:req-number-shift",
    "owner": "操作員(裁定)+ AI",
    "what": "需求冊 v0253 起 VCGC-REQ239 跳號,中央編號照順序發,整段錯一位:冊 REQ240→號 239 · 241→240 · 242→241 · 243→242 · 245→243 · 246→245(244 相符);SDD X-NUM / X-REQ 紅",
-   "reason": "號已發不能改(只增);要讓冊服從號就得改 6 個已推上分支的需求代碼及其引用(工作流冊 · 交接項 · 技能文件),屬身分變更,不在本批自行處理",
-   "next": "操作員裁定:冊改從中央號(出需求冊 / 工作流冊新版並同步引用),或接受錯位並在 SDD 登記對照表",
+   "reason": "2026-11-14 容器實測:中央編號認冊上代碼(declared),號發了不改;把冊的代碼改名不會對齊,反而讓既有號碼底下的內容換人並另發新號(該嘗試已退回未推)。所以這個錯位靠改冊解不掉",
+   "next": "操作員裁定二選一:① 接受錯位,在 SDD 登記對照表(X-NUM 對這 6 條改判已知例外)② 授權一次性重發這 6 個號(違反只增,要明令)",
    "requirement": "VCGC-REQ246",
    "case": "",
    "state": "PENDING",
    "receipt": null,
-   "updated_at": "2026-11-13T22:22:39Z"
+   "updated_at": "2026-11-14T00:31:30Z"
   },
   {
    "id": "VCGC-REQ246:panorama-vdf-collect",
-   "owner": "AI(VCGC)",
+   "owner": "操作員(驗收)",
    "what": "ssot panorama「註冊@VCGC」RED:CGC_MDL247_SSOTPanorama 呼叫 VDF_SystemManager.collect,VDF 管理器今天重寫成單檔後沒有這個名稱 → AttributeError",
-   "reason": "VCGC 讀他系統自報應該降級成 NODATA 而不是炸掉;要出 CGC_MDL247 薄尾,本批沒做",
-   "next": "chain CGC_MDL247_SSOTPanorama → 薄尾:取不到 collect 時記 NODATA 並指路 VDF 管理器 → 自測 → 編號 / 註冊",
+   "reason": "已出 CGC_MDL247_SSOTPanorama_v0101 薄尾:讀不到 collect() 記 NODATA 不當掉(自測 7/7 + 前版鏈)",
+   "next": "VDF 管理器要不要補 collect() 自報介面由 VDF 自己決定;VCGC 不代修",
    "requirement": "VCGC-REQ246",
    "case": "",
-   "state": "PENDING",
+   "state": "REVIEW",
    "receipt": null,
-   "updated_at": "2026-11-13T22:22:39Z"
+   "updated_at": "2026-11-14T00:31:30Z"
   },
   {
    "id": "VCGC-REQ246:closeout-red",
