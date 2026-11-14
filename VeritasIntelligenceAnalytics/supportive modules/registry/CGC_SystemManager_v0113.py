@@ -399,11 +399,19 @@ def em_selftest(chk) -> None:
         chk("E5 自動登記:一個字都不印(不弄亂 --json 等輸出)· 不擋主流程", auto_ok, buf.getvalue()[:200])
 
 
+def entry_lane() -> str:
+    """入口車道(同 v0112):帶 VIA_FROM_VCGC=YES 進來 = via-vcgc;沒帶 = standalone(獨立 MAIN,不拒)。"""
+    return "via-vcgc" if os.environ.get("VIA_FROM_VCGC") == "YES" else "standalone"
+
+
 def main() -> int:
     argv = sys.argv[1:]
     if argv[:1] == ["engine-matrix"]:
         return em_cmd(argv[1:], VIA_ROOT)
     em_auto(VIA_ROOT)                                            # 每次執行靜默登記版本與時間(不印 · 不擋)
+    if entry_lane() == "standalone":
+        os.environ["VIA_FROM_VCGC"] = "YES"                      # 自立閘座(同 v0112):前版鏈與下游模組兼容;入口誠實印本版
+        print(f"[VCGC] 獨立 MAIN(standalone)· {TAG} · 三總管各自運作下互動")
     return _prior().main()
 
 
@@ -413,7 +421,7 @@ def selftest() -> int:
     def chk(name, cond, note=""):
         ok.append(bool(cond))
         print(("  [OK] " if cond else "  [FAIL] ") + name + ((" · " + str(note)[:300]) if note and not cond else ""), flush=True)
-    print(f"[計] {TAG} 自測開始(本版 8 項 · 再前版 {_PRIOR_PATH.name})", flush=True)
+    print(f"[計] {TAG} 自測開始(本版 9 項 · 再前版 {_PRIOR_PATH.name})", flush=True)
     em_selftest(chk)
     files = em_files(VIA_ROOT)
     fams = {EM_VER_RX.match(p.name).group("fam") for p in files}
@@ -427,8 +435,19 @@ def selftest() -> int:
     chk("E7 檔面:def main / def selftest · 第 3 行加速器標記 · main 無「rc 2 拒絕」路(獨立 MAIN 照前版)· 子行程不經 shell · 零 TA-Lib · 不寫同意閘",
         "\ndef main(" in text and "\ndef selftest(" in text and text.splitlines()[2].strip() == "# [VIA:ACCEL-BRIDGE:v0111]" and no_reject
         and "shell=" + "True" not in text and "import " + "talib" not in text and "environ[\"VIA_NET" + "_CONSENT\"] =" not in text)
+    keep = os.environ.get("VIA_FROM_VCGC")
+    os.environ.pop("VIA_FROM_VCGC", None)
+    lane_a = entry_lane() == "standalone"
+    os.environ["VIA_FROM_VCGC"] = "YES"
+    lane_b = entry_lane() == "via-vcgc"
+    if keep is None:
+        os.environ.pop("VIA_FROM_VCGC", None)
+    else:
+        os.environ["VIA_FROM_VCGC"] = keep
+    chk("E8 入口車道在本檔判(VCGC 流程一致閘要看到):沒帶旗 = standalone(不拒 · 印本版)· 帶 VIA_FROM_VCGC=YES = via-vcgc", lane_a and lane_b
+        and 'print(f"[VCGC] 獨立 MAIN(standalone)· {TAG}' in text)
     prior_rc = _load(_PRIOR_PATH, "cgc_prior_self_for_v0113").selftest()
-    chk(f"E8 前版 {_PRIOR_PATH.name} 自測照過(入口車道 standalone / via-vcgc · 前版鏈)", prior_rc == 0, prior_rc)
+    chk(f"E9 前版 {_PRIOR_PATH.name} 自測照過(入口車道 standalone / via-vcgc · 前版鏈)", prior_rc == 0, prior_rc)
     n = sum(ok)
     print(f"[計] {TAG} 自測 {n}/{len(ok)} · {'PASS' if n == len(ok) else 'FAIL'}", flush=True)
     return 0 if n == len(ok) else 1
