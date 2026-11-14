@@ -7,7 +7,8 @@
 本版照標準 v0101:七處只讀 VCGC 的冊與檔面文字;省 Token 工具(read · slice · digest · chain)只經鎖冊解析、以子行程唯讀執行,目標限 VRN 自己的樹與收據。
   collect [--json]                 自報:七處 · 健康 · 規範自查(給 VCGC 全景只讀)
   token read|slice|digest|chain …  省 Token 讀檔(只收 VRN 自己的檔 / 家族 / 收據)
-其餘動詞照前版。
+其餘動詞照前版:子程序環境照 v0265 sm_child_env(帶 VIA_FROM_VCGC=YES,引擎自測走 VCGC 閘);本管理器自己的動詞不以它為前提(標準 P3)。
+零網路 · 不用 TA-Lib · 不寫同意閘 · 不裝套件。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
