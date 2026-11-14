@@ -403,7 +403,7 @@ CSS = (":root{--bg:#f8f7f2;--fg:#26312f;--panel:#f1f3ec;--card:#fffefb;--line:#d
        "th,td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top}"
        "input{width:100%;max-width:420px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--fg)}"
        ".l{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}.GREEN{background:var(--g)}.YELLOW{background:var(--y)}.RED{background:var(--r)}"
-       "code{font-size:11px;word-break:break-all}")
+       "code{font-size:11px;overflow-wrap:anywhere}td.p{min-width:260px;max-width:420px}")
 
 
 def write_outputs(m: dict, out_dir: Path | None = None) -> dict:
@@ -421,9 +421,10 @@ def write_outputs(m: dict, out_dir: Path | None = None) -> dict:
     e = _html.escape
     s = m["summary"]
     eng_rows = "".join(
-        f"<tr><td>{e(c['system'])}</td><td><code>{e(c['path'])}</code></td><td>{len(c['refs'])}</td>"
+        f"<tr><td>{e(c['system'])}</td><td class='p'><code>{e(c['path'])}</code></td><td>{len(c['refs'])}</td><td>{c['dynamic']}</td>"
         f"<td>{e(' · '.join(c['books'][:8]))}{' …' if len(c['books']) > 8 else ''}</td><td>{e(' '.join(c['params']['flags'][:10]))}</td>"
-        f"<td>{e(' '.join(c['params']['env'][:6]))}</td><td>{len(c['params']['constants'])}</td></tr>" for c in m["engines"])
+        f"<td>{e(' '.join(c['params']['env'][:6]))}</td><td>{len(c['params']['constants'])}</td></tr>"
+        for c in sorted(m["engines"], key=lambda c: (-len(c["refs"]), -c["dynamic"], c["path"])))
     book_rows = "".join(
         f"<tr><td><span class='l {'GREEN' if b['state'] == 'OK' and not b['pinned_old'] else ('YELLOW' if b['state'] == 'OK' else 'RED')}'></span>{e(b['book'])}</td>"
         f"<td>{e(b['owner'])}</td><td>{e(b['tail_version'])}</td><td>{len(b['engines'])}</td><td>{e(' · '.join(b['systems']))}</td>"
@@ -440,7 +441,7 @@ def write_outputs(m: dict, out_dir: Path | None = None) -> dict:
             "<div class='cards'>" + "".join(f"<div class='c'><b>{n}</b>{e(t)}</div>" for n, t in cards) + "</div>"
             f"<div class='mut'>各系統引擎數:{e(' · '.join(f'{k} {v}' for k, v in s['by_system'].items()))}</div>"
             "<h2>引擎(凡出現 SSOT)</h2><input id='q' placeholder='篩選:系統 / 路徑 / 冊名 / 旗標 / 環境變數' oninput='f()'>"
-            "<div class='tbl'><table id='t'><thead><tr><th>系統</th><th>引擎</th><th>引用</th><th>SSOT 冊</th><th>旗標</th><th>環境變數</th><th>常數</th></tr></thead>"
+            "<div class='tbl'><table id='t'><thead><tr><th>系統</th><th>引擎</th><th>字面引用</th><th>動態名</th><th>SSOT 冊</th><th>旗標</th><th>環境變數</th><th>常數</th></tr></thead>"
             f"<tbody>{eng_rows}</tbody></table></div>"
             "<h2>SSOT 冊彙整(讀 / 寫 / 掃 / 名字)</h2><div class='tbl'><table><thead><tr><th>冊</th><th>冊主</th><th>尾版</th><th>引擎數</th><th>系統</th>"
             f"<th>讀/寫/掃/名</th><th>釘舊版</th></tr></thead><tbody>{book_rows}</tbody></table></div>"
