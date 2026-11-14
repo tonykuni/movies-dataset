@@ -1,0 +1,525 @@
+{
+ "schema": "VIA.SSOT.DomainCoverage.v1",
+ "version": "v0103",
+ "ts": "2026-11-14T02:51:05Z",
+ "engine": "VIA_VCGC_MDL262_SSOTConsistencyEngine",
+ "source": "操作員 2026-11-14:「INPUT OUTPUT PARAMTERS TIME RANGE BROKER ANALYST .......ALL SHOULD HAVE SSOT」 ‖ 操作員 2026-11-14:「財報科目三大報告的ssot及驗證法有無找到 加減法 / 除法」",
+ "policy": "每一類資料、每一個系統都要有自己的 SSOT 正本,而且拿得到中央號。本冊只宣告「去哪裡找每個系統在每一類的正本」;引擎只讀、逐格回報 GREEN(有正本 · 有中央號)/ YELLOW(有正本但沒號,或只有一部分)/ NODATA(沒有)。他系統的缺口只攤開,由該系統自己的管理器補;VCGC 不代建、不代修(L123)。某一類對某系統不適用時,由該系統宣告 na 與理由(出本冊新版),不是由 VCGC 判。",
+ "systems": [
+  "VCGC",
+  "VDF",
+  "VRN",
+  "VAP",
+  "VQG"
+ ],
+ "states": {
+  "GREEN": "有正本,且找得到中央號",
+  "YELLOW": "有正本但找不到中央號,或證據只涵蓋一部分",
+  "NODATA": "這個系統在這一類沒有宣告、也找不到正本",
+  "N/A": "該系統已宣告不適用"
+ },
+ "domains": {
+  "input": {
+   "zh": "輸入",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_InputConsole_Spec*.json"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/VDF_InputUniverse_SSOT_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "functional modules/VDF/VDF_FetchGroups_SSOT_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "candidate": {
+       "owner": "VDF",
+       "types": [
+        "INPT"
+       ]
+      }
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/SSOT/VRN_DocClass_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "只有文件分類(哪一類報告);沒有輸入欄位 / 來源的正本"
+     }
+    ],
+    "VAP": [],
+    "VQG": [
+     {
+      "candidate": {
+       "owner": "VQG",
+       "types": [
+        "INPT"
+       ]
+      }
+     },
+     {
+      "book": "functional modules/VQG/VQG_IndicatorRegister_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "行情輸入欄 15 列(VQG-067 … VQG-081);其他輸入(財報 · 籌碼)沒有登"
+     }
+    ]
+   }
+  },
+  "output": {
+   "zh": "輸出",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_Output_Header_SSOT_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/VDF_DataHome_SSOT_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "functional modules/VDF/registry/VDF_TableHeader*.json"
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/registry/VRN_OUTPUTS_SSOT*.json"
+     },
+     {
+      "book": "functional modules/VRN/registry/VRN_TableHeader*.json"
+     }
+    ],
+    "VAP": [
+     {
+      "book": "functional modules/VAP/spec/ssot/vap_spec.json",
+      "partial": "版面規格;沒有輸出檔 / 欄位的正本"
+     }
+    ],
+    "VQG": [
+     {
+      "book": "functional modules/VQG/VQG_IndicatorRegister_SSOT_v[0-9][0-9][0-9][0-9].json"
+     }
+    ]
+   }
+  },
+  "parameter": {
+   "zh": "參數",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_Central_Params_SSOT_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "number_kind": "PRMT",
+      "sub": "VCGC"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/VDF_Unified_Params*.json"
+     },
+     {
+      "book": "functional modules/VDF/SSOT/VDF_Config*.json"
+     },
+     {
+      "number_kind": "PRMT",
+      "sub": "VDF"
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/SSOT/VRN_Config*.json"
+     },
+     {
+      "number_kind": "PRMT",
+      "sub": "VRN"
+     }
+    ],
+    "VAP": [
+     {
+      "number_kind": "PRMT",
+      "sub": "VAP"
+     },
+     {
+      "book": "functional modules/VAP/VAP_Param_Registry_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VQG": [
+     {
+      "book": "functional modules/VQG/VQG_IndicatorRegister_SSOT_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "number_kind": "PRMT",
+      "sub": "VQG"
+     }
+    ]
+   }
+  },
+  "time_range": {
+   "zh": "時間範圍 / 期間",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_SSOT_PeriodRules*.json"
+     },
+     {
+      "central_key": "^COLUMN_PARAM_TIME\\.|^RX_PERIOD|^RX_YEAR|^YEAR_"
+     }
+    ],
+    "VDF": [
+     {
+      "candidate": {
+       "owner": "VDF",
+       "scope_rx": "start|end|date|period|range"
+      },
+      "partial": "只有個別起訖日候選;沒有一本時間範圍正本"
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/VRN_TickerDate_Regex_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "supportive modules/ssot/VRN_DatePeriodRegexSSOT*.json"
+     },
+     {
+      "book": "supportive modules/ssot/VRN_FinancialPeriod_Normalization_SSOT*.json"
+     }
+    ],
+    "VAP": [],
+    "VQG": [
+     {
+      "book": "functional modules/VQG/VQG_IndicatorRegister_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "每個指標的時間參數(視窗長度);沒有資料起訖範圍的正本"
+     }
+    ]
+   }
+  },
+  "broker": {
+   "zh": "券商",
+   "evidence": {
+    "VCGC": [
+     {
+      "union_scope": "broker"
+     },
+     {
+      "central_key": "^BROKER_"
+     }
+    ],
+    "VDF": [],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/VRN_Broker_Dict_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "functional modules/VRN/registry/VRN_BROKER_LIST_v*.json"
+     }
+    ],
+    "VAP": [],
+    "VQG": []
+   }
+  },
+  "analyst": {
+   "zh": "分析師",
+   "evidence": {
+    "VCGC": [
+     {
+      "union_scope": "job_title",
+      "partial": "只有職稱同義字;沒有分析師名冊(誰 · 屬哪家券商 · 何時)的正本"
+     }
+    ],
+    "VDF": [],
+    "VRN": [],
+    "VAP": [],
+    "VQG": []
+   }
+  },
+  "ticker": {
+   "zh": "代號",
+   "evidence": {
+    "VCGC": [
+     {
+      "central_key": "^TW_TICKER|^TWEquity|^TW_YFINANCE|^TW_BLOOMBERG|^TWETF_"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/SSOT/VDF_Regex_SSOT*.json"
+     },
+     {
+      "candidate": {
+       "owner": "VDF",
+       "types": [
+        "REGEX"
+       ]
+      }
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/VRN_TickerDate_Regex_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "supportive modules/ssot/VRN_TickerRegexSSOT*.json"
+     }
+    ],
+    "VAP": [],
+    "VQG": [
+     {
+      "book": "functional modules/VQG/VQG_IndicatorRegister_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "只引用 VDF 輸入冊 IN-01 / IN-02 的範圍與代號規則,自己不另立"
+     }
+    ]
+   }
+  },
+  "synonym": {
+   "zh": "同義字 / 詞彙",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_Central_Synonym_Regex_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "supportive modules/registry/VIA_SSOT_SynonymUnion_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/SSOT/VDF_Synonym_SSOT*.json"
+     },
+     {
+      "candidate": {
+       "owner": "VDF",
+       "types": [
+        "SYNONYM"
+       ]
+      }
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/SYNONYM_LIBRARY_v*.json"
+     },
+     {
+      "book": "functional modules/VRN/knowledge/VRN_FinData_Synonym_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VAP": [],
+    "VQG": [
+     {
+      "candidate": {
+       "owner": "VQG",
+       "types": [
+        "SYNONYM"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  "rating": {
+   "zh": "評等",
+   "evidence": {
+    "VCGC": [
+     {
+      "union_scope": "rating"
+     },
+     {
+      "central_key": "^RATING_"
+     }
+    ],
+    "VDF": [],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/VRN_Rating_Dict_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VAP": [],
+    "VQG": []
+   }
+  },
+  "fin_account": {
+   "zh": "財報科目(三大報表)",
+   "evidence": {
+    "VCGC": [
+     {
+      "union_scope": "fin_account"
+     },
+     {
+      "central_key": "^TW_FIN_DICT$"
+     }
+    ],
+    "VDF": [],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/VRN_FinStatement_Synonym_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "functional modules/VRN/SSOT/VRN_FinLexicon_SSOT_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VAP": [],
+    "VQG": []
+   }
+  },
+  "fin_validation": {
+   "zh": "財報驗證法(加減勾稽 / 除法比率)",
+   "evidence": {
+    "VCGC": [
+     {
+      "central_key": "^FIN_RATIO_CODEBOOK$",
+      "partial": "只有除法(29 式比率公式);沒有加減勾稽恆等式,也沒有容差與判定規則"
+     }
+    ],
+    "VDF": [],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/VRN_Method_SSOT_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VAP": [],
+    "VQG": []
+   }
+  },
+  "index": {
+   "zh": "指數",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_Global_Universe_v[0-9][0-9][0-9][0-9].json",
+      "partial": "idx 類 16 檔國際指數;擷取矩陣另登 A 大項與 I 大項的指數"
+     },
+     {
+      "book": "supportive modules/registry/VIA_SSOT_FetchTargetMatrix_SSOT_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/VDF_InputUniverse_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "IN-03 只有加權指數 · 櫃買指數"
+     },
+     {
+      "book": "functional modules/VDF/VDF_FetchGroups_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "TW_INDEX 群組"
+     }
+    ],
+    "VRN": [],
+    "VAP": [],
+    "VQG": []
+   }
+  },
+  "instrument": {
+   "zh": "金融商品",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_Global_Universe_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "supportive modules/registry/VIA_SSOT_FetchTargetMatrix_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "純登錄:111 個代碼,數值待接來源"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/VDF_InputUniverse_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "IN-01 台股全部 · IN-02 主動式台股 ETF"
+     }
+    ],
+    "VRN": [],
+    "VAP": [],
+    "VQG": []
+   }
+  },
+  "instrument_parameter": {
+   "zh": "金融商品參數",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_SSOT_FetchTargetMatrix_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "每列的頻率 · 多來源並存 · 證據層;沒有逐檔參數(合約規格、幣別、交易所、計價單位)"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/VDF_FetchGroups_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "群組層的更新頻率與容忍天數;沒有逐檔參數"
+     }
+    ],
+    "VRN": [],
+    "VAP": [
+     {
+      "book": "functional modules/VAP/VAP_Param_Registry_v[0-9][0-9][0-9][0-9].json",
+      "partial": "繪圖 / 版面參數,不是金融商品參數"
+     }
+    ],
+    "VQG": [
+     {
+      "book": "functional modules/VQG/VQG_IndicatorRegister_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "指標參數與行情輸入欄;沒有逐檔商品參數"
+     }
+    ]
+   }
+  },
+  "fetch_target": {
+   "zh": "擷取標的",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_SSOT_FetchTargetMatrix_SSOT_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/VDF_FetchGroups_SSOT_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "functional modules/VDF/VDF_InputUniverse_SSOT_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VRN": [],
+    "VAP": [],
+    "VQG": []
+   }
+  }
+ },
+ "prior": "VIA_SSOT_DomainCoverage_SSOT_v0102.json",
+ "change_v0101": "只增:+fin_account(財報科目 · 三大報表)+fin_validation(財報驗證法:加減勾稽 / 除法比率);其餘一字不動。",
+ "known_divergence": [
+  {
+   "topic": "除法比率的公式,中央碼冊 FIN_RATIO_CODEBOOK 與 VRN 方法冊 VRN_Method_SSOT 寫法不同(只攤開,不裁定)",
+   "rows": [
+    {
+     "ratio": "NET_MARGIN",
+     "central": "本期淨利 / 營業收入",
+     "vrn_method": "歸母淨利/營業收入(def10)"
+    },
+    {
+     "ratio": "ROE",
+     "central": "本期淨利 / 股東權益",
+     "vrn_method": "歸母淨利/平均母公司業主權益(def13)"
+    },
+    {
+     "ratio": "ROA",
+     "central": "本期淨利 / 總資產",
+     "vrn_method": "本期淨利/平均資產總額(def13)"
+    },
+    {
+     "ratio": "QUICK_RATIO",
+     "central": "(流動資產-存貨) / 流動負債",
+     "vrn_method": "(流動資產-存貨-預付)/流動負債(def13)"
+    }
+   ],
+   "same": [
+    "GROSS_MARGIN",
+    "OPERATING_MARGIN",
+    "DEBT_RATIO",
+    "CURRENT_RATIO"
+   ],
+   "next": "操作員裁定哪一套是正本(或分範疇:中央碼冊 = TWSE / TPEX 用字的顯示口徑,VRN 方法冊 = 驗算口徑),另一邊出新版對齊或登記差異"
+  }
+ ],
+ "change_v0102": "操作員 2026-11-14「VQG / VAP 輸入 輸出 參數 指數 金融商品 金融商品參數」與擷取資料矩陣貼文:+4 個領域(index · instrument · instrument_parameter · fetch_target);既有 11 個領域一字不動",
+ "change_v0103": "操作員 2026-11-14「SSOT FOR VCGC VAP VDF VQG VAP」:補登已經存在、但覆蓋冊沒指到的正本——VQG 指標登記冊(輸入 · 輸出 · 時間參數 · 代號引用)與 VAP 參數登記冊;只加證據指標,既有宣告一字不動、領域數不變"
+}
