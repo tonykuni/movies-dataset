@@ -13,12 +13,13 @@ r"""VRN-2 SystemManager v0270 — 薄尾:extract 表格解析三修(左右並排
   ① 抓表後先拆:表中間出現第二條「列標欄」(多數是文字),而且左右兩邊表頭各有 ≥2 個真期間 → 拆成兩張表(各自重建)。
      證據要兩樣都齊才拆(評等表中間的 Buy / Hold 文字欄不會被拆)。
   ② 多層表頭:第一列是期間群組(橫跨多欄)、第二列是子欄(實際數 / 預估 / 差異 …)→ 欄名 =「3Q25 實際數」這種合欄,不再把資料列當表頭。
+     合欄後照鏈上同一套算術驗(v0128 _arith_28:毛利 = 營收 − 成本 · 三率),只驗值欄、差異 / % 欄不驗;不符記 issue 改待審。
   ③ 期間把關:重建後期間欄出現數字殘片(76 · (24) · - · -12.2%)或同一期間重複 → 記 issue「期間表頭可疑」,這張表改待審,
-     不冒充 READ。QoQ / YoY / 差異 這類比較欄、連續兩位數年(22 · 23 · 24F)照常放行。
+     不冒充 READ。QoQ / YoY / 差異 這類比較欄、連續兩位數年(22 · 23 · 24F · 23 · 24F,預估年一起算)照常放行。
 號:VRN-2 私有 runtime 線(桌機)已用到 v0269,本版取下一個空號 v0270。
 extract 一律在本行程跑 v0262 那條鏈(桌機上前版是 v0269 單檔、extract 走子行程轉交,改在本行程跑才吃得到這三修);
 其餘動詞照前版(glob 取比本版小的最大版號)。零網路 · 不碰 TA-Lib · 不讀寫同意閘。
-自測:python VRN_SystemManager_v0270.py --selftest(本版 8 項 + v0262 鏈自測)。
+自測:python VRN_SystemManager_v0270.py --selftest(本版 9 項 + v0262 鏈自測)。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -77,7 +78,7 @@ def __getattr__(name):
     return getattr(PRIOR, name)
 
 
-_HOST = {"mod": None, "p27": None, "orig": None}
+_HOST = {"mod": None, "p27": None, "orig": None, "arith": None}
 
 
 def host():
@@ -121,11 +122,14 @@ def strict_period(s) -> bool:
     return bool(_STRICT_RX.match(_cl(s).replace(" ", "")))
 
 
+_YY_RX = re.compile(r"(\d{2})(?:[AEF]|\([AEF]\))?", re.I)
+
+
 def _two_digit_years(tokens: list) -> bool:
-    """連續遞增的兩位數年(22 · 23 · 24F)= 期間;其他兩位數(76 · 29)不是。"""
+    """連續遞增的兩位數年(22 · 23 · 24F · 25(F))= 期間;其他兩位數(76 · 29)不是。"""
     ys = []
     for t in tokens:
-        m = re.fullmatch(r"(\d{2})[AEF]?", t.replace(" ", ""))
+        m = _YY_RX.fullmatch(t.replace(" ", ""))
         if not m:
             return False
         ys.append(int(m.group(1)))
@@ -209,6 +213,33 @@ def composite_header(rows: list):
     return lab, rows[2:], (r0[0] or r1[0])
 
 
+_DIFF_SUB_RX = re.compile(r"差異|變動|增減|差額|%|率|YoY|QoQ|MoM|HoH|y/y|q/q|Δ|chg|change|diff|vs\.?", re.I)
+
+
+def _value_col(label: str) -> bool:
+    """合欄名的子欄是「值」(實際數 · 預估數 · 財測)才進算術;差異 / 變動 / 年增率 / % 那幾欄不是同一個量,不拿來驗。"""
+    sub = label.split(" ", 1)[1] if " " in label else ""
+    return not (sub and _DIFF_SUB_RX.search(sub))
+
+
+def chain_arith():
+    """鏈上現行的算術核:v0128 的 _arith_28(毛利率 0.4 / 40 都收)優先,沒有就用 v0127 的 _arith。"""
+    if _HOST["arith"] is None:
+        cur, seen, fn = host(), set(), None
+        while cur is not None and id(cur) not in seen and fn is None:
+            seen.add(id(cur))
+            fn = vars(cur).get("_arith_28")
+            cur = vars(cur).get("PRIOR")
+        _HOST["arith"] = fn or p27()._arith
+    return _HOST["arith"]
+
+
+def composite_arith(matrix: dict) -> list:
+    """多層表頭表照鏈上同一套算術驗(毛利 = 營收 − 成本 · 三率),只驗值欄(PR 638 · Codex P1)。"""
+    g = {k: {per: v for per, v in d.items() if _value_col(per)} for k, d in matrix.items()}
+    return list(chain_arith()({k: d for k, d in g.items() if d}))
+
+
 def rebuild_composite(lab: list, body: list, title: str, lex: list) -> dict:
     P = p27()
     out_rows, matrix = [], defaultdict(dict)
@@ -229,7 +260,8 @@ def rebuild_composite(lab: list, body: list, title: str, lex: list) -> dict:
         out_rows.append({"label_raw": label, "label_std": std, "cat": cat, "values": vals,
                          "periods_est": any(re.search(r"[EF]\)?$", k.split(" ")[0], re.I) for k in vals)})
     cat, conf = P._classify_table(out_rows)
-    return {"category": cat, "confidence": conf, "periods": lab, "rows": out_rows, "matrix": dict(matrix), "issues": [],
+    issues = composite_arith(matrix) if cat in ("IS", "FORECAST") else []
+    return {"category": cat, "confidence": conf, "periods": lab, "rows": out_rows, "matrix": dict(matrix), "issues": issues,
             "notes": [title] if title else [], "layout_note": "多層表頭(上層期間 × 下層子欄)",
             "unmatched_labels": [r["label_raw"] for r in out_rows if not r["label_std"] and r["values"]][:30]}
 
@@ -239,8 +271,10 @@ def period_issue(periods: list) -> str:
     pers = [p for p in (periods or []) if p and not re.fullmatch(r"c\d+", p)]
     junk = [p for p in pers if not strict_period(p) and not _CMP_RX.match(p.replace(" ", ""))
             and (p27()._to_num(p) is not None or p.strip() in ("-", "—", "–"))]
-    if junk and _two_digit_years(junk):
-        junk = []
+    if junk:                                                       # 22 · 23 · 24F:整串兩位數年連同預估年一起看(PR 638 · Codex P2)
+        yy = [p for p in pers if _YY_RX.fullmatch(p.replace(" ", ""))]
+        if _two_digit_years(yy) and set(junk) <= set(yy):
+            junk = []
     dup = sorted({p for p in pers if strict_period(p) and pers.count(p) > 1})
     if not junk and not dup:
         return ""
@@ -322,7 +356,7 @@ def main(argv=None) -> int:
 
 
 def selftest() -> int:
-    print("[計] %s %s 自測開始(本版 8 項 · 再 v0262 鏈)" % (DISPLAY_NAME, TAG), flush=True)
+    print("[計] %s %s 自測開始(本版 9 項 · 再 v0262 鏈)" % (DISPLAY_NAME, TAG), flush=True)
     ok = []
 
     def chk(name, cond, note=""):
@@ -363,9 +397,18 @@ def selftest() -> int:
     chk("④ 多層表頭:欄名 = 3Q25 實際數 … 4Q25(F) 市場共識 · 營業利益 3Q25 實際數 = -24 · 4Q25(F) 調整後 = 163 · 不再把資料列當表頭",
         rc3.get("periods", [])[:2] == ["3Q25 實際數", "3Q25 中信預估"] and oi.get("3Q25 實際數") == -24.0 and oi.get("4Q25(F) 調整後") == 163.0
         and "多層表頭" in str(rc3.get("layout_note")), (rc3.get("periods", [])[:3], oi))
-    chk("⑤ 期間把關:數字殘片 / 期間重複 → 記可疑;QoQ · YoY · 差異欄 · 連續兩位數年(22 · 23 · 24F)放行",
+    gp = [["損益表", "2024", "", "2025F", ""], ["", "實際數", "差異", "預估數", "差異"],
+          ["營業收入", "100", "5.0%", "120", "8%"], ["營業成本", "60", "-", "70", "-"], ["營業毛利", "999", "3.1%", "50", "2%"]]
+    ok_gp = [r[:] for r in gp]
+    ok_gp[4][1] = "40"
+    rg, rk = rb_inner({"engine": "pdfplumber", "rows": gp}, lex), rb_inner({"engine": "pdfplumber", "rows": ok_gp}, lex)
+    chk("⑤ 多層表頭照鏈上算術驗:毛利 999 ≠ 100 − 60 → 記 issue(REVIEW 依據)· 改成 40 → 無 issue(差異 / % 欄不拿來驗)· 晶心科第 3 頁損益段(無比率列)無誤報",
+        "多層表頭" in str(rg.get("layout_note")) and any("2024 實際數" in x and "≠" in x for x in rg.get("issues") or [])
+        and "多層表頭" in str(rk.get("layout_note")) and not rk.get("issues") and not rc3.get("issues"), (rg.get("issues"), rk.get("issues"), rc3.get("issues")))
+    chk("⑥ 期間把關:數字殘片 / 期間重複 → 記可疑;QoQ · YoY · 差異欄 · 連續兩位數年(22 · 23 · 24F · 23 · 24F)放行;不連續(22 · 24F)照記",
         period_issue(["(24)", "76", "-", "29"]).startswith("期間表頭可疑") and "期間重複" in period_issue(["2023", "2024", "2023", "2024"])
         and period_issue(["3Q24", "2Q25", "3Q25", "QoQ", "YoY"]) == "" and period_issue(["22", "23", "24F"]) == ""
+        and period_issue(["23", "24F"]) == "" and period_issue(["23", "24(F)"]) == "" and period_issue(["22", "24F"]).startswith("期間表頭可疑")
         and period_issue(["2024", "2025F", "差異"]) == "")
     if SAMPLE_PDF.is_file() and P._engines().get("pdfplumber"):
         install()
@@ -381,12 +424,13 @@ def selftest() -> int:
         is_ = next((t for t in p5t if "2027F" in t.get("periods", [])), {})
         p3t = next((t for t in fin["tables"] if t["page"] == 3 and "多層表頭" in str(t.get("layout_note"))), {})
         cur = next((r["values"] for r in bs.get("rows") or [] if r["label_raw"] == "流動資產"), {})
-        chk("⑥ 真檔(晶心科 6533):第 5 頁拆成資產負債表(2021–3Q25)+ 損益表(2023–2027F)· 流動資產 2023 = 3,602 · 第 3 頁多層表頭合欄 · 狀態 %s" % rec.get("status"),
-            bs and is_ and cur.get("2023") == 3602.0 and p3t and rec.get("status") in ("READ", "REVIEW"), (len(p5t), cur, bool(p3t)))
+        chk("⑦ 真檔(晶心科 6533):第 5 頁拆成資產負債表(2021–3Q25)+ 損益表(2023–2027F)· 流動資產 2023 = 3,602 · 第 3 頁多層表頭合欄並照算術驗(原檔 4Q25(F) 調整前 毛利率 56.5%% ≠ 595/596 → 記待審)· 狀態 %s" % rec.get("status"),
+            bs and is_ and cur.get("2023") == 3602.0 and p3t and any("4Q25(F) 調整前 gross_margin" in x for x in p3t.get("issues") or [])
+            and rec.get("status") in ("READ", "REVIEW"), (len(p5t), cur, bool(p3t), p3t.get("issues")))
     else:
-        chk("⑥ 真檔樣本不在 / pdfplumber 不在 → NODATA 照實跳過(不冒充)", True)
+        chk("⑦ 真檔樣本不在 / pdfplumber 不在 → NODATA 照實跳過(不冒充)", True)
     text = Path(__file__).read_text(encoding="utf-8")
-    chk("⑦ 檔面:def main / def selftest / def collect · 第 3 行加速器標記 · __main__ provenance 守門在 --selftest 之前 · 零 TA-Lib · 不寫同意閘",
+    chk("⑧ 檔面:def main / def selftest / def collect · 第 3 行加速器標記 · __main__ provenance 守門在 --selftest 之前 · 零 TA-Lib · 不寫同意閘",
         "\ndef main(" in text and "\ndef selftest(" in text and "\ndef collect(" in text and text.splitlines()[2].strip() == "# [VIA:ACCEL-BRIDGE:v0111]"
         and text.index('sys.argv[1:2] == ["provenance"]') < text.index('"--selftest" in sys.argv:')
         and "import " + "talib" not in text and "environ[\"VIA_NET" + "_CONSENT\"] =" not in text)
@@ -394,7 +438,7 @@ def selftest() -> int:
     uninstall()
     h = host()
     prior_rc = int(h.selftest() or 0)
-    chk("⑧ v0262 鏈自測照過(前版一字不動)", prior_rc == 0, prior_rc)
+    chk("⑨ v0262 鏈自測照過(前版一字不動)", prior_rc == 0, prior_rc)
     n = sum(ok)
     print("[計] %s %s(%s_%s.py)自測 %d/%d · %s" % (DISPLAY_NAME, TAG, FAMILY, TAG, n, len(ok), "PASS" if n == len(ok) else "FAIL"), flush=True)
     return 0 if n == len(ok) else 1
