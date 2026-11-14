@@ -1,0 +1,79 @@
+{
+ "schema": "via.systemmanager.standard/1",
+ "version": "v0101",
+ "issued_at": "2026-11-14",
+ "issued_by": "操作員 + AI(L120 / L123:三系統對等,沒有誰管誰;主導與修正在操作員與 AI)",
+ "why": "操作員 2026-11-11:「確認三個獨立系統三個 main() 三個 system manager · 補齊基本功能 · 遵守更新後獨立系統規範 · 沒有誰管誰 · 不符合就從頭規劃標準 system manager 重作」。實測(2026-11-11):VCGC 主控台缺 health / version / engines / records;VDF 管理器缺 help / version;VRN-2 管理器缺 help / health / test / version;VDF engines 借用 VCGC 函式(只讀借用,仍是相依)。",
+ "systems": {
+  "VCGC": {
+   "manager_family": "CGC_MDL149_VeritasCentralGovernanceConsole",
+   "dir": "supportive modules/registry",
+   "own_prefixes": [
+    "CGC_"
+   ],
+   "reports": [
+    "VIA_Reports/vcgc"
+   ]
+  },
+  "VDF": {
+   "manager_family": "VDF_SystemManager",
+   "dir": "functional modules/VDF",
+   "own_prefixes": [
+    "VDF_"
+   ],
+   "reports": [
+    "VIA_Reports/vdf_fetch",
+    "VIA_Reports/vdf"
+   ]
+  },
+  "VRN": {
+   "manager_family": "VRN_SystemManager",
+   "dir": "functional modules/VRN",
+   "own_prefixes": [
+    "VRN2_",
+    "VRN_"
+   ],
+   "reports": [
+    "VIA_Reports/vrn2"
+   ],
+   "display": "VRN(VRN-2 為主 · VRN-1 只讀補強,經 VRN2_PeerBridge)"
+  }
+ },
+ "verbs": {
+  "help": "列標準動詞與前版保留動詞(rc 0)",
+  "version": "自身身分:系統 · 管理器檔 · 版號 · sha256 · 前版 · main() 在否(rc 0)",
+  "status": "系統總燈(前版有 status 就原樣轉交,保留舊判讀)",
+  "health": "自檢:自己的夾 · 前版 · SSOT 正本 · 加速器 / 網路橋 · 無跨系統 import / 放行閘 · 不寫他系統(rc 0 綠 · 1 紅 · 2 黃)",
+  "selftest": "管理器自測(夾具 · 零網路 · 不寫真樹)",
+  "test": "自己引擎尾版的 --selftest(前版有 test 就轉交;沒有則本版逐支跑,限時 · 沒跑到的照實記 NODATA)",
+  "engines": "自己夾內的尾版家族清單(只看自己的樹,不借他系統函式)",
+  "records": "自己的收據 / 日誌最新 N 筆(只讀)",
+  "peers": "只讀監控對等系統:對方管理器尾版在否 · 對方自報收據最新時間(不執行對方程式碼、不改對方)",
+  "conform": "依本規範自查(動詞齊 · P1–P8);規範檔不在 → 黃(系統照常運作,不依賴它)",
+  "collect": "自報(給對等系統只讀監控):上行七處(spec · grid · register · deck · manager · inventory · handover)· 健康燈 · 規範自查燈 · rc;七處只讀 VCGC 的冊與檔面文字判定,不 import、不執行對方程式碼(rc 0 綠 · 1 紅 · 2 黃)",
+  "token": "省 Token 讀檔:read(骨架卡)· slice(一個定義)· digest(日誌判決行)· chain(薄尾版本鏈);工具只經 VCGC 鎖冊 VIA_ToolVersion_Lock 的 token.path 解析、以子行程唯讀執行;目標限本系統自己的樹、自己的收據夾與交接收據;鎖冊或工具不在 → ABSENT(rc 3),其他動詞不受影響"
+ },
+ "rc": {
+  "0": "GREEN",
+  "1": "RED",
+  "2": "YELLOW / STALE / NODATA",
+  "3": "ABSENT",
+  "4": "GATED(同意閘未開 · 等操作員)"
+ },
+ "properties": {
+  "P1": "有 def main() 與 __main__ 入口",
+  "P2": "標準動詞全有;前版其餘動詞原樣轉交(只增不減 · 不可丟失)",
+  "P3": "不要求其他系統的放行旗標(VDF / VRN-2 不以 VIA_FROM_VCGC 為前提;VCGC 也不以 VDF / VRN 旗標為前提)",
+  "P4": "不 import / 不載入其他系統的模組(peers 只讀檔)",
+  "P5": "不寫其他系統的樹(實測:跑完標準動詞,對方夾 git 狀態不變)",
+  "P6": "編號依 L122 / L125:VDF / VRN-2 不自行發號、不寫 VCGC 號冊;VCGC 只發號不代管",
+  "P7": "加速器橋(L103)· 網路橋(VDF 必要;其他照 L103 掛名 graceful)",
+  "P8": "不碰 TA-Lib · 不寫同意閘 · 前版檔一字不動(版號律)",
+  "P9": "collect() 存在且不 import 他系統;七處找不到的照實 False,不假綠",
+  "P10": "共用省 Token 工具只經鎖冊解析(不釘檔名)、子行程唯讀、限本系統的樹;不把工具搬進本系統、不改工具"
+ },
+ "relation": "三個 System Manager 對等:各是自己系統的入口,互不管理、互不放行、互相只讀監控。VCGC 的編號 / 串測是 VCGC 自己的工具,不是其他系統的閘門。",
+ "naming": "操作員 2026-11-11:VRN-2 為主 · 不足工具 VRN-1 強化 · 整合後統稱 VRN(政策 L128;來源細節仍分寫 VRN-1 / VRN-2)",
+ "prior": "VIA_SystemManager_Standard_v0100.json",
+ "why_v0101": "操作員 2026-11-14:「SYSTEM MANAGER 應該據最新狀況及政策重寫並導入多個 VCGC TOKEN-SAVING 工具去完成」。實錄:11/11 依 v0100 重寫時拿掉了 collect()(VCGC 全景與啟動門讀的自報介面)→ VDF 那一格 NODATA、啟動門自測失敗;舊 collect() 的上行七處靠 import VCGC 主控台計算,違反 P4。v0100 的動詞與 P1–P8 一字不動,只增兩個動詞與兩條性質。"
+}
