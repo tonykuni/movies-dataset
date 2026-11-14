@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-14T00:31:30Z",
+ "updated_at": "2026-11-14T02:00:19Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -5782,6 +5782,25 @@
    "version": "v0100",
    "updated_at": "2026-11-13T22:06:35Z",
    "timeout_seconds": 600
+  },
+  "C-vqg-v0112": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VQG/VQG_AllInOne_v0112.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VQG v0112 selftest · 本版 12/12 · 前版鏈 v0111 PASS",
+   "scope": "VQG v0112:fields 動詞 · 行情輸入欄 14 欄(VQG-067 … VQG-080:鍵欄 2 · 原始行情 4 · 還原行情 4 · 量值 2 · 扣除當沖 2)· 指標登記冊 v0101 · 冊⇄程式對帳 · VRN → VDF → VCGC 註冊檢查 · derive 算法 + v0111 鏈",
+   "dependencies": [
+    "functional modules/VQG/VQG_AllInOne_v0112.py",
+    "functional modules/VQG/VQG_AllInOne_v0111.py",
+    "functional modules/VQG/VQG_IndicatorRegister_SSOT_v0101.json"
+   ],
+   "version": "v0112",
+   "updated_at": "2026-11-14T02:00:19Z",
+   "timeout_seconds": 3600,
+   "registered_at": "2026-11-14T02:00:19Z"
   }
  },
  "work_items": [
@@ -11543,6 +11562,42 @@
    "state": "PENDING",
    "receipt": null,
    "updated_at": "2026-11-13T22:37:44Z"
+  },
+  {
+   "id": "VQG-v0112:workstation-selftest",
+   "owner": "操作員(工作站)",
+   "what": "VQG v0112 全鏈自測(本版 12 項 + v0111 → v0104)要在有 polars 的 VIA 環境跑;雲端容器沒有 polars,前版鏈跑不起來,C-vqg-v0112 在容器的收據是 FAIL(本版 12/12 過、前版鏈未跑)",
+   "reason": "政策不代裝套件(L19);新動詞只用標準庫,已用臨時空殼讓匯入鏈通過後驗過 12/12,但這不等於全鏈通過",
+   "next": "工作站:<VQG 環境 python> VQG_AllInOne_v0112.py selftest → 過了再 handoff test C-vqg-v0112",
+   "requirement": "",
+   "case": "C-vqg-v0112",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-14T02:00:19Z"
+  },
+  {
+   "id": "VQG-v0112:ticker-central-number",
+   "owner": "操作員(裁定)+ VCGC(發號)",
+   "what": "VQG fields --scan:14 欄 13 綠 1 黃 —— ticker 在 VDF 日列欄冊有欄,但中央欄位編號冊(FD)沒有號(同冊 yfinance_ticker · bloomberg_ticker · name 也沒有)",
+   "reason": "台股代號寫法的案(SCC-DA9E772F17 個股 · SCC-AA670A5409 主動式 ETF)還沒裁定;裁定前先不替 ticker 發欄位號,免得號跟著規則再改",
+   "next": "裁定代號規則 → VCGC 對 VDF 日列欄冊補發 ticker 等鍵欄的 FD 號 → VQG fields --scan 複驗 14 綠",
+   "requirement": "",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-14T02:00:19Z"
+  },
+  {
+   "id": "VCGC-REQ246:vdf-engine-matrix-module",
+   "owner": "VCGC",
+   "what": "VDF 引擎矩陣(213 家族:輸入項目格式 · 日期參數格式 · 編號分類說明 · 兩座橋 · 實測耗時 · 輸出項目格式)目前由暫存腳本產生,尚未成為有編號的 VCGC 模組;同批待登:SSOT 一致性引擎 v0101 – v0103 與 DomainCoverage / PeriodFormat / Sources v0101 三本冊",
+   "reason": "背景重測還在跑(編號冊與需求冊是多案相依檔),整批登記排在重測結束後一次做",
+   "next": "重測結束 → 需求冊 / 工作流冊 / 盤點冊出新版 → 編號 --apply --scope → audit → registry-sync → handoff checkpoint",
+   "requirement": "VCGC-REQ246",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-14T02:00:19Z"
   }
  ]
 }
