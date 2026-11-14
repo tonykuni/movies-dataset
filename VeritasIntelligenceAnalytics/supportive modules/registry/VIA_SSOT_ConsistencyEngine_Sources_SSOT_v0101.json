@@ -1,0 +1,219 @@
+{
+ "schema": "VIA.SSOT.ConsistencyEngine.Sources.v1",
+ "version": "v0101",
+ "ts": "2026-11-14T00:00:00+00:00",
+ "engine": "VIA_VCGC_MDL262_SSOTConsistencyEngine",
+ "source": "操作員 2026-11-13:「母子系統一律獨立性互不影響獨立開發進度 由VCGC進行衝突偵測及給編號 由我跟AI解決衝突 給編號具備政策性 所有都要服從」 ‖ 操作員 2026-11-14:個股與主動式 ETF 的代碼規則有好幾種寫法 →「開」(開案裁定)",
+ "policy": "本冊只宣告「去哪裡讀各系統自報的冊」。引擎對這些檔只讀;不寫、不改、不代修。新來源 = 出新版號冊加一列,引擎程式不用動。系統名照 L128 寫 VRN / VDF / VCGC / VQG / VAP(VRN-2 為主、VRN-1 為輔,只有談來源時才分開寫)。",
+ "systems": [
+  "VCGC",
+  "VDF",
+  "VRN",
+  "VAP",
+  "VQG",
+  "OPERATOR"
+ ],
+ "pseudo_systems": [
+  "OPERATOR"
+ ],
+ "pseudo_note": "OPERATOR 不是系統,是操作員提案那一列;「已自報 n/5」不算它",
+ "grant_book": "supportive modules/registry/VCGC_NUMBER_GRANT_latest.json",
+ "rank": {
+  "order": [
+   "LOCKED",
+   "NUMBERED",
+   "CENTRAL",
+   "CANDIDATE",
+   "SELF_REPORT",
+   "PROPOSAL"
+  ],
+  "rule": "採信值照位階取;同位階不同值 = 待裁,不用最後寫入者贏。值相同的不同來源各留一列,不併號。"
+ },
+ "concepts": {
+  "tw_stock_ticker": {
+   "parent": "ticker",
+   "meaning": "台股個股代號(原始碼)",
+   "members": [
+    "tw_stock_ticker",
+    "TW_TICKER_LOCKED",
+    "TWEquityTicker",
+    "tw_ticker",
+    "TW_TICKER_4D_NONZERO",
+    "TW_TICKER",
+    "VDF_IN01.code_regex",
+    "VDF_MDL009.SSOT_STOCK_RX",
+    "VDF_MDL009.STOCK_SHAPE_RX"
+   ]
+  },
+  "tw_stock_yfinance_ticker": {
+   "parent": "yfinance_ticker",
+   "meaning": "台股個股 Yahoo Finance 代號(.TW 上市 / .TWO 上櫃)",
+   "members": [
+    "tw_stock_yfinance_ticker",
+    "TW_YFINANCE",
+    "TWEquityYFTicker",
+    "tw_yfinance_ticker",
+    "tw_yfinance_ticker_alt",
+    "TW_YFINANCE_TW",
+    "TW_YFINANCE_TWO"
+   ]
+  },
+  "tw_stock_bloomberg_ticker": {
+   "parent": "bloomberg_ticker",
+   "meaning": "台股個股 Bloomberg 代號(TT;不帶 Equity)",
+   "members": [
+    "tw_stock_bloomberg_ticker",
+    "TW_BLOOMBERG",
+    "TWEquityBBGTicker",
+    "tw_bloomberg_ticker",
+    "TW_BLOOMBERG_TT"
+   ]
+  },
+  "tw_active_etf_ticker": {
+   "parent": "ticker",
+   "meaning": "主動式台股 ETF 代號",
+   "members": [
+    "ActiveTWETFTicker",
+    "TW_ACTIVE_ETF",
+    "TWETF_ActiveA",
+    "VDF_IN02.code_regex",
+    "VDF_ENG077.A_CODE",
+    "VDF_MDL010.A_CODE_FALLBACK"
+   ]
+  }
+ },
+ "sources": [
+  {
+   "id": "vcgc.central",
+   "system": "VCGC",
+   "adapter": "central_book",
+   "glob": "supportive modules/registry/VIA_Central_Synonym_Regex_v[0-9][0-9][0-9][0-9].json"
+  },
+  {
+   "id": "vcgc.candidates",
+   "system": "BY_OWNER",
+   "adapter": "asset_candidates",
+   "glob": "supportive modules/registry/VIA_AssetCandidates_SSOT_v[0-9][0-9][0-9][0-9].json",
+   "note": "候選冊是 VCGC 的;每筆資產的系統 = 它自己的 owner 欄"
+  },
+  {
+   "id": "operator.proposal",
+   "system": "OPERATOR",
+   "adapter": "proposal",
+   "glob": "supportive modules/registry/VIA_SSOT_Proposal_*_v[0-9][0-9][0-9][0-9].json"
+  },
+  {
+   "id": "vdf.request",
+   "system": "VDF",
+   "adapter": "number_request",
+   "glob": "functional modules/VDF/contract/*_NUMBER_REQUEST_latest.json"
+  },
+  {
+   "id": "vrn.request",
+   "system": "VRN",
+   "adapter": "number_request",
+   "glob": "functional modules/VRN/contract/*_NUMBER_REQUEST_latest.json"
+  },
+  {
+   "id": "vap.request",
+   "system": "VAP",
+   "adapter": "number_request",
+   "glob": "functional modules/VAP/contract/*_NUMBER_REQUEST_latest.json"
+  },
+  {
+   "id": "vqg.request",
+   "system": "VQG",
+   "adapter": "number_request",
+   "glob": "functional modules/VQG/contract/*_NUMBER_REQUEST_latest.json"
+  },
+  {
+   "id": "vrn.ticker_book",
+   "system": "VRN",
+   "adapter": "rule_list",
+   "glob": "supportive modules/ssot/VRN_TickerRegexSSOT_v029SSOT1B.json",
+   "key_field": "rule_id",
+   "pattern_field": "regex",
+   "target_field": "target",
+   "scope": "",
+   "mode": "search",
+   "note": "VRN 舊抽取規則冊(supportive modules/ssot;分不出 VRN-1 / VRN-2 來源,系統名照 L128 記 VRN)"
+  },
+  {
+   "id": "vrn.peer_borrowed",
+   "system": "VRN",
+   "adapter": "number_request",
+   "glob": "",
+   "why": "VRN-1(另一團隊的倉)不在本倉,VRN 經 VRN2_PeerBridge 借用;這裡沒有可讀的檔"
+  },
+  {
+   "id": "vdf.input_universe",
+   "system": "VDF",
+   "adapter": "json_list",
+   "glob": "functional modules/VDF/VDF_InputUniverse_SSOT_v[0-9][0-9][0-9][0-9].json",
+   "list_path": "inputs",
+   "id_field": "id",
+   "entries": [
+    {
+     "id": "IN-01",
+     "key": "VDF_IN01.code_regex",
+     "field": "code_regex",
+     "pos_field": "code_regex_positive",
+     "neg_field": "code_regex_negative"
+    },
+    {
+     "id": "IN-02",
+     "key": "VDF_IN02.code_regex",
+     "field": "code_regex",
+     "pos_field": "code_regex_positive",
+     "neg_field": "code_regex_negative"
+    }
+   ],
+   "note": "VDF 輸入冊的兩條代碼律(個股 · 主動式 ETF)"
+  },
+  {
+   "id": "vdf.mdl009",
+   "system": "VDF",
+   "adapter": "py_const",
+   "glob": "functional modules/VDF/VDF_MDL009_TWStockList_v[0-9][0-9][0-9][0-9].py",
+   "entries": [
+    {
+     "name": "SSOT_STOCK_RX",
+     "key": "VDF_MDL009.SSOT_STOCK_RX"
+    },
+    {
+     "name": "STOCK_SHAPE_RX",
+     "key": "VDF_MDL009.STOCK_SHAPE_RX"
+    }
+   ],
+   "note": "全台股清單引擎程式裡的代碼律(只 ast.parse,不執行)"
+  },
+  {
+   "id": "vdf.eng077",
+   "system": "VDF",
+   "adapter": "py_const",
+   "glob": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v[0-9][0-9][0-9][0-9].py",
+   "entries": [
+    {
+     "name": "A_CODE",
+     "key": "VDF_ENG077.A_CODE"
+    }
+   ],
+   "note": "主動式 ETF 清單的代碼律正本(MDL010 沿用)"
+  },
+  {
+   "id": "vdf.mdl010",
+   "system": "VDF",
+   "adapter": "py_const",
+   "glob": "functional modules/VDF/VDF_MDL010_ActiveETFList_v[0-9][0-9][0-9][0-9].py",
+   "entries": [
+    {
+     "name": "A_CODE_FALLBACK",
+     "key": "VDF_MDL010.A_CODE_FALLBACK"
+    }
+   ],
+   "note": "MDL010 載不到 ENG077 時用的同文後備"
+  }
+ ],
+ "prior": "VIA_SSOT_ConsistencyEngine_Sources_SSOT_v0100.json",
+ "change_v0101": "只增:+4 個 VDF 來源(輸入冊清單 2 條 · 引擎程式常數 4 個)+概念 tw_active_etf_ticker;tw_stock_ticker 概念加 3 個成員。要引擎 v0103 才讀得到 json_list / py_const。"
+}
