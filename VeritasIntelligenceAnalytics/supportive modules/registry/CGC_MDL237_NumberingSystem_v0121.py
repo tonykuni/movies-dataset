@@ -7,6 +7,8 @@ VCGC 衝突閘「子系統邊界」不讓 VCGC 指定 VDF 冊發號(VDF 的冊�
 → 候選冊 → 本系統中央檢測與發號 → 發號回執 → VDF 自己把號寫回自己的冊。原候選契約(v0114)只收
 參數 / 邏輯 / 正則 / 同義字 / 政策 / 冊,本版只增(v0100 … v0120 一字不動):
   ① 候選型別多三種:MACRO → MRC(總體經濟)· INSTRUMENT → FM(金融市場商品)· FINDATA → FD(財務數據欄位)。
+  ③ 候選冊上限 256 → 1024:候選冊是累積冊(收件後舊資產照留),現有 95 筆 + 擷取 390 筆超過 256,收件端照規則拒寫;
+     上限照留(防爆量),只放寬到 1024。
   ② MRC / FM 是帶地區的號(<類>-<地區>-四碼):候選列沒有地區欄,地區取申請的 scope 最後一段
      (例 vdf.fetchone.mrc.us → US · vdf.fetchone.fm.tw → TW);沒有就 GLB。FD 不帶地區。
 其餘檢測(欄位 · 身分 · 版本 · 同字異義 · 撞號)全照 v0114 起的既有規則;發號仍只由既有分配器(只增)做;本檔不寫檔。
@@ -104,6 +106,8 @@ def _own(name: str):
 INTAKE = _own("TYPE_KIND")                                              # v0114:候選契約 · 檢測 · candidate_items
 NEW_TYPES = {"MACRO": "MRC", "INSTRUMENT": "FM", "FINDATA": "FD"}
 INTAKE.TYPE_KIND.update(NEW_TYPES)                                      # 只增:舊型別一個不動
+MAX_CANDIDATES_V0114 = INTAKE.MAX_CANDIDATES
+INTAKE.MAX_CANDIDATES = 1024                                            # 候選冊是累積冊(舊資產照留):95 + 擷取 390 > 256;仍設上限,不是取消
 _CAND_V0114 = INTAKE.candidate_items
 
 
@@ -161,6 +165,15 @@ def selftest() -> int:
     except ValueError as exc:
         rejected = "TYPE_OR_OWNER" in str(exc)
     valid = [INTAKE.validate_candidate(x) for x in (a, b, c, d)]
+    many = [_fixture("VDF_FETCH_X%03d" % i, "INSTRUMENT", "vdf.fetchone.fm.glb", "X%03d" % i, {"id": "X%03d" % i}) for i in range(300)]
+    plan_many = INTAKE.make_plan(many, [], [])
+    try:
+        INTAKE.make_plan(many * 4, [], [])
+        capped = False
+    except ValueError as exc:
+        capped = "CANDIDATE_LIMIT" in str(exc)
+    chk("①b 候選上限 1024:300 筆照收(舊上限 256 會拒)· 超過 1024 照樣拒 CANDIDATE_LIMIT",
+        INTAKE.MAX_CANDIDATES == 1024 and MAX_CANDIDATES_V0114 == 256 and plan_many["ready"] == 300 and capped, plan_many.get("ready"))
     chk("② 新型別候選過檢測(欄位 · 身分 · 版本規則照 v0114);不認得的型別照樣退件 TYPE_OR_OWNER", len(valid) == 4 and rejected)
     items, plan = INTAKE.candidate_items([a, b, c, d], "fixture:fetchone")
     by = {it["semantic_key"]: it for it in items}
@@ -178,13 +191,13 @@ def selftest() -> int:
     rc_prior = 0
     if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") != "1":
         keep = (BASE.ENGINE, INTAKE.candidate_items)
-        BASE.ENGINE, INTAKE.candidate_items = PRIOR.ENGINE, _CAND_V0114
+        BASE.ENGINE, INTAKE.candidate_items, INTAKE.MAX_CANDIDATES = PRIOR.ENGINE, _CAND_V0114, MAX_CANDIDATES_V0114
         for k in NEW_TYPES:
             INTAKE.TYPE_KIND.pop(k, None)
         try:
             rc_prior = PRIOR.selftest()
         finally:
-            BASE.ENGINE, INTAKE.candidate_items = keep
+            BASE.ENGINE, INTAKE.candidate_items, INTAKE.MAX_CANDIDATES = keep[0], keep[1], 1024
             INTAKE.TYPE_KIND.update(NEW_TYPES)
         chk("⑥ 前版鏈 v0120 → … 自測 rc 0(暫時拿掉本版補丁跑);跑完新型別與收件補丁都補回",
             rc_prior == 0 and BASE.ENGINE == ENGINE and INTAKE.candidate_items is candidate_items and all(k in INTAKE.TYPE_KIND for k in NEW_TYPES), f"rc {rc_prior}")
