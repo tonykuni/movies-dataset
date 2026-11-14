@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-14T07:36:10Z",
+ "updated_at": "2026-11-14T08:07:13Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -6051,6 +6051,25 @@
    "updated_at": "2026-11-14T03:21:05Z",
    "timeout_seconds": 900,
    "registered_at": "2026-11-14T03:21:05Z"
+  },
+  "C-lake-console-v0102": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_LakeConsole_v0102.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VIA_LakeConsole v0102 自測 11/11 PASS",
+   "scope": "本機 HTML 操作台 v0102:收尾與驗證按鈕列(兩套管理器自報 / 自檢 · SSOT 覆蓋 · Graphify · 省 Token 卡 · 交接檢查 · 串測 · 收尾閘)+ 三系統收尾鏈 closeout_3sys + closeout 命令(全部跑完才開頁)+ v0101 鏈",
+   "dependencies": [
+    "docs/handoff/ai/VIA_LakeConsole_v0102.py",
+    "docs/handoff/ai/VIA_LakeConsole_v0101.py",
+    "docs/handoff/ai/VIA_LakeConsole_v0100.py"
+   ],
+   "version": "v0102",
+   "updated_at": "2026-11-14T08:07:13Z",
+   "timeout_seconds": 1800,
+   "registered_at": "2026-11-14T08:07:13Z"
   }
  },
  "work_items": [
@@ -11920,6 +11939,30 @@
    "state": "PENDING",
    "receipt": null,
    "updated_at": "2026-11-14T03:21:05Z"
+  },
+  {
+   "id": "VCGC-LakeMatrix:fixture-date-pinned",
+   "owner": "VCGC",
+   "what": "C-lake-matrix · C-lake-matrix-v0101 永遠紅:VIA_LakeMatrix v0100 自測夾具把「今天」釘在 2026-11-10,入湖時間戳卻用真時鐘 → 11/10 以後 ⓔ「VCGC 今天有活動」必不過",
+   "reason": "夾具日期寫死(測試本身的 bug,不是湖壞);v0100 已發布不就地改",
+   "next": "LakeMatrix 出 v0102:夾具的入湖時間跟著夾具的 now(或 now 取真時鐘)→ 兩案複驗",
+   "requirement": "VCGC-REQ075",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-14T08:07:13Z"
+  },
+  {
+   "id": "VCGC-ToolMatrix:peer-pins-vcgc",
+   "owner": "VDF · VRN",
+   "what": "獨立性檢查紅:VDF_ENG093 v0105 · VDF_MDL014 v0102 · VRN_ENG090 v0103 現行尾版寫死 VCGC 檔名(另 1 支在交接夾的 VRN2 發行副本)",
+   "reason": "他系統的檔,VCGC 不代改(L123);要由 VDF / VRN 出不寫死檔名的新版,會動到它們的行為",
+   "next": "VDF / VRN 各自出新版(經鎖冊或 glob 找 VCGC 工具)→ ToolMatrix check 複驗",
+   "requirement": "VCGC-REQ075",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-14T08:07:13Z"
   }
  ]
 }
