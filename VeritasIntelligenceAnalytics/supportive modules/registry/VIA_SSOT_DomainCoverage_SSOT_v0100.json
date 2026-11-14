@@ -1,0 +1,322 @@
+{
+ "schema": "VIA.SSOT.DomainCoverage.v1",
+ "version": "v0100",
+ "ts": "2026-11-14T00:00:00+00:00",
+ "engine": "VIA_VCGC_MDL262_SSOTConsistencyEngine",
+ "source": "操作員 2026-11-14:「INPUT OUTPUT PARAMTERS TIME RANGE BROKER ANALYST .......ALL SHOULD HAVE SSOT」",
+ "policy": "每一類資料、每一個系統都要有自己的 SSOT 正本,而且拿得到中央號。本冊只宣告「去哪裡找每個系統在每一類的正本」;引擎只讀、逐格回報 GREEN(有正本 · 有中央號)/ YELLOW(有正本但沒號,或只有一部分)/ NODATA(沒有)。他系統的缺口只攤開,由該系統自己的管理器補;VCGC 不代建、不代修(L123)。某一類對某系統不適用時,由該系統宣告 na 與理由(出本冊新版),不是由 VCGC 判。",
+ "systems": [
+  "VCGC",
+  "VDF",
+  "VRN",
+  "VAP",
+  "VQG"
+ ],
+ "states": {
+  "GREEN": "有正本,且找得到中央號",
+  "YELLOW": "有正本但找不到中央號,或證據只涵蓋一部分",
+  "NODATA": "這個系統在這一類沒有宣告、也找不到正本",
+  "N/A": "該系統已宣告不適用"
+ },
+ "domains": {
+  "input": {
+   "zh": "輸入",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_InputConsole_Spec*.json"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/VDF_InputUniverse_SSOT_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "functional modules/VDF/VDF_FetchGroups_SSOT_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "candidate": {
+       "owner": "VDF",
+       "types": [
+        "INPT"
+       ]
+      }
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/SSOT/VRN_DocClass_SSOT_v[0-9][0-9][0-9][0-9].json",
+      "partial": "只有文件分類(哪一類報告);沒有輸入欄位 / 來源的正本"
+     }
+    ],
+    "VAP": [],
+    "VQG": [
+     {
+      "candidate": {
+       "owner": "VQG",
+       "types": [
+        "INPT"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  "output": {
+   "zh": "輸出",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_Output_Header_SSOT_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/VDF_DataHome_SSOT_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "functional modules/VDF/registry/VDF_TableHeader*.json"
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/registry/VRN_OUTPUTS_SSOT*.json"
+     },
+     {
+      "book": "functional modules/VRN/registry/VRN_TableHeader*.json"
+     }
+    ],
+    "VAP": [
+     {
+      "book": "functional modules/VAP/spec/ssot/vap_spec.json",
+      "partial": "版面規格;沒有輸出檔 / 欄位的正本"
+     }
+    ],
+    "VQG": []
+   }
+  },
+  "parameter": {
+   "zh": "參數",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_Central_Params_SSOT_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "number_kind": "PRMT",
+      "sub": "VCGC"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/VDF_Unified_Params*.json"
+     },
+     {
+      "book": "functional modules/VDF/SSOT/VDF_Config*.json"
+     },
+     {
+      "number_kind": "PRMT",
+      "sub": "VDF"
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/SSOT/VRN_Config*.json"
+     },
+     {
+      "number_kind": "PRMT",
+      "sub": "VRN"
+     }
+    ],
+    "VAP": [
+     {
+      "number_kind": "PRMT",
+      "sub": "VAP"
+     }
+    ],
+    "VQG": [
+     {
+      "book": "functional modules/VQG/VQG_IndicatorRegister_SSOT_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "number_kind": "PRMT",
+      "sub": "VQG"
+     }
+    ]
+   }
+  },
+  "time_range": {
+   "zh": "時間範圍 / 期間",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_SSOT_PeriodRules*.json"
+     },
+     {
+      "central_key": "^COLUMN_PARAM_TIME\\.|^RX_PERIOD|^RX_YEAR|^YEAR_"
+     }
+    ],
+    "VDF": [
+     {
+      "candidate": {
+       "owner": "VDF",
+       "scope_rx": "start|end|date|period|range"
+      },
+      "partial": "只有個別起訖日候選;沒有一本時間範圍正本"
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/VRN_TickerDate_Regex_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "supportive modules/ssot/VRN_DatePeriodRegexSSOT*.json"
+     },
+     {
+      "book": "supportive modules/ssot/VRN_FinancialPeriod_Normalization_SSOT*.json"
+     }
+    ],
+    "VAP": [],
+    "VQG": []
+   }
+  },
+  "broker": {
+   "zh": "券商",
+   "evidence": {
+    "VCGC": [
+     {
+      "union_scope": "broker"
+     },
+     {
+      "central_key": "^BROKER_"
+     }
+    ],
+    "VDF": [],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/VRN_Broker_Dict_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "functional modules/VRN/registry/VRN_BROKER_LIST_v*.json"
+     }
+    ],
+    "VAP": [],
+    "VQG": []
+   }
+  },
+  "analyst": {
+   "zh": "分析師",
+   "evidence": {
+    "VCGC": [
+     {
+      "union_scope": "job_title",
+      "partial": "只有職稱同義字;沒有分析師名冊(誰 · 屬哪家券商 · 何時)的正本"
+     }
+    ],
+    "VDF": [],
+    "VRN": [],
+    "VAP": [],
+    "VQG": []
+   }
+  },
+  "ticker": {
+   "zh": "代號",
+   "evidence": {
+    "VCGC": [
+     {
+      "central_key": "^TW_TICKER|^TWEquity|^TW_YFINANCE|^TW_BLOOMBERG|^TWETF_"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/SSOT/VDF_Regex_SSOT*.json"
+     },
+     {
+      "candidate": {
+       "owner": "VDF",
+       "types": [
+        "REGEX"
+       ]
+      }
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/VRN_TickerDate_Regex_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "supportive modules/ssot/VRN_TickerRegexSSOT*.json"
+     }
+    ],
+    "VAP": [],
+    "VQG": []
+   }
+  },
+  "synonym": {
+   "zh": "同義字 / 詞彙",
+   "evidence": {
+    "VCGC": [
+     {
+      "book": "supportive modules/registry/VIA_Central_Synonym_Regex_v[0-9][0-9][0-9][0-9].json"
+     },
+     {
+      "book": "supportive modules/registry/VIA_SSOT_SynonymUnion_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VDF": [
+     {
+      "book": "functional modules/VDF/SSOT/VDF_Synonym_SSOT*.json"
+     },
+     {
+      "candidate": {
+       "owner": "VDF",
+       "types": [
+        "SYNONYM"
+       ]
+      }
+     }
+    ],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/SYNONYM_LIBRARY_v*.json"
+     },
+     {
+      "book": "functional modules/VRN/knowledge/VRN_FinData_Synonym_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VAP": [],
+    "VQG": [
+     {
+      "candidate": {
+       "owner": "VQG",
+       "types": [
+        "SYNONYM"
+       ]
+      }
+     }
+    ]
+   }
+  },
+  "rating": {
+   "zh": "評等",
+   "evidence": {
+    "VCGC": [
+     {
+      "union_scope": "rating"
+     },
+     {
+      "central_key": "^RATING_"
+     }
+    ],
+    "VDF": [],
+    "VRN": [
+     {
+      "book": "functional modules/VRN/knowledge/VRN_Rating_Dict_v[0-9][0-9][0-9][0-9].json"
+     }
+    ],
+    "VAP": [],
+    "VQG": []
+   }
+  }
+ }
+}
