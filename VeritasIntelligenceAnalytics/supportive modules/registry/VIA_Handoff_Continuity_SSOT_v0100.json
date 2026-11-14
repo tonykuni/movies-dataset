@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-14T02:13:09Z",
+ "updated_at": "2026-11-14T02:35:15Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -5820,6 +5820,27 @@
    "updated_at": "2026-11-14T02:11:08Z",
    "timeout_seconds": 5400,
    "registered_at": "2026-11-14T02:11:08Z"
+  },
+  "C-ssot-consistency-v0103": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/VIA_VCGC_MDL262_SSOTConsistencyEngine_v0103.py",
+    "--selftest"
+   ],
+   "success_marker": "[VIA_VCGC_MDL262_SSOTConsistencyEngine v0103 薄尾自測] 12/12 PASS",
+   "scope": "VCGC 多系統 SSOT 一致性引擎尾版 v0103:json_list / py_const 來源 · 同概念併案;鏈 v0102(period 期別正規化)· v0101(domains 領域覆蓋)· v0100(32 項);對他系統只讀",
+   "dependencies": [
+    "supportive modules/registry/VIA_VCGC_MDL262_SSOTConsistencyEngine_v*.py",
+    "supportive modules/registry/VIA_SSOT_ConsistencyEngine_Sources_SSOT_v*.json",
+    "supportive modules/registry/VIA_SSOT_ConsistencyEngine_FailureModes_SSOT_v*.json",
+    "supportive modules/registry/VIA_SSOT_DomainCoverage_SSOT_v*.json",
+    "supportive modules/registry/VIA_SSOT_PeriodFormat_SSOT_v*.json"
+   ],
+   "version": "v0103",
+   "updated_at": "2026-11-14T02:35:15Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-14T02:35:15Z"
   }
  },
  "work_items": [
@@ -11609,14 +11630,14 @@
   {
    "id": "VCGC-REQ246:vdf-engine-matrix-module",
    "owner": "VCGC",
-   "what": "VDF 引擎矩陣(213 家族:輸入項目格式 · 日期參數格式 · 編號分類說明 · 兩座橋 · 實測耗時 · 輸出項目格式)目前由暫存腳本產生,尚未成為有編號的 VCGC 模組;同批待登:SSOT 一致性引擎 v0101 – v0103 與 DomainCoverage / PeriodFormat / Sources v0101 三本冊",
-   "reason": "背景重測還在跑(編號冊與需求冊是多案相依檔),整批登記排在重測結束後一次做",
-   "next": "重測結束 → 需求冊 / 工作流冊 / 盤點冊出新版 → 編號 --apply --scope → audit → registry-sync → handoff checkpoint",
+   "what": "引擎矩陣(五系統:輸入項目格式 · 日期參數格式 · 編號分類說明 · 兩座橋 · 實測耗時 · 輸出項目格式)與 HTML 檢視頁目前由暫存腳本產生,尚未成為有編號的 VCGC 模組",
+   "reason": "要成為模組得有自測與盤點站;SSOT 引擎 v0101–v0103 與各冊已於 2026-11-14 登記完成,本項只剩矩陣產生器",
+   "next": "寫成 VIA_VCGC_MDL### 新檔(名碼經 ToolMatrix naming)→ 自測 → 編號 → 盤點站 → 交接案",
    "requirement": "VCGC-REQ246",
    "case": "",
    "state": "PENDING",
    "receipt": null,
-   "updated_at": "2026-11-14T02:00:19Z"
+   "updated_at": "2026-11-14T02:35:15Z"
   },
   {
    "id": "VCGC-WKF045:vdf-vrn-converge-20261114",
@@ -11629,6 +11650,18 @@
    "state": "PENDING",
    "receipt": null,
    "updated_at": "2026-11-14T02:13:09Z"
+  },
+  {
+   "id": "VCGC-REQ246:fetch-target-matrix",
+   "owner": "VDF(接真值源)+ 操作員(判定)",
+   "what": "擷取資料矩陣冊 VIA_SSOT_FetchTargetMatrix_SSOT_v0100:12 大項 56 列純登錄(數值全部 PENDING_SOURCE);代碼 111 個中 21 個已在全球標的冊、90 個是新的;31 列有關鍵字對得上的既有登錄、25 列全新;7 列清單未列完(貼文用「…」帶過)",
+   "reason": "本冊只登要抓什麼與從哪裡抓,不指派引擎、不填值;「關鍵字對得上」不等於同一筆資料;證據層 T1 / T4 的定義貼文沒給,照原樣登錄",
+   "next": "操作員 / VDF 逐列判定:既有擷取能否涵蓋 → 不能的由 VDF 出引擎並在自己的擷取群組冊登記;7 列未列完的清單補齊後出 v0101;金融商品逐檔參數(合約規格 · 幣別 · 交易所 · 計價單位)另立正本",
+   "requirement": "VCGC-REQ246",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-14T02:35:15Z"
   }
  ]
 }

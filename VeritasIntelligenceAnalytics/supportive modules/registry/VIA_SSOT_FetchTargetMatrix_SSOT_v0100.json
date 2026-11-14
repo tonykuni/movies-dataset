@@ -1,0 +1,3393 @@
+{
+ "schema": "via.ssot.fetch_target_matrix/1",
+ "version": "v0100",
+ "ts": "2026-11-14T02:33:58Z",
+ "zh": "擷取資料矩陣 SSOT(what & where 的登錄)",
+ "owner": "VCGC 登錄與發號;擷取實作屬 VDF(本冊不寫 VDF 的冊、不指派引擎)",
+ "source": "操作員 2026-11-14 貼文「VERITAS INTELLIGENCE · 擷取資料矩陣 · 只增不減(APPEND-ONLY)· 多來源並存 · EVIDENCE-HONEST · 純登錄不捏造」「12 大項目 · 56 小項目(擷取列)」「分類編號新增不重複」",
+ "rules": [
+  "只增不減:新增列出新版號冊,舊列不刪不改;勘誤另加列",
+  "純登錄:本冊只記要抓什麼、從哪裡抓;數值一律待接真值源(value_state = PENDING_SOURCE),不填、不估",
+  "多來源並存:同一標的的各個來源與各種算法都保留,差異拿來做一致性檢查,不擇一覆蓋",
+  "不重複:每個代碼、每個來源在本冊只登一次(symbols / sources),列用編號引用;已在既有冊登過的代碼標 ALREADY_REGISTERED 並指回原冊,不另立一份",
+  "證據層(T1 · T4 · SSOT · 衍生)與用途照操作員貼文原樣登錄,本冊不另作解釋",
+  "open_list = true 表示貼文用「…」或「百餘檔」「25 檔」帶過,清單未列完,不代補"
+ ],
+ "numbering": {
+  "major": "FTM-<A…L>",
+  "row": "FTM-<大項字母><兩位流水>",
+  "symbol": "FTM-S<三位流水>(依首次出現)",
+  "source": "FTM-SRC<兩位流水>(依首次出現)"
+ },
+ "dedupe_against": [
+  "supportive modules/registry/VIA_Global_Universe_v0100.json(代碼完全相同才算已登)",
+  "functional modules/VDF/VDF_FetchGroups_SSOT_v0102.json(擷取群組 · 關鍵字對應)",
+  "functional modules/VDF/VDF_InputUniverse_SSOT_v0104.json(輸入 / 輸出宣告 · 關鍵字對應)",
+  "functional modules/VDF/VDF_TWEquity_DailyRow_Schema_v0100.json(日列欄 · 關鍵字對應)",
+  "VDF 圈內引擎尾版的名稱與說明(關鍵字對應)"
+ ],
+ "dedupe_note": "existing_related 是關鍵字對得上的既有登錄,代表「可能已有相關擷取」,不是已驗證的同一筆資料;是否同一筆由操作員與 VDF 判定",
+ "counts": {
+  "majors": 12,
+  "rows": 56,
+  "symbols": 111,
+  "symbols_already_registered": 21,
+  "symbols_new": 90,
+  "symbols_in_more_than_one_row": 14,
+  "sources": 49,
+  "rows_related_existing": 31,
+  "rows_new": 25,
+  "rows_open_list": 7
+ },
+ "majors": [
+  {
+   "id": "FTM-A",
+   "letter": "A",
+   "zh": "全球指數流 (Index FIS)",
+   "rows": 5
+  },
+  {
+   "id": "FTM-B",
+   "letter": "B",
+   "zh": "ETF FIS 宇宙 (依風險層 ~70檔)",
+   "rows": 5
+  },
+  {
+   "id": "FTM-C",
+   "letter": "C",
+   "zh": "台股族群 & 個股流 (核心)",
+   "rows": 5
+  },
+  {
+   "id": "FTM-D",
+   "letter": "D",
+   "zh": "台股主動式ETF & 選股 (展現層)",
+   "rows": 4
+  },
+  {
+   "id": "FTM-E",
+   "letter": "E",
+   "zh": "全球商品流 (現貨/期貨/供給/庫存/成本)",
+   "rows": 7
+  },
+  {
+   "id": "FTM-F",
+   "letter": "F",
+   "zh": "加密資產 (Crypto)",
+   "rows": 3
+  },
+  {
+   "id": "FTM-G",
+   "letter": "G",
+   "zh": "美股指數分族群進出",
+   "rows": 3
+  },
+  {
+   "id": "FTM-H",
+   "letter": "H",
+   "zh": "資金品質指標 (TWSE)",
+   "rows": 5
+  },
+  {
+   "id": "FTM-I",
+   "letter": "I",
+   "zh": "情緒/風險指標 (新增)",
+   "rows": 6
+  },
+  {
+   "id": "FTM-J",
+   "letter": "J",
+   "zh": "宏觀數據 (政府 vs 民間差異,新增)",
+   "rows": 5
+  },
+  {
+   "id": "FTM-K",
+   "letter": "K",
+   "zh": "AUM 多來源計算 (並存,新增)",
+   "rows": 5
+  },
+  {
+   "id": "FTM-L",
+   "letter": "L",
+   "zh": "真值/交叉驗證源 (彙總)",
+   "rows": 3
+  }
+ ],
+ "rows": [
+  {
+   "no": "FTM-A01",
+   "seq": 1,
+   "major": "FTM-A",
+   "item": "美股大盤",
+   "target": "S&P500 ^GSPC/SPY · 道瓊 ^DJI/DIA · 那斯達克100 ^NDX/QQQ · 羅素2000 ^RUT/IWM",
+   "symbols": [
+    "^GSPC",
+    "SPY",
+    "^DJI",
+    "DIA",
+    "^NDX",
+    "QQQ",
+    "^RUT",
+    "IWM"
+   ],
+   "open_list": false,
+   "primary_source": "ICI 週度 + ETF 創贖",
+   "source_keys": [
+    "ICI",
+    "ETF創贖"
+   ],
+   "frequency": "日",
+   "multi_source": "Y(ICI+創贖)",
+   "evidence_tier": "T1",
+   "use": "指數 FIS 方向/強度",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [
+    "^GSPC",
+    "SPY",
+    "^DJI",
+    "DIA",
+    "^NDX",
+    "QQQ",
+    "^RUT",
+    "IWM"
+   ],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-A02",
+   "seq": 2,
+   "major": "FTM-A",
+   "item": "台股大盤",
+   "target": "加權 ^TWII/0050 · 櫃買 ^TWOII/006201",
+   "symbols": [
+    "^TWII",
+    "0050",
+    "^TWOII",
+    "006201"
+   ],
+   "open_list": false,
+   "primary_source": "TWSE T86 + 創贖",
+   "source_keys": [
+    "TWSE T86",
+    "ETF創贖"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1/T4",
+   "use": "指數 FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 輸入冊 IN-03",
+     "book": "VDF_InputUniverse_SSOT_v0104.json",
+     "keyword": "加權指數"
+    },
+    {
+     "where": "VDF 輸入冊 OUT-06",
+     "book": "VDF_InputUniverse_SSOT_v0104.json",
+     "keyword": "加權指數"
+    },
+    {
+     "where": "VDF 輸入冊 OUT-08",
+     "book": "VDF_InputUniverse_SSOT_v0104.json",
+     "keyword": "加權指數"
+    },
+    {
+     "where": "VDF 輸入冊 OUT-05",
+     "book": "VDF_InputUniverse_SSOT_v0104.json",
+     "keyword": "櫃買指數"
+    },
+    {
+     "where": "VDF 擷取群組 TW_INDEX",
+     "book": "VDF_FetchGroups_SSOT_v0102.json",
+     "keyword": "TW_INDEX"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [
+    "^TWII"
+   ],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-A03",
+   "seq": 3,
+   "major": "FTM-A",
+   "item": "亞洲",
+   "target": "日經 ^N225/EWJ · 韓 ^KS11/EWY · 港 ^HSI/2800.HK · 中 000300/MCHI/ASHR · 印 ^NSEI/INDA",
+   "symbols": [
+    "^N225",
+    "EWJ",
+    "^KS11",
+    "EWY",
+    "^HSI",
+    "2800.HK",
+    "000300",
+    "MCHI",
+    "ASHR",
+    "^NSEI",
+    "INDA"
+   ],
+   "open_list": false,
+   "primary_source": "EPFR/北向AKShare/NSDL/日銀",
+   "source_keys": [
+    "EPFR",
+    "北向 AKShare",
+    "NSDL",
+    "日銀"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1/T4",
+   "use": "指數 FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [
+    "^N225",
+    "EWJ",
+    "^KS11",
+    "^HSI"
+   ],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-A04",
+   "seq": 4,
+   "major": "FTM-A",
+   "item": "歐洲",
+   "target": "DAX ^GDAXI/EWG · FTSE ^FTSE/EWU · STOXX50 ^STOXX50E/VGK",
+   "symbols": [
+    "^GDAXI",
+    "EWG",
+    "^FTSE",
+    "EWU",
+    "^STOXX50E",
+    "VGK"
+   ],
+   "open_list": false,
+   "primary_source": "EPFR",
+   "source_keys": [
+    "EPFR"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "指數 FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [
+    "^GDAXI",
+    "^FTSE",
+    "^STOXX50E",
+    "VGK"
+   ],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-A05",
+   "seq": 5,
+   "major": "FTM-A",
+   "item": "新興市場",
+   "target": "MSCI EM EEM/VWO/IEMG",
+   "symbols": [
+    "EEM",
+    "VWO",
+    "IEMG"
+   ],
+   "open_list": false,
+   "primary_source": "EPFR/IIF",
+   "source_keys": [
+    "EPFR",
+    "IIF"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "指數 FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [
+    "EEM"
+   ],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-B01",
+   "seq": 6,
+   "major": "FTM-B",
+   "item": "T0 防禦/低波",
+   "target": "SHV·BIL·AGG·BND·TLT · USMV·SPLV · GLD",
+   "symbols": [
+    "SHV",
+    "BIL",
+    "AGG",
+    "BND",
+    "TLT",
+    "USMV",
+    "SPLV",
+    "GLD"
+   ],
+   "open_list": false,
+   "primary_source": "創贖/issuer AUM",
+   "source_keys": [
+    "ETF創贖",
+    "issuer"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "risk_tier FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [
+    "TLT"
+   ],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-B02",
+   "seq": 7,
+   "major": "FTM-B",
+   "item": "T1 核心市值",
+   "target": "SPY·VOO·IVV·VTI·QQQ·DIA·IWM",
+   "symbols": [
+    "SPY",
+    "VOO",
+    "IVV",
+    "VTI",
+    "QQQ",
+    "DIA",
+    "IWM"
+   ],
+   "open_list": false,
+   "primary_source": "創贖/AUM",
+   "source_keys": [
+    "ETF創贖",
+    "issuer"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "市場β FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [
+    "SPY",
+    "QQQ",
+    "DIA",
+    "IWM"
+   ],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-B03",
+   "seq": 8,
+   "major": "FTM-B",
+   "item": "T2 產業/主題",
+   "target": "XLK·SMH·XLE… · BOTZ·ARKK·ICLN·LIT",
+   "symbols": [
+    "XLK",
+    "SMH",
+    "XLE",
+    "BOTZ",
+    "ARKK",
+    "ICLN",
+    "LIT"
+   ],
+   "open_list": true,
+   "primary_source": "創贖",
+   "source_keys": [
+    "ETF創贖"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "主題β FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-B04",
+   "seq": 9,
+   "major": "FTM-B",
+   "item": "T2 區域/國別",
+   "target": "EWT·EWJ·EWY·MCHI·INDA·EEM",
+   "symbols": [
+    "EWT",
+    "EWJ",
+    "EWY",
+    "MCHI",
+    "INDA",
+    "EEM"
+   ],
+   "open_list": false,
+   "primary_source": "創贖",
+   "source_keys": [
+    "ETF創贖"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "區域β FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [
+    "EWT",
+    "EWJ",
+    "EEM"
+   ],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-B05",
+   "seq": 10,
+   "major": "FTM-B",
+   "item": "T4 槓桿/反向",
+   "target": "TQQQ·SQQQ·SOXL·SOXS·UPRO·SPXU·UVXY",
+   "symbols": [
+    "TQQQ",
+    "SQQQ",
+    "SOXL",
+    "SOXS",
+    "UPRO",
+    "SPXU",
+    "UVXY"
+   ],
+   "open_list": false,
+   "primary_source": "創贖",
+   "source_keys": [
+    "ETF創贖"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T4",
+   "use": "高波動(部位)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-C01",
+   "seq": 11,
+   "major": "FTM-C",
+   "item": "族群分類",
+   "target": "31 群(v1.0×24 + v1.1×7)L/P/G",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "File1 族群分類 SSOT",
+   "source_keys": [
+    "File1 族群分類 SSOT"
+   ],
+   "frequency": "—",
+   "multi_source": "Y(只增不減errata)",
+   "evidence_tier": "SSOT",
+   "use": "grouping 骨架",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 引擎 VDF_ENG070_GroupClassificationIndex VIA-VDF-ENG300",
+     "book": "(引擎檔)",
+     "keyword": "GroupClassification"
+    },
+    {
+     "where": "VDF 輸入冊 OUT-08",
+     "book": "VDF_InputUniverse_SSOT_v0104.json",
+     "keyword": "產業分類"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-C02",
+   "seq": 12,
+   "major": "FTM-C",
+   "item": "個股角色",
+   "target": "百餘檔 Leader/Peer/Laggard(hot/lead/chg)",
+   "symbols": [],
+   "open_list": true,
+   "primary_source": "File1 + VDF 計算",
+   "source_keys": [
+    "File1 族群分類 SSOT",
+    "VDF 計算"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1/T4 待VDF",
+   "use": "個股下鑽層",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-C03",
+   "seq": 13,
+   "major": "FTM-C",
+   "item": "法人買賣超($)",
+   "target": "三大法人",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "TWSE T86",
+   "source_keys": [
+    "TWSE T86"
+   ],
+   "frequency": "日 EOD",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "族群流方向(當沖免疫)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 日列欄 inst_total_net(三大法人合計買賣超)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "三大法人"
+    },
+    {
+     "where": "VDF 輸入冊 OUT-05",
+     "book": "VDF_InputUniverse_SSOT_v0104.json",
+     "keyword": "買賣超"
+    },
+    {
+     "where": "VDF 日列欄 inst_foreign_net(外資買賣超)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "買賣超"
+    },
+    {
+     "where": "VDF 日列欄 inst_trust_net(投信買賣超)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "買賣超"
+    },
+    {
+     "where": "VDF 日列欄 inst_dealer_net(自營商買賣超)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "買賣超"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-C04",
+   "seq": 14,
+   "major": "FTM-C",
+   "item": "Δ融資餘額",
+   "target": "逐檔融資",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "TWSE MI_MARGN",
+   "source_keys": [
+    "TWSE MI_MARGN"
+   ],
+   "frequency": "日 EOD",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "族群流(當沖免疫)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 日列欄 margin_balance(融資餘額)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "融資餘額"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-C05",
+   "seq": 15,
+   "major": "FTM-C",
+   "item": "個股→族群上捲",
+   "target": "Σ主動ETF持股增減 × File1",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "主動ETF PCF + grouping",
+   "source_keys": [
+    "TWSE 每日投組 PCF",
+    "File1 族群分類 SSOT"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "主動資金族群流(真值)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 輸入冊 OUT-04",
+     "book": "VDF_InputUniverse_SSOT_v0104.json",
+     "keyword": "holdings_changes"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-D01",
+   "seq": 16,
+   "major": "FTM-D",
+   "item": "主動ETF清單",
+   "target": "25 檔 00980A…00423A(末碼A股票型)",
+   "symbols": [
+    "00980A",
+    "00423A"
+   ],
+   "open_list": true,
+   "primary_source": "TWSE 主動式ETF專頁",
+   "source_keys": [
+    "TWSE 主動式ETF專頁"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "展現(不入訊號測試)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 輸入冊 IN-02",
+     "book": "VDF_InputUniverse_SSOT_v0104.json",
+     "keyword": "主動式台股 ETF"
+    },
+    {
+     "where": "VDF 引擎 VDF_MDL010_ActiveETFList VIA-VDF-MDL173",
+     "book": "(引擎檔)",
+     "keyword": "主動式台股 ETF"
+    },
+    {
+     "where": "VDF 引擎 VDF_ENG231_GlobalListings VIA-VDF-ENG295",
+     "book": "(引擎檔)",
+     "keyword": "主動式台股 ETF"
+    },
+    {
+     "where": "VDF 擷取群組 TW_ACTIVE_ETF",
+     "book": "VDF_FetchGroups_SSOT_v0102.json",
+     "keyword": "TW_ACTIVE_ETF"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-D02",
+   "seq": 17,
+   "major": "FTM-D",
+   "item": "績效 Matrix",
+   "target": "7 horizon 1/5/10/20/60/120/240日",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "收盤 adj",
+   "source_keys": [
+    "收盤 adj(還原收盤)"
+   ],
+   "frequency": "日",
+   "multi_source": "N",
+   "evidence_tier": "T1",
+   "use": "績效排行",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 日列欄 yf_adj_close(yfinance 還原收盤)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "還原收盤"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-D03",
+   "seq": 18,
+   "major": "FTM-D",
+   "item": "持股異動/選股",
+   "target": "NEW/加碼/減碼/出清/持平",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "TWSE 每日投組 PCF",
+   "source_keys": [
+    "TWSE 每日投組 PCF"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "選股→族群上捲(接C)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 輸入冊 OUT-04",
+     "book": "VDF_InputUniverse_SSOT_v0104.json",
+     "keyword": "holdings_changes"
+    },
+    {
+     "where": "VDF 引擎 VDF_ENG078_ActiveETFHoldingsHistory VIA-VDF-ENG206",
+     "book": "(引擎檔)",
+     "keyword": "ActiveETFHoldings"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-D04",
+   "seq": 19,
+   "major": "FTM-D",
+   "item": "規模/受益人數",
+   "target": "日變動",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "投信投顧公會",
+   "source_keys": [
+    "投信投顧公會"
+   ],
+   "frequency": "日/週",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "主動資金流真值",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 引擎 VDF_ENG094_ActiveETFActivity VIA-VDF-ENG308",
+     "book": "(引擎檔)",
+     "keyword": "規模 AUM"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-E01",
+   "seq": 20,
+   "major": "FTM-E",
+   "item": "能源-原油",
+   "target": "WTI/Brent USO·BNO·USL·DBO;現貨 FRED DCOILWTICO/DCOILBRENTEU",
+   "symbols": [
+    "USO",
+    "BNO",
+    "USL",
+    "DBO",
+    "DCOILWTICO",
+    "DCOILBRENTEU"
+   ],
+   "open_list": false,
+   "primary_source": "ETF創贖 + CFTC COT + EIA",
+   "source_keys": [
+    "ETF創贖",
+    "CFTC COT",
+    "EIA"
+   ],
+   "frequency": "日/週",
+   "multi_source": "Y(3源並存)",
+   "evidence_tier": "T1/T4",
+   "use": "商品FIS+基本面",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-E02",
+   "seq": 21,
+   "major": "FTM-E",
+   "item": "能源-氣/汽油",
+   "target": "天然氣 UNG(DHHNGSP)· 汽油 UGA",
+   "symbols": [
+    "UNG",
+    "DHHNGSP",
+    "UGA"
+   ],
+   "open_list": false,
+   "primary_source": "創贖 + EIA週儲(週四)+ COT",
+   "source_keys": [
+    "ETF創贖",
+    "EIA",
+    "CFTC COT"
+   ],
+   "frequency": "日/週",
+   "multi_source": "Y",
+   "evidence_tier": "T1/T4",
+   "use": "商品FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-E03",
+   "seq": 22,
+   "major": "FTM-E",
+   "item": "貴金屬",
+   "target": "金 GLD/IAU(LBMA/COMEX)· 銀 SLV · 白金鈀 PPLT/PALL",
+   "symbols": [
+    "GLD",
+    "IAU",
+    "SLV",
+    "PPLT",
+    "PALL"
+   ],
+   "open_list": false,
+   "primary_source": "創贖 + COT + 倉儲/持金噸數",
+   "source_keys": [
+    "ETF創贖",
+    "CFTC COT",
+    "LBMA/WGC",
+    "COMEX"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "商品FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-E04",
+   "seq": 23,
+   "major": "FTM-E",
+   "item": "工業金屬",
+   "target": "銅 CPER/COPX(LME/COMEX/SHFE)· 基本金屬 DBB · 鈾 URA · 鋰 LIT",
+   "symbols": [
+    "CPER",
+    "COPX",
+    "DBB",
+    "URA",
+    "LIT"
+   ],
+   "open_list": false,
+   "primary_source": "創贖 + COT + 倉儲",
+   "source_keys": [
+    "ETF創贖",
+    "CFTC COT",
+    "LME",
+    "COMEX",
+    "SHFE"
+   ],
+   "frequency": "日/週",
+   "multi_source": "Y",
+   "evidence_tier": "T1/T4",
+   "use": "商品FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-E05",
+   "seq": 24,
+   "major": "FTM-E",
+   "item": "農產",
+   "target": "黃豆 SOYB · 玉米 CORN · 小麥 WEAT · 廣基農 DBA",
+   "symbols": [
+    "SOYB",
+    "CORN",
+    "WEAT",
+    "DBA"
+   ],
+   "open_list": false,
+   "primary_source": "創贖 + COT + USDA WASDE",
+   "source_keys": [
+    "ETF創贖",
+    "CFTC COT",
+    "USDA WASDE"
+   ],
+   "frequency": "日/週/月",
+   "multi_source": "Y",
+   "evidence_tier": "T1/T4",
+   "use": "商品FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-E06",
+   "seq": 25,
+   "major": "FTM-E",
+   "item": "廣基/商品股",
+   "target": "DBC·PDBC·GSG · 金礦 GDX · 能源股 XLE",
+   "symbols": [
+    "DBC",
+    "PDBC",
+    "GSG",
+    "GDX",
+    "XLE"
+   ],
+   "open_list": false,
+   "primary_source": "創贖 + COT",
+   "source_keys": [
+    "ETF創贖",
+    "CFTC COT"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "商品FIS",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-E07",
+   "seq": 26,
+   "major": "FTM-E",
+   "item": "供給/庫存/成本",
+   "target": "EIA產量·Cushing庫存 · OPEC MOMR · LME/LBMA倉儲 · USDA · roll/儲存/邊際成本",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "EIA/OPEC/LME/USDA",
+   "source_keys": [
+    "EIA",
+    "OPEC MOMR",
+    "LME",
+    "LBMA/WGC",
+    "USDA WASDE"
+   ],
+   "frequency": "週/月/日",
+   "multi_source": "Y",
+   "evidence_tier": "T1/T4",
+   "use": "基本面疊加",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-F01",
+   "seq": 27,
+   "major": "FTM-F",
+   "item": "主要幣",
+   "target": "BTC(主導~56%)·ETH·XRP·SOL·… 依市值",
+   "symbols": [
+    "BTC",
+    "ETH",
+    "XRP",
+    "SOL"
+   ],
+   "open_list": true,
+   "primary_source": "CoinGecko/CMC 市值主導率",
+   "source_keys": [
+    "CoinGecko",
+    "CMC"
+   ],
+   "frequency": "日/即時",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "加密方向",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-F02",
+   "seq": 28,
+   "major": "FTM-F",
+   "item": "現貨ETF創贖/持幣",
+   "target": "BTC IBIT/FBTC/GBTC · ETH ETHA/FETH · SOL · XRP XRPC/GXRP · LTC LTCC",
+   "symbols": [
+    "IBIT",
+    "FBTC",
+    "GBTC",
+    "ETHA",
+    "FETH",
+    "XRPC",
+    "GXRP",
+    "LTCC"
+   ],
+   "open_list": true,
+   "primary_source": "Farside / issuer 持幣量",
+   "source_keys": [
+    "Farside",
+    "issuer"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "加密FIS(當沖/roll免疫)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-F03",
+   "seq": 29,
+   "major": "FTM-F",
+   "item": "穩定幣",
+   "target": "USDT · USDC",
+   "symbols": [
+    "USDT",
+    "USDC"
+   ],
+   "open_list": false,
+   "primary_source": "市值/鏈上",
+   "source_keys": [
+    "CoinGecko",
+    "鏈上"
+   ],
+   "frequency": "即時",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "現金等價(排除方向流)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-G01",
+   "seq": 30,
+   "major": "FTM-G",
+   "item": "SPX→11 GICS",
+   "target": "XLK·XLV·XLF·XLY·XLC·XLI·XLP·XLE·XLU·XLRE·XLB",
+   "symbols": [
+    "XLK",
+    "XLV",
+    "XLF",
+    "XLY",
+    "XLC",
+    "XLI",
+    "XLP",
+    "XLE",
+    "XLU",
+    "XLRE",
+    "XLB"
+   ],
+   "open_list": false,
+   "primary_source": "sector ETF 創贖/FIS",
+   "source_keys": [
+    "ETF創贖"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "分族群進出(真實)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-G02",
+   "seq": 31,
+   "major": "FTM-G",
+   "item": "DJI→成分族群",
+   "target": "30 成分(價格加權)依 sector",
+   "symbols": [],
+   "open_list": true,
+   "primary_source": "成分 NetFlow",
+   "source_keys": [
+    "成分 NetFlow(計算)"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T4 待接",
+   "use": "分族群進出",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-G03",
+   "seq": 32,
+   "major": "FTM-G",
+   "item": "NDX→Mag7/類股",
+   "target": "Mag7 vs 其餘 IT/Comm/ConsDisc",
+   "symbols": [],
+   "open_list": true,
+   "primary_source": "成分 / QQQ 權值",
+   "source_keys": [
+    "成分 NetFlow(計算)",
+    "issuer"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T4 待接",
+   "use": "分族群進出",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-H01",
+   "seq": 33,
+   "major": "FTM-H",
+   "item": "融資使用率",
+   "target": "槓桿浮額",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "MI_MARGN + 融資限額",
+   "source_keys": [
+    "TWSE MI_MARGN",
+    "TWSE 融資限額"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "品質(高=散戶槓桿)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 日列欄 margin_balance(融資餘額)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "融資餘額"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-H02",
+   "seq": 34,
+   "major": "FTM-H",
+   "item": "融資維持率",
+   "target": "整戶擔保維持率 <130% 追繳",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "衍生:融資成本基礎 vs 現價",
+   "source_keys": [
+    "衍生計算"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "衍生估計",
+   "use": "品質脆弱度(非原生欄位)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 日列欄 margin_maintenance_ratio(融資維持率)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "融資維持率"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-H03",
+   "seq": 35,
+   "major": "FTM-H",
+   "item": "券資比",
+   "target": "融券/融資",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "MI_MARGN",
+   "source_keys": [
+    "TWSE MI_MARGN"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1(漏SBL)",
+   "use": "品質(兩側槓桿+軋空)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 日列欄 short_to_margin_ratio(券資比)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "券資比"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-H04",
+   "seq": 36,
+   "major": "FTM-H",
+   "item": "當沖比",
+   "target": "當沖值/總值",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "TWSE 每日當日沖銷統計",
+   "source_keys": [
+    "TWSE 當日沖銷統計"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "data-quality 折扣權重",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 日列欄 day_trade_ratio(當沖比)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "當沖比"
+    },
+    {
+     "where": "VDF 日列欄 day_trade_volume(當沖成交量)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "當沖成交"
+    },
+    {
+     "where": "VDF 日列欄 day_trade_value(當沖成交值)",
+     "book": "VDF_TWEquity_DailyRow_Schema_v0100.json",
+     "keyword": "當沖成交"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-H05",
+   "seq": 37,
+   "major": "FTM-H",
+   "item": "借券賣出 SBL",
+   "target": "法人空方",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "TWSE/TDCC 借券",
+   "source_keys": [
+    "TWSE/TDCC 借券"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "補券資比漏的法人空",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-I01",
+   "seq": 38,
+   "major": "FTM-I",
+   "item": "^VIX 隱含波動",
+   "target": "VIX spot",
+   "symbols": [
+    "^VIX"
+   ],
+   "open_list": false,
+   "primary_source": "CBOE",
+   "source_keys": [
+    "CBOE"
+   ],
+   "frequency": "即時/日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "risk-off 溫度 / RORO",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [
+    "^VIX"
+   ],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-I02",
+   "seq": 39,
+   "major": "FTM-I",
+   "item": "VIX 期限結構",
+   "target": "VIX/VIX3M · VVIX",
+   "symbols": [
+    "^VIX",
+    "VIX3M",
+    "VVIX"
+   ],
+   "open_list": false,
+   "primary_source": "CBOE",
+   "source_keys": [
+    "CBOE"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "contango/backwardation",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [
+    "^VIX"
+   ],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-I03",
+   "seq": 40,
+   "major": "FTM-I",
+   "item": "AAII 散戶多空",
+   "target": "Bull/Bear/Neutral %",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "AAII 週報(週四)",
+   "source_keys": [
+    "AAII"
+   ],
+   "frequency": "週",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "散戶情緒(反指)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 擷取群組 SENTIMENT",
+     "book": "VDF_FetchGroups_SSOT_v0102.json",
+     "keyword": "AAII"
+    },
+    {
+     "where": "VDF 引擎 VDF_ENG116_AAIIWorkbook VIA-VDF-ENG358",
+     "book": "(引擎檔)",
+     "keyword": "AAII"
+    },
+    {
+     "where": "VDF 引擎 VDF_Engine_aaii_sentiment VIA-VDF-MDL120",
+     "book": "(引擎檔)",
+     "keyword": "AAII"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-I04",
+   "seq": 41,
+   "major": "FTM-I",
+   "item": "CNN Fear & Greed",
+   "target": "7 分量複合指數",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "CNN(可拆 7 分量)",
+   "source_keys": [
+    "CNN"
+   ],
+   "frequency": "日",
+   "multi_source": "Y(拆分量)",
+   "evidence_tier": "T1",
+   "use": "綜合情緒",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 擷取群組 SENTIMENT",
+     "book": "VDF_FetchGroups_SSOT_v0102.json",
+     "keyword": "CNN"
+    },
+    {
+     "where": "VDF 引擎 VDF_ENG229_CNNFearGreedHistory VIA-VDF-ENG369",
+     "book": "(引擎檔)",
+     "keyword": "CNN"
+    },
+    {
+     "where": "VDF 引擎 VDF_Engine_cnn_fear_greed_proxy VIA-VDF-MDL121",
+     "book": "(引擎檔)",
+     "keyword": "CNN"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-I05",
+   "seq": 42,
+   "major": "FTM-I",
+   "item": "Put/Call Ratio",
+   "target": "總量/指數/個股",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "CBOE",
+   "source_keys": [
+    "CBOE"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "選擇權情緒",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-I06",
+   "seq": 43,
+   "major": "FTM-I",
+   "item": "NAAIM/II 投顧情緒",
+   "target": "專業部位/多空",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "NAAIM / Investors Intelligence",
+   "source_keys": [
+    "NAAIM",
+    "Investors Intelligence"
+   ],
+   "frequency": "週",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "專業情緒(對照散戶)",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-J01",
+   "seq": 44,
+   "major": "FTM-J",
+   "item": "PMI 製造/服務",
+   "target": "官方 vs 民間",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "中 NBS官方 / Caixin民間 · 美 ISM / S&P Global",
+   "source_keys": [
+    "NBS",
+    "Caixin",
+    "ISM",
+    "S&P Global"
+   ],
+   "frequency": "月",
+   "multi_source": "Y(官vs民並存)",
+   "evidence_tier": "T1",
+   "use": "景氣 + 官民差異",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 引擎 VDF_ENG114_PmiPair VIA-VDF-ENG277",
+     "book": "(引擎檔)",
+     "keyword": "PMI"
+    },
+    {
+     "where": "VDF 擷取群組 CN_NBS",
+     "book": "VDF_FetchGroups_SSOT_v0102.json",
+     "keyword": "NBS"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-J02",
+   "seq": 45,
+   "major": "FTM-J",
+   "item": "CPI 通膨",
+   "target": "官方 vs 民間即時",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "BLS官方 / Truflation · Cleveland Fed Nowcast · MIT BPP",
+   "source_keys": [
+    "BLS",
+    "Truflation",
+    "Cleveland Fed Nowcast",
+    "MIT BPP"
+   ],
+   "frequency": "月/日",
+   "multi_source": "Y(官vs民)",
+   "evidence_tier": "T1",
+   "use": "通膨 + 官民差異",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-J03",
+   "seq": 46,
+   "major": "FTM-J",
+   "item": "PPI 生產者",
+   "target": "官方",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "BLS",
+   "source_keys": [
+    "BLS"
+   ],
+   "frequency": "月",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "生產者通膨",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 擷取群組 SHIPPING",
+     "book": "VDF_FetchGroups_SSOT_v0102.json",
+     "keyword": "PPI"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-J04",
+   "seq": 47,
+   "major": "FTM-J",
+   "item": "官民差異指標",
+   "target": "官方 − 民間",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "計算(只增不減保留兩源)",
+   "source_keys": [
+    "衍生計算"
+   ],
+   "frequency": "月",
+   "multi_source": "Y",
+   "evidence_tier": "衍生",
+   "use": "數據品質/領先訊號",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-J05",
+   "seq": 48,
+   "major": "FTM-J",
+   "item": "宏觀因子",
+   "target": "利率/DXY/殖利率曲線/信用利差",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "FRED",
+   "source_keys": [
+    "FRED"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "接全球sim RISK/USD/INFL/GEO",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 擷取群組 INTL_FIN",
+     "book": "VDF_FetchGroups_SSOT_v0102.json",
+     "keyword": "FRED"
+    },
+    {
+     "where": "VDF 擷取群組 INTL_DAILY",
+     "book": "VDF_FetchGroups_SSOT_v0102.json",
+     "keyword": "FRED"
+    },
+    {
+     "where": "VDF 擷取群組 US_MACRO",
+     "book": "VDF_FetchGroups_SSOT_v0102.json",
+     "keyword": "FRED"
+    },
+    {
+     "where": "VDF 擷取群組 SENTIMENT",
+     "book": "VDF_FetchGroups_SSOT_v0102.json",
+     "keyword": "FRED"
+    },
+    {
+     "where": "VDF 引擎 VDF_ENG074_FredMacroSSOT VIA-VDF-ENG311",
+     "book": "(引擎檔)",
+     "keyword": "FRED"
+    },
+    {
+     "where": "VDF 引擎 VDF_MDL016_MacroCrossCheck VIA-VDF-MDL245",
+     "book": "(引擎檔)",
+     "keyword": "FRED"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-K01",
+   "seq": 49,
+   "major": "FTM-K",
+   "item": "法1 現貨ETF",
+   "target": "AUM = Σ(shares × NAV)",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "issuer/創贖",
+   "source_keys": [
+    "issuer",
+    "ETF創贖"
+   ],
+   "frequency": "日",
+   "multi_source": "並存",
+   "evidence_tier": "T1",
+   "use": "AUM 真值",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 引擎 VDF_ENG094_ActiveETFActivity VIA-VDF-ENG308",
+     "book": "(引擎檔)",
+     "keyword": "AUM"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-K02",
+   "seq": 50,
+   "major": "FTM-K",
+   "item": "法2 期貨ETF",
+   "target": "AUM = 持倉 × 價",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "issuer",
+   "source_keys": [
+    "issuer"
+   ],
+   "frequency": "日",
+   "multi_source": "並存",
+   "evidence_tier": "T1",
+   "use": "AUM",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 引擎 VDF_ENG094_ActiveETFActivity VIA-VDF-ENG308",
+     "book": "(引擎檔)",
+     "keyword": "AUM"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-K03",
+   "seq": 51,
+   "major": "FTM-K",
+   "item": "法3 holdings-sum",
+   "target": "Σ(成分 × 價)",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "holdings 明細",
+   "source_keys": [
+    "holdings 明細"
+   ],
+   "frequency": "日",
+   "multi_source": "並存",
+   "evidence_tier": "T1",
+   "use": "AUM 交叉驗證",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 引擎 VDF_ENG094_ActiveETFActivity VIA-VDF-ENG308",
+     "book": "(引擎檔)",
+     "keyword": "AUM"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-K04",
+   "seq": 52,
+   "major": "FTM-K",
+   "item": "法4 issuer 申報",
+   "target": "官方申報 AUM",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "issuer 官方",
+   "source_keys": [
+    "issuer"
+   ],
+   "frequency": "日",
+   "multi_source": "並存",
+   "evidence_tier": "T1",
+   "use": "AUM 基準",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [
+    {
+     "where": "VDF 引擎 VDF_ENG094_ActiveETFActivity VIA-VDF-ENG308",
+     "book": "(引擎檔)",
+     "keyword": "AUM"
+    }
+   ],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "RELATED_EXISTING"
+  },
+  {
+   "no": "FTM-K05",
+   "seq": 53,
+   "major": "FTM-K",
+   "item": "一致性檢查",
+   "target": "四法差異 → 一致性/勘誤",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "計算(只增不減保留各法)",
+   "source_keys": [
+    "衍生計算"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "衍生",
+   "use": "多源一致性 QA",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-L01",
+   "seq": 54,
+   "major": "FTM-L",
+   "item": "台股源",
+   "target": "TWSE(T86/MI_MARGN/當沖/PCF)· TDCC集保 · 投信投顧公會 · 北向 AKShare",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "官方/公會",
+   "source_keys": [
+    "TWSE T86",
+    "TWSE MI_MARGN",
+    "TWSE 當日沖銷統計",
+    "TWSE 每日投組 PCF",
+    "TDCC 集保",
+    "投信投顧公會",
+    "北向 AKShare"
+   ],
+   "frequency": "日",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "台股真值池",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-L02",
+   "seq": 55,
+   "major": "FTM-L",
+   "item": "美股/全球源",
+   "target": "ICI週度 · EPFR/IIF · FRED · EIA · CFTC COT · USDA WASDE · LBMA/WGC · LME · OPEC MOMR",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "官方/機構",
+   "source_keys": [
+    "ICI",
+    "EPFR",
+    "IIF",
+    "FRED",
+    "EIA",
+    "CFTC COT",
+    "USDA WASDE",
+    "LBMA/WGC",
+    "LME",
+    "OPEC MOMR"
+   ],
+   "frequency": "日/週/月",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "全球真值池",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  },
+  {
+   "no": "FTM-L03",
+   "seq": 56,
+   "major": "FTM-L",
+   "item": "情緒/加密源",
+   "target": "CBOE(VIX/PutCall)· AAII · CNN · NAAIM · Farside(crypto)",
+   "symbols": [],
+   "open_list": false,
+   "primary_source": "官方/供應商",
+   "source_keys": [
+    "CBOE",
+    "AAII",
+    "CNN",
+    "NAAIM",
+    "Farside"
+   ],
+   "frequency": "日/週",
+   "multi_source": "Y",
+   "evidence_tier": "T1",
+   "use": "情緒/加密真值池",
+   "value_state": "PENDING_SOURCE",
+   "existing_related": [],
+   "existing_related_more": 0,
+   "symbols_already_registered": [],
+   "dedupe": "NEW"
+  }
+ ],
+ "symbols": [
+  {
+   "no": "FTM-S001",
+   "symbol": "^GSPC",
+   "kind": "指數",
+   "rows": [
+    "FTM-A01"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S002",
+   "symbol": "SPY",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A01",
+    "FTM-B02"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#etf"
+  },
+  {
+   "no": "FTM-S003",
+   "symbol": "^DJI",
+   "kind": "指數",
+   "rows": [
+    "FTM-A01"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S004",
+   "symbol": "DIA",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A01",
+    "FTM-B02"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#etf"
+  },
+  {
+   "no": "FTM-S005",
+   "symbol": "^NDX",
+   "kind": "指數",
+   "rows": [
+    "FTM-A01"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S006",
+   "symbol": "QQQ",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A01",
+    "FTM-B02"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#etf"
+  },
+  {
+   "no": "FTM-S007",
+   "symbol": "^RUT",
+   "kind": "指數",
+   "rows": [
+    "FTM-A01"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S008",
+   "symbol": "IWM",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A01",
+    "FTM-B02"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#etf"
+  },
+  {
+   "no": "FTM-S009",
+   "symbol": "^TWII",
+   "kind": "指數",
+   "rows": [
+    "FTM-A02"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S010",
+   "symbol": "0050",
+   "kind": "台股 ETF",
+   "rows": [
+    "FTM-A02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S011",
+   "symbol": "^TWOII",
+   "kind": "指數",
+   "rows": [
+    "FTM-A02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S012",
+   "symbol": "006201",
+   "kind": "台股 ETF",
+   "rows": [
+    "FTM-A02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S013",
+   "symbol": "^N225",
+   "kind": "指數",
+   "rows": [
+    "FTM-A03"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S014",
+   "symbol": "EWJ",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A03",
+    "FTM-B04"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#etf"
+  },
+  {
+   "no": "FTM-S015",
+   "symbol": "^KS11",
+   "kind": "指數",
+   "rows": [
+    "FTM-A03"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S016",
+   "symbol": "EWY",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A03",
+    "FTM-B04"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S017",
+   "symbol": "^HSI",
+   "kind": "指數",
+   "rows": [
+    "FTM-A03"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S018",
+   "symbol": "2800.HK",
+   "kind": "港股 ETF",
+   "rows": [
+    "FTM-A03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S019",
+   "symbol": "000300",
+   "kind": "指數",
+   "rows": [
+    "FTM-A03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S020",
+   "symbol": "MCHI",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A03",
+    "FTM-B04"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S021",
+   "symbol": "ASHR",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S022",
+   "symbol": "^NSEI",
+   "kind": "指數",
+   "rows": [
+    "FTM-A03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S023",
+   "symbol": "INDA",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A03",
+    "FTM-B04"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S024",
+   "symbol": "^GDAXI",
+   "kind": "指數",
+   "rows": [
+    "FTM-A04"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S025",
+   "symbol": "EWG",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A04"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S026",
+   "symbol": "^FTSE",
+   "kind": "指數",
+   "rows": [
+    "FTM-A04"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S027",
+   "symbol": "EWU",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A04"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S028",
+   "symbol": "^STOXX50E",
+   "kind": "指數",
+   "rows": [
+    "FTM-A04"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S029",
+   "symbol": "VGK",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A04"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#etf"
+  },
+  {
+   "no": "FTM-S030",
+   "symbol": "EEM",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A05",
+    "FTM-B04"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#etf"
+  },
+  {
+   "no": "FTM-S031",
+   "symbol": "VWO",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S032",
+   "symbol": "IEMG",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-A05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S033",
+   "symbol": "SHV",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S034",
+   "symbol": "BIL",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S035",
+   "symbol": "AGG",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S036",
+   "symbol": "BND",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S037",
+   "symbol": "TLT",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B01"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#etf+us_fiscal_rates"
+  },
+  {
+   "no": "FTM-S038",
+   "symbol": "USMV",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S039",
+   "symbol": "SPLV",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S040",
+   "symbol": "GLD",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B01",
+    "FTM-E03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S041",
+   "symbol": "VOO",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S042",
+   "symbol": "IVV",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S043",
+   "symbol": "VTI",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S044",
+   "symbol": "XLK",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B03",
+    "FTM-G01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S045",
+   "symbol": "SMH",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S046",
+   "symbol": "XLE",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B03",
+    "FTM-E06",
+    "FTM-G01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S047",
+   "symbol": "BOTZ",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S048",
+   "symbol": "ARKK",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S049",
+   "symbol": "ICLN",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S050",
+   "symbol": "LIT",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B03",
+    "FTM-E04"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S051",
+   "symbol": "EWT",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B04"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#etf"
+  },
+  {
+   "no": "FTM-S052",
+   "symbol": "TQQQ",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S053",
+   "symbol": "SQQQ",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S054",
+   "symbol": "SOXL",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S055",
+   "symbol": "SOXS",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S056",
+   "symbol": "UPRO",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S057",
+   "symbol": "SPXU",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S058",
+   "symbol": "UVXY",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-B05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S059",
+   "symbol": "00980A",
+   "kind": "台股主動式 ETF",
+   "rows": [
+    "FTM-D01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S060",
+   "symbol": "00423A",
+   "kind": "台股主動式 ETF",
+   "rows": [
+    "FTM-D01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S061",
+   "symbol": "USO",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S062",
+   "symbol": "BNO",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S063",
+   "symbol": "USL",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S064",
+   "symbol": "DBO",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S065",
+   "symbol": "DCOILWTICO",
+   "kind": "FRED 序列",
+   "rows": [
+    "FTM-E01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S066",
+   "symbol": "DCOILBRENTEU",
+   "kind": "FRED 序列",
+   "rows": [
+    "FTM-E01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S067",
+   "symbol": "UNG",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S068",
+   "symbol": "DHHNGSP",
+   "kind": "FRED 序列",
+   "rows": [
+    "FTM-E02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S069",
+   "symbol": "UGA",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S070",
+   "symbol": "IAU",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S071",
+   "symbol": "SLV",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S072",
+   "symbol": "PPLT",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S073",
+   "symbol": "PALL",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S074",
+   "symbol": "CPER",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E04"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S075",
+   "symbol": "COPX",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E04"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S076",
+   "symbol": "DBB",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E04"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S077",
+   "symbol": "URA",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E04"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S078",
+   "symbol": "SOYB",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S079",
+   "symbol": "CORN",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S080",
+   "symbol": "WEAT",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S081",
+   "symbol": "DBA",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E05"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S082",
+   "symbol": "DBC",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E06"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S083",
+   "symbol": "PDBC",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E06"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S084",
+   "symbol": "GSG",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E06"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S085",
+   "symbol": "GDX",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-E06"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S086",
+   "symbol": "BTC",
+   "kind": "加密資產",
+   "rows": [
+    "FTM-F01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S087",
+   "symbol": "ETH",
+   "kind": "加密資產",
+   "rows": [
+    "FTM-F01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S088",
+   "symbol": "XRP",
+   "kind": "加密資產",
+   "rows": [
+    "FTM-F01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S089",
+   "symbol": "SOL",
+   "kind": "加密資產",
+   "rows": [
+    "FTM-F01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S090",
+   "symbol": "IBIT",
+   "kind": "加密現貨 ETF",
+   "rows": [
+    "FTM-F02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S091",
+   "symbol": "FBTC",
+   "kind": "加密現貨 ETF",
+   "rows": [
+    "FTM-F02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S092",
+   "symbol": "GBTC",
+   "kind": "加密現貨 ETF",
+   "rows": [
+    "FTM-F02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S093",
+   "symbol": "ETHA",
+   "kind": "加密現貨 ETF",
+   "rows": [
+    "FTM-F02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S094",
+   "symbol": "FETH",
+   "kind": "加密現貨 ETF",
+   "rows": [
+    "FTM-F02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S095",
+   "symbol": "XRPC",
+   "kind": "加密現貨 ETF",
+   "rows": [
+    "FTM-F02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S096",
+   "symbol": "GXRP",
+   "kind": "加密現貨 ETF",
+   "rows": [
+    "FTM-F02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S097",
+   "symbol": "LTCC",
+   "kind": "加密現貨 ETF",
+   "rows": [
+    "FTM-F02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S098",
+   "symbol": "USDT",
+   "kind": "穩定幣",
+   "rows": [
+    "FTM-F03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S099",
+   "symbol": "USDC",
+   "kind": "穩定幣",
+   "rows": [
+    "FTM-F03"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S100",
+   "symbol": "XLV",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-G01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S101",
+   "symbol": "XLF",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-G01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S102",
+   "symbol": "XLY",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-G01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S103",
+   "symbol": "XLC",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-G01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S104",
+   "symbol": "XLI",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-G01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S105",
+   "symbol": "XLP",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-G01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S106",
+   "symbol": "XLU",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-G01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S107",
+   "symbol": "XLRE",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-G01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S108",
+   "symbol": "XLB",
+   "kind": "美股 ETF",
+   "rows": [
+    "FTM-G01"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S109",
+   "symbol": "^VIX",
+   "kind": "指數",
+   "rows": [
+    "FTM-I01",
+    "FTM-I02"
+   ],
+   "dedupe": "ALREADY_REGISTERED",
+   "existing": "VIA_Global_Universe_v0100.json#idx"
+  },
+  {
+   "no": "FTM-S110",
+   "symbol": "VIX3M",
+   "kind": "指數",
+   "rows": [
+    "FTM-I02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  },
+  {
+   "no": "FTM-S111",
+   "symbol": "VVIX",
+   "kind": "指數",
+   "rows": [
+    "FTM-I02"
+   ],
+   "dedupe": "NEW",
+   "existing": null
+  }
+ ],
+ "sources": [
+  {
+   "no": "FTM-SRC01",
+   "key": "ICI",
+   "rows": [
+    "FTM-A01",
+    "FTM-L02"
+   ]
+  },
+  {
+   "no": "FTM-SRC02",
+   "key": "ETF創贖",
+   "rows": [
+    "FTM-A01",
+    "FTM-A02",
+    "FTM-B01",
+    "FTM-B02",
+    "FTM-B03",
+    "FTM-B04",
+    "FTM-B05",
+    "FTM-E01",
+    "FTM-E02",
+    "FTM-E03",
+    "FTM-E04",
+    "FTM-E05",
+    "FTM-E06",
+    "FTM-G01",
+    "FTM-K01"
+   ]
+  },
+  {
+   "no": "FTM-SRC03",
+   "key": "TWSE T86",
+   "rows": [
+    "FTM-A02",
+    "FTM-C03",
+    "FTM-L01"
+   ]
+  },
+  {
+   "no": "FTM-SRC04",
+   "key": "EPFR",
+   "rows": [
+    "FTM-A03",
+    "FTM-A04",
+    "FTM-A05",
+    "FTM-L02"
+   ]
+  },
+  {
+   "no": "FTM-SRC05",
+   "key": "北向 AKShare",
+   "rows": [
+    "FTM-A03",
+    "FTM-L01"
+   ]
+  },
+  {
+   "no": "FTM-SRC06",
+   "key": "NSDL",
+   "rows": [
+    "FTM-A03"
+   ]
+  },
+  {
+   "no": "FTM-SRC07",
+   "key": "日銀",
+   "rows": [
+    "FTM-A03"
+   ]
+  },
+  {
+   "no": "FTM-SRC08",
+   "key": "IIF",
+   "rows": [
+    "FTM-A05",
+    "FTM-L02"
+   ]
+  },
+  {
+   "no": "FTM-SRC09",
+   "key": "issuer",
+   "rows": [
+    "FTM-B01",
+    "FTM-B02",
+    "FTM-F02",
+    "FTM-G03",
+    "FTM-K01",
+    "FTM-K02",
+    "FTM-K04"
+   ]
+  },
+  {
+   "no": "FTM-SRC10",
+   "key": "File1 族群分類 SSOT",
+   "rows": [
+    "FTM-C01",
+    "FTM-C02",
+    "FTM-C05"
+   ]
+  },
+  {
+   "no": "FTM-SRC11",
+   "key": "VDF 計算",
+   "rows": [
+    "FTM-C02"
+   ]
+  },
+  {
+   "no": "FTM-SRC12",
+   "key": "TWSE MI_MARGN",
+   "rows": [
+    "FTM-C04",
+    "FTM-H01",
+    "FTM-H03",
+    "FTM-L01"
+   ]
+  },
+  {
+   "no": "FTM-SRC13",
+   "key": "TWSE 每日投組 PCF",
+   "rows": [
+    "FTM-C05",
+    "FTM-D03",
+    "FTM-L01"
+   ]
+  },
+  {
+   "no": "FTM-SRC14",
+   "key": "TWSE 主動式ETF專頁",
+   "rows": [
+    "FTM-D01"
+   ]
+  },
+  {
+   "no": "FTM-SRC15",
+   "key": "收盤 adj(還原收盤)",
+   "rows": [
+    "FTM-D02"
+   ]
+  },
+  {
+   "no": "FTM-SRC16",
+   "key": "投信投顧公會",
+   "rows": [
+    "FTM-D04",
+    "FTM-L01"
+   ]
+  },
+  {
+   "no": "FTM-SRC17",
+   "key": "CFTC COT",
+   "rows": [
+    "FTM-E01",
+    "FTM-E02",
+    "FTM-E03",
+    "FTM-E04",
+    "FTM-E05",
+    "FTM-E06",
+    "FTM-L02"
+   ]
+  },
+  {
+   "no": "FTM-SRC18",
+   "key": "EIA",
+   "rows": [
+    "FTM-E01",
+    "FTM-E02",
+    "FTM-E07",
+    "FTM-L02"
+   ]
+  },
+  {
+   "no": "FTM-SRC19",
+   "key": "LBMA/WGC",
+   "rows": [
+    "FTM-E03",
+    "FTM-E07",
+    "FTM-L02"
+   ]
+  },
+  {
+   "no": "FTM-SRC20",
+   "key": "COMEX",
+   "rows": [
+    "FTM-E03",
+    "FTM-E04"
+   ]
+  },
+  {
+   "no": "FTM-SRC21",
+   "key": "LME",
+   "rows": [
+    "FTM-E04",
+    "FTM-E07",
+    "FTM-L02"
+   ]
+  },
+  {
+   "no": "FTM-SRC22",
+   "key": "SHFE",
+   "rows": [
+    "FTM-E04"
+   ]
+  },
+  {
+   "no": "FTM-SRC23",
+   "key": "USDA WASDE",
+   "rows": [
+    "FTM-E05",
+    "FTM-E07",
+    "FTM-L02"
+   ]
+  },
+  {
+   "no": "FTM-SRC24",
+   "key": "OPEC MOMR",
+   "rows": [
+    "FTM-E07",
+    "FTM-L02"
+   ]
+  },
+  {
+   "no": "FTM-SRC25",
+   "key": "CoinGecko",
+   "rows": [
+    "FTM-F01",
+    "FTM-F03"
+   ]
+  },
+  {
+   "no": "FTM-SRC26",
+   "key": "CMC",
+   "rows": [
+    "FTM-F01"
+   ]
+  },
+  {
+   "no": "FTM-SRC27",
+   "key": "Farside",
+   "rows": [
+    "FTM-F02",
+    "FTM-L03"
+   ]
+  },
+  {
+   "no": "FTM-SRC28",
+   "key": "鏈上",
+   "rows": [
+    "FTM-F03"
+   ]
+  },
+  {
+   "no": "FTM-SRC29",
+   "key": "成分 NetFlow(計算)",
+   "rows": [
+    "FTM-G02",
+    "FTM-G03"
+   ]
+  },
+  {
+   "no": "FTM-SRC30",
+   "key": "TWSE 融資限額",
+   "rows": [
+    "FTM-H01"
+   ]
+  },
+  {
+   "no": "FTM-SRC31",
+   "key": "衍生計算",
+   "rows": [
+    "FTM-H02",
+    "FTM-J04",
+    "FTM-K05"
+   ]
+  },
+  {
+   "no": "FTM-SRC32",
+   "key": "TWSE 當日沖銷統計",
+   "rows": [
+    "FTM-H04",
+    "FTM-L01"
+   ]
+  },
+  {
+   "no": "FTM-SRC33",
+   "key": "TWSE/TDCC 借券",
+   "rows": [
+    "FTM-H05"
+   ]
+  },
+  {
+   "no": "FTM-SRC34",
+   "key": "CBOE",
+   "rows": [
+    "FTM-I01",
+    "FTM-I02",
+    "FTM-I05",
+    "FTM-L03"
+   ]
+  },
+  {
+   "no": "FTM-SRC35",
+   "key": "AAII",
+   "rows": [
+    "FTM-I03",
+    "FTM-L03"
+   ]
+  },
+  {
+   "no": "FTM-SRC36",
+   "key": "CNN",
+   "rows": [
+    "FTM-I04",
+    "FTM-L03"
+   ]
+  },
+  {
+   "no": "FTM-SRC37",
+   "key": "NAAIM",
+   "rows": [
+    "FTM-I06",
+    "FTM-L03"
+   ]
+  },
+  {
+   "no": "FTM-SRC38",
+   "key": "Investors Intelligence",
+   "rows": [
+    "FTM-I06"
+   ]
+  },
+  {
+   "no": "FTM-SRC39",
+   "key": "NBS",
+   "rows": [
+    "FTM-J01"
+   ]
+  },
+  {
+   "no": "FTM-SRC40",
+   "key": "Caixin",
+   "rows": [
+    "FTM-J01"
+   ]
+  },
+  {
+   "no": "FTM-SRC41",
+   "key": "ISM",
+   "rows": [
+    "FTM-J01"
+   ]
+  },
+  {
+   "no": "FTM-SRC42",
+   "key": "S&P Global",
+   "rows": [
+    "FTM-J01"
+   ]
+  },
+  {
+   "no": "FTM-SRC43",
+   "key": "BLS",
+   "rows": [
+    "FTM-J02",
+    "FTM-J03"
+   ]
+  },
+  {
+   "no": "FTM-SRC44",
+   "key": "Truflation",
+   "rows": [
+    "FTM-J02"
+   ]
+  },
+  {
+   "no": "FTM-SRC45",
+   "key": "Cleveland Fed Nowcast",
+   "rows": [
+    "FTM-J02"
+   ]
+  },
+  {
+   "no": "FTM-SRC46",
+   "key": "MIT BPP",
+   "rows": [
+    "FTM-J02"
+   ]
+  },
+  {
+   "no": "FTM-SRC47",
+   "key": "FRED",
+   "rows": [
+    "FTM-J05",
+    "FTM-L02"
+   ]
+  },
+  {
+   "no": "FTM-SRC48",
+   "key": "holdings 明細",
+   "rows": [
+    "FTM-K03"
+   ]
+  },
+  {
+   "no": "FTM-SRC49",
+   "key": "TDCC 集保",
+   "rows": [
+    "FTM-L01"
+   ]
+  }
+ ]
+}
