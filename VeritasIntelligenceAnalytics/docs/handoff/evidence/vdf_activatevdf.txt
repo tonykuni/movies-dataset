@@ -29,17 +29,17 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 693 · import 0 · 提及 132 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 693 · import 0 · 提及 131 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0174.py(家族 vdf)
+  [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0175.py(家族 vdf)
   [VDF engine run] MDL013 VDF_MDL013_ActivateVDF · 閘 GREEN · VDF_MDL013_ActivateVDF_v0116.py
 === VDF_MDL013_ActivateVDF v0116 · 薄尾自測(操作入口多擷取矩陣 · 總覽頁套 VRN-2 視覺規格)===
   [OK] ① 操作入口有「擷取矩陣」且檔在才給連結(其他入口照舊)
   [OK] ② 總覽頁套 VRN-2 視覺規格(inserted)· ENG236 尾版 VDF_ENG236_FetchMatrixUI v0102
   [OK] ③ 收尾印矩陣一行
   [OK] ③b 收尾 VDF 編號同步一行(VDF_SSOTSync 尾版 sync;只寫 VDF 自己的 registry / contract)· [VDF 編號同步] YELLOW · 登記 2 條(REGEX 1 · SSOT 1)· 已確認 0 · 衝突待人判 0 · 待中央號 2 · 自撞 0 · 冊 VDF_SSOT_Register_v0100.json · 核發冊 尚無(VCGC 還沒核發)
-  [OK] ③c 同步出錯 → 紅燈一行照實報(不丟例外、不擋啟動)· [VDF 編號同步] RED · NotADirectoryError: [Errno 20] Not a directory: '/tmp/vdf_act0116_8vy473wi/ACTIVATE_VDF_latest.html/VDF/registry'
+  [OK] ③c 同步出錯 → 紅燈一行照實報(不丟例外、不擋啟動)· [VDF 編號同步] RED · NotADirectoryError: [Errno 20] Not a directory: '/tmp/vdf_act0116_3r2cb7n0/ACTIVATE_VDF_latest.html/VDF/registry'
   [OK] ④ 換裝在位:v0114 全域 OPERATE_LINKS 多一條 · main 叫的 activate = 本版
   [OK] ⑤ VDF 獨立:不匯入他系統程式 · 兩座橋在 · 同意閘不寫
 [計] VDF_MDL013_ActivateVDF v0116 本版 7/7 · PASS
@@ -50,7 +50,7 @@
   [OK] ④ 鎖驗證:原位元相同 = EXACT · CRLF + BOM = EOL_BOM_EQUIVALENT · 改過 = MISMATCH · 冊沒鎖 = NOLOCK
   [OK] ⑤ 本倉工具:加速器 VeritasCeleritas_v1141.py(鎖冊 · EXACT)· 網路工具 VeritasAegisNexus_v1652.py(鎖冊 · EXACT)
   [OK] ⑥ 本輪鉤真的掛上:子行程起跑就有 VeritasCeleritas(已載)+ VeritasAegisNexus(綁最新 · 用到才載 → 用到後 578 個名字)· 起跑沒帶進 pandas · 環境原樣(OMP / POLARS = 1 · NUMEXPR_MAX_THREADS 沒被加)· DuckDB 鉤仍在 · 一行收據
-  [OK] ⑦ VIA_VDF_TOOLS=0 → 不掛(回前版行為)· 收尾彙總 [加速] 子行程 1 個已掛 · 加速器 1/1 · 網路工具 1/1 · 執行緒預算套回 1 · 平均載入 0.17 秒
+  [OK] ⑦ VIA_VDF_TOOLS=0 → 不掛(回前版行為)· 收尾彙總 [加速] 子行程 1 個已掛 · 加速器 1/1 · 網路工具 1/1 · 執行緒預算套回 1 · 平均載入 0.147 秒
   [OK] ⑦b 換在本體模組全域:v0107 hook_dir 真的寫出 v0115 鉤(含 _vdf_tools · 標籤 vdf-activate-v0115)—— 只換抄本的那份寫出來會是 v0107 舊鉤
   [OK] ⑧ 對照只讀本輪的家:只收家裡的庫(倉內 / 擷取家的不收)· 同名取 mega · 一名一檔
   [OK] ⑨ 沒有家 → 照前版(v0113 db_files)
@@ -130,8 +130,8 @@
   [計] VDF_MDL013_ActivateVDF v0110 本版 4/5 · FAIL
 [計] VDF_MDL013_ActivateVDF v0115 前版鏈 rc 1 · FAIL
 [計] VDF_MDL013_ActivateVDF v0116 前版鏈 rc 1 · FAIL
-  [VDF engine run] VDF_MDL013_ActivateVDF rc=1 · 5.3s · python base 退路(境未見)
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VQG_AllInOne_v0112.py(冊上 VQG_AllInOne | X-NUM 編號冊號碼 ≠ 冊上代碼:['VCGC-REQ245', 'VCGC-REQ240', 'VCGC-REQ241', 'VCGC-REQ242', 'VCGC- | X-REQ 需求代碼不合 ['VCGC-REQ 跳號'] · 歸屬指到不存在 [] · 工作流引用不存在的需求 [] → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 38, 'changed': 20, 'stale': 0, 'expected': 20038, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-  [教訓] 重複出錯:run VDF_SystemManager · rc=1 · (無例外訊息) · 第 2 次 · 帳本 CGC_MDL058(via-lessons)
-[監控] 背景全景監控中 pid 508 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 345 提交 · 快照 1012.9h · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [VDF engine run] VDF_MDL013_ActivateVDF rc=1 · 5.0s · python base 退路(境未見)
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VQG_AllInOne_v0111.py(冊上 VQG_AllInOne | X-NUM 編號冊號碼 ≠ 冊上代碼:['VCGC-REQ245', 'VCGC-REQ240', 'VCGC-REQ241', 'VCGC-REQ242', 'VCGC- | X-REQ 需求代碼不合 ['VCGC-REQ 跳號'] · 歸屬指到不存在 [] · 工作流引用不存在的需求 [] → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 1, 'changed': 8, 'stale': 0, 'expected': 20069, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+  [教訓] 重複出錯:run VDF_SystemManager · rc=1 · (無例外訊息) · 第 3 次 · 帳本 CGC_MDL058(via-lessons)
+[監控] 背景全景監控中 pid 508 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 358 提交 · 快照 1014.7h · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
