@@ -1,0 +1,387 @@
+{
+ "schema": "VIA.VRN2.SSOTProposals.v1",
+ "system": "VRN-2",
+ "version": "v0101",
+ "date": "2026-11-01",
+ "source": "操作員 2026-10-29 貼回的 Gemini 對話(台股代號三形式 · ETF 尾碼分類 · 台北 / 香港電話 · 評等代碼 0 ~ 5 · 目標價同義字 · 分析師職稱);VRN-2 只提案,ssot_id 由 VCGC 核發後 VRN2_SSOTSync apply 自動補填 ;v0101(2026-11-01)加 8 條:不用 MOPS 政策 · TARGET_PRICE(ADJ) 同步還原參數 · MOPS 歷史列記號 · TWSE / TPEX 資料集識別欄 · 兩家共識中位數同義字 · 共識閘品質用字 · ⑥e 失敗 0 正則 · 合併參數(VRN-2 只提案 · ssot_id 空白 · VCGC 偵測衝突後核發)",
+ "rule": "子系統提出時 ssot_id 空白;proposed_no 是 VRN-2 自己的暫編號;VCGC 偵測三系統衝突 → 使用者 + AI 修到無誤 → VCGC 核發 → 本冊不改,登記冊出新版補填",
+ "entries": [
+  {
+   "proposed_no": "VRN2-PROP-0001",
+   "ssot_id": "",
+   "kind": "REGEX",
+   "key": "TW_TICKER_TWSE",
+   "status": "提案 · 待 VCGC 核號",
+   "value": "^(?P<code>[1-9]\\d{3}|00\\d{2,3}[ABDLRTUV]?)$",
+   "note": "台股代號 · 證交所 / 櫃買形式:4 碼股票(首碼 1-9)或 00 開頭 ETF(4 ~ 5 碼 + 可選尾碼)"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0002",
+   "ssot_id": "",
+   "kind": "REGEX",
+   "key": "TW_TICKER_YFINANCE",
+   "status": "提案 · 待 VCGC 核號",
+   "value": "^(?P<code>[1-9]\\d{3}|00\\d{2,3}[ABDLRTUV]?)\\.(?P<ex>TW|TWO)$",
+   "note": "Yahoo Finance 形式:代號 + .TW(上市)/ .TWO(上櫃)"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0003",
+   "ssot_id": "",
+   "kind": "REGEX",
+   "key": "TW_TICKER_BLOOMBERG",
+   "status": "提案 · 待 VCGC 核號",
+   "value": "^(?P<code>[1-9]\\d{3}|00\\d{2,3}[ABDLRTUV]?)\\s+TT$",
+   "note": "Bloomberg 形式:代號 + 空格 + TT"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0004",
+   "ssot_id": "",
+   "kind": "DICT",
+   "key": "TW_ETF_SUFFIX_CLASS",
+   "status": "提案 · 待 VCGC 核號",
+   "value": {
+    "": "ETF_EQUITY_PASSIVE(股票型被動)",
+    "A": "ETF_EQUITY_ACTIVE(主動式股票型)",
+    "B": "ETF_BOND_PASSIVE(債券型被動)",
+    "D": "ETF_BOND_ACTIVE(主動式債券型)",
+    "L": "ETF_LEVERAGED(槓桿型)",
+    "R": "ETF_INVERSE(反向型)",
+    "T": "ETF_BALANCED(平衡 / 多資產型)",
+    "U": "ETF_FUTURES(期貨 / 商品型)",
+    "V": "ETF_FUTURES(期貨 / 商品型 · 第二碼)"
+   },
+   "note": "00 開頭 ETF 尾碼分類;VRN-2 範圍只擷取 STOCK,ETF 只分類(同 VRN2_MarketFetch v0101 九類)"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0005",
+   "ssot_id": "",
+   "kind": "REGEX",
+   "key": "PHONE_TAIPEI_HK",
+   "status": "提案 · 待 VCGC 核號",
+   "value": "(?<!\\d)(?:(?:\\+?886[-/\\s]*\\(?0?2\\)?|\\(02\\)|02)[-/\\s]*\\d{4}[-/\\s]*\\d{4}|(?:\\+?852[-/\\s]*)?[2-9]\\d{3}[-/\\s]*\\d{4})(?!\\d)",
+   "note": "台北(+886 2 / (02) / 02 + 8 碼)與香港(+852 + 8 碼 · 首碼 2-9)市話;分隔可為 - / 空白;前後不能緊接數字"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0006",
+   "ssot_id": "",
+   "kind": "DICT",
+   "key": "RATING_CODE",
+   "status": "提案 · 待 VCGC 核號",
+   "value": {
+    "0": {
+     "label": "無評等",
+     "en": [
+      "NR",
+      "Not Rated",
+      "No Rating",
+      "Unrated",
+      "Suspended",
+      "Under Review"
+     ],
+     "zh": [
+      "無評等",
+      "未評等",
+      "暫停評等",
+      "評等中"
+     ]
+    },
+    "1": {
+     "label": "強力買進",
+     "en": [
+      "Strong Buy",
+      "Conviction Buy",
+      "Top Pick",
+      "Conviction List"
+     ],
+     "zh": [
+      "強力買進",
+      "強烈買進",
+      "首選",
+      "強力推薦"
+     ]
+    },
+    "2": {
+     "label": "買進",
+     "en": [
+      "Buy",
+      "Outperform",
+      "Overweight",
+      "Add",
+      "Accumulate",
+      "Positive",
+      "Attractive"
+     ],
+     "zh": [
+      "買進",
+      "優於大盤",
+      "增持",
+      "加碼",
+      "逢低買進",
+      "正向"
+     ]
+    },
+    "3": {
+     "label": "中立",
+     "en": [
+      "Hold",
+      "Neutral",
+      "Market Perform",
+      "Equal-weight",
+      "Equalweight",
+      "In-line",
+      "Sector Perform",
+      "Perform"
+     ],
+     "zh": [
+      "中立",
+      "持有",
+      "區間操作",
+      "與大盤同步",
+      "觀望"
+     ]
+    },
+    "4": {
+     "label": "賣出",
+     "en": [
+      "Sell",
+      "Underperform",
+      "Underweight",
+      "Reduce",
+      "Negative",
+      "Unattractive"
+     ],
+     "zh": [
+      "賣出",
+      "劣於大盤",
+      "減持",
+      "減碼"
+     ]
+    },
+    "5": {
+     "label": "強力賣出",
+     "en": [
+      "Strong Sell",
+      "Conviction Sell"
+     ],
+     "zh": [
+      "強力賣出",
+      "強烈賣出"
+     ]
+    }
+   },
+   "note": "評等代碼 0 ~ 5 與中英同義字;RATING 欄仍照原文印,代碼另欄"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0007",
+   "ssot_id": "",
+   "kind": "SYN",
+   "key": "TARGET_PRICE",
+   "status": "提案 · 待 VCGC 核號",
+   "value": [
+    "Target Price",
+    "TP",
+    "Price Target",
+    "PT",
+    "12-m TP",
+    "12M TP",
+    "12-month target",
+    "Fair Value",
+    "Target",
+    "目標價",
+    "目標股價",
+    "合理價",
+    "合理股價",
+    "12 個月目標價",
+    "目標價位"
+   ],
+   "note": "目標價標籤同義字(標籤旁才算 · 原文有這個數不夠)"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0008",
+   "ssot_id": "",
+   "kind": "SYN",
+   "key": "ANALYST_TITLE",
+   "status": "提案 · 待 VCGC 核號",
+   "value": {
+    "en": [
+     "Analyst",
+     "Research Analyst",
+     "Equity Analyst",
+     "Senior Analyst",
+     "Lead Analyst",
+     "Associate Analyst",
+     "Associate",
+     "Research Associate",
+     "Head of Research",
+     "Strategist",
+     "Sector Head",
+     "Managing Director",
+     "Director",
+     "Vice President",
+     "VP"
+    ],
+    "zh": [
+     "分析師",
+     "研究員",
+     "資深分析師",
+     "首席分析師",
+     "產業分析師",
+     "證券分析師",
+     "研究部主管",
+     "研究部副總",
+     "協理",
+     "副總",
+     "經理",
+     "襄理",
+     "策略分析師"
+    ]
+   },
+   "note": "分析師職稱(姓名照原文印;職稱用來切姓名與職稱、不入 ANALYST 欄)"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0009",
+   "ssot_id": "",
+   "kind": "CFG",
+   "key": "UI_NUMBER_FORMAT",
+   "status": "提案 · 待 VCGC 核號",
+   "value": {
+    "amount_unit": "百萬台幣",
+    "thousands_separator": true,
+    "exceptions": [
+     "每股(EPS / DPS / BVPS / 目標價 / 收盤)",
+     "倍數(P/E · PBR · EV/EBITDA · x · 倍)",
+     "百分比(% · 率 · margin · ROE …)"
+    ],
+    "header": "底線 → 空格",
+    "cell_align": "top"
+   },
+   "note": "操作員 2026-10-29:U/I 數值一律百萬台幣 + 千分位,每股 / 倍數例外;表頭空格;內容靠上"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0010",
+   "ssot_id": "",
+   "kind": "CFG",
+   "key": "POLICY_NO_MOPS_DOMESTIC_TWSE_TPEX",
+   "status": "提案 · 待 VCGC 核號",
+   "value": {
+    "domestic": "TWSE / TPEX 官方(openapi.twse.com.tw · tpex.org.tw)",
+    "mops": "不用",
+    "step_6e": "MarketFetch --fetch 一律 --no-financial",
+    "on_disk": "MOPS 財報移到 market/vdf/_mops_quarantine_<時間>(不刪)",
+    "store": "增量庫 MOPS 歷史算的列清掉(先備份 · 可還原)· 以後不收",
+    "yahoo": "照用(VDF 還原因子)",
+    "consensus": "照用(鉅亨 FactSet + YFinance)"
+   },
+   "note": "操作員 2026-10-31「不可用 MOPS · 全部國內使用 TWSE TPEX」· 2026-11-01「Yahoo 和共識照用 · 增量庫 MOPS 資料清掉」"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0011",
+   "ssot_id": "",
+   "kind": "PARAM",
+   "key": "TP_ADJ_SYNC",
+   "status": "提案 · 待 VCGC 核號",
+   "value": {
+    "rule": "TARGET_PRICE(ADJ) = TARGET_PRICE × 報告日前最後交易日的還原因子:VDF 已還原 → adj_close ÷ close;CLOSE_MISMATCH 且 Yahoo 收盤 ÷ TWSE 收盤 報告日前一致、報告日後回到一致 → Yahoo 還原收盤 ÷ TWSE 收盤;其他 MISSING 不猜",
+    "ratio_tol": 0.005,
+    "min_gap": 0.01,
+    "window_days": 10,
+    "same_factor": [
+     "TARGET_PRICE(ADJ)",
+     "ADJ_CLOSE_BEFORE_REPORT",
+     "UPSIDE_PCT(ADJ)"
+    ]
+   },
+   "note": "操作員 2026-11-01「Target Price(Adj) 也應該同步還原才有可比較性」· ConsensusJoin v0105"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0012",
+   "ssot_id": "",
+   "kind": "LIST",
+   "key": "MOPS_HISTORY_ROW_MARKERS",
+   "status": "提案 · 待 VCGC 核號",
+   "value": [
+    "VALUE_SOURCE ^HISTORY",
+    "REPORT(無歷史)",
+    "REPORT(未對齊)",
+    "REPORT(口徑不明 · 不覆蓋)",
+    "RECON_RATIO 非空",
+    "Deleted.HISTORY_VALUE 非空"
+   ],
+   "note": "增量庫認列 MOPS 歷史算出來的列(FinancialAligned 以 (run_id, file_sha) 整組 · Deleted 逐列)· OutputStore v0102"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0013",
+   "ssot_id": "",
+   "kind": "LIST",
+   "key": "TW_DATASET_IDENTITY_PREFIX",
+   "status": "提案 · 待 VCGC 核號",
+   "value": [
+    "date",
+    "ticker",
+    "yfinance_ticker",
+    "bloomberg_ticker",
+    "name"
+   ],
+   "note": "VRN-2 資料集照 TWSE / TPEX(VDF 落盤)格式:前五欄 · 主鍵 [date, ticker] · parquet/<資料集>/ticker=/year=/data.parquet + <資料集>.parquet + 大寫表頭 CSV · 值與 VDF IDENTITY_PREFIX 相同但來源不同(不合併編號)"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0014",
+   "ssot_id": "",
+   "kind": "SYN",
+   "key": "CONSENSUS_TARGET_PRICE_MEDIAN",
+   "status": "提案 · 待 VCGC 核號",
+   "value": {
+    "FACTSET_TARGET_PRICE_MEDIAN": [
+     "factset_target_median",
+     "factset_target_price_median",
+     "鉅亨 FactSet 目標價中位數"
+    ],
+    "YFINANCE_TARGET_PRICE_MEDIAN": [
+     "yf_target_median",
+     "yfinance_target_price_median",
+     "Yahoo Finance 目標價中位數"
+    ]
+   },
+   "note": "兩家目標價中位數並存(不合併成一個數)· 合併資料集另給 median_gap_pct 與各自上漲空間"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0015",
+   "ssot_id": "",
+   "kind": "DICT",
+   "key": "CONSENSUS_GATE_QUALITY",
+   "status": "提案 · 待 VCGC 核號",
+   "value": {
+    "PASS": "OK",
+    "CONFLICT": "REVIEW",
+    "INCOMPLETE": "PARTIAL"
+   },
+   "note": "共識閘 → TWSE / TPEX(VDF)品質欄的用字"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0016",
+   "ssot_id": "",
+   "kind": "REGEX",
+   "key": "VDF_FETCH_ZERO_FAILURE",
+   "status": "提案 · 待 VCGC 核號",
+   "value": "失敗 0\\b",
+   "note": "⑥e「擷取 YELLOW · 跑 N 次 · 失敗 0」= VDF 引擎回 rc 2(PARTIAL · 不是失敗)→ 收尾頁算資料源並寫錨點 · RoundAll v0120"
+  },
+  {
+   "proposed_no": "VRN2-PROP-0017",
+   "ssot_id": "",
+   "kind": "PARAM",
+   "key": "TW_MARKET_CONSENSUS_MERGE",
+   "status": "提案 · 待 VCGC 核號",
+   "value": {
+    "key": [
+     "date",
+     "ticker"
+    ],
+    "price_as_of": "共識那天或之前最後一個交易日",
+    "max_days": 14,
+    "date_tz": "Asia/Taipei(UTC+8)"
+   },
+   "note": "共識 × TWSE / TPEX 日線合併 = tw_market_consensus · ConsensusJoin v0105"
+  }
+ ]
+}

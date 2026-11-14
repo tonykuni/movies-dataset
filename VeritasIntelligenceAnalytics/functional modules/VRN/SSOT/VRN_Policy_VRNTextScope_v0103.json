@@ -1,0 +1,47 @@
+{
+ "schema": "VIA.Policy.VRNTextScope.v1",
+ "batch": "R30",
+ "ts": "2026-09-28",
+ "book_edited": false,
+ "source": "操作員 R30 令(2026-09-28):「我比較擔心擷取文字不遺漏 文字修復還原狀態分類 修正後的個股報告第一頁 你要如何驗證全部擷取無遺漏 生成修復文字你自己看得懂品質 依品質再修正優化檢查 修完的完整內容再進行 SUMMARY 依規定」「個股報告只取第一頁及年度財報也更新政策邏輯」「年度財報可能會分左右 · 右上下表堆疊 先拆左右再拆上下 更新 邏輯整合編號儲存更新後再進行下去」",
+ "reader": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py(尾版;照本冊讀,不另寫第二份)",
+ "stock_report": {
+  "pages": "first",
+  "keys": ["評等", "目標價", "投資評等", "Rating", "Target Price", "買進", "中立", "持有", "減碼", "Buy", "Hold", "Sell"],
+  "rule": "個股報告只取第 1 頁:核對 · 修復 · 摘要都只用第 1 頁,其餘頁不進(首頁分區 標題帶 / 本文 / 右資訊區 / 頁尾)"
+ },
+ "annual_report": {
+  "pages": "all",
+  "keys": ["年報", "年度報告", "財務報告", "財務報表", "合併財務", "Annual Report", "Financial Statements"],
+  "rule": "年度財報全部頁;表可能左右並排、右側上下堆疊 → 版面先拆左右、再拆上下(全寬標題 / 附註帶先切開)"
+ },
+ "layout": {
+  "order": "vertical_first",
+  "min_gap_pt": 8.0,
+  "rule": "遞迴 XY 切:每一區先找直切縫(左→右),切不開才橫切(上→下;橫縫至少一行高,表格列距不算段落縫);全寬帶(標題 · 附註)先獨立成帶"
+ },
+ "completeness": {
+  "truth": "來源文字層每一個字物件(fitz rawdict);docx 每個 <w:t>;影像只能靠 OCR",
+  "cover_min": 0.999,
+  "numbers": "數字 token 逐一核,少一個就紅",
+  "moved_is_not_missing": true,
+  "second_reader": "pdfplumber 在就互核;缺件照實寫",
+  "rule": "覆蓋率 = 來源字多重集合出現在修復文的比例(NFKC,空白與零寬不計)"
+ },
+ "repair": {
+  "rounds": ["R0 原樣", "R1 去零寬 · 全形英數轉半形", "R2 中文字間空白 · 數字接回", "R3 斷行接回 · 多空白"],
+  "rollback": "任何一輪覆蓋率下降 = 整輪退回(修復不能吃字)",
+  "quality": "0–100:亂碼 · 字間空白 · 斷行 · 數字斷開 · 全形英數 · 碎行;A≥90 · B≥75 · C≥60 · D"
+ },
+ "states": {
+  "INTACT": "原生完整(綠)", "REPAIRED": "修復還原完整(綠)", "OCR_RESTORED": "OCR 還原 · 單法(黃)",
+  "IMAGE_NO_OCR": "影像頁 · 本機無 OCR(黃)", "IMAGE_TEXT_UNVERIFIED": "頁內圖文字未核(黃)",
+  "GARBLED": "文字層亂碼(紅)", "PARTIAL": "有遺漏(紅,列出缺什麼)", "EMPTY": "無文字(黃)"
+ },
+ "summary": {
+  "gate": "只有完整(綠)的文件才摘要;個股報告只用修好的第 1 頁",
+  "engine": "VRN_ENG062_SummarizerV1 尾版 summarize_report(一標題五點)",
+  "network": "還原收盤價要網路:只在操作員自己開 VIA_NET_CONSENT=YES 時才抓(AI 不代設,L07/L08)"
+ },
+ "eng072": "VRN 正線首頁輸出(VIA_Reports/first_page_text/<檔名>.txt)對來源第 1 頁核覆蓋率與數字"
+}

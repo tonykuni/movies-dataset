@@ -1,69 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-v0104（2026-09-25）：全名冊 .TW/.TWO、查庫後分批補缺、EPS-only、完整來源與時間旁表。
-VRN_ENG070_YahooConsensus — Yahoo 共識資料引擎(批194;操作員令)
-====================================================================
-操作員令:「透過 Yahoo 取得共識資料」。
-網路紀律(批180 凍結令+批181 階梯):零自建網路——一律經 SUP_MDL740
-統包唯一正主 yahoo_quote_summary_raw 道(cookie+crumb 標準握手+雙同意
-閘 fail-closed 隨統包);Yahoo 缺載/擋牆=誠實列敗不假數。
-資料層(與 VRN_ENG069 共識庫同表多源共存=整合去重非另起爐灶):
-  consensus_daily(date×code×source 主鍵 14 欄;本引擎 source=
-  'YAHOO_QS',validated='YAHOO_DIRECT')——targetHigh/Low/Mean/
-  Median×numberOfAnalystOpinions×EPS(earningsTrend 0y/+1y)×
-  close(prices_canonical)×upside_pct=target_median/close-1;
-  同鍵重跑=先刪後插冪等;consensus_latest 視圖自然涵蓋多源。
-用法:python3 VRN_ENG070_YahooConsensus_v0101.py run [codes…] |
-      --status | --selftest
-v0102→v0103(側線 2026-09-24;主線批號由併線的手指定 L25;全景三回第三回實測):自測改在**暫存庫**跑(L17)。
-  v0102 自測開正式庫(資料家接點)拿寫鎖、BEGIN 插 TEST70、ROLLBACK——不留列,但日更鏈寫庫時兩邊互撞。
-  ⑥ 多源共存從前讀正式庫看有沒有別源(上游沒料就永遠 SKIP);改成暫存庫放一列 EXTERNAL_ANALYST 夾具,
-  確定地驗「同代號同日兩源並存、主鍵三元不撞」——這才是本引擎的不變量,上游有沒有料是上游的事。
-  +⑨ 靜態釘住「自測不碰正式庫」。其餘一字未動;v0102 留作版史 L04。
-v0100→v0101(批197):工作站空庫自舉——DB 父目錄自建+consensus_daily
-表 DDL 自建(IF NOT EXISTS)+close 取價 prices_canonical 缺=NULL 誠實
-(工作站 fresh clone 無庫即炸=實測揪蟲;雲端行為零變更)。
+"""VRN_ENG070_YahooConsensus v0105 — v0104 薄尾(v0104 一字不動):取收盤價前先查表在不在,不讓「查不到的 SELECT」把交易弄壞。
+
+實錄(2026-11-13 容器全量實跑 VRN_SystemManager v0264 test:VRN_ENG070 FAIL rc 1):
+  _duckdb.TransactionException: Current transaction is aborted (please ROLLBACK)
+根因:upsert 先 SELECT prices_canonical 取收盤價;庫裡沒有這張表(工作站空庫 / 暫存自測庫)→ 例外被吞(close=NULL 照實),
+  但 DuckDB 的規則是「交易裡任何一句失敗 = 整個交易作廢」→ 下一句 DELETE 就炸。v0104 的自測在 BEGIN 裡呼叫 upsert,所以必炸;
+  正式 run 若呼叫端開了交易、庫裡又沒有價格層,也會一樣炸(不是只有自測)。
+修法(只改這一件):先用 information_schema 查 prices_canonical 在不在(這一句不會失敗),不在就 close=NULL,不去碰會失敗的 SELECT;
+  表在才照 v0104 取價。其餘(剖析 · 冪等先刪後插 · 多源共存 · 網路一律經 SUP_MDL740 統包 · 雙同意閘 fail-closed)全照 v0104。
+VRN-2 自己的引擎;零網路自測;不用 TA-Lib;不寫同意閘。
+用法同 v0104:python VRN_ENG070_YahooConsensus_v0105.py run [codes…] | --status | --selftest
 """
 from __future__ import annotations
-# ===== [VIA:ACCEL-BRIDGE:v0111] 最新有版號的正本加速器(動態取最高 VeritasCeleritas_v####;退回鎖版 v1141)· 正本網路工具 VeritasAegisNexus_v1652(找不到 = 不改任何行為) =====
-import importlib as _cb_il
-import re as _cb_re
-import sys as _cb_sys
-from pathlib import Path as _cb_Path
-_ACCEL, _ACCEL_VER = None, ""
-_cb_p = _cb_Path(__file__).resolve()
-while _cb_p.parent != _cb_p:
-    if (_cb_p / "supportive modules").is_dir():
-        _cb_sup = _cb_p / "supportive modules"
-        _cb_c = sorted(list(_cb_sup.glob("VeritasCeleritas_v[0-9][0-9][0-9][0-9].py")) + list(_cb_sup.glob("*/VeritasCeleritas_v[0-9][0-9][0-9][0-9].py")),
-                       key=lambda x: int(_cb_re.search(r"_v(\d{4})", x.name).group(1)))
-        for _cb_d in [str(_cb_sup)] + ([str(_cb_c[-1].parent)] if _cb_c else []) + [str(x.parent) for x in list(_cb_sup.glob("*/VeritasAegisNexus_v1652.py"))[:1]]:
-            if _cb_d not in _cb_sys.path:
-                _cb_sys.path.insert(0, _cb_d)
-        if _cb_c:
-            try:
-                _ACCEL, _ACCEL_VER = _cb_il.import_module(_cb_c[-1].stem), _cb_c[-1].stem
-            except Exception:  # noqa: BLE001
-                _ACCEL = None
-        break
-    _cb_p = _cb_p.parent
-if _ACCEL is None:
-    try:
-        import VeritasCeleritas_v1141 as _ACCEL  # noqa: F401  退回鎖版
-        _ACCEL_VER = "VeritasCeleritas_v1141"
-    except Exception:  # noqa: BLE001
-        _ACCEL = None
-
-
-def _net():
-    """正本網路工具(只在需要出網時載入;本引擎不出網)。"""
-    try:
-        import VeritasAegisNexus_v1652 as _NET  # noqa: WPS433
-        return _NET
-    except Exception:  # noqa: BLE001
-        return None
-# ===== [VIA:ACCEL-BRIDGE:END] =====
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
 try:
     import sys as _sa_sys
@@ -78,270 +27,114 @@ try:
 except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
+# [VIA:NET-BRIDGE] 留名:本版不出網;run 的網路照 v0104 經 SUP_MDL740 統包(雙同意閘 fail-closed)
 
 import importlib.util
-import os
+import re
 import sys
-from datetime import datetime
+import tempfile
 from pathlib import Path
 
+VERSION = "v0105"
+TAG = "VRN_ENG070_YahooConsensus " + VERSION
 HERE = Path(__file__).resolve().parent
-VIA = HERE.parent.parent
-DB_TW = VIA / "functional modules" / "VDF" / "output_hub" / "mega" / "vdf_tw_market.duckdb"
-NET_DIR = VIA / "supportive modules" / "network"
-DEFAULT_CODES = None  # 正式雙所名冊；不再默抓三檔
-MODULES = "financialData,earningsTrend,earningsHistory,recommendationTrend,upgradeDowngradeHistory,defaultKeyStatistics"
+_STEM = "VRN_ENG070_YahooConsensus"
 
 
-
-def _store():
-    """共識 schema／擷取契約正主 ENG069 尾版。"""
-    p = sorted(HERE.glob('VRN_ENG069_ConsensusDB_v*.py'))[-1]
-    spec = importlib.util.spec_from_file_location('_consensus_store', p)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
+def _vnum(p) -> int:
+    m = re.search(r"_v(\d{4})$", Path(p).stem)
+    return int(m.group(1)) if m else -1
 
 
-def _net():
-    p = sorted(NET_DIR.glob("SUP_MDL740_NetUnified_v*.py"))[-1]
-    spec = importlib.util.spec_from_file_location("net740_e70", p)
-    m = importlib.util.module_from_spec(spec)
-    sys.modules["net740_e70"] = m
-    spec.loader.exec_module(m)
-    return m
+PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(__file__)), key=_vnum)
+_spec = importlib.util.spec_from_file_location(_STEM + "_prior_for_" + Path(__file__).stem, PRIOR_PATH)
+PRIOR = importlib.util.module_from_spec(_spec)
+sys.modules[_spec.name] = PRIOR
+_spec.loader.exec_module(PRIOR)
+_UPSERT_V0104 = PRIOR.upsert
 
 
-def _raw(d, *keys):
-    """Yahoo 巢狀取值:{'raw': x} 或平值;缺=None 誠實"""
-    cur = d
-    for k in keys:
-        if not isinstance(cur, dict):
-            return None
-        cur = cur.get(k)
-    if isinstance(cur, dict):
-        cur = cur.get("raw")
-    return cur if isinstance(cur, (int, float)) else None
+def __getattr__(name):
+    return getattr(PRIOR, name)
 
 
-def parse_symbol(payload: dict) -> dict | None:
-    """quoteSummary result → 共識欄(零發明:僅收 Yahoo 實回值)"""
-    fin = payload.get("financialData") or {}
-    row = {
-        "target_high": _raw(fin, "targetHighPrice"),
-        "target_low": _raw(fin, "targetLowPrice"),
-        "target_mean": _raw(fin, "targetMeanPrice"),
-        "target_median": _raw(fin, "targetMedianPrice"),
-        "n_analysts": _raw(fin, "numberOfAnalystOpinions"),
-        "eps_fy0": None, "eps_fy1": None,
-    }
-    for t in (payload.get("earningsTrend") or {}).get("trend", []) or []:
-        eps = _raw(t, "earningsEstimate", "avg")
-        if t.get("period") == "0y":
-            row["eps_fy0"] = eps
-        elif t.get("period") == "+1y":
-            row["eps_fy1"] = eps
-    if all(row[k] is None for k in ("target_median", "target_mean", "eps_fy0", "eps_fy1")):
-        return None  # 無共識面=誠實跳過
-    return row
-
-
-def _ensure_schema(con):
-    """工作站空庫自舉:consensus_daily 表 DDL(IF NOT EXISTS;
-    與 VRN_ENG069 同構 14 欄;雲端既有表=零觸碰)"""
-    con.execute("""CREATE TABLE IF NOT EXISTS consensus_daily(
-        date VARCHAR, code VARCHAR, source VARCHAR,
-        target_high DOUBLE, target_low DOUBLE, target_mean DOUBLE,
-        target_median DOUBLE, n_analysts BIGINT,
-        eps_fy0 DOUBLE, eps_fy1 DOUBLE, adopted_eps DOUBLE,
-        close DOUBLE, upside_pct DOUBLE, validated VARCHAR)""")
+def _has_table(con, name: str) -> bool:
+    """information_schema 查表:這一句不會因表不存在而失敗 → 不弄壞呼叫端的交易。"""
+    return bool(con.execute("SELECT count(*) FROM information_schema.tables WHERE table_name = ?", [name]).fetchone()[0])
 
 
 def upsert(con, date: str, code: str, row: dict, symbol: str | None = None) -> None:
-    """同鍵(date,code,source)先刪後插=冪等;close 自 prices_canonical
-    (工作站無價格層=NULL 誠實不猜價)"""
-    _ensure_schema(con)
-    try:
-        close = con.execute(
-            "SELECT close FROM prices_canonical WHERE ticker=? "
-            "AND date<=? ORDER BY date DESC LIMIT 1", [symbol or f"{code}.TW", date]).fetchone()
-    except Exception:
-        close = None  # 價格層缺(工作站空庫)=NULL 誠實
-    close_v = close[0] if close else None
+    """同 v0104 upsert(先刪後插冪等);只差在取收盤價前先查 prices_canonical 在不在。"""
+    PRIOR._ensure_schema(con)
+    close_v = None
+    if _has_table(con, "prices_canonical"):
+        r = con.execute("SELECT close FROM prices_canonical WHERE ticker=? AND date<=? ORDER BY date DESC LIMIT 1",
+                        [symbol or f"{code}.TW", date]).fetchone()
+        close_v = r[0] if r else None
     tgt = row["target_median"] if row["target_median"] is not None else row["target_mean"]
     upside = (tgt / close_v - 1) if (tgt and close_v) else None
-    con.execute("DELETE FROM consensus_daily WHERE date=? AND code=? AND source='YAHOO_QS'",
-                [date, code])
-    con.execute(
-        "INSERT INTO consensus_daily VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-        [date, code, "YAHOO_QS", row["target_high"], row["target_low"],
-         row["target_mean"], row["target_median"], row["n_analysts"],
-         row["eps_fy0"], row["eps_fy1"],
-         row["eps_fy1"] if row["eps_fy1"] is not None else row["eps_fy0"],
-         close_v, upside, "YAHOO_DIRECT"])
+    con.execute("DELETE FROM consensus_daily WHERE date=? AND code=? AND source='YAHOO_QS'", [date, code])
+    con.execute("INSERT INTO consensus_daily VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                [date, code, "YAHOO_QS", row["target_high"], row["target_low"], row["target_mean"], row["target_median"],
+                 row["n_analysts"], row["eps_fy0"], row["eps_fy1"],
+                 row["eps_fy1"] if row["eps_fy1"] is not None else row["eps_fy0"], close_v, upside, "YAHOO_DIRECT"])
 
 
-def run(codes: list[str] | None = None) -> int:
-    if os.environ.get('VIA_NET_CONSENT') != 'YES':
-        print('[Yahoo共識] 同意閘未開(VIA_NET_CONSENT≠YES)=拒跑(fail-closed 誠實)')
-        return 2
-    store = _store()
-    universe = store.fetch_universe(DB_TW, codes)
-    if not universe or (codes and set(map(str, codes)) - set(universe)):
-        print('[Yahoo共識] ABSENT：正式雙所名冊缺席或所選股票沒有交易所對映；零擷取')
-        return 3
-    day = store.snapshot_day()
-    todo = store.pending_codes(DB_TW, universe, 'YAHOO_QS', day)
-    if not todo:
-        print(f'[Yahoo共識] {day} 已查 {len(universe)} 檔；零重抓')
-        return 0
-    net = _net()
-    import duckdb
-    con = duckdb.connect(str(DB_TW))
-    ok = empty = failed = 0
-    try:
-        for i in range(0, len(todo), 40):
-            batch = todo[i:i+40]
-            r = net.yahoo_quote_summary_raw([universe[c]['symbol'] for c in batch], MODULES)
-            data = r.get('data') or {}
-            for c in batch:
-                symbol = universe[c]['symbol']
-                payload = data.get(symbol)
-                # 缺載/傳輸失敗不能當成當天已證實「無覆蓋」。
-                valid = isinstance(payload, dict) and bool(payload) and not payload.get('error')
-                row = parse_symbol(payload) if valid else None
-                state = 'OK' if row else ('NO_COVERAGE' if valid else 'ERROR')
-                con.execute('BEGIN')
-                try:
-                    if row:
-                        upsert(con, day, c, row, symbol)
-                    store.record_observation(con, day=day, code=c, source='YAHOO_QS', symbol=symbol,
-                        urls=[f'https://query1.finance.yahoo.com/v10/finance/quoteSummary/{symbol}'],
-                        payload=payload if valid else {'response_state': r.get('state'), 'payload': payload},
-                        provider_asof=None, state=state)
-                    con.execute('COMMIT')
-                except Exception:
-                    con.execute('ROLLBACK')
-                    raise
-                ok += state == 'OK'; empty += state == 'NO_COVERAGE'; failed += state == 'ERROR'
-            print(f'[Yahoo共識] {min(i+40,len(todo))}/{len(todo)} · 有資料 {ok} · 無覆蓋 {empty} · 傳輸/缺載 {failed}')
-    finally:
-        con.close()
-    return 2 if failed or not (ok or empty) else 0
-
-
-def status() -> int:
-    import duckdb
-    con = duckdb.connect(str(DB_TW), read_only=True)
-    try:
-        for s, n, mx in con.execute(
-                "SELECT source, count(*), max(date) FROM consensus_daily "
-                "GROUP BY source ORDER BY source").fetchall():
-            print(f"  [{s}] {n:,} 筆 · 最新 {mx}")
-    except Exception:
-        print("  [共識庫] 未建(誠實)")
-    con.close()
-    return 0
+PRIOR.upsert = upsert                      # v0104 的 run / selftest 用模組全域名 upsert → 換成本版
 
 
 def selftest() -> int:
     import duckdb
-    fails = []
+    ok = []
 
     def chk(name, cond, note=""):
-        print(f"  [{'OK' if cond else 'FAIL'}] {name} {note}")
-        if not cond:
-            fails.append(name)
+        ok.append(bool(cond))
+        print("  [%s] %s%s" % ("OK" if cond else "FAIL", name, (" · " + str(note)) if note else ""), flush=True)
 
-    skips = []
-
-    def skp(name, note=""):
-        """批468 誠實三態:**缺料 ≠ 壞掉**。上游件根本不存在(不是存在但不合格)
-           時記 SKIP 並點名補法;不得靜靜放過,也不得當成本引擎的缺陷。
-           與 ENG068 v0103/v0104 同律。"""
-        print(f"  [SKIP] {name} {note}")
-        skips.append(name)
-
+    print("=== %s 自測(交易內取價不再弄壞交易)===" % TAG, flush=True)
+    row = {"target_high": 1500.0, "target_low": 900.0, "target_mean": 1250.0, "target_median": 1200.0,
+           "n_analysts": 30, "eps_fy0": 60.0, "eps_fy1": 72.0}
+    with tempfile.TemporaryDirectory() as td:
+        con = duckdb.connect(str(Path(td) / "a.duckdb"))
+        PRIOR._ensure_schema(con)
+        con.execute("BEGIN")
+        err = ""
+        try:
+            _UPSERT_V0104(con, "1900-01-01", "T70", row)
+        except Exception as exc:  # noqa: BLE001 — 重現桌機 / 容器實錄
+            err = type(exc).__name__
+        con.close()
+        chk("① 重現:v0104 在交易裡、庫沒有 prices_canonical → TransactionException", err == "TransactionException", err or "沒炸")
+        con = duckdb.connect(str(Path(td) / "b.duckdb"))
+        PRIOR._ensure_schema(con)
+        con.execute("BEGIN")
+        upsert(con, "1900-01-01", "T70", row)
+        upsert(con, "1900-01-01", "T70", row)
+        n, close_v = con.execute("SELECT count(*), max(close) FROM consensus_daily WHERE code='T70' AND source='YAHOO_QS'").fetchone()
+        con.execute("ROLLBACK")
+        chk("② 本版:同一交易裡兩次 upsert 不炸 · 冪等 1 筆 · 沒價格層 close = NULL(照實)", n == 1 and close_v is None, (n, close_v))
+        con.execute("CREATE TABLE prices_canonical(ticker VARCHAR, date VARCHAR, close DOUBLE)")
+        con.execute("INSERT INTO prices_canonical VALUES ('T70.TW', '1899-12-29', 1000.0)")
+        upsert(con, "1900-01-01", "T70", row)
+        close_v, up = con.execute("SELECT close, upside_pct FROM consensus_daily WHERE code='T70' AND source='YAHOO_QS'").fetchone()
+        chk("③ 有價格層 → 取當日或之前最近收盤 · upside = 中位 / 收盤 − 1", close_v == 1000.0 and abs(up - 0.2) < 1e-9, (close_v, up))
+        con.close()
+    print("  ── 前版 v0104 自測(換裝本版 upsert 後)──", flush=True)
+    rc = PRIOR.selftest()
+    chk("④ v0104 自測(原本在 BEGIN 裡炸)換裝後通過", rc == 0, "rc %s" % rc)
+    chk("⑤ 換裝:v0104 模組的 upsert 指本版", PRIOR.upsert is upsert)
     src = Path(__file__).read_text(encoding="utf-8")
-    chk("① 統包唯一網路道(quoteSummary raw 道;零自建網路)",
-        "yahoo_quote_summary_raw" in src
-        and ("import " + "requests") not in src
-        and ("sub" + "process") not in src)
-    saved = os.environ.pop("VIA_NET_CONSENT", None)
-    rc = run(["2330"])
-    if saved is not None:
-        os.environ["VIA_NET_CONSENT"] = saved
-    chk("② 同意閘 fail-closed(閘未開=拒跑 rc2 零觸網)", rc == 2)
-    fx = {"financialData": {"targetHighPrice": {"raw": 1500.0},
-                            "targetLowPrice": {"raw": 900.0},
-                            "targetMeanPrice": {"raw": 1250.0},
-                            "targetMedianPrice": {"raw": 1200.0},
-                            "numberOfAnalystOpinions": {"raw": 30}},
-          "earningsTrend": {"trend": [
-              {"period": "0y", "earningsEstimate": {"avg": {"raw": 60.0}}},
-              {"period": "+1y", "earningsEstimate": {"avg": {"raw": 72.0}}}]}}
-    row = parse_symbol(fx)
-    chk("③ 剖析器數學(fixture:目標四值+30 分析師+EPS 0y/+1y)",
-        row == {"target_high": 1500.0, "target_low": 900.0,
-                "target_mean": 1250.0, "target_median": 1200.0,
-                "n_analysts": 30, "eps_fy0": 60.0, "eps_fy1": 72.0})
-    chk("④ 無共識面=誠實跳過(空回包→None 不假列)",
-        parse_symbol({"financialData": {}}) is None)
-    import tempfile
-    _td = tempfile.TemporaryDirectory()
-    con = duckdb.connect(str(Path(_td.name) / "tw_selftest.duckdb"))   # v0103:暫存庫(L17);不再拿正式庫寫鎖
-    _ensure_schema(con)                                                # 建表在交易外:ROLLBACK 只撤測試列
-    con.execute("BEGIN")
-    con.execute("INSERT INTO consensus_daily VALUES ('1900-01-01','TEST70','EXTERNAL_ANALYST',"
-                "1400,1000,1200,1180,12,58,70,70,NULL,NULL,'FIXTURE')")   # ⑥ 夾具:另一源同代號同日
-    upsert(con, "1900-01-01", "TEST70", row)
-    upsert(con, "1900-01-01", "TEST70", row)  # 同鍵重跑
-    n, up = con.execute(
-        "SELECT count(*), max(upside_pct) FROM consensus_daily "
-        "WHERE code='TEST70' AND source='YAHOO_QS'").fetchone()
-    chk("⑤ 同鍵冪等(重跑仍 1 筆)+upside=中位/close-1(無 close=NULL 誠實)",
-        n == 1 and up is None)
-    multi = con.execute(
-        "SELECT count(DISTINCT source) FROM consensus_daily WHERE code='TEST70' AND date='1900-01-01'").fetchone()[0]
-    # 批468:本檢要的是**同一個代號在兩個源都有列**。EXTERNAL_ANALYST 那一源
-    # 由 ENG069 ② 供料,上游一筆都沒有時這裡永遠不可能綠 → SKIP 並指回上游;
-    # 兩源都有料而主鍵撞了才是真缺陷。
-    if multi < 2:
-        skp("⑥ 多源共存(EXTERNAL_ANALYST+YAHOO_QS 同表;主鍵三元不撞)",
-            f"(同鍵源數 {multi}<2=上游 ENG069 ② 的 EXTERNAL 源未取數,"
-            "非本引擎缺陷;補齊後複判)")
-    else:
-        chk("⑥ 多源共存(EXTERNAL_ANALYST+YAHOO_QS 同表;主鍵三元不撞)",
-            multi >= 2)
-    con.execute("ROLLBACK")
-    left = con.execute(
-        "SELECT count(*) FROM consensus_daily WHERE code='TEST70'").fetchone()[0]
-    chk("⑦ fixture 零殘留(ROLLBACK 後正表無測試列)", left == 0)
-    con.close()
-    _td.cleanup()
-    boot = (VIA / "supportive modules" / "registry" /
-            "via_boot_update.sh").read_text(encoding="utf-8")
-    chk("⑧ boot 接線+紀律宣告(統包正主/fail-closed/多源共存/不假數)",
-        "VRN_ENG070" in boot and all(k in src for k in
-        ("統包唯一正主", "fail-closed", "多源共存", "不假數")))
-    import inspect as _insp
-    chk("⑨ 自測只寫暫存庫(v0103;v0102 開正式庫拿寫鎖,日更鏈寫庫時兩邊互撞)",
-        ("connect(str(" + "DB_" + "TW") not in _insp.getsource(selftest))   # 拆字拼:整句寫在自測裡的話,尺會量到自己(初稿就是這樣自紅)
-    print(f"  [計] 九檢 OK {9 - len(fails) - len(skips)} · FAIL {len(fails)}"
-          f" · SKIP {len(skips)}(誠實三態;上游件未產生非本引擎缺陷)")
-    return 1 if fails else 0
+    chk("⑥ 不用 TA-Lib · 不寫同意閘 · 本版不自建網路", not re.search(r"^\s*(?:import|from)\s+(talib|requests|urllib)", src, re.M)
+        and not re.search(r"environ\[[\"']VIA_(NET|SCRAPE)_CONSENT", src))
+    n = sum(ok)
+    print("[%s] %s selftest · %d/%d" % ("PASS" if n == len(ok) else "FAIL", TAG, n, len(ok)), flush=True)
+    return 0 if n == len(ok) else 1
 
 
 def main() -> int:
-    args = sys.argv[1:]
-    if "--selftest" in args:
-        print("=== Yahoo 共識引擎(VRN_ENG070)· 八檢自測(零網路)===")
+    if "--selftest" in sys.argv[1:]:
         return selftest()
-    if "--status" in args:
-        return status()
-    if args and args[0] == "run":
-        return run(args[1:] or DEFAULT_CODES)
-    return status()
+    return PRIOR.main()
 
 
 if __name__ == "__main__":

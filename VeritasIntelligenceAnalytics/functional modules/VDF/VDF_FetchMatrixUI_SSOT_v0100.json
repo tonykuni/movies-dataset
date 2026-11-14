@@ -1,0 +1,659 @@
+{
+ "schema": "VDF_FetchMatrixUI_SSOT_v0100",
+ "owner": "VDF",
+ "why": "操作員 2026-11-01 令:「參考這種方式有架構地呈現擷取項目於 HTML U/I」(範本 taiwan_stock_data_matrix.html:依資料庫分段 · 每表一列 · 來源徽章 · 端點 · 狀態 · 點列看明細 · 來源篩選 · 總結卡)。本冊只放「顯示用」的對照(中文名 · 來源 · 端點引用);端點路徑與實測狀態一律回端點冊 VIA_VDF_TWMarketEndpoints_SSOT 讀(本冊不抄第二份);表 · 庫 · 寫入者照 VIA_DB_Table_SSOT;族群 · 頻率照 VDF_FetchGroups_SSOT;引擎照 VDF_FetchSystem_SSOT。冊上沒登的表 → 依擷取冊引擎分組推定來源並在頁上標「推定」。",
+ "endpoint_ref": "ep = 端點冊 JSON 路徑(以 . 分隔,例 twse.datasets.daily_quote · b723_spec.indices.twse);endpoint + state = 端點冊沒有的那一條,照實寫來源依據(state 只用端點冊 state_rule 的五種:VERIFIED · CANDIDATE · TREE_EVIDENCE · DEAD · UNKNOWN)",
+ "providers": {
+  "TWSE": {
+   "zh": "臺灣證券交易所 OpenAPI",
+   "short": "TWSE",
+   "color": "#2563eb"
+  },
+  "TPEX": {
+   "zh": "證券櫃檯買賣中心 OpenAPI",
+   "short": "TPEx",
+   "color": "#7c3aed"
+  },
+  "MOPS": {
+   "zh": "公開資訊觀測站(交易所 opendata)",
+   "short": "MOPS",
+   "color": "#047857"
+  },
+  "YFINANCE": {
+   "zh": "Yahoo Finance",
+   "short": "yfinance",
+   "color": "#b45309"
+  },
+  "FRED": {
+   "zh": "St. Louis Fed FRED(要 FRED_API_KEY)",
+   "short": "FRED",
+   "color": "#c2410c"
+  },
+  "AKSHARE": {
+   "zh": "AkShare(含國家統計局等政府資料轉接)",
+   "short": "AkShare",
+   "color": "#be185d"
+  },
+  "OTHER": {
+   "zh": "其他公開來源(CNN · AAII · FactSet · 央行 · 投信)",
+   "short": "其他",
+   "color": "#475569"
+  },
+  "DERIVED": {
+   "zh": "衍生(VDF 引擎由庫內資料計算,不出網)",
+   "short": "衍生",
+   "color": "#6b7280"
+  }
+ },
+ "engine_group_providers": {
+  "TWSE/TPEX": [
+   "TWSE",
+   "TPEX"
+  ],
+  "YFINANCE": [
+   "YFINANCE"
+  ],
+  "FED": [
+   "FRED"
+  ],
+  "AKSHARE": [
+   "AKSHARE"
+  ],
+  "OTHERS": [
+   "OTHER"
+  ]
+ },
+ "db_order": [
+  "vdf_tw_market.duckdb",
+  "VDF_TWIndex_Daily.duckdb",
+  "ActiveTWETF.duckdb",
+  "vdf_global_market.duckdb",
+  "aaii_sentiment.duckdb",
+  "vdf_hub.duckdb",
+  "parquet",
+  "vake"
+ ],
+ "db_labels": {
+  "vdf_tw_market.duckdb": "台股正庫(量價 · 籌碼 · 月營收 · 財報 · 名錄)",
+  "VDF_TWIndex_Daily.duckdb": "台股官方指數",
+  "ActiveTWETF.duckdb": "主動式台股 ETF(名冊 · 每日持股)",
+  "vdf_global_market.duckdb": "國際正庫(國際行情 · 美國總經 · 情緒 · 評價)",
+  "aaii_sentiment.duckdb": "AAII 散戶情緒",
+  "vdf_hub.duckdb": "VDF 輸出匯流",
+  "parquet": "Parquet 檔庫(國際股財報)",
+  "vake": "VAKE 檔庫(AkShare 總經 · 航運)"
+ },
+ "other_system_prefixes": [
+  "vrn_",
+  "via_policy_",
+  "via_handover"
+ ],
+ "tables": {
+  "tw_daily_prices": {
+   "label": "個股日行情 OHLCV",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "twse.datasets.daily_quote"
+    },
+    {
+     "provider": "TPEX",
+     "ep": "tpex.datasets.daily_quote"
+    },
+    {
+     "provider": "YFINANCE",
+     "endpoint": "yf history(.TW / .TWO)· Adj Close",
+     "state": "TREE_EVIDENCE",
+     "role": "fallback",
+     "label": "Adj Close 與補洞(ENG064)",
+     "engines": [
+      "e064"
+     ]
+    }
+   ]
+  },
+  "tw_trading_daily": {
+   "label": "成交量 · 成交值 · 筆數",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "twse.datasets.daily_quote"
+    },
+    {
+     "provider": "TPEX",
+     "ep": "tpex.datasets.daily_quote"
+    }
+   ]
+  },
+  "tw_valuation_daily": {
+   "label": "本益比 · 淨值比 · 殖利率",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "twse.datasets.per_pbr_yield"
+    },
+    {
+     "provider": "TPEX",
+     "ep": "tpex.datasets.per_pbr"
+    }
+   ]
+  },
+  "tw_chip_inst": {
+   "label": "三大法人買賣超",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "twse.datasets.institutional"
+    },
+    {
+     "provider": "TPEX",
+     "ep": "tpex.datasets.institutional"
+    }
+   ]
+  },
+  "tw_chip_margin": {
+   "label": "融資融券",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "twse.datasets.margin"
+    },
+    {
+     "provider": "TPEX",
+     "ep": "tpex.datasets.margin"
+    }
+   ]
+  },
+  "tw_chip_derived": {
+   "label": "籌碼衍生(當沖 · 券資比)",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "twse.datasets.day_trade"
+    },
+    {
+     "provider": "TPEX",
+     "ep": "tpex.datasets.day_trade"
+    },
+    {
+     "provider": "DERIVED",
+     "label": "券資比 · 當沖比由三表直算"
+    }
+   ]
+  },
+  "tw_daytrade_eligible": {
+   "label": "可當沖標的",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "twse.datasets.day_trade"
+    }
+   ]
+  },
+  "tw_daytrade_market": {
+   "label": "當沖市場統計",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "twse.datasets.day_trade"
+    }
+   ]
+  },
+  "tw_market_agg": {
+   "label": "市場成交資訊(全市場合計)",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "twse.datasets.market_total"
+    }
+   ]
+  },
+  "tw_monthly_revenue": {
+   "label": "月營收(全部個股)",
+   "sources": [
+    {
+     "provider": "MOPS",
+     "ep": "b723_spec.monthly_revenue.twse",
+     "label": "上市 t187ap05_L"
+    },
+    {
+     "provider": "MOPS",
+     "ep": "b723_spec.monthly_revenue.tpex",
+     "label": "上櫃 t187ap05_O"
+    }
+   ]
+  },
+  "monthly_revenue_analysis": {
+   "label": "月營收分析(年增 · 月增)",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "由 tw_monthly_revenue 計算"
+    }
+   ]
+  },
+  "tw_universe": {
+   "label": "全台股清單",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "b723_spec.universe.twse",
+     "label": "上市 t187ap03_L"
+    },
+    {
+     "provider": "TPEX",
+     "ep": "b723_spec.universe.tpex",
+     "label": "上櫃 t187ap03_O"
+    }
+   ]
+  },
+  "tw_listings": {
+   "label": "上市櫃名錄",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "b723_spec.universe.twse"
+    },
+    {
+     "provider": "TPEX",
+     "ep": "b723_spec.universe.tpex"
+    }
+   ]
+  },
+  "tw_listings_industry": {
+   "label": "產業別名錄",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "b723_spec.universe.twse"
+    },
+    {
+     "provider": "TPEX",
+     "ep": "b723_spec.universe.tpex"
+    }
+   ]
+  },
+  "etf_book": {
+   "label": "ETF 名冊",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "endpoint": "/opendata/t187ap47_L",
+     "state": "TREE_EVIDENCE",
+     "label": "MDL010 擷取冊 role 寫明 t187ap47_L"
+    }
+   ]
+  },
+  "tw_financial": {
+   "label": "個股三大報表(canonical)",
+   "sources": [
+    {
+     "provider": "MOPS",
+     "ep": "b723_spec.financials_tw"
+    },
+    {
+     "provider": "DERIVED",
+     "label": "由 tw_financial_mops 正規化"
+    }
+   ]
+  },
+  "tw_financial_mops": {
+   "label": "MOPS 財報彙總(上市 · 上櫃 · 各業別)",
+   "sources": [
+    {
+     "provider": "MOPS",
+     "endpoint": "/opendata/t187ap06_* · t187ap07_*(各業別 L / O)",
+     "state": "TREE_EVIDENCE",
+     "label": "工作站 2026-10-22 對照頁的來源欄實見這些端點代號"
+    }
+   ]
+  },
+  "tw_financial_mops_log": {
+   "label": "MOPS 財報擷取台帳",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "每個端點每一趟的結果"
+    }
+   ]
+  },
+  "consensus_daily": {
+   "label": "分析師共識(每日)",
+   "sources": [
+    {
+     "provider": "OTHER",
+     "endpoint": "CNYES / FactSet",
+     "state": "TREE_EVIDENCE",
+     "label": "工作站對照頁來源欄 CNYES_FACTSET / EXTERNAL_ANALYST"
+    },
+    {
+     "provider": "YFINANCE",
+     "endpoint": "yf quoteSummary",
+     "state": "TREE_EVIDENCE"
+    }
+   ]
+  },
+  "consensus_latest": {
+   "label": "分析師共識(最新)",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "由 consensus_daily 取最新"
+    }
+   ]
+  },
+  "analyst_estimates": {
+   "label": "分析師預估區間",
+   "sources": [
+    {
+     "provider": "YFINANCE",
+     "endpoint": "yf quoteSummary(earningsTrend)",
+     "state": "TREE_EVIDENCE"
+    }
+   ]
+  },
+  "tw_rates_cbc": {
+   "label": "中央銀行利率",
+   "sources": [
+    {
+     "provider": "OTHER",
+     "endpoint": "中央銀行統計資料",
+     "state": "TREE_EVIDENCE"
+    }
+   ]
+  },
+  "tw_prices_adj": {
+   "label": "調整後價格層",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "原始價 × 調整係數(原始永不改)"
+    }
+   ]
+  },
+  "prices_canonical": {
+   "label": "價格正典層",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "多來源對齊後的正典價"
+    }
+   ]
+  },
+  "features_daily": {
+   "label": "每日特徵(因子)",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "ENG061 FeatureStore"
+    }
+   ]
+  },
+  "group_features_daily": {
+   "label": "族群每日特徵",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "ENG062 GroupFeatureLayer"
+    }
+   ]
+  },
+  "etf_revenue_holdings": {
+   "label": "ETF 持股 × 營收",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "ENG076"
+    }
+   ]
+  },
+  "etf_revenue_momentum": {
+   "label": "ETF 營收動能",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "ENG076"
+    }
+   ]
+  },
+  "via_ingest_ledger": {
+   "label": "匯入台帳",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "寫入紀錄"
+    }
+   ]
+  },
+  "tw_index_daily": {
+   "label": "加權 · 櫃買指數",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "ep": "b723_spec.indices.twse"
+    },
+    {
+     "provider": "TPEX",
+     "ep": "b723_spec.indices.tpex"
+    }
+   ]
+  },
+  "active_tw_etf_universe": {
+   "label": "主動式台股 ETF 名冊",
+   "sources": [
+    {
+     "provider": "TWSE",
+     "endpoint": "/opendata/t187ap47_L",
+     "state": "TREE_EVIDENCE",
+     "label": "MDL010 擷取冊 role 寫明 t187ap47_L"
+    }
+   ]
+  },
+  "holdings_changes": {
+   "label": "主動式 ETF 持股增減",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "由 holdings_daily 前後兩日相減"
+    }
+   ]
+  },
+  "active_etf_holdings_coverage": {
+   "label": "主動式 ETF 持股覆蓋率",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "覆蓋率統計"
+    }
+   ]
+  },
+  "fetch_status": {
+   "label": "主動式 ETF 擷取狀態",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "擷取台帳"
+    }
+   ]
+  },
+  "global_daily": {
+   "label": "國際每日行情",
+   "sources": [
+    {
+     "provider": "YFINANCE",
+     "endpoint": "yf download(國際代號)",
+     "state": "TREE_EVIDENCE"
+    }
+   ]
+  },
+  "gl_prices_adj": {
+   "label": "國際調整後價格",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "調整係數層"
+    }
+   ]
+  },
+  "us_macro": {
+   "label": "美國總經(FRED 序列)",
+   "sources": [
+    {
+     "provider": "FRED",
+     "endpoint": "api.stlouisfed.org/fred/series/observations",
+     "state": "TREE_EVIDENCE",
+     "label": "FRED(要 FRED_API_KEY)"
+    },
+    {
+     "provider": "OTHER",
+     "endpoint": "美國財政部 fiscaldata(TGA)",
+     "state": "TREE_EVIDENCE",
+     "engines": [
+      "e113"
+     ]
+    }
+   ]
+  },
+  "cross_macro": {
+   "label": "跨市場總經",
+   "sources": [
+    {
+     "provider": "FRED",
+     "endpoint": "FRED",
+     "state": "TREE_EVIDENCE"
+    },
+    {
+     "provider": "YFINANCE",
+     "endpoint": "yf",
+     "state": "TREE_EVIDENCE"
+    }
+   ]
+  },
+  "sentiment_daily": {
+   "label": "市場情緒(CNN Fear & Greed)",
+   "sources": [
+    {
+     "provider": "OTHER",
+     "endpoint": "CNN Fear & Greed",
+     "state": "TREE_EVIDENCE"
+    }
+   ]
+  },
+  "macro_series_registry": {
+   "label": "總經序列名冊",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "序列登錄"
+    }
+   ]
+  },
+  "factset_earnings": {
+   "label": "FactSet 盈餘預估",
+   "sources": [
+    {
+     "provider": "OTHER",
+     "endpoint": "FactSet Earnings Insight",
+     "state": "TREE_EVIDENCE"
+    }
+   ]
+  },
+  "etf_stats_daily": {
+   "label": "ETF 每日統計",
+   "sources": [
+    {
+     "provider": "YFINANCE",
+     "endpoint": "yf",
+     "state": "TREE_EVIDENCE"
+    }
+   ]
+  },
+  "index_valuation_proxy": {
+   "label": "指數評價代理",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "評價代理計算"
+    }
+   ]
+  },
+  "fwd_valuation_daily": {
+   "label": "指數 Forward 評價",
+   "sources": [
+    {
+     "provider": "OTHER",
+     "endpoint": "FactSet 新聞稿",
+     "state": "TREE_EVIDENCE"
+    },
+    {
+     "provider": "YFINANCE",
+     "endpoint": "yf",
+     "state": "TREE_EVIDENCE"
+    }
+   ]
+  },
+  "fwd_valuation_factset_candidates": {
+   "label": "FactSet 新聞稿解析候選",
+   "sources": [
+    {
+     "provider": "OTHER",
+     "endpoint": "FactSet 新聞稿",
+     "state": "TREE_EVIDENCE"
+    }
+   ]
+  },
+  "aaii_sentiment": {
+   "label": "AAII 散戶情緒",
+   "sources": [
+    {
+     "provider": "OTHER",
+     "endpoint": "AAII sentiment workbook",
+     "state": "TREE_EVIDENCE"
+    }
+   ]
+  },
+  "digest_vdf_rows": {
+   "label": "VDF 每日摘要列",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "ENG045 OutputHub"
+    }
+   ]
+  },
+  "vdf_sample_rows": {
+   "label": "VDF 樣本列",
+   "sources": [
+    {
+     "provider": "DERIVED",
+     "label": "ENG045 OutputHub"
+    }
+   ]
+  },
+  "income_statement_quarterly": {
+   "label": "國際股財報(季)",
+   "sources": [
+    {
+     "provider": "YFINANCE",
+     "ep": "b723_spec.financials_foreign"
+    }
+   ]
+  },
+  "income_statement_annual": {
+   "label": "國際股財報(年)",
+   "sources": [
+    {
+     "provider": "YFINANCE",
+     "ep": "b723_spec.financials_foreign"
+    }
+   ]
+  }
+ },
+ "vake_groups": {
+  "CN_MACRO": "中國經濟",
+  "CN_NBS": "國家統計局 NBS",
+  "GLOBAL_MACRO": "各國經濟 · 央行利率",
+  "SHIPPING": "航運指數"
+ },
+ "visual_spec": "VDF_UI_VisualSpec_SSOT 尾版(= VRN-2 vrn2-professional-v0242 鎖定原文);徽章色只用於淺底"
+}

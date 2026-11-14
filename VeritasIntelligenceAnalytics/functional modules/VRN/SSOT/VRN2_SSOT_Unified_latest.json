@@ -1,0 +1,2840 @@
+{
+ "book": "VIA_SSOT_Unified",
+ "version": "v0100",
+ "ts": "2026-10-28T14:05:47",
+ "built_by": "VRN(基層建 · L116)",
+ "numbering": "number 欄留空 · 由 VCGC 審核後核號",
+ "rule": "只增不減 · 同 (ns,key) regex 不同 = CONFLICT 兩邊都留 · 同義字聯集 · 三系統副本內容相同",
+ "inputs": [
+  "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\functional modules\\VRN\\SSOT",
+  "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\functional modules\\VRN\\_vdf_fetch",
+  "(VCGC governance_vocab 未找到 · 之後再併)"
+ ],
+ "namespaces": [
+  "adjprice",
+  "broker",
+  "finreport",
+  "market_field",
+  "misc",
+  "temporal",
+  "ticker"
+ ],
+ "count": {
+  "entries": 145,
+  "conflicts": 0,
+  "regex": 41,
+  "synonyms": 101,
+  "rules": 3
+ },
+ "entries": [
+  {
+   "ns": "adjprice",
+   "key": "ADJ_RULE",
+   "kind": "rule",
+   "value": {
+    "schema": "VIA.VDF.AdjPriceRule.SSOT.v1",
+    "version": "v0100",
+    "batch": "側線 2026-10-03 b",
+    "ts": "2026-10-02T23:28:46",
+    "law": "L110 / L104",
+    "purpose": "調整價係數規則正本(VDF 基層,L108 ①):原始永不改,係數另存,台美同法,驗證兩條",
+    "rules": [
+     {
+      "id": "R-ADJ-01",
+      "zh": "原始不覆寫",
+      "raw_columns": [
+       "open",
+       "high",
+       "low",
+       "close",
+       "volume"
+      ],
+      "never_overwrite": true
+     },
+     {
+      "id": "R-ADJ-02",
+      "zh": "係數另存",
+      "factor_row": [
+       "ticker",
+       "market",
+       "effective_date",
+       "split_factor",
+       "dividend_factor",
+       "source_id",
+       "as_of"
+      ],
+      "adj_columns": [
+       "adj_close",
+       "adj_open",
+       "adj_high",
+       "adj_low",
+       "adj_version"
+      ]
+     },
+     {
+      "id": "R-ADJ-03",
+      "zh": "台美同法",
+      "method": "back-adjust from latest (multiply cumulative factor backwards)",
+      "markets": [
+       "TW",
+       "US"
+      ],
+      "currency": "原幣,不換算"
+     },
+     {
+      "id": "R-ADJ-04",
+      "zh": "驗證",
+      "step_function": "adj_close/close 只在 effective_date 跳階,其餘日恆定(容差 1e-6)",
+      "second_source_sample": {
+       "n": 20,
+       "note": "yfinance 記 auto_adjust 口徑"
+      }
+     },
+     {
+      "id": "R-ADJ-05",
+      "zh": "VRN 只讀",
+      "consumer": "VRN 讀 adj_* 欄(L104),不自算"
+     }
+    ]
+   },
+   "sources": [
+    "VDF_AdjPrice_Rule_SSOT_v0100.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "BOA",
+   "kind": "synonyms",
+   "value": [
+    "BOA",
+    "BofA",
+    "BofA Securities",
+    "ML",
+    "Merrill Lynch",
+    "美林",
+    "美林證券",
+    "美銀",
+    "美銀證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "CAPITAL",
+   "kind": "synonyms",
+   "value": [
+    "Capital",
+    "Capital Securities",
+    "群益",
+    "群益投顧",
+    "群益金鼎證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "CATHAY",
+   "kind": "synonyms",
+   "value": [
+    "Cathay",
+    "Cathay Securities",
+    "國泰",
+    "國泰投顧",
+    "國泰期貨",
+    "國泰證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "CITI",
+   "kind": "synonyms",
+   "value": [
+    "Citi",
+    "Citigroup",
+    "花旗",
+    "花旗環球",
+    "花旗環球證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "CLSA",
+   "kind": "synonyms",
+   "value": [
+    "CLSA",
+    "CLST",
+    "里昂",
+    "里昂證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "CONCORD",
+   "kind": "synonyms",
+   "value": [
+    "Concord",
+    "Concord Securities",
+    "康和",
+    "康和投顧",
+    "康和證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "CS",
+   "kind": "synonyms",
+   "value": [
+    "CS",
+    "Credit Suisse",
+    "瑞信",
+    "瑞士信貸"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "CTBC",
+   "kind": "synonyms",
+   "value": [
+    "CTBC",
+    "CTBC Securities",
+    "中信",
+    "中信投顧",
+    "中信證",
+    "中國信託",
+    "中國信託證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "DAIWA",
+   "kind": "synonyms",
+   "value": [
+    "Daiwa",
+    "Daiwa Capital Markets",
+    "大和",
+    "大和資本"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "ESUN",
+   "kind": "synonyms",
+   "value": [
+    "E.SUN",
+    "E.SUN Securities",
+    "玉山",
+    "玉山投顧",
+    "玉山證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "FIRST",
+   "kind": "synonyms",
+   "value": [
+    "First",
+    "First Securities",
+    "第一金",
+    "第一金投顧",
+    "第一金證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "FUBON",
+   "kind": "synonyms",
+   "value": [
+    "Fubon",
+    "Fubon Securities",
+    "富邦",
+    "富邦投顧",
+    "富邦證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "GS",
+   "kind": "synonyms",
+   "value": [
+    "GS",
+    "Goldman Sachs",
+    "高盛"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "HSBC",
+   "kind": "synonyms",
+   "value": [
+    "HSBC",
+    "匯豐",
+    "匯豐證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "HUANAN",
+   "kind": "synonyms",
+   "value": [
+    "Hua Nan",
+    "Hua Nan Securities",
+    "華南",
+    "華南投顧",
+    "華南永昌",
+    "華南永昌證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "JPM",
+   "kind": "synonyms",
+   "value": [
+    "J.P. Morgan",
+    "JPM",
+    "JPMorgan",
+    "小摩",
+    "摩根大通",
+    "摩通"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "KGI",
+   "kind": "synonyms",
+   "value": [
+    "KGI",
+    "KGI Securities",
+    "凱基",
+    "凱基投顧",
+    "凱基證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "MASTERLINK",
+   "kind": "synonyms",
+   "value": [
+    "MasterLink",
+    "MasterLink Securities",
+    "元富",
+    "元富投顧",
+    "元富證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "MCQ",
+   "kind": "synonyms",
+   "value": [
+    "MCQ",
+    "MQ",
+    "Macquarie",
+    "Macquarie Capital",
+    "麥格理",
+    "麥格理資本"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "MEGA",
+   "kind": "synonyms",
+   "value": [
+    "Mega",
+    "Mega Securities",
+    "兆豐",
+    "兆豐投顧",
+    "兆豐證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "MS",
+   "kind": "synonyms",
+   "value": [
+    "MS",
+    "Morgan Stanley",
+    "大摩",
+    "摩根士丹利"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "NOMURA",
+   "kind": "synonyms",
+   "value": [
+    "Nomura",
+    "野村",
+    "野村證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "PRESIDENT",
+   "kind": "synonyms",
+   "value": [
+    "President",
+    "President Securities",
+    "統一",
+    "統一投顧",
+    "統一證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "SINOPAC",
+   "kind": "synonyms",
+   "value": [
+    "SinoPac",
+    "SinoPac Securities",
+    "永豐",
+    "永豐投顧",
+    "永豐金",
+    "永豐金證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "TAISHIN",
+   "kind": "synonyms",
+   "value": [
+    "Taishin",
+    "Taishin Securities",
+    "台新",
+    "台新投顧",
+    "台新證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "UBS",
+   "kind": "synonyms",
+   "value": [
+    "UBS",
+    "瑞士銀行",
+    "瑞銀",
+    "瑞銀證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "WATERLAND",
+   "kind": "synonyms",
+   "value": [
+    "Waterland",
+    "Waterland Securities",
+    "國票",
+    "國票投顧",
+    "國票華頓",
+    "國票證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "broker",
+   "key": "YUANTA",
+   "kind": "synonyms",
+   "value": [
+    "Yuanta",
+    "Yuanta Securities",
+    "元大",
+    "元大投顧",
+    "元大證券"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "adjusted_profit",
+   "kind": "synonyms",
+   "value": [
+    "Adjusted profit",
+    "Core profit",
+    "Underlying profit",
+    "調整後淨利"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "ar_turnover",
+   "kind": "synonyms",
+   "value": [
+    "AR turnover",
+    "Receivables turnover",
+    "應收帳款週轉率",
+    "應收款項週轉率(次)"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "RATIO",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "capex",
+   "kind": "synonyms",
+   "value": [
+    "Capex",
+    "Capital expenditure",
+    "資本支出"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "CF",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "capital_surplus",
+   "kind": "synonyms",
+   "value": [
+    "Additional paid-in capital",
+    "Capital surplus",
+    "資本公積"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "cash",
+   "kind": "synonyms",
+   "value": [
+    "Cash",
+    "Cash and cash equivalents",
+    "現金",
+    "現金及約當現金"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "cff",
+   "kind": "synonyms",
+   "value": [
+    "Cash from financing activities",
+    "Financing cash flow",
+    "Financing cashflow",
+    "Net cash from financing activities",
+    "Net financing cashflow",
+    "籌資活動現金流量",
+    "融資活動現金流量"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "CF",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "cfi",
+   "kind": "synonyms",
+   "value": [
+    "Cash from investing activities",
+    "Investing cash flow",
+    "Investing cashflow",
+    "Net cash from investing activities",
+    "Net investing cashflow",
+    "投資活動之淨現金流出",
+    "投資活動現金流量"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "CF",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "cfo",
+   "kind": "synonyms",
+   "value": [
+    "Cash from operating activities",
+    "Net cash from operating activities",
+    "Net operating cashflow",
+    "Operating cash flow",
+    "Operating cashflow",
+    "營業活動之淨現金流入",
+    "營業活動現金流量",
+    "營運現金流"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "CF",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "common_stock",
+   "kind": "synonyms",
+   "value": [
+    "Common stock",
+    "Share capital",
+    "普通股股本",
+    "股本"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "current_assets",
+   "kind": "synonyms",
+   "value": [
+    "Current assets",
+    "Total current assets",
+    "流動資產",
+    "流動資產合計"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "current_liabilities",
+   "kind": "synonyms",
+   "value": [
+    "Current liabilities",
+    "Total current liabilities",
+    "流動負債",
+    "流動負債合計"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "da",
+   "kind": "synonyms",
+   "value": [
+    "D&A",
+    "Depreciation & amortization",
+    "Depreciation/amortisation",
+    "折舊",
+    "折舊及攤銷",
+    "折舊攤銷"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "debt_ratio",
+   "kind": "synonyms",
+   "value": [
+    "Debt ratio",
+    "Liabilities to assets",
+    "負債占資產比率(%)",
+    "負債比率"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "RATIO",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "dividends_paid",
+   "kind": "synonyms",
+   "value": [
+    "Dividends",
+    "Dividends paid",
+    "發放股利",
+    "股利支付"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "CF",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "eps",
+   "kind": "synonyms",
+   "value": [
+    "Diluted EPS",
+    "EPS",
+    "EPS (NT$)",
+    "EPS(元)",
+    "每股盈餘",
+    "每股盈餘(元)",
+    "稅後EPS"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "expected_price_return",
+   "kind": "synonyms",
+   "value": [
+    "Expected share price return",
+    "預期股價報酬"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "VAL",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "expected_total_return",
+   "kind": "synonyms",
+   "value": [
+    "Expected total return",
+    "預期總報酬"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "VAL",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "fcf",
+   "kind": "synonyms",
+   "value": [
+    "FCF",
+    "Free cash flow",
+    "Free cashflow",
+    "自由現金流",
+    "自由現金流量"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "CF",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "fixed_assets",
+   "kind": "synonyms",
+   "value": [
+    "Fixed assets",
+    "PP&E",
+    "Property, plant and equipment",
+    "不動產、廠房及設備",
+    "不動產廠房及設備",
+    "固定資產"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "fx_movement",
+   "kind": "synonyms",
+   "value": [
+    "Exch rate movements",
+    "FX effect",
+    "匯率變動影響"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "CF",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "gross_profit",
+   "kind": "synonyms",
+   "value": [
+    "Gross profit",
+    "毛利",
+    "營業毛利"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "intangibles",
+   "kind": "synonyms",
+   "value": [
+    "Intangible assets",
+    "Intangibles",
+    "無形資產"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "interest_coverage",
+   "kind": "synonyms",
+   "value": [
+    "Interest cover",
+    "Interest coverage",
+    "利息保障倍數"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "RATIO",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "inventory",
+   "kind": "synonyms",
+   "value": [
+    "Inventories",
+    "Inventory",
+    "存貨"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "investments",
+   "kind": "synonyms",
+   "value": [
+    "Investments",
+    "Long-term investments",
+    "長期投資"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "liab_and_equity",
+   "kind": "synonyms",
+   "value": [
+    "Total liabilities & equity",
+    "Total liabilities and equity",
+    "Total liabs & equity",
+    "負債及權益總計",
+    "負債及股東權益總計",
+    "負債與權益總計"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "loans_increase",
+   "kind": "synonyms",
+   "value": [
+    "Increase in loans",
+    "Net borrowings",
+    "借款增加"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "CF",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "lt_debt",
+   "kind": "synonyms",
+   "value": [
+    "Long-term borrowings",
+    "Long-term debt",
+    "長期借款",
+    "長期債務",
+    "長期負債",
+    "長期負債合計"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "lt_investments",
+   "kind": "synonyms",
+   "value": [
+    "Long-term investments",
+    "長期投資",
+    "長期投資合計"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "minorities_equity",
+   "kind": "synonyms",
+   "value": [
+    "Minorities/other equity",
+    "Minority interests (BS)",
+    "非控制權益"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "minority_interest",
+   "kind": "synonyms",
+   "value": [
+    "Minority interest",
+    "Minority interests",
+    "Non-controlling interests",
+    "少數股權",
+    "非控制權益"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "net_debt_equity",
+   "kind": "synonyms",
+   "value": [
+    "Net debt to equity",
+    "Net debt/equity (%)",
+    "Net gearing",
+    "淨負債比"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "RATIO",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "net_income",
+   "kind": "synonyms",
+   "value": [
+    "Net income",
+    "Net profit",
+    "PAT",
+    "Profit after tax",
+    "Profit attributable to parent",
+    "本期淨利",
+    "歸屬母公司淨利",
+    "母公司淨利",
+    "稅後淨利",
+    "稅後純益"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "net_interest",
+   "kind": "synonyms",
+   "value": [
+    "Net interest expense",
+    "Net interest inc/(exp)",
+    "Net interest income",
+    "利息收入淨額",
+    "淨利息收支"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "ni_growth",
+   "kind": "synonyms",
+   "value": [
+    "EPS growth",
+    "Net income growth",
+    "淨利成長率",
+    "稅後淨利年增率"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "RATIO",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "noncurrent_assets",
+   "kind": "synonyms",
+   "value": [
+    "Non-current assets",
+    "Total non-current assets",
+    "非流動資產",
+    "非流動資產合計"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "nonop_income",
+   "kind": "synonyms",
+   "value": [
+    "Non-OP",
+    "Non-op",
+    "Non-op income",
+    "Non-operating",
+    "Non-operating income",
+    "業外損益",
+    "業外收支",
+    "營業外收入及支出"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "operating_income",
+   "kind": "synonyms",
+   "value": [
+    "Operating income",
+    "Operating profit",
+    "營業利益",
+    "營業淨利"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "other_current_assets",
+   "kind": "synonyms",
+   "value": [
+    "Other current assets",
+    "其他流動資產",
+    "其它流動資產"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "other_current_liabilities",
+   "kind": "synonyms",
+   "value": [
+    "Other current liabilities",
+    "Other current liabs",
+    "其他流動負債",
+    "其它流動負債"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "other_items",
+   "kind": "synonyms",
+   "value": [
+    "Other items",
+    "Others",
+    "其他",
+    "其他項目"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "other_noncurrent_assets",
+   "kind": "synonyms",
+   "value": [
+    "Other non-current assets",
+    "其他非流動資產",
+    "其它非流動資產"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "other_noncurrent_liabilities",
+   "kind": "synonyms",
+   "value": [
+    "Other non-current liabilities",
+    "Provisions",
+    "Provisions/other LT liabs",
+    "其他非流動負債",
+    "其它非流動負債",
+    "負債準備"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "payables",
+   "kind": "synonyms",
+   "value": [
+    "Accounts payable",
+    "Payables",
+    "應付帳款",
+    "應付帳款及票據",
+    "應付票據及帳款"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "pretax_income",
+   "kind": "synonyms",
+   "value": [
+    "PBT",
+    "Pretax profit",
+    "Profit before tax",
+    "稅前利益",
+    "稅前淨利",
+    "稅前純益"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "price",
+   "kind": "synonyms",
+   "value": [
+    "Current price",
+    "Price",
+    "Share price",
+    "收盤價",
+    "股價"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "VAL",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "quick_ratio",
+   "kind": "synonyms",
+   "value": [
+    "Quick ratio",
+    "速動比",
+    "速動比率",
+    "速動比率(%)"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "RATIO",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "rating",
+   "kind": "synonyms",
+   "value": [
+    "Add",
+    "BUY",
+    "Buy",
+    "HOLD",
+    "Hold",
+    "Neutral",
+    "Outperform",
+    "Rating",
+    "Recommendation",
+    "Reduce",
+    "SELL",
+    "Sell",
+    "Underperform",
+    "中立",
+    "強力買進",
+    "投資評等",
+    "持有",
+    "評等",
+    "買進",
+    "賣出",
+    "逢低買進"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "VAL",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "receivables",
+   "kind": "synonyms",
+   "value": [
+    "Accounts receivable",
+    "Receivables",
+    "應收帳款",
+    "應收帳款及票據",
+    "應收票據及帳款"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "retained_earnings",
+   "kind": "synonyms",
+   "value": [
+    "Retained earnings",
+    "保留盈餘"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "revenue",
+   "kind": "synonyms",
+   "value": [
+    "Net revenue",
+    "Net sales",
+    "Revenue",
+    "營收",
+    "營收淨額",
+    "營業收入",
+    "營業收入淨額"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "revenue_growth",
+   "kind": "synonyms",
+   "value": [
+    "Revenue growth",
+    "Revenue growth (% YoY)",
+    "Sales growth",
+    "營收 YoY",
+    "營收年增率",
+    "營收成長率"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "RATIO",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "roic",
+   "kind": "synonyms",
+   "value": [
+    "ROIC",
+    "ROIC (%)",
+    "投入資本報酬率"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "RATIO",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "st_debt",
+   "kind": "synonyms",
+   "value": [
+    "Short-term borrowings",
+    "Short-term debt",
+    "短期借款",
+    "短期債務"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "tax",
+   "kind": "synonyms",
+   "value": [
+    "Income tax",
+    "Income tax expense",
+    "Tax expense",
+    "Taxation",
+    "所得稅",
+    "所得稅費用"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "IS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "tax_paid",
+   "kind": "synonyms",
+   "value": [
+    "Tax paid",
+    "Taxes paid",
+    "支付所得稅"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "CF",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "total_assets",
+   "kind": "synonyms",
+   "value": [
+    "Total assets",
+    "總資產",
+    "資產總計",
+    "資產總額"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "total_equity",
+   "kind": "synonyms",
+   "value": [
+    "Shareholder funds",
+    "Shareholders' equity",
+    "Shareholders' funds",
+    "Total equity",
+    "權益",
+    "權益總計",
+    "權益總額",
+    "歸屬於母公司業主之權益",
+    "歸屬母公司權益",
+    "母公司業主權益",
+    "股東權益合計"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "total_liabilities",
+   "kind": "synonyms",
+   "value": [
+    "Total liabilities",
+    "總負債",
+    "負債總計",
+    "負債總額"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "BS",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "finreport",
+   "key": "wc_changes",
+   "kind": "synonyms",
+   "value": [
+    "Change in working capital",
+    "Working capital changes",
+    "營運資金變動"
+   ],
+   "sources": [
+    "VRN2_Synonyms_v0101.json(FinLexicon)"
+   ],
+   "note": "CF",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "close",
+   "kind": "synonyms",
+   "value": [
+    "Close",
+    "ClosingPrice",
+    "收市",
+    "收盤",
+    "收盤價",
+    "收盤指數"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "date",
+   "kind": "synonyms",
+   "value": [
+    "Date",
+    "日期",
+    "資料日期"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "day_trade_buy_value",
+   "kind": "synonyms",
+   "value": [
+    "當日沖銷交易 買進成交金額",
+    "當日沖銷交易買進成交金額"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "day_trade_sell_value",
+   "kind": "synonyms",
+   "value": [
+    "當日沖銷交易 賣出成交金額",
+    "當日沖銷交易賣出成交金額"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "day_trade_volume",
+   "kind": "synonyms",
+   "value": [
+    "DayTradingVolume",
+    "當日沖銷交易 成交股數",
+    "當日沖銷交易成交股數"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "high",
+   "kind": "synonyms",
+   "value": [
+    "High",
+    "HighestPrice",
+    "最高",
+    "最高價",
+    "最高指數"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "low",
+   "kind": "synonyms",
+   "value": [
+    "Low",
+    "LowestPrice",
+    "最低",
+    "最低價",
+    "最低指數"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "name",
+   "kind": "synonyms",
+   "value": [
+    "CompanyAbbreviation",
+    "CompanyName",
+    "Name",
+    "公司名稱",
+    "公司簡稱",
+    "名稱",
+    "證券名稱"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "open",
+   "kind": "synonyms",
+   "value": [
+    "Open",
+    "OpeningPrice",
+    "開市",
+    "開盤",
+    "開盤價",
+    "開盤指數"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "shares_outstanding",
+   "kind": "synonyms",
+   "value": [
+    "Capitals",
+    "發行股數"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "ticker",
+   "kind": "synonyms",
+   "value": [
+    "Code",
+    "SecuritiesCompanyCode",
+    "代號",
+    "公司代號",
+    "股票代號",
+    "證券代號"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "turnover",
+   "kind": "synonyms",
+   "value": [
+    "TradeValue",
+    "TransactionAmount",
+    "成交金額",
+    "成交金額(元)"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "market_field",
+   "key": "volume",
+   "kind": "synonyms",
+   "value": [
+    "TradeVolume",
+    "TradingShares",
+    "成交股數"
+   ],
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Synonyms_v0101.json(VDF ALIASES)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "misc",
+   "key": "NUMBER",
+   "kind": "regex",
+   "value": "^[\\(（]?[\\-−+]?[\\d,]+(?:\\.\\d+)?[\\)）]?\\s*(%|x|倍|bps|ppts?)?$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {}
+  },
+  {
+   "ns": "misc",
+   "key": "TW_BLOOMBERG",
+   "kind": "regex",
+   "value": "(?<!\\d)([1-9]\\d{3})\\s+TT\\b",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {}
+  },
+  {
+   "ns": "misc",
+   "key": "TW_YFINANCE",
+   "kind": "regex",
+   "value": "(?<!\\d)([1-9]\\d{3})\\.(TW|TWO)\\b",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {}
+  },
+  {
+   "ns": "temporal",
+   "key": "DATE",
+   "kind": "regex",
+   "value": "^(\\d{4})[\\-/\\.](\\d{1,2})[\\-/\\.](\\d{1,2})$|^(\\d{4})(\\d{2})(\\d{2})$|^(\\d{1,2})\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\s+(\\d{4})$|^(1[01]\\d)[\\-/\\.](\\d{1,2})[\\-/\\.](\\d{1,2})$|^(\\d{2,4})\\s*年\\s*(\\d{1,2})\\s*月\\s*(\\d{1,2})\\s*日$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "2024-08-01",
+     "2024/08/01",
+     "20240801",
+     "2025/8/19"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "temporal",
+   "key": "Date_Extraction",
+   "kind": "regex",
+   "value": "(?:(?:20)?\\d{2}[-/]?\\d{2}[-/]?\\d{2})|(?:11\\d{5})|(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\s+\\d{1,2},?\\s+\\d{4})",
+   "sources": [
+    "VRN2_Regex_v0103.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "2024-08-01",
+     "2024/08/01",
+     "20240801",
+     "1130801"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "temporal",
+   "key": "MONTH",
+   "kind": "regex",
+   "value": "^(?:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\\s\\-/']?(\\d{2,4}))$|^(\\d{4})[\\-/\\.](\\d{1,2})$|^(\\d{2,4})\\s*年\\s*(\\d{1,2})\\s*月$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "Dec-24"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "temporal",
+   "key": "QUARTER",
+   "kind": "regex",
+   "value": "^([1-4])Q[\\s\\-]?(\\d{2,4})\\s*[\\(（]?[AEFPaefp]?[\\)）]?$|^(\\d{2,4})Q([1-4])\\s*[\\(（]?[AEFPaefp]?[\\)）]?$|^Q([1-4])[\\s\\-']?(\\d{2,4})$|^(\\d{2,4})\\s*年?\\s*第?([1-4])\\s*季$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "2024Q1",
+     "24Q1",
+     "1Q24"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "temporal",
+   "key": "YEAR",
+   "kind": "regex",
+   "value": "^(?:FY|CY|年度)?[\\s\\-]?(?:(19|20)?(\\d{2}))\\s*(?:年度?)?\\s*[\\(（]?(?:[AEFPaefp]|實際|預估|Act|Est|F)?[\\)）]?$|^(?:1[0-2])/(\\d{2})[AEFPaefp]?$|^(1[01]\\d)\\s*年[AEFP]?$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "FY24",
+     "FY-23"
+    ],
+    "miss_wrongly": [
+     "99"
+    ]
+   }
+  },
+  {
+   "ns": "temporal",
+   "key": "Year_Quarter_Extraction",
+   "kind": "regex",
+   "value": "(?:(?:20)?\\d{2}(?:\\.|\\s*)?Q[1-4])|(?:(?:20)?\\d{2}(?:年)?)",
+   "sources": [
+    "VRN2_Regex_v0103.json(MasterDict)"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "2024-08-01",
+     "2024/08/01",
+     "20240801",
+     "1130801",
+     "2024Q1",
+     "24Q1",
+     "1Q24",
+     "FY24",
+     "FY-23",
+     "Dec-24",
+     "2025/8/19"
+    ],
+    "miss_wrongly": [
+     "99"
+    ]
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ANY.TW_BB_TICKER",
+   "kind": "regex",
+   "value": "^((?:[1-9]\\d{3})|(?:00\\d{2,3}[ABDLRTUV]?))\\sTT$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "2330 TT"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ANY.TW_TICKER",
+   "kind": "regex",
+   "value": "^((?:[1-9]\\d{3})|(?:00\\d{2,3}[ABDLRTUV]?))$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "2330",
+     "6488",
+     "0050",
+     "00878",
+     "00981A",
+     "00679B",
+     "00631L",
+     "00632R",
+     "00635U",
+     "00701T"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ANY.TW_YF_TICKER",
+   "kind": "regex",
+   "value": "^((?:[1-9]\\d{3})|(?:00\\d{2,3}[ABDLRTUV]?))\\.(TW|TWO)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "2330.TW",
+     "6488.TWO",
+     "0050.TW"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_BALANCED.TW_BB_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}T)\\sTT$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "平衡型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_BALANCED.TW_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}T)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "平衡型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "00701T"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_BALANCED.TW_YF_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}T)\\.(TW|TWO)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "平衡型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_BOND_ACTIVE.TW_BB_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}D)\\sTT$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "主動債券 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_BOND_ACTIVE.TW_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}D)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "主動債券 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_BOND_ACTIVE.TW_YF_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}D)\\.(TW|TWO)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "主動債券 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_BOND_PASSIVE.TW_BB_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}B)\\sTT$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "被動債券 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_BOND_PASSIVE.TW_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}B)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "被動債券 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "00679B"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_BOND_PASSIVE.TW_YF_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}B)\\.(TW|TWO)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "被動債券 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_EQUITY_ACTIVE.TW_BB_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}A)\\sTT$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "主動股票 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_EQUITY_ACTIVE.TW_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}A)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "主動股票 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "00981A"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_EQUITY_ACTIVE.TW_YF_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}A)\\.(TW|TWO)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "主動股票 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_EQUITY_PASSIVE.TW_BB_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3})\\sTT$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "被動股票 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_EQUITY_PASSIVE.TW_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3})$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "被動股票 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "0050",
+     "00878"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_EQUITY_PASSIVE.TW_YF_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3})\\.(TW|TWO)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "被動股票 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "0050.TW"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_FUTURES.TW_BB_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}[UV])\\sTT$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "期貨型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_FUTURES.TW_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}[UV])$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "期貨型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "00635U"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_FUTURES.TW_YF_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}[UV])\\.(TW|TWO)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "期貨型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_INVERSE.TW_BB_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}R)\\sTT$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "反向型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_INVERSE.TW_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}R)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "反向型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "00632R"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_INVERSE.TW_YF_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}R)\\.(TW|TWO)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "反向型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_LEVERAGED.TW_BB_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}L)\\sTT$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "槓桿型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_LEVERAGED.TW_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}L)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "槓桿型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "00631L"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "ETF_LEVERAGED.TW_YF_TICKER",
+   "kind": "regex",
+   "value": "^(00\\d{2,3}L)\\.(TW|TWO)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "槓桿型 ETF",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "FIRST4_PRINCIPLE",
+   "kind": "rule",
+   "value": {
+    "rule": "需與第一頁 TWSE (4碼)、Yahoo Finance (4碼+.TW/.TWO) 或 Bloomberg (4碼+ TT) 三平台規格對照完全一致。若檔名萃取出的前4個數字與首頁的定義相符,即確認代碼擷取成功。",
+    "check": "檔名萃取的前 4 碼數字 == 首頁代號(TWSE 4 碼 / yfinance 4 碼 / Bloomberg 4 碼)→ 代碼擷取成功;三種形式共用同一 4 碼基礎,只差市場後綴 · 相互填滿:有任一種即可推出 BLOOMBERG;YFINANCE 需市場別"
+   },
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "ticker",
+   "key": "IDENTITY_RULE",
+   "kind": "rule",
+   "value": "TWSE→.TW · TPEX→.TWO · 'XXXX TT' · 市場不明不猜尾綴 · 名冊排除 ETF / 權證 / 興櫃",
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK"
+  },
+  {
+   "ns": "ticker",
+   "key": "STOCK.TW_BB_TICKER",
+   "kind": "regex",
+   "value": "^([1-9]\\d{3})\\sTT$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "一般個股 (Stock)",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "2330 TT"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "STOCK.TW_TICKER",
+   "kind": "regex",
+   "value": "^([1-9]\\d{3})$",
+   "sources": [
+    "VDF_TW_DataFetchEngine_v0037.py",
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "一般個股 (Stock)",
+   "number": "",
+   "variants": [
+    {
+     "value": "^[1-9]\\d{3}$",
+     "sources": [
+      "VDF_TW_DataFetchEngine_v0037.py"
+     ],
+     "vectors": {
+      "hit": [
+       "2330",
+       "6488"
+      ],
+      "miss_wrongly": []
+     },
+     "equivalent": true
+    }
+   ],
+   "status": "EQUIVALENT",
+   "vectors": {
+    "hit": [
+     "2330",
+     "6488"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "STOCK.TW_YF_TICKER",
+   "kind": "regex",
+   "value": "^([1-9]\\d{3})\\.(TW|TWO)$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "一般個股 (Stock)",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "2330.TW",
+     "6488.TWO"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "TW_TICKER",
+   "kind": "regex",
+   "value": "(?<!\\d)([1-9]\\d{3})(?!\\d)",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "2330",
+     "6488",
+     "2330.TW",
+     "6488.TWO",
+     "2330 TT"
+    ],
+    "miss_wrongly": []
+   }
+  },
+  {
+   "ns": "ticker",
+   "key": "TW_TICKER_BASE",
+   "kind": "regex",
+   "value": "^([1-9]\\d{3})$",
+   "sources": [
+    "VRN2_Regex_v0103.json"
+   ],
+   "note": "",
+   "number": "",
+   "variants": [],
+   "status": "OK",
+   "vectors": {
+    "hit": [
+     "2330",
+     "6488"
+    ],
+    "miss_wrongly": []
+   }
+  }
+ ]
+}

@@ -1,0 +1,528 @@
+{
+ "schema": "VIA.VRN.MasterDict.v1",
+ "version": "v0100",
+ "rule": "操作員 2026-10-10 貼入 4 版 VIA_MASTER_SSOT_DICTIONARY → 聯集去重 · 一筆不丟;CLSA=CLST 同一家;MCQ=麥格理;去大陸公司(本冊 4 版本來就沒有大陸券商;統一券商冊另去中金 / 中銀國際 / 廣發)",
+ "provenance": {
+  "variants": {
+   "A": "原版(日期正則較寬 · 季度只認 Q)",
+   "B": "+ 民國 7 碼 / 英文月份日期 · 年度 YYYY年/YY年",
+   "C": "結構重排(DATE_AND_TICKER_PATTERNS)+ _cite 標記",
+   "D": "同 C · 全部 _cite · 目標價別名少 3 個(TARGET PRICE / PRICE TARGET / TARGET)"
+  },
+  "dropped": "_cite 欄位(\"[cite: 2]\" 等)= 產生工具的引用標記,不是資料 → 不收",
+  "conflicts": "無(券商 / 評等 4 版完全一致;差異只在日期 / 季度正則與目標價別名,已聯集)"
+ },
+ "DOMESTIC_BROKERS": {
+  "YUANTA": {
+   "chinese_name": "元大證券",
+   "english_name": "Yuanta Securities",
+   "aliases": [
+    "元大",
+    "元大投顧",
+    "Yuanta",
+    "元大證券",
+    "Yuanta Securities"
+   ]
+  },
+  "KGI": {
+   "chinese_name": "凱基證券",
+   "english_name": "KGI Securities",
+   "aliases": [
+    "凱基",
+    "凱基投顧",
+    "KGI",
+    "凱基證券",
+    "KGI Securities"
+   ]
+  },
+  "FUBON": {
+   "chinese_name": "富邦證券",
+   "english_name": "Fubon Securities",
+   "aliases": [
+    "富邦",
+    "富邦投顧",
+    "Fubon",
+    "富邦證券",
+    "Fubon Securities"
+   ]
+  },
+  "CAPITAL": {
+   "chinese_name": "群益金鼎證券",
+   "english_name": "Capital Securities",
+   "aliases": [
+    "群益",
+    "群益投顧",
+    "Capital",
+    "群益金鼎證券",
+    "Capital Securities"
+   ]
+  },
+  "MASTERLINK": {
+   "chinese_name": "元富證券",
+   "english_name": "MasterLink Securities",
+   "aliases": [
+    "元富",
+    "元富投顧",
+    "MasterLink",
+    "元富證券",
+    "MasterLink Securities"
+   ]
+  },
+  "SINOPAC": {
+   "chinese_name": "永豐金證券",
+   "english_name": "SinoPac Securities",
+   "aliases": [
+    "永豐",
+    "永豐金",
+    "永豐投顧",
+    "SinoPac",
+    "永豐金證券",
+    "SinoPac Securities"
+   ]
+  },
+  "PRESIDENT": {
+   "chinese_name": "統一證券",
+   "english_name": "President Securities",
+   "aliases": [
+    "統一",
+    "統一投顧",
+    "President",
+    "統一證券",
+    "President Securities"
+   ]
+  },
+  "MEGA": {
+   "chinese_name": "兆豐證券",
+   "english_name": "Mega Securities",
+   "aliases": [
+    "兆豐",
+    "兆豐投顧",
+    "Mega",
+    "兆豐證券",
+    "Mega Securities"
+   ]
+  },
+  "CATHAY": {
+   "chinese_name": "國泰證券",
+   "english_name": "Cathay Securities",
+   "aliases": [
+    "國泰",
+    "國泰期貨",
+    "國泰投顧",
+    "Cathay",
+    "國泰證券",
+    "Cathay Securities"
+   ]
+  },
+  "TAISHIN": {
+   "chinese_name": "台新證券",
+   "english_name": "Taishin Securities",
+   "aliases": [
+    "台新",
+    "台新投顧",
+    "Taishin",
+    "台新證券",
+    "Taishin Securities"
+   ]
+  },
+  "CTBC": {
+   "chinese_name": "中國信託證券",
+   "english_name": "CTBC Securities",
+   "aliases": [
+    "中信",
+    "中信證",
+    "中信投顧",
+    "中國信託",
+    "CTBC",
+    "中國信託證券",
+    "CTBC Securities"
+   ]
+  },
+  "FIRST": {
+   "chinese_name": "第一金證券",
+   "english_name": "First Securities",
+   "aliases": [
+    "第一金",
+    "第一金投顧",
+    "First",
+    "第一金證券",
+    "First Securities"
+   ]
+  },
+  "HUANAN": {
+   "chinese_name": "華南永昌證券",
+   "english_name": "Hua Nan Securities",
+   "aliases": [
+    "華南",
+    "華南永昌",
+    "華南投顧",
+    "Hua Nan",
+    "華南永昌證券",
+    "Hua Nan Securities"
+   ]
+  },
+  "ESUN": {
+   "chinese_name": "玉山證券",
+   "english_name": "E.SUN Securities",
+   "aliases": [
+    "玉山",
+    "玉山投顧",
+    "E.SUN",
+    "玉山證券",
+    "E.SUN Securities"
+   ]
+  },
+  "WATERLAND": {
+   "chinese_name": "國票證券",
+   "english_name": "Waterland Securities",
+   "aliases": [
+    "國票",
+    "國票投顧",
+    "國票華頓",
+    "Waterland",
+    "國票證券",
+    "Waterland Securities"
+   ]
+  },
+  "CONCORD": {
+   "chinese_name": "康和證券",
+   "english_name": "Concord Securities",
+   "aliases": [
+    "康和",
+    "康和投顧",
+    "Concord",
+    "康和證券",
+    "Concord Securities"
+   ]
+  }
+ },
+ "FOREIGN_BROKERS": {
+  "MS": {
+   "chinese_name": "摩根士丹利",
+   "english_name": "Morgan Stanley",
+   "aliases": [
+    "大摩",
+    "摩根士丹利",
+    "Morgan Stanley",
+    "MS"
+   ]
+  },
+  "JPM": {
+   "chinese_name": "摩根大通",
+   "english_name": "J.P. Morgan",
+   "aliases": [
+    "小摩",
+    "摩根大通",
+    "摩通",
+    "JPM",
+    "JPMorgan",
+    "J.P. Morgan"
+   ]
+  },
+  "GS": {
+   "chinese_name": "高盛",
+   "english_name": "Goldman Sachs",
+   "aliases": [
+    "高盛",
+    "Goldman Sachs",
+    "GS"
+   ]
+  },
+  "UBS": {
+   "chinese_name": "瑞銀證券",
+   "english_name": "UBS",
+   "aliases": [
+    "瑞銀",
+    "瑞士銀行",
+    "UBS",
+    "瑞銀證券"
+   ]
+  },
+  "BOA": {
+   "chinese_name": "美林證券",
+   "english_name": "BofA Securities",
+   "aliases": [
+    "美林",
+    "美銀",
+    "美銀證券",
+    "BOA",
+    "BofA",
+    "Merrill Lynch",
+    "ML",
+    "美林證券",
+    "BofA Securities"
+   ]
+  },
+  "CITI": {
+   "chinese_name": "花旗環球證券",
+   "english_name": "Citigroup",
+   "aliases": [
+    "花旗",
+    "花旗環球",
+    "Citi",
+    "Citigroup",
+    "花旗環球證券"
+   ]
+  },
+  "MCQ": {
+   "chinese_name": "麥格理資本",
+   "english_name": "Macquarie",
+   "aliases": [
+    "麥格理",
+    "Macquarie",
+    "MCQ",
+    "MQ",
+    "麥格理資本",
+    "Macquarie Capital"
+   ],
+   "operator_added": [
+    "麥格理資本",
+    "Macquarie Capital"
+   ]
+  },
+  "NOMURA": {
+   "chinese_name": "野村證券",
+   "english_name": "Nomura",
+   "aliases": [
+    "野村",
+    "Nomura",
+    "野村證券"
+   ]
+  },
+  "CLSA": {
+   "chinese_name": "里昂證券",
+   "english_name": "CLSA",
+   "aliases": [
+    "里昂",
+    "CLSA",
+    "里昂證券",
+    "CLST"
+   ],
+   "operator_added": [
+    "CLST",
+    "里昂證券"
+   ]
+  },
+  "HSBC": {
+   "chinese_name": "匯豐證券",
+   "english_name": "HSBC",
+   "aliases": [
+    "匯豐",
+    "HSBC",
+    "匯豐證券"
+   ]
+  },
+  "DAIWA": {
+   "chinese_name": "大和資本",
+   "english_name": "Daiwa Capital Markets",
+   "aliases": [
+    "大和",
+    "大和資本",
+    "Daiwa",
+    "Daiwa Capital Markets"
+   ]
+  },
+  "CS": {
+   "chinese_name": "瑞士信貸",
+   "english_name": "Credit Suisse",
+   "aliases": [
+    "瑞信",
+    "瑞士信貸",
+    "CS",
+    "Credit Suisse"
+   ]
+  }
+ },
+ "TICKER_PATTERNS": {
+  "Stock_Base": {
+   "Regex": "^([1-9]\\d{3})$",
+   "Description": "4碼數字,且第1碼不可以為零。"
+  },
+  "Validation_Rule": "需與第一頁 TWSE (4碼)、Yahoo Finance (4碼+.TW/.TWO) 或 Bloomberg (4碼+ TT) 三平台規格對照完全一致。若檔名萃取出的前4個數字與首頁的定義相符,即確認代碼擷取成功。"
+ },
+ "DATE_AND_TIME_PATTERNS": {
+  "Date_Extraction": {
+   "Regex": "(?:(?:20)?\\d{2}[-/]?\\d{2}[-/]?\\d{2})|(?:11\\d{5})|(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\s+\\d{1,2},?\\s+\\d{4})",
+   "Validation_Rule": "從檔案名稱擷取之日期,必須與首頁左右資訊區所截取之報告日期完全對照相同。",
+   "Patterns": [
+    "8碼數字 (例如: 20250122)",
+    "7碼數字 (包含民國年, 例如: 1140122)",
+    "6碼數字 (省略二零, 例如: 250122)",
+    "YYYY-MM-DD",
+    "YYYY/MM/DD",
+    "英文日期格式 (包含英文月份全寫如 January 或簡寫如 Jan)",
+    "YYYY年 (例如: 2025)",
+    "YYYY/MM (例如: 2025/01)"
+   ],
+   "legacy_regex": {
+    "Regex": "(?:(?:20)?\\d{2}[-/]?\\d{2}[-/]?\\d{2})|(?:(?:20)?\\d{2}[-/]\\d{2})|(?:(?:20)?\\d{2})",
+    "from": "A",
+    "note": "最後一段 (?:(?:20)?\\d{2}) 單獨兩位數也會中(過寬)→ 留檔不採用"
+   }
+  },
+  "Year_Quarter_Extraction": {
+   "Regex": "(?:(?:20)?\\d{2}(?:\\.|\\s*)?Q[1-4])|(?:(?:20)?\\d{2}(?:年)?)",
+   "Validation_Rule": "支援各類券商財報/財測季度預估寫法,需與報告內文及表格欄位對齊。",
+   "Patterns": [
+    "YYYY年 (例如: 2025, 2026)",
+    "YY年 (例如: 25, 26)",
+    "YYYY.Q# (例如: 2025.Q1, 2025.Q2)",
+    "YYYYQ# (例如: 2025Q1, 2025Q3)",
+    "YYQ# (例如: 25Q1, 26Q4)"
+   ],
+   "legacy_regex": {
+    "Regex": "(?:(?:20)?\\d{2}(?:\\.|\\s*)?Q[1-4])",
+    "from": "A",
+    "note": "只認季度"
+   },
+   "caution": "第二段 (?:(?:20)?\\d{2}(?:年)?) 單獨兩位數也會中 → 只在表頭期間欄用,不做全文搜尋"
+  }
+ },
+ "TARGET_PRICE_LIST": {
+  "aliases": [
+   "Target Price",
+   "Price Target",
+   "TP",
+   "PT",
+   "Target",
+   "Tgt",
+   "Fair Value",
+   "FV",
+   "Valuation",
+   "目標價",
+   "目標股價",
+   "目標",
+   "合理價",
+   "合理股價",
+   "預期價",
+   "目標區間",
+   "Base Case",
+   "Bull Case",
+   "Bear Case",
+   "TARGET PRICE",
+   "PRICE TARGET",
+   "TARGET"
+  ],
+  "regex_defense_pattern": "(?i)(?:Target|目標(?:價)?)\\s*[:：$]?\\s*[\\d,]+(\\.\\d+)?",
+  "preprocessing_strips": [
+   "NT$",
+   "TWD",
+   "上看",
+   "下看",
+   "元"
+  ],
+  "caution": "「Price target (2026F) NT$650」的年份 / 「Up/downside to price target (%)」的百分比不是目標價(首頁引擎既有教訓)"
+ },
+ "RATING_LIST": {
+  "Strong_Buy": {
+   "code": 1,
+   "aliases": [
+    "Strong Buy",
+    "SB",
+    "強力買進",
+    "積極買進",
+    "買進(強烈)",
+    "買進(強力)",
+    "Conviction Buy",
+    "Trading Buy"
+   ]
+  },
+  "Buy": {
+   "code": 2,
+   "aliases": [
+    "Buy",
+    "Outperform",
+    "OP",
+    "Overweight",
+    "OW",
+    "Long",
+    "買進",
+    "優於大盤",
+    "加碼",
+    "增持",
+    "買進(維持)",
+    "買進(調升)",
+    "買進(重申)",
+    "Accumulate",
+    "收集",
+    "逢低買進",
+    "買進(初次)"
+   ]
+  },
+  "Hold": {
+   "code": 3,
+   "aliases": [
+    "Hold",
+    "Neutral",
+    "N",
+    "Market Perform",
+    "MP",
+    "Equal Weight",
+    "EW",
+    "中立",
+    "持有",
+    "區間操作",
+    "觀望",
+    "維持中立",
+    "中立(調降)",
+    "中立(調升)",
+    "Sector Perform",
+    "Peer Perform",
+    "中性"
+   ]
+  },
+  "Sell": {
+   "code": 4,
+   "aliases": [
+    "Sell",
+    "Underperform",
+    "UP",
+    "Underweight",
+    "UW",
+    "Short",
+    "賣出",
+    "減碼",
+    "劣於大盤",
+    "賣出(調降)",
+    "賣出(重申)",
+    "Reduce",
+    "減持",
+    "逢高減碼",
+    "賣出(初次)"
+   ]
+  },
+  "Strong_Sell": {
+   "code": 5,
+   "aliases": [
+    "Strong Sell",
+    "SS",
+    "強力賣出",
+    "積極賣出",
+    "Conviction Sell"
+   ]
+  },
+  "Not_Rated": {
+   "code": 0,
+   "aliases": [
+    "Not Rated",
+    "NR",
+    "未評等",
+    "No Rating",
+    "N/A",
+    "無評等",
+    "暫無評等",
+    "未覆蓋",
+    "未納入研究範圍",
+    "Coverage Dropped",
+    "CD",
+    "停止覆蓋",
+    "Under Review",
+    "UR",
+    "評等審視中",
+    "Restricted",
+    "受限"
+   ]
+  }
+ },
+ "short_alias_rule": "1~2 字母代碼(N · B · H · S · OP · OW · UP · UW · MP · EW · SB · SS · NR · UR · CD · MS · GS · JP · CS · ML · MQ)只在結構化欄位(評等欄 / 檔名券商槽)比對,不做全文搜尋;全文要字邊界"
+}

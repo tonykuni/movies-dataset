@@ -1,0 +1,675 @@
+{
+ "schema": "VDF-MACRO-KEYWORD/1.0",
+ "version": "v0100",
+ "ts": "2026-11-09",
+ "owner": "VDF",
+ "rule": "操作員 2026-11-09:「所有總體經濟數據都要向下一階、二階層找尋有無次階級及相關資料,如 PMI、PPI、就業相關數據等;可網路搜尋新聞或抓關鍵字,或尋找專業關鍵字後 MacroMicro 的未進入頁面就會出現一些關鍵字」「國際重要序列可容易新增」「FED 需要 API KEY … 使用者仍須自己申請」。",
+ "parent_ssot": "references/intake/VIA_VDF_SSOT_b*/macro_ssot.json(series_registry 的點分碼 = 階層:US.Prices.PPI.FinalDemand.Goods → 家族 PPI · 一階 FinalDemand · 二階 Goods)",
+ "tree_book": "VDF_USMacro_Tree_v0100.json(families · synonyms · finer_on_file · PARKED 原因)",
+ "roster_book": "VDF_USMacro_Detail_Fetch_Roster_v0100.json(已排進擷取的細項)",
+ "policy": {
+  "network": "雙閘(VIA_NET_CONSENT=YES + VIA_SCRAPE_CONSENT)經 SUP_MDL740 NetUnified;本冊與引擎永不代設,閘關 = SKIP 照實記",
+  "fred_key": "FRED_API_KEY 環境變數或輸出根 .fred_api_key;引擎只查有沒有、收據與網址一律遮罩(api_key=***);金鑰由使用者自己向 https://fred.stlouisfed.org/docs/api/api_key.html 申請,先前給的測試鑰不入倉、不寫死",
+  "write": "引擎不改 VDF_FetchGroups 冊;探索到的候選只進 candidates jsonl(只增);要抓才由操作員 `VDF_MDL012_FetchGroups edit <group> add <id> --apply`",
+  "akshare": "AKShare 只做交叉比對車道(VIA_USMacro_SSOT_Process:may cross-check, never replace FRED);候選只標 LANE_ONLY"
+ },
+ "families": [
+  {
+   "id": "pmi",
+   "zh": "採購經理人指數",
+   "code_prefixes": [
+    "US.Business.ISM",
+    "US.Business.SPG",
+    "EU.Business.PMI",
+    "CN.Business.PMI"
+   ],
+   "seeds": [
+    "PMI",
+    "ISM",
+    "採購經理人",
+    "Purchasing Managers"
+   ],
+   "level1": [
+    "製造業 (Mfg)",
+    "服務業 / 非製造業 (Svc)",
+    "綜合 (Composite)"
+   ],
+   "level2": [
+    "PMI 本體 (PMI)",
+    "新訂單 (NewOrders)",
+    "生產 (Production)",
+    "就業 (Employment)",
+    "供應商交貨 (SupplierDeliveries)",
+    "存貨 (Inventories)",
+    "客戶存貨 (CustomerInventories)",
+    "價格 (Prices)",
+    "未完成訂單 (Backlog)",
+    "新出口訂單 (NewExportOrders)",
+    "進口 (Imports)",
+    "商業活動 (BusinessActivity)"
+   ],
+   "fred_series_hint": [
+    "NAPM",
+    "NAPMNOI",
+    "NAPMPI",
+    "NAPMEI",
+    "NAPMSDI",
+    "NAPMII",
+    "NAPMPRI",
+    "NMFCI"
+   ],
+   "fred_search": [
+    "ISM manufacturing PMI",
+    "ISM services PMI",
+    "purchasing managers index new orders"
+   ],
+   "akshare_fns": [
+    "macro_usa_ism_pmi",
+    "macro_usa_ism_non_pmi",
+    "macro_usa_pmi",
+    "macro_usa_services_pmi",
+    "macro_china_pmi",
+    "macro_china_cx_pmi_yearly",
+    "macro_china_cx_services_pmi_yearly",
+    "macro_euro_manufacturing_pmi",
+    "macro_euro_services_pmi"
+   ],
+   "keywords": [
+    "PMI",
+    "ISM",
+    "製造業PMI",
+    "非製造業PMI",
+    "服務業PMI",
+    "新訂單",
+    "供應商交貨",
+    "客戶存貨",
+    "Markit",
+    "S&P Global PMI",
+    "財新PMI",
+    "中採PMI"
+   ]
+  },
+  {
+   "id": "ppi",
+   "zh": "生產者物價",
+   "code_prefixes": [
+    "US.Prices.PPI"
+   ],
+   "seeds": [
+    "PPI",
+    "生產者物價",
+    "Producer Price"
+   ],
+   "level1": [
+    "最終需求 (FinalDemand)",
+    "中間需求 (IntermediateDemand)",
+    "全商品 (AllCommodities)",
+    "扣食品能源 (ExFoodEnergy)"
+   ],
+   "level2": [
+    "最終需求 商品 (Goods)",
+    "最終需求 服務 (Services)",
+    "最終需求 扣除食品能源貿易 (ExFoodEnergyTrade)",
+    "加工中間財 (Processed)",
+    "未加工中間財 (Unprocessed)",
+    "能源 (Energy)",
+    "食品 (Food)"
+   ],
+   "fred_series_hint": [
+    "PPIFIS",
+    "PPIFID",
+    "PPIACO",
+    "PPICOR",
+    "WPSFD49207",
+    "WPSFD4131",
+    "WPSID61",
+    "WPSID62",
+    "WPSFD49104"
+   ],
+   "fred_search": [
+    "producer price index final demand",
+    "producer price index intermediate demand"
+   ],
+   "akshare_fns": [
+    "macro_usa_ppi",
+    "macro_usa_core_ppi",
+    "macro_china_ppi",
+    "macro_china_ppi_yearly"
+   ],
+   "keywords": [
+    "PPI",
+    "生產者物價",
+    "最終需求",
+    "中間需求",
+    "核心PPI",
+    "出廠價格"
+   ]
+  },
+  {
+   "id": "labor",
+   "zh": "就業",
+   "code_prefixes": [
+    "US.Labor"
+   ],
+   "seeds": [
+    "就業",
+    "失業",
+    "非農",
+    "NFP",
+    "Payroll",
+    "Unemployment",
+    "Jobless",
+    "JOLTS"
+   ],
+   "level1": [
+    "非農就業 (NFP)",
+    "失業率 (UnempRate)",
+    "初領失業金 (InitialClaims)",
+    "續領失業金 (ContinuingClaims)",
+    "職缺 (JOLTS)",
+    "平均時薪 (AvgHourlyEarnings)",
+    "每週工時 (AvgWeeklyHours)",
+    "勞參率 (ParticipationRate)",
+    "就業人口比 (EmpPopRatio)",
+    "民間 ADP (ADP)"
+   ],
+   "level2": [
+    "U3",
+    "U4",
+    "U5",
+    "U6",
+    "失業持續期 (Duration)",
+    "平均失業週數 (Mean)",
+    "民間非農 (PrivatePayrolls)",
+    "政府 (GovtPayrolls)",
+    "製造業 (MfgPayrolls)",
+    "營建 (ConstructionPayrolls)",
+    "職缺率 (Openings)",
+    "離職率 (Quits)",
+    "招聘率 (Hires)",
+    "裁員 Challenger (JobCuts)",
+    "生產力 (Productivity)",
+    "單位勞動成本 (UnitLaborCosts)",
+    "就業成本指數 (ECI)"
+   ],
+   "fred_series_hint": [
+    "PAYEMS",
+    "UNRATE",
+    "U4RATE",
+    "U5RATE",
+    "U6RATE",
+    "CIVPART",
+    "EMRATIO",
+    "ICSA",
+    "CCSA",
+    "JTSJOL",
+    "JTSQUR",
+    "JTSHIR",
+    "CES0500000003",
+    "AWHAETP",
+    "UEMPMEAN",
+    "UEMPLT5",
+    "UEMP5TO14",
+    "UEMP15T26",
+    "UEMP27OV"
+   ],
+   "fred_search": [
+    "unemployment rate",
+    "nonfarm payrolls",
+    "job openings",
+    "initial claims",
+    "average hourly earnings"
+   ],
+   "akshare_fns": [
+    "macro_usa_non_farm",
+    "macro_usa_unemployment_rate",
+    "macro_usa_initial_jobless",
+    "macro_usa_adp_employment",
+    "macro_usa_job_cuts",
+    "macro_usa_lmci"
+   ],
+   "keywords": [
+    "非農",
+    "失業率",
+    "初領失業金",
+    "續領",
+    "JOLTS",
+    "職缺",
+    "ADP",
+    "小非農",
+    "平均時薪",
+    "勞動參與率",
+    "U6",
+    "挑戰者裁員"
+   ]
+  },
+  {
+   "id": "cpi",
+   "zh": "消費者物價",
+   "code_prefixes": [
+    "US.Prices.CPI",
+    "US.Prices.PCE"
+   ],
+   "seeds": [
+    "CPI",
+    "PCE",
+    "通膨",
+    "Inflation",
+    "消費者物價"
+   ],
+   "level1": [
+    "CPI 總指數 (Headline)",
+    "核心 CPI (Core)",
+    "PCE (PCE)",
+    "核心 PCE (Core)"
+   ],
+   "level2": [
+    "食品 (Food)",
+    "能源 (Energy)",
+    "住房 (Shelter)",
+    "業主約當租金 (OER)",
+    "醫療 (Medical)",
+    "交通 (Transport)",
+    "服裝 (Apparel)",
+    "核心商品 (CoreGoods)",
+    "核心服務 (CoreServices)",
+    "超級核心 (SuperCore)",
+    "年增 (YoY)",
+    "月增 (MoM)"
+   ],
+   "fred_series_hint": [
+    "CPIAUCSL",
+    "CPILFESL",
+    "PCEPI",
+    "PCEPILFE",
+    "CPIENGSL",
+    "CPIUFDSL",
+    "CUSR0000SAH1",
+    "CUSR0000SEHC",
+    "CPIMEDSL",
+    "CPITRNSL",
+    "CPIAPPSL"
+   ],
+   "fred_search": [
+    "consumer price index shelter",
+    "core PCE price index"
+   ],
+   "akshare_fns": [
+    "macro_usa_cpi_monthly",
+    "macro_usa_core_cpi_monthly",
+    "macro_usa_core_pce_price",
+    "macro_china_cpi",
+    "macro_china_cpi_yearly"
+   ],
+   "keywords": [
+    "CPI",
+    "核心CPI",
+    "PCE",
+    "核心PCE",
+    "住房通膨",
+    "業主約當租金",
+    "超級核心",
+    "通膨預期"
+   ]
+  },
+  {
+   "id": "gdp",
+   "zh": "國內生產毛額",
+   "code_prefixes": [
+    "US.Growth.GDP",
+    "US.Growth.GDPNow"
+   ],
+   "seeds": [
+    "GDP",
+    "經濟成長",
+    "Gross Domestic"
+   ],
+   "level1": [
+    "實質 GDP (Real)",
+    "名目 GDP (Nominal)",
+    "季增年率 (QoQ)",
+    "GDPNow (GDPNow)"
+   ],
+   "level2": [
+    "個人消費 (PCE)",
+    "民間投資 (GPDI)",
+    "政府支出 (GCE)",
+    "淨出口 (NetExports)",
+    "存貨變動 (Inventories)",
+    "GDP 平減指數 (Deflator)"
+   ],
+   "fred_series_hint": [
+    "GDPC1",
+    "GDP",
+    "PCECC96",
+    "GPDIC1",
+    "GCEC1",
+    "NETEXC",
+    "GDPDEF",
+    "A191RL1Q225SBEA"
+   ],
+   "fred_search": [
+    "real gross domestic product",
+    "GDP deflator"
+   ],
+   "akshare_fns": [
+    "macro_usa_gdp_monthly",
+    "macro_china_gdp_yearly",
+    "macro_euro_gdp_yoy"
+   ],
+   "keywords": [
+    "GDP",
+    "經濟成長率",
+    "GDPNow",
+    "個人消費支出",
+    "民間投資",
+    "淨出口"
+   ]
+  },
+  {
+   "id": "rates",
+   "zh": "利率 · 聯準會",
+   "code_prefixes": [
+    "US.Rates",
+    "US.Fed"
+   ],
+   "seeds": [
+    "利率",
+    "聯準會",
+    "Fed",
+    "Treasury",
+    "殖利率",
+    "yield"
+   ],
+   "level1": [
+    "公債殖利率 (Treasury)",
+    "政策利率 (Rates)",
+    "資產負債表 (BalanceSheet)",
+    "TIPS 實質利率 (TIPS)",
+    "利差 (Spread)",
+    "損益兩平通膨 (BreakEven)",
+    "信用利差 (Credit)",
+    "貨幣供給 (MoneySupply)",
+    "前瞻指引 (ForwardGuidance)"
+   ],
+   "level2": [
+    "2 年 (2Y)",
+    "10 年 (10Y)",
+    "30 年 (30Y)",
+    "10y-2y (10Y2Y)",
+    "10y-3m (10Y3M)",
+    "總資產 (TotalAssets)",
+    "準備金 (Reserves)",
+    "TGA (TGA)",
+    "逆回購 (RRP)",
+    "IORB (IORB)",
+    "M2 (M2)"
+   ],
+   "fred_series_hint": [
+    "FEDFUNDS",
+    "DFEDTARU",
+    "IORB",
+    "DGS2",
+    "DGS10",
+    "DGS30",
+    "T10Y2Y",
+    "T10Y3M",
+    "DFII10",
+    "WALCL",
+    "WRESBAL",
+    "WTREGEN",
+    "RRPONTSYD"
+   ],
+   "fred_search": [
+    "treasury constant maturity",
+    "federal funds effective rate",
+    "overnight reverse repurchase"
+   ],
+   "akshare_fns": [
+    "macro_usa_interest_rate",
+    "macro_bank_usa_interest_rate",
+    "macro_china_shibor_all"
+   ],
+   "keywords": [
+    "利率決議",
+    "點陣圖",
+    "殖利率曲線",
+    "倒掛",
+    "縮表",
+    "QT",
+    "準備金",
+    "TGA",
+    "逆回購"
+   ]
+  },
+  {
+   "id": "housing",
+   "zh": "房市",
+   "code_prefixes": [
+    "US.Housing"
+   ],
+   "seeds": [
+    "房市",
+    "Housing",
+    "房屋",
+    "新屋"
+   ],
+   "level1": [
+    "新屋開工 (Starts)",
+    "建照 (BuildingPermits)",
+    "房價 (Prices)",
+    "房貸 (Mortgage)",
+    "新屋銷售 (NewHomeSales)",
+    "成屋銷售 (ExistingHomeSales)"
+   ],
+   "level2": [
+    "單戶 (SingleFamily)",
+    "多戶 (MultiFamily)",
+    "Case-Shiller (CaseShiller)",
+    "FHFA (FHFA)",
+    "30 年房貸利率 (30Y)",
+    "待售屋 (Inventory)",
+    "營建支出 (Construction)"
+   ],
+   "fred_series_hint": [
+    "HOUST",
+    "PERMIT",
+    "HSN1F",
+    "EXHOSLUSM495S",
+    "CSUSHPISA",
+    "SPCS20RSA",
+    "MORTGAGE30US",
+    "TTLCONS"
+   ],
+   "fred_search": [
+    "housing starts",
+    "existing home sales",
+    "case shiller home price"
+   ],
+   "akshare_fns": [
+    "macro_usa_house_starts",
+    "macro_usa_building_permits",
+    "macro_usa_new_home_sales",
+    "macro_usa_exist_home_sales",
+    "macro_usa_house_price_index",
+    "macro_china_new_house_price"
+   ],
+   "keywords": [
+    "新屋開工",
+    "建築許可",
+    "成屋銷售",
+    "Case-Shiller",
+    "房貸利率",
+    "NAHB"
+   ]
+  },
+  {
+   "id": "consumer",
+   "zh": "消費 · 零售 · 信心",
+   "code_prefixes": [
+    "US.Consumer",
+    "US.Business.UMichSentiment",
+    "US.Business.UMichExpectations",
+    "US.Business.ConsumerConfidence",
+    "US.Sentiment"
+   ],
+   "seeds": [
+    "零售",
+    "消費",
+    "信心",
+    "Retail",
+    "Confidence",
+    "Sentiment"
+   ],
+   "level1": [
+    "零售銷售 (RetailSales)",
+    "密大信心 (UMichSentiment)",
+    "密大預期 (UMichExpectations)",
+    "大會議信心 (ConsumerConfidence)",
+    "市場情緒 CNN (CNN)",
+    "AAII (AAII)",
+    "個人所得支出 (PersonalIncome)"
+   ],
+   "level2": [
+    "控制組 (Control)",
+    "扣汽車 (ExAuto)",
+    "恐懼貪婪 (FearGreed)",
+    "Put/Call (PutCall)",
+    "多空差 (BullBearSpread)",
+    "VIX (VIX)",
+    "儲蓄率 (SavingRate)",
+    "實質可支配所得 (RealDPI)",
+    "通膨預期 1y/5y (InflationExpectations)"
+   ],
+   "fred_series_hint": [
+    "RSAFS",
+    "RSXFS",
+    "UMCSENT",
+    "MICH",
+    "PI",
+    "PCE",
+    "PSAVERT",
+    "DSPIC96"
+   ],
+   "fred_search": [
+    "retail sales control group",
+    "consumer sentiment michigan"
+   ],
+   "akshare_fns": [
+    "macro_usa_retail_sales",
+    "macro_usa_michigan_consumer_sentiment",
+    "macro_usa_cb_consumer_confidence",
+    "macro_usa_personal_spending",
+    "macro_china_consumer_goods_retail"
+   ],
+   "keywords": [
+    "零售銷售",
+    "控制組",
+    "密大消費者信心",
+    "大會議消費者信心",
+    "個人所得",
+    "儲蓄率",
+    "通膨預期"
+   ]
+  },
+  {
+   "id": "industry",
+   "zh": "工業 · 耐久財",
+   "code_prefixes": [
+    "US.Growth.IndProd",
+    "US.Growth.DurableGoods",
+    "US.Growth.CapUtil",
+    "US.Business.RegionalFed",
+    "US.Business.NFIB",
+    "US.Business.LEI"
+   ],
+   "seeds": [
+    "工業生產",
+    "耐久財",
+    "Industrial",
+    "Durable",
+    "產能利用"
+   ],
+   "level1": [
+    "工業生產 (IndProd)",
+    "耐久財訂單 (DurableGoods)",
+    "產能利用率 (CapUtil)",
+    "區域聯準會調查 (RegionalFed)",
+    "NFIB 小企業 (NFIB)",
+    "領先指標 (LEI)"
+   ],
+   "level2": [
+    "製造業生產 (Manufacturing)",
+    "耐久財總額 (Total)",
+    "核心資本財 (Core)",
+    "扣運輸 (ExTransport)",
+    "工廠訂單 (FactoryOrders)",
+    "存貨銷售比 (ISRatio)",
+    "費城聯準 (Philly)",
+    "紐約帝國 (Empire)"
+   ],
+   "fred_series_hint": [
+    "INDPRO",
+    "IPMAN",
+    "TCU",
+    "DGORDER",
+    "ADXTNO",
+    "NEWORDER",
+    "AMDMUO",
+    "ISRATIO"
+   ],
+   "fred_search": [
+    "durable goods new orders",
+    "industrial production index",
+    "capacity utilization"
+   ],
+   "akshare_fns": [
+    "macro_usa_industrial_production",
+    "macro_usa_durable_goods_orders",
+    "macro_usa_factory_orders",
+    "macro_china_industrial_production_yoy"
+   ],
+   "keywords": [
+    "工業生產",
+    "耐久財",
+    "核心資本財",
+    "產能利用率",
+    "工廠訂單",
+    "存貨銷售比"
+   ]
+  }
+ ],
+ "web_sources": [
+  {
+   "id": "macromicro_home_zh",
+   "url": "https://www.macromicro.me/",
+   "zh": "財經M平方 首頁(未進頁面即出現的關鍵字:選單 · 熱門圖表 · 新聞標題)",
+   "lane": "http_text",
+   "extract": "anchors+headings"
+  },
+  {
+   "id": "macromicro_home_en",
+   "url": "https://en.macromicro.me/",
+   "zh": "MacroMicro 英文首頁",
+   "lane": "http_text",
+   "extract": "anchors+headings"
+  },
+  {
+   "id": "macromicro_collections",
+   "url": "https://www.macromicro.me/collections",
+   "zh": "財經M平方 主題總表(若頁面存在)",
+   "lane": "http_text",
+   "extract": "anchors+headings"
+  },
+  {
+   "id": "fred_releases",
+   "url": "https://api.stlouisfed.org/fred/releases?file_type=json&limit=1000&api_key={FRED_API_KEY}",
+   "zh": "FRED 發布清單(要金鑰 · 網址遮罩)",
+   "lane": "http_json",
+   "extract": "releases[].name"
+  }
+ ],
+ "news_hint": "新聞關鍵字車道只抓標題 / 連結文字做關鍵字,不存全文、不判斷新聞內容;命中家族 seeds 的關鍵字進候選(kind=keyword),由操作員決定要不要變成序列。",
+ "why_v0100": "VDF 已有美國總經樹(PARKED · 細項 roster)與 AKShare 選單,但沒有「照家族向下一、二階層找子序列」的引擎,也沒有關鍵字探索;本冊把每個家族的一階 / 二階名稱、FRED 已知序列、AKShare 函數、關鍵字寫成冊,引擎讀冊不寫死。",
+ "match_rule": "level1 / level2 名稱括號內的英文 token 對冊上點分碼(不分大小寫);沒括號的中文名只能靠 FRED / 網頁探索找序列"
+}

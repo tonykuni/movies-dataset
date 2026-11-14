@@ -1,0 +1,25 @@
+{
+  "workflow": "VCGC_TokenTools",
+  "version": "v0101",
+  "date": "2026-11-10",
+  "mode": "UNFREEZE(scope=TOOLS)",
+  "protected_paths": ["dict\\VDF\\_active", "functional modules\\VDF"],
+  "pre_gates": ["Hydra", "join", "tools", "inputs"],
+  "post_gates": ["outputs", "ssot_alignment", "no_protected_touch"],
+  "steps": [
+    {"id": "T01", "sink": "nav",     "tool": "Graphify",     "verb": "graphify install --project --strict", "cwd": "VIA_ROOT", "check": ["graphify --version", "graphify-out/GRAPH_REPORT.md exists"], "lamp_if_missing": "RED"},
+    {"id": "T02", "sink": "ghost",   "tool": "claude-mem",   "verb": "cowork-plugin thedotmack/claude-mem", "check": ["~/.claude-mem exists", "worker port 37777 up"], "cap_tokens": 800, "lamp_if_missing": "YELLOW"},
+    {"id": "T03", "sink": "verbose", "tool": "Ponytail",     "verb": "cowork-plugin DietrichGebert/ponytail; /ponytail lite", "check": ["/ponytail reports lite"], "lamp_if_missing": "YELLOW"},
+    {"id": "T04", "sink": "bloat",   "tool": "anydoc",       "verb": "npx skills add firecrawl/anydoc -a claude-code -y", "check": ["anydoc --version"], "cache": "TEMP/via_anydoc/<sha>", "lamp_if_missing": "YELLOW"},
+    {"id": "T05", "sink": "bloat",   "tool": "ctx-split",    "verb": "vcgc ctx split", "outputs": [".claude/ctx/vcgc.md", ".claude/ctx/vdf.md", ".claude/ctx/vrn2.md", ".claude/ctx/vap.md"], "max_lines_each": 120, "lamp_if_missing": "RED"},
+    {"id": "T06", "sink": "rawcli",  "tool": ".claudeignore", "verb": "land file", "outputs": [".claudeignore"], "lamp_if_missing": "RED"},
+    {"id": "T07", "sink": "rawcli",  "tool": "CGC_MDL256",   "verb": "verify paste pack <=300 lines, ends NEXT:", "lamp_if_missing": "RED"},
+    {"id": "T08", "sink": "ghost",   "tool": "VIA_AgentMemory", "verb": "vcgc memory --from ledger --out VIA_AgentMemory.json", "max_tokens": 1200, "readers": ["claude", "manus", "chatgpt", "gemini"], "lamp_if_missing": "YELLOW"},
+    {"id": "T09", "sink": "L0",      "tool": "Filesystem MCP", "verb": "claude mcp add fs -- npx -y @modelcontextprotocol/server-filesystem <VIA_ROOT>", "scope": ["VIA_ROOT"], "lamp_if_missing": "YELLOW"},
+    {"id": "T10", "sink": "L0",      "tool": "GitHub MCP",   "verb": "claude mcp add --transport http github https://api.githubcopilot.com/mcp/", "policy": "read + draft; push/merge manual", "lamp_if_missing": "YELLOW"},
+    {"id": "T11", "sink": "L0",      "tool": "Playwright MCP", "verb": "claude mcp add playwright npx @playwright/mcp@latest", "bridge": "[VIA:NET-BRIDGE:v####]", "lamp_if_missing": "YELLOW"},
+    {"id": "T12", "sink": "measure", "tool": "/cost",        "verb": "record input/output tokens before and after each step", "fail_if": "no reduction after T01-T04", "lamp_if_missing": "RED"}
+  ],
+  "unverified_do_not_install": ["Token Savior", "Caveman", "RTK", "Headroom", "PromptThrift MCP", "token-optimizer-mcp", "Token Optimizer MCP"],
+  "go": ["T01 GREEN", "T05 GREEN", "T06 GREEN", "T07 GREEN", "T12 shows reduction"]
+}

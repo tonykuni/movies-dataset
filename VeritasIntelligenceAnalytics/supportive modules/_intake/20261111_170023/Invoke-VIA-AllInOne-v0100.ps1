@@ -1,0 +1,483 @@
+﻿#requires -Version 7.0
+<#
+Invoke-VIA-AllInOne-v0100.ps1
+Windows PowerShell 7: enter via_vcgc_0194 first, then intake all 17 files.
+Verified v0194 is the main backend. AgentOS runs explicit offline commands.
+No Git operation; no source cleanup; historical JSON actions are not replayed.
+NoWatch = one pass; ScanOnly = skip native install; EnvironmentOnly = venv only.
+Local records are not official SSOT ids or proof of production result accuracy.
+Signature policies apply before this script loads. Use the supplied bootstrap.
+#>
+[CmdletBinding()]
+param(
+    [switch]$EnvironmentOnly,
+    [switch]$ScanOnly,
+    [switch]$NoWatch,
+    [switch]$Offline,
+    [string]$BasePython = '',
+    [string]$EnvironmentRoot = "$env:LOCALAPPDATA\VIA\venvs\via_vcgc_0194",
+    [string]$DownloadsRoot = 'C:\Users\tonyk\Downloads',
+    [string]$RepositoryRoot = 'C:\Users\tonyk\OneDrive\Documents\movies-dataset',
+    [string]$DataRoot = 'C:\Users\tonyk\OneDrive\Documents\VeritasIntelligenceAnalytics',
+    [string]$ReportRoot = "$env:LOCALAPPDATA\VCGC\MultiMatrix_v0194",
+    [string]$IntakeRoot = "$env:LOCALAPPDATA\VCGC\UnifiedIntake_v0100",
+    [ValidateRange(1,4)][int]$Workers = 1
+)
+
+# 01. Parameters and embedded code. Only missing PyArrow can be installed in the venv; no fixed py -3.12 dependency.
+$ViaPythonProbe = 'import json,sys,venv; print(json.dumps({"executable":sys.executable,"prefix":sys.prefix,"version":list(sys.version_info[:3])}))'
+$ViaCatalogJson = @'
+[
+  {
+    "id": "I001",
+    "name": "VIA_Flow_Overview_Console.md",
+    "role": "流程說明／參考",
+    "sha256": null
+  },
+  {
+    "id": "I002",
+    "name": "Start-VCGC-v0194.ps1",
+    "role": "舊啟動器／參考",
+    "sha256": "9a91572dcc0ab07ceb5c8035723308daee4dafb8d481f8879e2e42256671d5bb"
+  },
+  {
+    "id": "I003",
+    "name": "VCGC_MultiMatrix_Integration_v0193.zip",
+    "role": "前版相容性／比較",
+    "sha256": "faf995f2ca66ed5159c0d05f4102e2a4d77570e2d70940d68f5fb14b5727725b"
+  },
+  {
+    "id": "I004",
+    "name": "VCGC_MultiMatrix_Resilience_v0194.zip",
+    "role": "主引擎／測試／安裝",
+    "sha256": "4f1b0307c01fd78893276d4eb3feec644f55a778997159b34e19b13f1837f6d8"
+  },
+  {
+    "id": "I005",
+    "name": "README_v0194.md",
+    "role": "v0194 操作說明",
+    "sha256": "36cd143d6aff12c37b8a87194f9879efeab12cd6be18df428e2230d24a5b8fda"
+  },
+  {
+    "id": "I006",
+    "name": "VCGC_MultiMatrix_v0194.html",
+    "role": "前端參考／主介面取自驗證套件",
+    "sha256": "dd5528ed865b27e98d4767ac4fabd514ff8933d48aef5b6fa0eb6371226468fc"
+  },
+  {
+    "id": "I007",
+    "name": "VIA_MultiMatrix_UI_Design_v0101.html",
+    "role": "UI 設計參考",
+    "sha256": "4e8ddff9dc48891818ef55a1cf0bc48b718625e849176c5fbd2835f3a8f17fa3"
+  },
+  {
+    "id": "I008",
+    "name": "VIA_Matrix_Design_v0101.zip",
+    "role": "矩陣設計／契約參考",
+    "sha256": "39fe47241c42ec01ae1e0def51817b627545d46a31a7c510be5278a7c5fa0fbe"
+  },
+  {
+    "id": "I009",
+    "name": "VCGC_Panorama_v0100.zip",
+    "role": "全景分析舊版／比較",
+    "sha256": "355136f2c028b00165ae89e6e3b8e8862f41a3d6b1ce2dc650ddeb45fedce1e1"
+  },
+  {
+    "id": "I010",
+    "name": "VIA_Tidy_Manifest_20261107_080509.json",
+    "role": "整理清冊／唯讀解析",
+    "sha256": null
+  },
+  {
+    "id": "I011",
+    "name": "VIA_Intake_Manifest_20261107_080551.json",
+    "role": "接收清冊／唯讀解析",
+    "sha256": null
+  },
+  {
+    "id": "I012",
+    "name": "VIA_Tidy_Manifest_20261107_080002.json",
+    "role": "整理清冊／唯讀解析",
+    "sha256": null
+  },
+  {
+    "id": "I013",
+    "name": "VIA_Intake_Manifest_20261107_080002.json",
+    "role": "接收清冊／唯讀解析",
+    "sha256": null
+  },
+  {
+    "id": "I014",
+    "name": "VIA_AgentOS_v0300_Preview.html",
+    "role": "AgentOS 預覽參考",
+    "sha256": null
+  },
+  {
+    "id": "I015",
+    "name": "VIA_AgentOS_VCGC_QA_v0300.json",
+    "role": "歷史 QA／本輪另外測試",
+    "sha256": null
+  },
+  {
+    "id": "I016",
+    "name": "VIA_AgentOS_VCGC_README_v0300.md",
+    "role": "AgentOS 操作說明",
+    "sha256": null
+  },
+  {
+    "id": "I017",
+    "name": "VIA_SystemIntegrationEngine_v0300.py",
+    "role": "AgentOS 無伺服器測試／報告",
+    "sha256": "97ca853d253ea58194a2938762899624852f8651c9853fa3224d93d46855f304"
+  }
+]
+'@
+$ViaController = @'
+# Embedded in the single PowerShell deliverable; no additional Python download.
+import ast, contextlib, hashlib, html, importlib.util, io, json, ntpath, os, re, shutil, stat, sys, tempfile, time, uuid, webbrowser, zipfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+MAX_INPUT_BYTES = 128 * 1024 * 1024
+MAX_ARCHIVE_BYTES = 512 * 1024 * 1024
+MAX_ARCHIVE_ENTRIES = 10000
+AGENT_TIMEOUT = 300
+DEPENDENCY_INDEX = 'https://pypi.org/simple'
+DEPENDENCY_SPEC = 'pyarrow'
+ENGINE_NAME = 'CGC_MDL149_VeritasCentralGovernanceConsole_v0194.py'
+ENGINE_HASH = '66e8333349f53ce8269214cafa775035dd0f2582f2dac34066693416ffe69f6d'
+FRONTEND_NAME = 'VCGC_MultiMatrix_v0194.html'
+ACTIVE_ARCHIVE = 'VCGC_MultiMatrix_Resilience_v0194.zip'
+AGENT_NAME = 'VIA_SystemIntegrationEngine_v0300.py'
+AGENT_HASH = '97ca853d253ea58194a2938762899624852f8651c9853fa3224d93d46855f304'
+
+def now():
+    return datetime.now(timezone.utc).isoformat(timespec='seconds')
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def strict_json(raw):
+    def pairs(items):
+        result={}
+        for key,value in items:
+            if key in result:raise ValueError('DUPLICATE_JSON_KEY: '+key)
+            result[key]=value
+        return result
+    return json.loads(raw,object_pairs_hook=pairs,parse_constant=lambda x:(_ for _ in ()).throw(ValueError('NONFINITE_JSON: '+x)))
+
+def atomic(path, value):
+    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
+    data=value if isinstance(value,bytes) else (json.dumps(value,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode('utf-8')
+    fd,temp=tempfile.mkstemp(dir=path.parent,prefix='.'+path.name,suffix='.tmp')
+    try:
+        with os.fdopen(fd,'wb') as stream:stream.write(data);stream.flush();os.fsync(stream.fileno())
+        os.replace(temp,path)
+    finally:
+        with contextlib.suppress(FileNotFoundError):os.unlink(temp)
+
+def stable_read(path):
+    for attempt in range(3):
+        before=path.stat()
+        if before.st_size>MAX_INPUT_BYTES:raise ValueError('INPUT_SIZE_LIMIT')
+        data=path.read_bytes();after=path.stat()
+        if len(data)==after.st_size and (before.st_size,before.st_mtime_ns,before.st_ino)==(after.st_size,after.st_mtime_ns,after.st_ino):return data
+        time.sleep(0.05)
+    raise ValueError('SOURCE_CHANGED_DURING_READ')
+
+def checked_archive(data):
+    archive=zipfile.ZipFile(io.BytesIO(data));entries=archive.infolist();seen=set();total=0
+    try:
+        if len(entries)>MAX_ARCHIVE_ENTRIES:raise ValueError('ZIP_ENTRY_LIMIT')
+        for entry in entries:
+            name=entry.filename.replace('\\','/');parts=name.rstrip('/').split('/');total+=entry.file_size
+            if not name or name.startswith('/') or ntpath.splitdrive(name)[0] or any(p in ('','..','.') for p in parts):raise ValueError('ZIP_PATH_ESCAPE')
+            if any(re.search(r'[<>:"|?*\x00-\x1f]',p) or p.endswith((' ','.')) or p.split('.')[0].upper() in {'CON','PRN','AUX','NUL',*[f'COM{i}' for i in range(1,10)],*[f'LPT{i}' for i in range(1,10)]} for p in parts):raise ValueError('ZIP_WINDOWS_PATH')
+            key=name.rstrip('/').casefold()
+            if key in seen:raise ValueError('ZIP_DUPLICATE_CASEFOLD_PATH')
+            seen.add(key)
+            if stat.S_ISLNK(entry.external_attr>>16):raise ValueError('ZIP_LINK_BLOCKED')
+            if entry.flag_bits&1:raise ValueError('ZIP_ENCRYPTED')
+            if entry.file_size>MAX_INPUT_BYTES or total>MAX_ARCHIVE_BYTES:raise ValueError('ZIP_EXPANSION_LIMIT')
+        return archive,entries,total
+    except Exception:archive.close();raise
+
+def extract_archive(data, destination):
+    archive,entries,total=checked_archive(data);destination=Path(destination)
+    try:
+        if shutil.disk_usage(destination.parent).free<total*2+32*1024*1024:raise OSError('ZIP_DISK_RESERVE')
+        destination.mkdir(exist_ok=False)
+        for entry in entries:
+            target=destination.joinpath(*entry.filename.replace('\\','/').rstrip('/').split('/'))
+            if entry.is_dir():target.mkdir(parents=True,exist_ok=True)
+            else:atomic(target,archive.read(entry))
+        return {'entries':len(entries),'uncompressed_bytes':total,'path':str(destination)}
+    finally:archive.close()
+
+def inspect_asset(spec, downloads, copies, packages):
+    source=downloads/spec['name'];row={'id':spec['id'],'name':spec['name'],'role':spec['role'],'version':(re.search(r'_v(\d{4})',spec['name']) or re.search(r'-v(\d{4})',spec['name'])).group(1) if re.search(r'[_-]v\d{4}',spec['name']) else 'UNDECLARED','path':str(source),'status':'YELLOW','state':'MISSING','official_ssot_id':None,'observed_at':now(),'expected_sha256':spec.get('sha256')}
+    if not source.is_file():return row
+    try:
+        if source.is_symlink():raise ValueError('INPUT_SYMLINK')
+        data=stable_read(source);actual=sha(data);row.update(sha256=actual,bytes=len(data),updated_at=datetime.fromtimestamp(source.stat().st_mtime,timezone.utc).isoformat())
+        known=bool(spec.get('sha256'));matched=known and actual==spec['sha256'];row['provenance']='KNOWN_HASH_MATCH' if matched else 'HASH_MISMATCH' if known else 'USER_INPUT_UNPINNED'
+        snapshot=copies/spec['name'];atomic(snapshot,data);row['snapshot_path']=str(snapshot)
+        if known and not matched:raise ValueError('HASH_MISMATCH_NOT_EXECUTED')
+        suffix=source.suffix.lower()
+        if suffix=='.zip':
+            # Only reviewed, hash-pinned packages are expanded. Unknown archives stay inventoried.
+            if matched:row['archive']=extract_archive(data,packages/source.stem);row['state']='EXTRACTED_SEPARATE_VERSION';row['status']='GREEN'
+            else:
+                archive,entries,total=checked_archive(data);archive.close();row.update(state='ARCHIVE_REVIEW_ONLY',archive={'entries':len(entries),'uncompressed_bytes':total})
+        elif suffix=='.json':
+            obj=strict_json(data.decode('utf-8-sig'));row['json']={'root_type':type(obj).__name__,'top_level_keys':list(obj)[:60] if isinstance(obj,dict) else [],'top_level_count':len(obj) if isinstance(obj,(dict,list)) else None}
+            row['state']='JSON_PARSED_ACTIONS_NOT_REPLAYED' if 'Manifest' in source.name else 'HISTORICAL_QA_NOT_CURRENT_PROOF'
+        elif suffix=='.py':
+            tree=ast.parse(data.decode('utf-8-sig'),filename=str(source));defs=[n.name for n in tree.body if isinstance(n,(ast.FunctionDef,ast.ClassDef))];row['ast']={'top_level_definitions':len(defs),'duplicate_names':sorted({n for n in defs if defs.count(n)>1})};row['state']='AST_PARSED_EXECUTION_PENDING' if matched else 'AST_PARSED_NOT_EXECUTED'
+        else:row['state']='REFERENCE_REGISTERED_NOT_EXECUTED';row['status']='GREEN' if matched else 'YELLOW'
+    except Exception as error:row.update(status='RED',state='INSPECTION_BLOCKED',error=type(error).__name__+': '+str(error))
+    return row
+
+def duplicate_inventory(packages):
+    by_name={}
+    for path in packages.rglob('*'):
+        if path.is_file():by_name.setdefault(path.name.casefold(),[]).append({'path':str(path),'sha256':sha(path.read_bytes())})
+    return [{'name':name,'decision':'IDENTICAL_KEEP_PROVENANCE' if len({r['sha256'] for r in entries})==1 else 'DIFFERENT_KEEP_SEPARATE','sources':entries} for name,entries in sorted(by_name.items()) if len(entries)>1]
+
+def write_reports(report, root, out):
+    report['updated_at']=now();atomic(root/'VCGC_Intake_Registry_v0100.json',report);atomic(out/'all_in_one_status.json',report)
+    rows=[]
+    for row in report['files']:
+        cols=[row['status'],row['id'],row['name']+' / '+row['version'],row.get('updated_at','—'),row['role'],row['state'],row.get('error',row.get('provenance','NOT_OBSERVED')),row.get('sha256','—')]
+        rows.append('<tr>'+''.join('<td>'+html.escape(str(c))+'</td>' for c in cols)+'</tr>')
+    links=[]
+    for label,path in [('VCGC 主矩陣',out/FRONTEND_NAME),('本次整合清冊',root/'VCGC_Intake_Registry_v0100.json'),('舊套件同名檔比較',root/'VCGC_Archive_Comparison_v0100.json')]:
+        if path.is_file():links.append('<a href="'+html.escape(path.resolve().as_uri(),quote=True)+'">'+html.escape(label)+'</a>')
+    page='''<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VCGC 一鍵整合清冊</title><style>body{font:13px/1.5 system-ui;background:#f1f3eb;color:#193f35;margin:24px}h1{font-size:23px}table{border-collapse:collapse;background:white;width:100%}td,th{border:1px solid #d6ddcf;padding:8px;text-align:left;overflow-wrap:anywhere}a{margin-right:20px}pre{white-space:pre-wrap}section{padding:12px;background:#e4eadb;margin:14px 0}</style><h1>理 · VCGC 一鍵整合清冊 v0100</h1><section>本頁燈號表示檔案接收／驗證狀態；不代表五系統業務結果通過。未知檔案只在本機讀取；無伺服器。新增的清冊是本地納管，正式 SSOT 編號仍待原生裁定。</section>'''
+    page+='<nav>'+' '.join(links)+'</nav><p>狀態：'+html.escape(report['state'])+' · '+html.escape(report['updated_at'])+'</p><div style="overflow:auto"><table><thead><tr>'+''.join('<th>'+c+'</th>' for c in ['燈號','編號','名稱／版本','更新時間','角色','處理狀態','原因／來源','SHA256'])+'</tr></thead><tbody>'+''.join(rows)+'</tbody></table></div><h2>執行紀錄</h2><pre>'+html.escape(json.dumps(report.get('runs',[]),ensure_ascii=False,indent=2))+'</pre><h2>安裝／原生結案</h2><pre>'+html.escape(json.dumps(report.get('installation',{}),ensure_ascii=False,indent=2))+'</pre></html>'
+    atomic(root/'VCGC_AllInOne_Index.html',page.encode('utf-8'));atomic(out/'VCGC_AllInOne_Index.html',page.encode('utf-8'))
+
+def load_backend(path, workers):
+    if sha(path.read_bytes())!=ENGINE_HASH:raise ValueError('BACKEND_HASH_MISMATCH')
+    spec=importlib.util.spec_from_file_location('vcgc_all_backend',path);module=importlib.util.module_from_spec(spec);sys.modules[spec.name]=module;spec.loader.exec_module(module);module.MAX_WORKERS=workers;return module
+
+def ensure_parquet(backend, out, enabled=True):
+    probe=[sys.executable,'-c','import json,pyarrow,pyarrow.parquet; print(json.dumps({"pyarrow":pyarrow.__version__,"path":pyarrow.__file__}))']
+    first=backend.run_process(probe,out,out/'dependency_logs','pyarrow-probe',timeout=30)
+    jobs=[first]
+    if first['exit_code']==0:return jobs
+    if not enabled or sys.prefix==sys.base_prefix:
+        jobs.append({'label':'pyarrow-install','state':'NOT_ATTEMPTED','reason':'Offline requested or not inside a dedicated virtual environment'});return jobs
+    print('[依賴] 虛擬環境缺少可用 PyArrow；從 PyPI 安裝二進位套件並記錄版本／來源。',flush=True)
+    result=backend.run_process([sys.executable,'-m','pip','--isolated','--disable-pip-version-check','install','--only-binary=:all:','--index-url',DEPENDENCY_INDEX,'--retries','1','--timeout','20','--report',str(out/'dependency_install.json'),DEPENDENCY_SPEC],out,out/'dependency_logs','pyarrow-install',timeout=AGENT_TIMEOUT)
+    jobs.append(result)
+    if result['exit_code']==0:
+        verified=backend.run_process(probe,out,out/'dependency_logs','pyarrow-verify',timeout=30);jobs.append(verified)
+        if verified['exit_code']==0:first['state']='RESOLVED_AFTER_INSTALL';first['resolved_by_log']=verified['log']
+    return jobs
+
+def run_agent(backend, agent, out, root, registry):
+    jobs=[('agent-doctor',['--doctor']),('agent-self-test',['--agent-self-test']),('integration-self-test',['--self-test']),('matrix-reference-test',['--matrix-test']),('agent-report',['--agent-report','--project-root',str(root/'sources'),'--vcgc-root',str(registry)])]
+    result=[]
+    for name,args in jobs:
+        print('[AgentOS] '+name,flush=True)
+        job=backend.run_process([sys.executable,str(agent)]+args+['--data-dir',str(root/'agent_evidence'),'--no-browser'],root,out/'agent_logs',name,timeout=AGENT_TIMEOUT)
+        job['scope']='LOCAL_TEST_OR_READ_ONLY_REPORT; NOT_PRODUCTION_ACCEPTANCE';result.append(job)
+        if job['timed_out']:break
+    return result
+
+def main(config):
+    downloads=Path(config['downloads']);out=Path(config['out']);repo=Path(config['repo']);data_root=Path(config['data']);intake=Path(config['intake']);workers=int(config.get('workers',1))
+    if workers not in (1,2,3,4):raise ValueError('WORKER_RANGE')
+    out.mkdir(parents=True,exist_ok=True);intake.mkdir(parents=True,exist_ok=True)
+    # This lock also prevents a second launch from starting duplicate background watchers.
+    lock=intake/'launcher.lock';fd=os.open(lock,os.O_CREAT|os.O_RDWR,0o600);stream=os.fdopen(fd,'r+b',buffering=0);locked=False
+    try:
+        if os.fstat(stream.fileno()).st_size==0:stream.write(b'0')
+        stream.seek(0)
+        if os.name=='nt':
+            import msvcrt
+            msvcrt.locking(stream.fileno(),msvcrt.LK_NBLCK,1)
+        else:
+            import fcntl
+            fcntl.flock(stream.fileno(),fcntl.LOCK_EX|fcntl.LOCK_NB)
+        locked=True
+        run_id=datetime.now().strftime('%Y%m%d_%H%M%S')+'_'+uuid.uuid4().hex[:8];root=intake/run_id;sources=root/'sources';packages=root/'packages';sources.mkdir(parents=True);packages.mkdir()
+        report={'schema':'via.intake.registry/1','direction':'OUTPUT','version':'v0100','run_id':run_id,'state':'INTAKE_RUNNING','files':[],'runs':[],'official_ssot_id':None,'production_validation':'NOT_RUN','source_snapshot_policy':'Listed 17 Downloads files are snapshotted once; rerun to ingest newer downloads.'}
+        for item in config['catalog']:
+            print('[納管] '+item['id']+' '+item['name'],flush=True);report['files'].append(inspect_asset(item,downloads,sources,packages))
+        atomic(root/'VCGC_Archive_Comparison_v0100.json',{'direction':'OUTPUT','comparisons':duplicate_inventory(packages),'policy':'No source deletion or automatic semantic merge'})
+        report['state']='INTAKE_COMPLETED';write_reports(report,root,out)
+        active=next(r for r in report['files'] if r['name']==ACTIVE_ARCHIVE)
+        if active['state']!='EXTRACTED_SEPARATE_VERSION':
+            report['state']='BLOCKED_ACTIVE_PACKAGE';write_reports(report,root,out)
+            if config.get('open',True):webbrowser.open((out/'VCGC_AllInOne_Index.html').as_uri())
+            return 2
+        package=Path(active['archive']['path']);engine=package/ENGINE_NAME;frontend=package/FRONTEND_NAME;backend=load_backend(engine,workers)
+        for label,method,name in [('VCGC selftest',backend.run_selftest,'selftest.json'),('VCGC resilience',backend.run_resilience_tests,'resilience_tests.json')]:
+            print('[測試] '+label,flush=True);qa=method(out/name);report['runs'].append({'name':label,'status':qa['status'],'tests':qa['tests'],'passed':qa['passed'],'scope':qa['scope']})
+            if qa['status']!='PASS':report['state']='BLOCKED_VCGC_TEST';write_reports(report,root,out);return 2
+        report['runs']+=ensure_parquet(backend,out,config.get('auto_dependencies',True))
+        agent=next((r for r in report['files'] if r['name']==AGENT_NAME),None)
+        registry=repo/'VeritasIntelligenceAnalytics'/'supportive modules'/'registry'
+        if agent and agent.get('sha256')==AGENT_HASH and agent['state']=='AST_PARSED_EXECUTION_PENDING':
+            report['runs']+=run_agent(backend,Path(agent['snapshot_path']),out,root,registry)
+        else:report['runs'].append({'name':'AgentOS','status':'NOT_RUN','reason':'Missing or unrecognized source hash; AST/reference inventory retained'})
+        # Optional failures remain visible while VCGC can still provide the diagnostic view.
+        current=backend.tail(registry,'CGC_MDL149_VeritasCentralGovernanceConsole_v*.py')
+        version=backend.version_number(current) if current else 0
+        report['installation']={'native_version':version,'state':'NOT_ATTEMPTED','official_closeout':'PENDING'}
+        if config.get('install',True) and version in (192,193,194):
+            try:
+                print('[VCGC] 版本化安裝／原生註冊',flush=True);result=backend.install([repo],out,frontend,True);report['installation']['result']=result
+                report['installation']['state']='COMMANDS_COMPLETED_PENDING_NATIVE_CLOSEOUT' if backend.command_success(result) else 'REGISTRATION_PENDING'
+            except Exception as error:report['installation'].update(state='INSTALL_BLOCKED',error=str(error))
+        elif config.get('install',True):report['installation'].update(state='UNSUPPORTED_OR_MISSING_NATIVE_PRIOR',reason='Known predecessor must be v0192/v0193; no renaming, no Git merge')
+        else:report['installation']['state']='SCAN_ONLY_REQUESTED'
+        report['state']='LOCAL_INTAKE_READY_PRODUCTION_PENDING'
+        report['pending_commands']=[{'label':r.get('label',r.get('name')),'state':r.get('state',r.get('status')),'log':r.get('log')} for r in report['runs'] if r.get('state') in ('NONZERO','TIMEOUT','NOT_ATTEMPTED') or r.get('status')=='NOT_RUN']
+        write_reports(report,root,out)
+        roots=[str(repo),str(data_root),str(root)]
+        if not any(Path(p).is_dir() for p in roots[:2]):report['state']='BLOCKED_SOURCE_ROOTS';write_reports(report,root,out);return 2
+        print('[VCGC] 掃描原系統＋本次納管資料，workers='+str(workers),flush=True)
+        snapshot=backend.scan(roots,out,frontend,workers,activate=config.get('activate_tools',True));backend.repair_plan(snapshot,out)
+        report['vcgc_snapshot']={'run_id':snapshot['run_id'],'overall':snapshot['overall'],'generated_at':snapshot['generated_at']}
+        # Updating only the report mirror avoids self-triggering changes to the scanned intake registry.
+        atomic(out/'all_in_one_status.json',report)
+        if config.get('open',True):webbrowser.open((out/FRONTEND_NAME).as_uri());webbrowser.open((out/'VCGC_AllInOne_Index.html').as_uri())
+        print('[UI] 報告資料夾：'+str(out),flush=True)
+        if config.get('watch',True):backend.watch(roots,out,frontend)
+        return 0
+    finally:
+        if locked:
+            stream.seek(0)
+            if os.name=='nt':msvcrt.locking(stream.fileno(),msvcrt.LK_UNLCK,1)
+            else:fcntl.flock(stream.fileno(),fcntl.LOCK_UN)
+        stream.close()
+
+if __name__=='__main__':
+    try:raise SystemExit(main(strict_json(Path(sys.argv[1]).read_text(encoding='utf-8-sig'))))
+    except KeyboardInterrupt:print('[VCGC] 已停止；保留所有紀錄。');raise SystemExit(130)
+    except Exception as error:print('[RED] '+type(error).__name__+': '+str(error),file=sys.stderr);raise SystemExit(2)
+
+'@
+
+# 02/03. Complete interpreter and environment functions.
+function Get-ViaPythonInfo {
+    param([Parameter(Mandatory)][string]$Executable)
+    $PSNativeCommandUseErrorActionPreference = $false
+    try {
+        $ViaProbeOutput = @(& $Executable -c $ViaPythonProbe 2>$null)
+        if ($LASTEXITCODE -ne 0) { return $null }
+        $ViaInfo = ($ViaProbeOutput -join "`n") | ConvertFrom-Json -ErrorAction Stop
+        if ($ViaInfo.version[0] -ne 3 -or $ViaInfo.version[1] -lt 11) { return $null }
+        if (-not (Test-Path -LiteralPath $ViaInfo.executable -PathType Leaf)) { return $null }
+        return $ViaInfo
+    } catch { return $null }
+}
+
+function Enter-ViaEnvironment {
+    $ErrorActionPreference = 'Stop'
+    $PSNativeCommandUseErrorActionPreference = $false
+    $ViaEnvPython = Join-Path $EnvironmentRoot 'Scripts\python.exe'
+    $ViaActivate = Join-Path $EnvironmentRoot 'Scripts\Activate.ps1'
+    if (-not (Test-Path -LiteralPath $ViaEnvPython -PathType Leaf)) {
+        if (Test-Path -LiteralPath $EnvironmentRoot) {
+            throw "環境目錄已存在但缺 python.exe；保留原目錄，請檢查：$EnvironmentRoot"
+        }
+        $ViaCandidates = [Collections.Generic.List[string]]::new()
+        if ($BasePython) { $ViaCandidates.Add($BasePython) }
+        if (-not $BasePython) {
+            foreach ($ViaCommand in @(Get-Command python,python3 -All -CommandType Application -ErrorAction SilentlyContinue)) {
+                if ($ViaCommand.Source -notmatch 'WindowsApps') { $ViaCandidates.Add($ViaCommand.Source) }
+            }
+            $ViaPyLauncher = Get-Command py -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($ViaPyLauncher) {
+                # -0p only enumerates installed runtimes; no installer is invoked.
+                foreach ($ViaLine in @(& $ViaPyLauncher.Source -0p 2>$null)) {
+                    if ([string]$ViaLine -match '([A-Za-z]:\\.*\\python(?:\.exe)?)\s*$') {
+                        $ViaCandidates.Add($Matches[1].Trim())
+                    }
+                }
+            }
+        }
+        $ViaBaseInfo = $null
+        foreach ($ViaCandidate in @($ViaCandidates | Select-Object -Unique)) {
+            $ViaBaseInfo = Get-ViaPythonInfo -Executable $ViaCandidate
+            if ($ViaBaseInfo) { break }
+        }
+        if (-not $ViaBaseInfo) { throw '找不到可用 Python 3.11+。可用 -BasePython 指定實際 python.exe；不會自動安裝其他版本。' }
+        New-Item -ItemType Directory -Path (Split-Path -Parent $EnvironmentRoot) -Force | Out-Null
+        Write-Host "[環境] 使用 Python $($ViaBaseInfo.version -join '.')：$($ViaBaseInfo.executable)" -ForegroundColor Cyan
+        & $ViaBaseInfo.executable -m venv --system-site-packages $EnvironmentRoot
+        if ($LASTEXITCODE -ne 0) { throw "建立環境失敗：$EnvironmentRoot" }
+    }
+    if (-not (Test-Path -LiteralPath $ViaActivate -PathType Leaf)) { throw "缺少啟用腳本：$ViaActivate" }
+    . $ViaActivate
+    $ViaInfo = Get-ViaPythonInfo -Executable $ViaEnvPython
+    if (-not $ViaInfo) { throw "環境中的 Python 無法執行：$ViaEnvPython" }
+    if ([IO.Path]::GetFullPath($ViaInfo.prefix).TrimEnd('\') -ine [IO.Path]::GetFullPath($EnvironmentRoot).TrimEnd('\')) {
+        throw 'Python prefix 與指定環境不一致，停止。'
+    }
+    Write-Host "[GREEN] 已進入 via_vcgc_0194 · Python $($ViaInfo.version -join '.')" -ForegroundColor Green
+    Write-Host "        $ViaEnvPython"
+    return $ViaEnvPython
+}
+
+
+# 04. Single entry. A failing phase leaves the PowerShell window open.
+function Start-ViaAllInOne {
+    $ErrorActionPreference = 'Stop'
+    $PSNativeCommandUseErrorActionPreference = $false
+    $ViaTranscriptStarted = $false
+    $ViaOldEncoding = $env:PYTHONIOENCODING
+    $ViaOldBytecode = $env:PYTHONDONTWRITEBYTECODE
+    try {
+        if (-not $IsWindows) { throw '此啟動器需要 Windows PowerShell 7。' }
+        $ViaPython = Enter-ViaEnvironment
+        if ($EnvironmentOnly) { $global:LASTEXITCODE = 0; return }
+        New-Item -ItemType Directory -Path $ReportRoot -Force | Out-Null
+        $ViaLaunchId = (Get-Date -Format 'yyyyMMdd_HHmmss') + '_' + [guid]::NewGuid().ToString('N').Substring(0,8)
+        $ViaLog = Join-Path $ReportRoot ('all_in_one_' + $ViaLaunchId + '.log')
+        try { Start-Transcript -LiteralPath $ViaLog -ErrorAction Stop | Out-Null; $ViaTranscriptStarted = $true }
+        catch { Write-Host '[YELLOW] Transcript 未啟動；引擎仍會保存 JSON 與各階段紀錄。' -ForegroundColor Yellow }
+        $ViaConfigDir = Join-Path $ReportRoot 'launcher_configs'
+        New-Item -ItemType Directory -Path $ViaConfigDir -Force | Out-Null
+        $ViaConfigPath = Join-Path $ViaConfigDir ($ViaLaunchId + '.json')
+        $ViaConfiguration = [ordered]@{
+            downloads = [IO.Path]::GetFullPath($DownloadsRoot)
+            repo = [IO.Path]::GetFullPath($RepositoryRoot)
+            data = [IO.Path]::GetFullPath($DataRoot)
+            out = [IO.Path]::GetFullPath($ReportRoot)
+            intake = [IO.Path]::GetFullPath($IntakeRoot)
+            workers = $Workers
+            install = (-not $ScanOnly.IsPresent)
+            watch = (-not $NoWatch.IsPresent)
+            open = $true
+            activate_tools = $true
+            auto_dependencies = (-not $Offline.IsPresent)
+            catalog = @($ViaCatalogJson | ConvertFrom-Json -AsHashtable -ErrorAction Stop)
+        }
+        $ViaConfiguration | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $ViaConfigPath -Encoding utf8
+        $env:PYTHONIOENCODING = 'utf-8'
+        $env:PYTHONDONTWRITEBYTECODE = '1'
+        Write-Host "[START] 17 個檔案 · workers=$Workers · 本機無伺服器矩陣" -ForegroundColor Cyan
+        Write-Host "[UI] 若需即時刷新，在矩陣選擇報告資料夾：$ReportRoot" -ForegroundColor Cyan
+        Write-Host '[WATCH] Ctrl+C 停止監看；保留環境、紀錄與 PowerShell 視窗。'
+        $ViaController | & $ViaPython - $ViaConfigPath | Out-Host
+        $ViaExitCode = [int]$LASTEXITCODE
+        if ($ViaExitCode -notin @(0,130)) { throw "整合流程停止（exit $ViaExitCode）；檢查：$ReportRoot" }
+        $global:LASTEXITCODE = $ViaExitCode
+        Write-Host '[INFO] 本機測試結果與正式五系統驗收分開記錄；請依矩陣紅黃燈繼續處理。' -ForegroundColor Cyan
+    } catch {
+        $global:LASTEXITCODE = 2
+        Write-Host ('[RED] ' + $_.Exception.Message) -ForegroundColor Red
+        Write-Host '[INFO] 視窗保留。未完成項目維持待處理，不標示正式驗收通過。' -ForegroundColor Yellow
+    } finally {
+        $env:PYTHONIOENCODING = $ViaOldEncoding
+        $env:PYTHONDONTWRITEBYTECODE = $ViaOldBytecode
+        if ($ViaTranscriptStarted) { Stop-Transcript | Out-Null }
+    }
+}
+
+Start-ViaAllInOne

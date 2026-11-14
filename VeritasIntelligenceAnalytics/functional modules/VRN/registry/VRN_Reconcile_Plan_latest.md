@@ -1,0 +1,28 @@
+# 版本號衝突調和計畫 · 2026-10-27 13:55 · 29 件
+- 調和 VRN_SystemManager_v0152.py → 本機內容存為 VRN_SystemManager_v0241.py · 原號還原 main · 同族 2 版衝突 · 接續編號
+- 調和 VRN_SystemManager_v0153.py → 本機內容存為 VRN_SystemManager_v0242.py · 原號還原 main · 同族 2 版衝突 · 接續編號
+- 調和 SSOT/VRN_DocClass_SSOT_v0100.json → 本機內容存為 VRN_DocClass_SSOT_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_Essentia_CardBook_VRN_v0100.json → 本機內容存為 VRN_Essentia_CardBook_VRN_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_ExtractionLogic_SSOT_v0100.json → 本機內容存為 VRN_ExtractionLogic_SSOT_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_FieldRules_SSOT_v0100.json → 本機內容存為 VRN_FieldRules_SSOT_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_FieldSpec_SSOT_v0100.json → 本機內容存為 VRN_FieldSpec_SSOT_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_FinLexicon_SSOT_v0102.json → 本機內容存為 VRN_FinLexicon_SSOT_v0142.json · 原號還原 main · 同族 8 版衝突 · 接續編號
+- 調和 SSOT/VRN_FinLexicon_SSOT_v0103.json → 本機內容存為 VRN_FinLexicon_SSOT_v0143.json · 原號還原 main · 同族 8 版衝突 · 接續編號
+- 調和 SSOT/VRN_FinLexicon_SSOT_v0104.json → 本機內容存為 VRN_FinLexicon_SSOT_v0144.json · 原號還原 main · 同族 8 版衝突 · 接續編號
+- 調和 SSOT/VRN_FinLexicon_SSOT_v0105.json → 本機內容存為 VRN_FinLexicon_SSOT_v0145.json · 原號還原 main · 同族 8 版衝突 · 接續編號
+- 調和 SSOT/VRN_FinLexicon_SSOT_v0106.json → 本機內容存為 VRN_FinLexicon_SSOT_v0146.json · 原號還原 main · 同族 8 版衝突 · 接續編號
+- 調和 SSOT/VRN_FinLexicon_SSOT_v0107.json → 本機內容存為 VRN_FinLexicon_SSOT_v0147.json · 原號還原 main · 同族 8 版衝突 · 接續編號
+- 調和 SSOT/VRN_FinLexicon_SSOT_v0108.json → 本機內容存為 VRN_FinLexicon_SSOT_v0148.json · 原號還原 main · 同族 8 版衝突 · 接續編號
+- 調和 SSOT/VRN_FinLexicon_SSOT_v0109.json → 本機內容存為 VRN_FinLexicon_SSOT_v0149.json · 原號還原 main · 同族 8 版衝突 · 接續編號
+- 調和 SSOT/VRN_FinancialShown_v0100.json → 本機內容存為 VRN_FinancialShown_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_LayoutRestore_SSOT_v0100.json → 本機內容存為 VRN_LayoutRestore_SSOT_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_LogicArchitecture_SSOT_v0100.json → 本機內容存為 VRN_LogicArchitecture_SSOT_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_MatrixApplicability_SSOT_v0100.json → 本機內容存為 VRN_MatrixApplicability_SSOT_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_PluginHub_SSOT_v0100.json → 本機內容存為 VRN_PluginHub_SSOT_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_Policy_VRNTextScope_v0100.json → 本機內容存為 VRN_Policy_VRNTextScope_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_SisterLineage_Sync_v0100.json → 本機內容存為 VRN_SisterLineage_Sync_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_SourceProvenance_SSOT_v0100.json → 本機內容存為 VRN_SourceProvenance_SSOT_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_StageAlias_Map_v0100.json → 本機內容存為 VRN_StageAlias_Map_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_TabFields_v0100.json → 本機內容存為 VRN_TabFields_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_ValuationMethod_SSOT_v0100.json → 本機內容存為 VRN_ValuationMethod_SSOT_v0105.json · 原號還原 main
+- 調和 SSOT/VRN_Workflow_VRN_SSOT_v0105.json → 本機內容存為 VRN_Workflow_VRN_SSOT_v0110.json · 原號還原 main

@@ -1,0 +1,75 @@
+{
+ "engine": "VDF_MDL010_ActiveETFList v0100",
+ "date": "2026-10-13",
+ "count": 31,
+ "lamp": "GREEN",
+ "checks": [
+  {
+   "id": "V1",
+   "name": "ETF 冊有料",
+   "lamp": "GREEN",
+   "note": "主動式 31 · 非 A 碼 241 · 來源 {'etf_book': 'OK'}"
+  },
+  {
+   "id": "V2",
+   "name": "代碼律 ^\\d{5}A$(ENG077 VDF_ENG077_ActiveETFUniverse_v0100.py)",
+   "lamp": "GREEN",
+   "note": "違律 []"
+  },
+  {
+   "id": "V3",
+   "name": "不重號",
+   "lamp": "GREEN",
+   "note": "重號 []"
+  },
+  {
+   "id": "V4",
+   "name": "yf / bloomberg 後綴",
+   "lamp": "GREEN",
+   "note": "不合 []"
+  },
+  {
+   "id": "V5",
+   "name": "日差(對前一份)",
+   "lamp": "GREEN",
+   "note": "{\"ACTIVE\": 31, \"NEW\": 0, \"DELISTED\": 0}"
+  },
+  {
+   "id": "V6",
+   "name": "大量下市守門",
+   "lamp": "GREEN",
+   "note": "今日消失 0 / 上限 20"
+  },
+  {
+   "id": "V7",
+   "name": "揭露類型可判(國內 / 國外成分)",
+   "lamp": "GREEN",
+   "note": "國內 22 · 國外 9 · 未知 []"
+  }
+ ],
+ "rules": "VDF_ENG077_ActiveETFUniverse_v0100.py",
+ "diff": {
+  "baseline": false,
+  "counts": {
+   "ACTIVE": 31,
+   "NEW": 0,
+   "DELISTED": 0
+  },
+  "new": [],
+  "delisted_today": [],
+  "mass_delist": false,
+  "mass_delist_limit": 20
+ },
+ "rejected_non_active": 241,
+ "sources": {
+  "etf_book": "OK"
+ },
+ "key_columns": [
+  "date",
+  "ticker",
+  "yf_ticker",
+  "bloomberg_ticker",
+  "name"
+ ],
+ "built_at": "2026-10-13T15:55:26+00:00"
+}

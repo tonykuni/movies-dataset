@@ -1,0 +1,44 @@
+{
+ "schema": "VIA.VRN.AutoTune.v1",
+ "version": "v0101",
+ "prior": "VRN_AutoTune_Config_v0100.json",
+ "ts": "2026-10-11T06:56:13",
+ "rule": "auto 依實測決策 · 有門檻才動 · 變差自動回滾;layout / restore / basicinfo 都套",
+ "config": {
+  "rescue_order": [
+   "pymupdf_lines",
+   "pymupdf_text",
+   "pdfplumber_lines",
+   "pdfplumber_text",
+   "camelot_lattice",
+   "camelot_stream",
+   "tabula_lattice",
+   "tabula_stream",
+   "img2table"
+  ],
+  "disabled_backends": [],
+  "tr_dual": "on",
+  "postextract": "on",
+  "rescue_budget": 1350,
+  "ocr_budget": 675,
+  "ocr_dpi": 200,
+  "basic_ocr_budget": 180,
+  "bench_budget": 300
+ },
+ "decisions": [
+  {
+   "key": "rescue_budget",
+   "old": 900,
+   "new": 1350,
+   "why": "救回預算用完還有表沒試完 → 放寬",
+   "evidence": "用 902 秒 · 仍失敗 26"
+  },
+  {
+   "key": "ocr_budget",
+   "old": 450,
+   "new": 675,
+   "why": "OCR 預算用完還有表沒試完 → 放寬",
+   "evidence": "用 452 秒 · 仍失敗 26"
+  }
+ ]
+}

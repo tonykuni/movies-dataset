@@ -1,0 +1,49 @@
+{
+ "schema": "VDF-MACRO-CROSSCHECK-PAIRS/1.0",
+ "version": "v0100",
+ "ts": "2026-11-09",
+ "owner": "VDF",
+ "rule": "操作員 2026-11-09:「AKShare 引擎也可抓到一些總體經濟數據,跟原本 FRED 或其他政府 / 私人機構抓出來的資料,可用最新三筆數據進行比較做出警告:是來源不同還是 AKShare 有誤」。",
+ "policy": {
+  "authority": "FRED / 官方來源為正本(VIA_USMacro_SSOT_Process:AKShare may cross-check, never replace FRED);比對只出警告,不改任何一邊的資料",
+  "n_latest": 3,
+  "verdicts": {
+   "AGREE": "最新 n 筆同期間、同單位、差在容忍內",
+   "SOURCE_DIFF:PERIOD_LABEL_SHIFT": "值一樣但期間標籤差一期(一邊標資料月、一邊標發布月)→ 來源定義不同,不是錯",
+   "SOURCE_DIFF:UNIT_SCALE": "值差一個固定倍數(10 / 100 / 1000)→ 單位不同,不是錯",
+   "SOURCE_DIFF:OFFICIAL_LAGGING": "AKShare 已有更新一期而官方庫還沒 → 官方庫該回填(不是 AKShare 錯)",
+   "AKSHARE_STALE": "AKShare 最新一筆落後官方 ≥ 2 期 → AKShare 來源沒更新(警告)",
+   "AKSHARE_SUSPECT": "同期間、同單位、差超過容忍且無法用上面任何一種解釋 → AKShare 可疑(可能抓錯欄 / 修正值未更新 / 解析錯),RED",
+   "NODATA": "任一邊沒有資料(VAKE 庫不在 · us_macro 無此序列 · 閘關 · 沒鑰)→ 照實列,不猜"
+  },
+  "network": "離線先讀本機(VAKE vake.duckdb v_<fn> · vdf_global_market.duckdb us_macro / parquet 鏡像);--live 才經 SUP_MDL740 雙閘 akshare_call / FRED observations;FRED 鑰只查有沒有、遮罩"
+ },
+ "transforms": {"level": "原值", "yoy_pct": "同比 %(與 12 期前比;季 4 期)", "mom_pct": "環比 %", "diff": "與前一期差", "diff_k": "與前一期差 ÷ 1000(千 → 百萬)"},
+ "pairs": [
+  {"id": "US_UNRATE", "zh": "美國失業率 U3", "freq": "M", "akshare": {"fn": "macro_usa_unemployment_rate", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "UNRATE", "transform": "level", "unit": "%"}, "tol": {"abs": 0.05, "pct": 1.0}},
+  {"id": "US_NFP", "zh": "美國非農就業變動(千人)", "freq": "M", "akshare": {"fn": "macro_usa_non_farm", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "PAYEMS", "transform": "diff", "unit": "千人"}, "tol": {"abs": 3.0, "pct": 3.0}},
+  {"id": "US_CPI_YOY", "zh": "美國 CPI 年增 %", "freq": "M", "akshare": {"fn": "macro_usa_cpi_monthly", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "CPIAUCSL", "transform": "yoy_pct", "unit": "%"}, "tol": {"abs": 0.1, "pct": 5.0}},
+  {"id": "US_CORE_CPI_YOY", "zh": "美國核心 CPI 年增 %", "freq": "M", "akshare": {"fn": "macro_usa_core_cpi_monthly", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "CPILFESL", "transform": "yoy_pct", "unit": "%"}, "tol": {"abs": 0.1, "pct": 5.0}},
+  {"id": "US_CORE_PCE_YOY", "zh": "美國核心 PCE 年增 %", "freq": "M", "akshare": {"fn": "macro_usa_core_pce_price", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "PCEPILFE", "transform": "yoy_pct", "unit": "%"}, "tol": {"abs": 0.1, "pct": 5.0}},
+  {"id": "US_PPI_YOY", "zh": "美國 PPI 年增 %", "freq": "M", "akshare": {"fn": "macro_usa_ppi", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "PPIFIS", "transform": "yoy_pct", "unit": "%"}, "tol": {"abs": 0.15, "pct": 8.0}},
+  {"id": "US_ISM_MFG_PMI", "zh": "美國 ISM 製造業 PMI", "freq": "M", "akshare": {"fn": "macro_usa_ism_pmi", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "NAPM", "transform": "level", "unit": "index", "note": "FRED NAPM 2026-09-26 回 400(樹冊 PARKED)→ 官方邊多半 NODATA,照實"}, "tol": {"abs": 0.2, "pct": 0.5}},
+  {"id": "US_INITIAL_CLAIMS", "zh": "美國初領失業金(千人)", "freq": "W", "akshare": {"fn": "macro_usa_initial_jobless", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "ICSA", "transform": "level", "unit": "人(FRED)vs 千 / 萬(AKShare)→ 預期 UNIT_SCALE"}, "tol": {"abs": 1.0, "pct": 1.0}},
+  {"id": "US_GDP_QOQ_ANN", "zh": "美國 GDP 季增年率 %", "freq": "Q", "akshare": {"fn": "macro_usa_gdp_monthly", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "A191RL1Q225SBEA", "transform": "level", "unit": "%"}, "tol": {"abs": 0.1, "pct": 5.0}},
+  {"id": "US_FEDFUNDS", "zh": "美國聯邦基金利率上限 %", "freq": "M", "akshare": {"fn": "macro_bank_usa_interest_rate", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "DFEDTARU", "transform": "level", "unit": "%"}, "tol": {"abs": 0.01, "pct": 0.5}},
+  {"id": "US_RETAIL_MOM", "zh": "美國零售銷售月增 %", "freq": "M", "akshare": {"fn": "macro_usa_retail_sales", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "RSAFS", "transform": "mom_pct", "unit": "%"}, "tol": {"abs": 0.15, "pct": 10.0}},
+  {"id": "US_UMICH", "zh": "密大消費者信心", "freq": "M", "akshare": {"fn": "macro_usa_michigan_consumer_sentiment", "date_cols": ["日期", "date"], "value_cols": ["今值", "value"], "transform": "level"},
+   "official": {"provider": "FRED", "series": "UMCSENT", "transform": "level", "unit": "index"}, "tol": {"abs": 0.3, "pct": 1.0}}
+ ],
+ "why_v0100": "第一批只收 FRED 有正本、AKShare 有對應函數的美國序列;中國 / 歐元區序列沒有 FRED 正本,等官方(NBS / Eurostat)車道進 us_macro 類表後再加對。"
+}
