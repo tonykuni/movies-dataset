@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-15T10:53:10Z",
+ "updated_at": "2026-11-15T11:08:35Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -10176,6 +10176,59 @@
    "reason": "工作站 2026-11-15 13:46:ActivateVDF lists_verify 讀資料家 via_database\\vdf_database 的 0-2-ActiveETFList/verify_report.json = 0 B(檔在但空);fetch verify 讀的是預設家 VIA_Reports\\vdf_fetch\\dict(1520 B)—— 兩個家;閘關時清單步 GATED 無法重生",
    "next": "桌機開雙閘後 `VDF_SystemManager fetch run MDL010 --apply --home <資料家>` 重生;或先看 0 B 檔的 LastWriteTime / Attributes(OneDrive 同步衝突?)",
    "updated_at": "2026-11-15T07:26:30Z"
+  },
+  {
+   "id": "VDF-REQ022:V-vdf-threecode-v0101",
+   "requirement": "VDF-REQ022",
+   "case": "V-vdf-threecode-v0101",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "MDL014 v0101:yfinance 代碼照市場(上市 .TW · 上櫃 .TWO;v0100 一律 .TW,實測 6488 環球晶記成 6488.TW)+ V12;自測 7/7 + 前版 67/67;經 VDF_SystemManager engine run;handoff test rc 0 · marker true(2026-11-15T11:06:48+00:00 · sha e16c1c31ee87)",
+   "next": "擷取冊 v0110 的 014 即用 v0101;桌機真資料 build 看 V12",
+   "receipt": "docs/handoff/evidence/V-vdf-threecode-v0101.json",
+   "updated_at": "2026-11-15T11:08:35Z"
+  },
+  {
+   "id": "VDF-REQ027:V-vdf-universe-share-v0100",
+   "requirement": "VDF-REQ027",
+   "case": "V-vdf-universe-share-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "MDL018 v0100 統一 SSOT 分享:一份 · sha 鎖 · 版本只增 · latest 原子寫 · verify · 四系統投影(VCGC 燈與收據 · VRN-2 / VQG 只帶符合的 ETF · VAP 彙總)· U/I;自測 8/8;經 VDF_SystemManager engine run;handoff test rc 0 · marker true(2026-11-15T11:07:08+00:00 · sha d493459e8575)",
+   "next": "桌機真資料 ui;各系統讀 latest 照 view 展現",
+   "receipt": "docs/handoff/evidence/V-vdf-universe-share-v0100.json",
+   "updated_at": "2026-11-15T11:08:35Z"
+  },
+  {
+   "id": "VDF-REQ027:V-vdf-fetchsystem-book-v0110",
+   "requirement": "VDF-REQ027",
+   "case": "V-vdf-fetchsystem-book-v0110",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "擷取冊 v0110 只把 014 改指 MDL014 v0101;擷取系統 v0110 讀尾版冊 9/9;fixture 實跑 fetch run MDL014 rc 0;經 VDF_SystemManager engine run;handoff test rc 0 · marker true(2026-11-15T11:07:26+00:00 · sha 1a43e4066a4f)",
+   "next": "總控 fetch run MDL014 即用 v0101",
+   "receipt": "docs/handoff/evidence/V-vdf-fetchsystem-book-v0110.json",
+   "updated_at": "2026-11-15T11:08:35Z"
+  },
+  {
+   "id": "VDF-REQ027:workstation-live-share",
+   "requirement": "VDF-REQ027",
+   "case": null,
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "容器只有種子冊(AMBER 照實);真資料要桌機開雙閘跑 009 · 010 · e232 · ENG051",
+   "next": "桌機開雙閘 → ActivateVDF 一輪 → `VDF_MDL018_UniverseShare_v0100.py ui`(總控入口)→ 開 VIA_Reports/vdf/universe_share/VDF_UniverseShare_UI.html",
+   "updated_at": "2026-11-15T11:08:35Z"
+  },
+  {
+   "id": "VDF-REQ027:peers-read-share",
+   "requirement": "VDF-REQ027",
+   "case": null,
+   "state": "PENDING",
+   "owner": "各系統自己",
+   "reason": "VCGC · VRN-2 · VQG · VAP 讀 VDF_UniverseShare_latest.json 並照分享冊 view 展現,是各系統自己的手(L123 互不干涉,VDF 不代寫)",
+   "next": "各系統 manager 讀 latest → `VDF_MDL018_UniverseShare_v0100.py verify`(只讀)IDENTICAL 才用 → 照 VDF_UniverseShare_SSOT_v0100.json 的 view 展現;操作員點名先接哪一系統",
+   "updated_at": "2026-11-15T11:08:35Z"
   }
  ]
 }
