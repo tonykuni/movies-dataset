@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-15T10:42:32Z",
+ "updated_at": "2026-11-15T15:17:47Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -11478,6 +11478,17 @@
    "next": "VDF 自修(出新版號薄尾,不改舊版):lane_listings 加 sector3(讀 VIA_IndustryUnifiedMap 尾版,不抄第二份)· 產業名改讀統一冊 · 上櫃名稱改 CompanyAbbreviation;VCGC DuckDB 直查欄位檢(two_level · 未冊 0 · 全名 0)綠才算",
    "receipt": null,
    "updated_at": "2026-11-15T10:42:32Z"
+  },
+  {
+   "id": "VDF-REQ026:universe-profile-fields",
+   "requirement": "VDF-REQ026",
+   "case": "",
+   "state": "PENDING",
+   "owner": "VDF(VDF_SystemManager · ENG055 · ENG233)",
+   "reason": "欄位規格(操作員 2026-11-15):yf_ticker 上市 .TW / 上櫃 .TWO;官方雙層產業(industry_code → VIA-IND 統一名 + sector3,兩所去重一組);yfinance 雙層(sector · industry);name = 官方中文短名(TWSE 公司簡稱 · TPEx CompanyAbbreviation);name_en = 官方英文短名(TWSE 英文簡稱 · TPEx Symbol,去全形空白);yf_target_low / median / mean / high · yf_rating(recommendationKey)· yf_analyst_count(numberOfAnalystOpinions)· yf_beta",
+   "next": "VDF 冊 OUT-08 加 name_en · yf_target_* · yf_rating · yf_analyst_count、name 定口徑;ENG055 上櫃名稱改 CompanyAbbreviation 並補英文短名;ENG233 從 yfinance .info 取值(經網路工具 · 同意閘操作員開);VCGC 直查:欄位齊 · 尾綴對市場 · low ≤ median ≤ high · mean 在區間 · 分析師數 ≥ 0 整數",
+   "receipt": null,
+   "updated_at": "2026-11-15T15:17:47Z"
   }
  ]
 }
