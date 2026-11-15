@@ -1,0 +1,561 @@
+{
+ "schema": "VDF.ParamControl.v1",
+ "owner": "VDF",
+ "version": "v0101",
+ "ts": "2026-11-15T18:31:32Z",
+ "why": "操作員 2026-11-15:「輸入輸出參數時間範圍 有些可以動有些不可以動 都要編號儲存 各自存數量在各自系統中作為列管」「VCGC 只有統一給編號的功能」→ VDF 自己存:每個輸入 / 輸出參數與時間範圍一個編號(VDF-PAR-###)· 可動 / 不可動 · 理由 · 版本 · 註冊時間 + 數量;可動的改值 = 出新版冊(舊冊不動);不可動的要改先登衝突由操作員與 AI 裁。",
+ "params": [
+  {
+   "name": "檔名協定",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.protocol",
+   "value": {
+    "vdf_tw_market.duckdb": "tw",
+    "vdf_global_market.duckdb": "gl"
+   },
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "ENG065 協定;ENG065 / ENG079 / VRN2_VDFBridge / VAP 照讀,改了下游會斷",
+   "id": "VDF-PAR-001",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "擷取時間欄",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.volatile_columns",
+   "value": [
+    "_ingest_ts",
+    "_run_id",
+    "_src",
+    "_src_file",
+    "batch_id",
+    "created_at",
+    "fetch_ts",
+    "fetched_at",
+    "ingest_ts",
+    "ingested_at",
+    "inserted_at",
+    "loaded_at",
+    "run_id",
+    "source_file",
+    "updated_at"
+   ],
+   "class": "規則",
+   "mutable": false,
+   "why": "不算新列的欄;動了會讓重抓變成重複列",
+   "id": "VDF-PAR-002",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "日期欄候選",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.date_candidates",
+   "value": [
+    "date",
+    "trade_date",
+    "data_date",
+    "as_of",
+    "asof",
+    "snapshot_date",
+    "report_date",
+    "period",
+    "ym",
+    "month",
+    "dt",
+    "日期"
+   ],
+   "class": "規則",
+   "mutable": true,
+   "why": "新表有新日期欄名可只增",
+   "id": "VDF-PAR-003",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "清單新鮮天數",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.list_fresh_days",
+   "value": {
+    "green": 7,
+    "yellow": 30
+   },
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "綠 / 黃門檻",
+   "id": "VDF-PAR-004",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "輸出檔名 · manifest",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.manifest",
+   "value": "VDF_PARQUET_MANIFEST.json",
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "下游與 MCP 照這個名字找",
+   "id": "VDF-PAR-005",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "輸出檔名 · mcp_handoff",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.mcp_handoff",
+   "value": "VDF_PARQUET_MCP_HANDOFF.json",
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "下游與 MCP 照這個名字找",
+   "id": "VDF-PAR-006",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "輸出檔名 · catalog",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.catalog",
+   "value": "VDF_ParquetDB.duckdb",
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "下游與 MCP 照這個名字找",
+   "id": "VDF-PAR-007",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "擷取起日(預設)",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.fetch.start",
+   "value": "2022-01-01",
+   "class": "時間範圍",
+   "mutable": true,
+   "why": "操作員令 2022-01-01;群組起始日優先",
+   "id": "VDF-PAR-008",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "擷取迄日",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.fetch.end",
+   "value": "latest",
+   "class": "時間範圍",
+   "mutable": false,
+   "why": "永遠 latest(到最新)",
+   "id": "VDF-PAR-009",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "分批粒度",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.fetch.batch",
+   "value": "month",
+   "class": "規則",
+   "mutable": false,
+   "why": "按月分批 + 檢查點;改粒度會讓舊檢查點對不上",
+   "id": "VDF-PAR-010",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "檢查點夾",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.fetch.checkpoint_dir",
+   "value": "temp/vdf_parquet_sync",
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "中斷接續靠它",
+   "id": "VDF-PAR-011",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "擷取引擎",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.fetch.fetch_engine",
+   "value": "VDF_ENG064_HistoryBackfill",
+   "class": "輸入參數",
+   "mutable": false,
+   "why": "VDF 自己的回補引擎",
+   "id": "VDF-PAR-012",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "群組起始日 · G-PRICE 價量",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "groups.G-PRICE.start",
+   "value": "2022-01-01",
+   "class": "時間範圍",
+   "mutable": true,
+   "why": "照群組集體設定(操作員令)",
+   "id": "VDF-PAR-013",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "群組起始日 · G-CHIP 籌碼 · 當沖",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "groups.G-CHIP.start",
+   "value": "2022-01-01",
+   "class": "時間範圍",
+   "mutable": true,
+   "why": "照群組集體設定(操作員令)",
+   "id": "VDF-PAR-014",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "群組起始日 · G-FUND 基本面 · 共識",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "groups.G-FUND.start",
+   "value": "2022-01-01",
+   "class": "時間範圍",
+   "mutable": true,
+   "why": "照群組集體設定(操作員令)",
+   "id": "VDF-PAR-015",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "群組起始日 · G-MACRO 總經 · 情緒 · 利率",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "groups.G-MACRO.start",
+   "value": "2022-01-01",
+   "class": "時間範圍",
+   "mutable": true,
+   "why": "照群組集體設定(操作員令)",
+   "id": "VDF-PAR-016",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "群組起始日 · G-LIST 清單 · 主檔(快照)",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "groups.G-LIST.start",
+   "value": null,
+   "class": "時間範圍",
+   "mutable": false,
+   "why": "照群組集體設定(操作員令);清單快照群沒有起始日",
+   "id": "VDF-PAR-017",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "會計年度結束月",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.fin_period.fy_end_month",
+   "value": {
+    "NVDA": 1
+   },
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "新增公司只增",
+   "id": "VDF-PAR-018",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "預設會計年度結束月",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.fin_period.default_fy_end_month",
+   "value": 12,
+   "class": "規則",
+   "mutable": false,
+   "why": "曆年",
+   "id": "VDF-PAR-019",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "財報科目對照",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.fin_period.items",
+   "value": {
+    "revenue": {
+     "mops": [
+      "營業收入合計",
+      "營業收入"
+     ],
+     "yf": "Revenue"
+    },
+    "net_income": {
+     "mops": [
+      "本期淨利(淨損)",
+      "本期淨利",
+      "本期稅後淨利(淨損)"
+     ],
+     "yf": "Net_Income"
+    },
+    "eps": {
+     "mops": [
+      "基本每股盈餘(元)",
+      "基本每股盈餘"
+     ],
+     "yf": "EPS"
+    }
+   },
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "同義字只增不減",
+   "id": "VDF-PAR-020",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "財報容差",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.fin_period.tol",
+   "value": {
+    "amount_abs": 1.0,
+    "amount_rel": 0.005,
+    "eps_abs": 0.01,
+    "eps_rel": 0.005,
+    "eps_sum_warn": 0.03
+   },
+   "class": "規則",
+   "mutable": true,
+   "why": "金額 / EPS 容差",
+   "id": "VDF-PAR-021",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z",
+   "superseded_part": {
+    "key": "amount_abs",
+    "by": "VDF-PAR-036",
+    "why": "MDL021 v0101 起金額單位百萬元(本冊值 1.0 是元);eps_* 與 amount_rel 照本條"
+   }
+  },
+  {
+   "name": "財報測試代號",
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.fin_period.test_tickers",
+   "value": [
+    "3017",
+    "3324",
+    "NVDA"
+   ],
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "3017 · 3324 · NVDA",
+   "id": "VDF-PAR-022",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "統一參數 · 起始日",
+   "book": "VDF_Unified_Params_v0100.json",
+   "path": "time.start_date",
+   "value": "2018-01-01",
+   "class": "時間範圍",
+   "mutable": true,
+   "why": "見衝突 PC-001",
+   "id": "VDF-PAR-023",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "統一參數 · 迄日",
+   "book": "VDF_Unified_Params_v0100.json",
+   "path": "time.end_date",
+   "value": "TODAY",
+   "class": "時間範圍",
+   "mutable": false,
+   "why": "TODAY",
+   "id": "VDF-PAR-024",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "擷取 · batch_size",
+   "book": "VDF_Unified_Params_v0100.json",
+   "path": "fetch.batch_size",
+   "value": 5,
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "網路節流 / 重試",
+   "id": "VDF-PAR-025",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "擷取 · max_retries",
+   "book": "VDF_Unified_Params_v0100.json",
+   "path": "fetch.max_retries",
+   "value": 3,
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "網路節流 / 重試",
+   "id": "VDF-PAR-026",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "擷取 · retry_delay_s",
+   "book": "VDF_Unified_Params_v0100.json",
+   "path": "fetch.retry_delay_s",
+   "value": 2,
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "網路節流 / 重試",
+   "id": "VDF-PAR-027",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "擷取 · timeout_s",
+   "book": "VDF_Unified_Params_v0100.json",
+   "path": "fetch.timeout_s",
+   "value": 30,
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "網路節流 / 重試",
+   "id": "VDF-PAR-028",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "輸出格式",
+   "book": "VDF_Unified_Params_v0100.json",
+   "path": "output.formats",
+   "value": [
+    "parquet",
+    "csv",
+    "duckdb",
+    "sqlite",
+    "sql"
+   ],
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "下游讀這些格式",
+   "id": "VDF-PAR-029",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "CSV 編碼",
+   "book": "VDF_Unified_Params_v0100.json",
+   "path": "output.csv_encoding",
+   "value": "utf-8-sig",
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "Excel 開得了中文",
+   "id": "VDF-PAR-030",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "輸出根",
+   "book": "VDF_Unified_Params_v0100.json",
+   "path": "output.root",
+   "value": "functional modules/VDF/output_hub",
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "資料家冊決定實際位置",
+   "id": "VDF-PAR-031",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "模擬資料律",
+   "book": "VDF_Unified_Params_v0100.json",
+   "path": "honesty.simulation_data",
+   "value": "禁——模擬值必須欄名帶 _SIM 後綴且摘要標註,絕不冒充真值",
+   "class": "規則",
+   "mutable": false,
+   "why": "誠實律",
+   "id": "VDF-PAR-032",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "金額單位",
+   "book": "VDF_FinPeriod_SSOT_v0100.json",
+   "path": "fin_period.amount_unit",
+   "value": "百萬元",
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "操作員 2026-11-15 定;存值小數不設限",
+   "id": "VDF-PAR-033",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:31:32Z"
+  },
+  {
+   "name": "金額顯示格式",
+   "book": "VDF_FinPeriod_SSOT_v0100.json",
+   "path": "fin_period.display",
+   "value": {
+    "amount": "千分位 · 小數一位",
+    "eps": "小數兩位",
+    "note": "操作員 2026-11-15:金額部分用百萬元為單位,小數點後不設限,但顯示要有千分位號,小數點後一位,顯示才規範"
+   },
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "顯示才規範:千分位 · 小數一位(EPS 兩位)",
+   "id": "VDF-PAR-034",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:31:32Z"
+  },
+  {
+   "name": "金額單位換算",
+   "book": "VDF_FinPeriod_SSOT_v0100.json",
+   "path": "fin_period.unit_scale",
+   "value": {
+    "仟元": 0.001,
+    "千元": 0.001,
+    "百萬元": 1.0,
+    "元": 1e-06,
+    "(空白)": 1e-06,
+    "(yfinance)": 1e-06
+   },
+   "class": "規則",
+   "mutable": false,
+   "why": "交易所仟元 ÷1,000 · 原幣元 ÷1,000,000 · 每股類不換",
+   "id": "VDF-PAR-035",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:31:32Z"
+  },
+  {
+   "name": "金額絕對容差(百萬元)",
+   "book": "VDF_FinPeriod_SSOT_v0100.json",
+   "path": "fin_period.tol.amount_abs",
+   "value": 0.001,
+   "class": "規則",
+   "mutable": true,
+   "why": "最小報表單位仟元 = 0.001 百萬元;蓋過 VDF-PAR-021 的 amount_abs",
+   "id": "VDF-PAR-036",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:31:32Z"
+  }
+ ],
+ "counts": {
+  "io_params_total": 36,
+  "mutable": 17,
+  "immutable": 19,
+  "by_class": {
+   "輸出參數": 10,
+   "規則": 8,
+   "輸入參數": 9,
+   "時間範圍": 9
+  },
+  "code_params_harvested": 678,
+  "code_params_book": "VDF_Param_Registry_v0100.json",
+  "vcgc_prmt_numbered": 764,
+  "vcgc_prmt_book": "VIA_NumberBook_PRMT_v0100.jsonl(VCGC 給號,只讀)",
+  "inputs": 7,
+  "outputs": 21,
+  "groups": 5
+ },
+ "conflicts": [
+  {
+   "id": "PC-001",
+   "what": "起始日兩本冊不同:VDF_Unified_Params_v0100 time.start_date = 2018-01-01 · VDF_DataPlane_SSOT_v0102 群組起始日 = 2022-01-01(4 群)",
+   "status": "OPEN(待操作員與 AI 裁)",
+   "proposal": "資料平面照群組(操作員 2026-11-15 令);統一參數冊的 2018-01-01 給其他引擎用 → 要統一就出統一參數冊新版"
+  }
+ ],
+ "prior": "VDF_ParamControl_SSOT_v0100.json",
+ "why_v0101": "v0100 已隨 PR 652 發布 → 出新版(只增;VDF-PAR-001–032 一字不動,只在 VDF-PAR-021 旁加註)。操作員 2026-11-15:「金額部分用百萬元為單位,小數點後不設限,但顯示要有千分位號,小數點後一位,顯示才規範」→ +VDF-PAR-033 金額單位 · 034 金額顯示格式 · 035 金額單位換算 · 036 金額絕對容差(冊 = VDF_FinPeriod_SSOT_v0100.json,讀者 VDF_MDL021 v0101)。"
+}

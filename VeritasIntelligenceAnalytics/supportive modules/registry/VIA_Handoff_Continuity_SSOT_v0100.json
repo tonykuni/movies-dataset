@@ -5150,6 +5150,26 @@
    "updated_at": "2026-11-15T17:50:48Z",
    "registered_at": "2026-11-15T17:50:48Z"
   },
+  "V-vdf-finperiod-v0101": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL021_FinPeriodCheck",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL021_FinPeriodCheck v0101 自測 11/11 · PASS",
+   "scope": "VDF MDL021 v0101(VDF-REQ033 · VDF-REQ034):PR 652 Codex 三項(交易所仟元 / yfinance 元換算 · 全形科目名 · 指定代號整檔缺照列)+ 金額一律百萬元 · 顯示千分位小數一位 · EPS 兩位(夾具示例數字)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0101.py",
+    "functional modules/VDF/VDF_DataPlane_SSOT_v0102.json",
+    "functional modules/VDF/VDF_FinPeriod_SSOT_v0100.json"
+   ],
+   "version": "v0100",
+   "timeout_seconds": 600,
+   "updated_at": "2026-11-15T18:32:12Z",
+   "registered_at": "2026-11-15T18:32:12Z"
+  },
   "V-vrn2-finextract-v0102": {
    "argv": [
     "vrn_fin_extract",
@@ -10575,6 +10595,28 @@
    "updated_at": "2026-11-15T18:02:52Z",
    "receipt": "docs/handoff/evidence/V-vdf-finperiod-v0100.json"
   },
+ {
+  "id": "VDF-REQ033:V-vdf-finperiod-v0101",
+  "requirement": "VDF-REQ033",
+  "case": "V-vdf-finperiod-v0101",
+  "state": "VERIFIED",
+  "owner": "AI",
+  "reason": "MDL021 v0101(v0100 已發布不動):PR 652 Codex P1 交易所仟元 / yfinance 元換到同一尺度 · P2 全形「基本每股盈餘（元）」正規化 · P2 指定代號整檔缺照列黃 · PR 653 Codex P2 代號兩邊同一把尺(canon_ticker);自測 11/11(夾具示例數字,非真財報);handoff test rc 0 · marker true(2026-11-15T18:48:51+00:00 · sha 8601f03e4aeb)",
+  "next": "桌機 engine run VDF_MDL021_FinPeriodCheck run --tickers 3017,3324,NVDA",
+  "updated_at": "2026-11-15T18:49:12Z",
+  "receipt": "docs/handoff/evidence/V-vdf-finperiod-v0101.json"
+ },
+ {
+  "id": "VDF-REQ034:V-vdf-finperiod-v0101",
+  "requirement": "VDF-REQ034",
+  "case": "V-vdf-finperiod-v0101",
+  "state": "VERIFIED",
+  "owner": "AI",
+  "reason": "金額一律百萬元(存值小數不設限)· 顯示千分位 · 小數一位 · EPS 兩位;單位層冊 VDF_FinPeriod_SSOT_v0100 疊在 VDF_DataPlane_SSOT 尾版之上;參數 VDF-PAR-033–036;自測 ⑦ ⑩ ⑪;handoff test rc 0 · marker true(2026-11-15T18:48:51+00:00 · sha 8601f03e4aeb)",
+  "next": "桌機真財報頁上看顯示(同 VDF-REQ033:workstation-real-fin)",
+  "updated_at": "2026-11-15T18:49:12Z",
+  "receipt": "docs/handoff/evidence/V-vdf-finperiod-v0101.json"
+ },
   {
    "id": "VDF-REQ033:workstation-real-fin",
    "requirement": "VDF-REQ033",

@@ -1,0 +1,46 @@
+{
+ "schema": "VDF.FinPeriod.Params.v1",
+ "owner": "VDF",
+ "version": "v0100",
+ "prior": null,
+ "ts": "2026-11-15T18:31:18Z",
+ "why": "操作員 2026-11-15:「金額部分用百萬元為單位,小數點後不設限,但顯示要有千分位號,小數點後一位,顯示才規範」。財報期別核對(VDF_MDL021 v0101 起)的金額單位層:單位 · 換算 · 金額容差 · 顯示格式。疊在 VDF_DataPlane_SSOT 尾版 params.fin_period(會計年度結束月 · 科目對照 · EPS 容差 · 測試代號照讀)之上;VDF_DataPlane_SSOT_v0102 已發布且 VDF_MDL020 v0102 自測釘它的版號,所以不出 v0103,改由本冊承接。要改值 = 出本冊新版(舊冊不動)。",
+ "base": "VDF_DataPlane_SSOT 尾版 params.fin_period",
+ "readers": [
+  "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0101.py"
+ ],
+ "fin_period": {
+  "amount_unit": "百萬元",
+  "unit_scale": {
+   "仟元": 0.001,
+   "千元": 0.001,
+   "百萬元": 1.0,
+   "元": 1e-06
+  },
+  "unit_scale_blank": 1e-06,
+  "yfinance_scale": 1e-06,
+  "tol": {
+   "amount_abs": 0.001
+  },
+  "display": {
+   "amount": "千分位 · 小數一位",
+   "eps": "小數兩位",
+   "note": "操作員 2026-11-15:金額部分用百萬元為單位,小數點後不設限,但顯示要有千分位號,小數點後一位,顯示才規範"
+  },
+  "storage": "存值不四捨五入(小數不設限);只有顯示才規範",
+  "version": "v0100",
+  "registered_at": "2026-11-15T18:31:18Z"
+ },
+ "supersedes": [
+  {
+   "book": "VDF_DataPlane_SSOT_v0102.json",
+   "path": "params.fin_period.tol.amount_abs",
+   "old": 1.0,
+   "old_unit": "元",
+   "new": 0.001,
+   "new_unit": "百萬元",
+   "why": "MDL021 v0101 起金額單位百萬元;最小報表單位仟元 = 0.001 百萬元;相對容差 0.5% 照舊",
+   "book_untouched": true
+  }
+ ]
+}
