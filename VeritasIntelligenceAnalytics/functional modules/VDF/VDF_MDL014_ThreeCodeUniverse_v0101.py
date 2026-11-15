@@ -3,7 +3,7 @@
 """VDF_MDL014_ThreeCodeUniverse v0101 — 薄尾(v0100 一字不改):yfinance 代碼照市場 —— 上市 .TW · 上櫃 .TWO(+ V12)
 
 實測找到(2026-11-15 容器 build · 種子冊):OUT-01 的上櫃股 6488 環球晶記成 yf_ticker 6488.TW。
-v0100 classify(L174 / L179)與 assemble(L345)把個股 / 主動 ETF 的 yfinance 代碼一律接 .TW;
+v0100 classify(第 174 / 179 行)與 assemble(第 345 行)把個股 / 主動 ETF 的 yfinance 代碼一律接 .TW;
 可是同一本冊 VDF_InputUniverse_SSOT 的 SRC-03 寫的是「yfinance ####.TW / .TWO」,價表也是「ticker 去 .TW / .TWO」——
 上櫃股在 yfinance 是 ####.TWO,接成 .TW 抓不到(或抓到別的),下游(VRN-2 報表 · VQG 序列 · VAP 圖)拿到的代碼就錯。
 Bloomberg 代碼照舊「#### TT」(只加 TT,不加 Equity)。
