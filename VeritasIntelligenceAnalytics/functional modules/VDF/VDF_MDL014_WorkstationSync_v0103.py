@@ -108,6 +108,7 @@ V0101 = PRIOR.PRIOR                                        # _not_link_lines · 
 V0100 = PRIOR.V0100                                        # 本體:git · VIA_DIR
 git = V0100.git
 _NOT_LINK_V0101 = V0101._not_link_lines
+_NEXT_CMD_V0102 = V0101._next_cmd                          # v0102 換上去的那支(印 v0102 檔名)
 
 
 def __getattr__(name):
@@ -134,12 +135,19 @@ def not_link_lines(lines: list, links=None) -> list:
     return [ln for ln in lines if not any(_status_path(ln) == lk or _status_path(ln).startswith(lk + "/") for lk in links)]
 
 
+def _next_cmd(a) -> str:
+    """預演印的 NEXT 指向本版(PR 649 Codex P2:照 v0102 的 NEXT 跑 --apply 會起一支沒有本版濾法的新行程)。"""
+    return _NEXT_CMD_V0102(a).replace(PRIOR_PATH.name, Path(__file__).name, 1)
+
+
 def _install_v0103():
     V0101._not_link_lines = not_link_lines
+    V0101._next_cmd = _next_cmd
 
 
 def _uninstall_v0103():
     V0101._not_link_lines = _NOT_LINK_V0101
+    V0101._next_cmd = _NEXT_CMD_V0102
 
 
 _install_v0103()
@@ -212,6 +220,12 @@ def selftest() -> int:
     chk("② 本機真接一個接點:接得上 · git 不論怎麼報,本版量法都乾淨", pr["style"] in ("listed", "hidden") and pr["clean"] and "已接上" in pr["made"], pr)
     chk("③ 換裝在位:v0101 的 _not_link_lines = 本版(v0101 survey 與 v0102 _dirty_now 都經它)",
         V0101._not_link_lines is not_link_lines and PRIOR._not_link_lines is not_link_lines)
+    import argparse
+    ns = argparse.Namespace(case=["vdf_case", "x y"], repo=None, worktree=None, remote="origin", no_link_data=True)
+    nxt = V0101._next_cmd(ns)
+    chk("⑦ 預演的 NEXT 指向本版(%s)· 參數照 v0101 重組只多 --apply · run 的標籤是本版" % Path(__file__).name,
+        Path(__file__).name in nxt and PRIOR_PATH.name not in nxt and nxt.endswith(" --apply") and '--case "x y"' in nxt
+        and "--no-link-data" in nxt and V0101._next_cmd is _next_cmd and run.__module__ == __name__, nxt)
     src = Path(__file__).read_text(encoding="utf-8")
     head = src.split("def " + "selftest", 1)[0]
     imports = re.findall(r"^\s*(?:import|from)\s+([A-Za-z_][\w.]*)", src, re.M)
@@ -247,11 +261,21 @@ def selftest() -> int:
     return 0 if not f else 1
 
 
+def run(argv=None, here: Path = HERE) -> int:
+    """v0102 的流程(收據 · 停得乾淨照舊),標籤換本版。"""
+    keep = PRIOR.TAG
+    PRIOR.TAG = TAG
+    try:
+        return PRIOR.run(argv, here)
+    finally:
+        PRIOR.TAG = keep
+
+
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if "--selftest" in argv:
         return selftest()
-    return PRIOR.main(argv)
+    return run(argv)
 
 
 if __name__ == "__main__":
