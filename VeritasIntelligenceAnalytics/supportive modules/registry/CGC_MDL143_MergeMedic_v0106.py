@@ -467,10 +467,14 @@ def rewrite_text(text: str, vplans: list, crenames: list, moved_self: dict | Non
 
 
 # ───────────────────────── 主流程 ─────────────────────────
-def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", do_print: bool = True) -> dict:
+def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", do_print: bool = True,
+                 allow_foreign: list | None = None, ruling: str = "") -> dict:
     root = Path(root)
     rep = {"engine": Path(__file__).stem, "ref": ref, "apply": apply, "stamp": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),
-           "steps": [], "version_moves": [], "code_renames": [], "numberbooks": {}, "leaf_conflicts": [], "resolved": [], "manual": []}
+           "steps": [], "version_moves": [], "code_renames": [], "numberbooks": {}, "leaf_conflicts": [], "resolved": [], "manual": [],
+           "allow_foreign": list(allow_foreign or []), "ruling": ruling}
+    allow = [a.rstrip("/") + "/" for a in (allow_foreign or []) if a.strip()]
+    owned = lambda rel: bool(VCGC_OWNED_RX.search(rel)) or any(rel.startswith(a) for a in allow)  # noqa: E731
 
     def step(name, state, note=""):
         rep["steps"].append({"name": name, "state": state, "note": note})
@@ -510,7 +514,11 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
     for r in crenames:
         rep["code_renames"].append(r)
         step("代碼改號 " + r["book"] + "." + r["coll"], "PLAN" if not apply else "RUN", r["old"] + " → " + r["new"])
-    foreign = [m["family"] for m in rep["version_moves"] if not VCGC_OWNED_RX.search(m["family"])]
+    foreign = [m["family"] for m in rep["version_moves"] if not owned(m["family"])]
+    if allow and not ruling.strip():
+        rep["state"] = "STOP"
+        step("停:放行他系統地盤要附操作員裁定原文(--ruling)", "STOP")
+        return rep
     if foreign:
         rep["state"] = "STOP"
         step("停:同版號雙物在他系統地盤(L123 VCGC 不代改;交該系統自己合)", "STOP", ", ".join(foreign[:5]))
@@ -541,7 +549,7 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
         if not fp.is_file():
             continue
         why = ("L70 殼腳本不改" if Path(rel).suffix.lower() in NO_TOUCH_EXT
-               else ("L123 他系統地盤不改" if not VCGC_OWNED_RX.search(rel) else ""))
+               else ("L123 他系統地盤不改" if not owned(rel) else ""))
         if why:
             try:
                 t0 = fp.read_text(encoding="utf-8")
@@ -572,7 +580,8 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
                + "".join(f"- 版號 {m['family']}: {m['map']}\n" for m in rep["version_moves"])
                + "".join(f"- 代碼 {r['book']}.{r['coll']}: {r['old']} → {r['new']}\n" for r in crenames)
                + f"- 引用改寫 {nfiles} 檔 · {nsubs} 處(只動本分支改過、VCGC 地盤的檔;帳本 / 證據 / 凍結 / .ps1 / 他系統不動)\n"
-               + "".join(f"- 只列不改 {x['file']}({x['why']} · {x['hits']} 處)\n" for x in rep["refs_left"]) + (("\n" + trailer) if trailer else ""))
+               + "".join(f"- 只列不改 {x['file']}({x['why']} · {x['hits']} 處)\n" for x in rep["refs_left"])
+               + (f"- 操作員裁定放行 {', '.join(allow)}:{ruling}\n" if allow else "") + (("\n" + trailer) if trailer else ""))
         c = g(root, "commit", "-q", "-m", msg)
         step("改號提交", "OK" if c.returncode == 0 else "FAIL", f"搬 {len(moved)} 檔 · 改寫 {nfiles} 檔 {nsubs} 處")
         if c.returncode != 0:
@@ -805,8 +814,23 @@ def selftest() -> int:
             and (R / "functional modules" / "VRN" / "x.md").read_text(encoding="utf-8") == "VRN 自己的檔提到 L2\n"
             and sorted(x["file"] for x in rep.get("refs_left", [])) == ["Invoke-X-v0100.ps1", "functional modules/VRN/x.md"],
             json.dumps(rep.get("refs_left"), ensure_ascii=False)[:160])
+        G("checkout", "-q", "main")
+        G("checkout", "-q", "-b", "f_theirs")
+        W(R / "functional modules" / "VDF" / "VDF_X_v0101.py", "VERSION = 'v0101'  # theirs\n")
+        G("add", "-A"); G("commit", "-q", "-m", "ft")
+        G("checkout", "-q", "main"); G("checkout", "-q", "-b", "f_ours")
+        W(R / "functional modules" / "VDF" / "VDF_X_v0101.py", "VERSION = 'v0101'  # ours\n")
+        G("add", "-A"); G("commit", "-q", "-m", "fo")
+        r1 = branch_merge(R, "f_theirs", apply=True, do_print=False)
+        r2 = branch_merge(R, "f_theirs", apply=True, do_print=False, allow_foreign=["functional modules/VDF"])
+        r3 = branch_merge(R, "f_theirs", apply=True, do_print=False, allow_foreign=["functional modules/VDF"], ruling="自測裁定")
+        fx = R / "functional modules" / "VDF"
+        chk("⑰ 他系統同號雙物:沒放行 = 停 · 放行沒附裁定原文 = 停 · 放行 + 裁定 = 我方升版(他方留原號)· 裁定入紀錄",
+            r1["state"] == "STOP" and r2["state"] == "STOP" and r3["state"] == "OK" and r3["ruling"] == "自測裁定"
+            and "theirs" in (fx / "VDF_X_v0101.py").read_text(encoding="utf-8") and "ours" in (fx / "VDF_X_v0102.py").read_text(encoding="utf-8")
+            and "VERSION = 'v0102'" in (fx / "VDF_X_v0102.py").read_text(encoding="utf-8"), [r1["state"], r2["state"], r3["state"]])
         G("checkout", "-q", "-b", "dirty")
-        W(R / "NOTE.md", "改了沒提交\n")
+        W(reg / "FAM_MDL900_Tool_v0102.py", "改了沒提交\n")            # 已追蹤檔改動 = 髒樹
         st = branch_merge(R, "theirs", apply=True, do_print=False)
         chk("⑬ 髒樹誠實停(不 stash 不硬合)", st["state"] == "STOP")
 
@@ -828,7 +852,9 @@ def main() -> int:
             return 2
         root = Path(a[a.index("--root") + 1]) if "--root" in a else PRIOR.ROOT_DEFAULT
         trailer = Path(a[a.index("--trailer-file") + 1]).read_text(encoding="utf-8").strip() if "--trailer-file" in a else ""
-        rep = branch_merge(Path(root), a[1], apply="--apply" in a, trailer=trailer)
+        allow = [x for x in (a[a.index("--allow-foreign") + 1].split(",") if "--allow-foreign" in a else []) if x.strip()]
+        ruling = a[a.index("--ruling") + 1] if "--ruling" in a else ""
+        rep = branch_merge(Path(root), a[1], apply="--apply" in a, trailer=trailer, allow_foreign=allow, ruling=ruling)
         print(f"[{Path(__file__).stem}] branch-merge {a[1]} · {rep.get('state')} · 版號搬家 {len(rep['version_moves'])} · 代碼改號 {len(rep['code_renames'])}"
               f" · 衝突解 {len(rep['resolved'])} · 未解 {len(rep['manual'])}")
         return 0 if rep.get("state") in ("OK", "PLAN") else 1
