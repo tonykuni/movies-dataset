@@ -10,7 +10,8 @@
     K2 年度 = 四個單季加總(單季用報的;沒有就用累計拆出來的)
     K3 累計拆出的單季 = 報的單季(兩邊都有才比)
     EPS 季加總與年度只看差幾 %(各季加權股數不同,本來就不會剛好相等;超過 3% 才黃)
-  容差:金額 max(1, 0.5%)· EPS max(0.01, 0.5%)。缺期照實列「缺」,不補不猜。
+  金額一律換成百萬元(交易所仟元 ÷1,000 · yfinance 原幣元 ÷1,000,000;每股類不換);存值小數不設限,顯示千分位 · 小數一位(EPS 兩位)。
+  容差:金額 max(0.001 百萬元, 0.5%)· EPS max(0.01, 0.5%)。缺期照實列「缺」,不補不猜。
 資料來源(唯讀):資料家正典庫 vdf_tw_market 的 tw_financial_mops / tw_financial(有就讀);或 --file 給 csv / parquet(長表:ticker ·
   period_end · kind(YTD | Q | FY)· item · value)。會計年度結束月與科目對照放 VDF 自己的冊 VDF_DataPlane_SSOT 尾版(fin_period 段),冊上沒有用內建。
 用法:run [--home 資料家] [--tickers 3017,3324,NVDA] [--file 長表] [--fy-end NVDA=1] | --selftest
@@ -79,7 +80,8 @@ DEFAULT = {"fy_end_month": {"NVDA": 1}, "default_fy_end_month": 12,
            "items": {"revenue": {"mops": ["營業收入合計", "營業收入"], "yf": "Revenue"},
                      "net_income": {"mops": ["本期淨利(淨損)", "本期淨利", "本期稅後淨利(淨損)"], "yf": "Net_Income"},
                      "eps": {"mops": ["基本每股盈餘(元)", "基本每股盈餘"], "yf": "EPS"}},
-           "tol": {"amount_abs": 1.0, "amount_rel": 0.005, "eps_abs": 0.01, "eps_rel": 0.005, "eps_sum_warn": 0.03}}
+           "tol": {"amount_abs": 0.001, "amount_rel": 0.005, "eps_abs": 0.01, "eps_rel": 0.005, "eps_sum_warn": 0.03},
+           "amount_unit": "百萬元", "display": {"amount": "千分位 · 小數一位", "eps": "小數兩位"}}
 LAMP_RANK = {"RED": 3, "YELLOW": 2, "GREEN": 1, "GRAY": 0}
 
 
@@ -134,7 +136,8 @@ def normalize(rows: list, pm: dict) -> dict:
     return out
 
 
-UNIT_SCALE = {"仟元": 1000.0, "千元": 1000.0, "百萬元": 1_000_000.0, "元": 1.0, "": 1.0, None: 1.0}
+# 金額一律換成「百萬元」再比(操作員 2026-11-15「金額部分用百萬元為單位,小數點後不設限」);存值不四捨五入,只有顯示才規範
+UNIT_SCALE = {"仟元": 0.001, "千元": 0.001, "百萬元": 1.0, "元": 1e-6, "": 1e-6, None: 1e-6}
 
 
 def norm_label(s) -> str:
@@ -200,7 +203,7 @@ def read_db(home: Path, tickers: list, pm: dict) -> tuple:
                 key = mops_map.get(norm_label(item))
                 if key is None or val is None:
                     continue
-                if key != "eps":                                   # 金額:交易所仟元 → 元(跟 yfinance 同尺度);每股類照元
+                if key != "eps":                                   # 金額:交易所仟元 → 百萬元;每股類照元
                     scale = UNIT_SCALE.get(unit)
                     if scale is None:
                         notes.append("不認得的單位 %s(%s)· 這列不比" % (unit, item))
@@ -220,7 +223,8 @@ def read_db(home: Path, tickers: list, pm: dict) -> tuple:
                     kind = "FY" if str(r[2]).lower().startswith("annual") else "Q"
                     for i, c in enumerate(want):
                         if r[3 + i] is not None:
-                            rows.append({"ticker": re.sub(r"\.TWO?$", "", str(r[0]), flags=re.I), "period_end": r[1], "kind": kind, "item": yf[c], "value": r[3 + i]})
+                            v = float(r[3 + i]) if yf[c] == "eps" else float(r[3 + i]) * 1e-6     # yfinance 金額是原幣元 → 百萬元
+                            rows.append({"ticker": re.sub(r"\.TWO?$", "", str(r[0]), flags=re.I), "period_end": r[1], "kind": kind, "item": yf[c], "value": v})
         else:
             notes.append("沒有 tw_financial(單季 / 年度)")
     finally:
@@ -233,8 +237,14 @@ def read_file(path: Path) -> list:
     rel = "read_parquet('%s')" % str(path).replace("'", "''") if str(path).endswith(".parquet") else "read_csv_auto('%s')" % str(path).replace("'", "''")
     con = duckdb.connect()
     try:
-        cur = con.execute("SELECT ticker, period_end, kind, item, value FROM %s" % rel)
-        return [dict(zip(["ticker", "period_end", "kind", "item", "value"], r)) for r in cur.fetchall()]
+        cols = {r[0] for r in con.execute("DESCRIBE SELECT * FROM %s" % rel).fetchall()}
+        cur = con.execute("SELECT ticker, period_end, kind, item, value, %s FROM %s" % ("unit" if "unit" in cols else "NULL", rel))
+        out = []
+        for t, pe, k, it, v, u in cur.fetchall():
+            if v is not None and it != "eps" and u is not None:      # 有 unit 欄就換成百萬元;沒有 = 當作已是百萬元
+                v = float(v) * UNIT_SCALE.get(u, 1.0)
+            out.append({"ticker": t, "period_end": pe, "kind": k, "item": it, "value": v})
+        return out
     finally:
         con.close()
 
@@ -249,9 +259,10 @@ def _chip(lp) -> str:
 
 
 def _fmt(v, item) -> str:
+    """顯示規範(操作員 2026-11-15):金額(百萬元)千分位 · 小數一位;EPS 小數兩位。只管顯示,存值不動。"""
     if v is None:
         return "—"
-    return ("%.2f" % v) if item == "eps" else format(round(v), ",")
+    return ("%.2f" % v) if item == "eps" else format(v, ",.1f")
 
 
 def page(res: list, meta: dict) -> str:
@@ -287,7 +298,7 @@ def page(res: list, meta: dict) -> str:
             _e(" · ".join("%s %s(%s)" % (c["lamp"], c["name"], c["note"]) for c in r["checks"]) + ((" · 缺 " + "/".join(r["missing"])) if r["missing"] else ""))))
     p.append('<div class="sec"><b>矩陣(檔 × 科目 × 會計年度)</b><div class="scroll"><table><thead><tr><th class="l">燈</th><th class="l">檔 · 科目</th><th>會計年度</th>'
              '<th>累計 Q1</th><th>累計 Q2</th><th>累計 Q3</th><th>累計 Q4</th><th>單季 Q1</th><th>單季 Q2</th><th>單季 Q3</th><th>單季 Q4</th><th>年度</th><th class="l">對帳</th></tr></thead>'
-             '<tbody>%s</tbody></table></div><p class="small">「拆」= 由累計拆出的單季(沒有報的單季時才用)</p></div>' % "".join(rows))
+             '<tbody>%s</tbody></table></div><p class="small">金額單位:百萬元(千分位 · 小數一位;EPS 元 · 小數兩位)· 「拆」= 由累計拆出的單季(沒有報的單季時才用)</p></div>' % "".join(rows))
     p.append("</body></html>")
     return "".join(p)
 
@@ -419,11 +430,13 @@ def selftest() -> int:
         rows, note = read_db(Path(td) / "home", ["3017", "3324", "NVDA"], pm)
         rr = {(r["ticker"], r["item"], r["fy"]): r for r in check(normalize(rows, pm), pm)}
         chk("⑦ 讀正典庫(唯讀):交易所累計只取 basis=YTD 損益(資產負債不混)· 交易所仟元 → 元再跟 yfinance 比(Q2 拆 110,000 = 報 110,000 → K3 綠)"
-            "· 全形「基本每股盈餘（元）」認得、每股不乘 · 3017.TW 去後綴對上",
-            len(rows) == 4 and rr[("3017", "revenue", 2024)]["single"][2] == 110000 and any(c["name"].startswith("K3 Q2") and c["lamp"] == "GREEN" for c in rr[("3017", "revenue", 2024)]["checks"])
+            "· 全形「基本每股盈餘（元）」認得、每股不乘 · 3017.TW 去後綴對上 · 金額都換成百萬元(仟元 ÷1,000 · 元 ÷1,000,000)",
+            len(rows) == 4 and abs(rr[("3017", "revenue", 2024)]["single"][2] - 0.11) < 1e-9 and any(c["name"].startswith("K3 Q2") and c["lamp"] == "GREEN" for c in rr[("3017", "revenue", 2024)]["checks"])
             and rr[("3017", "eps", 2024)]["ytd"].get(2) == 2.85, (rows, note))
         part = run([x for x in fixture_rows() if x["ticker"] == "3017"], {"source": "夾具", "tickers": ["3017", "3324", "NVDA"]}, Path(td) / "o2")
         miss = [r for r in part["results"] if r["missing"] == ["整檔沒有財報列"]]
+        chk("⑩ 顯示規範:金額千分位 · 小數一位(26,044.0 · 0.1)· EPS 小數兩位(2.85)· 存值不四捨五入",
+            _fmt(26044.0, "revenue") == "26,044.0" and _fmt(0.11, "revenue") == "0.1" and _fmt(2.85, "eps") == "2.85" and rr[("3017", "revenue", 2024)]["single"][2] != 0.1)
         chk("⑨ 指定 3017 · 3324 · NVDA 但只有 3017 的資料 → 3324 / NVDA 照列「整檔沒有財報列」· 總燈不是綠",
             sorted(r["ticker"] for r in miss) == ["3324", "NVDA"] and part["lamp"] != "GREEN", (part["lamp"], [r["ticker"] for r in miss]))
     text = Path(__file__).read_text(encoding="utf-8")
