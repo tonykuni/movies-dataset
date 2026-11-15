@@ -1,0 +1,73 @@
+{
+ "schema": "VIA.PolicyLaws.Candidate/1",
+ "candidate": "POL-CAND-20261115-01",
+ "state": "CANDIDATE · 未入冊 · 未發號",
+ "made_at": "2026-11-15T10:05:30Z",
+ "made_by": "Claude(claude.ai 專案對話)· 操作員 2026-11-15 17:48 令",
+ "target_book": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Policy_Laws_SSOT_v*.json(尾版)· 由 VCGC 衝突檢測後發號入冊",
+ "law": {
+  "id": "",
+  "id_proposed": "下一個空號(由 VCGC 發,不自訂)",
+  "batch": "2026-11-15 清單先行",
+  "cat": "執行 / 效能",
+  "rank": null,
+  "ranked_by": "未標(位階由操作員排定)",
+  "key": "LISTS_FIRST_DAG_PARALLEL",
+  "zh": "【清單先行 · 相依圖並行律】① 每個系統的一鍵流程分四段,順序固定:CPU/DRAM 規劃 → AST 覆蓋閘 → 清單步 → 相依圖扇出。② CPU/DRAM:只動本行程(gc · 不改他行程優先序);並行槽 = min(核−1, (可用記憶體−保底 1024 MB)÷每步峰值, 6);重活的記憶體准入交給該系統自己的引擎(例:ActivateVDF 准入閘)。③ AST 覆蓋閘:該系統自己的夾 + 自己的前綴 + 尾版(_vNNNN 最大;薄尾沿 PRIOR_NAME 前版鏈),ast.parse 認加速器橋(import VIA_SuperAccel_Module / VeritasCeleritas)與網路工具橋(模組層 VIA_NET_TOOL_PATH + def _via_net*;只有匯入網路函式庫的尾版才需要),每支列版本號與 VCGC 編號(只讀編號冊;冊上沒有 = 待號 = 黃);目標加速器 100% · 網路呼叫者 100% · 編號 100%;字串標記不算數(只有註解 / 文件字串寫 ACCEL-BRIDGE 而沒有匯入 = 紅)。④ 清單步先跑:清單是之後各步的輸入(VDF 009 台股清單 · 010 主動式 ETF 清單)。清單步本身互不相依的也並行。⑤ 相依圖:寫同一份資源(同一個 duckdb 檔 · 同一本帳)= 同一道串行;其餘全部同時起跑;以「本輪寫出的產物」當起跑信號(檔案修改時間 ≥ 本輪開始),不等整條上游跑完。⑥ 輸入冪等:先並行讀現況,只寫缺的;已是目標值 = 零寫入(帳本不多加行)。⑦ 輸出:四燈矩陣(覆蓋)+ 時間軸(每步起訖 · 等誰)+ 牆鐘 vs 各步加總(串行估計)與省下的秒數;紅 = 失敗、黃 = 沒資料 / 等同意閘 / 待號、灰 = 未跑 / 略過。⑧ 獨立:每個系統由自己的 SystemManager 實作與執行本律;VCGC 只監看與發號;覆蓋不合只報、不代改他系統的檔;不代設同意閘;不碰 TA-Lib。",
+  "origin": "操作員原文 2026-11-15:「輸入準備好 啟動兩個清單引擎也會生出輸入 先檢查全部都導入加速器及網路工具AST覆蓋率100%,給予版本號及編號,先優化CPU/DRAM,取得清單後這些流程幾乎獨立啟動分量最佳化規劃部個獨立步驟同時啟動最快完成所有流程並輸出 這個概念也傳給VRN VCGC VDF VQG VAP」"
+ },
+ "landing": {
+  "VDF": {
+   "state": "已示範(交付件)",
+   "list_step": "MDL009 台股清單 · MDL010 主動式 ETF 清單",
+   "fanout": "ActivateVDF 依資料庫分道並行擷取(同庫串、異庫並);清單落地即起 014 info / 清單驗收;補缺 → 014 → 族群監控",
+   "evidence": "Invoke-VIA-VDF-ListsFetch-v0101.ps1 沙盒實跑:牆鐘 84s vs 串行估計 148s(省 43%);覆蓋 102/102 · 網路 12/12 · 編號 102/102",
+   "todo_for_vdf_line": [
+    "ActivateVDF 的 lists 步把 009 與 010 並行(現為依序)",
+    "把冪等輸入與清單落地信號收進 VDF_SystemManager 自己的動詞(現由交付件的輔助檔做)"
+   ]
+  },
+  "VRN": {
+   "state": "待 VRN 線落地",
+   "list_step": "報告收件清單(待 VRN 線依自己的 manager 定義)",
+   "fanout": "每份報告的解析 / 擷取彼此獨立 → 並行;寫同一本冊的步驟串",
+   "coverage_now": "尾版 82 · 加速器 80/82 · 網路 1/1 · 編號 82/82",
+   "red": [
+    "VRN_ENG112_FinancialRead v0100(VIA-VRN-ENG300)缺加速器橋",
+    "VRN2_MarketFetch v0112(VIA-VRN-MDL310)加速器動態載入,不是標準橋(黃)"
+   ]
+  },
+  "VCGC": {
+   "state": "待 VCGC 線落地",
+   "list_step": "尾版清冊 + 編號冊",
+   "fanout": "覆蓋 / 政策 / 編號 / 矩陣各檢查彼此獨立 → 並行;寫同一本冊的串",
+   "coverage_now": "尾版 283 · 加速器 283/283 · 網路 3/4 · 編號 283/283",
+   "red": [
+    "CGC_MDL095_DeckServer v0161(VIA-VCGC-MDL1494)匯入 http.client 而沒有網路工具橋"
+   ]
+  },
+  "VQG": {
+   "state": "待 VQG 線落地",
+   "list_step": "標的清單(universe)",
+   "fanout": "各因子 / 各檢查在 DuckDB + Polars 本機唯讀 → 並行",
+   "coverage_now": "尾版 1 · 加速器 0/1 · 編號 1/1",
+   "red": [
+    "VQG_AllInOne v0110(VIA-VQG-MDL007)及前版鏈都沒有加速器橋(文件字串有 [VIA:ACCEL-BRIDGE] 字樣但沒有匯入)"
+   ]
+  },
+  "VAP": {
+   "state": "待 VAP 線落地",
+   "list_step": "圖表請求清單",
+   "fanout": "各圖表算圖彼此獨立 → 並行",
+   "coverage_now": "尾版 14 · 加速器 14/14 · 網路 1/1 · 編號 14/14",
+   "red": []
+  }
+ },
+ "needs_ruling": [
+  "本律編號與位階(VCGC 發號、操作員排位階)",
+  "四支紅 / 黃尾版由各自系統線出薄尾新版補橋,或操作員裁定豁免(例:DeckServer 的 http.client 只連本機時是否算網路呼叫者)"
+ ],
+ "candidate_version": "v0100",
+ "prior": null,
+ "sha256_of_law_zh": "53175a07dc0fd0b1415e1034696ce86ab4e4a9e07755388b66f58fa04aa5b8c8"
+}
