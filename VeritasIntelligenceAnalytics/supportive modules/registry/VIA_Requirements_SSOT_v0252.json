@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0252",
- "batch": "VDF 資料庫狀態矩陣 + DuckDB 現查實測(2026-11-15):VDF-REQ028 · VDF-REQ029(前版 v0251)",
- "ts": "2026-11-15T14:16:53Z",
+ "batch": "VDF 資料庫狀態矩陣 + DuckDB 現查實測 + 資料平面(2026-11-15):VDF-REQ028 · VDF-REQ029 · VDF-REQ030(前版 v0251)",
+ "ts": "2026-11-15T15:04:35Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -140,7 +140,7 @@
  "tally": {
   "RECORDED": 24,
   "COVERED": 139,
-  "PARTIAL": 112,
+  "PARTIAL": 113,
   "MISSING": 1
  },
  "requirements": [
@@ -7248,6 +7248,28 @@
    "why_homes": "VDF 自己的資料庫頁與交接收據;VRN-2 的實測走 VRN-2 自己的 manager(L123)",
    "ts": "2026-11-15T14:16:53Z",
    "updated_at": "2026-11-15T14:16:53Z"
+  },
+  {
+   "code": "VDF-REQ030",
+   "subsystem": "VDF",
+   "topic": "VDF System Manager 管理範圍 + 清單輸入閘 + 資料家 parquet 增量庫(不重複擷取)+ 增量匯出 PC / 雲端同步夾 / MCP",
+   "requirement": "操作員 2026-11-15:「用 VCGC 節省工具啟動 將每個系統 SYSTEM MANAGER 該控管的項目範圍 VDF SYSTEM MANAGER 都要有 輸出 PARQUET 增量資料庫可出道各類雲端硬碟 MCP TO THEM AND PC FILE · VDF 重點在於輸入輸出多且複雜 結果也需要整合 · 台股及主動式台股 ETF 清單也要被驗證有效作為輸入 · 輸出 PARQUET 增量維護資料庫不重複擷取 ·(資料家 via_database\\vdf_database 的 tw__ / gl__ parquet 21 檔)· 整理清簡優化再輸出更新快速」;同日補充原則:「全部共享 SSOT REGEX 同義字衝突訊號 · 輸入輸出參數各自子系統留存 · 已成功的現況下若修改則用模塊下新增紀錄更正版本號更新」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0112.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL020_DataPlane_v0100.py",
+    "functional modules/VDF/VDF_SystemManager_v0183.py",
+    "functional modules/VDF/VDF_DataPlane_SSOT_v0100.json"
+   ],
+   "evidence": "2026-11-15 容器:VDF_MDL020_DataPlane v0100 自測 16/16(資料家 · 鍵律 · 首建 / 重跑不動檔 / 只補新鍵 · 同鍵重抓不算新列 · status · 不重複擷取計畫 · 去重 · 匯出 PC / Google 同步夾 + MCP 交接清單與已上傳回寫 · 防呆 · 清單輸入閘 · 管理範圍頁 · 入口旗標 · 共用代碼律 AST 讀 · 參數冊)。VDF_SystemManager v0183 自測 39/39(v0182 全部 + P1 標準轉交者 · P2 沙盒真跑 · P3 導覽列)。沙盒實測(擷取 fixture 輸出排成工作站資料家:output_hub/mega 兩本正典庫):sync 建 4 檔 7,446 列 → 重跑 0 寫 4 不動 → 下一輪擷取後只補 65 列(同鍵重抓 50 列只差擷取時間不收)· status 全綠 · plan 要擷取 0 · 匯出 PC 4 檔 / Google 同步夾 4 檔 → 再匯出 0 複製 · 清單閘(真 fixture 清單)YELLOW(模組自報 V7 / V8 / V9 黃 · 主動式 ETF 合格判定未判 2)· 管理範圍頁桌機 / 手機不橫捲。",
+   "next": "桌機 pull → VDF_SystemManager scope(資料家冊自動選 via_database\\vdf_database)→ parquet plan → parquet sync → parquet export --to <夾|onedrive|gdrive|dropbox>;清單閘綠才拿去擷取",
+   "hand": "操作員(桌機真資料家 · 雲端同步夾 · MCP 上傳由 MCP 端照交接清單做)",
+   "why_homes": "VDF 自己的模組與參數冊;代碼律讀共用的 MDL009 / ENG077(不另寫);他系統不動(L123)",
+   "ts": "2026-11-15T15:04:35Z",
+   "updated_at": "2026-11-15T15:04:35Z"
   }
  ],
  "non_requirements": [
@@ -7641,5 +7663,5 @@
  "why_v0247": "只增:導入 VIA_VCGC_Commercial_Review_v0100(22 差異 · 40 隔離測試 NOT_RUN)→ 8 條 CAND-VCGC-COM-* 候選需求登冊待批(不發正式號);REQ221 補 G7 證據。",
  "why_v0250": "只增:+VDF-REQ026(PARTIAL:主動式台股 ETF 抓不到每日持股 = 不符合;MDL010 v0101 V8 + 擷取冊 v0109;桌機真抓與下游改讀待做);VDF-REQ025 / 026 歸屬補工作流冊 VIA_Workflow_VDF_SSOT_v0110.json(WKF018 / WKF019 回指;AGENTS.md 第 3 條 · PR 650 Codex P1);tally 照 requirements 逐筆重數;其餘一字不動。",
  "why_v0251": "只增:+VDF-REQ027(PARTIAL:統一 SSOT 分享 · MDL018 v0100 · MDL014 v0101 yf 後綴照市場 · 擷取冊 v0110;桌機真資料與各系統自己讀待做);tally 照 requirements 逐筆重數;其餘一字不動。",
- "why_v0252": "只增:+VDF-REQ028(PARTIAL:資料庫狀態矩陣 MDL019 v0100 · 管理員 v0182 套進資料庫頁;桌機真資料待做)· +VDF-REQ029(PARTIAL:DuckDB 現查核對 + 增量維護實測 · VRN-2 自己的 manager 實測;桌機真資料家待做);tally 照 requirements 逐筆重數;其餘一字不動。"
+ "why_v0252": "只增:+VDF-REQ028(PARTIAL:資料庫狀態矩陣)· +VDF-REQ029(PARTIAL:DuckDB 現查核對 + 增量維護實測)· +VDF-REQ030(PARTIAL:管理範圍 · 清單輸入閘 · parquet 增量庫 · 增量匯出;桌機真資料家待做);tally 照 requirements 逐筆重數;其餘一字不動。"
 }
