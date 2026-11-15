@@ -2380,6 +2380,7 @@ def main(argv=None) -> int:
 
 DP_VERBS = ("scope", "inputs", "parquet")
 DP_GLOB = "VDF_MDL020_DataPlane_v*.py"
+DP_ENTRY = "VIA_FROM_VDFSM"          # 寫入動詞(sync / export)要的 VDF 總控旗標;CI 沒有 VIA_FROM_VCGC 也要能過(PR 650 Windows CI 實錄)
 
 
 def sm_dataplane(args: list, root: Path, capture: bool = False):
@@ -2395,10 +2396,11 @@ def sm_dataplane(args: list, root: Path, capture: bool = False):
         return 3
     tail = max(hits, key=sm_vnum)
     cmd = [sys.executable, str(tail), *[a for a in args if a != "--legacy"]]
+    env = dict(sm_child_env(), **{DP_ENTRY: "YES"})              # VDF 自己的總控旗標(同 engine run 那條路;不是他系統旗標)
     if capture:
-        cp = subprocess.run(cmd, env=sm_child_env(), capture_output=True, text=True, encoding="utf-8", errors="replace")
+        cp = subprocess.run(cmd, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         return cp.returncode, cp.stdout + cp.stderr
-    return subprocess.run(cmd, env=sm_child_env()).returncode
+    return subprocess.run(cmd, env=env).returncode
 
 
 def dp_selftest(ck, root: Path) -> None:
@@ -2408,6 +2410,20 @@ def dp_selftest(ck, root: Path) -> None:
     ck("P1 主分派多一行資料平面 if(登在本版 SM_MAIN_IFS)· 本檔照樣是標準轉交者 · 三動詞不在原生表(不搶前版)",
        me["standard"] and 'if verb in DP_VERBS and "--legacy" not in args:' in SM_MAIN_IFS and not set(DP_VERBS) & set(SM_NATIVE), me.get("why"))
     hits = sorted((root / SM_CONFIG["dir"]).glob(DP_GLOB), key=sm_vnum)
+    saved = {k: os.environ.pop(k, None) for k in ("VIA_FROM_VCGC", DP_ENTRY)}   # 照 CI:呼叫端沒有任何入口旗標也要能寫
+    try:
+        _dp_sandbox(ck, root, hits)
+    finally:
+        for k, v in saved.items():
+            if v is not None:
+                os.environ[k] = v
+    text = SM_HERE.read_text(encoding="utf-8")
+    ck("P3 管理員頁導覽列有「VDF 管理範圍」· help 列出三動詞 · 不動態載入他檔(子行程叫資料平面)· 只帶 VDF 自己的旗標",
+       "('VDF 管理範圍', 'VIA_Reports/vdf/VDF_SCOPE_latest.html')" in text and "資料平面(v0183" in text and sm_static_checks(SM_HERE)["P4_no_peer_import"]
+       and DP_ENTRY not in SM_CONFIG["peer_gate_flags"])
+
+
+def _dp_sandbox(ck, root: Path, hits: list) -> None:
     with tempfile.TemporaryDirectory() as td:
         tr = Path(td)
         (tr / SM_CONFIG["dir"]).mkdir(parents=True)
@@ -2435,10 +2451,8 @@ def dp_selftest(ck, root: Path) -> None:
                 note = (r1[1][-200:], r2[1][-160:], r3[1][-160:])
             else:
                 ok_run, note = True, "duckdb 不在 → 只驗轉交"
-    ck("P2 沙盒真跑(%s):parquet sync 建 tw__ 檔 · 重跑沒新鍵不動檔 · status 列得出 · 模組不在 → ABSENT rc 3"
+    ck("P2 沙盒真跑(%s · 呼叫端沒有入口旗標,同 CI):parquet sync 建 tw__ 檔 · 重跑沒新鍵不動檔 · status 列得出 · 模組不在 → ABSENT rc 3"
        % (hits[-1].name if hits else "資料平面模組不在倉"), r0[0] == 3 and "ABSENT" in r0[1] and (ok_run or not hits), note)
-    ck("P3 管理員頁導覽列有「VDF 管理範圍」· help 列出三動詞 · 不動態載入他檔(子行程叫資料平面)",
-       "('VDF 管理範圍', 'VIA_Reports/vdf/VDF_SCOPE_latest.html')" in text and "資料平面(v0183" in text and sm_static_checks(SM_HERE)["P4_no_peer_import"])
 
 
 if __name__ == "__main__":
