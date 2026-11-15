@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-15T15:46:32Z",
+ "updated_at": "2026-11-15T18:02:52Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -10542,6 +10542,59 @@
    "reason": "真擷取 2022-01-01~最新要操作員開兩道同意閘(AI 不代設);真資料家 via_database\\vdf_database 在桌機;容器實跑 ENG064 照實被閘擋(GATED)",
    "next": "桌機 pull → 自己的視窗設同意閘 → VDF_SystemManager parquet backfill --start 2022-01-01 → parquet view",
    "updated_at": "2026-11-15T15:46:32Z"
+  },
+  {
+   "id": "VDF-REQ032:V-vdf-dataplane-v0102",
+   "requirement": "VDF-REQ032",
+   "case": "V-vdf-dataplane-v0102",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "MDL020 v0102:群組起始日同步 · 清單每檔內容版本 + 註冊時間 · 檔名協定不變 · parquet io 輸入 7 + 輸出 21 矩陣;自測 6/6 含 v0101 11/11;handoff test rc 0 · marker true(2026-11-15T18:02:01+00:00 · sha 73b3fc1a1383)",
+   "next": "桌機 parquet io --home <資料家>",
+   "updated_at": "2026-11-15T18:02:52Z",
+   "receipt": "docs/handoff/evidence/V-vdf-dataplane-v0102.json"
+  },
+  {
+   "id": "VDF-REQ032:workstation-io",
+   "requirement": "VDF-REQ032",
+   "case": null,
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "真資料家在桌機;群組起始日目前 4 群皆 2022-01-01、清單群整份(要改某群 = 出新版冊)",
+   "next": "桌機 pull → VDF_SystemManager parquet io / parquet sync",
+   "updated_at": "2026-11-15T18:02:52Z"
+  },
+  {
+   "id": "VDF-REQ033:V-vdf-finperiod-v0100",
+   "requirement": "VDF-REQ033",
+   "case": "V-vdf-finperiod-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "MDL021 v0100:累計拆單季 · K1 / K2 / K3 · NVDA 會計年度 1 月底 · 抓錯三種 · 讀正典庫只取 YTD 損益;自測 8/8(夾具示例數字,非真財報);handoff test rc 0 · marker true(2026-11-15T18:02:20+00:00 · sha dedc81ef0487)",
+   "next": "桌機 engine run VDF_MDL021_FinPeriodCheck run --tickers 3017,3324,NVDA",
+   "updated_at": "2026-11-15T18:02:52Z",
+   "receipt": "docs/handoff/evidence/V-vdf-finperiod-v0100.json"
+  },
+  {
+   "id": "VDF-REQ033:workstation-real-fin",
+   "requirement": "VDF-REQ033",
+   "case": null,
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "3017 / 3324 / NVDA 真財報要 ENG082 交易所車道 + yfinance 車道在桌機抓過(同意閘操作員設);NVDA 若不在 tw_financial 用 --file",
+   "next": "桌機抓完財報 → MDL021 run → 看頁",
+   "updated_at": "2026-11-15T18:02:52Z"
+  },
+  {
+   "id": "VRN-REQ020:V-vrn2-finextract-v0102",
+   "requirement": "VRN-REQ020",
+   "case": "V-vrn2-finextract-v0102",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "VRN-2 擷取器 v0102:EPS 標明照標明 · 沒標明兩值取小 · 一值取並標註區分不明確 · 冊 v0101 只增;自測 9/9 含 v0101 十檢;handoff test rc 0 · marker true(2026-11-15T18:02:31+00:00 · sha 3ace00c1c033)",
+   "next": "VRN-2 桌機跑真財報頁照用",
+   "updated_at": "2026-11-15T18:02:52Z",
+   "receipt": "docs/handoff/evidence/V-vrn2-finextract-v0102.json"
   }
  ]
 }
