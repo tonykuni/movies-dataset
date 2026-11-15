@@ -4736,99 +4736,6 @@
    "timeout_seconds": 1800,
    "registered_at": "2026-11-10T06:30:00Z"
   },
-  "C-vqg-v0111": {
-   "argv": [
-    "--family",
-    "core",
-    "functional modules/VQG/VQG_AllInOne_v0111.py",
-    "--selftest"
-   ],
-   "success_marker": "[PASS] VQG v0111 selftest · 本版 12/12 · 前版鏈 v0110 PASS",
-   "scope": "VQG v0111:indicators 動詞 · VQG 指標登記冊 v0100(66 列:19 技術指標 · 11 量化分析 · 4 策略 · 9 回測績效 · 8 因子 · 5 因子檢定 · 10 報酬統計)· 冊⇄程式對帳 · 匯出 CSV/MD + v0110 鏈",
-   "dependencies": [
-    "functional modules/VQG/VQG_AllInOne_v0111.py",
-    "functional modules/VQG/VQG_AllInOne_v0110.py",
-    "functional modules/VQG/VQG_IndicatorRegister_SSOT_v0100.json"
-   ],
-   "version": "v0111",
-   "updated_at": "2026-11-11T03:30:00Z",
-   "timeout_seconds": 1800,
-   "registered_at": "2026-11-11T03:30:00Z"
-  },
-  "C-vdf-mdl008-v0109": {
-   "argv": [
-    "--family",
-    "core",
-    "functional modules/VDF/VDF_MDL008_FetchSystem_v0109.py",
-    "--selftest",
-    "--deep"
-   ],
-   "success_marker": "[計] VDF_MDL008_FetchSystem v0109 本版 9/9 · 合計 PASS",
-   "scope": "VDF_MDL008_FetchSystem v0109:子行程改指本版(v0108 只換父行程載冊 · 子行程仍是 v0107 → 009 = MDL009 v0102 · 清單無 shares_issued)→ 子行程載冊 009 = v0103 + v0108 鏈",
-   "dependencies": [
-    "functional modules/VDF/VDF_MDL008_FetchSystem_v0109.py",
-    "functional modules/VDF/VDF_MDL008_FetchSystem_v0108.py",
-    "functional modules/VDF/VDF_FetchSystem_SSOT_v0108.json",
-    "functional modules/VDF/VDF_MDL009_TWStockList_v0103.py"
-   ],
-   "version": "v0109",
-   "updated_at": "2026-11-11T01:10:00Z",
-   "timeout_seconds": 1800,
-   "registered_at": "2026-11-11T01:10:00Z"
-  },
-  "C-sm-vdf-v0170": {
-   "argv": [
-    "--family",
-    "core",
-    "functional modules/VDF/VDF_SystemManager_v0170.py",
-    "--selftest"
-   ],
-   "success_marker": "[計] VDF_SystemManager v0170 自測 16/16 PASS",
-   "scope": "VDF_SystemManager v0170:test 改本系統逐支跑(v0169 轉交到沒有 test 的前版)· 引擎 rc 依 L16 分類;16 項",
-   "dependencies": [
-    "functional modules/VDF/VDF_SystemManager_v0170.py",
-    "functional modules/VDF/VDF_SystemManager_v0169.py"
-   ],
-   "version": "v0170",
-   "updated_at": "2026-11-12T19:30:00Z",
-   "timeout_seconds": 900,
-   "registered_at": "2026-11-12T19:30:00Z"
-  },
-  "C-sm-vrn-v0264": {
-   "argv": [
-    "--family",
-    "core",
-    "functional modules/VRN/VRN_SystemManager_v0277.py",
-    "--selftest"
-   ],
-   "success_marker": "[計] VRN_SystemManager v0277 自測 17/17 PASS",
-   "scope": "VRN_SystemManager v0277:test 依 L16 分 PASS / NODATA / ABSENT / GATED / FAIL(v0263 把缺件記成失敗);17 項",
-   "dependencies": [
-    "functional modules/VRN/VRN_SystemManager_v0277.py",
-    "functional modules/VRN/VRN_SystemManager_v0276.py"
-   ],
-   "version": "v0264",
-   "updated_at": "2026-11-12T19:30:00Z",
-   "timeout_seconds": 900,
-   "registered_at": "2026-11-12T19:30:00Z"
-  },
-  "C-desktop-validate-v0100": {
-   "argv": [
-    "--family",
-    "core",
-    "docs/handoff/ai/VIA_DesktopValidate_v0100.py",
-    "--selftest"
-   ],
-   "success_marker": "[PASS] VIA_DesktopValidate v0100 selftest · 13/13",
-   "scope": "VIA_DesktopValidate v0100:唯讀驗證三系統產出(管理器 health · 清單股數 · 持股率越界 · VRN 收據 · VQG 指標冊 · prove)",
-   "dependencies": [
-    "docs/handoff/ai/VIA_DesktopValidate_v0100.py"
-   ],
-   "version": "v0100",
-   "updated_at": "2026-11-12T19:30:00Z",
-   "timeout_seconds": 900,
-   "registered_at": "2026-11-12T19:30:00Z"
-  },
   "C-nearcomplete-lock": {
    "argv": [
     "--family",
@@ -4953,6 +4860,204 @@
    "version": "v0101",
    "updated_at": "2026-11-10T14:49:40Z",
    "timeout_seconds": 600
+  },
+  "V-vdf-macro-hierarchy-v0102": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL015_MacroHierarchy",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL015_MacroHierarchy v0102 薄尾 5/5 · PASS",
+   "scope": "VDF MDL015 v0102:前版鏈(v0101 VAKE 測具 → v0100 14 項)在子行程跑,子環境只少 FRED 環境鑰那一個名字;本行程環境不動;AST 定位根因 v0100 _key_value() 先讀環境鑰;AI 不設 / 不寫 / 不讀鑰值(工作站 2026-11-15 RED 3/4 的修正)。經 VDF 自己的 manager(VDF_SystemManager engine run)跑 · VCGC 只記收據(AGENTS.md 第 5 條 · PR 648 Codex P1)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0102.py",
+    "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0101.py",
+    "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0100.py",
+    "functional modules/VDF/VDF_MacroKeyword_SSOT_v0100.json",
+    "functional modules/VDF/VDF_USMacro_Tree_v0100.json",
+    "supportive modules/network/via_net_unified_v0101.py"
+   ],
+   "version": "v0102",
+   "updated_at": "2026-11-15T04:07:54Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-15T03:57:13Z"
+  },
+  "V-vdf-macro-crosscheck-v0102": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL016_MacroCrossCheck",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL016_MacroCrossCheck v0102 薄尾 5/5 · PASS",
+   "scope": "VDF MDL016 v0102:前版鏈(v0101 VAKE 測具 → v0100 16 項)在子行程跑,子環境只少 FRED 環境鑰那一個名字;本行程環境不動;AST 定位根因 v0100 find_key() 先讀環境鑰;AI 不設 / 不寫 / 不讀鑰值(工作站 2026-11-15 RED 3/4 的修正)。經 VDF 自己的 manager(VDF_SystemManager engine run)跑 · VCGC 只記收據(AGENTS.md 第 5 條 · PR 648 Codex P1)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0102.py",
+    "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0101.py",
+    "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0100.py",
+    "functional modules/VDF/VDF_MacroCrossCheck_Pairs_SSOT_v0100.json",
+    "supportive modules/network/via_net_unified_v0101.py"
+   ],
+   "version": "v0102",
+   "updated_at": "2026-11-15T04:07:54Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-15T03:57:13Z"
+  },
+  "C-bridge-sweeper-v0105": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/via_bridge_sweeper_v0105.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] via_bridge_sweeper v0105 selftest · 本版 4/4",
+   "scope": "雙橋稽核 v0105:v0104 原封(SHA = C-bridge-sweeper-v0104 收據)· 標準加速器橋塊放本版 · 正尺 CGC_MDL124 v0111 掃描本版 HAS / 前版 版史 · 前版鏈自測 rc 0(PR 647 Codex P1 · AGENTS.md 第 4 條)",
+   "dependencies": [
+    "supportive modules/registry/via_bridge_sweeper_v0105.py",
+    "supportive modules/registry/via_bridge_sweeper_v0104.py",
+    "supportive modules/registry/via_bridge_sweeper_v0103.py",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0111.py",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0109.py"
+   ],
+   "version": "v0105",
+   "updated_at": "2026-11-15T03:57:13Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-15T03:57:13Z"
+  },
+  "V-vdf-workstation-sync-v0103": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL014_WorkstationSync",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL014_WorkstationSync v0103 薄尾 7/7 · PASS",
+   "scope": "VDF MDL014 v0103:資料接點(output_hub · VIA_Reports/vdf_fetch)不論 git 報成檔 / 資料夾 / 走進去列檔都不算工作樹髒;自測當場真接一個接點量本機 git(列出 / 藏起);前版鏈 v0102 → v0101 → v0100,rc≠0 只在 Windows 平台前提(v0101-⑤ 第二子句)時改判。經 VDF 自己的 manager 跑(AGENTS.md 第 5 條);預演的 NEXT 指向 v0103(PR 649 Codex P2)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL014_WorkstationSync_v0103.py",
+    "functional modules/VDF/VDF_MDL014_WorkstationSync_v0102.py",
+    "functional modules/VDF/VDF_MDL014_WorkstationSync_v0101.py",
+    "functional modules/VDF/VDF_MDL014_WorkstationSync_v0100.py"
+   ],
+   "version": "v0103",
+   "updated_at": "2026-11-15T04:39:55Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-15T04:26:00Z"
+  },
+  "V-vdf-userkeys-v0100": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL017_UserApiKeys",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL017_UserApiKeys v0100 自測 10/10 · PASS",
+   "scope": "VDF MDL017 v0100:個人鑰存每個使用者自己的設定檔(隱藏輸入 · 驗格式 · 原子寫 · POSIX 600)· 順序 個人鑰 → 環境測試鑰 → 舊共用 → 沒有 · run 只在子行程環境放個人鑰 · status 不露鑰 · 自測全在暫存夾。經 VDF 自己的 manager 跑(AGENTS.md 第 5 條)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-15T05:08:57Z",
+   "timeout_seconds": 300,
+   "registered_at": "2026-11-15T05:08:57Z"
+  },
+  "C-vqg-v0111": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VQG/VQG_AllInOne_v0111.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VQG v0111 selftest · 本版 12/12 · 前版鏈 v0110 PASS",
+   "scope": "VQG v0111:indicators 動詞 · VQG 指標登記冊 v0100(66 列:19 技術指標 · 11 量化分析 · 4 策略 · 9 回測績效 · 8 因子 · 5 因子檢定 · 10 報酬統計)· 冊⇄程式對帳 · 匯出 CSV/MD + v0110 鏈",
+   "dependencies": [
+    "functional modules/VQG/VQG_AllInOne_v0111.py",
+    "functional modules/VQG/VQG_AllInOne_v0110.py",
+    "functional modules/VQG/VQG_IndicatorRegister_SSOT_v0100.json"
+   ],
+   "version": "v0111",
+   "updated_at": "2026-11-11T03:30:00Z",
+   "timeout_seconds": 1800,
+   "registered_at": "2026-11-11T03:30:00Z"
+  },
+  "C-vdf-mdl008-v0109": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0109.py",
+    "--selftest",
+    "--deep"
+   ],
+   "success_marker": "[計] VDF_MDL008_FetchSystem v0109 本版 9/9 · 合計 PASS",
+   "scope": "VDF_MDL008_FetchSystem v0109:子行程改指本版(v0108 只換父行程載冊 · 子行程仍是 v0107 → 009 = MDL009 v0102 · 清單無 shares_issued)→ 子行程載冊 009 = v0103 + v0108 鏈",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0109.py",
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0108.py",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0108.json",
+    "functional modules/VDF/VDF_MDL009_TWStockList_v0103.py"
+   ],
+   "version": "v0109",
+   "updated_at": "2026-11-11T01:10:00Z",
+   "timeout_seconds": 1800,
+   "registered_at": "2026-11-11T01:10:00Z"
+  },
+  "C-sm-vdf-v0170": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_SystemManager_v0170.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_SystemManager v0170 自測 16/16 PASS",
+   "scope": "VDF_SystemManager v0170:test 改本系統逐支跑(v0169 轉交到沒有 test 的前版)· 引擎 rc 依 L16 分類;16 項",
+   "dependencies": [
+    "functional modules/VDF/VDF_SystemManager_v0170.py",
+    "functional modules/VDF/VDF_SystemManager_v0169.py"
+   ],
+   "version": "v0170",
+   "updated_at": "2026-11-12T19:30:00Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-12T19:30:00Z"
+  },
+  "C-sm-vrn-v0264": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VRN/VRN_SystemManager_v0277.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VRN_SystemManager v0277 自測 17/17 PASS",
+   "scope": "VRN_SystemManager v0277:test 依 L16 分 PASS / NODATA / ABSENT / GATED / FAIL(v0263 把缺件記成失敗);17 項",
+   "dependencies": [
+    "functional modules/VRN/VRN_SystemManager_v0277.py",
+    "functional modules/VRN/VRN_SystemManager_v0276.py"
+   ],
+   "version": "v0264",
+   "updated_at": "2026-11-12T19:30:00Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-12T19:30:00Z"
+  },
+  "C-desktop-validate-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_DesktopValidate_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_DesktopValidate v0100 selftest · 13/13",
+   "scope": "VIA_DesktopValidate v0100:唯讀驗證三系統產出(管理器 health · 清單股數 · 持股率越界 · VRN 收據 · VQG 指標冊 · prove)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_DesktopValidate_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-12T19:30:00Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-12T19:30:00Z"
   },
   "C-vdf-eng051-v0104": {
    "argv": [
@@ -10830,6 +10935,71 @@
    "next": "操作員上傳原件 → VRN2_NonStockSummarizer 自動改用原件(ORIGINAL)· 不用改程式",
    "receipt": null,
    "updated_at": "2026-11-12T21:00:00Z"
+  },
+  {
+   "id": "VDF-REQ023:V-vdf-macro-hierarchy-v0102",
+   "requirement": "VDF-REQ023",
+   "case": "V-vdf-macro-hierarchy-v0102",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "工作站 2026-11-15 v0101 RED 3/4(操作員設了 FRED 環境鑰 → v0100 自測驗假鑰檔 FAIL)→ v0102 子環境少鑰名;經 VDF_SystemManager engine run(AGENTS.md 第 5 條)· handoff test rc 0 · marker true(2026-11-15T04:08:09+00:00 · sha db6725bc2bc0)",
+   "next": "工作站拉 main 重跑 VDF:確認 GREEN 與「本機有沒有設 FRED 環境鑰」那一行",
+   "receipt": "docs/handoff/evidence/V-vdf-macro-hierarchy-v0102.json",
+   "updated_at": "2026-11-15T04:08:42Z"
+  },
+  {
+   "id": "VDF-REQ024:V-vdf-macro-crosscheck-v0102",
+   "requirement": "VDF-REQ024",
+   "case": "V-vdf-macro-crosscheck-v0102",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "工作站 2026-11-15 v0101 RED 3/4(同 MDL015 根因:find_key 先讀環境鑰)→ v0102;經 VDF_SystemManager engine run(AGENTS.md 第 5 條)· handoff test rc 0 · marker true(2026-11-15T04:08:28+00:00 · sha 3933d56bbd2a)",
+   "next": "工作站拉 main 重跑 VDF 確認 GREEN",
+   "receipt": "docs/handoff/evidence/V-vdf-macro-crosscheck-v0102.json",
+   "updated_at": "2026-11-15T04:08:42Z"
+  },
+  {
+   "id": "VCGC-REQ220:C-bridge-sweeper-v0105",
+   "requirement": "VCGC-REQ220",
+   "case": "C-bridge-sweeper-v0105",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "v0104 原封(SHA = 收據)· 標準加速器橋放 v0105(PR 647 Codex P1);handoff test rc 0 · marker true(2026-11-15T03:58:28Z · sha fb753f4d9bad)",
+   "next": "VDF 對外擷取真抓驗證 = 操作員",
+   "receipt": "docs/handoff/evidence/C-bridge-sweeper-v0105.json",
+   "updated_at": "2026-11-15T03:59:43Z"
+  },
+  {
+   "id": "VDF-REQ018:V-vdf-workstation-sync-v0103",
+   "requirement": "VDF-REQ018",
+   "case": "V-vdf-workstation-sync-v0103",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "工作站 2026-11-15 11:33 v0102 6/7 · v0101-⑤ FAIL(平台前提:Windows git 把接點當資料夾)→ v0103 濾接點更寬 + 本機 git 量測改判;NEXT 指向 v0103(PR 649 Codex P2);經 VDF_SystemManager engine run · handoff test rc 0 · marker true(2026-11-15T04:40:14Z · sha fe4fc7de6019 · 自測 7/7)",
+   "next": "工作站拉 main 重跑 VDF:看 v0103 印的「本機 git 報接點:列出 / 藏起」與 GREEN",
+   "receipt": "docs/handoff/evidence/V-vdf-workstation-sync-v0103.json",
+   "updated_at": "2026-11-15T04:41:00Z"
+  },
+  {
+   "id": "VDF-REQ025:V-vdf-userkeys-v0100",
+   "requirement": "VDF-REQ025",
+   "case": "V-vdf-userkeys-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "MDL017 v0100 個人鑰模組(存 / 讀 / 順序 / run / status 不露鑰)自測 10/10;經 VDF_SystemManager engine run;handoff test rc 0 · marker true(2026-11-15T05:09:14Z · sha 4945f41fa12c)",
+   "next": "桌機每個人 set fred → status → run -- ActivateVDF",
+   "receipt": "docs/handoff/evidence/V-vdf-userkeys-v0100.json",
+   "updated_at": "2026-11-15T05:08:57Z"
+  },
+  {
+   "id": "VDF-REQ025:workstation-each-user-key",
+   "requirement": "VDF-REQ025",
+   "case": null,
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "容器沒有任何人的真鑰,也不代輸;個人鑰的真實使用只能在桌機由每個人自己輸入後驗",
+   "next": "桌機:`python VDF_MDL017_UserApiKeys_v0100.py set fred` → `status` 顯示「實際會用:個人鑰」→ `run -- python ActivateVDF.py run --db-home …` 的 [鑰] 行顯示個人鑰;之後 AI 逐支引擎出新版直接讀個人鑰",
+   "updated_at": "2026-11-15T05:08:57Z"
   },
   {
    "id": "VRN-REQ020:C-vrn2-nonstock-core-v0100",

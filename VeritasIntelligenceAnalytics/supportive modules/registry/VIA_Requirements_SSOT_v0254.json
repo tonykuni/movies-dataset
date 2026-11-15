@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0254",
- "batch": "X-REQ 歸屬格式:19 條需求的 homes 寫了檔案路徑 → 改指工作流代碼(依工作流 spec.requirements 回指),路徑移 homes_files",
- "ts": "2026-11-13T17:30:00Z",
+ "batch": "VDF 個人 API 鑰(2026-11-15):VDF-REQ025 每個人輸入自己的 API 鑰 · 環境鑰只當測試鑰(前版 v0248)",
+ "ts": "2026-11-15T05:08:57Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -140,7 +140,7 @@
  "tally": {
   "RECORDED": 26,
   "COVERED": 148,
-  "PARTIAL": 122,
+  "PARTIAL": 123,
   "MISSING": 1
  },
  "requirements": [
@@ -7191,6 +7191,26 @@
    ]
   },
   {
+   "code": "VDF-REQ025",
+   "subsystem": "VDF",
+   "topic": "每個人輸入自己的 API 鑰(個人設定檔)· 環境鑰只當測試鑰",
+   "requirement": "操作員 2026-11-15:「環境鑰用於測試用 最後版本要輸入每個人的API KEY」;存放位置操作員選「個人設定檔(每個 Windows 使用者自己的 %APPDATA%\\VIA\\keys)」",
+   "status": "PARTIAL",
+   "homes": [
+    "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py",
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py"
+   ],
+   "evidence": "2026-11-15 容器:MDL017 v0100 自測 10/10(暫存夾 · 不碰真個人鑰 · 本行程環境不變);VDF_SystemManager engine run 同結果;順序 個人鑰 → 環境測試鑰 → 舊共用鑰匙檔 → 沒有;run -- <指令> 只在子行程環境放個人鑰。讀 FRED 鑰的 9 支引擎(MDL003 · MDL012 · MDL015 · MDL016 · MDL201 · ENG047 · ENG055 · ENG074 · ENG110)都先讀環境變數 → 經 run 包起來即用個人鑰,引擎一字不動",
+   "next": "桌機每個人:`python VDF_MDL017_UserApiKeys_v0100.py set fred`(隱藏輸入)→ `status` 看「實際會用:個人鑰」→ 以 `run -- python ActivateVDF.py run …` 跑;之後各引擎出新版直接讀個人鑰(可不經 run)、舊共用鑰匙檔改提示搬到個人鑰",
+   "hand": "操作員(每個人輸入自己的鑰)+ AI(引擎逐支接個人鑰)",
+   "why_homes": "VDF 自己的鑰(FRED 只在 VDF 用);不碰同意閘;四系統獨立",
+   "ts": "2026-11-15T05:08:57Z",
+   "updated_at": "2026-11-15T05:08:57Z"
+  },
+  {
    "code": "VRN-REQ020",
    "subsystem": "VRN",
    "topic": "VRN-2 非個股車道:非個股摘要器 v0310(v0300 同邏輯)整合 · 輸入 PDF / Word / 圖片 / 文字 / 網頁 / 訊息(JSON · .eml · LINE 匯出)/ 筆記 · 一檔一列矩陣(標題 + 四點 + 原句驗證 + 狀態)· 個股報告仍歸 VRN-2 主線",
@@ -8049,5 +8069,6 @@
  "why_v0250": "只增:+VCGC-REQ223;其餘一字不動。",
  "why_v0251": "只增:+VDF-REQ027 · +VRN-REQ021;其餘一字不動。",
  "why_v0252": "SDDValidator X-REQ RED:homes 只收工作流 / 步代碼、律號或 VIA_ / docs/ / CLAUDE.md / Master 開頭的冊;19 條寫了檔案路徑(functional modules/ · supportive modules/ · review/ …;檔都在,是格式不合不是遺失)。本版把那些路徑移到 homes_files(不丟),有工作流回指的補上工作流代碼。其餘一字不動。",
- "merge_v0253": "CGC_MDL143_MergeMedic_v0106 branch-merge origin/claude/optimistic-goodall-yhalc5:本版 = 他方尾版 VIA_Requirements_SSOT_v0253.json 全部 + 本分支新增(L25 後合者升版;本分支原版號 v0250)"
+ "merge_v0253": "CGC_MDL143_MergeMedic_v0106 branch-merge origin/claude/optimistic-goodall-yhalc5:本版 = 他方尾版 VIA_Requirements_SSOT_v0253.json 全部 + 本分支新增(L25 後合者升版;本分支原版號 v0250)",
+ "merge_v0254": "CGC_MDL143_MergeMedic_v0106 branch-merge origin/main:本版 = 他方尾版 VIA_Requirements_SSOT_v0249.json 全部 + 本分支新增(L25 後合者升版;本分支原版號 v0253)"
 }
