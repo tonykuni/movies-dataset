@@ -385,20 +385,26 @@ def main(argv=None) -> int:
     if verb not in ("build", "view", "ui"):
         print("[%s] 未知動詞 %s(build [--apply] | view <VCGC|VRN-2|VQG|VAP> | ui | verify [檔] | --selftest)" % (TAG, verb))
         return 2
-    b = build_share()
-    if verb == "view":
+    if verb == "view":                                 # 各系統拿到的那一份 = 已發佈的 latest(驗過 sha);沒有才現建
         if len(args) < 2:
             print("[用法] view <VCGC|VRN-2|VQG|VAP>")
             return 2
-        print(json.dumps(view(b, args[1]), ensure_ascii=False, indent=1)[:20000])
+        book = load_book()[0]
+        lp = VIA / book["bundle"]["dir"] / book["bundle"]["latest"]
+        b = json.loads(lp.read_text(encoding="utf-8")) if lp.is_file() else build_share()
+        if lp.is_file() and not verify(b)["identical"]:
+            print("[%s] view · latest 的 sha 對不上 → 不用(DIFFERENT)" % TAG)
+            return 1
+        print(json.dumps(view(b, args[1], book), ensure_ascii=False, indent=1)[:20000])
         return 0
+    b = build_share()
     print("[%s] %s · 列 %d · 個股 %d · 主動 ETF %d(符合 %d · 不符合 %d · 未判 %d)· 指數 %d · sha %s" % (
         TAG, b["lamp"], b["counts"]["total"], b["counts"]["by_group"].get("IN-01", 0), b["counts"]["by_group"].get("IN-02", 0),
         b["counts"]["etf"]["qualified"], b["counts"]["etf"]["not_qualified"], b["counts"]["etf"]["undetermined"],
         b["counts"]["by_group"].get("IN-03", 0), b["content_sha256"][:16]))
     for c in b["universe"]["checks"]:
         print("  [%-6s] %-4s %s · %s" % (c["lamp"], c["id"], c["name"], str(c["note"])[:110]))
-    print("  [%-6s] V8   %s" % (b["qualify"]["lamp"], b["qualify"]["note"][:150]))
+    print("  [%-6s] ETF 判定(VDF-REQ026)%s" % (b["qualify"]["lamp"], b["qualify"]["note"][:150]))
     if verb == "ui" or "--apply" in args:
         w = write_bundle(b)
         print("  [寫出] %s\n  [寫出] %s\n  [U/I] %s" % (w["versioned"], w["latest"], w["ui"]))
