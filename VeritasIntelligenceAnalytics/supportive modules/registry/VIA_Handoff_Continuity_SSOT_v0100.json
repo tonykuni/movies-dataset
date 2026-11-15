@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-10T10:05:00Z",
+ "updated_at": "2026-11-15T07:17:01Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4855,6 +4855,70 @@
    "updated_at": "2026-11-15T05:08:57Z",
    "timeout_seconds": 300,
    "registered_at": "2026-11-15T05:08:57Z"
+  },
+  "V-vdf-activate-v0119": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL013_ActivateVDF",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL013_ActivateVDF v0119 前版鏈 rc 0 · PASS",
+   "scope": "VDF MDL013 v0119:本輪鉤載工具的期間標 VIA_VDF_TOOLS_LOADING,期間生的子行程(加速器 import → cross_init → py-cpuinfo 用 sys.executable 再起的 python · 它在 Windows spawn 的 cpuid 行程)不再掛工具、不排准入閘(斷無限遞迴;工作站 v0115 ⑥ 子行程 180 秒逾時 → 前版鏈當機即此);網路工具第一次用到才執行的那段同樣標記;載入看門狗(堆疊寫檔);前版鏈 v0115 自測期間用「v0115 鉤 + 防遞迴」。容器用有深度上限的 cpuinfo 替身重現(前版遞迴到上限 · 本版第 1 層就停)。經 VDF 自己的 manager 跑(AGENTS.md 第 5 條)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL013_ActivateVDF_v0119.py",
+    "functional modules/VDF/VDF_MDL013_ActivateVDF_v0118.py",
+    "functional modules/VDF/VDF_MDL013_ActivateVDF_v0117.py",
+    "functional modules/VDF/VDF_MDL013_ActivateVDF_v0115.py",
+    "supportive modules/VeritasCeleritas_v1141.py"
+   ],
+   "version": "v0119",
+   "updated_at": "2026-11-15T07:17:01Z",
+   "timeout_seconds": 1800,
+   "registered_at": "2026-11-15T07:17:01Z"
+  },
+  "V-vdf-active-etf-list-v0101": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL010_ActiveETFList",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL010_ActiveETFList v0101 前版鏈 rc 0 · PASS",
+   "scope": "VDF MDL010 v0101(VDF-REQ026「主動式台股ETF若無法抓取每日持股資訊就代表不符合」):V8 讀 ENG051 自己的擷取紀錄 fetch_status(匯出 parquet 優先 · 沒有才唯讀開 ActiveTWETF.duckdb · 多根取最新一輪)→ 最新一輪 PASS 且持股 > 0 = 符合 · FAIL / 持股 0 = 不符合 · 國外成分 = 不符合 · 沒紀錄 = 未判(黃,不猜);清單列 / 欄 / DuckDB 表照 v0100;另寫 active_etf_qualified_latest.csv;qualify 不連網重判;擷取系統 fixture 換的網路入口轉得到 v0100 collect。經 VDF 自己的 manager 跑",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL010_ActiveETFList_v0101.py",
+    "functional modules/VDF/VDF_MDL010_ActiveETFList_v0100.py",
+    "functional modules/VDF/VDF_MDL009_TWStockList_v0103.py",
+    "functional modules/VDF/VDF_MDL009_TWStockList_v0100.py",
+    "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0100.py"
+   ],
+   "version": "v0101",
+   "updated_at": "2026-11-15T07:17:01Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-15T07:17:01Z"
+  },
+  "V-vdf-fetchsystem-book-v0109": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL008_FetchSystem",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL008_FetchSystem v0110 本版 9/9 · 合計 PASS",
+   "scope": "VDF 擷取冊 v0109:010 改指 VDF_MDL010_ActiveETFList_v0101.py(V8 每日持股可抓判定 · VDF-REQ026);擷取函式定位留 v0100 collect(帶 file);輸出契約不變;其餘 36 列與 v0108 一字不差。擷取系統 v0110 整本讀尾版冊 → 本冊生效(9/9);另以 fixture 離線網實跑 fetch run MDL010 → 輸出 2/2 · V8 黃(沙盒沒有 ENG051 紀錄)",
+   "dependencies": [
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0109.json",
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0110.py",
+    "functional modules/VDF/VDF_MDL010_ActiveETFList_v0101.py"
+   ],
+   "version": "v0109",
+   "updated_at": "2026-11-15T07:17:01Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-15T07:17:01Z"
   }
  },
  "work_items": [
