@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CGC_MDL237_NumberingSystem v0121 — 薄尾:檔名規則閘(P2 · 不合格不給號)
+"""CGC_MDL237_NumberingSystem v0123 — 薄尾:檔名規則閘(P2 · 不合格不給號)
 
 操作員令(2026-11-10 / 11):「檔名依規定並註記版本號 · 自動編號註冊衝突重複檢測 · 編號功能今天算才嚴格啟用」→
 規劃 VIA_RegistryUpgrade_Plan_20261110 P2;操作員「繼續做 P2 檔名規則閘」。
@@ -10,7 +10,7 @@
   N1 檔名 = <族>_v<NNNN>.<py|ps1>(族:英數 · 底線 · 連字號 · 點;版號恰 4 位數)→ 不合 = FAIL
   N2 不撞同族:同一檔名(族 + 版號)已在樹上另一處(參考 / 收件 / 報表 / 退役夾除外)→ FAIL(同號兩份,誰是正本說不清)
   N3 版號只增:同夾同族已有更大的版號 → HOLD(補環要人明說:--allow-gap <檔>)
-FAIL / HOLD 的檔從本批拿掉(不給號);其餘照 v0120 發號 + 收據。本批全被擋 → rc 2,一列不寫。
+FAIL / HOLD 的檔從本批拿掉(不給號);其餘照 v0122 發號 + 收據。本批全被擋 → rc 2,一列不寫。
 每個判定寫一列到只增帳 registry/VIA_RegistrationGate_v0100.jsonl(at 到分鐘 · operator · file · verdict · rules · engine)= 自動註冊 LOG。
 `gate <檔…>`:只判不寫(試算)。
 只收 VCGC 呼叫(經 via-vcgc run);零網路;不碰 TA-Lib;只讀子系統的檔。
@@ -58,7 +58,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ENGINE = Path(__file__).stem
-VERSION = "v0121"
+VERSION = "v0123"
 _STEM = "CGC_MDL237_NumberingSystem"
 GATE_LOG = HERE / "VIA_RegistrationGate_v0100.jsonl"
 CODE_EXT = (".py", ".ps1")
@@ -81,7 +81,7 @@ def _load_v0121(path: Path, name: str):
 
 
 PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum_v0121(p) < _vnum_v0121(__file__)), key=_vnum_v0121)
-PRIOR = _load_v0121(PRIOR_PATH, _STEM + "_prior_for_" + ENGINE)       # v0120(收據)
+PRIOR = _load_v0121(PRIOR_PATH, _STEM + "_prior_for_" + ENGINE)       # v0122(收據)
 VIA_ROOT = PRIOR.VIA_ROOT
 
 
@@ -259,7 +259,7 @@ def selftest(deep: bool = False) -> int:
     finally:
         PRIOR.main, globals()["gate"] = keep_main, keep_gate
     real = tree_files()
-    chk("真樹可讀(git ls-files)· 前版 v0120 在列", f"supportive modules/registry/{PRIOR_PATH.name}" in real, f"{len(real)} 支")
+    chk("真樹可讀(git ls-files)· 前版 v0122 在列", f"supportive modules/registry/{PRIOR_PATH.name}" in real, f"{len(real)} 支")
     names = [n for n in dir(PRIOR) if not n.startswith("_") and callable(getattr(PRIOR, n, None))]
     chk("尾版保有前版公開名稱(TAILAPI · 經 __getattr__ 轉接)", all(getattr(sys.modules[__name__], n, None) is not None for n in names), f"{len(names)} 支")
     src = Path(__file__).read_text(encoding="utf-8")
@@ -267,7 +267,7 @@ def selftest(deep: bool = False) -> int:
         and not re.search(r"environ\[[\"']VIA_(NET|SCRAPE)_CONSENT", src))
     if deep:
         rc0 = PRIOR.selftest(deep=False)
-        chk("前版 v0120 自測過", rc0 == 0, f"rc {rc0}")
+        chk("前版 v0122 自測過", rc0 == 0, f"rc {rc0}")
     print(f"[計] {_STEM} {VERSION} 本版 {sum(checks)}/{len(checks)} " + ("PASS" if all(checks) else "FAIL")
           + ("" if deep else " · 前版自測另跑(--selftest --deep)"))
     return 0 if all(checks) else 1

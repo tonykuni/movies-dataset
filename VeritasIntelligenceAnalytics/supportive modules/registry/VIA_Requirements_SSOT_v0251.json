@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0251",
- "batch": "VDF / VRN 邊跑邊修(2026-11-13):+VDF-REQ025 · +VRN-REQ021(前版 v0250)",
- "ts": "2026-11-13T13:00:00Z",
+ "batch": "Agent OS + Graphify 併入 VCGC(2026-11-12):+VCGC-REQ223(前版 v0250)",
+ "ts": "2026-11-12T22:30:00Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -7153,14 +7153,14 @@
    "homes": [
     "functional modules/VRN/VRN2_NonStockSummarizer_v0100.py",
     "functional modules/VRN/VRN2_NonStockCore_v0100.py",
-    "functional modules/VRN/VRN2_ReportRows_v0102.py",
+    "functional modules/VRN/VRN2_ReportRows_v0103.py",
     "functional modules/VRN/nonstock_v0310/engine/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310.py"
    ],
    "workflow": null,
    "modules": [
     "functional modules/VRN/VRN2_NonStockSummarizer_v0100.py",
     "functional modules/VRN/VRN2_NonStockCore_v0100.py",
-    "functional modules/VRN/VRN2_ReportRows_v0102.py"
+    "functional modules/VRN/VRN2_ReportRows_v0103.py"
    ],
    "evidence": "2026-11-12 容器:核心 18/18 · 入口 18/18 · ReportRows v0102 8/8;真 PDF 19 份 → 非個股 5 PASS(原句驗證 4/4 ×5)· 個股 14 → 主線車道;夾具 txt / html / json / docx / eml / LINE 文字全過;圖片 = OCR 車道未就緒 → ABSENT 照實",
    "next": "① 操作員原件 internal/NON_STOCK_CORE_v0200.py 到了 → 自動改用原件(模式 ORIGINAL);② 桌機 OCR 隔離境(via_rapidocr 最輕)經 VCGC InstallGate 建 → 圖片 / 掃描 PDF 轉 PASS;③ 桌機有 PyMuPDF → PDF 走 v0310 自己的 VRN-2 版面鏈",
@@ -7192,52 +7192,6 @@
    "next": "桌機:貼 via_graphify_v0101 那一行建隔離 venv(第一次要操作員開 VIA_NET_CONSENT)→ via-vcgc graphify run;「27 工具」= 8+9+10 為 AI 解讀,操作員可更正",
    "hand": "operator(Graphify 隔離 venv · 27 工具解讀確認)",
    "why_homes": "VCGC 自己的冊與入口;Agent OS / Graphify 原檔不改;他系統不動(L123)"
-  },
-  {
-   "code": "VDF-REQ025",
-   "subsystem": "VDF",
-   "topic": "VDF 全量實跑 + 邊跑邊修:管理器 test 依 L16 把缺第三方套件崩潰判 ABSENT · ENG089 自測過時門檻修 · 桌機一鍵 VDF 啟動 → 持股率 → 驗證",
-   "requirement": "操作員 2026-11-13:「啟動VDF VRN邊跑邊修結果驗證」(桌機唯讀驗證 v0101 黃 2:V3 持股率最新日 2026-09-21 · V4 VRN-2 收據最新 2026-11-04)",
-   "status": "PARTIAL",
-   "homes": [
-    "functional modules/VDF/VDF_SystemManager_v0171.py",
-    "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0110.py",
-    "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0109.py",
-    "docs/handoff/ai/VIA_DesktopRunVerify_v0100.ps1"
-   ],
-   "workflow": null,
-   "modules": [
-    "functional modules/VDF/VDF_SystemManager_v0171.py",
-    "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0110.py",
-    "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0109.py"
-   ],
-   "evidence": "2026-11-13 容器全量 VDF 85 支:通過 68 · 缺件/缺料 13 · 失敗 4(ENG053 ⑦ 未映 READY 1 · ENG082 缺 yfinance · ENG089 ⑬ 門檻過時 → v0109 修 · ENG236 ④ 快取測試在有庫的樹上不封閉);管理器 v0171 17/17 · ENG089 v0109 PASS;重跑:ENG089 v0109 漏帶 CATALOG 同步 → ENG093 紅 → v0110 補,ENG093 回綠 16/16",
-   "next": "桌機:VIA_DesktopRunVerify v0100(同意閘由操作員開 → ActivateVDF 實抓 → ENG238 補持股率到最新)· ENG053 ⑦ / ENG236 ④ 待查",
-   "hand": "operator(同意閘 · 桌機實跑)· AI(ENG053 / ENG236)",
-   "why_homes": "VDF 自己的管理器 / 引擎;桌機腳本只跑 VDF 自己的入口"
-  },
-  {
-   "code": "VRN-REQ021",
-   "subsystem": "VRN",
-   "topic": "VRN 全量實跑 + 邊跑邊修:ENG070 交易內取價弄壞交易修 · ENG062 沒測試檔照實 NODATA · 管理器 test 依 L16 判缺套件 ABSENT · 桌機一鍵 VRN-2 RoundAll → 驗證",
-   "requirement": "操作員 2026-11-13:「啟動VDF VRN邊跑邊修結果驗證」(桌機唯讀驗證 v0101 黃 2:V3 持股率最新日 2026-09-21 · V4 VRN-2 收據最新 2026-11-04)",
-   "status": "PARTIAL",
-   "homes": [
-    "functional modules/VRN/VRN_SystemManager_v0265.py",
-    "functional modules/VRN/VRN_ENG070_YahooConsensus_v0105.py",
-    "functional modules/VRN/VRN_ENG062_SummarizerV1_v0114.py",
-    "docs/handoff/ai/VIA_DesktopRunVerify_v0100.ps1"
-   ],
-   "workflow": null,
-   "modules": [
-    "functional modules/VRN/VRN_SystemManager_v0265.py",
-    "functional modules/VRN/VRN_ENG070_YahooConsensus_v0105.py",
-    "functional modules/VRN/VRN_ENG062_SummarizerV1_v0114.py"
-   ],
-   "evidence": "2026-11-13 容器全量 VRN 74 支:通過 52 · 缺件/缺料 10 · 失敗 12(8 缺 fitz · ENG070 TransactionException → v0105 修 6/6 · ENG062 沒測試檔 → v0114 NODATA · ENG087 NLP Hub nfkc 輸出跟期望差一個空格 · ENG088 收容夾 bee8a683c 重收後清冊對不上);管理器 v0265 18/18",
-   "next": "桌機 VIA_DesktopRunVerify v0100 跑 VRN-2 RoundAll(repair / full)→ V4 收據轉新;ENG087 / ENG088 待查",
-   "hand": "operator(桌機實跑)· AI(ENG087 / ENG088)",
-   "why_homes": "VRN-2 自己的管理器 / 引擎"
   }
  ],
  "non_requirements": [
@@ -7630,6 +7584,5 @@
  ],
  "why_v0247": "只增:導入 VIA_VCGC_Commercial_Review_v0100(22 差異 · 40 隔離測試 NOT_RUN)→ 8 條 CAND-VCGC-COM-* 候選需求登冊待批(不發正式號);REQ221 補 G7 證據。",
  "why_v0249": "只增:+VRN-REQ020 非個股 v0310 整合進 VRN-2 + 多格式讀取 + 矩陣輸出;其餘一字不動。",
- "why_v0250": "只增:+VCGC-REQ223;其餘一字不動。",
- "why_v0251": "只增:+VDF-REQ025 · +VRN-REQ021;其餘一字不動。"
+ "why_v0250": "只增:+VCGC-REQ223;其餘一字不動。"
 }

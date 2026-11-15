@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """VRN_ENG088_SsotAdditiveBridge v0101 — v0100 薄尾(v0100 一字不動):收容夾「冊外多出的檔」不把 Python 自動產生的 __pycache__/*.pyc 算進去。
 
-實錄(2026-11-13 容器全量實跑 VRN_SystemManager v0265 test:VRN_ENG088 FAIL rc 1):19 檢只紅 ⑦
+實錄(2026-11-13 容器全量實跑 VRN_SystemManager v0278 test:VRN_ENG088 FAIL rc 1):19 檢只紅 ⑦
   (30 件 · 不符 0 · 夾內多出/少掉 5)。逐檔攤開:多出的 5 件全是
   __pycache__/{VRN_Evidence_Core,audit_ssot,test_vrn_evidence,ticker_regexes}.cpython-313.pyc · baseline/__pycache__/SUP_MDL749_…pyc
   = 任何行程 import 收容夾內的 .py 時 Python 自己寫的位元組碼快取(.gitignore 已忽略、不入倉、隨機器與 Python 版本而變)。

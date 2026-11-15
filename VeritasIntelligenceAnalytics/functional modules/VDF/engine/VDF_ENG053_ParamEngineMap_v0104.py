@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-VDF_ENG053_ParamEngineMap v0103 — v0102 薄尾(v0102 一字不動):車道→引擎的「源碼實證」要看穿薄尾,看到它載入的前版本體。
+VDF_ENG053_ParamEngineMap v0104 — v0102 薄尾(v0102 一字不動):車道→引擎的「源碼實證」要看穿薄尾,看到它載入的前版本體。
 
 實錄(2026-11-13 容器全量重跑 VDF_SystemManager v0171 test:VDF_ENG053 FAIL rc 1):十一檢只紅 ⑦(未映 READY 1 = cnyes_consensus)。
 根因:在役面只收家族尾版(對);ENG050_OrderFetch 尾版 v0102 是薄尾,只換 fetch_twse_lane,

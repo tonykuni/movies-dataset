@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CGC_MDL245_SDDValidator v0108 — v0107 薄尾(v0107 一字不動):本體 rel() 碰到 VIA 樹外的引擎不再整支炸。
+"""CGC_MDL245_SDDValidator v0109 — v0107 薄尾(v0107 一字不動):本體 rel() 碰到 VIA 樹外的引擎不再整支炸。
 
 實錄(2026-11-13 容器 ssot panorama · 慢性 RED「上下連結@VCGC · 正主呼叫失敗 ValueError」):
   工作流冊登了倉根的 VIA_MCP_Engine/VIA_MCP_Engine_v0103.py(MCP 引擎本來就在 VeritasIntelligenceAnalytics 外);
@@ -35,7 +35,7 @@ import re
 import sys
 from pathlib import Path
 
-VERSION = "v0108"
+VERSION = "v0109"
 ENGINE = "CGC_MDL245_SDDValidator " + VERSION
 HERE = Path(__file__).resolve().parent
 _STEM = "CGC_MDL245_SDDValidator"

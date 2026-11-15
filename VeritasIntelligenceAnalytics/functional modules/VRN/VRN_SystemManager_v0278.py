@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VRN_SystemManager v0263 — 標準 System Manager(依 VIA_SystemManager_Standard_v0100 從頭重作)
+"""VRN_SystemManager v0278 — 標準 System Manager(依 VIA_SystemManager_Standard_v0100 從頭重作)
 
 操作員令(2026-11-11):「確認三個獨立系統三個 main() 三個 system manager · 補齊基本功能 · 更健全 · 遵守更新後獨立系統規範 ·
 沒有誰管誰 · 主導全修正全在我跟 AI · 不符合就從頭規劃標準 system manager 重作」。
-實測缺口(2026-11-11):管理器缺 help / health / test / version(未知動詞會順手寫資產登記冊);操作員 2026-11-11:VRN-2 為主 · VRN-1 補強 · 整合後統稱 VRN(L128)
+實測缺口(2026-11-11):v0277 實測(容器 2026-11-13 全量 74 支):8 支缺 fitz 直接 import 崩潰 rc 1 被記成失敗 → 本版依 L16 判 ABSENT 並寫明缺哪個套件(自家模組缺仍算壞);v0276 實測(容器 2026-11-12):test 把引擎 rc 2(缺件 fitz 等 · L16 ≠ 壞)記成失敗 → 13 支誤紅;本版依 L16 分 PASS / NODATA / ABSENT / GATED / FAIL
 本版是 VRN 自己的入口(L120 / L123):
   · 標準動詞本版自己做:help · version · health · engines · records · peers · conform · selftest(本系統另做 test(逐支尾版 --selftest))。
-  · 其餘動詞(前版鏈全部功能)一律以子行程原樣轉交前版 VRN_SystemManager_v0262(參數 · 環境 · rc 不變)—— 只增不減,不可丟失。
+  · 其餘動詞(前版鏈全部功能)一律以子行程原樣轉交前版 VRN_SystemManager_v0277(參數 · 環境 · rc 不變)—— 只增不減,不可丟失。
     標準動詞後加 --legacy 也轉交前版(看前版原本的版本)。
   · 對等:不 import / 不載入其他系統模組(本檔零動態載入);不要求其他系統的放行旗標;peers 只讀對方檔案(不執行對方程式碼、不寫對方)。
   · 編號依 L122 / L125(本檔不寫號冊)。前版檔一字不動(版號律)。不碰 TA-Lib;不讀寫同意閘;零網路。
@@ -90,7 +90,7 @@ SM_CONFIG = {'system': 'VRN',
                    'dir': 'functional modules/VDF',
                    'own_prefixes': ['VDF_'],
                    'reports': ['VIA_Reports/vdf_fetch', 'VIA_Reports/vdf']}}}
-SM_VERSION = "v0263"
+SM_VERSION = "v0278"
 SM_TAG = SM_CONFIG["manager_family"] + " " + SM_VERSION
 SM_HERE = Path(__file__).resolve()
 SM_NATIVE = ("help", "version", "health", "engines", "records", "peers", "conform", "selftest") + tuple(SM_CONFIG["native_extra"])
@@ -319,13 +319,39 @@ def sm_test_native(root: Path, only: str = "", max_n: int = 25, timeout: int = 1
         try:
             r = subprocess.run([sys.executable, str(p), "--selftest"], cwd=tempfile.gettempdir(), capture_output=True, text=True,
                                encoding="utf-8", errors="replace", timeout=timeout, env=sm_child_env())
-            rows.append({"family": fam, "rc": r.returncode, "result": "PASS" if r.returncode == 0 else "FAIL"})
+            res = SM_TEST_RC.get(r.returncode, "FAIL")
+            lib = sm_missing_lib((r.stdout or "") + "\n" + (r.stderr or "")) if res == "FAIL" else ""
+            rows.append({"family": fam, "rc": r.returncode, "result": "ABSENT" if lib else res, **({"why": "缺套件 " + lib} if lib else {})})
         except subprocess.TimeoutExpired:
             rows.append({"family": fam, "rc": 124, "result": "TIMEOUT"})
     untested = len(picked) - len(rows)
-    fail = [r for r in rows if r["result"] != "PASS"]
-    lamp = "RED" if fail else ("YELLOW" if untested or not rows else "GREEN")
-    return {"lamp": lamp, "tested": len(rows), "untested": untested, "fail": fail, "rows": rows}
+    fail = [r for r in rows if r["result"] in ("FAIL", "TIMEOUT")]
+    soft = [r for r in rows if r["result"] in ("NODATA", "ABSENT", "GATED")]
+    lamp = "RED" if fail else ("YELLOW" if untested or soft or not rows else "GREEN")
+    return {"lamp": lamp, "tested": len(rows), "untested": untested, "fail": fail, "soft": soft, "rows": rows}
+
+
+SM_REPO_MOD_PREFIX = ("VRN", "VDF", "CGC_", "SUP_", "VIA_", "VQG", "VAP", "nonstock", "vrn2_", "vdf_")   # 自家模組缺 = 真壞,不算缺件
+
+
+def sm_missing_lib(text: str) -> str:
+    """引擎因缺「第三方套件」而崩潰(最後一個例外是 ModuleNotFoundError,或每一個 [FAIL] 行都寫 No module named)→ 回套件名;
+    自家模組(VRN_ / VDF_ / CGC_ …)缺 = 真壞,回空。依 L16:缺件 ≠ 壞,照實記 ABSENT(黃),不冒充綠也不誤紅。"""
+    names = re.findall(r"No module named '([\w.]+)'", text or "")
+    if not names:
+        return ""
+    lines = [ln for ln in (text or "").splitlines() if ln.strip()]
+    last_exc = next((ln for ln in reversed(lines) if re.match(r"^\w*(Error|Exception)\b", ln.strip())), "")
+    fails = [ln for ln in lines if "[FAIL]" in ln]
+    crash = last_exc.strip().startswith("ModuleNotFoundError")
+    only_lib_fails = bool(fails) and all("No module named" in ln for ln in fails)
+    tops = {n.split(".")[0] for n in names}
+    if (crash or only_lib_fails) and not any(t.startswith(SM_REPO_MOD_PREFIX) for t in tops):
+        return ",".join(sorted(tops))
+    return ""
+
+
+SM_TEST_RC = {0: "PASS", 2: "NODATA", 3: "ABSENT", 4: "GATED"}   # L16 五態碼:2 缺件 / 缺料 ≠ 壞掉 · 3 缺席 · 4 同意閘未開(操作員的手)
 
 
 SM_RC = {"GREEN": 0, "RED": 1, "YELLOW": 2, "ABSENT": 3}
@@ -381,8 +407,9 @@ def sm_cmd(verb: str, args: list, root: Path) -> int:
         mx = int(args[args.index("--max") + 1]) if "--max" in args else 25
         t = sm_test_native(root, only, mx)
         for x in t["rows"]:
-            print(f"  {x['result']:<8}{x['family']} · rc {x['rc']}")
-        print(f"[{SM_TAG}] test {t['lamp']} · 測 {t['tested']} · 沒測到 {t['untested']}(照實記 NODATA)· 失敗 {len(t['fail'])}")
+            print(f"  {x['result']:<8}{x['family']} · rc {x['rc']}" + (f" · {x['why']}" if x.get("why") else ""))
+        print(f"[{SM_TAG}] test {t['lamp']} · 測 {t['tested']} · 通過 {t['tested'] - len(t['fail']) - len(t['soft'])} · 缺件/缺料 {len(t['soft'])}(L16 rc 2/3/4 ≠ 壞)"
+              f" · 失敗 {len(t['fail'])} · 沒測到 {t['untested']}(照實記 NODATA)")
         return SM_RC[t["lamp"]]
     if verb == "status":
         h = sm_health(root)
@@ -420,6 +447,12 @@ def selftest() -> int:
         fam = SM_CONFIG["own_prefixes"][0] + "ENG001_Demo"
         (own / f"{fam}_v0100.py").write_text("import sys\nif '--selftest' in sys.argv: sys.exit(0)\n", encoding="utf-8")
         (own / f"{fam}_v0101.py").write_text("import sys\nif '--selftest' in sys.argv: sys.exit(1)\n", encoding="utf-8")
+        fam2 = SM_CONFIG["own_prefixes"][0] + "ENG002_NeedsLib"
+        (own / f"{fam2}_v0100.py").write_text("import sys\nif '--selftest' in sys.argv: sys.exit(2)\n", encoding="utf-8")
+        fam3 = SM_CONFIG["own_prefixes"][0] + "ENG003_MissingPkg"
+        (own / f"{fam3}_v0100.py").write_text("import sys\nif '--selftest' in sys.argv:\n    import zz_fake_pkg_for_sm_test\n", encoding="utf-8")
+        fam4 = SM_CONFIG["own_prefixes"][0] + "ENG004_MissingOwn"
+        (own / f"{fam4}_v0100.py").write_text("import sys\nif '--selftest' in sys.argv:\n    import VRN_ENG999_NotInRepo\n", encoding="utf-8")
         for name, pc in SM_CONFIG["peers"].items():
             pd = root / pc["dir"]
             pd.mkdir(parents=True, exist_ok=True)
@@ -437,7 +470,7 @@ def selftest() -> int:
         peer_sig = lambda: sorted((str(p), p.read_bytes()) for pc in SM_CONFIG["peers"].values() for p in (root / pc["dir"]).rglob("*") if p.is_file())
         before = peer_sig()
         e = sm_engines(root)
-        ck("engines:只看自己的夾(對等系統的檔不列)· 尾版取最大版號", set(e) == {fam, SM_CONFIG["manager_family"]}
+        ck("engines:只看自己的夾(對等系統的檔不列)· 尾版取最大版號", set(e) == {fam, fam2, fam3, fam4, SM_CONFIG["manager_family"]}
            and e[fam]["tail_ver"] == 101 and e[fam]["versions"] == 2, sorted(e))
         ck("version:前版找得到且有 main", sm_version_info(root)["prior"] == prior.name and sm_version_info(root)["prior_has_main"])
         ck("records:只列自己的收據", [r["file"] for r in sm_records(root)] == [str((rd / "mine.json").relative_to(root))])
@@ -475,7 +508,14 @@ def selftest() -> int:
         c = sm_conform(root)
         ck("conform:規範動詞全覆蓋 · P1–P8 靜態全過", c["lamp"] == "GREEN", (c.get("missing_verbs"), c.get("bad")))
         t = sm_test_native(root)
-        ck("test(本版):逐支 --selftest · 失敗照實紅", t["lamp"] == "RED" and t["tested"] == 1 and t["fail"][0]["family"] == fam, t)
+        ck("test(本版):逐支 --selftest · 失敗照實紅(自家模組缺也算壞)", t["lamp"] == "RED" and t["tested"] == 4
+           and {r["family"] for r in t["fail"]} == {fam, fam4}, t)
+        t3 = sm_test_native(root, only="MissingPkg")
+        ck("test:缺第三方套件而崩潰(ModuleNotFoundError)→ ABSENT + 寫明缺哪個套件 → YELLOW(L16)", t3["lamp"] == "YELLOW" and not t3["fail"]
+           and t3["soft"] and t3["soft"][0]["result"] == "ABSENT" and "zz_fake_pkg_for_sm_test" in t3["soft"][0].get("why", ""), t3)
+        t2 = sm_test_native(root, only="NeedsLib")
+        ck("test:rc 2(缺件 / 缺料)記 NODATA 不算失敗 → YELLOW(L16 缺件≠壞)", t2["lamp"] == "YELLOW" and not t2["fail"]
+           and t2["soft"] and t2["soft"][0]["result"] == "NODATA", t2)
         keep_here = sys.modules[__name__].__dict__["SM_HERE"]
         try:
             globals()["SM_HERE"] = own / (SM_CONFIG["manager_family"] + "_v0002.py")

@@ -11,7 +11,7 @@
   V3 VDF 持股率   vdf_tw_holding.duckdb / tw_inst_holding_pct:列數 · 股數非空 · 外資持股率非空 · 持股率越界(<0 或 >100)· 最新日
   V4 VRN 產出     VIA_Reports/vrn2 最新收據:*_latest.json 的燈 / 判決欄 · 最新時間
   V5 VQG 指標冊   VQG v0111 indicators --check(冊 ⇄ 程式對帳)
-  V6 VRN-1 對等   VRN2_PeerBridge v0102 prove(只讀 VRN-1 clone;選用)
+  V6 VRN-1 對等   VRN2_PeerBridge v0103 prove(只讀 VRN-1 clone;選用)
 
 燈:GREEN 0 · YELLOW 2 · RED 1 · ABSENT 3。只寫 VIA_Reports/validate/(不入版控);結果 JSON + MD + 一行貼回摘要。
 用法:python VIA_DesktopValidate_v0100.py [--root <倉根>] [--no-prove] [--timeout 900]
@@ -301,9 +301,9 @@ def selftest() -> int:
         (root / ".git").mkdir(parents=True)
         for sub, name, body in (("supportive modules/registry", "CGC_MDL149_VeritasCentralGovernanceConsole_v0195.py", "print('[X] health GREEN')"),
                                 ("functional modules/VDF", "VDF_SystemManager_v0169.py", "print('[X] health YELLOW');import sys;sys.exit(2)"),
-                                ("functional modules/VRN", "VRN_SystemManager_v0263.py", "import sys;sys.exit(1)"),
+                                ("functional modules/VRN", "VRN_SystemManager_v0276.py", "import sys;sys.exit(1)"),
                                 ("functional modules/VQG", "VQG_AllInOne_v0111.py", "print('[GREEN] VQG v0111 indicators 對帳 · 問題 0')"),
-                                ("functional modules/VRN", "VRN2_PeerBridge_v0102.py", "print('[prove v0102] YELLOW · 驗了 0 項');print('狀態 MATCH 15 · GAP 8')")):
+                                ("functional modules/VRN", "VRN2_PeerBridge_v0103.py", "print('[prove v0102] YELLOW · 驗了 0 項');print('狀態 MATCH 15 · GAP 8')")):
             (v / sub).mkdir(parents=True, exist_ok=True)
             (v / sub / name).write_text(body + "\n", encoding="utf-8")
         ck("找倉根(有 .git 與 VIA 夾)", find_root(str(root)) == root)

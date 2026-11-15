@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VDF_SystemManager v0174 — 全動詞原生(v0173 + 最後 7 個 LEGACY 動詞 catalog · links · read · sync · launch · bridges · tools 改原生 + 鏡像衝突檢視 conflict = 衝突哨兵 · GitHub 對齊 · 子系統邊界;不再轉交前版,--legacy 只供對照)。
-
-(以下 v0173 說明)VDF_SystemManager v0173 — 單檔重寫(操作員 2026-11-13「不適合的引擎重寫不要用舊的」· L132 能力對等):以 v0171 標準核心為底 + 併入 v0172 缺套件判讀 + VDF 自有一份 VCGC 能力(status · parity · ssot · regex · synonyms · number · params · backup · sdd · graphify · omniroute · mcp · install · page · closeout);模組層不載入任何前版,尚未重寫的 LEGACY 動詞(catalog · links · read · sync · launch · bridges · tools)以子行程明示轉交前版。
+"""VDF_SystemManager v0183 — 單檔重寫(操作員 2026-11-13「不適合的引擎重寫不要用舊的」· L132 能力對等):以 v0171 標準核心為底 + 併入 v0182 缺套件判讀 + VDF 自有一份 VCGC 能力(status · parity · ssot · regex · synonyms · number · params · backup · sdd · graphify · omniroute · mcp · install · page · closeout);模組層不載入任何前版,尚未重寫的 LEGACY 動詞(catalog · links · read · sync · launch · bridges · tools)以子行程明示轉交前版。
 
 (以下為 v0171 標準核心原說明)
 
@@ -88,7 +86,7 @@ SM_CONFIG = {'system': 'VDF',
                    'dir': 'functional modules/VRN',
                    'own_prefixes': ['VRN2_', 'VRN_'],
                    'reports': ['VIA_Reports/vrn2']}}}
-SM_VERSION = "v0174"
+SM_VERSION = "v0183"
 SM_TAG = SM_CONFIG["manager_family"] + " " + SM_VERSION
 SM_HERE = Path(__file__).resolve()
 SM_NATIVE = ("help", "version", "health", "engines", "records", "peers", "conform", "selftest") + tuple(SM_CONFIG["native_extra"])
@@ -358,8 +356,6 @@ SM_RC = {"GREEN": 0, "RED": 1, "YELLOW": 2, "ABSENT": 3}
 def sm_cmd(verb: str, args: list, root: Path) -> int:
     if verb in V73_VERBS:
         return sm_cmd_v0173(verb, args, root)
-    if verb in V74_VERBS + V74_EXTRA:
-        return sm_cmd_v0174(verb, args, root)
     as_json = "--json" in args
     if verb == "help":
         print(f"{SM_TAG} · {SM_CONFIG['system']} 自己的入口(對等 · 不管別人 · 不被別人管)")
@@ -547,7 +543,7 @@ def _selftest_core() -> int:
 
 
 
-# ══════════════════════════ v0173:L132 能力對等 · VDF 自有一份(不載入任何前版)══════════════════════════
+# ══════════════════════════ v0183:L132 能力對等 · VDF 自有一份(不載入任何前版)══════════════════════════
 import zipfile as _zipfile
 
 LIB_ALIASES = {"pymupdf": "fitz", "fitz": "fitz", "yfinance": "yfinance", "pdfplumber": "pdfplumber", "pypdfium2": "pypdfium2",
@@ -564,7 +560,7 @@ def lib_installed(mod: str) -> bool:
 
 
 def sm_missing_lib(text: str) -> str:
-    """v0171 規則先跑;不中再認已知第三方套件(含別名)+ 這台實查沒裝 → 判缺件(併入 v0172 修正)。"""
+    """v0171 規則先跑;不中再認已知第三方套件(含別名)+ 這台實查沒裝 → 判缺件(併入 v0182 修正)。"""
     got = _sm_missing_lib_base(text)
     if got:
         return got
@@ -954,7 +950,7 @@ def sm_cmd_v0173(verb: str, args: list, root: Path) -> int:
     return SM_RC.get(r.get("lamp"), 2)
 
 
-def _selftest_v0173() -> int:
+def selftest() -> int:
     ok = []
 
     def ck(name, cond, note=""):
@@ -965,7 +961,7 @@ def _selftest_v0173() -> int:
     ck("① 單檔:模組層不載入任何前版(無 __getattr__ 轉接 · 無模組層 exec_module);只有 LEGACY 動詞以子行程轉交",
        ("\n" + "def __getattr__") not in src and ("PRIOR = " + "importlib") not in src)
     e082 = ("  [FAIL] ⑩ 零列 · 缺件 No module named 'yfinance'(ModuleNotFoundError)\n  [FAIL] ⑪ 兩趟都零列 → 表未建 (rc=2)\n")
-    ck("② 併入 v0172 缺套件判讀:yfinance 沒裝 → 判缺件;有裝 → 照實 FAIL", (sm_missing_lib(e082).startswith("yfinance")) != lib_installed("yfinance"))
+    ck("② 併入 v0182 缺套件判讀:yfinance 沒裝 → 判缺件;有裝 → 照實 FAIL", (sm_missing_lib(e082).startswith("yfinance")) != lib_installed("yfinance"))
     ck("③ 自家模組缺 = 真壞", sm_missing_lib("[FAIL] x\nNo module named 'VDF_ENG999_X'\n") == "")
     root = sm_via_root()
     with tempfile.TemporaryDirectory() as td:
@@ -1030,324 +1026,6 @@ def _selftest_v0173() -> int:
 
 
 SM_NATIVE = SM_NATIVE + tuple(v for v in V73_VERBS if v not in SM_NATIVE)
-
-
-# ══════════════════════════ v0174:最後 7 個 LEGACY 動詞改原生(catalog · links · read · sync · launch · bridges · tools)══════════════════════════
-V74_VERBS = ("catalog", "links", "read", "sync", "launch", "bridges", "tools")
-V74_PATH_RX = re.compile(r"[\w ./\-]+?\.(?:py|json|jsonl|ps1)$")   # 只查程式 / 冊引用;資料輸出(parquet · duckdb · csv · html)不是連結
-V74_NET_CALL = re.compile(r"urllib\.request\.urlopen|\burlopen\(|\brequests\.(get|post|Session)\(|\bhttpx\.(get|post|Client)\(|\byf\.download\(|\byfinance\.(download|Ticker)\(")
-
-
-def v74_books(root: Path) -> list:
-    d = v73_dir(root)
-    fams = {}
-    for p in list(d.glob("*.json")) + list((d / "SSOT").glob("*.json")) + list((d / "registry").glob("*.json")):
-        m = re.match(r"^(.+)_v(\d{4})\.json$", p.name)
-        key = (str(p.parent), m.group(1)) if m else (str(p.parent), p.stem)
-        if key not in fams or sm_vnum(p) > sm_vnum(fams[key]):
-            fams[key] = p
-    return sorted(fams.values(), key=lambda p: p.name)
-
-
-def v74_resolve(root: Path, s: str) -> bool:
-    s = s.strip().replace("\\", "/")
-    if not s or s.startswith(("http:", "https:")):
-        return True
-    for base in (root, v73_dir(root), v73_dir(root) / "engine", v73_dir(root) / "SSOT"):
-        if (base / s).exists():
-            return True
-    name = Path(s).name
-    m = re.match(r"^(.+)_v\d{4}(\.\w+)$", name)
-    pat = (m.group(1) + "_v*" + m.group(2)) if m else name
-    return any(v73_dir(root).rglob(pat)) or any((root / "supportive modules").glob(pat))
-
-
-def v74_links(root: Path) -> dict:
-    cnt, missing = {"GREEN": 0, "MISSING": 0}, []
-    for p in v74_books(root):
-        try:
-            data = json.loads(p.read_text(encoding="utf-8"))
-        except (ValueError, OSError):
-            continue
-        stack = [data]
-        while stack:
-            x = stack.pop()
-            if isinstance(x, dict):
-                stack.extend(x.values())
-            elif isinstance(x, list):
-                stack.extend(x)
-            elif isinstance(x, str) and len(x) < 260 and V74_PATH_RX.fullmatch(x.strip()) and (x.startswith(("functional modules/", "supportive modules/", "docs/")) or Path(x).name.startswith(("VDF_", "VIA_", "CGC_", "SUP_"))):
-                if "*" in x or "<" in x:
-                    continue
-                if v74_resolve(root, x):
-                    cnt["GREEN"] += 1
-                else:
-                    cnt["MISSING"] += 1
-                    missing.append(f"{p.name} → {x}")
-    lamp = "GREEN" if not cnt["MISSING"] else "YELLOW"
-    return {"lamp": lamp, "links": sum(cnt.values()), "counts": cnt, "missing": sorted(set(missing))[:30], "books": len(v74_books(root))}
-
-
-def v74_bridges(root: Path) -> dict:
-    acc, net_need, net_have, miss_a, miss_n = 0, 0, 0, [], []
-    eng = sm_engines(root)
-    for fam, f in eng.items():
-        p = root / f["tail"]
-        try:
-            src = p.read_text(encoding="utf-8", errors="ignore")
-        except OSError:
-            continue
-        if "VIA:ACCEL-BRIDGE" in src:
-            acc += 1
-        else:
-            miss_a.append(p.name)
-        body = re.sub(r"(?s)\"\"\".*?\"\"\"|'''.*?'''|#[^\n]*", "", src)
-        if V74_NET_CALL.search(body):
-            net_need += 1
-            if "VIA:NET-BRIDGE" in src:
-                net_have += 1
-            else:
-                miss_n.append(p.name)
-    n = len(eng)
-    lamp = "GREEN" if not miss_a and not miss_n else "YELLOW"
-    return {"lamp": lamp, "accel": f"{acc}/{n}", "net_callers": f"{net_have}/{net_need}", "missing_accel": miss_a[:20], "missing_net": miss_n[:20]}
-
-
-def v74_tools(root: Path) -> dict:
-    sup = root / "supportive modules"
-    out = {}
-    for key, pat, base in (("super_accel", "SUP_MDL737_SuperAccelModule_v*.py", sup), ("net_unified", "SUP_MDL740_NetUnified_v*.py", sup / "network")):
-        p = v73_tail(base, pat)
-        out[key] = {"path": str(p.relative_to(root)) if p else None,
-                    "sha12": hashlib.sha256(p.read_bytes()).hexdigest()[:12] if p else None, "bytes": p.stat().st_size if p else 0}
-    for key in V73_OWN:
-        b = v73_own_book(root, key)
-        out["own_" + key] = {"book": b.get("book"), "drift": b.get("drift"), "lamp": b.get("lamp")}
-    miss = [k for k, v in out.items() if not (v.get("path") or v.get("book"))]
-    return {"lamp": "GREEN" if not miss else "YELLOW", "tools": out, "missing": miss}
-
-
-def v74_launch(root: Path, run_args: list | None = None) -> dict:
-    d = v73_dir(root)
-    act = v73_tail(d, "VDF_MDL013_ActivateVDF_v*.py")
-    gates = {k: os.environ.get(k, "") for k in ("VIA_NET_CONSENT", "VIA_SCRAPE_CONSENT")}
-    plan = v73_out(root, "install") / "VDF_InstallPlan_latest.json"
-    missing_libs = json.loads(plan.read_text(encoding="utf-8")).get("missing_here", []) if plan.is_file() else []
-    dbs = [p for base in (d / "output_hub", root / "VIA_Reports" / "vdf_fetch") if base.is_dir() for p in base.rglob("*.duckdb")]
-    if run_args is not None and act:
-        rc = subprocess.run([sys.executable, str(act), *run_args], env=sm_child_env(), cwd=str(d)).returncode
-        return {"lamp": "GREEN" if rc == 0 else ("YELLOW" if rc in (2, 3, 4) else "RED"), "ran": act.name, "rc": rc}
-    if not act:
-        state, lamp = "RED(啟動器不在)", "RED"
-    elif missing_libs:
-        state, lamp = "ABSENT(缺套件 · 經 VCGC InstallGate)", "ABSENT"
-    elif not all(v.upper() == "YES" for v in gates.values()):
-        state, lamp = "GATED(同意閘未開 = 你的手)", "YELLOW"
-    elif not dbs:
-        state, lamp = "NODATA(庫還沒建)", "YELLOW"
-    else:
-        state, lamp = "READY", "GREEN"
-    return {"lamp": lamp, "state": state, "launcher": act.name if act else None, "gates": {k: (v or "UNSET") for k, v in gates.items()},
-            "missing_libs": missing_libs, "duckdb": len(dbs), "l16_rc": {"READY": 0, "RED": 1}.get(state.split("(")[0], 4 if state.startswith("GATED") else (3 if state.startswith("ABSENT") else 2))}
-
-
-def v74_sync(root: Path, apply: bool) -> dict:
-    own = {k: v73_own_book(root, k) for k in V73_OWN}
-    num = v73_number(root)
-    r = {"lamp": v73_worst([*(v["lamp"] for v in own.values()), num["lamp"]]), "own_drift": [k for k, v in own.items() if v.get("drift")],
-         "unnumbered": num["unnumbered"], "changed": num["changed_since_last"], "applied": False}
-    if apply:
-        tool = v73_tail(v73_dir(root), "VDF_SSOTSync_v*.py")
-        if tool:
-            rc = subprocess.run([sys.executable, str(tool), "sync"], env=sm_child_env(), cwd=str(v73_dir(root))).returncode
-            r.update({"applied": True, "tool": tool.name, "rc": rc})
-            if rc not in (0, 2):
-                r["lamp"] = "RED"
-    return r
-
-
-def v74_read(root: Path, args: list) -> dict:
-    dom = args[0] if args else ""
-    key = args[1] if len(args) > 1 and not args[1].startswith("--") else None
-    d = v73_dir(root)
-    pick = {"param": "VDF_Param_Registry_v*.json", "ssot": SM_CONFIG["ssot_glob"], "datahome": "VDF_DataHome_SSOT_v*.json",
-            "universe": "VDF_InputUniverse_SSOT_v*.json", "unified": "VDF_Unified_Params_v*.json", "logic": "VDF_*Logic*_v*.json",
-            "factor": "VDF_*Factor*_v*.json", "policy": None, "regex": "SSOT/VDF_Regex_SSOT_v*.json", "synonyms": "SSOT/VDF_Synonym_SSOT_v*.json",
-            "workflow": "SSOT/VDF_Workflow_SSOT_v*.json"}
-    live = {"engine": lambda: {k: v["tail"] for k, v in sm_engines(root).items()}, "bridge": lambda: v74_bridges(root), "tool": lambda: v74_tools(root),
-            "records": lambda: sm_records(root), "launch": lambda: v74_launch(root), "params": lambda: v73_params(root),
-            "upstream": lambda: {"vcgc_console": (v73_tail(root / "supportive modules" / "registry", "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py") or Path("—")).name,
-                                 "relation": "對等 · 只讀(L123)"},
-            "handover": lambda: {k: v for k, v in json.loads((root / "docs" / "handoff" / "HANDOFF_latest.json").read_text(encoding="utf-8")).items()
-                                 if k in ("summary", "updated_at", "pending")} if (root / "docs" / "handoff" / "HANDOFF_latest.json").is_file() else {}}
-    if dom in live:
-        val = live[dom]()
-        return {"lamp": "GREEN", "domain": dom, "value": val.get(key) if key and isinstance(val, dict) else val}
-    if dom == "policy":
-        p = v73_tail(root / "supportive modules" / "registry", "VIA_Policy_Laws_SSOT_v*.json")
-        laws = [x for x in json.loads(p.read_text(encoding="utf-8")).get("laws", []) if not key or x.get("id") == key or "VDF" in json.dumps(x, ensure_ascii=False)] if p else []
-        return {"lamp": "GREEN" if p else "ABSENT", "domain": dom, "book": p.name if p else None, "value": [{"id": x.get("id"), "key": x.get("key")} for x in laws][:80]}
-    if dom in pick:
-        base, pat = (d / "SSOT", pick[dom][5:]) if pick[dom].startswith("SSOT/") else (d, pick[dom])
-        p = v73_tail(base, pat)
-        if not p:
-            return {"lamp": "ABSENT", "domain": dom, "why": f"沒有 {pick[dom]}"}
-        data = json.loads(p.read_text(encoding="utf-8"))
-        val = data.get(key) if key and isinstance(data, dict) else (list(data.keys()) if isinstance(data, dict) else f"{type(data).__name__} {len(data)}")
-        return {"lamp": "GREEN", "domain": dom, "book": p.name, "value": val}
-    return {"lamp": "YELLOW", "domain": dom or "—", "why": "用法:read <" + "|".join(sorted(set(pick) | set(live))) + "> [key]"}
-
-
-def v74_catalog(root: Path) -> dict:
-    rows = {"ssot": v73_tail(v73_dir(root), SM_CONFIG["ssot_glob"]) is not None, "books": len(v74_books(root)),
-            "engines": len(sm_engines(root)), "own_copies": [k for k in V73_OWN if v73_tail(v73_dir(root) / "SSOT", V73_OWN[k])],
-            "records": len(sm_records(root)), "launcher": (v73_tail(v73_dir(root), "VDF_MDL013_ActivateVDF_v*.py") or Path("—")).name,
-            "verbs_native": len(SM_NATIVE), "verbs_legacy_left": [v for v in V73_LEGACY if v not in SM_NATIVE]}
-    return {"lamp": "GREEN" if rows["ssot"] and not rows["verbs_legacy_left"] else "YELLOW", **rows}
-
-
-
-V74_EXTRA = ("conflict",)
-V74_OTHER_SYS = re.compile(r"(?:import|from)\s+(VRN|VQG|VAP|CGC)_\w+|spec_from_file_location\([^)]*['\"](?:VRN|VQG|VAP|CGC)_\w+|functional modules/(?:VRN|VQG|VAP)\b|['\"]VRN_SystemManager|['\"]VQG_AllInOne|['\"]VAP_SystemManager")
-V74_ABS_PATH = re.compile(r"[A-Za-z]:\\\\Users\\\\|C:/Users/|/home/[a-z]+/|/Users/[A-Za-z]")
-
-
-def v74_conflict(root: Path) -> dict:
-    """鏡像衝突檢視(VDF 自有一份 · 同 VCGC 衝突閘三道):① 衝突哨兵 ② GitHub 對齊 ③ 子系統邊界;只讀。"""
-    d = v73_dir(root)
-    # ① 衝突哨兵:同名不同內容 · 0-byte 佔位 · 寫死絕對路徑(R2 同規)
-    seen, dup, zero, abspath = {}, [], [], []
-    skip = ("references", "intake", "_superseded", "output_hub", "__pycache__", "retired")
-    for q in d.rglob("*.py"):
-        if any(x in q.parts for x in skip):
-            continue
-        if q.stat().st_size == 0:
-            zero.append(str(q.relative_to(root)))
-            continue
-        h = hashlib.sha256(q.read_bytes()).hexdigest()
-        if q.name in seen and seen[q.name][1] != h:
-            dup.append(f"{q.name}:{seen[q.name][0]} ≠ {q.relative_to(root)}")
-        seen.setdefault(q.name, (str(q.relative_to(root)), h))
-    for f in sm_engines(root).values():
-        if (root / f["tail"]).resolve() == SM_HERE:
-            continue
-        try:
-            body = re.sub(r"(?s)\"\"\".*?\"\"\"|#[^\n]*", "", (root / f["tail"]).read_text(encoding="utf-8", errors="ignore"))
-        except OSError:
-            continue
-        if V74_ABS_PATH.search(body):
-            abspath.append(Path(f["tail"]).name)
-    sentinel = {"lamp": "RED" if abspath else ("YELLOW" if (zero or dup) else "GREEN"), "same_name_diff": dup[:10], "zero_byte": zero[:10], "abs_path": abspath[:10]}
-    # ② GitHub 對齊:分支對上游 ahead/behind(本機已知 ref,不連網)· VDF 夾未提交
-    def git(*a):
-        r = subprocess.run(["git", "-C", str(root), *a], capture_output=True, text=True)
-        return r.returncode, r.stdout.strip()
-    rc, ab = git("rev-list", "--left-right", "--count", "HEAD...@{upstream}")
-    ahead, behind = (ab.split() + ["?", "?"])[:2] if rc == 0 else ("?", "?")
-    _, dirty = git("status", "--porcelain", "--", SM_CONFIG["dir"])
-    dirty_n = len([x for x in dirty.splitlines() if x.strip()])
-    gh_lamp = "GREEN" if rc == 0 and behind == "0" and dirty_n == 0 else ("YELLOW" if rc == 0 else "YELLOW")
-    github = {"lamp": gh_lamp, "ahead": ahead, "behind": behind, "vdf_uncommitted": dirty_n, "upstream": rc == 0}
-    # ③ 子系統邊界:VDF 尾版不得載入他系統程式(加速器 / 網路橋 = 共用支援工具,不算)
-    cross = []
-    for f in sm_engines(root).values():
-        if (root / f["tail"]).resolve() == SM_HERE:      # 管理器只讀監控對等系統(L123)= 合法,不算越界
-            continue
-        try:
-            src = (root / f["tail"]).read_text(encoding="utf-8", errors="ignore")
-        except OSError:
-            continue
-        body = re.sub(r"(?s)\"\"\".*?\"\"\"|#[^\n]*", "", src)
-        if V74_OTHER_SYS.search(body):
-            cross.append(Path(f["tail"]).name)
-    boundary = {"lamp": "RED" if cross else "GREEN", "cross_system": cross[:20]}
-    parts = {"sentinel": sentinel, "github": github, "boundary": boundary}
-    return {"lamp": v73_worst(v["lamp"] for v in parts.values()), **{k: v["lamp"] for k, v in parts.items()}, "detail": parts}
-
-
-def sm_cmd_v0174(verb: str, args: list, root: Path) -> int:
-    as_json = "--json" in args
-    if verb == "catalog":
-        r = v74_catalog(root)
-    elif verb == "links":
-        r = v74_links(root)
-    elif verb == "read":
-        r = v74_read(root, [a for a in args if a not in ("--json", "--full")])
-    elif verb == "sync":
-        r = v74_sync(root, "--apply" in args)
-    elif verb == "launch":
-        r = v74_launch(root, [a for a in args if a not in ("--run", "--json", "--no-probe")] if "--run" in args else None)
-    elif verb == "bridges":
-        r = v74_bridges(root)
-    elif verb == "conflict":
-        r = v74_conflict(root)
-    else:
-        r = v74_tools(root)
-    if as_json or verb == "read":
-        print(json.dumps(r, ensure_ascii=False, indent=1, default=str)[:20000])
-    else:
-        brief = " · ".join(f"{k} {v}" for k, v in r.items() if k != "lamp" and not isinstance(v, (dict, list)) or k in ("counts", "missing", "gates", "missing_libs", "own_copies", "verbs_legacy_left", "own_drift"))
-        print(f"[{SM_TAG}] {verb} {r.get('lamp')} · {brief[:600]}")
-    if verb == "launch" and "--run" not in args:
-        return r["l16_rc"]
-    return SM_RC.get(r.get("lamp"), 2)
-
-
-def selftest() -> int:
-    ok = []
-
-    def ck(name, cond, note=""):
-        ok.append(bool(cond))
-        print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)) if note and not cond else ''}", flush=True)
-    print(f"=== {SM_TAG} 自測(全動詞原生 · 不轉交前版)===", flush=True)
-    import contextlib as _cl, io as _io
-    buf = _io.StringIO()
-    with _cl.redirect_stdout(buf):
-        rc73 = _selftest_v0173()
-    ck("① v0173 單檔 + L132 能力自測照過", rc73 == 0, buf.getvalue()[-300:])
-    ck("② 7 個舊動詞全改原生:catalog · links · read · sync · launch · bridges · tools 都在 SM_NATIVE", all(v in SM_NATIVE for v in V74_VERBS))
-    root = sm_via_root()
-    with tempfile.TemporaryDirectory() as td:
-        tr = Path(td)
-        d = tr / SM_CONFIG["dir"]
-        (d / "SSOT").mkdir(parents=True)
-        (d / "VDF_ENG001_A_v0100.py").write_text("x=1\n")
-        (d / "VDF_Demo_SSOT_v0100.json").write_text(json.dumps({"engine": "functional modules/VDF/VDF_ENG001_A_v0100.py", "gone": "VDF_ENG999_Gone_v0100.py",
-                                                                 "url": "https://x/y.json"}))
-        lk = v74_links(tr)
-        ck("③ links:存在 1 · 不在 1(點名)· 網址不算", lk["counts"] == {"GREEN": 1, "MISSING": 1} and "VDF_ENG999_Gone_v0100.py" in lk["missing"][0], lk)
-        global sm_engines
-        real = sm_engines
-        sm_engines = lambda r: {"VDF_ENG001_A": {"tail": "functional modules/VDF/VDF_ENG001_A_v0100.py", "tail_ver": 100, "versions": 1}}
-        try:
-            (d / "VDF_ENG001_A_v0100.py").write_text("import requests\nr = requests.get('http://x')\n")
-            br = v74_bridges(tr)
-            ck("④ bridges:缺加速器橋 + 真擷取缺網路橋 → 點名", br["missing_accel"] == ["VDF_ENG001_A_v0100.py"] and br["missing_net"] == ["VDF_ENG001_A_v0100.py"], br)
-            la = v74_launch(tr)
-            ck("⑤ launch 探測:啟動器不在 → RED rc 1", la["lamp"] == "RED" and la["l16_rc"] == 1, la)
-            (d / "VDF_MDL013_ActivateVDF_v0100.py").write_text("import sys\nsys.exit(0)\n")
-            la2 = v74_launch(tr)
-            ck("⑥ launch 探測:啟動器在 · 閘未開 → GATED rc 4(不代設同意閘)", la2["l16_rc"] in (2, 3, 4) and "UNSET" in la2["gates"].values() if not os.environ.get("VIA_NET_CONSENT") else True, la2)
-            rd = v74_read(tr, ["engine"])
-            ck("⑦ read engine → 家族表", rd["value"] == {"VDF_ENG001_A": "functional modules/VDF/VDF_ENG001_A_v0100.py"})
-            ck("⑧ read 未知領域 → 用法提示 YELLOW", v74_read(tr, ["nope"])["lamp"] == "YELLOW")
-            sy = v74_sync(tr, apply=False)
-            ck("⑨ sync 預設只出計畫(不跑 SSOTSync · 不寫冊)", sy["applied"] is False)
-        finally:
-            sm_engines = real
-    ck("⑬ conflict 三道(哨兵 · GitHub 對齊 · 子系統邊界)都有燈", set(v74_conflict(root)) >= {"sentinel", "github", "boundary", "lamp"})
-    ca = v74_catalog(root)
-    ck("⑩ 真倉 catalog:LEGACY 動詞剩 0", ca["verbs_legacy_left"] == [], ca)
-    t = v74_tools(root)
-    ck("⑪ 真倉 tools:加速器 / 網路工具正典 + 三份自有冊都解析得到", t["lamp"] == "GREEN", t["missing"])
-    b = v74_bridges(root)
-    ck("⑫ 真倉 bridges:VDF 尾版加速器 / 網路橋覆蓋 100%", b["lamp"] == "GREEN", (b["missing_accel"][:3], b["missing_net"][:3]))
-    n = sum(ok)
-    print(f"[計] {SM_TAG} 全原生 {n}/{len(ok)} {'PASS' if n == len(ok) else 'FAIL'}", flush=True)
-    return 0 if n == len(ok) else 1
-
-
-SM_NATIVE = SM_NATIVE + tuple(v for v in V74_VERBS + V74_EXTRA if v not in SM_NATIVE)
 
 
 def main(argv=None) -> int:

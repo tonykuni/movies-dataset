@@ -1,10 +1,10 @@
 {
  "schema": "VIA.Workflow.SDD.v1",
- "version": "v0148",
+ "version": "v0152",
  "subsystem": "VCGC",
  "zh": "中央治理 · 中樞工作流",
- "batch": "X-COL:補 tests(self/cross/real)與步欄(verb · what · evidence 前綴);原證據路徑移 evidence_file",
- "ts": "2026-11-13T17:20:00Z",
+ "batch": "X-REG:SkillExport 九步引擎指尾版 v0101(舊值留 engine_before)",
+ "ts": "2026-11-13T18:23:39+00:00",
  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
  "sdd": {
   "layers": [
@@ -1981,81 +1981,89 @@
      "code": "VCGC-WKF023-STP001",
      "alias": "tier1_index",
      "name": "Tier1 索引(常駐只付這層)",
-     "engine": "docs/handoff/ai/VIA_SkillExport_v0100.py",
+     "engine": "docs/handoff/ai/VIA_SkillExport_v0101.py",
      "verb": "registry",
      "inside": "VCGC run",
      "evidence": "self:VIA_SkillExport",
-     "what": "10 列 READY/UNMAPPED · 三層字元數"
+     "what": "10 列 READY/UNMAPPED · 三層字元數",
+     "engine_before": "docs/handoff/ai/VIA_SkillExport_v0100.py"
     },
     {
      "code": "VCGC-WKF023-STP002",
      "alias": "tier2_sop",
      "name": "Tier2:命中才載入一個技能的四段 SOP",
-     "engine": "docs/handoff/ai/VIA_SkillExport_v0100.py",
+     "engine": "docs/handoff/ai/VIA_SkillExport_v0101.py",
      "verb": "sop <slash>",
      "inside": "VCGC run",
      "evidence": "self:VIA_SkillExport",
-     "what": "四段齊 · 只印一個技能"
+     "what": "四段齊 · 只印一個技能",
+     "engine_before": "docs/handoff/ai/VIA_SkillExport_v0100.py"
     },
     {
      "code": "VCGC-WKF023-STP003",
      "alias": "export_one",
      "name": "Tier3 首測:/export-skill /ast-diag",
-     "engine": "docs/handoff/ai/VIA_SkillExport_v0100.py",
+     "engine": "docs/handoff/ai/VIA_SkillExport_v0101.py",
      "verb": "export /ast-diag --out <夾>",
      "inside": "VCGC run",
      "evidence": "self:VIA_SkillExport",
-     "what": "SKILL.md + scripts/ + references/ + assets/ · sha256"
+     "what": "SKILL.md + scripts/ + references/ + assets/ · sha256",
+     "engine_before": "docs/handoff/ai/VIA_SkillExport_v0100.py"
     },
     {
      "code": "VCGC-WKF023-STP004",
      "alias": "three_checks",
      "name": "Celeritas 三檢 + PY 骨架規則(真 AST 走訪)",
-     "engine": "docs/handoff/ai/VIA_SkillExport_v0100.py",
+     "engine": "docs/handoff/ai/VIA_SkillExport_v0101.py",
      "verb": "check <技能夾>",
      "inside": "VCGC run",
      "evidence": "self:VIA_SkillExport",
-     "what": "19/19 · N/A 1 · 灰 0"
+     "what": "19/19 · N/A 1 · 灰 0",
+     "engine_before": "docs/handoff/ai/VIA_SkillExport_v0100.py"
     },
     {
      "code": "VCGC-WKF023-STP005",
      "alias": "export_all",
      "name": "過了才 10 技能全匯出",
-     "engine": "docs/handoff/ai/VIA_SkillExport_v0100.py",
+     "engine": "docs/handoff/ai/VIA_SkillExport_v0101.py",
      "verb": "export-all --out <夾>",
      "inside": "VCGC run",
      "evidence": "self:VIA_SkillExport",
-     "what": "GREEN 10/10"
+     "what": "GREEN 10/10",
+     "engine_before": "docs/handoff/ai/VIA_SkillExport_v0100.py"
     },
     {
      "code": "VCGC-WKF023-STP006",
      "alias": "vske_register",
      "name": "VSKE 登錄冊(只增;已存在拒寫)",
-     "engine": "docs/handoff/ai/VIA_SkillExport_v0100.py",
+     "engine": "docs/handoff/ai/VIA_SkillExport_v0101.py",
      "verb": "vske --apply --out <夾>",
      "inside": "VCGC run",
      "evidence": "self:VIA_SkillExport",
-     "what": "10 筆 · sop 指紋"
+     "what": "10 筆 · sop 指紋",
+     "engine_before": "docs/handoff/ai/VIA_SkillExport_v0100.py"
     },
     {
      "code": "VCGC-WKF023-STP007",
      "alias": "token_measure",
      "name": "省 Token 本倉真檔實測(量不到 → 總燈不給綠)",
-     "engine": "docs/handoff/ai/VIA_SkillExport_v0100.py",
+     "engine": "docs/handoff/ai/VIA_SkillExport_v0101.py",
      "verb": "tokens",
      "inside": "VCGC run",
      "evidence": "self:VIA_SkillExport",
-     "what": "整檔 vs 骨架卡字元數 · 省 %"
+     "what": "整檔 vs 骨架卡字元數 · 省 %",
+     "engine_before": "docs/handoff/ai/VIA_SkillExport_v0100.py"
     },
     {
      "code": "VCGC-WKF023-STP008",
      "alias": "ps_readonly",
      "name": "PS 唯讀驗證器(不代寫不代改 .ps1)",
-     "engine": "docs/handoff/ai/VIA_SkillExport_v0100.py",
+     "engine": "docs/handoff/ai/VIA_SkillExport_v0101.py",
      "verb": "check --ps <檔>",
      "inside": "VCGC run",
      "evidence": "self:VIA_SkillExport",
-     "what": "無 pwsh → ParseFile UNAVAILABLE 不當通過"
+     "what": "無 pwsh → ParseFile UNAVAILABLE 不當通過",
+     "engine_before": "docs/handoff/ai/VIA_SkillExport_v0100.py"
     },
     {
      "code": "VCGC-WKF023-STP009",
@@ -2092,9 +2100,10 @@
     {
      "code": "VCGC-WKF023-TST001",
      "case": "C-skill-export-v0100",
-     "engine": "docs/handoff/ai/VIA_SkillExport_v0100.py",
+     "engine": "docs/handoff/ai/VIA_SkillExport_v0101.py",
      "verb": "--selftest",
-     "expect": "rc 0 · 56/56 PASS(含假綠迴歸與裝飾器窄豁免兩個負向測)"
+     "expect": "rc 0 · 56/56 PASS(含假綠迴歸與裝飾器窄豁免兩個負向測)",
+     "engine_before": "docs/handoff/ai/VIA_SkillExport_v0100.py"
     },
     {
      "code": "VCGC-WKF023-TST002",
@@ -2137,7 +2146,7 @@
      "code": "VCGC-WKF024-STP001",
      "alias": "find_peer",
      "name": "找 VRN-1(只讀)",
-     "engine": "functional modules/VRN/VRN2_PeerBridge_v0103.py",
+     "engine": "functional modules/VRN/VRN2_PeerBridge_v0104.py",
      "verb": "peer",
      "inside": "VCGC run",
      "evidence": "self:VRN2_PeerBridge",
@@ -2148,7 +2157,7 @@
      "code": "VCGC-WKF024-STP002",
      "alias": "lend_manifest",
      "name": "VRN-2 自己的工具冊(倉內正本 + VRN-1 期待位置)",
-     "engine": "functional modules/VRN/VRN2_PeerBridge_v0103.py",
+     "engine": "functional modules/VRN/VRN2_PeerBridge_v0104.py",
      "verb": "manifest --apply",
      "inside": "VCGC run",
      "evidence": "self:VRN2_PeerBridge",
@@ -2159,7 +2168,7 @@
      "code": "VCGC-WKF024-STP003",
      "alias": "gap_matrix",
      "name": "能力差異矩陣(程式算 · MATCH 附證據)",
-     "engine": "functional modules/VRN/VRN2_PeerBridge_v0103.py",
+     "engine": "functional modules/VRN/VRN2_PeerBridge_v0104.py",
      "verb": "gap",
      "inside": "VCGC run",
      "evidence": "self:VRN2_PeerBridge",
@@ -2170,7 +2179,7 @@
      "code": "VCGC-WKF024-STP004",
      "alias": "borrow_one",
      "name": "實借一支驗 sha256 並載入",
-     "engine": "functional modules/VRN/VRN2_PeerBridge_v0103.py",
+     "engine": "functional modules/VRN/VRN2_PeerBridge_v0104.py",
      "verb": "borrow <tool_id>",
      "inside": "VCGC run",
      "evidence": "self:VRN2_PeerBridge",
@@ -2181,7 +2190,7 @@
      "code": "VCGC-WKF024-STP005",
      "alias": "borrow_book",
      "name": "缺口登成借用冊(只增)",
-     "engine": "functional modules/VRN/VRN2_PeerBridge_v0103.py",
+     "engine": "functional modules/VRN/VRN2_PeerBridge_v0104.py",
      "verb": "fill --apply",
      "inside": "VCGC run",
      "evidence": "self:VRN2_PeerBridge",
@@ -2192,7 +2201,7 @@
      "code": "VCGC-WKF024-STP006",
      "alias": "readiness",
      "name": "整合就緒燈(有缺口不給綠)",
-     "engine": "functional modules/VRN/VRN2_PeerBridge_v0103.py",
+     "engine": "functional modules/VRN/VRN2_PeerBridge_v0104.py",
      "verb": "readiness",
      "inside": "VCGC run",
      "evidence": "self:VRN2_PeerBridge",
@@ -2203,7 +2212,7 @@
      "code": "VCGC-WKF024-STP007",
      "alias": "integrate_gate",
      "name": "整合閘:不綠就拒絕執行",
-     "engine": "functional modules/VRN/VRN2_PeerBridge_v0103.py",
+     "engine": "functional modules/VRN/VRN2_PeerBridge_v0104.py",
      "verb": "integrate",
      "inside": "VCGC run",
      "evidence": "self:VRN2_PeerBridge",
@@ -3242,7 +3251,7 @@
      "357 站全入類 · 沒跑過 NOT_RUN 不算綠",
      "自測 10/10 · 三種輸出 + 只增帳"
     ],
-    "entry": "python3 \"docs/handoff/ai/VIA_DailyBackup_v0100.py\" check && python3 \"docs/handoff/ai/VIA_VCGCToolBoard_v0100.py\" run --open",
+    "entry": "python3 \"docs/handoff/ai/VIA_DailyBackup_v0100.py\" check && python3 \"docs/handoff/ai/VIA_VCGCToolBoard_v0101.py\" run --open",
     "evidence": "VIA_Reports/backup/CHECK_latest.json · VIA_Reports/vcgc/TOOLBOARD_latest.json · docs/handoff/evidence/C-vcgc-toolboard.json",
     "books": []
    },
@@ -3267,7 +3276,7 @@
      "code": "VCGC-WKF036-STP002",
      "alias": "toolboard",
      "name": "工具看板 run(燈號最前 · 分類 × 串測燈 · 卡上工具)",
-     "engine": "docs/handoff/ai/VIA_VCGCToolBoard_v0100.py",
+     "engine": "docs/handoff/ai/VIA_VCGCToolBoard_v0101.py",
      "verb": "run",
      "inside": "VCGC",
      "evidence": "step:VCGC-WKF036-STP001",
@@ -3774,7 +3783,7 @@
    }
   }
  ],
- "prior": "VIA_Workflow_VCGC_SSOT_v0147.json",
+ "prior": "VIA_Workflow_VCGC_SSOT_v0151.json",
  "why_v0101": "VCGC-WKF008/009 的已知未綠移除:唯一接觸口 CGC_MDL157 v0106 沿命令冊 dot-source 鏈讀 + 撞號以編號系統唯一碼為準 + 補 15 支缺梭 → 29/29 GREEN",
  "why_v0103": "側線 i:+VCGC-WKF001-STP007 SSOT 全景(CGC_MDL247);需求回指補齊(REQ072→WKF001 · REQ073→WKF004,SDD v0104 X-REQ-BACK 量到的單向);新需求 REQ077–082 掛上;其餘步與工作流一字不動",
  "why_v0104": "側線 2026-09-30 a:VCGC-REQ084 回指(WKF001 · WKF003)· STP005 / WKF003-STP006 記只登本批與註冊完整性稽核;代碼 · 步序 · 正主一律不動",
@@ -3818,5 +3827,7 @@
  "why_v0145": "+WKF039 five_system_activate(五系統啟動 via HTML U/I;REQ216)。操作員 2026-11-10「activate 5 system via html u/i and run」→ VIA_LakeConsole v0101 薄尾:白名單 +6 動作(five_systems · activate_vcgc/vdf/vrn2/vqg/vap)+ 鏈 activate_all · 燈號 +6 盞 · 按鈕列 · 矩陣收據複製 · 逾時依系統。",
  "why_v0146": "只增:+VCGC-WKF042(SystemCard 全景卡 · 自建平台管理者版 · MCP parity);操作員 2026-11-10 四令合一。",
  "why_v0147": "只改 VCGC-WKF029.spec.acceptance[6] 的措辭:舊字「只經 VCGC」是 L120 列管的唯一入口舊字(SDDValidator X-PEER-TEXT YELLOW);發號本來就是 VCGC 的職責(L125),改寫成職責句、意思不變。原句留 acceptance_before_v0147。其餘一字不動。",
- "why_v0148": "SDDValidator X-COL RED:VCGC-WKF042 缺 tests 與步欄 → 照既有交接案補測法(self = 已登的 handoff 案),證據改前綴寫法(self: / step:),原檔案路徑留 evidence_file。其餘一字不動。 另:26 步的 engine 由釘死舊版改指註冊冊尾版(X-REG;舊值留 engine_before);WKF042-STP003 改指 VCGC MCP 伺服器 CGC_MDL279 v0103,樹外 VIA_MCP_Engine 留 engine_external。"
+ "why_v0148": "SDDValidator X-COL RED:VCGC-WKF042 缺 tests 與步欄 → 照既有交接案補測法(self = 已登的 handoff 案),證據改前綴寫法(self: / step:),原檔案路徑留 evidence_file。其餘一字不動。 另:26 步的 engine 由釘死舊版改指註冊冊尾版(X-REG;舊值留 engine_before);WKF042-STP003 改指 VCGC MCP 伺服器 CGC_MDL279 v0103,樹外 VIA_MCP_Engine 留 engine_external。",
+ "why_v0149": "SkillExport 九步引擎指到尾版 VIA_SkillExport_v0101.py(薄尾:v0100 動詞全轉接,另加 detect/header/chain);原值留各步 engine_before。SDD X-REG 清紅。",
+ "why_v0150": "2026-11-13 SDD X-REG RED:VCGC-WKF036 入口與 STP002 正主釘 VIA_VCGCToolBoard_v0100.py,元件註冊冊登的尾版是 v0101(v0101 薄尾疊 v0100,動詞 run 照舊)→ 改指 v0101(2 處);其餘一字不動;v0151 凍結不改"
 }

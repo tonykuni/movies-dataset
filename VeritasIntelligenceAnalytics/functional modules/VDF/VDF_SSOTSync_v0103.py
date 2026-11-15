@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-r"""VDF_SSOTSync v0101 — v0100 薄尾(v0100 一字不動):同義字收割看穿薄尾,尾版是薄尾就往前版本體收 UNIFIED_ALIAS。
+r"""VDF_SSOTSync v0103 — v0100 薄尾(v0100 一字不動):同義字收割看穿薄尾,尾版是薄尾就往前版本體收 UNIFIED_ALIAS。
 
 實錄(2026-11-13 容器 VDF_SystemManager v0171 test --max 200:VDF_SSOTSync FAIL rc 1):自測 ① 實樹沒掃到任何 SYN(同義字)。
 根因:v0100 只讀「家族尾版」原文裡的 UNIFIED_ALIAS 字面字典;VDF_ENG053_ParamEngineMap 的尾版今天換成 v0103 薄尾
@@ -58,7 +58,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-VERSION = "v0101"
+VERSION = "v0103"
 HERE = Path(__file__).resolve().parent
 _STEM = "VDF_SSOTSync"
 

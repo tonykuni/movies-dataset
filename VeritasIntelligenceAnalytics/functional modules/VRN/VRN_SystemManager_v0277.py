@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VRN_SystemManager v0264 — 標準 System Manager(依 VIA_SystemManager_Standard_v0100 從頭重作)
+"""VRN_SystemManager v0277 — 標準 System Manager(依 VIA_SystemManager_Standard_v0100 從頭重作)
 
 操作員令(2026-11-11):「確認三個獨立系統三個 main() 三個 system manager · 補齊基本功能 · 更健全 · 遵守更新後獨立系統規範 ·
 沒有誰管誰 · 主導全修正全在我跟 AI · 不符合就從頭規劃標準 system manager 重作」。
-實測缺口(2026-11-11):v0263 實測(容器 2026-11-12):test 把引擎 rc 2(缺件 fitz 等 · L16 ≠ 壞)記成失敗 → 13 支誤紅;本版依 L16 分 PASS / NODATA / ABSENT / GATED / FAIL
+實測缺口(2026-11-11):v0276 實測(容器 2026-11-12):test 把引擎 rc 2(缺件 fitz 等 · L16 ≠ 壞)記成失敗 → 13 支誤紅;本版依 L16 分 PASS / NODATA / ABSENT / GATED / FAIL
 本版是 VRN 自己的入口(L120 / L123):
   · 標準動詞本版自己做:help · version · health · engines · records · peers · conform · selftest(本系統另做 test(逐支尾版 --selftest))。
-  · 其餘動詞(前版鏈全部功能)一律以子行程原樣轉交前版 VRN_SystemManager_v0263(參數 · 環境 · rc 不變)—— 只增不減,不可丟失。
+  · 其餘動詞(前版鏈全部功能)一律以子行程原樣轉交前版 VRN_SystemManager_v0276(參數 · 環境 · rc 不變)—— 只增不減,不可丟失。
     標準動詞後加 --legacy 也轉交前版(看前版原本的版本)。
   · 對等:不 import / 不載入其他系統模組(本檔零動態載入);不要求其他系統的放行旗標;peers 只讀對方檔案(不執行對方程式碼、不寫對方)。
   · 編號依 L122 / L125(本檔不寫號冊)。前版檔一字不動(版號律)。不碰 TA-Lib;不讀寫同意閘;零網路。
@@ -90,7 +90,7 @@ SM_CONFIG = {'system': 'VRN',
                    'dir': 'functional modules/VDF',
                    'own_prefixes': ['VDF_'],
                    'reports': ['VIA_Reports/vdf_fetch', 'VIA_Reports/vdf']}}}
-SM_VERSION = "v0264"
+SM_VERSION = "v0277"
 SM_TAG = SM_CONFIG["manager_family"] + " " + SM_VERSION
 SM_HERE = Path(__file__).resolve()
 SM_NATIVE = ("help", "version", "health", "engines", "records", "peers", "conform", "selftest") + tuple(SM_CONFIG["native_extra"])

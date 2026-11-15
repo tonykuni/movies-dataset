@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """VRN_ENG062_SummarizerV1 v0114 — v0113 薄尾(v0113 一字不動):--selftest 找不到測試檔 → 照實 NODATA(rc 2),不算壞。
 
-實錄(2026-11-13 容器全量實跑 VRN_SystemManager v0264 test:VRN_ENG062 FAIL rc 1):
+實錄(2026-11-13 容器全量實跑 VRN_SystemManager v0277 test:VRN_ENG062 FAIL rc 1):
   v0113 的 --selftest 只在本檔所在夾找 test_summary*.py;倉內沒有這幾支測試檔(在 VRN-2 套件包裡)→ 跑 0 個測試 → rc 1。
   依 L16「缺件 ≠ 壞」:沒測到要照實說「沒測到」(NODATA · rc 2),不能當成失敗,也不能假裝通過。
 本版只改 --selftest:依序找 本夾 → ../VRN2(VRN-2 套件夾)的 test_summary*.py;找到 → 照 v0113 跑(過 0 · 不過 1);

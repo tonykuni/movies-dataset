@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0250",
- "batch": "Agent OS + Graphify 併入 VCGC(2026-11-12):+VCGC-REQ223(前版 v0249)",
- "ts": "2026-11-12T22:30:00Z",
+ "batch": "VRN-2 非個股車道多格式(2026-11-12):+VRN-REQ020(前版 v0248)",
+ "ts": "2026-11-12T21:00:00Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -7153,45 +7153,19 @@
    "homes": [
     "functional modules/VRN/VRN2_NonStockSummarizer_v0100.py",
     "functional modules/VRN/VRN2_NonStockCore_v0100.py",
-    "functional modules/VRN/VRN2_ReportRows_v0102.py",
+    "functional modules/VRN/VRN2_ReportRows_v0103.py",
     "functional modules/VRN/nonstock_v0310/engine/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310.py"
    ],
    "workflow": null,
    "modules": [
     "functional modules/VRN/VRN2_NonStockSummarizer_v0100.py",
     "functional modules/VRN/VRN2_NonStockCore_v0100.py",
-    "functional modules/VRN/VRN2_ReportRows_v0102.py"
+    "functional modules/VRN/VRN2_ReportRows_v0103.py"
    ],
    "evidence": "2026-11-12 容器:核心 18/18 · 入口 18/18 · ReportRows v0102 8/8;真 PDF 19 份 → 非個股 5 PASS(原句驗證 4/4 ×5)· 個股 14 → 主線車道;夾具 txt / html / json / docx / eml / LINE 文字全過;圖片 = OCR 車道未就緒 → ABSENT 照實",
    "next": "① 操作員原件 internal/NON_STOCK_CORE_v0200.py 到了 → 自動改用原件(模式 ORIGINAL);② 桌機 OCR 隔離境(via_rapidocr 最輕)經 VCGC InstallGate 建 → 圖片 / 掃描 PDF 轉 PASS;③ 桌機有 PyMuPDF → PDF 走 v0310 自己的 VRN-2 版面鏈",
    "hand": "operator(原件核心)· VCGC(OCR 隔離境)",
    "why_homes": "VRN-2 自己的車道入口與核心;v0310 原檔不改(SHA 釘);OCR 只借 VCGC 鎖冊路徑,子行程隔離境"
-  },
-  {
-   "code": "VCGC-REQ223",
-   "subsystem": "VCGC",
-   "topic": "Agent OS 全功能併入 VCGC 成一個系統(主控台 agentos 門)· 登錄 27 工具(8 Skill + 9 MCP + 10 slash)· 14 動詞 · 4 模組 · 5 遮罩正則 · 8 同義對照(整合冊 + 中央正則 / 同義字冊只增)· Graphify 併入(graphify 門 · 隔離環境)· 全部逐項真跑 → 矩陣;四系統對等獨立不變(VCGC 只裝環境 / 偵測衝突 / 發新 SSOT 號)",
-   "requirement": "操作員 2026-11-12:「Please integrate all of the function of agent OS into VCGC together into one system. Register all of its assistance SSOT regex 同義字 and other 27 tools also integrate graphify into VCGC as well, activate all of them to run」;四系統獨立互不影響、功能互相支援(VCGC 幫裝環境 / 套件、偵測 SSOT 邏輯 / 格式與環境 / 套件衝突、處理後發新 SSOT 號給各系統自己更新)",
-   "status": "PARTIAL",
-   "homes": [
-    "supportive modules/registry/CGC_MDL280_VCGCAgentOSHub_v0101.py",
-    "supportive modules/registry/CGC_MDL280_VCGCAgentOSHub_v0100.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0196.py",
-    "supportive modules/registry/VIA_VCGC_AgentOS_Integration_SSOT_v0100.json",
-    "supportive modules/registry/VIA_Central_Synonym_Regex_v0108.json"
-   ],
-   "workflow": null,
-   "modules": [
-    "supportive modules/registry/CGC_MDL280_VCGCAgentOSHub_v0101.py",
-    "supportive modules/registry/CGC_MDL280_VCGCAgentOSHub_v0100.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0196.py",
-    "supportive modules/agent_os/VIA_AgentOS_v0102.py",
-    "docs/handoff/ai/VIA_SkillExport_v0101.py"
-   ],
-   "evidence": "2026-11-12 容器:CGC_MDL280 v0101 自測 15/15(v0100 自測不封閉 → 薄尾修) · 主控台 v0196 自測 9/9;activate 綠 57 · 黃 0 · 紅 0 · 缺件 1(Agent OS selftest · 14 動詞 · 8 Skill skills run · MCP stdio 真握手 9/9 tools/call · 10 slash chain · 13 中央冊條目 · 正則全編譯);Graphify 容器隔離 venv 建置被自動權限擋(外部程式碼)→ ABSENT 照實",
-   "next": "桌機:貼 via_graphify_v0101 那一行建隔離 venv(第一次要操作員開 VIA_NET_CONSENT)→ via-vcgc graphify run;「27 工具」= 8+9+10 為 AI 解讀,操作員可更正",
-   "hand": "operator(Graphify 隔離 venv · 27 工具解讀確認)",
-   "why_homes": "VCGC 自己的冊與入口;Agent OS / Graphify 原檔不改;他系統不動(L123)"
   }
  ],
  "non_requirements": [
@@ -7583,6 +7557,5 @@
   }
  ],
  "why_v0247": "只增:導入 VIA_VCGC_Commercial_Review_v0100(22 差異 · 40 隔離測試 NOT_RUN)→ 8 條 CAND-VCGC-COM-* 候選需求登冊待批(不發正式號);REQ221 補 G7 證據。",
- "why_v0249": "只增:+VRN-REQ020 非個股 v0310 整合進 VRN-2 + 多格式讀取 + 矩陣輸出;其餘一字不動。",
- "why_v0250": "只增:+VCGC-REQ223;其餘一字不動。"
+ "why_v0249": "只增:+VRN-REQ020 非個股 v0310 整合進 VRN-2 + 多格式讀取 + 矩陣輸出;其餘一字不動。"
 }

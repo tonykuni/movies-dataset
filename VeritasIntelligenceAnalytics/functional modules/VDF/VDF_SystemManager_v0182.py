@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VDF_SystemManager v0172 — v0171 薄尾(v0171 一字不動):缺第三方套件的判讀認得「別名 + 這台真的沒裝」。
+"""VDF_SystemManager v0182 — v0171 薄尾(v0171 一字不動):缺第三方套件的判讀認得「別名 + 這台真的沒裝」。
 
 實錄(2026-11-13 容器 VDF_SystemManager v0171 test --max 200):VDF_ENG082_FinStatements 判 FAIL。
   它只卡 yfinance(容器沒裝):⑩ ⑫ 兩行寫「缺件 No module named 'yfinance'」,但連帶的 ⑪「兩趟都零列(rc=2)」那行沒寫 →
@@ -65,7 +65,7 @@ import re
 import sys
 from pathlib import Path
 
-VERSION = "v0172"
+VERSION = "v0182"
 HERE = Path(__file__).resolve().parent
 _STEM = "VDF_SystemManager"
 
@@ -138,7 +138,7 @@ def selftest() -> int:
     chk("④ 套件其實有裝(json)→ 不算缺件,照實 FAIL", sm_missing_lib("[FAIL] openpyxl 不在\n") == "" if lib_installed("openpyxl") else True)
     chk("⑤ 自家模組缺 → 真壞(不判缺件)", sm_missing_lib("[FAIL] x\nNo module named 'VDF_ENG999_X'\nyfinance 不在\n") == "")
     chk("⑥ 沒有缺件字樣 → 不判缺件", sm_missing_lib("[FAIL] yfinance 道 數字對不上\n") == "")
-    chk("⑦ 換裝:v0171 的 sm_missing_lib 指本版 · 版號 v0172", PRIOR.sm_missing_lib is sm_missing_lib and PRIOR.SM_VERSION == VERSION)
+    chk("⑦ 換裝:v0171 的 sm_missing_lib 指本版 · 版號 v0182", PRIOR.sm_missing_lib is sm_missing_lib and PRIOR.SM_VERSION == VERSION)
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         rc = PRIOR.selftest()

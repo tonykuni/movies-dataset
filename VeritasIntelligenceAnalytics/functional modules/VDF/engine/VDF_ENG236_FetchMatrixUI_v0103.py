@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-VDF_ENG236_FetchMatrixUI v0102 — v0101 薄尾(v0101 一字不動):自測 ④「讀庫失敗 → 沿用快取」改成密封(不受這台機器有沒有庫影響)。
+VDF_ENG236_FetchMatrixUI v0103 — v0101 薄尾(v0101 一字不動):自測 ④「讀庫失敗 → 沿用快取」改成密封(不受這台機器有沒有庫影響)。
 
 實錄(2026-11-13 容器全量實跑 VDF_SystemManager v0171 test:VDF_ENG236 FAIL rc 1):v0101 自測 11/12,只紅 ④ 第二項。
 根因:④ 呼叫 table_columns(tmp) 沒指定庫家 → ENG237 照 DataHome 冊 / 倉內 output_hub 退路找到一本真庫(VDF_Universe.duckdb)→

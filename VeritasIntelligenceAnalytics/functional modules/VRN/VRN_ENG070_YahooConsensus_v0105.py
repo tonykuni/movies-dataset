@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """VRN_ENG070_YahooConsensus v0105 — v0104 薄尾(v0104 一字不動):取收盤價前先查表在不在,不讓「查不到的 SELECT」把交易弄壞。
 
-實錄(2026-11-13 容器全量實跑 VRN_SystemManager v0264 test:VRN_ENG070 FAIL rc 1):
+實錄(2026-11-13 容器全量實跑 VRN_SystemManager v0277 test:VRN_ENG070 FAIL rc 1):
   _duckdb.TransactionException: Current transaction is aborted (please ROLLBACK)
 根因:upsert 先 SELECT prices_canonical 取收盤價;庫裡沒有這張表(工作站空庫 / 暫存自測庫)→ 例外被吞(close=NULL 照實),
   但 DuckDB 的規則是「交易裡任何一句失敗 = 整個交易作廢」→ 下一句 DELETE 就炸。v0104 的自測在 BEGIN 裡呼叫 upsert,所以必炸;

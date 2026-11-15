@@ -3,7 +3,7 @@
 """
 SUP_MDL744_NLPApplicationHub v0103 — v0102 薄尾(v0102 一字不動):詞庫找不到就到尾版收容包內的既有位置找,TextProcessor 才掛得起來。
 
-實錄(2026-11-13 容器全量實跑 VRN_SystemManager v0265 test:VRN_ENG087 FAIL「TextProcessor 正規化」):
+實錄(2026-11-13 容器全量實跑 VRN_SystemManager v0278 test:VRN_ENG087 FAIL「TextProcessor 正規化」):
   ENG087 期望 '台積電 2330 買進, 需求強勁。'(正主會在半形逗號後補空白),實得 '買進,需求'(純 stdlib NFKC)。
 根因(逐層追到底):
   ① 尾版收容件已是 VIA_NLP_OneEngine_v1.9.0(語意序最大),v0102 到「尾版夾/data/lexicon/ssot_lexicon.json」找詞庫;

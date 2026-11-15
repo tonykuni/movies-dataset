@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # [VIA:ACCEL-BRIDGE:v0111]
-r"""VRN2_ReportRows v0102 — v0101 薄尾(v0101 一字不動):非個股車道改走 VRN2_NonStockSummarizer v0100。
+r"""VRN2_ReportRows v0103 — v0101 薄尾(v0101 一字不動):非個股車道改走 VRN2_NonStockSummarizer v0100。
 
 操作員 2026-11-12:「非個股 v0300 整合進 VRN-2;輸入有 PDF / Word / 圖片 / 文字;個股與非個股報告都要處理;結果用矩陣」。
 v0101 的非個股只在有 internal/NON_STOCK_CORE_v0200.py 時才跑 v0310(一直缺 → 全落「暫代」)。本版只換兩件事:
@@ -10,7 +10,7 @@ v0101 的非個股只在有 internal/NON_STOCK_CORE_v0200.py 時才跑 v0310(一
   ② 同一個輸入夾裡的非 PDF(Word / 圖片 / 文字 / 網頁 / 訊息 / 筆記)也一起交非個股車道 → <out>/nonstock_other/NONSTOCK_MATRIX.*;
      摘要頁 summary 多 non_pdf 一節(檔數 · 狀態 · 矩陣路徑);燈號把 non_pdf 的 ERROR / ABSENT / REVIEW 照實併進來。
 個股車道(VRN-2 主線冊)不變。邊界同 v0101:只寫自己的輸出夾;零網路;不用 TA-Lib;不 import VCGC。
-用法:python VRN2_ReportRows_v0102.py run [--pdf-dir D] [--out O] [--vrn2-books B] [--nonstock-out N] · --selftest
+用法:python VRN2_ReportRows_v0103.py run [--pdf-dir D] [--out O] [--vrn2-books B] [--nonstock-out N] · --selftest
 """
 from __future__ import annotations
 
@@ -39,10 +39,10 @@ import sys
 import tempfile
 from pathlib import Path
 
-VERSION = "v0102"
+VERSION = "v0103"
 ENGINE = "VRN2_ReportRows " + VERSION
 HERE = Path(__file__).resolve().parent
-_PRIOR = HERE / "VRN2_ReportRows_v0101.py"
+_PRIOR = HERE / "VRN2_ReportRows_v0102.py"
 _spec = importlib.util.spec_from_file_location("vrn2_reportrows_v0101_for_v0102", _PRIOR)
 PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = PRIOR
