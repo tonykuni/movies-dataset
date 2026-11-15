@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-15T07:26:30Z",
+ "updated_at": "2026-11-15T10:53:10Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -4919,6 +4919,68 @@
    "updated_at": "2026-11-15T07:17:01Z",
    "timeout_seconds": 1200,
    "registered_at": "2026-11-15T07:17:01Z"
+  },
+  "V-vdf-threecode-v0101": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL014_ThreeCodeUniverse",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL014_ThreeCodeUniverse v0101 前版鏈 rc 0 · PASS",
+   "scope": "VDF MDL014 v0101(VDF-REQ022 三代號宇宙):yfinance 代碼照市場 —— 上市 .TW · 上櫃 .TWO(v0100 一律 .TW;冊 SRC-03 寫 .TW / .TWO;2026-11-15 實測 6488 環球晶記成 6488.TW)· +V12 後綴照市場(不合 RED · 市場認不出 AMBER;主動 ETF 照 v0100 classify 上市慣例)· classify / info 查本機個股組補市場;前版 v0100 自測 67/67。經 VDF 自己的 manager 跑",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py",
+    "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0100.py",
+    "functional modules/VDF/VDF_InputUniverse_SSOT_v0104.json"
+   ],
+   "version": "v0101",
+   "updated_at": "2026-11-15T10:53:10Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-15T10:53:10Z"
+  },
+  "V-vdf-universe-share-v0100": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL018_UniverseShare",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL018_UniverseShare v0100 自測 8/8 · PASS",
+   "scope": "VDF MDL018 v0100(VDF-REQ027 統一 SSOT 分享):MDL014 尾版 OUT-01 + MDL010 尾版判定 → 一份(content_sha256 鎖 · 版本檔只增 + latest 原子寫)· verify 任何系統只讀重算 · 分享冊 views:VCGC 燈與收據 · VRN-2 / VQG 列(只帶符合的 ETF)· VAP 彙總 · U/I 三行標頭 × 5 + 實測收據 + VDF 鎖定樣式;不寫他系統的程式或冊。經 VDF 自己的 manager 跑",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL018_UniverseShare_v0100.py",
+    "functional modules/VDF/VDF_UniverseShare_SSOT_v0100.json",
+    "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py",
+    "functional modules/VDF/VDF_MDL010_ActiveETFList_v0101.py",
+    "functional modules/VDF/VDF_UI_VisualSpec_SSOT_v0100.json"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-15T10:53:10Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-15T10:53:10Z"
+  },
+  "V-vdf-fetchsystem-book-v0110": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL008_FetchSystem",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL008_FetchSystem v0110 本版 9/9 · 合計 PASS",
+   "scope": "VDF 擷取冊 v0110:014 改指 VDF_MDL014_ThreeCodeUniverse_v0101.py(yf 後綴照市場 + V12);擷取系統 v0110 讀尾版冊 9/9;fixture 實跑 fetch run MDL014 rc 0;其餘 36 列與 v0109 一字不差",
+   "dependencies": [
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0110.json",
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0110.py",
+    "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py"
+   ],
+   "version": "v0110",
+   "updated_at": "2026-11-15T10:53:10Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-15T10:53:10Z"
   }
  },
  "work_items": [
