@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-15T11:23:45Z",
+ "updated_at": "2026-11-15T14:00:33Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -5001,6 +5001,42 @@
    "updated_at": "2026-11-15T11:21:54Z",
    "timeout_seconds": 1200,
    "registered_at": "2026-11-15T11:21:54Z"
+  },
+  "V-vdf-dbmatrix-v0100": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL019_DBStatusMatrix",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL019_DBStatusMatrix v0100 自測 8/8 · PASS",
+   "scope": "VDF MDL019 v0100(VDF-REQ028 資料庫狀態矩陣):只讀 VDF 自己的 DB_CHECK / VERIFY 報告 → KPI · 建議(由重到輕)· 矩陣一 庫 × 狀態 · 矩陣二 寫入引擎 × 狀態 · 逐表明細 · 他系統表只讀 · VDF 鎖定樣式;沒清點 = GRAY 不假造。經 VDF 自己的 manager 跑",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL019_DBStatusMatrix_v0100.py",
+    "functional modules/VDF/VDF_UI_VisualSpec_SSOT_v0100.json"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-15T14:00:33Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-15T14:00:33Z"
+  },
+  "V-vdf-manager-v0182": {
+   "argv": [
+    "VDF_SystemManager",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_SystemManager v0182 全原生 36/36 PASS",
+   "scope": "VDF SystemManager v0182(VDF-REQ028):v0181 單檔全文 + db check / db verify 轉交後以子行程叫 MDL019 渲染 → 資料庫頁 DB_CHECK_latest.html = 狀態矩陣(原平表另存 DB_CHECK_table_latest.html)· rc 照轉交那一版 · 本檔仍是標準轉交者(R1)· 導覽列多「資料庫狀態矩陣」· 不動態載入他檔(P4)。前版 v0181 全部自測照跑",
+   "dependencies": [
+    "functional modules/VDF/VDF_SystemManager_v0182.py",
+    "functional modules/VDF/VDF_SystemManager_v0181.py",
+    "functional modules/VDF/VDF_MDL019_DBStatusMatrix_v0100.py"
+   ],
+   "version": "v0182",
+   "updated_at": "2026-11-15T14:00:33Z",
+   "timeout_seconds": 1500,
+   "registered_at": "2026-11-15T14:00:33Z"
   }
  },
  "work_items": [
