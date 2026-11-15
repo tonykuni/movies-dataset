@@ -91,6 +91,8 @@ NO_TOUCH_EXT = {".ps1", ".psm1", ".psd1", ".cmd", ".bat"}          # L70:.ps1 �
 VCGC_OWNED_RX = re.compile(r"^(VeritasIntelligenceAnalytics/supportive modules/|VeritasIntelligenceAnalytics/docs/|supportive modules/|docs/|reg/|\.claude/|CLAUDE\.md$|AGENTS\.md$|\.mcp\.json$|NOTE\.md$)")
 EVIDENCE_RX = re.compile(r"(^|/)docs/handoff/evidence/")
 NUMBERBOOK_RX = re.compile(r"(^|/)VIA_NumberBooks/[^/]+\.jsonl$")
+# 號碼登記冊(以號為鍵):兩邊都改的葉子一律留他方(已發的號身分不可被改;2026-11-15 實錄 SSOT387 / SSOT390 被「取較新」改了身分)
+NUMBER_REG_RX = re.compile(r"(^|/)(VIA_Numbering_SSOT|VIA_RegistryNumbers|VIA_Component_Inventory_SSOT|VIA_TableNumbers)_v\d+\.json$")
 SHORT_RX = re.compile(r"^((?:[A-Z]+_)+?[A-Z]+\d+)_")
 KEY_CANDIDATES = ("id", "code", "key", "case", "name", "path")
 # 代碼族:冊家族 stem → [(集合路徑, 鍵欄)];集合為 dict 時鍵欄 = None(鍵本身)
@@ -191,7 +193,7 @@ def _tail_pick(gv, hv):
     return hv if hm[fam] > gm[fam] else gv
 
 
-def merge3(b, gv, hv, path: str, log: list):
+def merge3(b, gv, hv, path: str, log: list, no_tail: bool = False):
     """b = 基準 · gv = 他方(theirs)· hv = 我方(ours);MISSING = 不存在。"""
     if _eq(gv, hv):
         return gv
@@ -210,7 +212,7 @@ def merge3(b, gv, hv, path: str, log: list):
         bd = bb or {}
         out = OrderedDict()
         for k in list(gv.keys()) + [k for k in hv.keys() if k not in gv]:
-            r = merge3(bd.get(k, MISSING), gv.get(k, MISSING), hv.get(k, MISSING), path + "." + str(k), log)
+            r = merge3(bd.get(k, MISSING), gv.get(k, MISSING), hv.get(k, MISSING), path + "." + str(k), log, no_tail)
             if r is not MISSING:
                 out[k] = r
         return out
@@ -222,12 +224,12 @@ def merge3(b, gv, hv, path: str, log: list):
             order = [x[kf] for x in gv] + [x[kf] for x in hv if x[kf] not in gm]
             out = []
             for k in order:
-                r = merge3(bm.get(k, MISSING), gm.get(k, MISSING), hm.get(k, MISSING), f"{path}[{kf}={k}]", log)
+                r = merge3(bm.get(k, MISSING), gm.get(k, MISSING), hm.get(k, MISSING), f"{path}[{kf}={k}]", log, no_tail)
                 if r is not MISSING:
                     out.append(r)
             return out
         if len(gv) == len(hv) == len(bl) and bl:
-            return [merge3(bl[i], gv[i], hv[i], f"{path}[{i}]", log) for i in range(len(bl))]
+            return [merge3(bl[i], gv[i], hv[i], f"{path}[{i}]", log, no_tail) for i in range(len(bl))]
         try:
             bs, gs, hs = (set(json.dumps(x, sort_keys=True, ensure_ascii=False) for x in lst) for lst in (bl, gv, hv))
         except TypeError:
@@ -236,7 +238,7 @@ def merge3(b, gv, hv, path: str, log: list):
         out = [x for x in gv if not (ks(x) in bs and ks(x) not in hs)]
         out += [x for x in hv if ks(x) not in bs and ks(x) not in gs]
         return out
-    pick = _tail_pick(gv, hv)
+    pick = None if no_tail else _tail_pick(gv, hv)
     if pick is not None:
         log.append({"path": path, "how": "葉子兩邊都改 · 指尾版指標取較新", "theirs": _short(gv), "ours": _short(hv), "took": "ours" if pick is hv else "theirs"})
         return pick
@@ -623,7 +625,7 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
                 ent["how"] = "台帳聯集(只增)"
             elif jload(o) is not MISSING and jload(t) is not MISSING:
                 log = []
-                merged = tally_fix(merge3(jload(b), jload(t), jload(o), "$", log))
+                merged = tally_fix(merge3(jload(b), jload(t), jload(o), "$", log, no_tail=bool(NUMBER_REG_RX.search(path))))
                 (root / path).write_bytes(jdump(merged, t))
                 rep["leaf_conflicts"] += [dict(x, file=path) for x in log]
                 ent["how"] = f"JSON 三方鍵聯集 · 葉子取捨 {len(log)}"
@@ -842,6 +844,13 @@ def selftest() -> int:
         st = branch_merge(R, "theirs", apply=True, do_print=False)
         chk("⑬ 髒樹誠實停(不 stash 不硬合)", st["state"] == "STOP")
 
+    lg = []
+    mb, mt, mo = {"rows": [{"code": "N1", "name": "base"}]}, {"rows": [{"code": "N1", "name": "X_v0117"}]}, {"rows": [{"code": "N1", "name": "X_v0118"}]}
+    r_reg = merge3(mb, mt, mo, "$", lg, no_tail=True)
+    r_any = merge3(mb, mt, mo, "$", [], no_tail=False)
+    chk("⑱ 號碼登記冊兩邊都改的葉子留他方(已發號身分不改);一般冊照舊取較新指標",
+        r_reg["rows"][0]["name"] == "X_v0117" and r_any["rows"][0]["name"] == "X_v0118"
+        and bool(NUMBER_REG_RX.search("supportive modules/registry/VIA_Numbering_SSOT_v0100.json")), r_reg)
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑭ 加速器橋在 · 不匯入 TA-Lib · 不寫死署名信箱", "VIA:ACCEL-BRIDGE" in src and ("import " + "talib") not in src
         and "user.email=" not in src.split("def selftest")[0])
