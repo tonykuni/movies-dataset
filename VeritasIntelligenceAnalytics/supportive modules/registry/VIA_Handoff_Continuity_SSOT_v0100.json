@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-15T14:00:33Z",
+ "updated_at": "2026-11-15T14:26:57Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -5037,6 +5037,23 @@
    "updated_at": "2026-11-15T14:00:33Z",
    "timeout_seconds": 1500,
    "registered_at": "2026-11-15T14:00:33Z"
+  },
+  "V-vrn2-reportsdb-dryrun": {
+   "argv": [
+    "VRN_SystemManager",
+    "metrics-resolve"
+   ],
+   "success_marker": "[Z298 收斂] CLEAN · ",
+   "scope": "VRN-2 真庫實測(VDF-REQ029 操作員令「Real test for VRN vdf …」的 VRN-2 部分):經 VRN-2 自己的 manager 乾跑 metrics-resolve(不帶 --apply 一律唯讀開庫)讀 functional modules/VRN/db/vrn_reports.duckdb → 列數前後 · 有變的報告 · 年份 EPS / 同值併 / 多值 CONFLICT;CLEAN = 庫已收斂、這輪沒有要改的。VDF 不讀 VRN-2 的庫(L123),只看這張收據。",
+   "dependencies": [
+    "functional modules/VRN/VRN_SystemManager_v0275.py",
+    "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0140.py",
+    "functional modules/VRN/db/vrn_reports.duckdb"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-15T14:25:04Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-15T14:25:04Z"
   }
  },
  "work_items": [
@@ -10296,6 +10313,70 @@
    "next": "VRN 收尾:桌機 status 的 參數 ABSENT(VRN_ResearchReport_SSOT.active.json 只在工作站)· 樣本 ABSENT(C:\\測試樣本報告)由操作員確認",
    "receipt": "docs/handoff/evidence/V-vrn2-manager-v0275.json",
    "updated_at": "2026-11-15T11:23:45Z"
+  },
+  {
+   "id": "VDF-REQ028:V-vdf-dbmatrix-v0100",
+   "requirement": "VDF-REQ028",
+   "case": "V-vdf-dbmatrix-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "MDL019 v0100 資料庫狀態矩陣:只讀 VDF 清點 / 核對報告 → KPI · 建議由重到輕 · 庫 × 狀態 · 寫入引擎 × 狀態 · 逐表明細 · 他系統表只讀;自測 12/12;經 VDF_SystemManager engine run;handoff test rc 0 · marker true(2026-11-15T14:25:24+00:00 · sha 882ae5f69108)",
+   "next": "桌機 ActivateVDF 一輪 → 資料庫頁即矩陣",
+   "receipt": "docs/handoff/evidence/V-vdf-dbmatrix-v0100.json",
+   "updated_at": "2026-11-15T14:26:57Z"
+  },
+  {
+   "id": "VDF-REQ028:V-vdf-manager-v0182",
+   "requirement": "VDF-REQ028",
+   "case": "V-vdf-manager-v0182",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "VDF SystemManager v0182:db check / db verify 轉交後叫 MDL019 渲染 → DB_CHECK_latest.html = 矩陣頁(原平表另存)· 仍是標準轉交者;自測 36/36;handoff test rc 0 · marker true(2026-11-15T14:26:34+00:00 · sha 8787ec85ffc3)",
+   "next": "桌機 pull 後照常用 VDF_SystemManager",
+   "receipt": "docs/handoff/evidence/V-vdf-manager-v0182.json",
+   "updated_at": "2026-11-15T14:26:57Z"
+  },
+  {
+   "id": "VDF-REQ028:workstation-real-db",
+   "requirement": "VDF-REQ028",
+   "case": null,
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "冊上 5 本庫(vdf_tw_market / vdf_global_market / vdf_hub / ActiveTWETF / aaii_sentiment)要 live 引擎才建;容器 db check 0/5 照實紅",
+   "next": "桌機 ActivateVDF(真資料家)→ 資料庫頁矩陣照建議第一條處理",
+   "updated_at": "2026-11-15T14:26:57Z"
+  },
+  {
+   "id": "VDF-REQ029:V-vdf-dbmatrix-v0100",
+   "requirement": "VDF-REQ029",
+   "case": "V-vdf-dbmatrix-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "DuckDB 現查段(⑨–⑫:唯讀開庫 · 日期範圍 / 日期數 · 壞檔不擋 · 清點 vs 現查 · .duckdb ⇄ .parquet · 整列重複 · backups 只數)自測 12/12;容器實測 擷取 fixture 鏈 9/9 · 輸出 23/23 → 重跑 48/48 張表列數不變 · 重複 0 · 兩份落地 18/18 一致;handoff test rc 0 · marker true(2026-11-15T14:25:24+00:00 · sha 882ae5f69108)",
+   "next": "桌機真資料家同一頁直接查真庫",
+   "receipt": "docs/handoff/evidence/V-vdf-dbmatrix-v0100.json",
+   "updated_at": "2026-11-15T14:26:57Z"
+  },
+  {
+   "id": "VDF-REQ029:V-vrn2-reportsdb-dryrun",
+   "requirement": "VDF-REQ029",
+   "case": "V-vrn2-reportsdb-dryrun",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "VRN-2 自己的 manager 乾跑 metrics-resolve 讀真庫 vrn_reports.duckdb:CLEAN(74 → 74 列 · 報告 0/50 有變 · 多值 CONFLICT 2 組照標)· 庫檔 md5 前後相同;VDF 不讀 VRN-2 的庫(L123);handoff test rc 0 · marker true(2026-11-15T14:25:44+00:00 · sha 07c482992896)",
+   "next": "VRN-2 桌機照常 run;收據看這張",
+   "receipt": "docs/handoff/evidence/V-vrn2-reportsdb-dryrun.json",
+   "updated_at": "2026-11-15T14:26:57Z"
+  },
+  {
+   "id": "VDF-REQ029:workstation-real-home",
+   "requirement": "VDF-REQ029",
+   "case": null,
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "真資料擷取要網路與同意閘(操作員設,AI 不代設);冊上 5 本庫的清點 vs DuckDB 現查逐表一致才算收",
+   "next": "桌機 pull → ActivateVDF 一輪 → 資料庫頁 DuckDB 現查段 · 清點 vs 現查 0 不一致",
+   "updated_at": "2026-11-15T14:26:57Z"
   }
  ]
 }
