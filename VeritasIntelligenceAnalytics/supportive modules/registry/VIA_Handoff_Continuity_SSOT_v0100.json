@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-15T07:17:01Z",
+ "updated_at": "2026-11-15T07:26:30Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -10051,6 +10051,69 @@
    "reason": "容器沒有任何人的真鑰,也不代輸;個人鑰的真實使用只能在桌機由每個人自己輸入後驗",
    "next": "桌機:`python VDF_MDL017_UserApiKeys_v0100.py set fred` → `status` 顯示「實際會用:個人鑰」→ `run -- python ActivateVDF.py run --db-home …` 的 [鑰] 行顯示個人鑰;之後 AI 逐支引擎出新版直接讀個人鑰",
    "updated_at": "2026-11-15T05:08:57Z"
+  },
+  {
+   "id": "VDF-REQ018:V-vdf-activate-v0119",
+   "requirement": "VDF-REQ018",
+   "case": "V-vdf-activate-v0119",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "ActivateVDF v0119 本輪鉤:載工具期間生的子行程不再掛工具 · 不排准入閘(斷 py-cpuinfo 無限遞迴)· 載入看門狗 · 前版鏈 v0115 自測用防遞迴鉤;容器替身重現(前版深度 40 · 本版 0);經 VDF_SystemManager engine run;handoff test rc 0 · marker true(2026-11-15T07:26:02+00:00 · sha c0341fc5d4e6)",
+   "next": "桌機 pull 後 ActivateVDF --selftest:[資訊] 行看本機 py-cpuinfo 有無 · 前版鏈 rc 0;一輪收尾多一行「[加速] 載工具時生的輔助子行程 N 支」",
+   "receipt": "docs/handoff/evidence/V-vdf-activate-v0119.json",
+   "updated_at": "2026-11-15T07:26:30Z"
+  },
+  {
+   "id": "VDF-REQ026:V-vdf-active-etf-list-v0101",
+   "requirement": "VDF-REQ026",
+   "case": "V-vdf-active-etf-list-v0101",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "MDL010 v0101 V8:ENG051 最新一輪抓不到每日持股 = 不符合 · 國外成分 = 不符合 · 沒紀錄 = 未判;清單照 v0100;判定檔 active_etf_qualified_latest.csv;自測 10/10 + 前版 7/7;經 VDF_SystemManager engine run;handoff test rc 0 · marker true(2026-11-15T07:24:19+00:00 · sha 6d49b3109851)",
+   "next": "桌機開閘真抓一輪後看判定名單(qualify 可不連網重判)",
+   "receipt": "docs/handoff/evidence/V-vdf-active-etf-list-v0101.json",
+   "updated_at": "2026-11-15T07:26:30Z"
+  },
+  {
+   "id": "VDF-REQ026:V-vdf-fetchsystem-book-v0109",
+   "requirement": "VDF-REQ026",
+   "case": "V-vdf-fetchsystem-book-v0109",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "擷取冊 v0109 只把 010 改指 MDL010 v0101;擷取系統 v0110 讀尾版冊 9/9;fixture 實跑 fetch run MDL010 輸出 2/2;經 VDF_SystemManager engine run;handoff test rc 0 · marker true(2026-11-15T07:24:36+00:00 · sha 4da99d791479)",
+   "next": "總控 fetch run MDL010 即用 v0101",
+   "receipt": "docs/handoff/evidence/V-vdf-fetchsystem-book-v0109.json",
+   "updated_at": "2026-11-15T07:26:30Z"
+  },
+  {
+   "id": "VDF-REQ026:workstation-live-qualify",
+   "requirement": "VDF-REQ026",
+   "case": null,
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "判定要 ENG051 真抓的紀錄;容器沒有真網路持股來源,也不代開同意閘",
+   "next": "桌機本視窗開雙閘 → ActivateVDF 一輪(010 清單 → ENG051 抓持股)→ `python VDF_MDL010_ActiveETFList_v0101.py qualify`(總控入口)貼回不符合 / 未判名單",
+   "updated_at": "2026-11-15T07:26:30Z"
+  },
+  {
+   "id": "VDF-REQ026:downstream-read-qualified",
+   "requirement": "VDF-REQ026",
+   "case": null,
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "判定檔已產出,下游(ENG094 活動 · ENG096 指標 · VRN-2 報表)還讀整份清單;改讀判定檔要各出新版,VRN-2 部分歸 VRN-2 自己的手",
+   "next": "操作員點名先改哪一支;VDF 內的由 AI 出新版只取 qualified=True",
+   "updated_at": "2026-11-15T07:26:30Z"
+  },
+  {
+   "id": "VDF-REQ018:workstation-010-datahome-0B",
+   "requirement": "VDF-REQ018",
+   "case": null,
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "工作站 2026-11-15 13:46:ActivateVDF lists_verify 讀資料家 via_database\\vdf_database 的 0-2-ActiveETFList/verify_report.json = 0 B(檔在但空);fetch verify 讀的是預設家 VIA_Reports\\vdf_fetch\\dict(1520 B)—— 兩個家;閘關時清單步 GATED 無法重生",
+   "next": "桌機開雙閘後 `VDF_SystemManager fetch run MDL010 --apply --home <資料家>` 重生;或先看 0 B 檔的 LastWriteTime / Attributes(OneDrive 同步衝突?)",
+   "updated_at": "2026-11-15T07:26:30Z"
   }
  ]
 }
