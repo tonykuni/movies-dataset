@@ -4750,6 +4750,70 @@
    "version": "v0101",
    "updated_at": "2026-11-10T14:49:40Z",
    "timeout_seconds": 600
+  },
+  "V-vdf-macro-hierarchy-v0102": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0102.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL015_MacroHierarchy v0102 薄尾 5/5 · PASS",
+   "scope": "VDF MDL015 v0102:前版鏈(v0101 VAKE 測具 → v0100 14 項)在子行程跑,子環境只少 FRED 環境鑰那一個名字;本行程環境不動;AST 定位根因 v0100 _key_value() 先讀環境鑰;AI 不設 / 不寫 / 不讀鑰值(工作站 2026-11-15 RED 3/4 的修正)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0102.py",
+    "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0101.py",
+    "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0100.py",
+    "functional modules/VDF/VDF_MacroKeyword_SSOT_v0100.json",
+    "functional modules/VDF/VDF_USMacro_Tree_v0100.json",
+    "supportive modules/network/via_net_unified_v0101.py"
+   ],
+   "version": "v0102",
+   "updated_at": "2026-11-15T03:57:13Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-15T03:57:13Z"
+  },
+  "V-vdf-macro-crosscheck-v0102": {
+   "argv": [
+    "--family",
+    "core",
+    "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0102.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL016_MacroCrossCheck v0102 薄尾 5/5 · PASS",
+   "scope": "VDF MDL016 v0102:前版鏈(v0101 VAKE 測具 → v0100 16 項)在子行程跑,子環境只少 FRED 環境鑰那一個名字;本行程環境不動;AST 定位根因 v0100 find_key() 先讀環境鑰;AI 不設 / 不寫 / 不讀鑰值(工作站 2026-11-15 RED 3/4 的修正)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0102.py",
+    "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0101.py",
+    "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0100.py",
+    "functional modules/VDF/VDF_MacroCrossCheck_Pairs_SSOT_v0100.json",
+    "supportive modules/network/via_net_unified_v0101.py"
+   ],
+   "version": "v0102",
+   "updated_at": "2026-11-15T03:57:13Z",
+   "timeout_seconds": 600,
+   "registered_at": "2026-11-15T03:57:13Z"
+  },
+  "C-bridge-sweeper-v0105": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/via_bridge_sweeper_v0105.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] via_bridge_sweeper v0105 selftest · 本版 4/4",
+   "scope": "雙橋稽核 v0105:v0104 原封(SHA = C-bridge-sweeper-v0104 收據)· 標準加速器橋塊放本版 · 正尺 CGC_MDL124 v0111 掃描本版 HAS / 前版 版史 · 前版鏈自測 rc 0(PR 647 Codex P1 · AGENTS.md 第 4 條)",
+   "dependencies": [
+    "supportive modules/registry/via_bridge_sweeper_v0105.py",
+    "supportive modules/registry/via_bridge_sweeper_v0104.py",
+    "supportive modules/registry/via_bridge_sweeper_v0103.py",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0111.py",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0109.py"
+   ],
+   "version": "v0105",
+   "updated_at": "2026-11-15T03:57:13Z",
+   "timeout_seconds": 1200,
+   "registered_at": "2026-11-15T03:57:13Z"
   }
  },
  "work_items": [
@@ -9817,6 +9881,39 @@
    "next": "操作員上傳或 --nonstock-out 指桌機 v0310 輸出夾",
    "receipt": null,
    "updated_at": "2026-11-10T10:05:00Z"
+  },
+  {
+   "id": "VDF-REQ023:V-vdf-macro-hierarchy-v0102",
+   "requirement": "VDF-REQ023",
+   "case": "V-vdf-macro-hierarchy-v0102",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "工作站 2026-11-15 v0101 RED 3/4(操作員設了 FRED 環境鑰 → v0100 自測驗假鑰檔 FAIL)→ v0102 子環境少鑰名;handoff test rc 0 · marker true(2026-11-15T03:57:24Z · sha db6725bc2bc0)",
+   "next": "工作站拉 main 重跑 VDF:確認 GREEN 與「本機有沒有設 FRED 環境鑰」那一行",
+   "receipt": "docs/handoff/evidence/V-vdf-macro-hierarchy-v0102.json",
+   "updated_at": "2026-11-15T03:59:43Z"
+  },
+  {
+   "id": "VDF-REQ024:V-vdf-macro-crosscheck-v0102",
+   "requirement": "VDF-REQ024",
+   "case": "V-vdf-macro-crosscheck-v0102",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "工作站 2026-11-15 v0101 RED 3/4(同 MDL015 根因:find_key 先讀環境鑰)→ v0102;handoff test rc 0 · marker true(2026-11-15T03:57:34Z · sha 3933d56bbd2a)",
+   "next": "工作站拉 main 重跑 VDF 確認 GREEN",
+   "receipt": "docs/handoff/evidence/V-vdf-macro-crosscheck-v0102.json",
+   "updated_at": "2026-11-15T03:59:43Z"
+  },
+  {
+   "id": "VCGC-REQ220:C-bridge-sweeper-v0105",
+   "requirement": "VCGC-REQ220",
+   "case": "C-bridge-sweeper-v0105",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "v0104 原封(SHA = 收據)· 標準加速器橋放 v0105(PR 647 Codex P1);handoff test rc 0 · marker true(2026-11-15T03:58:28Z · sha fb753f4d9bad)",
+   "next": "VDF 對外擷取真抓驗證 = 操作員",
+   "receipt": "docs/handoff/evidence/C-bridge-sweeper-v0105.json",
+   "updated_at": "2026-11-15T03:59:43Z"
   }
  ]
 }
