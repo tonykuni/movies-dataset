@@ -4837,6 +4837,24 @@
    "updated_at": "2026-11-15T04:39:55Z",
    "timeout_seconds": 1200,
    "registered_at": "2026-11-15T04:26:00Z"
+  },
+  "V-vdf-userkeys-v0100": {
+   "argv": [
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_MDL017_UserApiKeys",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL017_UserApiKeys v0100 自測 10/10 · PASS",
+   "scope": "VDF MDL017 v0100:個人鑰存每個使用者自己的設定檔(隱藏輸入 · 驗格式 · 原子寫 · POSIX 600)· 順序 個人鑰 → 環境測試鑰 → 舊共用 → 沒有 · run 只在子行程環境放個人鑰 · status 不露鑰 · 自測全在暫存夾。經 VDF 自己的 manager 跑(AGENTS.md 第 5 條)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py"
+   ],
+   "version": "v0100",
+   "updated_at": "2026-11-15T05:08:57Z",
+   "timeout_seconds": 300,
+   "registered_at": "2026-11-15T05:08:57Z"
   }
  },
  "work_items": [
@@ -9948,6 +9966,27 @@
    "next": "工作站拉 main 重跑 VDF:看 v0103 印的「本機 git 報接點:列出 / 藏起」與 GREEN",
    "receipt": "docs/handoff/evidence/V-vdf-workstation-sync-v0103.json",
    "updated_at": "2026-11-15T04:41:00Z"
+  },
+  {
+   "id": "VDF-REQ025:V-vdf-userkeys-v0100",
+   "requirement": "VDF-REQ025",
+   "case": "V-vdf-userkeys-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "MDL017 v0100 個人鑰模組(存 / 讀 / 順序 / run / status 不露鑰)自測 10/10;經 VDF_SystemManager engine run;handoff test rc 0 · marker true(2026-11-15T05:09:14Z · sha 4945f41fa12c)",
+   "next": "桌機每個人 set fred → status → run -- ActivateVDF",
+   "receipt": "docs/handoff/evidence/V-vdf-userkeys-v0100.json",
+   "updated_at": "2026-11-15T05:08:57Z"
+  },
+  {
+   "id": "VDF-REQ025:workstation-each-user-key",
+   "requirement": "VDF-REQ025",
+   "case": null,
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "容器沒有任何人的真鑰,也不代輸;個人鑰的真實使用只能在桌機由每個人自己輸入後驗",
+   "next": "桌機:`python VDF_MDL017_UserApiKeys_v0100.py set fred` → `status` 顯示「實際會用:個人鑰」→ `run -- python ActivateVDF.py run --db-home …` 的 [鑰] 行顯示個人鑰;之後 AI 逐支引擎出新版直接讀個人鑰",
+   "updated_at": "2026-11-15T05:08:57Z"
   }
  ]
 }
