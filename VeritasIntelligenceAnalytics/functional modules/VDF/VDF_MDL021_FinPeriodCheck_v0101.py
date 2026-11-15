@@ -148,6 +148,11 @@ def _d(s) -> date | None:
     return None
 
 
+def canon_ticker(t) -> str:
+    """代號正規化(兩邊同一把尺):去 .TW / .TWO 後綴 · 去空白 · 大寫。--file 長表 · 正典庫 · --tickers 都經這裡。"""
+    return re.sub(r"\.TWO?$", "", str(t).strip(), flags=re.I).upper()
+
+
 def normalize(rows: list, pm: dict) -> dict:
     """長表列 {ticker, period_end, kind(YTD|Q|FY), item, value} → {(ticker, item): {fy: {"YTD": {q: v}, "Q": {q: v}, "FY": v}}}"""
     out = {}
@@ -155,7 +160,7 @@ def normalize(rows: list, pm: dict) -> dict:
         d = _d(r.get("period_end"))
         if d is None or r.get("value") is None:
             continue
-        t = str(r["ticker"]).upper()
+        t = canon_ticker(r["ticker"])
         fye = int((pm["fy_end_month"] or {}).get(t, pm["default_fy_end_month"]))
         fy, fq = fiscal(d, fye)
         slot = out.setdefault((t, r["item"]), {}).setdefault(fy, {"YTD": {}, "Q": {}, "FY": None})
@@ -343,9 +348,9 @@ def page(res: list, meta: dict) -> str:
 def run(rows: list, meta: dict, out_dir: Path = OUT) -> dict:
     pm, src = params()
     res = check(normalize(rows, pm), pm)
-    have = {r["ticker"] for r in res}
-    for t in meta.get("tickers") or []:                       # 指定了卻整檔沒資料:照列缺、不讓總燈變綠
-        tt = re.sub(r"\.TWO?$", "", str(t).strip(), flags=re.I).upper()
+    have = {canon_ticker(r["ticker"]) for r in res}
+    for t in meta.get("tickers") or []:                       # 指定了卻整檔沒資料:照列缺、不讓總燈變綠(兩邊同一把尺 canon_ticker)
+        tt = canon_ticker(t)
         if tt and tt not in have:
             res.append({"ticker": tt, "item": "—", "fy": "—", "ytd": {}, "q_reported": {}, "q_derived": {}, "single": {}, "fy_value": None,
                         "checks": [], "missing": ["整檔沒有財報列"], "lamp": "YELLOW"})
@@ -472,8 +477,12 @@ def selftest() -> int:
             and rr[("3017", "eps", 2024)]["ytd"].get(2) == 2.85, (rows, note))
         part = run([x for x in fixture_rows() if x["ticker"] == "3017"], {"source": "夾具", "tickers": ["3017", "3324", "NVDA"]}, Path(td) / "o2")
         miss = [r for r in part["results"] if r["missing"] == ["整檔沒有財報列"]]
-        chk("⑨ 指定 3017 · 3324 · NVDA 但只有 3017 的資料 → 3324 / NVDA 照列「整檔沒有財報列」· 總燈不是綠",
-            sorted(r["ticker"] for r in miss) == ["3324", "NVDA"] and part["lamp"] != "GREEN", (part["lamp"], [r["ticker"] for r in miss]))
+        suf = run([dict(x, ticker="3017.TW") for x in fixture_rows() if x["ticker"] == "3017"], {"source": "夾具", "tickers": ["3017.TW"]}, Path(td) / "o3")
+        chk("⑨ 指定 3017 · 3324 · NVDA 但只有 3017 的資料 → 3324 / NVDA 照列「整檔沒有財報列」· 總燈不是綠;"
+            "長表與 --tickers 都寫 3017.TW → 兩邊同一把尺,不誤報缺、總燈綠(PR 653 Codex P2)",
+            sorted(r["ticker"] for r in miss) == ["3324", "NVDA"] and part["lamp"] != "GREEN"
+            and suf["lamp"] == "GREEN" and not [r for r in suf["results"] if r["missing"] == ["整檔沒有財報列"]] and {r["ticker"] for r in suf["results"]} == {"3017"},
+            (part["lamp"], [r["ticker"] for r in miss], suf["lamp"], [(r["ticker"], r["missing"]) for r in suf["results"]]))
         chk("⑩ 顯示規範:金額千分位 · 小數一位(26,044.0 · 0.1)· EPS 小數兩位(2.85)· 存值不四捨五入",
             _fmt(26044.0, "revenue") == "26,044.0" and _fmt(0.11, "revenue") == "0.1" and _fmt(2.85, "eps") == "2.85" and rr[("3017", "revenue", 2024)]["single"][2] != 0.1)
         lf = Path(td) / "long.csv"
