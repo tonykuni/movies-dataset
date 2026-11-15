@@ -3,8 +3,8 @@
  "version": "v0112",
  "subsystem": "VDF",
  "zh": "資料鍛造工作流",
- "batch": "VDF 資料庫狀態矩陣 + DuckDB 現查 + 資料平面 2026-11-15",
- "ts": "2026-11-15T15:04:35Z",
+ "batch": "VDF 資料庫狀態矩陣 + DuckDB 現查 + 資料平面 + 一本冊分批輸出 2026-11-15",
+ "ts": "2026-11-15T15:36:44Z",
  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
  "sdd": {
   "layers": [
@@ -1897,6 +1897,90 @@
      "expect": "rc 0 · 39/39"
     }
    ]
+  },
+  {
+   "code": "VDF-WKF024",
+   "alias": "batch_backfill_view",
+   "name": "VDF 一本冊 → 清單閘 → ENG064 分批擷取 → 分批 sync(temp 檢查點)→ 2022-01-01 起輸出檢視",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-15T15:36:44Z",
+   "spec": {
+    "goal": "輸入參數與 21 個輸出 DataFrame 由一本冊控管;擷取與輸出都分批、中斷不全丟;輸出 2022-01-01~最新並顯示逐月覆蓋。",
+    "requirements": [
+     "VDF-REQ031"
+    ],
+    "acceptance": [
+     "一本冊:輸入 7 · 輸出 21",
+     "冊上鍵優先",
+     "按月分批 · 每批記檢查點",
+     "中斷後重跑接續、不重做已完成的批",
+     "合併後驗列數 / 重複鍵再原子替換",
+     "只輸出起始月以後、不刪更早的列",
+     "擷取用 ENG064(同意閘操作員設)",
+     "檢視頁卡片 + 矩陣 · 名稱不空格",
+     "手機寬不橫捲"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python \"functional modules/VDF/VDF_SystemManager_v0183.py\" parquet backfill [--start 2022-01-01] [--end YYYY-MM-DD] [--skip-fetch] | parquet sync --start | parquet view",
+    "evidence": "docs/handoff/evidence/V-vdf-dataplane-v0101.json",
+    "books": [
+     "functional modules/VDF/VDF_DataPlane_SSOT_v0101.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "inputs → ENG064 run --start --end → 分批 sync → view"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF024-STP001",
+     "alias": "backfill",
+     "name": "清單閘 → ENG064 擷取 → 分批 sync → 檢視",
+     "engine": "functional modules/VDF/VDF_SystemManager_v0183.py",
+     "verb": "parquet backfill --start 2022-01-01",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF024-STP003",
+     "what": "清單閘紅就停;擷取照 ENG064(每批落庫 + checkpoint);同意閘沒開照實 GATED 仍續做 sync",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0101.json",
+     "known_open": {
+      "why": "真擷取要操作員開同意閘 · 真資料家在桌機",
+      "hand": "operator",
+      "ref": "VDF-REQ031:workstation-backfill-2022"
+     }
+    },
+    {
+     "code": "VDF-WKF024-STP002",
+     "alias": "view",
+     "name": "輸出檢視頁",
+     "engine": "functional modules/VDF/VDF_SystemManager_v0183.py",
+     "verb": "parquet view --start 2022-01-01",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF024-STP003",
+     "what": "卡片(每個輸出)+ 矩陣(輸出 × 月)",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0101.json"
+    },
+    {
+     "code": "VDF-WKF024-STP003",
+     "alias": "selftest_gate",
+     "name": "v0101 自測 11 項(含前版 v0100 16 項)",
+     "engine": "functional modules/VDF/VDF_MDL020_DataPlane_v0101.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL020_DataPlane",
+     "what": "見 VDF-REQ031 evidence",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0101.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF024-TST001",
+     "case": "V-vdf-dataplane-v0101",
+     "engine": "functional modules/VDF/VDF_MDL020_DataPlane_v0101.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 11/11"
+    }
+   ]
   }
  ],
  "prior": "VIA_Workflow_VDF_SSOT_v0111.json",
@@ -1911,5 +1995,5 @@
  "why_v0109": "SDD X-COL 紅補欄(只增;其餘一字不動):VDF-WKF016 / 017(2026-11-09 新增時缺)補 tests(列表式 TST · 自測 + 離線實跑各一,容器 2026-11-14 實跑 MDL015 自測 14/14 · plan rc 0 GREEN;MDL016 自測 16/16 · run rc 0 NODATA 12/12)· 每步補 what · 證據改成 self: / step: 型別(原檔路徑留 evidence_file)。",
  "why_v0110": "只增:+VDF-WKF018 user_api_keys(VDF-REQ025;上一輪漏登工作流,AGENTS.md 第 3 條)· +VDF-WKF019 active_etf_qualify(VDF-REQ026;PR 650 Codex P1)。兩條都帶 tests(交接冊已有案)與待辦 known_open(誰的手 · 參照工作項);VDF-WKF001–017 一字不動。",
  "why_v0111": "只增:+VDF-WKF020 universe_share(VDF-REQ027);VDF-WKF015 +TST002(MDL014 v0101 yf 後綴照市場);步的正主改指尾版(SDD X-REG「註冊冊不是尾版」):WKF015 → MDL014 v0101 · WKF016 → MDL015 v0102 · WKF017 → MDL016 v0102(上一輪出 v0102 時漏改);其餘一字不動。",
- "why_v0112": "只增:+VDF-WKF021 db_status_matrix(VDF-REQ028)· +VDF-WKF022 duckdb_live_verify(VDF-REQ029)· +VDF-WKF023 data_plane(VDF-REQ030);其餘一字不動。"
+ "why_v0112": "只增:+VDF-WKF021 · +VDF-WKF022 · +VDF-WKF023 · +VDF-WKF024 batch_backfill_view(VDF-REQ031);其餘一字不動。"
 }

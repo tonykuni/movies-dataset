@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0252",
- "batch": "VDF 資料庫狀態矩陣 + DuckDB 現查實測 + 資料平面(2026-11-15):VDF-REQ028 · VDF-REQ029 · VDF-REQ030(前版 v0251)",
- "ts": "2026-11-15T15:04:35Z",
+ "batch": "VDF 資料庫狀態矩陣 + DuckDB 現查實測 + 資料平面 + 一本冊分批輸出(2026-11-15):VDF-REQ028 · REQ029 · REQ030 · REQ031(前版 v0251)",
+ "ts": "2026-11-15T15:36:44Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -140,7 +140,7 @@
  "tally": {
   "RECORDED": 24,
   "COVERED": 139,
-  "PARTIAL": 113,
+  "PARTIAL": 114,
   "MISSING": 1
  },
  "requirements": [
@@ -7270,6 +7270,28 @@
    "why_homes": "VDF 自己的模組與參數冊;代碼律讀共用的 MDL009 / ENG077(不另寫);他系統不動(L123)",
    "ts": "2026-11-15T15:04:35Z",
    "updated_at": "2026-11-15T15:04:35Z"
+  },
+  {
+   "code": "VDF-REQ031",
+   "subsystem": "VDF",
+   "topic": "VDF 一本冊控管輸入參數與輸出 DataFrame · 分批增量(中斷 temp 留得住)· 2022-01-01 起輸出 · 輸出檢視頁 · 子系統名稱不空格",
+   "requirement": "操作員 2026-11-15:「四個子系統名稱字不可空格 VeritasDataForge...只有 VCGC 為 VIA Central Governance Console 分兩大塊 中央控管該有的功能 SSOT 等 及 節省 TOKEN 消耗支援功能等工具 卡片簡單散開說明 矩陣詳細說明 這些搞清楚後整合好 VDF 輸入參數輸出 DATAFRAME 先控管一本 輸出資料庫到 via_database\\vdf_database(tw__ / gl__ 21 檔 · output_hub · temp)以增量擷取 BATCH FETCHING 中斷 TEMP 也會存一部分不全部丟失 然後輸出 2022-01-01~最新的資料 輸出檢視顯示」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0112.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL020_DataPlane_v0101.py",
+    "functional modules/VDF/VDF_DataPlane_SSOT_v0101.json",
+    "functional modules/VDF/VDF_SystemManager_v0183.py"
+   ],
+   "evidence": "2026-11-15 容器:VDF_DataPlane_SSOT_v0101(一本冊:輸入 7 · 輸出 21 個 DataFrame · 擷取起日 2022-01-01 · 前版冊不動)· VDF_MDL020_DataPlane v0101 薄尾(v0100 一字不動)自測 11/11:按月分批 · 每批寫完立刻記檢查點 · 模擬做 3 批就中斷 → temp 留 3 批 + 3 行檢查點、parquet 不半套 → 重跑接續 3 批、合併後 = 來源 2022-01 起全部 · 重複鍵 0 · 冊上鍵 · 晚到舊日期也收 · 沒新鍵不動檔 · 輸出檢視頁(卡片 + DataFrame × 月矩陣)· backfill 清單閘紅就停 · 前版 v0100 16/16。沙盒實測 backfill:真的叫 ENG064 → 同意閘未開照實拒跑(GATED,AI 不代設)→ 分批 sync 照做 → 檢視頁 2022-01 ~ 2026-11 共 59 個月(冊上 21 · 沙盒已有 4)· 桌機 / 手機不橫捲。子系統名稱:VDF 頁首一律 VeritasDataForge(MDL018 / MDL019 / 分享冊未上 main 就地改 · 收據重跑;MDL020 v0100 不改、由 v0101 換頁首);分享冊 VCGC 改 VIA Central Governance Console、VRN-2 改 VeritasReportNova。",
+   "next": "桌機 pull → 開兩道同意閘(操作員自己設)→ VDF_SystemManager parquet backfill --start 2022-01-01 → parquet view 看 21 個輸出逐月覆蓋",
+   "hand": "操作員(桌機真資料家 · 同意閘)",
+   "why_homes": "VDF 自己的冊與模組;擷取用 VDF 自己的 ENG064;他系統名稱不一致(VeritaQuantGuard / VeritasQuantGuard 等)交 VCGC 衝突冊",
+   "ts": "2026-11-15T15:36:44Z",
+   "updated_at": "2026-11-15T15:36:44Z"
   }
  ],
  "non_requirements": [
@@ -7663,5 +7685,5 @@
  "why_v0247": "只增:導入 VIA_VCGC_Commercial_Review_v0100(22 差異 · 40 隔離測試 NOT_RUN)→ 8 條 CAND-VCGC-COM-* 候選需求登冊待批(不發正式號);REQ221 補 G7 證據。",
  "why_v0250": "只增:+VDF-REQ026(PARTIAL:主動式台股 ETF 抓不到每日持股 = 不符合;MDL010 v0101 V8 + 擷取冊 v0109;桌機真抓與下游改讀待做);VDF-REQ025 / 026 歸屬補工作流冊 VIA_Workflow_VDF_SSOT_v0110.json(WKF018 / WKF019 回指;AGENTS.md 第 3 條 · PR 650 Codex P1);tally 照 requirements 逐筆重數;其餘一字不動。",
  "why_v0251": "只增:+VDF-REQ027(PARTIAL:統一 SSOT 分享 · MDL018 v0100 · MDL014 v0101 yf 後綴照市場 · 擷取冊 v0110;桌機真資料與各系統自己讀待做);tally 照 requirements 逐筆重數;其餘一字不動。",
- "why_v0252": "只增:+VDF-REQ028(PARTIAL:資料庫狀態矩陣)· +VDF-REQ029(PARTIAL:DuckDB 現查核對 + 增量維護實測)· +VDF-REQ030(PARTIAL:管理範圍 · 清單輸入閘 · parquet 增量庫 · 增量匯出;桌機真資料家待做);tally 照 requirements 逐筆重數;其餘一字不動。"
+ "why_v0252": "只增:+VDF-REQ028 · +VDF-REQ029 · +VDF-REQ030 · +VDF-REQ031(都 PARTIAL;桌機真資料家待做);tally 照 requirements 逐筆重數;其餘一字不動。"
 }

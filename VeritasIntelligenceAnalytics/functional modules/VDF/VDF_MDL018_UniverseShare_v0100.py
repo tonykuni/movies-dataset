@@ -473,7 +473,7 @@ def selftest() -> int:
         css, css_note = _spec_css()
         chk("⑥ U/I:三行標頭 × 5(VDF 發佈 + 四系統預覽)· 實測收據表 · sha 印出 · 套 VDF 鎖定樣式(%s)· 不載外部腳本" % css_note,
             page.count("VERITAS INTELLIGENCE ANALYTICS") == 5 and "實測結果" in page and b["content_sha256"] in page
-            and all(x in page for x in ("Veritas Central Governance Console", "Veritas ReportNova", "VeritaQuantGuard", "VeritasAutoPlot"))
+            and all(x in page for x in ("VeritasDataForge", "VIA Central Governance Console", "VeritasReportNova", "VeritaQuantGuard", "VeritasAutoPlot"))
             and bool(css) and css in page and "<script" not in page.lower(), css_note)
     finally:
         M10._EVIDENCE_ROOT_OVERRIDE[:] = keep_ov

@@ -510,7 +510,7 @@ def page(data: dict, m: dict, adv: list) -> str:
     p = ['<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="via-page" content="DB_STATUS_MATRIX">'
          '<meta name="viewport" content="width=device-width,initial-scale=1">',
          "<title>VDF 資料庫狀態矩陣</title><style>%s</style><style>%s</style></head><body>" % (css, EXTRA_CSS),
-         '<header class="mx-head"><div class="mx-r1">VERITAS INTELLIGENCE ANALYTICS</div><div class="mx-r2">Veritas DataForge</div>'
+         '<header class="mx-head"><div class="mx-r1">VERITAS INTELLIGENCE ANALYTICS</div><div class="mx-r2">VeritasDataForge</div>'
          '<div class="mx-r3">資料庫狀態矩陣 · 建議 · DuckDB 現查 · 庫 × 狀態 · 寫入引擎 × 狀態 · 逐表明細</div></header>']
     o = m["oldest"]
     kpis = [("總燈", _chip(chk.get("lamp"))), ("庫(找到 / 冊上)", "%d / %d" % (m["db_found"], m["db_total"])),
