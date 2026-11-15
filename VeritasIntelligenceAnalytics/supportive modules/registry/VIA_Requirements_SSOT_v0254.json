@@ -7268,6 +7268,22 @@
    ]
   },
   {
+   "code": "VDF-REQ026",
+   "subsystem": "VDF",
+   "topic": "台股個股清單 / 輪廓表欄位規格:yf 尾綴 · TWSE/TPEX 雙層產業統一 · yfinance 雙層分類 · 中英文短名 · yfinance 共識目標價 / 評等 / 分析師數 / β",
+   "requirement": "操作員 2026-11-15:「TWSE YFINANCE TICKER尾綴為\".TW\" TPEX則為\".TWO\" TWSE/TPEX兩層產業分類整合去重為一組完整分類 YFINANCE .INFO為一組雙層分類 NAME都是用TWSE/TPEX擷取中文短名稱 ENGLISH NAME也擷取自TWSE TPEX英文短名稱 自YFINANCE .INFO擷取YFINANCE CONSENSUS LOW MEDIAN MEAN HIGH TARGET PRICE / YF RATING /YF ANALYST COUNT / YF BETA」",
+   "status": "PARTIAL",
+   "homes": [
+    "VDF-WKF010",
+    "VIA_IndustryUnifiedMap_v0100.json"
+   ],
+   "evidence": "VDF_InputUniverse_SSOT_v0104:OUT-01 yf_ticker 有(ENG055 .TW/.TWO 已做);OUT-08(E-12 VDF_ENG233_UniverseProfile 待建)已列 twse_industry_code · industry_unified · sector3 · yf_sector · yf_industry · yf_beta;缺 name_en、yf_target_low/median/mean/high、yf_rating、yf_analyst_count;name 未定口徑(ENG055 上櫃取全名)。官方欄位:TWSE 公司簡稱 / 英文簡稱 · TPEx CompanyAbbreviation / Symbol(去全形空白);yfinance .info:sector · industry · targetLowPrice · targetMedianPrice · targetMeanPrice · targetHighPrice · recommendationKey(/Mean)· numberOfAnalystOpinions · beta",
+   "next": "VDF 自修(VDF 冊出新版加欄 · ENG055 / ENG233 新版號薄尾);VCGC DuckDB 直查欄位檢綠才轉 COVERED",
+   "hand": "VDF",
+   "version": "v0100",
+   "updated_at": "2026-11-15T15:17:47Z"
+  },
+  {
    "code": "VDF-REQ027",
    "subsystem": "VDF",
    "topic": "VDF 全量實跑 + 邊跑邊修:管理器 test 依 L16 把缺第三方套件崩潰判 ABSENT · ENG089 自測過時門檻修 · 桌機一鍵 VDF 啟動 → 持股率 → 驗證",
@@ -7658,22 +7674,6 @@
    "hand": "各系統(VRN-2 · VAP · VQG)/ 操作員",
    "version": "v0100",
    "updated_at": "2026-11-13T20:26:25Z"
-  },
-  {
-   "code": "VDF-REQ026",
-   "subsystem": "VDF",
-   "topic": "台股個股清單 / 輪廓表欄位規格:yf 尾綴 · TWSE/TPEX 雙層產業統一 · yfinance 雙層分類 · 中英文短名 · yfinance 共識目標價 / 評等 / 分析師數 / β",
-   "requirement": "操作員 2026-11-15:「TWSE YFINANCE TICKER尾綴為\".TW\" TPEX則為\".TWO\" TWSE/TPEX兩層產業分類整合去重為一組完整分類 YFINANCE .INFO為一組雙層分類 NAME都是用TWSE/TPEX擷取中文短名稱 ENGLISH NAME也擷取自TWSE TPEX英文短名稱 自YFINANCE .INFO擷取YFINANCE CONSENSUS LOW MEDIAN MEAN HIGH TARGET PRICE / YF RATING /YF ANALYST COUNT / YF BETA」",
-   "status": "PARTIAL",
-   "homes": [
-    "VDF-WKF010",
-    "VIA_IndustryUnifiedMap_v0100.json"
-   ],
-   "evidence": "VDF_InputUniverse_SSOT_v0104:OUT-01 yf_ticker 有(ENG055 .TW/.TWO 已做);OUT-08(E-12 VDF_ENG233_UniverseProfile 待建)已列 twse_industry_code · industry_unified · sector3 · yf_sector · yf_industry · yf_beta;缺 name_en、yf_target_low/median/mean/high、yf_rating、yf_analyst_count;name 未定口徑(ENG055 上櫃取全名)。官方欄位:TWSE 公司簡稱 / 英文簡稱 · TPEx CompanyAbbreviation / Symbol(去全形空白);yfinance .info:sector · industry · targetLowPrice · targetMedianPrice · targetMeanPrice · targetHighPrice · recommendationKey(/Mean)· numberOfAnalystOpinions · beta",
-   "next": "VDF 自修(VDF 冊出新版加欄 · ENG055 / ENG233 新版號薄尾);VCGC DuckDB 直查欄位檢綠才轉 COVERED",
-   "hand": "VDF",
-   "version": "v0100",
-   "updated_at": "2026-11-15T15:17:47Z"
   }
  ],
  "non_requirements": [
