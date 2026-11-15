@@ -134,6 +134,14 @@ def normalize(rows: list, pm: dict) -> dict:
     return out
 
 
+UNIT_SCALE = {"仟元": 1000.0, "千元": 1000.0, "百萬元": 1_000_000.0, "元": 1.0, "": 1.0, None: 1.0}
+
+
+def norm_label(s) -> str:
+    """科目名正規化:全形括號 / 冒號 → 半形 · 去空白(ENG082 照原文存「基本每股盈餘（元）」)。"""
+    return re.sub(r"\s+", "", str(s or "").replace("（", "(").replace("）", ")").replace("：", ":"))
+
+
 def _close(a, b, item, tol) -> bool:
     if item == "eps":
         return abs(a - b) <= max(tol["eps_abs"], tol["eps_rel"] * abs(b))
@@ -184,11 +192,21 @@ def read_db(home: Path, tickers: list, pm: dict) -> tuple:
         tabs = {r[0] for r in con.execute("SHOW TABLES").fetchall()}
         codes = [re.sub(r"\.TWO?$", "", t, flags=re.I) for t in tickers]
         if "tw_financial_mops" in tabs:
-            mops_map = {lab: key for key, v in pm["items"].items() for lab in v.get("mops") or []}
-            q = "SELECT code, period, item, value FROM tw_financial_mops WHERE basis = 'YTD' AND code IN (%s)" % ",".join("?" * len(codes))
-            for code, period, item, val in con.execute(q, codes).fetchall():
-                if item in mops_map:
-                    rows.append({"ticker": code, "period_end": period, "kind": "YTD", "item": mops_map[item], "value": val})
+            mops_map = {norm_label(lab): key for key, v in pm["items"].items() for lab in v.get("mops") or []}
+            mcols = {r[0] for r in con.execute("DESCRIBE tw_financial_mops").fetchall()}
+            ucol = "unit" if "unit" in mcols else "NULL"
+            q = "SELECT code, period, item, value, %s FROM tw_financial_mops WHERE basis = 'YTD' AND code IN (%s)" % (ucol, ",".join("?" * len(codes)))
+            for code, period, item, val, unit in con.execute(q, codes).fetchall():
+                key = mops_map.get(norm_label(item))
+                if key is None or val is None:
+                    continue
+                if key != "eps":                                   # 金額:交易所仟元 → 元(跟 yfinance 同尺度);每股類照元
+                    scale = UNIT_SCALE.get(unit)
+                    if scale is None:
+                        notes.append("不認得的單位 %s(%s)· 這列不比" % (unit, item))
+                        continue
+                    val = float(val) * scale
+                rows.append({"ticker": code, "period_end": period, "kind": "YTD", "item": key, "value": val})
         else:
             notes.append("沒有 tw_financial_mops(交易所累計)")
         if "tw_financial" in tabs:
@@ -277,6 +295,12 @@ def page(res: list, meta: dict) -> str:
 def run(rows: list, meta: dict, out_dir: Path = OUT) -> dict:
     pm, src = params()
     res = check(normalize(rows, pm), pm)
+    have = {r["ticker"] for r in res}
+    for t in meta.get("tickers") or []:                       # 指定了卻整檔沒資料:照列缺、不讓總燈變綠
+        tt = re.sub(r"\.TWO?$", "", str(t).strip(), flags=re.I).upper()
+        if tt and tt not in have:
+            res.append({"ticker": tt, "item": "—", "fy": "—", "ytd": {}, "q_reported": {}, "q_derived": {}, "single": {}, "fy_value": None,
+                        "checks": [], "missing": ["整檔沒有財報列"], "lamp": "YELLOW"})
     meta = dict(meta, params=src, ts=datetime.now(timezone.utc).isoformat(timespec="seconds"), tag=TAG)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "VDF_FIN_PERIOD_CHECK_latest.json").write_text(json.dumps({"meta": meta, "results": res}, ensure_ascii=False, indent=1, default=str) + "\n", encoding="utf-8")
@@ -386,15 +410,22 @@ def selftest() -> int:
         h.mkdir(parents=True)
         c = duckdb.connect(str(h / "vdf_tw_market.duckdb"))
         c.execute("CREATE TABLE tw_financial_mops(date VARCHAR, code VARCHAR, statement VARCHAR, basis VARCHAR, item VARCHAR, value DOUBLE, period VARCHAR)")
-        c.execute("INSERT INTO tw_financial_mops VALUES ('2024-03-31','3017','IS','YTD','營業收入合計',100,'2024Q1'),('2024-06-30','3017','IS','YTD','營業收入合計',210,'2024Q2'),"
-                  "('2024-06-30','3017','BS','POINT','資產總計',999,'2024Q2')")
+        c.execute("ALTER TABLE tw_financial_mops ADD COLUMN unit VARCHAR")
+        c.execute("INSERT INTO tw_financial_mops VALUES ('2024-03-31','3017','IS','YTD','營業收入合計',100,'2024Q1','仟元'),('2024-06-30','3017','IS','YTD','營業收入合計',210,'2024Q2','仟元'),"
+                  "('2024-06-30','3017','BS','POINT','資產總計',999,'2024Q2','仟元'),('2024-06-30','3017','IS','YTD','基本每股盈餘（元）',2.85,'2024Q2','元')")
         c.execute('CREATE TABLE tw_financial("Ticker" VARCHAR, "Period" VARCHAR, "Period_Type" VARCHAR, "Revenue" DOUBLE, "Net_Income" DOUBLE, "EPS" DOUBLE)')
-        c.execute("INSERT INTO tw_financial VALUES ('3017.TW','2024-06-30','quarterly',110,NULL,NULL)")
+        c.execute("INSERT INTO tw_financial VALUES ('3017.TW','2024-06-30','quarterly',110000,NULL,NULL)")
         c.close()
         rows, note = read_db(Path(td) / "home", ["3017", "3324", "NVDA"], pm)
         rr = {(r["ticker"], r["item"], r["fy"]): r for r in check(normalize(rows, pm), pm)}
-        chk("⑦ 讀正典庫(唯讀):交易所累計只取 basis=YTD 的損益科目(資產負債不混)· yfinance 單季 3017.TW 去後綴對上 · Q2 拆 110 = 報 110 → K3 綠",
-            len(rows) == 3 and rr[("3017", "revenue", 2024)]["single"][2] == 110 and any(c["name"].startswith("K3 Q2") and c["lamp"] == "GREEN" for c in rr[("3017", "revenue", 2024)]["checks"]), (rows, note))
+        chk("⑦ 讀正典庫(唯讀):交易所累計只取 basis=YTD 損益(資產負債不混)· 交易所仟元 → 元再跟 yfinance 比(Q2 拆 110,000 = 報 110,000 → K3 綠)"
+            "· 全形「基本每股盈餘（元）」認得、每股不乘 · 3017.TW 去後綴對上",
+            len(rows) == 4 and rr[("3017", "revenue", 2024)]["single"][2] == 110000 and any(c["name"].startswith("K3 Q2") and c["lamp"] == "GREEN" for c in rr[("3017", "revenue", 2024)]["checks"])
+            and rr[("3017", "eps", 2024)]["ytd"].get(2) == 2.85, (rows, note))
+        part = run([x for x in fixture_rows() if x["ticker"] == "3017"], {"source": "夾具", "tickers": ["3017", "3324", "NVDA"]}, Path(td) / "o2")
+        miss = [r for r in part["results"] if r["missing"] == ["整檔沒有財報列"]]
+        chk("⑨ 指定 3017 · 3324 · NVDA 但只有 3017 的資料 → 3324 / NVDA 照列「整檔沒有財報列」· 總燈不是綠",
+            sorted(r["ticker"] for r in miss) == ["3324", "NVDA"] and part["lamp"] != "GREEN", (part["lamp"], [r["ticker"] for r in miss]))
     text = Path(__file__).read_text(encoding="utf-8")
     chk("⑧ 獨立:不匯入他系統 · 不碰 TA-Lib · 庫只唯讀開 · 兩座橋在",
         not re.search(r"^\s*(import|from)\s+(talib|CGC_|VRN_|VQG_|VAP_)", text, re.M) and "read_only=True" in text
