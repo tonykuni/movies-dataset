@@ -12,7 +12,9 @@ please apply this matrix on the user interface HTml u/i」(VDF-REQ028)。
          · 矩陣一 庫 × 狀態(熱度格)· 矩陣二 寫入引擎 × 狀態(要重跑誰)· 逐表明細(依庫 · 列數 / 最少條 · 落後天上色)
          · 他系統的表(VRN-2 / VRN 未分辨:只讀監控 · 不代修 L123)。VDF 鎖定視覺規格(css sha256 驗過才套)。
   輸出   VIA_Reports/vdf/DB_STATUS_MATRIX_latest.html + .json。VDF 管理員 v0182 在 db check / db verify 後自動叫本支,資料庫頁即本頁。
-動詞:render [--check JSON] [--verify JSON] [--out DIR] | --selftest。零網路 · 零安裝 · 不碰 TA-Lib · 同意閘不讀不寫 · 不寫環境。
+動詞:render [--check JSON] [--verify JSON] [--out DIR] [--home DIR …] | --selftest。
+  DuckDB 現查(唯讀):清點報告選的資料家 + 擷取家裡每個 .duckdb(read_only)與 parquet(read_parquet)—— 表 · 列 · 欄 · 日期範圍 · 日期數(增量快照)· 最新幾列;
+         清點報告的列數逐表對現查(不一致 = 紅,排建議第一)。鎖住 / 壞檔照實記不擋。零網路 · 零安裝 · 不碰 TA-Lib · 同意閘不讀不寫 · 不寫環境。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -203,10 +205,176 @@ def advice(m: dict, chk: dict, ver: dict | None, now: datetime | None = None) ->
             out.append(("YELLOW", "清點是 %.0f 小時前(%s)" % (age_h, chk.get("ts")), "重跑 `VDF_SystemManager db check`"))
     except (TypeError, ValueError) as exc:
         out.append(("YELLOW", "清點時間讀不懂(%s)" % exc, "重跑 `VDF_SystemManager db check`"))
+    lv = m.get("live")
+    if lv and lv.get("diff"):
+        out.append(("RED", "清點報告與 DuckDB 現查列數不一致 %d 張(例 %s)" % (len(lv["diff"]), "%s.%s 報告 %s / 現查 %s" % (
+            lv["diff"][0]["庫"], lv["diff"][0]["表"], lv["diff"][0]["報告"], lv["diff"][0]["現查"])), "庫在這段時間被寫過 → 重跑 `VDF_SystemManager db check` 再看"))
+    elif lv and lv.get("compared"):
+        out.append(("GREEN", "清點報告與 DuckDB 現查一致(%d 張逐表比列數)" % lv["compared"], "清點可信"))
+    mr = m.get("mirror")
+    if mr and mr.get("diff"):
+        x = mr["diff"][0]
+        out.append(("RED", "擷取輸出兩份落地不一致 %d 張(例 %s.%s:duckdb %s / parquet %s)" % (len(mr["diff"]), x["庫"], x["表"], x["duckdb"], x["parquet"]),
+                    "同一引擎寫的 .duckdb 與 .parquet 列數要相同 → 重跑該擷取引擎(VDF_SystemManager fetch run <id> --apply)"))
+    elif mr and mr.get("compared"):
+        out.append(("GREEN", "擷取輸出兩份落地一致(.duckdb ⇄ 同名 .parquet %d 張)" % mr["compared"], "照常"))
+    dup = [(f["rel"], t["name"], t["dups"]) for f in (m.get("scan") or {}).get("files") or [] for t in f["tables"] if t.get("dups")]
+    if dup:
+        out.append(("YELLOW", "有整列重複的表 %d 張(例 %s.%s 重複 %d 列)" % (len(dup), dup[0][0], dup[0][1], dup[0][2]),
+                    "增量寫入應以鍵覆寫;看該寫入引擎的去重鍵"))
+    elif m.get("scan") and (m["scan"].get("files")):
+        n_t = sum(1 for f in m["scan"]["files"] for t in f["tables"] if t.get("dups") == 0)
+        out.append(("GREEN", "增量維護:%d 張表沒有整列重複" % n_t, "照常增量擷取"))
     if not out:
         out.append(("GREEN", "全部正常", "照常增量擷取"))
     out.sort(key=lambda a: -LAMP_RANK.get(a[0], 0))
     return [{"lamp": a, "what": b, "do": c} for a, b, c in out]
+
+
+# ---------------------------------------------------------------- DuckDB 現查(唯讀)
+DATE_CANDS = ("date", "trade_date", "portfolio_date", "as_of", "asof", "snapshot_date", "data_date", "report_date", "dt", "日期")
+SCAN_GLOBS = ("*.duckdb", "*/*.duckdb", "*/*/*.duckdb", "*/*.parquet", "*/*/*.parquet")
+SKIP_PARTS = ("_tmp", ".tmp", "VIA_spill", "__pycache__")
+BACKUP_PARTS = ("backups",)  # 引擎覆寫前的備份(時間戳檔名):只數不列,不算資料
+DUP_MAX_ROWS = 2_000_000  # 超過就不數重複列(大表在工作站上太慢;頁上寫「—」)
+
+
+def default_homes(chk: dict | None, root: Path = VIA) -> list:
+    """要現查的家:清點報告選的資料家 + 擷取家(VIA_VDF_FETCH_HOME · 倉內 VIA_Reports/vdf_fetch/dict);不在的不收。"""
+    out = []
+    if chk:
+        h = (chk.get("home_pick") or {}).get("picked") or chk.get("home")
+        if h:
+            out.append(Path(h))
+    if os.environ.get("VIA_VDF_FETCH_HOME"):
+        out.append(Path(os.environ["VIA_VDF_FETCH_HOME"]))
+    out.append(Path(root) / "VIA_Reports" / "vdf_fetch" / "dict")
+    seen, uniq = set(), []
+    for h in out:
+        k = str(Path(h).resolve()) if Path(h).exists() else str(h)
+        if Path(h).is_dir() and k not in seen:
+            seen.add(k)
+            uniq.append(Path(h))
+    return uniq
+
+
+def _cell_s(v) -> str:
+    s = "" if v is None else str(v)
+    return s if len(s) <= 40 else s[:39] + "…"
+
+
+def _table_stats(con, rel: str, name: str, preview: int) -> dict:
+    cols = [r[0] for r in con.execute("DESCRIBE SELECT * FROM %s" % rel).fetchall()]
+    n = con.execute("SELECT COUNT(*) FROM %s" % rel).fetchone()[0]
+    low = {c.lower(): c for c in cols}
+    dcol = next((low[c] for c in DATE_CANDS if c in low), None)
+    st = {"name": name, "rows": n, "cols": len(cols), "date_col": dcol, "dmin": None, "dmax": None, "ndates": None, "dups": None}
+    if 0 < n <= DUP_MAX_ROWS:
+        try:  # 增量維護:同一列不該寫兩次(整列相同 = 重複)
+            st["dups"] = n - con.execute("SELECT COUNT(*) FROM (SELECT DISTINCT * FROM %s)" % rel).fetchone()[0]
+        except Exception:  # noqa: BLE001 — 欄型別不能比(極少見):照實記不知道,不擋
+            st["dups"] = None
+    elif n == 0:
+        st["dups"] = 0
+    if dcol and n:
+        q = '"%s"' % dcol.replace('"', '""')
+        dmin, dmax, nd = con.execute("SELECT MIN(CAST(%s AS VARCHAR)), MAX(CAST(%s AS VARCHAR)), COUNT(DISTINCT %s) FROM %s WHERE CAST(%s AS VARCHAR) NOT LIKE '1900%%'"
+                                     % (q, q, q, rel, q)).fetchone()
+        st.update(dmin=str(dmin)[:10] if dmin else None, dmax=str(dmax)[:10] if dmax else None, ndates=nd)
+        order = " ORDER BY %s DESC" % q
+    else:
+        order = ""
+    show = cols[:8]
+    sel = ", ".join('"%s"' % c.replace('"', '""') for c in show) or "*"
+    st["preview_cols"] = show
+    st["preview_rows"] = [[_cell_s(v) for v in r] for r in con.execute("SELECT %s FROM %s%s LIMIT %d" % (sel, rel, order, preview)).fetchall()]
+    return st
+
+
+def duck_scan(homes: list, preview: int = 3, max_files: int = 80, max_tables: int = 200) -> dict:
+    """每個家裡的 .duckdb(唯讀開)與 parquet(DuckDB read_parquet)現查:表 · 列 · 欄 · 日期範圍 · 日期數 · 最新幾列。
+    檔被別的行程鎖住 / 讀壞 → 照實記 error,不擋。"""
+    try:
+        import duckdb
+    except ImportError:
+        return {"error": "duckdb 未安裝(只查不裝)", "files": []}
+    files, seen, nbak = [], set(), 0
+    for home in homes:
+        for pat in SCAN_GLOBS:
+            for f in sorted(Path(home).glob(pat)):
+                if any(x in f.parts for x in SKIP_PARTS) or str(f) in seen:
+                    continue
+                if any(x in f.relative_to(home).parts for x in BACKUP_PARTS):
+                    seen.add(str(f))
+                    nbak += 1
+                    continue
+                seen.add(str(f))
+                files.append((Path(home), f))
+    out = []
+    for home, f in files[:max_files]:
+        rec = {"file": f.name, "rel": str(f.relative_to(home)), "home": str(home), "kind": f.suffix.lstrip("."),
+               "size": f.stat().st_size, "mtime": datetime.fromtimestamp(f.stat().st_mtime).isoformat(timespec="seconds"), "tables": [], "error": None}
+        try:
+            if f.suffix == ".duckdb":
+                con = duckdb.connect(str(f), read_only=True)
+                try:
+                    tabs = con.execute("SELECT table_schema, table_name FROM information_schema.tables "
+                                       "WHERE table_schema NOT IN ('information_schema', 'pg_catalog') ORDER BY 1, 2").fetchall()
+                    for sch, tn in tabs[:max_tables]:
+                        rel = '"%s"."%s"' % (sch.replace('"', '""'), tn.replace('"', '""'))
+                        rec["tables"].append(_table_stats(con, rel, tn if sch == "main" else "%s.%s" % (sch, tn), preview))
+                finally:
+                    con.close()
+            else:
+                con = duckdb.connect()
+                try:
+                    rec["tables"].append(_table_stats(con, "read_parquet('%s')" % str(f).replace("'", "''"), f.stem, preview))
+                finally:
+                    con.close()
+        except Exception as exc:  # noqa: BLE001 — 鎖住 / 壞檔 / 型別怪:照實記,不擋整頁
+            rec["error"] = "%s: %s" % (type(exc).__name__, str(exc)[:160])
+        out.append(rec)
+    return {"error": None, "files": out, "truncated": len(files) > max_files, "homes": [str(h) for h in homes], "backup_files": nbak}
+
+
+def mirror_check(scan: dict) -> dict:
+    """擷取輸出的兩份落地要一致:同資料夾裡 .duckdb 的表 ⇄ 同名 .parquet(引擎一次寫兩份)列數相同。"""
+    pq = {}
+    for f in scan.get("files") or []:
+        if f["kind"] == "parquet" and f["tables"]:
+            pq[(f["home"], str(Path(f["rel"]).parent), Path(f["rel"]).stem)] = f["tables"][0]["rows"]
+    same, diff = [], []
+    for f in scan.get("files") or []:
+        if f["kind"] != "duckdb":
+            continue
+        for t in f["tables"]:
+            k = (f["home"], str(Path(f["rel"]).parent), t["name"])
+            if k in pq:
+                (same if pq[k] == t["rows"] else diff).append({"庫": f["rel"], "表": t["name"], "duckdb": t["rows"], "parquet": pq[k]})
+    return {"compared": len(same) + len(diff), "same": len(same), "diff": diff}
+
+
+def verify_live(rows: list, scan: dict, home: str | None = None) -> dict:
+    """清點報告(db check)的列數 vs DuckDB 現查:同庫同表才比(只比清點那個家);報告沒列數(缺庫 / 缺表)不比。"""
+    live = {}
+    for f in scan.get("files") or []:
+        if home and str(Path(f["home"])) != str(Path(home)):
+            continue
+        if f["kind"] == "duckdb":
+            for t in f["tables"]:
+                live[(f["file"], t["name"])] = t["rows"]
+    same, diff, absent = [], [], []
+    for r in rows:
+        if r.get("列數") is None or r.get("類別") == "他系統表":
+            continue
+        k = (r.get("庫"), r.get("表"))
+        if k not in live:
+            absent.append(k)
+        elif int(live[k]) == int(r["列數"]):
+            same.append(k)
+        else:
+            diff.append({"庫": k[0], "表": k[1], "報告": r["列數"], "現查": live[k]})
+    return {"compared": len(same) + len(diff), "same": len(same), "diff": diff, "not_found": absent}
 
 
 # ---------------------------------------------------------------- U/I
@@ -237,7 +405,7 @@ EXTRA_CSS = (
     ".mx-bar{display:inline-block;height:8px;border-radius:4px;background:#eeeee7;width:80px;vertical-align:middle;overflow:hidden;margin-right:6px}"
     ".mx-bar span{display:block;height:100%}.mx-small{font-size:10.5px;color:#6b7468}.mx-adv li{margin:6px 0}"
     ".mx-adv code{background:#eeeee7;border-radius:4px;padding:0 4px}details.mx-db{border-top:1px solid #e1e4dc;padding:6px 0}"
-    "details.mx-db summary{cursor:pointer;font-weight:600;padding:4px 0}")
+    "details.mx-db summary{cursor:pointer;font-weight:600;padding:4px 0}.mx-h3{font-size:13px;font-weight:600;margin:16px 0 6px;word-break:break-all}")
 
 
 def _e(x) -> str:
@@ -262,6 +430,78 @@ def _md_code(s: str) -> str:
     return re.sub(r"`([^`]+)`", r"<code>\1</code>", _e(s))
 
 
+def _sz(n: int) -> str:
+    return ("%.1f MB" % (n / 1048576.0)) if n >= 1048576 else ("%d KB" % max(1, round(n / 1024.0)))
+
+
+def _dups_cell(tables: list) -> str:
+    dp = [t["dups"] for t in tables if t.get("dups") is not None]
+    return "—" if not dp else ("0" if not sum(dp) else "%d %s" % (sum(dp), _chip("YELLOW")))
+
+
+def _duck_section(m: dict) -> str:
+    """DuckDB 現查段:每個家一塊 —— 先列 .duckdb 庫(表 · 列 · 日期 · 重複 · 歸屬),各庫最新幾列收合;parquet 鏡像收合成一個小表。"""
+    sc = m.get("scan") or {}
+    if not sc:
+        return ""
+    lv, mr = m.get("live") or {}, m.get("mirror") or {}
+    vt = []
+    if lv and lv.get("compared"):
+        vt.append("清點報告 vs 現查:比對 %d 張 · 一致 %d · 不一致 %d" % (lv["compared"], lv.get("same", 0), len(lv.get("diff") or [])))
+    elif lv:
+        vt.append("清點報告 vs 現查:冊上的庫不在這些家裡(0 張可比)")
+    if mr.get("compared"):
+        vt.append(".duckdb ⇄ 同名 .parquet:%d 張 · 一致 %d · 不一致 %d" % (mr["compared"], mr["same"], len(mr["diff"])))
+    alltabs = [t for f in sc.get("files") or [] for t in f["tables"]]
+    if alltabs:
+        vt.append("整列重複:%d 張表 · 重複 %d 列" % (sum(1 for t in alltabs if t.get("dups") is not None), sum(t.get("dups") or 0 for t in alltabs)))
+    if sc.get("backup_files"):
+        vt.append("引擎覆寫前備份 %d 檔(backups/,只數不列)" % sc["backup_files"])
+    bad = bool(lv.get("diff") or mr.get("diff"))
+    lamp = "RED" if bad else ("YELLOW" if any(t.get("dups") for t in alltabs) else ("GREEN" if alltabs else "GRAY"))
+    out = ['<section class="mx-sec"><h2>DuckDB 現查(唯讀 · 本頁產生時直接查庫)</h2><p>%s %s</p>' % (_chip(lamp), _e(" · ".join(vt) or "沒有可比的"))]
+    if sc.get("error"):
+        out.append('<p class="mx-small">%s</p>' % _e(sc["error"]))
+    for i, home in enumerate(sc.get("homes") or [], 1):
+        fs = [f for f in sc.get("files") or [] if f["home"] == home]
+        dbs, pqs = [f for f in fs if f["kind"] == "duckdb"], [f for f in fs if f["kind"] == "parquet"]
+        out.append('<h3 class="mx-h3">家 %d · %s<span class="mx-small"> · %d 個 .duckdb · %d 個 parquet</span></h3>' % (i, _e(home), len(dbs), len(pqs)))
+        rows = []
+        for f in dbs:
+            dmax = max([t["dmax"] for t in f["tables"] if t.get("dmax")] or ["—"])
+            nd = max([t["ndates"] for t in f["tables"] if t.get("ndates")] or [0])
+            rows.append("<tr><td><b>%s</b>%s</td><td class=\"mx-num\">%d</td><td class=\"mx-num\">%s</td><td>%s</td><td class=\"mx-num\">%s</td>"
+                        "<td class=\"mx-num\">%s</td><td class=\"mx-num\">%s</td><td class=\"mx-small\">%s</td><td>%s</td></tr>" % (
+                            _e(f["file"]), ('<br><span class="mx-small">%s</span>' % _e(str(Path(f["rel"]).parent))) if str(Path(f["rel"]).parent) != "." else "",
+                            len(f["tables"]), _e(format(sum(t["rows"] for t in f["tables"]), ",")), _e(dmax), _e(nd or "—"), _dups_cell(f["tables"]),
+                            _sz(f["size"]), _e(f["mtime"].replace("T", " ")[:16]),
+                            (_chip("RED") + " " + _e(f["error"])) if f["error"] else ("DB 冊" if f["file"] in m["dbs"] else "擷取輸出")))
+        if rows:
+            out.append('<div class="mx-scroll"><table class="mx"><thead><tr><th>庫</th><th>表</th><th>總列數</th><th>最新日</th><th>日期數</th><th>重複列</th>'
+                       '<th>大小</th><th>更新</th><th>歸屬</th></tr></thead><tbody>%s</tbody></table></div>' % "".join(rows))
+        for f in dbs:
+            if not f["tables"]:
+                continue
+            inner = []
+            for t in f["tables"]:
+                pv = "".join("<tr>%s</tr>" % "".join("<td>%s</td>" % _e(c) for c in r) for r in t["preview_rows"])
+                inner.append('<p><b>%s</b> · %s 列 · %d 欄%s%s</p><div class="mx-scroll"><table class="mx"><thead><tr>%s</tr></thead><tbody>%s</tbody></table></div>' % (
+                    _e(t["name"]), _e(format(t["rows"], ",")), t["cols"],
+                    (" · %s %s ~ %s · %s 個日期" % (_e(t["date_col"]), _e(t["dmin"]), _e(t["dmax"]), _e(t["ndates"]))) if t.get("date_col") else "",
+                    (" · 重複 %d 列" % t["dups"]) if t.get("dups") else "", "".join("<th>%s</th>" % _e(c) for c in t["preview_cols"]), pv))
+            out.append('<details class="mx-db"><summary>%s · %d 表 · 每表最新 3 列</summary>%s</details>' % (_e(f["rel"]), len(f["tables"]), "".join(inner)))
+        if pqs:
+            prow = "".join("<tr><td>%s</td><td class=\"mx-num\">%s</td><td>%s</td><td class=\"mx-num\">%s</td><td class=\"mx-small\">%s</td><td>%s</td></tr>" % (
+                _e(f["rel"]), _e(format(sum(t["rows"] for t in f["tables"]), ",")), _e(max([t["dmax"] for t in f["tables"] if t.get("dmax")] or ["—"])),
+                _dups_cell(f["tables"]), _e(f["mtime"].replace("T", " ")[:16]), (_chip("RED") + " " + _e(f["error"])) if f["error"] else "") for f in pqs)
+            out.append('<details class="mx-db"><summary>parquet 檔 %d 個(DuckDB read_parquet 現查)</summary><div class="mx-scroll"><table class="mx"><thead><tr>'
+                       '<th>檔</th><th>列</th><th>最新日</th><th>重複列</th><th>更新</th><th></th></tr></thead><tbody>%s</tbody></table></div></details>' % (len(pqs), prow))
+        if not fs:
+            out.append('<p class="mx-small">這個家裡沒有 .duckdb / parquet</p>')
+    out.append("</section>")
+    return "".join(out)
+
+
 def page(data: dict, m: dict, adv: list) -> str:
     chk, ver = data["check"], data["verify"]
     css, css_note = _spec_css()
@@ -271,15 +511,18 @@ def page(data: dict, m: dict, adv: list) -> str:
          '<meta name="viewport" content="width=device-width,initial-scale=1">',
          "<title>VDF 資料庫狀態矩陣</title><style>%s</style><style>%s</style></head><body>" % (css, EXTRA_CSS),
          '<header class="mx-head"><div class="mx-r1">VERITAS INTELLIGENCE ANALYTICS</div><div class="mx-r2">Veritas DataForge</div>'
-         '<div class="mx-r3">資料庫狀態矩陣 · 庫 × 狀態 · 寫入引擎 × 狀態 · 逐表明細 · 建議</div></header>']
+         '<div class="mx-r3">資料庫狀態矩陣 · 建議 · DuckDB 現查 · 庫 × 狀態 · 寫入引擎 × 狀態 · 逐表明細</div></header>']
     o = m["oldest"]
     kpis = [("總燈", _chip(chk.get("lamp"))), ("庫(找到 / 冊上)", "%d / %d" % (m["db_found"], m["db_total"])),
             ("VDF 表", str(len(m["own"]))), ("紅 · 黃 · 綠", "%d · %d · %d" % (m["lamps"]["RED"], m["lamps"]["YELLOW"], m["lamps"]["GREEN"])),
             ("最舊落後", ("%s 天" % o["落後天"]) if o else "—"), ("獨立核對", _chip("GREEN" if ver and ver.get("lamp") == "PASS" else ("RED" if ver else "GRAY")) + (" " + _e(ver.get("lamp")) if ver else " 沒有")),
-            ("他系統表(只讀)", str(len(m["other"]))), ("清點時間", _e(str(chk.get("ts") or "—").replace("T", " ")[:16]))]
+            ("他系統表(只讀)", str(len(m["other"]))),
+            ("DuckDB 現查", "%d 檔 · %d 表" % (len((m.get("scan") or {}).get("files") or []), sum(len(f["tables"]) for f in (m.get("scan") or {}).get("files") or []))),
+            ("清點時間", _e(str(chk.get("ts") or "—").replace("T", " ")[:16]))]
     p.append('<div class="mx-kpis">%s</div>' % "".join('<div class="mx-kpi"><div class="k">%s</div><div class="v">%s</div></div>' % (_e(k), v) for k, v in kpis))
     p.append('<section class="mx-sec"><h2>建議(照清點結果 · 由重到輕)</h2><ol class="mx-adv">%s</ol></section>' % "".join(
         "<li>%s %s<br><span class=\"mx-small\">→ %s</span></li>" % (_chip(a["lamp"]), _e(a["what"]), _md_code(a["do"])) for a in adv))
+    p.append(_duck_section(m))
     head = "".join("<th>%s %s</th>" % (_e(c), _chip(CAT_LAMP.get(c, "INFO"))) for c in cats)
     body = []
     for db in sorted(m["dbs"], key=lambda d: (-LAMP_RANK.get(m["by_db"][d]["lamp"], 0), d)):
@@ -327,11 +570,17 @@ def page(data: dict, m: dict, adv: list) -> str:
     return "".join(p)
 
 
-def render(root: Path = VIA, out_dir: Path | None = None, check: Path | None = None, verify: Path | None = None) -> dict:
+def render(root: Path = VIA, out_dir: Path | None = None, check: Path | None = None, verify: Path | None = None,
+           homes: list | None = None, scan: bool = True) -> dict:
     data = load(root, check, verify)
     if not data["check"]:
         return {"lamp": "GRAY", "why": "沒有 %s(先跑 `VDF_SystemManager db check`)" % data["check_path"]}
     m = matrix(data["check"])
+    if scan:
+        m["scan"] = duck_scan(list(homes) if homes else default_homes(data["check"], root))
+        ck_home = (data["check"] or {}).get("home") if data["check"] else None
+        m["live"] = verify_live(m["own"], m["scan"], ck_home)
+        m["mirror"] = mirror_check(m["scan"])
     adv = advice(m, data["check"], data["verify"])
     d = Path(out_dir or Path(root) / OUT_REL)
     d.mkdir(parents=True, exist_ok=True)
@@ -339,7 +588,11 @@ def render(root: Path = VIA, out_dir: Path | None = None, check: Path | None = N
     hp.write_text(page(data, m, adv), encoding="utf-8")
     summ = {"engine": TAG, "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "check_ts": data["check"].get("ts"),
             "lamp": data["check"].get("lamp"), "db_found": m["db_found"], "db_total": m["db_total"], "tables": len(m["own"]),
-            "lamps": m["lamps"], "by_db": m["by_db"], "engines": m["engines"], "advice": adv, "other": len(m["other"])}
+            "lamps": m["lamps"], "by_db": m["by_db"], "engines": m["engines"], "advice": adv, "other": len(m["other"]),
+            "duckdb_live": {"homes": (m.get("scan") or {}).get("homes"), "files": [{k: f[k] for k in ("rel", "kind", "error")} | {"tables": [
+                {k: t[k] for k in ("name", "rows", "cols", "dmin", "dmax", "ndates", "dups")} for t in f["tables"]]} for f in (m.get("scan") or {}).get("files") or []],
+                "verify": m.get("live"), "mirror": m.get("mirror"),
+                "dups": sum(t.get("dups") or 0 for f in (m.get("scan") or {}).get("files") or [] for t in f["tables"])}}
     jp.write_text(json.dumps(summ, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     return {"lamp": data["check"].get("lamp"), "page": str(hp), "data": str(jp), "advice": adv, "db_found": m["db_found"], "db_total": m["db_total"]}
 
@@ -349,12 +602,13 @@ def main(argv=None) -> int:
     if args == ["--selftest"]:
         return selftest()
     if args[:1] not in (["render"], []):
-        print("[%s] 動詞:render [--check JSON] [--verify JSON] [--out DIR] | --selftest(只讀;VDF 自己的報告)" % TAG)
+        print("[%s] 動詞:render [--check JSON] [--verify JSON] [--out DIR] [--home DIR …] | --selftest(只讀;VDF 自己的報告 + DuckDB 現查)" % TAG)
         return 2
 
     def opt(k):
         return Path(args[args.index(k) + 1]) if k in args and args.index(k) + 1 < len(args) else None
-    r = render(VIA, opt("--out"), opt("--check"), opt("--verify"))
+    homes = [Path(args[i + 1]) for i, a in enumerate(args) if a == "--home" and i + 1 < len(args)]
+    r = render(VIA, opt("--out"), opt("--check"), opt("--verify"), homes or None)
     if r.get("lamp") == "GRAY":
         print("[%s] %s" % (TAG, r["why"]))
         return 2
@@ -418,11 +672,59 @@ def selftest() -> int:
             "VERITAS INTELLIGENCE ANALYTICS" in pg and "矩陣一 · 庫 × 狀態" in pg and "矩陣二 · 寫入引擎 × 狀態" in pg and "逐表明細" in pg
             and "他系統的表(只讀監控" in pg and 'content="DB_STATUS_MATRIX"' in pg[:300] and bool(css) and css in pg and "<script" not in pg.lower() and Path(r["data"]).is_file(), css_note)
         r0 = render(d, d / "out2", d / "none.json")
+        try:
+            import duckdb
+            dbf = d / "home" / "a.duckdb"
+            dbf.parent.mkdir()
+            con = duckdb.connect(str(dbf))
+            con.execute("CREATE TABLE p AS SELECT DATE '2026-11-01' + INTERVAL (i % 5) DAY AS date, i AS v FROM range(500) t(i)")
+            con.execute("CREATE TABLE q AS SELECT 1 AS x")
+            con.close()
+            (d / "home" / "sub").mkdir()
+            dk = duckdb.connect()
+            dk.execute("COPY (SELECT 'x' AS a, 2 AS b) TO '%s' (FORMAT parquet)" % str(d / "home" / "sub" / "o.parquet").replace("'", "''"))
+            dk.close()
+            (d / "home" / "bad.duckdb").write_bytes(b"not a duckdb file")
+            sc = duck_scan([d / "home"])
+            fa = next(f for f in sc["files"] if f["file"] == "a.duckdb")
+            tp = next(t for t in fa["tables"] if t["name"] == "p")
+            fb = next(f for f in sc["files"] if f["file"] == "bad.duckdb")
+            (d / "home" / "sub" / "backups").mkdir()
+            (d / "home" / "sub" / "backups" / "20261115_000000_o.parquet").write_bytes((d / "home" / "sub" / "o.parquet").read_bytes())
+            dk = duckdb.connect(str(d / "home" / "sub" / "m.duckdb"))
+            dk.execute("CREATE TABLE o AS SELECT 'x' AS a, 2 AS b UNION ALL SELECT 'x', 2")
+            dk.close()
+            sc = duck_scan([d / "home"])
+            fa = next(f for f in sc["files"] if f["file"] == "a.duckdb")
+            tp = next(t for t in fa["tables"] if t["name"] == "p")
+            fm = next(f for f in sc["files"] if f["file"] == "m.duckdb")
+            mc = mirror_check(sc)
+            chk("⑫ 增量維護:m.o 整列重複 1 · p 0 重複 · .duckdb(2 列)⇄ 同名 o.parquet(1 列)不一致照實抓 · backups/ 只數不列",
+                fm["tables"][0]["dups"] == 1 and tp["dups"] == 0 and mc["compared"] == 1 and sc["backup_files"] == 1
+                and not any("backups" in f["rel"] for f in sc["files"]) and mc["diff"][0]["duckdb"] == 2 and mc["diff"][0]["parquet"] == 1, (mc, fm["tables"][0]["dups"]))
+            fo = next(f for f in sc["files"] if f["file"] == "o.parquet")
+            chk("⑨ DuckDB 現查:唯讀開庫 · p 500 列 · 日期 2026-11-01 ~ 2026-11-05 · 5 個日期 · 最新列照日期排 · parquet 經 read_parquet · 壞檔照實記 error 不擋",
+                tp["rows"] == 500 and tp["dmin"] == "2026-11-01" and tp["dmax"] == "2026-11-05" and tp["ndates"] == 5
+                and str(tp["preview_rows"][0][0]).startswith("2026-11-05") and fo["tables"][0]["rows"] == 1 and fb["error"] and not fa["error"], (tp, fb.get("error")))
+            lv = verify_live([{"庫": "a.duckdb", "表": "p", "列數": 500, "類別": "正常"}, {"庫": "a.duckdb", "表": "q", "列數": 7, "類別": "正常"},
+                              {"庫": "a.duckdb", "表": "gone", "列數": 3, "類別": "正常"}, {"庫": "z.duckdb", "表": "x", "列數": None, "類別": "缺庫"}], sc)
+            chk("⑩ 清點 vs 現查:p 一致 · q 報告 7 / 現查 1 不一致 · gone 找不到 · 缺庫不比", lv["same"] == 1 and len(lv["diff"]) == 1 and lv["diff"][0]["現查"] == 1
+                and lv["not_found"] == [("a.duckdb", "gone")] and lv["compared"] == 2, lv)
+            fx2 = dict(fx, rows=[row("a.duckdb", "p", "OK", "GREEN", 500, 1, "2026-11-05", 10), row("a.duckdb", "q", "OK", "GREEN", 7, 1, None, None)],
+                       home_pick={"picked": str(d / "home")})
+            (d / "c2.json").write_text(json.dumps(fx2, ensure_ascii=False), encoding="utf-8")
+            r2 = render(d, d / "out3", d / "c2.json", d / "nope.json")
+            pg2 = Path(r2["page"]).read_text(encoding="utf-8")
+            chk("⑪ 頁面有 DuckDB 現查段(檔 · 表 · 總列數 · 日期數 · 歸屬 DB 冊)· 建議第一條紅 = 報告與現查不一致(q)",
+                "DuckDB 現查(唯讀" in pg2 and "a.duckdb" in pg2 and "DB 冊" in pg2 and r2["advice"][0]["lamp"] == "RED" and "不一致" in r2["advice"][0]["what"],
+                r2["advice"][:2])
+        except ImportError:
+            chk("⑨ DuckDB 現查:本機沒 duckdb → 照實跳過(不假綠)", duck_scan([d])["error"] == "duckdb 未安裝(只查不裝)")
     chk("⑦ 沒有清點報告 → GRAY 照實說先跑 db check(不假造)", r0.get("lamp") == "GRAY" and "db check" in r0.get("why", ""))
     text = Path(__file__).read_text(encoding="utf-8")
     body = text.split("def selftest", 1)[0]
-    chk("⑧ VDF 獨立:只讀 VDF 自己的報告 · 不匯入他系統程式 · 兩座橋在 · 同意閘不讀不寫 · 不碰 TA-Lib · 不寫環境 · 不連網",
-        not re.search(r"^\s*(import|from)\s+(talib|CGC_|VRN_|VRN2_|VQG_|VAP_|VCGC|duckdb)", text, re.M) and "[VIA:ACCEL-BRIDGE" in text and "[VIA:NET-BRIDGE" in text
+    chk("⑧ VDF 獨立:只讀 VDF 自己的報告 · 不匯入他系統程式 · 兩座橋在 · 同意閘不讀不寫 · 不碰 TA-Lib · 不寫環境 · 不連網 · DuckDB 只在現查函式裡唯讀開",
+        not re.search(r"^\s*(import|from)\s+(talib|CGC_|VRN_|VRN2_|VQG_|VAP_|VCGC)", text, re.M) and "read_only=True" in text and "[VIA:ACCEL-BRIDGE" in text and "[VIA:NET-BRIDGE" in text
         and not re.search(r"environ[\[.][^\n]{0,16}VIA_(NET|SCRAPE)_CON" + "SENT", body)
         and not re.search(r"os\.environ\[[^\]]*\]\s*=(?!=)|os\.environ\.(pop|setdefault|update)\(", body))
     print(f"[計] {TAG} 自測 {sum(ok)}/{len(ok)} · {'PASS' if all(ok) else 'FAIL'}")

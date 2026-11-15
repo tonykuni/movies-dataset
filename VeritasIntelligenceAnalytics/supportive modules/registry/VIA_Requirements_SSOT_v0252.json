@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0252",
- "batch": "VDF 資料庫狀態矩陣(2026-11-15):VDF-REQ028 一頁矩陣 + 建議 · 套進 VDF 資料庫頁(前版 v0251)",
- "ts": "2026-11-15T14:00:33Z",
+ "batch": "VDF 資料庫狀態矩陣 + DuckDB 現查實測(2026-11-15):VDF-REQ028 · VDF-REQ029(前版 v0251)",
+ "ts": "2026-11-15T14:16:53Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -140,7 +140,7 @@
  "tally": {
   "RECORDED": 24,
   "COVERED": 139,
-  "PARTIAL": 111,
+  "PARTIAL": 112,
   "MISSING": 1
  },
  "requirements": [
@@ -7227,6 +7227,27 @@
    "why_homes": "VDF 自己的清點報告與資料庫頁;他系統表只讀(L123)",
    "ts": "2026-11-15T14:00:33Z",
    "updated_at": "2026-11-15T14:00:33Z"
+  },
+  {
+   "code": "VDF-REQ029",
+   "subsystem": "VDF",
+   "topic": "VDF / VRN-2 實測:資料庫輸出經 DuckDB 現查核對 + 增量維護證明 · 顯示在 VDF HTML U/I",
+   "requirement": "操作員 2026-11-15:「Real test for VRN vdf and ensure database Output verified and maintained and display by duckdb through html u/i」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0112.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL019_DBStatusMatrix_v0100.py",
+    "functional modules/VDF/VDF_SystemManager_v0182.py"
+   ],
+   "evidence": "2026-11-15 容器:MDL019 v0100 加 DuckDB 現查段(唯讀開 .duckdb · parquet 經 read_parquet · 表 / 列 / 欄 / 日期範圍 / 日期數 / 整列重複 / 最新 3 列;清點報告列數逐表對現查;擷取 .duckdb ⇄ 同名 .parquet 對列數;backups/ 只數不列)自測 12/12。實測:VDF 擷取系統 MDL008 v0110 fixture 鏈 9/9 OK · 輸出 23/23 合格 → sandbox 資料家 6 個 .duckdb + 28 個 parquet;重跑一輪 → 48/48 張表列數不變 · 整列重複 0 · .duckdb ⇄ .parquet 18/18 一致(增量維護不重寫)。VDF SystemManager v0182 db check --home <sandbox> rc 1(冊上 5 本庫都要 live 引擎才建,容器 0/5 照實紅)· db verify PASS 差異 0 → 資料庫頁 = 矩陣 + DuckDB 現查段;桌機 / 手機寬不橫捲。VRN-2 自己的 manager:metrics-resolve 乾跑真庫 functional modules/VRN/db/vrn_reports.duckdb CLEAN(74 → 74 列 · 報告 0/50 有變 · 多值 CONFLICT 2 組照標)· 庫檔 md5 不變;manager --selftest rc 0(v0273 8/8 · v0274 9/9 · v0275 8/8)。VDF 不讀 VRN-2 的庫(L123,只看它自報)。",
+   "next": "桌機 pull 後 ActivateVDF 一輪(真資料家)→ 資料庫頁的 DuckDB 現查段直接查真庫;冊上 5 本庫的清點 vs 現查逐表一致才算收",
+   "hand": "操作員(桌機真資料家 · 擷取同意閘由操作員設,AI 不代設)",
+   "why_homes": "VDF 自己的資料庫頁與交接收據;VRN-2 的實測走 VRN-2 自己的 manager(L123)",
+   "ts": "2026-11-15T14:16:53Z",
+   "updated_at": "2026-11-15T14:16:53Z"
   }
  ],
  "non_requirements": [
@@ -7620,5 +7641,5 @@
  "why_v0247": "只增:導入 VIA_VCGC_Commercial_Review_v0100(22 差異 · 40 隔離測試 NOT_RUN)→ 8 條 CAND-VCGC-COM-* 候選需求登冊待批(不發正式號);REQ221 補 G7 證據。",
  "why_v0250": "只增:+VDF-REQ026(PARTIAL:主動式台股 ETF 抓不到每日持股 = 不符合;MDL010 v0101 V8 + 擷取冊 v0109;桌機真抓與下游改讀待做);VDF-REQ025 / 026 歸屬補工作流冊 VIA_Workflow_VDF_SSOT_v0110.json(WKF018 / WKF019 回指;AGENTS.md 第 3 條 · PR 650 Codex P1);tally 照 requirements 逐筆重數;其餘一字不動。",
  "why_v0251": "只增:+VDF-REQ027(PARTIAL:統一 SSOT 分享 · MDL018 v0100 · MDL014 v0101 yf 後綴照市場 · 擷取冊 v0110;桌機真資料與各系統自己讀待做);tally 照 requirements 逐筆重數;其餘一字不動。",
- "why_v0252": "只增:+VDF-REQ028(PARTIAL:資料庫狀態矩陣 MDL019 v0100 · 管理員 v0182 套進資料庫頁;桌機真資料待做);tally 照 requirements 逐筆重數;其餘一字不動。"
+ "why_v0252": "只增:+VDF-REQ028(PARTIAL:資料庫狀態矩陣 MDL019 v0100 · 管理員 v0182 套進資料庫頁;桌機真資料待做)· +VDF-REQ029(PARTIAL:DuckDB 現查核對 + 增量維護實測 · VRN-2 自己的 manager 實測;桌機真資料家待做);tally 照 requirements 逐筆重數;其餘一字不動。"
 }
