@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-15T14:26:57Z",
+ "updated_at": "2026-11-15T15:15:06Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -10412,6 +10412,38 @@
    "reason": "真資料擷取要網路與同意閘(操作員設,AI 不代設);冊上 5 本庫的清點 vs DuckDB 現查逐表一致才算收",
    "next": "桌機 pull → ActivateVDF 一輪 → 資料庫頁 DuckDB 現查段 · 清點 vs 現查 0 不一致",
    "updated_at": "2026-11-15T14:26:57Z"
+  },
+  {
+   "id": "VDF-REQ030:V-vdf-dataplane-v0100",
+   "requirement": "VDF-REQ030",
+   "case": "V-vdf-dataplane-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "MDL020 v0100 資料平面:管理範圍 · 清單輸入閘(共用代碼律 AST 讀)· tw__ / gl__ parquet 增量同步(沒新鍵不動檔 · 只補新鍵 · 原子替換 · 同鍵重抓不收)· 不重複擷取計畫 · 增量匯出 PC / 雲端同步夾 + MCP 交接清單 · 參數冊;自測 16/16;經 VDF_SystemManager engine run;handoff test rc 0 · marker true(2026-11-15T15:12:24+00:00 · sha 2431e37bd005)",
+   "next": "桌機 VDF_SystemManager scope → parquet plan / sync / export",
+   "receipt": "docs/handoff/evidence/V-vdf-dataplane-v0100.json",
+   "updated_at": "2026-11-15T15:15:06Z"
+  },
+  {
+   "id": "VDF-REQ030:V-vdf-manager-v0183",
+   "requirement": "VDF-REQ030",
+   "case": "V-vdf-manager-v0183",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "VDF SystemManager v0183:scope / inputs / parquet 以子行程轉 MDL020 · 仍是標準轉交者 · 沙盒真跑 sync 建檔 / 重跑不動檔;自測 39/39;handoff test rc 0 · marker true(2026-11-15T15:13:15+00:00 · sha a10a483017c9)",
+   "next": "桌機 pull 後照常用 VDF_SystemManager",
+   "receipt": "docs/handoff/evidence/V-vdf-manager-v0183.json",
+   "updated_at": "2026-11-15T15:15:06Z"
+  },
+  {
+   "id": "VDF-REQ030:workstation-real-home",
+   "requirement": "VDF-REQ030",
+   "case": null,
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "真資料家 via_database\\vdf_database(21 個 tw__ / gl__ parquet + output_hub 正典庫)只在桌機;雲端同步夾與 MCP 上傳在桌機端",
+   "next": "桌機 pull → VDF_SystemManager scope → parquet plan → parquet sync → parquet export --to <夾|onedrive|gdrive|dropbox>",
+   "updated_at": "2026-11-15T15:15:06Z"
   }
  ]
 }
