@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-13T20:26:25Z",
+ "updated_at": "2026-11-15T10:39:01Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -11445,6 +11445,28 @@
    "next": "VRN-2 會話推上 GitHub 並由 VRN-2 自己合併;合併後 VCGC 只讀複驗",
    "receipt": null,
    "updated_at": "2026-11-13T20:26:25Z"
+  },
+  {
+   "id": "VCGC-REQ244:vdf-universe-official-counts",
+   "requirement": "VCGC-REQ244",
+   "case": "",
+   "state": "PENDING",
+   "owner": "VDF(VDF_SystemManager)",
+   "reason": "官方實數(2026-11-14/15 · TWSE OpenAPI t187ap03_L · TPEx OpenAPI mopsfin_t187ap03_O · ISIN 上櫃頁交叉):上市個股 1,093(另 6 檔 91xxxx 為 TDR 不計)· 上櫃 897(ISIN 898,多 7848 為時差)· 合計約 1,990;主動式股票 ETF 35 檔,國內成分 26 · 國外成分 9(00402A 00409A 00412A 00983A 00986A 00988A 00989A 00990A 00997A)。VDF_InputUniverse_SSOT 的 OUT-01 門檻「加權 ≥ 900 · 櫃買 ≥ 700 · 總列 ≥ 1600」過鬆,少上百檔仍可能不紅",
+   "next": "VDF 自修:門檻改照官方清單逐碼比對(缺 / 多 / 市場錯置),IN-02 以國內成分 26 檔為準且每檔要有每日持股才算;VCGC 只讀複驗(DuckDB 直查)",
+   "receipt": null,
+   "updated_at": "2026-11-15T10:39:01Z"
+  },
+  {
+   "id": "VCGC-REQ244:vdf-etf-holdings-db-start",
+   "requirement": "VCGC-REQ244",
+   "case": "",
+   "state": "BLOCKED",
+   "owner": "操作員(桌機 · 同意閘)",
+   "reason": "主動式台股 ETF 持股截取庫(ENG077 etf_universe → ENG078 etf_holdings_daily → ActiveTWETF.duckdb)只在桌機;引擎同意閘 fail-closed,AI 不代設 VIA_NET_CONSENT / VIA_SCRAPE_CONSENT;容器跑 universe list = 個股 0 · ETF 0(庫不在),validate RED(誠實)",
+   "next": "桌機自開同意閘後依序:via-console run --item macro_lanes lanes=L1 → run --item etf_universe → run --item etf_holdings_daily → VDF_SystemManager universe list → universe validate;再經資料夾連線由 VCGC 跑 DuckDB 直查(官方 1,093 / 897 / 國內主動 ETF 26 · 持股主鍵不重 · 權重 ≤100.5)全綠才算",
+   "receipt": null,
+   "updated_at": "2026-11-15T10:39:01Z"
   }
  ]
 }
