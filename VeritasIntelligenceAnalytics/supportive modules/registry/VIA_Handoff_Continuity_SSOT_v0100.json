@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-15T10:39:01Z",
+ "updated_at": "2026-11-15T10:42:32Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -11467,6 +11467,17 @@
    "next": "桌機自開同意閘後依序:via-console run --item macro_lanes lanes=L1 → run --item etf_universe → run --item etf_holdings_daily → VDF_SystemManager universe list → universe validate;再經資料夾連線由 VCGC 跑 DuckDB 直查(官方 1,093 / 897 / 國內主動 ETF 26 · 持股主鍵不重 · 權重 ≤100.5)全綠才算",
    "receipt": null,
    "updated_at": "2026-11-15T10:39:01Z"
+  },
+  {
+   "id": "VCGC-REQ244:vdf-listings-fields",
+   "requirement": "VCGC-REQ244",
+   "case": "",
+   "state": "PENDING",
+   "owner": "VDF(VDF_SystemManager · ENG055)",
+   "reason": "唯讀查 VDF_ENG055_OmniFetch lane_listings(尾版 v0123 沿用 v0118 本體)寫 tw_listings_industry 的欄位:① 交易所欄 market = TWSE / TPEX 有(官方 t187ap03_L / _O 本身沒有交易所欄,由端點指定)+ yf_ticker .TW / .TWO;② 產業只有一層 industry_code + industry_name,沒有第二層(大類)—— 中央已有 VIA_IndustryUnifiedMap_v0100(35 碼 → sector3:ELEC 24-31 · FIN 17 · TRAD 其餘)但沒接;③ INDUSTRY_MAP 缺 91 碼(4 檔標『未冊碼』,統一冊有);④ 名稱口徑不一:上市取公司簡稱、上櫃取 CompanyName 全名(應取 CompanyAbbreviation)",
+   "next": "VDF 自修(出新版號薄尾,不改舊版):lane_listings 加 sector3(讀 VIA_IndustryUnifiedMap 尾版,不抄第二份)· 產業名改讀統一冊 · 上櫃名稱改 CompanyAbbreviation;VCGC DuckDB 直查欄位檢(two_level · 未冊 0 · 全名 0)綠才算",
+   "receipt": null,
+   "updated_at": "2026-11-15T10:42:32Z"
   }
  ]
 }
