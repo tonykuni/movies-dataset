@@ -648,8 +648,13 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
         return rep
 
     # ⑤ 搬過的冊 = 三方聯集
+    tops = {}
+    for dst, p in moved.items():                     # 每族只有新尾版做聯集;中間版是歷史快照,只換版號字樣(前版鏈照搬家表接)
+        k = (p["dir"], p["stem"], p["ext"])
+        if k not in tops or int(VER_RX.match(os.path.basename(dst)).group("v")) > int(VER_RX.match(os.path.basename(tops[k])).group("v")):
+            tops[k] = dst
     for dst, p in moved.items():
-        if p["ext"] != "json":
+        if p["ext"] != "json" or tops.get((p["dir"], p["stem"], p["ext"])) != dst:
             continue
         tp = _tail_path(root, theirs, p["stem"])
         bp = _tail_path(root, base, p["stem"])
@@ -666,7 +671,10 @@ def branch_merge(root: Path, ref: str, apply: bool = False, trailer: str = "", d
             if "version" in merged:
                 merged["version"] = newv
             if "prior" in merged and isinstance(merged["prior"], str):
-                merged["prior"] = os.path.basename(tp)
+                mv = sorted(int(v) for v in p["map"].values())
+                me = int(newv[1:])
+                merged["prior"] = (f"{p['stem']}_v{max(x for x in mv if x < me):04d}.{p['ext']}" if any(x < me for x in mv)
+                                   else os.path.basename(tp))
             merged["merge_" + newv] = (f"{Path(__file__).stem} branch-merge {ref}:本版 = 他方尾版 {os.path.basename(tp)} 全部 + 本分支新增"
                                        f"(L25 後合者升版;本分支原版號 v{[k for k, v in p['map'].items() if 'v' + v == newv][0]})")
         (root / dst).write_bytes(jdump(merged, ob))
