@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-14T08:08:21Z",
+ "updated_at": "2026-11-16T05:49:03Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -11975,6 +11975,18 @@
    "state": "PENDING",
    "receipt": null,
    "updated_at": "2026-11-14T08:08:21Z"
+  },
+  {
+   "id": "VCGC-PS:closeout-one-ps-workstation",
+   "owner": "操作員(工作站)",
+   "what": "Invoke-VIA-Closeout-v0100.ps1(操作員 2026-11-16「ONE PS TO HANDLE ALL」):一支 PS 跑完 Python 檢查 → fast-forward 同步 → VCGC 省 Token 第一步 → 三系統收尾(VIA_LakeConsole 尾版 closeout)→ 燈號總結 → 自動開報告頁;-Serve 另開操作台",
+   "reason": "雲端容器沒有 PowerShell(不代裝,L19),只能做結構檢查(括號平衡 · param 在模板章前 · 不設同意閘 · UTF-8 BOM)與治理量尺(PS 加速器章 / 模板章都認得這支);實際執行要在工作站",
+   "next": "工作站:pwsh -File .\\Invoke-VIA-Closeout-v0100.ps1 → 報告頁自動跳出 → 把結果回報;有錯照實修(出 v0101,不就地改)。編號待與 main 對齊後補發",
+   "requirement": "VCGC-REQ075",
+   "case": "",
+   "state": "PENDING",
+   "receipt": null,
+   "updated_at": "2026-11-16T05:49:03Z"
   }
  ]
 }
