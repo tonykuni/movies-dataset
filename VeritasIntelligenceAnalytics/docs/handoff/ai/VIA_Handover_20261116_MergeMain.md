@@ -45,11 +45,20 @@ $W = "$env:LOCALAPPDATA\VIA\movies-dataset-vdf-main"; if (-not (Test-Path $W)) {
 git -C $W fetch origin claude/optimistic-goodall-yhalc5; git -C $W checkout --detach FETCH_HEAD; Set-Location $W
 # ② 每天開機更新(它自己開同意閘 · 每日首跑才實跑)
 pwsh -NoProfile -ExecutionPolicy Bypass -File "VeritasIntelligenceAnalytics\supportive modules\registry\via_boot_update.ps1"
-# ③ VDF:環境檢查 → 降壓 → 五庫並行擷取(2022-01-01 起)→ 範圍矩陣 → 收尾頁(要真的出網,先自己設兩道同意閘)
-py "VeritasIntelligenceAnalytics\functional modules\VDF\VDF_MDL022_SafeParallelLaunch_v0100.py" run --start 2022-01-01
-# ④ VRN:用測試樣本夾跑個股 + 非個股整輪 → 輸出矩陣 → 收尾頁
-py "VeritasIntelligenceAnalytics\functional modules\VRN\VRN_MDL260_SafeParallelLaunch_v0100.py" run --roundall-args "--source C:\測試樣本報告"
+# ③ VDF(v0101):先降壓 → 資料家 = 文件夾下 VeritasIntelligenceAnalytics\via_database(自動找;也可 --data-home 指定)→ 3~5 支同時 →
+#    橋閘 100% 才增量擷取(ActivateVDF)→ parquet 同步 · 範圍矩陣 · 總經三期 · 收尾頁(要真的出網,先自己設兩道同意閘)
+py "VeritasIntelligenceAnalytics\functional modules\VDF\VDF_MDL022_SafeParallelLaunch_v0101.py" run
+# ④ VRN(v0101):先降壓 → 3~5 支同時 → 用測試樣本夾跑個股 + 非個股整輪 → 輸出矩陣 → 收尾頁
+py "VeritasIntelligenceAnalytics\functional modules\VRN\VRN_MDL260_SafeParallelLaunch_v0101.py" run --roundall-args "--source C:\測試樣本報告"
 # ⑤ 總經:官方 × AKShare 最新三期
 py "VeritasIntelligenceAnalytics\functional modules\VDF\VDF_MDL016_MacroCrossCheck_v0102.py" run
 ```
 `git checkout --detach` 遇到未提交改動會自己中止、不覆蓋;中止時把訊息貼回。
+
+## 2026-11-16 補記:桌機回報「卡斷且好慢」→ 啟動器 v0101
+- 根因(查程式):v0100 的擷取步直接叫 ENG239 → FetchGroups,用倉內預設擷取夾(空的)→ 等於從 2022 整個重抓;也沒走 VDF 正式入口 ActivateVDF
+  (記憶體准入閘 · 工具載入防遞迴 · 照 VDF_DataHome_SSOT 找資料家)。
+- v0101:① 第一步降壓並等系統靜下來 ② 資料家用操作員指定的 via_database(底下有 vdf_database 就用它),只讀清點,子行程帶 VIA_VDF_DB_HOME
+  ③ 道數夾 3~5;橋閘 / 不重複擷取計畫 / 清單閘 / OmniRoute 四支同時起,橋閘 100% 才擷取 ④ 心跳印每支靜了幾秒與子行程數。
+- 容器驗證:自測 VDF 23/23 · VRN 21/21;用模擬資料家從別的資料夾實跑,順序正確、ActivateVDF 收到 --db-home。容器的紅是環境(同意閘沒開 · 沒裝 yfinance · 假資料家只有一本庫)。
+- 沒驗到的:桌機真資料家的實際內容與速度;`.ps1` 與 Windows 行為。跑完請把最後 30 行或 `VIA_Reports\vdf\launch\VDF_Launch_latest.json` 貼回。
