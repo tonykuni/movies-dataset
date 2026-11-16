@@ -55,3 +55,16 @@
 $W="$env:LOCALAPPDATA\VIA\movies-dataset-vdf-main"; git -C $W fetch origin claude/optimistic-goodall-yhalc5; git -C $W checkout --detach FETCH_HEAD; $F="$W\VeritasIntelligenceAnalytics\functional modules\VRN\VRN_MDL260_SafeParallelLaunch_v0102.py"; if (Test-Path $F) { py $F run --source "C:\測試樣本報告" } else { "檔不在:同步沒成功,把上面 git 的訊息貼回" }
 ```
 只想先看就緒檢查:把 `run` 換成 `preflight`。看參數與分群表:`params --source "C:\測試樣本報告" --csv`。
+
+## 補記:一支 PS 進環境跑完 VRN + VDF(操作員「Integrate to one ps to enter the env and handle all」)
+- 檔:`VeritasIntelligenceAnalytics/Invoke-VIA-VrnVdf-HandleAll-v0100.ps1`(UTF-8 帶 BOM · CRLF)。
+  定位 → git 同步 → 進環境(VIA_ROOT · PYTHONPATH 最前放本工作樹啟動鉤 · UTF-8;只影響該視窗)→ VRN 啟動器尾版 → VDF 啟動器尾版 → 讀兩邊 `*_Launch_latest.json` 出總結。
+  不設同意閘、不安裝、不改檔;沒有 Read-Host / pause。
+- **沒有實跑過**:容器沒有 pwsh,下載 PowerShell 來測被權限擋下(沒有繞)。只做了靜態檢查(括號配對 · 無本機路徑 · 無同意閘賦值)。
+  本檔沒有內嵌 PS 加速器模板,加速器由它呼叫的兩支 Python 啟動器自己帶。
+- 容器跑測產物已照操作員令刪除:`VDF_SSOT_Register_v0113.json` · `VRN_Asset_Register_v0101–v0103.json` · `VCGC_Matrix_Output_v0194/`(都沒進過版控)。
+- VDF 啟動器 v0101 容器實跑(2026-11-16):RED · 擷取 GATED(同意閘沒開)· 沒有資料家 · 主動式 ETF 合格判定檔不在 · `VDF_ENG082_FinStatements` 自測紅 ·
+  總經交叉比對 12 對全 NODATA 卻回 rc 0(啟動器沒併燈,待修)。
+```powershell
+$W="$env:LOCALAPPDATA\VIA\movies-dataset-vdf-main"; git -C $W fetch origin claude/optimistic-goodall-yhalc5; git -C $W checkout --detach FETCH_HEAD; pwsh -NoProfile -ExecutionPolicy Bypass -File "$W\VeritasIntelligenceAnalytics\Invoke-VIA-VrnVdf-HandleAll-v0100.ps1" -Source "C:\測試樣本報告"
+```
