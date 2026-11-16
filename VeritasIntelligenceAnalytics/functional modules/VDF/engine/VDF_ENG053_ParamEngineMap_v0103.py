@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-r"""
-VDF_ENG053_ParamEngineMap v0103 — v0102 薄尾(v0102 一字不動):車道→引擎的「源碼實證」要看穿薄尾,看到它載入的前版本體。
+"""VDF_ENG053_ParamEngineMap v0103 — 薄尾:車道 → 引擎「源碼實證」沿薄尾前版鏈一起看。
 
-實錄(2026-11-13 容器全量重跑 VDF_SystemManager v0171 test:VDF_ENG053 FAIL rc 1):十一檢只紅 ⑦(未映 READY 1 = cnyes_consensus)。
-根因:在役面只收家族尾版(對);ENG050_OrderFetch 尾版 v0102 是薄尾,只換 fetch_twse_lane,
-  'cnyes_consensus' 這個字面在它載入的前版 v0101 本體裡 → 只掃尾版原文就找不到 → 誤判「沒有引擎接這條車道」。
-  不是車道沒人接,是掃描看不穿薄尾(同型:ENG089 v0109 薄尾漏帶 CATALOG)。
-本版只換 derive_string_consumers:尾版若是薄尾(檔內有 PRIOR_PATH + spec_from_file_location 載前版),
-  就把同夾同家族、版號比它小的檔一併當成它的原文來比對;命中照記在尾版名下(在役面不變、舊版不入工作面)。
-  不是薄尾 → 照 v0102 只看自己。字面比對規則(前綴收斂)一字照 v0102。
-VDF 自己的引擎;唯讀 · 零網路 · 零寫庫 · 不用 TA-Lib · 不寫同意閘。用法同 v0102:run | --selftest
+VDF 啟動實測(2026-11-14 · 引擎啟動檢查)本支自測 ⑦ 紅:READY 車道 cnyes_consensus「未映」。
+根因:v0101 起在役面只收各家族尾版;VDF_ENG050_OrderFetch 尾版 v0102 是薄尾(只修 TWSE 逐日錯誤記法,
+`PRIOR = …` 載入 v0101),車道分派(含 cnyes_consensus)寫在 v0101 → 尾版原文沒有車道字面 → 誤判沒人接單。
+本版(v0102 一字不動;只換 derive_string_consumers):
+  · 引擎是薄尾(原文有 `PRIOR… = …` 且自己載前版)時,把它實際載入的前版鏈原文一起掃(一路往回到第一支非薄尾為止);
+    非薄尾的整版重寫照舊只看自己(舊版有、新版拿掉的車道不會被算回來)。
+  · 命中仍記在「尾版」那一列(映射冊的在役面不變)。
+其餘(收割 · 四冊 · 治理五態 · 映射冊)照 v0102。唯讀收割零觸碰引擎原件;不碰 TA-Lib;零網路。
+用法同 v0102:python VDF_ENG053_ParamEngineMap_v0103.py run | --selftest
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -27,7 +27,6 @@ try:
 except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
-
 # ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(批115 VDF 全導入令;graceful 零行為變更) =====
 VIA_NET_TOOL_PATH = None
 try:
@@ -46,8 +45,17 @@ except Exception:
 
 
 def _via_net():
-    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)。本版不出網。"""
-    return None if VIA_NET_TOOL_PATH is None else VIA_NET_TOOL_PATH
+    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)"""
+    if VIA_NET_TOOL_PATH is None:
+        return None
+    try:
+        import importlib.util as _nb_ilu
+        _nb_spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
+        _nb_mod = _nb_ilu.module_from_spec(_nb_spec)
+        _nb_spec.loader.exec_module(_nb_mod)
+        return _nb_mod
+    except Exception:
+        return None
 # ===== [VIA:NET-BRIDGE:END] =====
 
 import importlib.util
@@ -56,66 +64,67 @@ import sys
 import tempfile
 from pathlib import Path
 
-VERSION = "0103"
 HERE = Path(__file__).resolve().parent
-_STEM = "VDF_ENG053_ParamEngineMap"
+STEM = "VDF_ENG053_ParamEngineMap"
+VERSION = "v0103"
+_VER_RX = re.compile(r"^(.*)_v(\d{4})$")
+_THIN_RX = re.compile(r"^\s*PRIOR\w*\s*=\s*(?:importlib|max\()", re.M)
 
 
-def _vnum(path) -> int:
-    m = re.search(r"_v(\d{4})$", Path(path).stem)
+def _vnum(p) -> int:
+    m = re.search(r"_v(\d{4})\.py$", str(p))
     return int(m.group(1)) if m else -1
 
 
-PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(__file__)), key=_vnum)
-_spec = importlib.util.spec_from_file_location(_STEM + "_prior_for_v0103", PRIOR_PATH)
-PRIOR = importlib.util.module_from_spec(_spec)
-sys.modules[_spec.name] = PRIOR
-_spec.loader.exec_module(PRIOR)
-_DERIVE_V0102 = PRIOR.derive_string_consumers
-
-_TAIL_RX = re.compile(r"PRIOR_PATH\s*=.*?spec_from_file_location", re.S)
-_FAM_RX = re.compile(r"^(.*)_v(\d{4})$")
-
-
-def __getattr__(name: str):
-    return getattr(PRIOR, name)
-
-
-def is_thin_tail(src: str) -> bool:
-    """薄尾 = 檔內用 PRIOR_PATH 找前版再 spec_from_file_location 載進來。"""
-    return bool(_TAIL_RX.search(src))
-
-
-def prior_chain(path: Path) -> list:
-    """同夾同家族、版號比它小的檔(由新到舊)。不是版號檔 → 空。"""
-    m = _FAM_RX.match(path.stem)
-    if not m:
-        return []
-    fam, me = m.group(1), int(m.group(2))
-    out = []
-    for p in path.parent.glob(fam + "_v*.py"):
-        mm = _FAM_RX.match(p.stem)
-        if mm and mm.group(1) == fam and int(mm.group(2)) < me:
-            out.append(p)
-    return sorted(out, key=_vnum, reverse=True)
+PRIOR_PATH = max((p for p in HERE.glob(STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(__file__)), key=_vnum)
+_spec = importlib.util.spec_from_file_location(STEM + "_prior_for_" + VERSION, PRIOR_PATH)
+P = importlib.util.module_from_spec(_spec)
+sys.modules[_spec.name] = P
+_spec.loader.exec_module(P)
+_DERIVE_V0102 = P.derive_string_consumers
+# 別名表照 v0102 原文再宣告一次(字面字典):VDF_SSOTSync 只從家族尾版收割 UNIFIED_ALIAS(同義字中央號 VDF:SYN:*),
+# 尾版沒有這張字面表 → 13 個同義字會被判退役。內容須與 v0102 一字不差(自測 ④ 核對)。
+UNIFIED_ALIAS = {
+    "START_DATE": "time.start_date", "END_DATE": "time.end_date",
+    "BATCH_SIZE": "fetch.batch_size", "MAX_RETRIES": "fetch.max_retries",
+    "RETRY_DELAY": "fetch.retry_delay_s", "RETRY_DELAY_S": "fetch.retry_delay_s",
+    "TIMEOUT": "fetch.timeout_s", "TIMEOUT_S": "fetch.timeout_s",
+    "HTTP_TIMEOUT": "fetch.timeout_s", "OUTPUT_DIR": "output.root",
+    "OUTPUT_ROOT": "output.root", "CSV_ENCODING": "output.csv_encoding",
+    "MARKETS": "markets",
+}
 
 
-def source_with_chain(path: Path) -> str:
-    """尾版原文;是薄尾就接上前版本體原文(一路往回,直到某版不是薄尾)。"""
+def __getattr__(name):
+    """尾版律 TAILAPI:前版公開名稱經本檔轉接。"""
+    return getattr(P, name)
+
+
+def is_thin(src: str) -> bool:
+    """薄尾 = 自己載前版(模組層 `PRIOR… = importlib… / max(…)`)。"""
+    return bool(_THIN_RX.search(src))
+
+
+def chain_source(path: Path) -> str:
+    """尾版原文 + 它實際載入的前版鏈原文(薄尾才往回;遇到非薄尾停)。"""
+    path = Path(path)
     src = path.read_text(encoding="utf-8", errors="replace")
-    parts = [src]
-    cur = src
-    for p in prior_chain(path):
-        if not is_thin_tail(cur):
+    m = _VER_RX.match(path.stem)
+    if not m:
+        return src
+    fam, cur, cur_src = m.group(1), int(m.group(2)), src
+    olders = sorted((q for q in path.parent.glob(fam + "_v*.py") if "_sha" not in q.name.lower() and 0 <= _vnum(q) < cur), key=_vnum, reverse=True)
+    for q in olders:
+        if not is_thin(cur_src):
             break
-        cur = p.read_text(encoding="utf-8", errors="replace")
-        parts.append(cur)
-    return "\n".join(parts)
+        cur_src = q.read_text(encoding="utf-8", errors="replace")
+        src += "\n" + cur_src
+    return src
 
 
 def derive_string_consumers(engines: dict, tokens: list) -> dict:
-    """同 v0102(前綴收斂 · 字面量含即中),只差在薄尾的原文 = 尾版 + 前版本體。"""
-    srcs = {rel: source_with_chain(PRIOR.VDF / rel) for rel in engines}
+    """同 v0102 的源碼實證(含前綴收斂後備),但每支引擎掃「尾版 + 薄尾前版鏈」原文;命中記在尾版列。"""
+    srcs = {rel: chain_source(P.VDF / rel) for rel in engines}
     hits = {t: [] for t in tokens}
     for t in tokens:
         probes = [t]
@@ -132,7 +141,7 @@ def derive_string_consumers(engines: dict, tokens: list) -> dict:
     return hits
 
 
-PRIOR.derive_string_consumers = derive_string_consumers   # v0102 build_map 用模組全域名 → 換成本版
+P.derive_string_consumers = derive_string_consumers               # v0102 build_map 依模組全域名找 → 本版接手
 
 
 def selftest() -> int:
@@ -140,44 +149,42 @@ def selftest() -> int:
 
     def chk(name, cond, note=""):
         ok.append(bool(cond))
-        print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)) if note else ''}", flush=True)
-
-    print(f"=== VDF_ENG053 參數映射器 v{VERSION} · 薄尾自測(車道源碼實證看穿薄尾;其餘照 v0102)===", flush=True)
+        print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)[:300]) if note and not cond else ''}", flush=True)
+    print(f"=== {STEM} {VERSION} · 薄尾自測(車道映通沿薄尾前版鏈)===", flush=True)
     with tempfile.TemporaryDirectory() as td:
         d = Path(td)
-        (d / "FAM_X_v0101.py").write_text("LANE = 'lane_only_in_body'\n", encoding="utf-8")
-        (d / "FAM_X_v0102.py").write_text(
-            "PRIOR_PATH = max(HERE.glob('FAM_X_v*.py'))\n_spec = importlib.util.spec_from_file_location('p', PRIOR_PATH)\n", encoding="utf-8")
-        (d / "FAM_Y_v0101.py").write_text("LANE = 'zzoldonly'\n", encoding="utf-8")
-        (d / "FAM_Y_v0102.py").write_text("X = 1  # 完整本體,不是薄尾\n", encoding="utf-8")
-        old_vdf = PRIOR.VDF
-        try:
-            PRIOR.VDF = d
-            eng = {"FAM_X_v0102.py": {}, "FAM_Y_v0102.py": {}}
-            old = _DERIVE_V0102(eng, ["lane_only_in_body"])
-            new = derive_string_consumers(eng, ["lane_only_in_body", "zzoldonly"])
-        finally:
-            PRIOR.VDF = old_vdf
-        chk("① 重現:v0102 只看尾版原文 → 薄尾前版本體裡的車道字面找不到", old["lane_only_in_body"] == [], old)
-        chk("② 本版:薄尾 → 接前版本體一起比 → 命中記在尾版名下", new["lane_only_in_body"] == ["FAM_X_v0102.py"], new["lane_only_in_body"])
-        chk("③ 不是薄尾的完整本體 → 不往回看舊版(舊版不入工作面)", new["zzoldonly"] == [], new["zzoldonly"])
-    real = PRIOR.VDF / "engine" / "VDF_ENG050_OrderFetch_v0102.py"
-    if real.is_file():
-        chk("④ 實檔:ENG050 v0102 是薄尾 · 接上前版後看得到 'cnyes_consensus'",
-            is_thin_tail(real.read_text(encoding="utf-8")) and "'cnyes_consensus'" in source_with_chain(real).replace('"', "'"))
-    print("  ── 前版 v0102 十一檢(換裝本版 derive_string_consumers 後)──", flush=True)
-    rc = PRIOR.selftest()
-    chk("⑤ v0102 十一檢(原本只紅 ⑦)換裝後全過", rc == 0, f"rc {rc}")
-    chk("⑥ 換裝:v0102 模組的 derive_string_consumers 指本版", PRIOR.derive_string_consumers is derive_string_consumers)
-    n = sum(ok)
-    print(f"  [計] VDF_ENG053 v{VERSION} 薄尾 {n}/{len(ok)} · 合計 {'PASS' if n == len(ok) else 'FAIL'}", flush=True)
-    return 0 if n == len(ok) else 1
+        (d / "VDF_ENG900_Demo_v0100.py").write_text("LANES = {'demo_lane': 1}\n", encoding="utf-8")
+        (d / "VDF_ENG900_Demo_v0101.py").write_text("PRIOR = importlib.util.module_from_spec(x)\n", encoding="utf-8")
+        (d / "VDF_ENG901_Full_v0100.py").write_text("LANES = {'gone_lane': 1}\n", encoding="utf-8")
+        (d / "VDF_ENG901_Full_v0101.py").write_text("LANES = {'new_lane': 1}\n", encoding="utf-8")
+        thin_src, full_src = chain_source(d / "VDF_ENG900_Demo_v0101.py"), chain_source(d / "VDF_ENG901_Full_v0101.py")
+        chk("① 薄尾往回併前版原文(demo_lane 看得到)· 整版重寫只看自己(舊版的 gone_lane 不算回來)",
+            "'demo_lane'" in thin_src and "'gone_lane'" not in full_src and "'new_lane'" in full_src)
+    m = P.build_map()
+    ready = P._ready_lanes()
+    un = [ln for ln in m["gaps"]["lanes_unmapped"] if ln in m["lane_engines"] and ln in ready]
+    cn = m["lane_engines"].get("cnyes_consensus") or []
+    chk("② 真倉:READY 車道零未映 · cnyes_consensus 映到 ENG050 尾版(v0102 薄尾 → v0101 分派)",
+        not un and any("VDF_ENG050_OrderFetch_v0102" in h for h in cn), (un, cn))
+    src = Path(__file__).read_text(encoding="utf-8")
+    chk("③ 加速器橋 · 網路工具橋在;不碰 TA-Lib;本檔不寫檔(映射冊照 v0102 run 寫)",
+        "[VIA:ACCEL-BRIDGE" in src and "[VIA:NET-BRIDGE" in src and "import " + "talib" not in src
+        and ".write_text(" not in src.split("def selftest", 1)[0])
+    chk("④ 尾版別名表(字面字典)與 v0102 一字不差 · 13 個同義字照收割(VDF_SSOTSync 只看尾版)",
+        UNIFIED_ALIAS == P.UNIFIED_ALIAS and len(UNIFIED_ALIAS) == 13 and "UNIFIED_ALIAS = {" in src)
+    print(f"  前版 {PRIOR_PATH.name} selftest ↓(在役面映通用本版)", flush=True)
+    prior_rc = P.selftest()
+    chk("⑤ 前版 v0102 自測照過(含 ⑦ READY 車道零缺)", prior_rc == 0, prior_rc)
+    print(f"[計] {STEM} {VERSION} 本版 {sum(ok)}/{len(ok)} · {'PASS' if all(ok) else 'FAIL'}", flush=True)
+    return 0 if all(ok) else 1
 
 
 def main() -> int:
-    if "--selftest" in sys.argv[1:]:
+    a = sys.argv[1:]
+    if a[:1] == ["--selftest"]:
         return selftest()
-    return PRIOR.main()
+    sys.argv = [sys.argv[0]] + a
+    return P.main()
 
 
 if __name__ == "__main__":

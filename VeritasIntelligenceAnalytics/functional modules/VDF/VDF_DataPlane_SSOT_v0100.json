@@ -1,0 +1,55 @@
+{
+ "schema": "VDF.DataPlane.Params.v1",
+ "owner": "VDF",
+ "version": "v0100",
+ "ts": "2026-11-15T15:10:00Z",
+ "why": "操作員 2026-11-15:「輸入輸出參數各自子系統留存」「全部共享 SSOT REGEX 同義字衝突訊號」—— 本冊只放 VDF_MDL020_DataPlane 的輸入輸出參數;代碼律不在這裡(讀共用的 MDL009 SSOT_STOCK_RX · ENG077 A_CODE)。改值 = 出新版號冊,舊冊不動。",
+ "params": {
+  "protocol": {
+   "vdf_tw_market.duckdb": "tw",
+   "vdf_global_market.duckdb": "gl"
+  },
+  "volatile_columns": [
+   "_ingest_ts",
+   "_run_id",
+   "_src",
+   "_src_file",
+   "batch_id",
+   "created_at",
+   "fetch_ts",
+   "fetched_at",
+   "ingest_ts",
+   "ingested_at",
+   "inserted_at",
+   "loaded_at",
+   "run_id",
+   "source_file",
+   "updated_at"
+  ],
+  "date_candidates": [
+   "date",
+   "trade_date",
+   "data_date",
+   "as_of",
+   "asof",
+   "snapshot_date",
+   "report_date",
+   "period",
+   "ym",
+   "month",
+   "dt",
+   "日期"
+  ],
+  "list_fresh_days": {
+   "green": 7,
+   "yellow": 30
+  },
+  "manifest": "VDF_PARQUET_MANIFEST.json",
+  "mcp_handoff": "VDF_PARQUET_MCP_HANDOFF.json",
+  "catalog": "VDF_ParquetDB.duckdb"
+ },
+ "shared_rules_read_from": {
+  "stock_code": "functional modules/VDF/VDF_MDL009_TWStockList_v*.py · SSOT_STOCK_RX(MDL001 鎖定律)",
+  "active_etf_code": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v*.py · A_CODE"
+ }
+}

@@ -3,8 +3,8 @@
  "version": "v0109",
  "subsystem": "VDF",
  "zh": "資料鍛造工作流",
- "batch": "X-COL:補 tests(self/cross/real)與步欄(verb · what · evidence 前綴);原證據路徑移 evidence_file",
- "ts": "2026-11-13T17:20:00Z",
+ "batch": "六項令 + 今日收尾備份 2026-11-09 晚",
+ "ts": "2026-11-14T01:28:47Z",
  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
  "sdd": {
   "layers": [
@@ -1168,8 +1168,8 @@
      "verb": "plan",
      "inside": "VDF",
      "evidence": "step:VDF-WKF016-STP003",
-     "evidence_file": "VIA_Reports/vdf/macro/VDF_MacroHierarchy_latest.md",
-     "what": "家族 / 一階 / 二階成樹 · declared_missing 照列"
+     "what": "讀冊(總經 SSOT 點分碼 + 關鍵字冊)成家族 / 一階 / 二階樹 · 標記 · 冊宣告沒序列 → declared_missing(離線、只讀)",
+     "evidence_file": "VIA_Reports/vdf/macro/VDF_MacroHierarchy_latest.md"
     },
     {
      "code": "VDF-WKF016-STP002",
@@ -1178,9 +1178,9 @@
      "engine": "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0100.py",
      "verb": "discover",
      "inside": "操作員桌機(雙閘 + FRED 鑰)",
-     "evidence": "step:VDF-WKF016-STP001",
-     "evidence_file": "VIA_Reports/vdf/macro/macro_hierarchy_candidates_v0100.jsonl",
-     "what": "fred · akshare · web 三車道 · 候選只增不刪"
+     "evidence": "step:VDF-WKF016-STP003",
+     "what": "fred · akshare · web 三車道找候選 → 候選 jsonl 只增去重(雙閘 + FRED 鑰;沒鑰 SKIP · 擷取冊不改)",
+     "evidence_file": "VIA_Reports/vdf/macro/macro_hierarchy_candidates_v0100.jsonl"
     },
     {
      "code": "VDF-WKF016-STP003",
@@ -1190,17 +1190,26 @@
      "verb": "--selftest",
      "inside": "VCGC run",
      "evidence": "self:VDF_MDL015_MacroHierarchy",
-     "evidence_file": "docs/handoff/evidence/V-vdf-macro-hierarchy.json",
-     "what": "自測 14 項(離線 · 零寫庫)"
+     "what": "自測 14 項(樹來自冊 · declared_missing · 鑰只查有無 · 雙閘關 DENY · 候選只增 · environ 原樣)",
+     "evidence_file": "docs/handoff/evidence/V-vdf-macro-hierarchy.json"
     }
    ],
-   "tests": {
-    "self": "handoff test V-vdf-macro-hierarchy",
-    "cross": [
-     "X-REQ-BACK"
-    ],
-    "real": "容器 plan 離線成樹;discover 在操作員桌機(雙閘 + FRED 鑰)"
-   }
+   "tests": [
+    {
+     "code": "VDF-WKF016-TST001",
+     "case": "C-macro-hierarchy-selftest",
+     "engine": "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 14/14"
+    },
+    {
+     "code": "VDF-WKF016-TST002",
+     "case": "C-macro-hierarchy-plan-offline",
+     "engine": "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0100.py",
+     "verb": "plan",
+     "expect": "rc 0 · GREEN · 家族 9 · 冊上序列 > 0(離線,不連網)"
+    }
+   ]
   },
   {
    "code": "VDF-WKF017",
@@ -1241,8 +1250,8 @@
      "verb": "run",
      "inside": "VDF",
      "evidence": "step:VDF-WKF017-STP003",
-     "evidence_file": "VIA_Reports/vdf/macro/VDF_MacroCrossCheck_latest.md",
-     "what": "VAKE v_<fn> × us_macro 最新三筆比對 → 警告"
+     "what": "離線比對 AKShare(VAKE v_<fn>)× 官方(us_macro)最新 n 筆 → 六種判決;沒庫 = NODATA 照實",
+     "evidence_file": "VIA_Reports/vdf/macro/VDF_MacroCrossCheck_latest.md"
     },
     {
      "code": "VDF-WKF017-STP002",
@@ -1251,9 +1260,9 @@
      "engine": "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0100.py",
      "verb": "run --live",
      "inside": "操作員桌機(雙閘 + FRED 鑰)",
-     "evidence": "step:VDF-WKF017-STP001",
-     "evidence_file": "VIA_Reports/vdf/macro/VDF_MacroCrossCheck_latest.json",
-     "what": "akshare_call + FRED observations 補最新"
+     "evidence": "step:VDF-WKF017-STP003",
+     "what": "--live 才連網補最新(akshare_call + FRED observations;雙閘 + 鑰遮罩)· 只警告不改資料",
+     "evidence_file": "VIA_Reports/vdf/macro/VDF_MacroCrossCheck_latest.json"
     },
     {
      "code": "VDF-WKF017-STP003",
@@ -1263,17 +1272,26 @@
      "verb": "--selftest",
      "inside": "VCGC run",
      "evidence": "self:VDF_MDL016_MacroCrossCheck",
-     "evidence_file": "docs/handoff/evidence/V-vdf-macro-crosscheck.json",
-     "what": "自測 16 項(離線)"
+     "what": "自測 16 項(對照冊讀冊 · 六種判決 fixture · 官方為正本 · 邊界不 import akshare / 不寫 environ)",
+     "evidence_file": "docs/handoff/evidence/V-vdf-macro-crosscheck.json"
     }
    ],
-   "tests": {
-    "self": "handoff test V-vdf-macro-crosscheck",
-    "cross": [
-     "X-REQ-BACK"
-    ],
-    "real": "容器離線比對;--live 在操作員桌機(雙閘 + FRED 鑰)"
-   }
+   "tests": [
+    {
+     "code": "VDF-WKF017-TST001",
+     "case": "C-macro-crosscheck-selftest",
+     "engine": "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 16/16"
+    },
+    {
+     "code": "VDF-WKF017-TST002",
+     "case": "C-macro-crosscheck-offline",
+     "engine": "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0100.py",
+     "verb": "run",
+     "expect": "rc 0 · 沒庫時每對 NODATA 照實(不假填)· 有庫時六種判決"
+    }
+   ]
   }
  ],
  "prior": "VIA_Workflow_VDF_SSOT_v0108.json",
@@ -1285,5 +1303,5 @@
  "why_v0106": "新增 VDF-WKF015 three_code_universe(操作員 2026-11-08 三代號輸入令)。",
  "why_v0107": "v0106 已發布 → 出新版。只做一件:VDF-WKF015(三種代號)冊上沒有 tests 欄 —— MDL245 v0107 修好列表式崩潰後 X-COL 第一次誠實標出。補 TST001 指向交接冊已有的 V-threecode-v0100(VDF_MDL014 --selftest 67/67,本輪容器重跑仍 67/67)。VDF 的其餘工作流一字不動;本冊是 VDF 車道的 SDD 冊,VCGC 只登錄不代修。",
  "why_v0108": "+VDF-WKF016 macro_hierarchy · +VDF-WKF017 macro_crosscheck(操作員 2026-11-09 六項令 2 · 3)。",
- "why_v0109": "SDDValidator X-COL RED:VDF-WKF016、VDF-WKF017 缺 tests 與步欄 → 照既有交接案補測法(self = 已登的 handoff 案),證據改前綴寫法(self: / step:),原檔案路徑留 evidence_file。其餘一字不動。"
+ "why_v0109": "SDD X-COL 紅補欄(只增;其餘一字不動):VDF-WKF016 / 017(2026-11-09 新增時缺)補 tests(列表式 TST · 自測 + 離線實跑各一,容器 2026-11-14 實跑 MDL015 自測 14/14 · plan rc 0 GREEN;MDL016 自測 16/16 · run rc 0 NODATA 12/12)· 每步補 what · 證據改成 self: / step: 型別(原檔路徑留 evidence_file)。"
 }

@@ -1,11 +1,11 @@
-# 近完工狀態鎖定紀錄 · VIA_NearCompleteLock v0100 · 2026-11-10T06:14:06Z
+# 近完工狀態鎖定紀錄 · VIA_NearCompleteLock v0100 · 2026-11-14T09:41:57Z
 
 鎖的是 git 歷史裡的整倉快照(tree 雜湊)與當時入口檔(blob 雜湊);`check` 會逐一重驗。只讀 · 不執行 · 不 import 任何系統模組。
 
 | 系統 | 里程碑 | 已鎖 |
 |---|---|---|
 | VCGC | 19 | 19 |
-| VDF | 19 | 19 |
+| VDF | 20 | 20 |
 | VRN-2 | 21 | 21 |
 | VRN-1 | 8 | 8 |
 
@@ -13,10 +13,10 @@
 
 | 系統 | 入口 | 版 | SHA-256 前 16 | HEAD |
 |---|---|---|---|---|
-| VCGC | supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0192.py | v0192 | 5d968efa467ef50a | 85f525b35de0 |
-| VDF | functional modules/VDF/VDF_SystemManager_v0168.py | v0168 | 95e25526bd0a86a4 | 85f525b35de0 |
-| VRN-2 | functional modules/VRN/VRN_SystemManager_v0262.py | v0262 | 9028f26d8ab47de8 | 85f525b35de0 |
-| VRN-1 | — | — | — | 0993c2d230a2 |
+| VCGC | supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0192.py | v0192 | 99ce1089cc7b4320 | b9bef7fe3bd4 |
+| VDF | functional modules/VDF/VDF_SystemManager_v0177.py | v0177 | a35bca9970015fd3 | b9bef7fe3bd4 |
+| VRN-2 | functional modules/VRN/VRN_SystemManager_v0262.py | v0262 | 77d1e2268d7daa89 | b9bef7fe3bd4 |
+| VRN-1 | — | — | — | bdd4c628de46 |
 
 ## VCGC
 
@@ -65,6 +65,7 @@
 | 2026-11-09 | `c2b0f991b6c9` | 615 | VDF_SystemManager_v0168.py | VDF PENDING | "PENDING:DoD 兩段缺一段(reader chain 封印收據)" -> W2 | ✔ |
 | 2026-11-09 | `f72bde1a7ad3` | 619 | VDF_SystemManager_v0168.py | run GREEN rc 0 (~150s) · constitution RED (CONFLICT_OPEN 3: 00004 · 00005 · 00006) | resolve conflicts 00004 (duplicate governance modules) · 00005 (277 _sha copies) · 00006 | ✔ |
 | 2026-11-10 | `1bf77e882822` | 622 | VDF_SystemManager_v0168.py | new engines selftest 14/14 · 15/15; mutual monitor VDF RED | desktop-only: discover --db-home with FRED_API_KEY + 雙閘; live AKShare/FRED cross-check; container 12 pairs NODATA | ✔ |
+| 2026-11-14 | `b9bef7fe3bd4` | 634 | VDF_SystemManager_v0177.py | CI 三條全綠;本機 VDF 管理器 / 申請工具自測 PASS | VAP 入口只能經 VCGC(633 資訊卡交接);VRN-2 本機新版由 VRN-2 自己收 | ✔ |
 
 ## VRN-2
 

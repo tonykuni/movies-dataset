@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0249",
- "batch": "VRN-2 非個股車道多格式(2026-11-12):+VRN-REQ020(前版 v0248)",
- "ts": "2026-11-12T21:00:00Z",
+ "batch": "VDF 個人 API 鑰(2026-11-15):VDF-REQ025 每個人輸入自己的 API 鑰 · 環境鑰只當測試鑰(前版 v0248)",
+ "ts": "2026-11-15T05:08:57Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -140,7 +140,7 @@
  "tally": {
   "RECORDED": 24,
   "COVERED": 139,
-  "PARTIAL": 107,
+  "PARTIAL": 108,
   "MISSING": 1
  },
  "requirements": [
@@ -7145,27 +7145,24 @@
    "next": "桌機:npm i -g omniroute(Node 22.22–22.x 或 24–26)· 儀表板設供應商金鑰 · parity --probe;遠端平台需 HTTPS 隧道(操作員)"
   },
   {
-   "code": "VRN-REQ020",
-   "subsystem": "VRN",
-   "topic": "VRN-2 非個股車道:非個股摘要器 v0310(v0300 同邏輯)整合 · 輸入 PDF / Word / 圖片 / 文字 / 網頁 / 訊息(JSON · .eml · LINE 匯出)/ 筆記 · 一檔一列矩陣(標題 + 四點 + 原句驗證 + 狀態)· 個股報告仍歸 VRN-2 主線",
-   "requirement": "操作員 2026-11-12:「非個股 v0300 用在 VRN-2 摘要非個股報告、新聞、訊息;輸入有 PDF word image text,確保 VRN-2 都讀得到,經 v0300 摘要,結果用矩陣輸出;VRN-2 能處理個股報告與非個股報告」",
+   "code": "VDF-REQ025",
+   "subsystem": "VDF",
+   "topic": "每個人輸入自己的 API 鑰(個人設定檔)· 環境鑰只當測試鑰",
+   "requirement": "操作員 2026-11-15:「環境鑰用於測試用 最後版本要輸入每個人的API KEY」;存放位置操作員選「個人設定檔(每個 Windows 使用者自己的 %APPDATA%\\VIA\\keys)」",
    "status": "PARTIAL",
    "homes": [
-    "functional modules/VRN/VRN2_NonStockSummarizer_v0100.py",
-    "functional modules/VRN/VRN2_NonStockCore_v0100.py",
-    "functional modules/VRN/VRN2_ReportRows_v0102.py",
-    "functional modules/VRN/nonstock_v0310/engine/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310.py"
+    "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py",
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
    ],
-   "workflow": null,
    "modules": [
-    "functional modules/VRN/VRN2_NonStockSummarizer_v0100.py",
-    "functional modules/VRN/VRN2_NonStockCore_v0100.py",
-    "functional modules/VRN/VRN2_ReportRows_v0102.py"
+    "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py"
    ],
-   "evidence": "2026-11-12 容器:核心 18/18 · 入口 18/18 · ReportRows v0102 8/8;真 PDF 19 份 → 非個股 5 PASS(原句驗證 4/4 ×5)· 個股 14 → 主線車道;夾具 txt / html / json / docx / eml / LINE 文字全過;圖片 = OCR 車道未就緒 → ABSENT 照實",
-   "next": "① 操作員原件 internal/NON_STOCK_CORE_v0200.py 到了 → 自動改用原件(模式 ORIGINAL);② 桌機 OCR 隔離境(via_rapidocr 最輕)經 VCGC InstallGate 建 → 圖片 / 掃描 PDF 轉 PASS;③ 桌機有 PyMuPDF → PDF 走 v0310 自己的 VRN-2 版面鏈",
-   "hand": "operator(原件核心)· VCGC(OCR 隔離境)",
-   "why_homes": "VRN-2 自己的車道入口與核心;v0310 原檔不改(SHA 釘);OCR 只借 VCGC 鎖冊路徑,子行程隔離境"
+   "evidence": "2026-11-15 容器:MDL017 v0100 自測 10/10(暫存夾 · 不碰真個人鑰 · 本行程環境不變);VDF_SystemManager engine run 同結果;順序 個人鑰 → 環境測試鑰 → 舊共用鑰匙檔 → 沒有;run -- <指令> 只在子行程環境放個人鑰。讀 FRED 鑰的 9 支引擎(MDL003 · MDL012 · MDL015 · MDL016 · MDL201 · ENG047 · ENG055 · ENG074 · ENG110)都先讀環境變數 → 經 run 包起來即用個人鑰,引擎一字不動",
+   "next": "桌機每個人:`python VDF_MDL017_UserApiKeys_v0100.py set fred`(隱藏輸入)→ `status` 看「實際會用:個人鑰」→ 以 `run -- python ActivateVDF.py run …` 跑;之後各引擎出新版直接讀個人鑰(可不經 run)、舊共用鑰匙檔改提示搬到個人鑰",
+   "hand": "操作員(每個人輸入自己的鑰)+ AI(引擎逐支接個人鑰)",
+   "why_homes": "VDF 自己的鑰(FRED 只在 VDF 用);不碰同意閘;四系統獨立",
+   "ts": "2026-11-15T05:08:57Z",
+   "updated_at": "2026-11-15T05:08:57Z"
   }
  ],
  "non_requirements": [
@@ -7275,7 +7272,7 @@
    "reason": "提問;本批答覆:不用外部庫(純 CSS + 頁內小段 JS,離線 · 不裝套件);清單裡 Textual 是終端機 UI、Faiss / scikit-learn 是機器學習、Layout-Parser 是文件影像版面分析,都不是 HTML 排版庫;真要拖放式儀表板再評估 Gridstack.js(MIT,需經 VCGC 工具啟用 + 操作員許可)"
   }
  ],
- "prior": "VIA_Requirements_SSOT_v0248.json",
+ "prior": "VIA_Requirements_SSOT_v0247.json",
  "why_v0104": "側線 i:操作員三則令(全部檢測 · SSOT 六族強化 · 全景上下單向;函式庫建議;盤點缺漏 · 省 Token 再升級 · AI 必用功能)入冊 VCGC-REQ077–083;舊 102 條一字不動",
  "why_v0105": "Codex #377 P1:v0104 已由 PR #376 併入 main,不得就地改;收尾追加的 VCGC-REQ078 範圍令(原話「註冊編號SSOT化更新全部SYNC ALL TO GITHUB」「既有範圍內註冊 不要擴張範圍」· 需求句補「只登本批範圍」· 證據改記範圍外列掛交接待辦)與 reviewed 144 → 149 改以本新版號發布;v0104 與其餘 108 條一字不動",
  "why_v0106": "側線 2026-09-30 a:操作員令重整編號 · 註冊 · SSOT 治理架構與風險 → VCGC-REQ084(PARTIAL:防線落地,對帳與對照表待辦);舊 109 條一字不動",
@@ -7556,6 +7553,5 @@
    "note": "候選號不是正式號:正式 VCGC-REQ 由操作員批准後的中央發號流程核定(L125);不同來源不合併"
   }
  ],
- "why_v0247": "只增:導入 VIA_VCGC_Commercial_Review_v0100(22 差異 · 40 隔離測試 NOT_RUN)→ 8 條 CAND-VCGC-COM-* 候選需求登冊待批(不發正式號);REQ221 補 G7 證據。",
- "why_v0249": "只增:+VRN-REQ020 非個股 v0310 整合進 VRN-2 + 多格式讀取 + 矩陣輸出;其餘一字不動。"
+ "why_v0247": "只增:導入 VIA_VCGC_Commercial_Review_v0100(22 差異 · 40 隔離測試 NOT_RUN)→ 8 條 CAND-VCGC-COM-* 候選需求登冊待批(不發正式號);REQ221 補 G7 證據。"
 }

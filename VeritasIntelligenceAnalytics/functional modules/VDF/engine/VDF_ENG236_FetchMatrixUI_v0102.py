@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-r"""
-VDF_ENG236_FetchMatrixUI v0102 — v0101 薄尾(v0101 一字不動):自測 ④「讀庫失敗 → 沿用快取」改成密封(不受這台機器有沒有庫影響)。
+r"""VDF_ENG236_FetchMatrixUI v0102 — 薄尾:自測不再被「本機資料家讀得到」左右(頁面 / 建頁行為一字不動)
 
-實錄(2026-11-13 容器全量實跑 VDF_SystemManager v0171 test:VDF_ENG236 FAIL rc 1):v0101 自測 11/12,只紅 ④ 第二項。
-根因:④ 呼叫 table_columns(tmp) 沒指定庫家 → ENG237 照 DataHome 冊 / 倉內 output_hub 退路找到一本真庫(VDF_Universe.duckdb)→
-  讀庫「成功」,根本沒走到「讀庫失敗 → 沿用快取」那條路;自測想驗的分支沒被執行,不是程式壞。
-  在桌機(有完整庫)同樣會紅;在沒有任何庫的機器才會綠 = 自測結果跟機器狀態綁在一起(不密封)。
-本版:前版自測照跑照印;紅的只有 ④ 那兩項時,用一個空的暫存夾當庫家(--home,走 ENG237 正常解析)重驗:
-  ④a 庫家是空夾 → 不當掉 · 寫原因;④b 同一空庫家 + 快取檔 → 沿用快取並標快取時間。兩項都過 → 判過;還有別的紅 → 照實紅。
-  table_columns / build / 頁面 / 算法一字不動;本機真庫讀到什麼照印(不藏)。
-VDF 自己的引擎;零網路 · 不寫庫 · 不用 TA-Lib · 不寫同意閘。用法同 v0101:build [--out 夾] [--db-check F] [--json] · --selftest
+工作站實跑(2026-11-15 ActivateVDF engine_launch):本支 RED —— v0101 自測 11/12:④b「讀庫失敗 → 沿用快取」。
+v0101 的 table_columns 經 ENG237 resolve_home 找資料家(--home > VIA_VDF_DB_HOME > 冊 > 倉內 output_hub);
+工作站一輪裡 VIA_VDF_DB_HOME 指向真的資料家、讀得到表 → 不會走快取 → ④b 判 FAIL(引擎沒錯,測資跟著環境走)。
+容器重現:VIA_VDF_DB_HOME 指向一份有表的庫 → v0101 自測同樣 11/12 · ④b FAIL。
+本版(v0100 … v0101 一字不動;只換自測期間的環境,跑完還原):
+  ① 測具檢:自測期間 VIA_VDF_DB_HOME 指向空的暫存夾(= 讀不到庫)→ 跑 v0101 自測(含 v0100)→ 前版鏈 rc 0。
+  ② 本境真實檢:用本機真的資料家跑一次 table_columns(只讀;快取寫進暫存夾)→ 讀到表 = 欄名;讀不到 = 原因(不當掉、不假綠)。
+零網路 · 不寫模板冊 · 不碰 TA-Lib · 同意閘不讀不寫。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -46,91 +44,112 @@ except Exception:
 
 
 def _via_net():
-    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)。本版不出網。"""
-    return None if VIA_NET_TOOL_PATH is None else VIA_NET_TOOL_PATH
-# ===== [VIA:NET-BRIDGE:END] =====
+    """統包唯一網路工具惰性載入;本檔的連網全經 MDL008 子行程改道。"""
+    if VIA_NET_TOOL_PATH is None:
+        return None
+    try:
+        import importlib.util as _nb_ilu
+        spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
+        module = _nb_ilu.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+    except Exception:
+        return None
 
+_STEM = "VDF_ENG236_FetchMatrixUI"
 import contextlib
 import importlib.util
-import io
-import json
+import os
+import pathlib
 import re
-import shutil
 import sys
 import tempfile
+import warnings
 from pathlib import Path
 
-VERSION = "0102"
-TAG = "VDF_ENG236_FetchMatrixUI v" + VERSION
 HERE = Path(__file__).resolve().parent
-_STEM = "VDF_ENG236_FetchMatrixUI"
+TAG = f"{_STEM} v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
 
 
-def _vnum(path) -> int:
-    m = re.search(r"_v(\d{4})$", Path(path).stem)
+def _vnum_tail(p) -> int:
+    m = re.search(r"_v(\d{4})$", Path(p).stem)
     return int(m.group(1)) if m else -1
 
 
-PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(__file__)), key=_vnum)
-_spec = importlib.util.spec_from_file_location(_STEM + "_prior_for_v0102", PRIOR_PATH)
+PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum_tail(p) < _vnum_tail(__file__)), key=_vnum_tail)
+_spec = importlib.util.spec_from_file_location(_STEM + "_prior_for_" + Path(__file__).stem, PRIOR_PATH)
 PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = PRIOR
-_spec.loader.exec_module(PRIOR)
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", SyntaxWarning)
+    warnings.simplefilter("ignore", DeprecationWarning)
+    _spec.loader.exec_module(PRIOR)
 
 
-def __getattr__(name: str):
+def __getattr__(name):
+    if name.startswith("__"):
+        raise AttributeError(name)
     return getattr(PRIOR, name)
 
 
-def sealed_cache_checks() -> list:
-    """④ 密封重驗:空暫存夾當庫家(ENG237 照 --home 解析)→ 讀不到表;再放快取檔 → 沿用快取。回 [(名, 過?, 註)]。"""
-    m = PRIOR.PRIOR.build_model(PRIOR.PRIOR.load_books(), None, None)
-    row = [r for s in m["sections"] for r in s["rows"]][0]
-    out = []
-    tmp = Path(tempfile.mkdtemp(prefix="vdf_eng236_v0102_"))
+def _own_src_ok() -> bool:
+    src = Path(__file__).read_text(encoding="utf-8")
+    body = src.split("def selftest", 1)[0]
+    return ("[VIA:ACCEL-BRIDGE" in src and "[VIA:NET-BRIDGE" in src and "_CONSENT" not in body
+            and not re.search(r"^\s*(import|from)\s+(CGC_|VRN_|VCGC|ta" + r"lib\b)", src, re.M))
+
+
+class _Checks:
+    def __init__(self):
+        self.ok = []
+
+    def __call__(self, name, cond, note=""):
+        self.ok.append(bool(cond))
+        print("  [%s] %s%s" % ("OK" if cond else "FAIL", name, (" · " + str(note)[:300]) if (note and not cond) else ""), flush=True)
+
+    def done(self) -> int:
+        good = all(self.ok)
+        print("[計] %s 薄尾 %d/%d · %s" % (TAG, sum(self.ok), len(self.ok), "PASS" if good else "FAIL"), flush=True)
+        return 0 if good else 1
+
+
+@contextlib.contextmanager
+def env_as(**kv):
+    keep = {k: os.environ.get(k) for k in kv}
+    os.environ.update({k: str(v) for k, v in kv.items()})
     try:
-        home = tmp / "empty_home"
-        home.mkdir()
-        nocache = PRIOR.table_columns(tmp, home=str(home))
-        out.append(("④a 庫家是空夾 → 不當掉 · 沒有表 · 寫原因", nocache["cols"] == {} and bool(nocache["why"]), nocache.get("why")))
-        (tmp / PRIOR.COLS_CACHE).write_text(json.dumps({"ts": "2026-11-01T00:00:00", "source": "庫 x",
-                                                        "tables": [{"db": row["db"], "table": row["table"], "columns": ["date", "close"]}]}), encoding="utf-8")
-        cached = PRIOR.table_columns(tmp, home=str(home))
-        out.append(("④b 同一空庫家 + 快取檔 → 沿用快取(標快取時間)",
-                    cached["cols"].get((row["db"], row["table"])) == ["date", "close"] and cached["source"].startswith("快取 2026-11-01"), cached.get("source")))
+        yield
     finally:
-        shutil.rmtree(tmp, ignore_errors=True)
-    return out
+        for k, v in keep.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
 
 
 def selftest() -> int:
-    print("=== %s · 薄尾自測(④ 讀庫失敗 → 快取 改密封重驗;前版自測照跑照印)===" % TAG, flush=True)
-    buf = io.StringIO()
-    with contextlib.redirect_stdout(buf):
-        rc = PRIOR.selftest()
-    out = buf.getvalue()
-    print(out, end="")
-    fails = [ln.strip() for ln in out.splitlines() if "[FAIL]" in ln]
-    only4 = bool(fails) and all("④" in ln and ("快取" in ln or "不當掉" in ln) for ln in fails)
-    sealed = sealed_cache_checks()
-    for name, good, note in sealed:
-        print("  [%s] %s%s" % ("OK" if good else "FAIL", name, (" · " + str(note)[:160]) if note else ""), flush=True)
-    seal_ok = all(g for _, g, _ in sealed)
-    with tempfile.TemporaryDirectory(prefix="vdf_eng236_v0102_live_") as td:
-        live = PRIOR.table_columns(Path(td))
-    print("  [資訊] 本機真庫讀表(不判燈,照印):%s" % (live.get("source") or live.get("why")), flush=True)
-    good = (rc == 0 and seal_ok) or (only4 and seal_ok)
-    print("[計] %s · 前版 %s · ④ 密封 %s · 合計 %s" % (
-        TAG, "PASS" if rc == 0 else ("只紅 ④(自測不密封)" if only4 else "FAIL"), "OK" if seal_ok else "FAIL", "PASS" if good else "FAIL"), flush=True)
-    return 0 if good else 1
+    chk = _Checks()
+    print("=== %s · 薄尾自測(資料家測具;零網路)===" % TAG, flush=True)
+    before = os.environ.get("VIA_VDF_DB_HOME")
+    with tempfile.TemporaryDirectory(prefix="vdf_eng236_v0102_") as td:
+        with env_as(VIA_VDF_DB_HOME=Path(td) / "empty_home"):
+            (Path(td) / "empty_home").mkdir()
+            rc = PRIOR.selftest()
+        chk("① 測具下(資料家 = 空暫存夾,讀不到庫)前版鏈自測 rc 0(④ 讀不到 → 寫原因 · 有快取 → 沿用快取)", rc == 0, rc)
+        r = PRIOR.table_columns(Path(td) / "real_probe")
+    real = ("讀到 %d 表" % len(r["cols"])) if r["cols"] else ("讀不到:%s" % (r.get("why") or r.get("source")))
+    chk("② 本境真實資料家照實(%s):讀到 → 欄名;讀不到 → 原因(不當掉)" % real, isinstance(r.get("cols"), dict) and bool(r["cols"] or r.get("why") or r.get("source")), r)
+    chk("③ VIA_VDF_DB_HOME 還原成自測前的值", os.environ.get("VIA_VDF_DB_HOME") == before)
+    chk("④ 兩座橋在 · 不匯入他系統程式 · 不碰 TA-Lib · 同意閘不讀不寫", _own_src_ok())
+    return chk.done()
 
 
 def main(argv=None) -> int:
     a = list(sys.argv[1:] if argv is None else argv)
     if a[:1] == ["--selftest"]:
         return selftest()
-    return PRIOR.main(a)
+    return PRIOR.main(argv)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

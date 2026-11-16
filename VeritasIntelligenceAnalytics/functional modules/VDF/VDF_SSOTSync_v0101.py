@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-r"""VDF_SSOTSync v0101 — v0100 薄尾(v0100 一字不動):同義字收割看穿薄尾,尾版是薄尾就往前版本體收 UNIFIED_ALIAS。
+r"""VDF_SSOTSync v0101 — 薄尾:VDF-390 擷取總冊逐項申請中央號(依大類:總經 MRC · 市場 FM · 財報 FD)
 
-實錄(2026-11-13 容器 VDF_SystemManager v0171 test --max 200:VDF_SSOTSync FAIL rc 1):自測 ① 實樹沒掃到任何 SYN(同義字)。
-根因:v0100 只讀「家族尾版」原文裡的 UNIFIED_ALIAS 字面字典;VDF_ENG053_ParamEngineMap 的尾版今天換成 v0103 薄尾
-  (本輪修 ENG053 ⑦ 出的,只換一支函式),字典留在前版 v0102 本體 → 收不到 → 同義字整批消失(本輪自己造成的回歸)。
-  同型:ENG053 v0103 的車道源碼實證也是「只看尾版原文 → 看不到薄尾載入的前版本體」。
-本版只換 harvest:先照 v0100 收;再把「原文沒有 UNIFIED_ALIAS 的薄尾」(檔內 PRIOR_PATH + spec_from_file_location 載前版)
-  沿同夾同家族往前找,第一個帶 UNIFIED_ALIAS 字面字典的本體照 v0100 同一格式補收(來源記本體檔名,與換薄尾前完全一樣)。
-  任何引擎以後出薄尾都不會再掉同義字。register / request / apply / sync 全照 v0100(它們都經 harvest)。
-VDF 自己的模組;零網路 · 不寫他系統 · 號只由 VCGC 中央發 · 不用 TA-Lib · 不寫同意閘。用法同 v0100。
+操作員令(2026-11-14):「依大類發中央號,總經 MRC · 市場 FM · 財報 FD」。號只由 VCGC 中央編號發(VDF 不自發號);
+VDF 這邊照 v0100 既有路走:登記冊(VDF 自己的帳)→ 申請(contract/VDF_NUMBER_REQUEST_latest.json)→ VCGC 收件發號 →
+apply 讀回執把中央號寫回自己的登記冊。v0100 一字不動;本版只多一類條目:
+  擷取項(VDF_FetchOne_Matrix_Registry_v0100 的 390 項)· 鍵 VDF:FETCH:<冊上編號>:
+    大類 → 申請型別(整個大類同一型別):
+      美國總經 · 領先 / 同時 / 落後 · 物價 · 財政 · 公債 · 聯準會 · 政策 · 全球總經 · 區域 → MACRO(中央 MRC)
+      財報 · 三大報表 · 共識 · 評價 → FINDATA(中央 FD)
+      其餘九大類 → INSTRUMENT(中央 FM)
+    scope = vdf.fetchone.<mrc|fm|fd>[.<地區>](MRC / FM 的號帶地區:US / CN / TW / GLB;VCGC v0121 取 scope 最後一段)
+    內容 = 冊上編號 · 大類 · 名稱 · 來源 · 頻率(內容不變 → 指紋不變 → 號不變)
+只寫 VDF 自己的登記冊與申請檔(照 v0100);零網路;不碰 TA-Lib。
 """
 from __future__ import annotations
+
+
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
 try:
     import sys as _sa_sys
@@ -45,137 +50,122 @@ except Exception:
 
 
 def _via_net():
-    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)。本版不出網。"""
-    return None if VIA_NET_TOOL_PATH is None else VIA_NET_TOOL_PATH
+    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)"""
+    if VIA_NET_TOOL_PATH is None:
+        return None
+    try:
+        import importlib.util as _nb_ilu
+        spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
+        module = _nb_ilu.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+    except Exception:
+        return None
 # ===== [VIA:NET-BRIDGE:END] =====
 
-import ast
-import contextlib
 import importlib.util
-import io
+import json
 import re
 import sys
 import tempfile
 from pathlib import Path
 
-VERSION = "v0101"
 HERE = Path(__file__).resolve().parent
 _STEM = "VDF_SSOTSync"
+TAG = f"{_STEM} v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
 
 
-def _vnum(p) -> int:
+def _vnum_v0101(p) -> int:
     m = re.search(r"_v(\d{4})$", Path(p).stem)
     return int(m.group(1)) if m else -1
 
 
-PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(__file__)), key=_vnum)
+PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum_v0101(p) < _vnum_v0101(__file__)), key=_vnum_v0101)
 _spec = importlib.util.spec_from_file_location(_STEM + "_prior_for_" + Path(__file__).stem, PRIOR_PATH)
-PRIOR = importlib.util.module_from_spec(_spec)
+PRIOR = importlib.util.module_from_spec(_spec)          # v0100
 sys.modules[_spec.name] = PRIOR
 _spec.loader.exec_module(PRIOR)
-_HARVEST_V0100 = PRIOR.harvest
-_TAIL_RX = re.compile(r"PRIOR_PATH\s*=.*?spec_from_file_location", re.S)
-_FAM_RX = re.compile(r"^(.*)_v(\d{4})$")
 
 
 def __getattr__(name):
     return getattr(PRIOR, name)
 
 
-def is_thin_tail(src: str) -> bool:
-    return bool(_TAIL_RX.search(src))
+FETCHONE_NAME = "VDF_FetchOne_Matrix_Registry_v0100.json"
+MRC_SECTIONS = ("美國總經 · 領先", "美國總經 · 同時", "美國總經 · 落後 / 物價", "財政 · 公債", "聯準會 · 政策", "全球總經 · 區域")
+FD_SECTIONS = ("財報 · 三大報表", "共識 · 評價")
+CN_RX = re.compile(r"^GL-(04[A-F]?|14|15|25|33)$")
+TW_RX = re.compile(r"^(PX-0[12]|PX-04C|PX-06F|EF-|FQ-|MX-(A1|A2|A3|A11|A12|D1|D2|E1)$|SE-(05|12)$)")
+NEW = {"MACRO": ("MRC", "MACRO", "總經擷取項"), "INSTR": ("FM", "INSTRUMENT", "市場擷取項"), "FINDATA": ("FD", "FINDATA", "財報擷取項")}
+for _k, (_c, _a, _z) in NEW.items():                     # 只增:v0100 的五類一個不動
+    PRIOR.VCGC_KIND[_k] = _c
+    PRIOR.SHORT[_k] = _c
+    PRIOR.ASSET_TYPE[_k] = _a
+    PRIOR.KIND_ZH[_k] = _z
+    PRIOR.RISK[_k] = "LOW"
+_HARVEST_V0100 = PRIOR.harvest
+_BUILD_V0100 = PRIOR.build_asset
 
 
-def _alias_dict(src: str):
+def kind_of(section: str) -> str:
+    return "MACRO" if section in MRC_SECTIONS else ("FINDATA" if section in FD_SECTIONS else "INSTR")
+
+
+def region_of(kind: str, iid: str) -> str:
+    if kind == "MACRO":
+        return "us" if re.match(r"^(US|FI|FD)-", iid) else ("cn" if CN_RX.match(iid) else "glb")
+    if kind == "INSTR":
+        return "tw" if TW_RX.match(iid) else ("us" if iid.startswith("AI-") else "glb")
+    return ""
+
+
+def fetchone_entries(vdf: Path = HERE) -> dict:
+    p = vdf / FETCHONE_NAME
+    if not p.is_file():
+        PRIOR.SKIPPED.append("%s(不在)" % FETCHONE_NAME)
+        return {}
     try:
-        tree = ast.parse(src)
-    except SyntaxError:
-        return None
-    for n in ast.walk(tree):
-        if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "UNIFIED_ALIAS" for t in n.targets) and isinstance(n.value, ast.Dict):
-            try:
-                return ast.literal_eval(n.value)
-            except ValueError:
-                return None
-    return None
-
-
-def body_alias(tail: Path):
-    """薄尾 → 沿同夾同家族往前找第一個帶 UNIFIED_ALIAS 的本體;回 (本體路徑, dict) 或 (None, None)。"""
-    m = _FAM_RX.match(tail.stem)
-    if not m:
-        return None, None
-    fam, me = m.group(1), int(m.group(2))
-    chain = sorted((p for p in tail.parent.glob(fam + "_v*.py") if _FAM_RX.match(p.stem) and _FAM_RX.match(p.stem).group(1) == fam
-                    and int(_FAM_RX.match(p.stem).group(2)) < me), key=_vnum, reverse=True)
-    for q in chain:
-        src = q.read_text(encoding="utf-8", errors="replace")
-        if "UNIFIED_ALIAS" in src:
-            d = _alias_dict(src)
-            return (q, d) if d else (None, None)
-        if not is_thin_tail(src):
-            break
-    return None, None
+        reg = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        PRIOR.SKIPPED.append("%s(%s)" % (FETCHONE_NAME, type(exc).__name__))
+        return {}
+    out = {}
+    for it in reg.get("items") or []:
+        iid, sec = str(it.get("id", "")).strip(), str(it.get("section", ""))
+        if not iid:
+            continue
+        kind = kind_of(sec)
+        content = {"id": iid, "section": sec, "name": str(it.get("name", "")), "source": str(it.get("source", "")), "freq": str(it.get("freq", "")),
+                   "region": region_of(kind, iid)}
+        key = "VDF:FETCH:%s" % iid
+        out[key] = {"kind": kind, "key": key, "fp": PRIOR._sha16(PRIOR._canon(content)), "version": p.stem[-5:], "src": [p.name], "content": content,
+                    "note": "擷取總冊 · 狀態 %s" % it.get("status", "")}
+    return out
 
 
 def harvest(vdf: Path = HERE) -> dict:
     items = _HARVEST_V0100(vdf)
-    pys = PRIOR._tails([p for p in list(Path(vdf).glob("VDF_*_v[0-9][0-9][0-9][0-9].py"))
-                        + list((Path(vdf) / "engine").glob("VDF_*_v[0-9][0-9][0-9][0-9].py"))])
-    for p in pys:
-        src = p.read_text(encoding="utf-8", errors="replace")
-        if "UNIFIED_ALIAS" in src or not is_thin_tail(src):
-            continue
-        body, alias = body_alias(p)
-        if not alias:
-            continue
-        for a, c in sorted(alias.items()):
-            key = "VDF:SYN:%s" % a
-            it = items.setdefault(key, {"kind": "SYN", "key": key, "fp": PRIOR._sha16("%s=%s" % (a, c)), "version": None,
-                                        "src": [], "content": {"alias": a, "canonical": c}, "note": ""})
-            if body.name not in it["src"]:
-                it["src"].append(body.name)
+    for k, e in fetchone_entries(vdf).items():
+        items.setdefault(k, e)
     return items
 
 
-PRIOR.harvest = harvest            # v0100 的 register / request / apply / sync / selftest 用模組全域名 → 換成本版
+def build_asset(e: dict) -> dict:
+    if e["kind"] not in NEW:
+        return _BUILD_V0100(e)
+    c = e.get("content") or {}
+    code, atype, zh = NEW[e["kind"]]
+    scope = "vdf.fetchone.%s" % code.lower() + (".%s" % c["region"] if c.get("region") else "")
+    value = {k: c.get(k) for k in ("id", "section", "name", "source", "freq")}
+    return {"candidate_id": re.sub(r"[^A-Za-z0-9_.:-]", "_", e["key"])[:400], "ssot_code": None, "asset_type": atype, "owner": "VDF",
+            "source_id": PRIOR.SOURCE_ID, "source_pointer": e["key"], "source_sha256": PRIOR.asset_sha(e), "version": e.get("semver") or "1.0.0",
+            "supersedes": e.get("supersedes"), "scope": scope, "semantic_key": c.get("id") or e["key"],
+            "name": ("VDF %s %s %s" % (zh, c.get("id", ""), c.get("name", ""))).strip()[:200], "value": value, "risk_level": "LOW",
+            "environment": PRIOR.ENVIRONMENT, "libraries": [], "aliases": [], "positive": [], "negative": []}
 
 
-def selftest() -> int:
-    ok = []
-
-    def chk(name, cond, note=""):
-        ok.append(bool(cond))
-        print("  [%s] %s%s" % ("OK" if cond else "FAIL", name, (" · " + str(note)) if note else ""), flush=True)
-
-    print("=== %s %s · 薄尾自測(同義字收割看穿薄尾;其餘照 v0100)===" % (_STEM, VERSION), flush=True)
-    with tempfile.TemporaryDirectory() as td:
-        d = Path(td)
-        (d / "engine").mkdir()
-        (d / "engine" / "VDF_ENG900_X_v0101.py").write_text("UNIFIED_ALIAS = {'ZZ_ALIAS': 'zz.canon'}\n", encoding="utf-8")
-        (d / "engine" / "VDF_ENG900_X_v0102.py").write_text(
-            "PRIOR_PATH = max(HERE.glob('VDF_ENG900_X_v*.py'))\n_spec = importlib.util.spec_from_file_location('p', PRIOR_PATH)\n", encoding="utf-8")
-        (d / "engine" / "VDF_ENG901_Y_v0101.py").write_text("UNIFIED_ALIAS = {'YY_OLD': 'yy.canon'}\n", encoding="utf-8")
-        (d / "engine" / "VDF_ENG901_Y_v0102.py").write_text("X = 1  # 完整本體,不是薄尾\n", encoding="utf-8")
-        old = _HARVEST_V0100(d)
-        new = harvest(d)
-    chk("① 重現:v0100 只看尾版 → 薄尾的前版字典收不到", "VDF:SYN:ZZ_ALIAS" not in old)
-    chk("② 本版:薄尾 → 往前版本體補收 · 來源記本體檔名", new.get("VDF:SYN:ZZ_ALIAS", {}).get("content", {}).get("canonical") == "zz.canon"
-        and new["VDF:SYN:ZZ_ALIAS"]["src"] == ["VDF_ENG900_X_v0101.py"])
-    chk("③ 完整本體(不是薄尾)不往回看舊版", "VDF:SYN:YY_OLD" not in new)
-    real = harvest(HERE)
-    syn = {k: v for k, v in real.items() if v["kind"] == "SYN"}
-    chk("④ 實樹:同義字回來了 · START_DATE → time.start_date", bool(syn) and real.get("VDF:SYN:START_DATE", {}).get("content", {}).get("canonical") == "time.start_date",
-        "SYN %d" % len(syn))
-    buf = io.StringIO()
-    with contextlib.redirect_stdout(buf):
-        rc = PRIOR.selftest()
-    print(buf.getvalue(), end="")
-    chk("⑤ v0100 自測(原本只紅 ① 沒有 SYN)換裝後全過", rc == 0, "rc %s" % rc)
-    chk("⑥ 換裝:v0100 的 harvest 指本版", PRIOR.harvest is harvest)
-    n = sum(ok)
-    print("[計] %s %s 薄尾 %d/%d · %s" % (_STEM, VERSION, n, len(ok), "PASS" if n == len(ok) else "FAIL"), flush=True)
-    return 0 if n == len(ok) else 1
+PRIOR.harvest = harvest
+PRIOR.build_asset = build_asset
 
 
 def main(argv=None) -> int:
@@ -185,5 +175,52 @@ def main(argv=None) -> int:
     return PRIOR.main(a)
 
 
+def selftest() -> int:
+    ok = []
+
+    def chk(name, cond, note=""):
+        ok.append(bool(cond))
+        print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)[:300]) if note and not cond else ''}", flush=True)
+
+    print(f"=== {TAG} · 薄尾自測(擷取總冊依大類申請中央號)===", flush=True)
+    ent = fetchone_entries(HERE)
+    by = {}
+    for e in ent.values():
+        by[e["kind"]] = by.get(e["kind"], 0) + 1
+    secs = {}
+    for e in ent.values():
+        secs.setdefault(e["content"]["section"], set()).add(e["kind"])
+    chk("① 390 項全收;六個總經大類 → MACRO · 財報 / 共識 → FINDATA · 其餘 → INSTR;每個大類只一種型別 · %s" % by,
+        len(ent) == 390 and all(len(v) == 1 for v in secs.values()) and all(secs[s] == {"MACRO"} for s in MRC_SECTIONS)
+        and all(secs[s] == {"FINDATA"} for s in FD_SECTIONS) and by.get("MACRO") == 124 and by.get("FINDATA") == 28 and by.get("INSTR") == 238, by)
+    a = {k: build_asset(dict(e, semver="1.0.0", supersedes=None)) for k, e in ent.items()}
+    x, y, z = a["VDF:FETCH:US-L01"], a["VDF:FETCH:PX-01"], a["VDF:FETCH:FN-01"]
+    chk("② 申請列照候選契約:型別 MACRO / INSTRUMENT / FINDATA · scope 帶地區(mrc.us · fm.tw)· FD 不帶 · 中央號欄空白 · 欄位齊",
+        x["asset_type"] == "MACRO" and x["scope"] == "vdf.fetchone.mrc.us" and y["asset_type"] == "INSTRUMENT" and y["scope"] == "vdf.fetchone.fm.tw"
+        and z["asset_type"] == "FINDATA" and z["scope"] == "vdf.fetchone.fd" and all(v["ssot_code"] is None for v in a.values())
+        and all(set(PRIOR.CANDIDATE_FIELDS) <= set(v) for v in a.values()) and len({v["candidate_id"] for v in a.values()}) == 390, (x, y, z))
+    chk("③ 舊五類照 v0100(SSOT · CFG · REGEX · SYN · PARAM 的對照表沒動)",
+        PRIOR.VCGC_KIND["REGEX"] == "RGX" and PRIOR.ASSET_TYPE["SYN"] == "SYNONYM" and PRIOR.SHORT["PARAM"] == "PRM" and PRIOR.harvest is harvest)
+    with tempfile.TemporaryDirectory(prefix="vdfsync_v0101_") as td:
+        d = Path(td)
+        (d / FETCHONE_NAME).write_text(json.dumps({"items": [{"id": "US-L01", "section": "美國總經 · 領先", "name": "ISM", "status": "PROXY"},
+                                                             {"id": "PX-01", "section": "價格 · 股/ETF/指數", "name": "台股上市", "status": "DONE"}]},
+                                                  ensure_ascii=False), encoding="utf-8")
+        r = PRIOR.register(d)
+        book = json.loads((d / "registry" / r["register"]).read_text(encoding="utf-8"))
+        e1 = book["entries"]["VDF:FETCH:US-L01"]
+        r2 = PRIOR.register(d)
+        chk("④ 登記冊(夾具):新條目 VDF-MRC-0001 / VDF-FM-0001 暫編 · 待 VCGC 核號;內容沒變再登記不出新版",
+            e1["no"] == "VDF-MRC-0001" and book["entries"]["VDF:FETCH:PX-01"]["no"] == "VDF-FM-0001" and e1["vcgc_kind"] == "MRC"
+            and "待 VCGC 核號" in e1["status"] and r2["written"] is False, (r, r2))
+    src = Path(__file__).read_text(encoding="utf-8")
+    body = src.split("def selftest", 1)[0]
+    chk("⑤ 加速器橋 · 網路工具橋在;本檔不另寫檔(登記冊 / 申請檔照 v0100 寫法);零網路;不碰 TA-Lib",
+        "[VIA:ACCEL-BRIDGE" in src and "[VIA:NET-BRIDGE" in src and ".write_text(" not in body and not re.search(r"^\s*(import|from)\s+talib", src, re.M))
+    good = all(ok)
+    print(f"  [計] {TAG} 本版 {sum(ok)}/{len(ok)} · 合計 {'PASS' if good else 'FAIL'}", flush=True)
+    return 0 if good else 1
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

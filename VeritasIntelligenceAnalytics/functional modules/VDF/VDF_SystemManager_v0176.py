@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VDF_SystemManager v0176 — v0175 單檔全文 + datamatrix 動詞(操作員 2026-11-14「資料好像抓他多了 分類用矩陣檢視一下」+「APPLY OMNIROUTE GRAPHIFY」):
-  · datamatrix:跑 VDF 自己的 VDF_ENG240_DataScopeMatrix 尾版(只讀)→ 大類 × 族群 × 引擎 × 表 分類矩陣(起始日前 · 重複 · 名單外 · 未分類 · 控制表入湖 · 多重副本)。
-  · MCP / OmniRoute:多一個只讀工具 vdf_datamatrix(讀最新矩陣摘要),五家 AI 用戶端設定自動帶上。
-  · Graphify:VDF_GRAPH_latest.json 併入資料血緣(大類 → 族群 → 引擎 → 表 → 湖 VIEW)。
+"""VDF_SystemManager v0176 — v0175 單檔全文 + 備份 zip 內檔名一律正斜線(Windows CI 2026-11-14 實測:SHA256SUMS 記反斜線、zip 內存正斜線 → backup check KeyError 崩);check 兼容 v0175 在 Windows 做的舊備份(反斜線名照對),缺件記 RED 不崩。
 
 (以下 v0175 說明)VDF_SystemManager v0175 — v0174 單檔全文 + 矩陣頁視覺鎖定修正(VCGC kit 色票完整對應:淺底深字 · 表格隔列 · 導覽列連到自建工作台與本系統實測輸出)。
 
@@ -363,8 +360,6 @@ SM_RC = {"GREEN": 0, "RED": 1, "YELLOW": 2, "ABSENT": 3}
 
 
 def sm_cmd(verb: str, args: list, root: Path) -> int:
-    if verb in V76_VERBS:
-        return sm_cmd_v0176(verb, args, root)
     if verb in V73_VERBS:
         return sm_cmd_v0173(verb, args, root)
     if verb in V74_VERBS + V74_EXTRA:
@@ -701,8 +696,10 @@ def v73_backup(root: Path, check_only: bool = False) -> dict:
         bad = []
         with _zipfile.ZipFile(zips[-1]) as z:
             sums = dict(ln.split("  ", 1)[::-1] for ln in z.read("SHA256SUMS").decode().splitlines() if "  " in ln)
+            names = set(z.namelist())
             for name, h in sums.items():
-                if hashlib.sha256(z.read(name)).hexdigest() != h:
+                key = name if name in names else name.replace("\\", "/")   # v0175 在 Windows 記反斜線;zip 內一律正斜線
+                if key not in names or hashlib.sha256(z.read(key)).hexdigest() != h:
                     bad.append(name)
         return {"lamp": "RED" if bad else "GREEN", "zip": zips[-1].name, "files": len(sums), "bad": bad}
     d = v73_dir(root)
@@ -713,7 +710,7 @@ def v73_backup(root: Path, check_only: bool = False) -> dict:
     lines = []
     with _zipfile.ZipFile(zp, "w", _zipfile.ZIP_DEFLATED) as z:
         for p in files:
-            rel = str(p.relative_to(root)) if p.is_relative_to(root) else "_manager/" + p.name
+            rel = p.relative_to(root).as_posix() if p.is_relative_to(root) else "_manager/" + p.name
             b = p.read_bytes()
             z.writestr(rel, b)
             lines.append(f"{hashlib.sha256(b).hexdigest()}  {rel}")
@@ -756,27 +753,23 @@ def v73_graph(root: Path) -> dict:
             if other != fam and other in src:
                 edges.append((fam, other))
     out = v73_out(root, "graph")
-    g = {"system": "VDF", "at": sm_utc(), "nodes": sorted(names), "edges": edges, "data_lineage": v76_lineage(root)}
+    g = {"system": "VDF", "at": sm_utc(), "nodes": sorted(names), "edges": edges}
     (out / "VDF_GRAPH_latest.json").write_text(json.dumps(g, ensure_ascii=False, indent=1), encoding="utf-8")
     deg = {}
     for a, b in edges:
         deg[b] = deg.get(b, 0) + 1
     top = sorted(deg.items(), key=lambda x: -x[1])[:10]
-    dl = g["data_lineage"]
     return {"lamp": "GREEN" if names else "YELLOW", "nodes": len(names), "edges": len(edges), "most_used": top,
-            "data_nodes": len(dl.get("nodes", [])), "data_edges": len(dl.get("edges", [])),
             "file": str((out / "VDF_GRAPH_latest.json").relative_to(root))}
 
 
 V73_MCP_TOOLS = {"vdf_health": "VDF 健康燈(只讀)", "vdf_engines": "VDF 家族尾版清單(只讀)",
-                 "vdf_params": "VDF 參數冊與時間總管(只讀)", "vdf_parity": "VDF 能力對等(L132)",
-                 "vdf_datamatrix": "VDF 已抓資料分類範圍矩陣摘要(只讀;抓多了沒有、多在哪)"}
+                 "vdf_params": "VDF 參數冊與時間總管(只讀)", "vdf_parity": "VDF 能力對等(L132)"}
 
 
 def v73_mcp_call(root: Path, name: str) -> dict:
     return {"vdf_health": lambda: sm_health(root), "vdf_engines": lambda: {k: v["tail"] for k, v in sm_engines(root).items()},
-            "vdf_params": lambda: v73_params(root), "vdf_parity": lambda: v73_parity(root),
-            "vdf_datamatrix": lambda: v76_datamatrix_summary(root)}[name]()
+            "vdf_params": lambda: v73_params(root), "vdf_parity": lambda: v73_parity(root)}[name]()
 
 
 def v73_mcp_serve(root: Path, stdin=None, stdout=None) -> int:
@@ -1025,7 +1018,7 @@ def _selftest_v0173() -> int:
             outp = _io.StringIO()
             v73_mcp_serve(tr, inp, outp)
             resp = [json.loads(x) for x in outp.getvalue().splitlines()]
-            ck("⑩ MCP stdio:initialize · tools/list 全部工具(v0176 起 5) · tools/call vdf_engines 回家族", len(resp) == 3 and len(resp[1]["result"]["tools"]) == len(V73_MCP_TOOLS)
+            ck("⑩ MCP stdio:initialize · tools/list 4 工具 · tools/call vdf_engines 回家族", len(resp) == 3 and len(resp[1]["result"]["tools"]) == 4
                and "VDF_ENG001_Demo" in resp[2]["result"]["content"][0]["text"])
             o = v73_omniroute(tr)
             ck("⑪ OmniRoute:5 家 AI 用戶端同一 VDF MCP", o["clients"] == ["chatgpt", "claude", "copilot", "gemini", "manus"])
@@ -1315,7 +1308,7 @@ def sm_cmd_v0174(verb: str, args: list, root: Path) -> int:
     return SM_RC.get(r.get("lamp"), 2)
 
 
-def _selftest_v0175() -> int:
+def selftest() -> int:
     ok = []
 
     def ck(name, cond, note=""):
@@ -1364,116 +1357,43 @@ def _selftest_v0175() -> int:
     ck("⑪ 真倉 tools:加速器 / 網路工具正典 + 三份自有冊都解析得到", t["lamp"] == "GREEN", t["missing"])
     b = v74_bridges(root)
     ck("⑫ 真倉 bridges:VDF 尾版加速器 / 網路橋覆蓋 100%", b["lamp"] == "GREEN", (b["missing_accel"][:3], b["missing_net"][:3]))
+    with tempfile.TemporaryDirectory() as td:
+        tr = Path(td)
+        d = tr / SM_CONFIG["dir"]
+        (d / "SSOT").mkdir(parents=True)
+        (d / "SSOT" / "VDF_Regex_SSOT_v0100.json").write_text('{"a":1}')
+        (d / "VDF_Demo_SSOT_v0100.json").write_text('{"b":2}')
+        real = sm_engines
+        sm_engines = lambda r: {}
+        try:
+            bk = v73_backup(tr)
+            out = v73_out(tr, "backup")
+            zp = out / Path(bk["zip"]).name
+            with _zipfile.ZipFile(zp) as z:
+                nm = z.namelist()
+                sums = z.read("SHA256SUMS").decode()
+            ok_names = not any("\\" in x for x in nm + sums.split()) and "functional modules/VDF/SSOT/VDF_Regex_SSOT_v0100.json" in nm
+            legacy = out / "VDF_Backup_99999999T999999Z.zip"   # 排序在最後 = check 會挑這份
+            with _zipfile.ZipFile(zp) as zi, _zipfile.ZipFile(legacy, "w") as zo:
+                for x in zi.namelist():
+                    zo.writestr(x, zi.read(x) if x != "SHA256SUMS" else sums.replace("/", "\\").encode())
+            c1 = v73_backup(tr, check_only=True)
+            lines = sums.splitlines() + ["0" * 64 + "  functional modules/VDF/VDF_Gone_v0100.json"]
+            with _zipfile.ZipFile(zp) as zi, _zipfile.ZipFile(legacy, "w") as zo:
+                for x in zi.namelist():
+                    zo.writestr(x, zi.read(x) if x != "SHA256SUMS" else ("\n".join(lines) + "\n").encode())
+            c2 = v73_backup(tr, check_only=True)
+        finally:
+            sm_engines = real
+    ck("⑭ v0176 備份 zip 內檔名與 SHA256SUMS 一律正斜線(含 SSOT 子夾)· 舊備份反斜線名 check 照樣 GREEN · 缺件 RED 不崩",
+       ok_names and "as_posix()" in SM_HERE.read_text(encoding="utf-8") and c1["lamp"] == "GREEN" and c2["lamp"] == "RED"
+       and c2["bad"] == ["functional modules/VDF/VDF_Gone_v0100.json"], (nm, c1, c2))
     n = sum(ok)
     print(f"[計] {SM_TAG} 全原生 {n}/{len(ok)} {'PASS' if n == len(ok) else 'FAIL'}", flush=True)
     return 0 if n == len(ok) else 1
 
 
 SM_NATIVE = SM_NATIVE + tuple(v for v in V74_VERBS + V74_EXTRA if v not in SM_NATIVE)
-
-# ══════════════════════════ v0176:datamatrix(資料範圍分類矩陣)· MCP / OmniRoute 工具 · Graphify 資料血緣 ══════════════════════════
-V76_VERBS = ("datamatrix",)
-V76_ENGINE_GLOB = "VDF_ENG240_DataScopeMatrix_v*.py"
-
-
-def v76_engine(root: Path):
-    d = v73_dir(root) / "engine"
-    hits = sorted((p for p in d.glob(V76_ENGINE_GLOB) if sm_vnum(p) >= 0), key=sm_vnum)
-    return hits[-1] if hits else None
-
-
-def v76_out(root: Path) -> Path:
-    return root / "VIA_Reports" / "vdf" / "datamatrix"
-
-
-def v76_datamatrix_summary(root: Path) -> dict:
-    """只讀:最新一次矩陣的總計 + 大類彙總(沒跑過 → NODATA 並提示動詞)。"""
-    p = v76_out(root) / "VDF_DataScope_latest.json"
-    try:
-        d = json.loads(p.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return {"lamp": "NODATA", "hint": "先跑 VDF_SystemManager datamatrix", "file": str(p)}
-    top = sorted((r for r in d.get("rows", []) if (r.get("excess") or 0) > 0 or r.get("kind") == "UNMAPPED"),
-                 key=lambda r: -(r.get("excess") or r.get("rows") or 0))[:10]
-    return {"lamp": d.get("lamp"), "at": d.get("at"), "home": d.get("home"), "totals": d.get("totals"),
-            "categories": [{k: c.get(k) for k in ("zh", "lamp", "tables", "rows", "pre_start", "dup_rows", "over_members", "excess", "excess_pct", "nodata")}
-                           for c in d.get("categories", [])],
-            "top_excess": [{k: r.get(k) for k in ("group", "db", "table", "rows", "excess", "flags", "note")} for r in top],
-            "file": str(p)}
-
-
-def v76_lineage(root: Path) -> dict:
-    """Graphify 併入:ENG240 寫的資料血緣圖(只讀;沒有就空)。"""
-    p = v76_out(root) / "VDF_DataLineage_latest.json"
-    try:
-        d = json.loads(p.read_text(encoding="utf-8"))
-        return {"source": str(p.relative_to(root)) if root in p.parents else str(p), "at": d.get("at"),
-                "nodes": d.get("nodes", []), "edges": d.get("edges", [])}
-    except (OSError, ValueError):
-        return {"source": None, "nodes": [], "edges": [], "hint": "先跑 datamatrix"}
-
-
-def v76_datamatrix(root: Path, args: list) -> int:
-    eng = v76_engine(root)
-    if not eng:
-        print(f"[{SM_TAG}] datamatrix RED · 找不到 {V76_ENGINE_GLOB}(VDF/engine)")
-        return 1
-    cmd = [sys.executable, "-B", str(eng)] + (["--selftest"] if "--selftest" in args else ["run"] + [a for a in args if a != "--selftest"])
-    env = dict(sm_child_env(), PYTHONIOENCODING="utf-8", PYTHONUTF8="1")   # 只補本系統入口旗標(P3)
-    print(f"[{SM_TAG}] datamatrix → {eng.name} {' '.join(cmd[3:])}", flush=True)
-    return subprocess.run(cmd, env=env).returncode
-
-
-def sm_cmd_v0176(verb: str, args: list, root: Path) -> int:
-    return v76_datamatrix(root, args)
-
-
-def selftest() -> int:
-    ok = []
-
-    def ck(name, cond, note=""):
-        ok.append(bool(cond))
-        print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)[:300]) if note and not cond else ''}", flush=True)
-    print(f"=== {SM_TAG} 自測(v0175 全套 + datamatrix · MCP · OmniRoute · Graphify 資料血緣)===", flush=True)
-    import contextlib as _cl, io as _io
-    buf = _io.StringIO()
-    with _cl.redirect_stdout(buf):
-        rc75 = _selftest_v0175()
-    ck("① v0175 全套自測照過", rc75 == 0, buf.getvalue()[-300:])
-    root = sm_via_root()
-    ck("② datamatrix 是原生動詞 · 引擎尾版找得到", "datamatrix" in SM_NATIVE and v76_engine(root) is not None)
-    out = _io.StringIO()
-    v73_mcp_serve(root, stdin=_io.StringIO(json.dumps({"jsonrpc": "2.0", "id": 1, "method": "tools/list"}) + "\n"
-                                           + json.dumps({"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "vdf_datamatrix"}}) + "\n"),
-                  stdout=out)
-    lines = [json.loads(x) for x in out.getvalue().splitlines() if x.strip()]
-    names = [t["name"] for t in lines[0]["result"]["tools"]] if lines else []
-    call = json.loads(lines[1]["result"]["content"][0]["text"]) if len(lines) > 1 and "result" in lines[1] else {}
-    ck("③ MCP tools/list 有 vdf_datamatrix · tools/call 回燈號", "vdf_datamatrix" in names and "lamp" in call, (names, call))
-    with tempfile.TemporaryDirectory() as td:
-        tr = Path(td)
-        (tr / "functional modules" / "VDF").mkdir(parents=True)
-        (tr / "supportive modules").mkdir()
-        orr = v73_omniroute(tr)
-        o = json.loads((tr / orr["file"]).read_text(encoding="utf-8"))
-        ck("④ OmniRoute 五家用戶端都帶 vdf_datamatrix", "vdf_datamatrix" in o["tools"] and len(o["routes"]) == 5, o["tools"])
-        dm = v76_out(tr)
-        dm.mkdir(parents=True)
-        (dm / "VDF_DataLineage_latest.json").write_text(json.dumps({"at": "x", "nodes": [{"id": "grp:A"}, {"id": "tbl:t"}],
-                                                                     "edges": [{"from": "grp:A", "to": "tbl:t"}]}), encoding="utf-8")
-        gr = v73_graph(tr)
-        g = json.loads((tr / gr["file"]).read_text(encoding="utf-8"))
-        ck("⑤ Graphify 併入資料血緣(節點 2 · 邊 1)", gr["data_nodes"] == 2 and gr["data_edges"] == 1 and g["data_lineage"]["edges"], gr)
-        ck("⑥ 摘要:沒跑過 → NODATA 並提示", v76_datamatrix_summary(tr)["lamp"] == "NODATA")
-    with _cl.redirect_stdout(_io.StringIO()):
-        rce = v76_datamatrix(root, ["--selftest"])
-    ck("⑦ datamatrix --selftest(子行程跑 ENG240 自測)rc 0", rce == 0, rce)
-    n = sum(ok)
-    print(f"[計] {SM_TAG} 自測 {n}/{len(ok)} {'PASS' if n == len(ok) else 'FAIL'}", flush=True)
-    return 0 if n == len(ok) else 1
-
-
-SM_NATIVE = SM_NATIVE + tuple(v for v in V76_VERBS if v not in SM_NATIVE)
 
 
 def main(argv=None) -> int:

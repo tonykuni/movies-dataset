@@ -237,21 +237,20 @@ jobs:
           python -m pip install duckdb==1.5.5 pandas==2.2.3
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: VDF manager self-test through the sole entry
+      - name: VDF manager self-test through its own MAIN
         shell: pwsh
         run: |
-          $env:VIA_FROM_VCGC = "YES"
-          $env:VIA_VCGC_PUSH = "NO"
-          $env:VIA_HUB_RUN = "ci-contracts-$env:GITHUB_RUN_ID"
+          # L120 ④ · L123:VDF 自己一條,直接跑 VDF_SystemManager 尾版,不經 VCGC 主控台(VCGC 升級出錯不連帶 VDF 紅;同 VRN-2 那條)
           $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          $vdf = Join-Path $via "functional modules\VDF"
+          $mgr = (Get-ChildItem $vdf -Filter "VDF_SystemManager_v*.py" -File |
+            Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } |
+            Select-Object -Last 1).FullName
+          if (-not $mgr) { throw "VDF manager absent" }
+          Write-Host ("VDF MAIN: " + (Split-Path -Leaf $mgr))
           Push-Location $via
           try {
-            $registry = Join-Path $via "supportive modules\registry"
-            $vcgc = (Get-ChildItem $registry -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File |
-              Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } |
-              Select-Object -Last 1).FullName
-            if (-not $vcgc) { throw "VCGC entry absent" }
-            python $vcgc run VDF_SystemManager --selftest
+            python $mgr --selftest
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } finally {
             Pop-Location

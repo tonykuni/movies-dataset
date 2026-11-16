@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CGC_MDL237_NumberingSystem v0120 — 薄尾:註冊收據(P1 · CONST-030 缺口)
+"""CGC_MDL237_NumberingSystem v0120 — 薄尾:舊同義字列補 scope(mom_alias 不再被詞彙表擋)· .py 常數正則用 AST 取原式
 
-操作員令(2026-11-10):「REGISTER 成功的指令或更新的文件版本號註冊給號 · 時間詳細到分鐘 · 檔案大小 · 檔案格式 ·
-自動編號註冊衝突重複檢測 · 編號功能今天算才嚴格啟用 · 取捨資料請小心」→ 規劃 VIA_RegistryUpgrade_Plan_20261110 P1;
-操作員「開始做 P1 註冊收據補欄」。
-
-做法(v0100 … v0119 一字不動;號冊一字不動):
-  · 收據另立一本只增帳 registry/VIA_RegistrationReceipts_v0100.jsonl(不放進 VIA_NumberBooks,號冊讀者與 IMMUT 稽核不受影響)。
-  · 每張收據:code · book · version · source · registered_at(YYYY-MM-DD HH:MM +00:00,到分鐘)· uuid · operator(AI / 操作員)·
-    bytes · format(副檔名)· sha256 · kind(new 新號 / version 換版 / backfill 今日補收據)· engine(發收據的尾版)。
-  · `--apply` 照前版跑完(rc 0)才比對前後號冊:新代碼或同代碼換版 → 發收據;前版 rc 非 0 一張不發。
-  · 重複檢測:同 (code, version, sha256) 已有收據就不再發(重跑零新增);同 code 同 version 但 sha 不同 → 記 conflict 欄,不蓋舊收據。
-  · `receipts`:嚴格啟用日(2026-11-10)起編號的列,有沒有收據 → GREEN / YELLOW(缺幾張、哪幾支);之前的列不判紅(不回溯)。
-  · `receipts --backfill --apply`:只對嚴格啟用日起編號、還沒收據的列補發(kind=backfill,時間取該列 numbered_at 到分鐘)。
-  · operator:`--operator <名>` 或環境變數 VIA_OPERATOR;都沒有記 "AI"。
-只收 VCGC 呼叫(經 via-vcgc run);零網路;不碰 TA-Lib;只讀子系統的冊。
+操作員令(2026-11-14):「mom_alias 也一起修,開 PR 並盯著 · HANDLE ALL PROBLEMS」。
+實錄:候選冊 v0102 的操作員提案 mom_alias(VQG · scope indicator.names · MOM / Momentum / 動能指標 → VQG.IND.MOM)
+  中央檢測一直 REVIEW:LEGACY_ALIAS_SCOPE_UNKNOWN —— 撞到舊列 VIA-VCGC-SYN214(glossary|MOMENTUM:動能 / MOMENTUM,
+  中英詞彙表)。v0114 make_plan 對「沒有 scope、分類也不是 中央同義冊/」的舊同義字列一律當成範圍不明而擋。
+  真倉 3217 列舊同義字:584 列分類帶 中央同義冊/<scope>;其餘 2633 列(ins 2022 · glossary 389 · macro 214 · xsrc 6 ·
+  macro-family 2)沒有 scope —— 任何新同義字只要有一個字跟它們重疊就卡住。
+本版只加三格(v0100 … v0119 一字不動):
+  ① 舊同義字列 scope = legacy.<鍵前綴>(鍵本身就帶命名空間:glossary|… · ins|… · macro|…;沒有前綴時用分類)——
+     讀冊投影(load_state;存冊一字不動)+ 收集時同樣補(synonym_items)。不同 scope 照 v0114 既有規則「同字異域各自保留」
+     (記 SAME_WORD_OTHER_SCOPE_RETAINED 註記,不擋);同 owner 同 scope 的舊列照比目標、不同照擋。
+  ② R22 舊正則列的來源是 .py 模組常數(VeritasCeleritas DataValidator._TW_TICKER_RE · VeritasAegisNexus TW_TICKER_REGEX …)
+     時,用 AST 讀那個常數(re.compile("…") 的第一個字面參數或字面字串)當原式;只讀,不執行被讀的檔。
+號不變;寫冊只走前版的 --apply(本檔不寫任何檔)。只收 VCGC 呼叫;零網路;不碰 TA-Lib。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -50,25 +49,18 @@ except Exception:
     VIA_NET_TOOL_PATH = None
 # ===== [VIA:NET-BRIDGE:END] =====
 
-import hashlib
+import ast
 import importlib.util
 import json
 import os
 import re
 import sys
-import uuid
-from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ENGINE = Path(__file__).stem
-VERSION = "v0120"
 _STEM = "CGC_MDL237_NumberingSystem"
-STRICT_FROM = "2026-11-10"                                   # 編號嚴格啟用日(操作員 2026-11-10;之前的列不回溯)
-VIA_ROOT = HERE.parents[1]                                   # 號冊 source 欄以 VIA 樹為根
-BOOK_DIR = HERE / "VIA_NumberBooks"
-RECEIPTS = HERE / "VIA_RegistrationReceipts_v0100.jsonl"
-FIELDS = ("code", "book", "version", "source", "registered_at", "uuid", "operator", "bytes", "format", "sha256", "kind", "engine")
+CENTRAL_SYN_PREFIX = "中央同義冊/"
 
 
 def _vnum_v0120(p) -> int:
@@ -85,295 +77,201 @@ def _load_v0120(path: Path, name: str):
 
 
 PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum_v0120(p) < _vnum_v0120(__file__)), key=_vnum_v0120)
-PRIOR = _load_v0120(PRIOR_PATH, _STEM + "_prior_for_" + ENGINE)       # v0119
+PRIOR = _load_v0120(PRIOR_PATH, _STEM + "_prior_for_" + ENGINE)        # v0119:R22 舊正則列 scope + 原式 · 讀冊投影
+BASE = PRIOR.BASE
+BASE.ENGINE = ENGINE
+_LOAD_STATE_V0119 = BASE.load_state                                     # = v0119.load_state(已投影 R22 舊正則列)
+_SYN_ITEMS_ORIG_V0120 = BASE.synonym_items
+_ENRICH_V0119 = PRIOR.enrich
+_PY_INDEX_V0120: dict = {}
+
+
+def _sanitize_v0120(s: str) -> str:
+    return re.sub(r"[^a-z0-9_.:-]+", "_", str(s).lower()).strip("._") or "x"
+
+
+def legacy_syn_scope(row: dict) -> str | None:
+    """舊同義字列的 scope:已有 scope / 分類是 中央同義冊/ → None(不動);否則 legacy.<鍵前綴>(沒前綴用分類)。"""
+    if row.get("kind") != "SYN" or row.get("asset_intake") or row.get("scope") or str(row.get("cat", "")).startswith(CENTRAL_SYN_PREFIX):
+        return None
+    key = str(row.get("key") or "")
+    ns = key.split("|", 1)[0] if "|" in key else str(row.get("cat") or "misc")
+    return "legacy." + _sanitize_v0120(ns)
+
+
+def load_state() -> dict:
+    """同 v0119(R22 舊正則列已投影),另把舊同義字列沒有 scope 的當場補 legacy.<鍵前綴>(唯讀投影;存冊一字不動)。"""
+    st = _LOAD_STATE_V0119()
+    rows = st.get("rows") or {}
+    for k, r in list(rows.items()):
+        sc = legacy_syn_scope(r)
+        if sc:
+            rows[k] = dict(r, scope=sc)
+    return st
+
+
+def synonym_items(extra: list) -> list:
+    """同 v0100;收集出來的舊同義字項同樣補 scope(apply 時 make_plan 的 legacy 走這份)。"""
+    out = []
+    for it in _SYN_ITEMS_ORIG_V0120(extra):
+        sc = legacy_syn_scope(it)
+        out.append(dict(it, scope=sc) if sc else it)
+    return out
+
+
+def py_path(source: str) -> Path | None:
+    name = Path(str(source)).name
+    if not name.endswith(".py"):
+        return None
+    if (HERE / name).is_file():
+        return HERE / name
+    if not _PY_INDEX_V0120:
+        for root, dirs, files in os.walk(BASE.VIA):
+            dirs[:] = [d for d in dirs if d not in PRIOR.SKIP_DIRS_V0119]
+            for f in files:
+                if f.endswith(".py"):
+                    _PY_INDEX_V0120.setdefault(f, Path(root) / f)
+        _PY_INDEX_V0120.setdefault("\0built", Path("."))
+    return _PY_INDEX_V0120.get(name)
+
+
+def py_constant(tree: ast.AST, dotted: str):
+    """AST 取常數:「名」= 模組層賦值;「類.名」= 類本體賦值。值 = re.compile("…") 第一個字面參數,或字面字串;取不到回 None。"""
+    parts = dotted.split(".")
+    body = getattr(tree, "body", [])
+    for cls in parts[:-1]:
+        body = next((n.body for n in body if isinstance(n, ast.ClassDef) and n.name == cls), None)
+        if body is None:
+            return None
+    want = parts[-1]
+    for n in body:
+        targets = n.targets if isinstance(n, ast.Assign) else ([n.target] if isinstance(n, ast.AnnAssign) and n.value is not None else [])
+        if not any(isinstance(t, ast.Name) and t.id == want for t in targets):
+            continue
+        v = n.value
+        if isinstance(v, ast.Call) and v.args and isinstance(v.args[0], ast.Constant) and isinstance(v.args[0].value, str):
+            fn = v.func.attr if isinstance(v.func, ast.Attribute) else getattr(v.func, "id", "")
+            if fn == "compile":
+                return v.args[0].value
+        if isinstance(v, ast.Constant) and isinstance(v.value, str):
+            return v.value
+    return None
+
+
+def enrich(it: dict, cache: dict | None = None) -> dict:
+    """同 v0119;來源是 .py 模組常數而 v0119 取不到時,用 AST 讀那個常數(只讀、不執行)。"""
+    out = _ENRICH_V0119(it, cache)
+    if out is it or out.get("pattern") or out.get("pattern_ref"):
+        return out
+    pp = py_path(str(out.get("source") or ""))
+    if pp is None:
+        return out
+    cache = {} if cache is None else cache
+    key = ("py", str(pp))
+    if key not in cache:
+        try:
+            cache[key] = ast.parse(pp.read_text(encoding="utf-8", errors="replace"))
+        except (OSError, SyntaxError, ValueError):
+            cache[key] = None
+    val = py_constant(cache[key], str(out.get("name") or "")) if cache[key] is not None else None
+    if PRIOR._is_regex_v0119(val):
+        out = dict(out, pattern=val)
+    elif isinstance(val, str) and val.strip():
+        out = dict(out, pattern_ref=val.strip()[:200])
+    return out
+
+
+PRIOR.enrich = enrich                                    # v0119 r22_items / load_state 以模組全域叫 enrich() → 走本版
+BASE.load_state = load_state
+BASE.synonym_items = synonym_items                       # v0100 collect() 以模組全域叫 synonym_items()
 
 
 def __getattr__(name):
     return getattr(PRIOR, name)
 
 
-# ---------- 收據核心 ----------
-def minute(ts: str | None = None) -> str:
-    """任何時間字串 → 'YYYY-MM-DD HH:MM +00:00';沒給 = 現在 UTC。缺時區的照 UTC 記(不猜在地時區)。"""
-    if not ts:
-        return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M +00:00")
-    s = str(ts).strip()
-    m = re.match(r"(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?\s*(Z|[+-]\d{2}:?\d{2})?$", s)
-    if not m:
-        return s[:10] + " 00:00 +00:00" if re.match(r"\d{4}-\d{2}-\d{2}$", s) else ""
-    tz = m.group(4) or "+00:00"
-    tz = "+00:00" if tz == "Z" else (tz if ":" in tz else tz[:3] + ":" + tz[3:])
-    return f"{m.group(1)} {m.group(2)}:{m.group(3)} {tz}"
-
-
-def book_rows(book_dir: Path | None = None) -> dict:
-    """{(book, code): row}(只讀;壞列跳過)。"""
-    out = {}
-    for f in sorted((book_dir or BOOK_DIR).glob("*.jsonl")):
-        for line in f.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                r = json.loads(line)
-            except ValueError:
-                continue
-            if isinstance(r, dict) and r.get("code"):
-                out[(f.name, r["code"])] = r
-    return out
-
-
-SUB_RX = re.compile(r"-FNC\d{3,}(?:-FNC\d{3,})*$")      # 函式子號(FNC 冊:code · q · api · line)
-
-
-def changed(before: dict, after: dict) -> list:
-    """新代碼 → kind=new;同代碼換版 → kind=version;其餘不算(只刷新時間的不發收據)。
-    函式子號不單發收據(去重):併入母號收據的 functions(本輪新增子號數)。"""
-    res, subs = [], {}
-    for k, r in after.items():
-        if SUB_RX.search(r["code"]):
-            if k not in before:
-                parent = SUB_RX.sub("", r["code"])
-                subs[parent] = subs.get(parent, 0) + 1
-            continue
-        old = before.get(k)
-        if old is None:
-            res.append((k, r, "new"))
-        elif str(old.get("version") or "") != str(r.get("version") or ""):
-            res.append((k, r, "version"))
-    return [(k, dict(r, _functions=subs.get(r["code"], 0)), kind) for k, r, kind in res]
-
-
-def file_facts(source: str, root: Path | None = None) -> dict:
-    p = (root or VIA_ROOT) / str(source or "")
-    if not source or not p.is_file():
-        return {"bytes": None, "format": Path(str(source or "")).suffix.lstrip(".").lower() or None, "sha256": None}
-    data = p.read_bytes()
-    return {"bytes": len(data), "format": p.suffix.lstrip(".").lower() or None, "sha256": hashlib.sha256(data).hexdigest()}
-
-
-def make_receipt(book: str, row: dict, kind: str, operator: str, at: str | None = None, root: Path | None = None) -> dict:
-    rec = {"code": row["code"], "book": book, "version": row.get("version"), "source": row.get("source"),
-           "registered_at": minute(at), "uuid": str(uuid.uuid4()), "operator": operator}
-    rec.update(file_facts(row.get("source"), root))
-    rec.update({"kind": kind, "engine": f"{_STEM} {VERSION}"})
-    if row.get("_functions"):
-        rec["functions"] = row["_functions"]                # 本輪新增函式子號數(子號不另發收據)
-    return rec
-
-
-def load_receipts(path: Path | None = None) -> list:
-    p = path or RECEIPTS
-    if not p.is_file():
-        return []
-    out = []
-    for line in p.read_text(encoding="utf-8").splitlines():
-        try:
-            out.append(json.loads(line))
-        except ValueError:
-            continue
-    return out
-
-
-def append_receipts(recs: list, path: Path | None = None) -> dict:
-    """只增;同 (code, version, sha256) 已有 → 略過(重複);同 (code, version) 不同 sha → 照發並標 conflict(不蓋舊收據)。"""
-    p = path or RECEIPTS
-    have = load_receipts(p)
-    seen = {(r.get("code"), r.get("version"), r.get("sha256")) for r in have}
-    by_cv = {}
-    for r in have:
-        by_cv.setdefault((r.get("code"), r.get("version")), set()).add(r.get("sha256"))
-    added, dup, conflict = [], 0, 0
-    for r in recs:
-        key = (r["code"], r.get("version"), r.get("sha256"))
-        if key in seen:
-            dup += 1
-            continue
-        prev = by_cv.get((r["code"], r.get("version")), set()) - {r.get("sha256")}
-        if prev:
-            r["conflict"] = "same code+version, different sha256: " + ",".join(sorted(str(x)[:12] for x in prev))
-            conflict += 1
-        seen.add(key)
-        by_cv.setdefault((r["code"], r.get("version")), set()).add(r.get("sha256"))
-        added.append(r)
-    if added:
-        with p.open("a", encoding="utf-8", newline="\n") as fh:
-            for r in added:
-                fh.write(json.dumps(r, ensure_ascii=False) + "\n")
-    return {"added": len(added), "duplicate": dup, "conflict": conflict}
-
-
-def is_file_source(source) -> bool:
-    """來源像檔案路徑(有副檔名)才要求 format;函式庫列(例:python stdlib)不是檔,不編格式。"""
-    return bool(source) and bool(re.search(r"\.[A-Za-z0-9]{1,8}$", str(source).strip()))
-
-
-def receipt_complete(r: dict) -> bool:
-    if not all(r.get(f) not in (None, "") for f in ("uuid", "operator", "registered_at")):
-        return False
-    if not re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2} [+-]\d{2}:\d{2}$", str(r.get("registered_at") or "")):
-        return False
-    return r.get("format") not in (None, "") or not is_file_source(r.get("source"))
-
-
-def strict_rows(rows: dict) -> dict:
-    return {k: r for k, r in rows.items() if str(r.get("numbered_at") or "")[:10] >= STRICT_FROM}
-
-
-def check(rows: dict | None = None, receipts: list | None = None) -> dict:
-    rows = book_rows() if rows is None else rows
-    receipts = load_receipts() if receipts is None else receipts
-    have = {(r.get("code"), str(r.get("version") or "")) for r in receipts}
-    strict = strict_rows(rows)
-    missing = sorted(r["code"] for r in strict.values() if (r["code"], str(r.get("version") or "")) not in have)
-    incomplete = sorted(r.get("code") for r in receipts if not receipt_complete(r))
-    lamp = "GREEN" if not missing and not incomplete else "YELLOW"
-    return {"lamp": lamp, "strict_from": STRICT_FROM, "strict_rows": len(strict), "receipts": len(receipts),
-            "missing": missing, "incomplete": incomplete,
-            "conflict": sorted(r["code"] for r in receipts if r.get("conflict"))}
-
-
-def backfill(operator: str, apply: bool, rows: dict | None = None, path: Path | None = None, root: Path | None = None) -> dict:
-    rows = book_rows() if rows is None else rows
-    rep = check(rows, load_receipts(path))
-    miss = set(rep["missing"])
-    recs = [make_receipt(b, r, "backfill", operator, r.get("numbered_at"), root)
-            for (b, c), r in strict_rows(rows).items() if c in miss]
-    res = append_receipts(recs, path) if apply else {"added": 0, "duplicate": 0, "conflict": 0}
-    res.update({"candidates": len(recs), "apply": apply})
-    return res
-
-
-# ---------- CLI ----------
-def _operator(args: list) -> tuple[str, list]:
-    if "--operator" in args:
-        i = args.index("--operator")
-        name = args[i + 1] if i + 1 < len(args) else ""
-        args = args[:i] + args[i + 2:]
-        return (name or "AI"), args
-    return (os.environ.get("VIA_OPERATOR") or "AI"), args
-
-
-def cmd_receipts(args: list, operator: str) -> int:
-    if "--backfill" in args:
-        res = backfill(operator, "--apply" in args)
-        print(f"[收據 · 補發 {STRICT_FROM} 起] 候選 {res['candidates']} · 寫入 {res['added']} · 重複略過 {res['duplicate']} · "
-              f"同號同版不同 sha {res['conflict']}" + ("" if res["apply"] else " · 試算(加 --apply 才寫)"))
-    rep = check()
-    print(f"[收據 · {VERSION}] {rep['lamp']} · 嚴格啟用日 {STRICT_FROM} 起編號 {rep['strict_rows']} 列 · 收據 {rep['receipts']} 張 · "
-          f"缺 {len(rep['missing'])} · 欄不全 {len(rep['incomplete'])} · 衝突 {len(rep['conflict'])}"
-          + (" · 缺:" + " · ".join(rep["missing"][:8]) + (" …" if len(rep["missing"]) > 8 else "") if rep["missing"] else ""))
-    if "--json" in args:
-        print(json.dumps(rep, ensure_ascii=False, indent=1))
-    return 0
-
-
 def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
-    if args[:1] == ["--selftest"]:
-        return selftest(deep="--deep" in args)
-    operator, args = _operator(args)
-    if args[:1] == ["receipts"]:
-        return cmd_receipts(args[1:], operator)
-    if "--apply" not in args:
-        return PRIOR.main(args)
-    before = book_rows()
-    rc = PRIOR.main(args)
-    if rc != 0:
-        print(f"[收據 · {VERSION}] 前版 rc {rc}:一張不發", file=sys.stderr)
-        return rc
-    recs = [make_receipt(b, r, kind, operator) for (b, _c), r, kind in changed(before, book_rows())]
-    res = append_receipts(recs)
-    print(f"[收據 · {VERSION}] 新號 / 換版 {len(recs)} · 寫入 {res['added']} · 重複略過 {res['duplicate']} · 同號同版不同 sha {res['conflict']}"
-          f" · 帳 {RECEIPTS.name}")
-    return rc
+    if args == ["--selftest"]:
+        return selftest()
+    return PRIOR.main(args)
 
 
-# ---------- 自測(暫存夾 · 不碰真冊)----------
-def selftest(deep: bool = False) -> int:
-    import tempfile
-    checks = []
+def selftest() -> int:
+    ok = []
 
     def chk(name, cond, note=""):
-        checks.append((name, bool(cond)))
-        print(f"  [{'OK' if cond else 'FAIL'}] {name}" + (f" · {note}" if note else ""))
+        ok.append(bool(cond))
+        print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)[:300]) if note and not cond else ''}")
 
-    print(f"=== {_STEM} {VERSION} · 薄尾自測(註冊收據 · 暫存夾 · 零外呼)===")
-    chk("時間到分鐘(含時區)", minute("2026-11-10 16:28:08 +0000") == "2026-11-10 16:28 +00:00"
-        and minute("2026-11-10T01:02:03Z") == "2026-11-10 01:02 +00:00" and minute("2026-11-10") == "2026-11-10 00:00 +00:00",
-        minute("2026-11-10 16:28:08 +0000"))
-    chk("現在時間格式", re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2} \+00:00$", minute()) is not None, minute())
-    with tempfile.TemporaryDirectory() as td:
-        root, books = Path(td) / "via", Path(td) / "via" / "books"
-        books.mkdir(parents=True)
-        src = root / "functional modules" / "X" / "X_ENG001_Demo_v0101.py"
-        src.parent.mkdir(parents=True)
-        src.write_bytes(b"print('demo')\n")
-        bk = books / "VIA_NumberBook_ENG_v0100.jsonl"
-        old = {"code": "VIA-X-ENG001", "version": "v0100", "source": "functional modules/X/X_ENG001_Demo_v0100.py",
-               "numbered_at": "2026-11-01 10:00:00 +0000"}
-        bk.write_text(json.dumps(old) + "\n", encoding="utf-8")
-        before = book_rows(books)
-        new = {"code": "VIA-X-ENG002", "version": "v0101", "source": "functional modules/X/X_ENG001_Demo_v0101.py",
-               "numbered_at": "2026-11-10 16:28:08 +0000"}
-        bump = dict(old, version="v0101", source=new["source"])
-        bk.write_text(json.dumps(bump) + "\n" + json.dumps(new) + "\n", encoding="utf-8")
-        after = book_rows(books)
-        ch = changed(before, after)
-        chk("比對:新號 = new · 換版 = version", sorted(k for _k, _r, k in ch) == ["new", "version"], [k for _k, _r, k in ch])
-        chk("只刷新不發", changed(after, after) == [])
-        fnc = {("FNC.jsonl", "VIA-X-ENG002-FNC001"): {"code": "VIA-X-ENG002-FNC001", "q": "main"},
-               ("FNC.jsonl", "VIA-X-ENG002-FNC001-FNC001"): {"code": "VIA-X-ENG002-FNC001-FNC001", "q": "main._v"}}
-        ch2 = changed(before, {**after, **fnc})
-        chk("函式子號不單發 · 併入母號 functions", len(ch2) == 2
-            and make_receipt(bk.name, [r for _k, r, _x in ch2 if r["code"] == "VIA-X-ENG002"][0], "new", "AI", None, root)
-            .get("functions") == 2)
-        rec = make_receipt(bk.name, new, "new", "AI", None, root)
-        chk("收據欄齊(uuid · operator · 分鐘 · bytes · format · sha256)",
-            all(rec.get(f) not in (None, "") for f in FIELDS) and rec["bytes"] == 14 and rec["format"] == "py"
-            and rec["sha256"] == hashlib.sha256(b"print('demo')\n").hexdigest(), rec["sha256"][:12])
-        miss_src = make_receipt(bk.name, dict(new, source="nope/none_v0100.py"), "new", "AI", None, root)
-        chk("來源檔不在 → bytes / sha 留空不編", miss_src["bytes"] is None and miss_src["sha256"] is None and miss_src["format"] == "py")
-        rp = Path(td) / "receipts.jsonl"
-        r1 = append_receipts([rec], rp)
-        r2 = append_receipts([make_receipt(bk.name, new, "new", "AI", None, root)], rp)
-        chk("重跑零新增(同 code · 版 · sha)", r1["added"] == 1 and r2 == {"added": 0, "duplicate": 1, "conflict": 0}, r2)
-        src.write_bytes(b"print('changed')\n")
-        r3 = append_receipts([make_receipt(bk.name, new, "new", "AI", None, root)], rp)
-        lines = rp.read_text(encoding="utf-8").splitlines()
-        chk("同號同版內容不同 → 標 conflict · 舊收據不蓋", r3["conflict"] == 1 and len(lines) == 2
-            and json.loads(lines[0])["sha256"] == rec["sha256"] and "conflict" in json.loads(lines[1]))
-        rep = check(after, [])
-        chk("嚴格啟用日前的列不判(只判今天起)", rep["strict_rows"] == 1 and rep["missing"] == ["VIA-X-ENG002"]
-            and rep["lamp"] == "YELLOW", rep["missing"])
-        rp2 = Path(td) / "r2.jsonl"
-        dry = backfill("AI", False, after, rp2, root)
-        chk("補發試算不寫", dry["candidates"] == 1 and dry["added"] == 0 and not rp2.exists())
-        res = backfill("AI", True, after, rp2, root)
-        got = load_receipts(rp2)
-        chk("補發:kind=backfill · 時間取 numbered_at 到分鐘", res["added"] == 1 and got[0]["kind"] == "backfill"
-            and got[0]["registered_at"] == "2026-11-10 16:28 +00:00")
-        chk("補發後 GREEN", check(after, got)["lamp"] == "GREEN")
-        chk("欄不全的收據 → YELLOW", check(after, [dict(got[0], registered_at="2026-11-10")])["lamp"] == "YELLOW")
-        lib = {"uuid": "u", "operator": "AI", "registered_at": "2026-11-10 16:52 +00:00", "source": "python stdlib", "format": None}
-        chk("函式庫列(非檔)不要求格式 · 檔案列缺格式才算不全", receipt_complete(lib)
-            and not receipt_complete(dict(lib, source="a/b_v0100.py")))
-        chk("號冊一字不動", bk.read_text(encoding="utf-8") == json.dumps(bump) + "\n" + json.dumps(new) + "\n")
-    os.environ.pop("VIA_OPERATOR", None)
-    chk("operator:--operator 優先,否則 AI", _operator(["x", "--operator", "Tony"]) == ("Tony", ["x"]) and _operator(["x"]) == ("AI", ["x"]))
-    chk("收據帳不在號冊夾(號冊讀者 / IMMUT 不受影響)", RECEIPTS.parent != BOOK_DIR and not RECEIPTS.name.startswith("VIA_NumberBook_"))
-    names = [n for n in dir(PRIOR) if not n.startswith("_") and callable(getattr(PRIOR, n, None))]
-    chk("尾版保有前版公開名稱(TAILAPI · 經 __getattr__ 轉接)", all(getattr(sys.modules[__name__], n, None) is not None for n in names),
-        f"{len(names)} 支")
-    chk("不碰 TA-Lib · 不寫同意閘", ("ta" + "lib") not in Path(__file__).read_text(encoding="utf-8").replace("TA-Lib", "")
-        and "VIA_NET_CONSENT\"] =" not in Path(__file__).read_text(encoding="utf-8"))
-    if deep:
-        rc0 = PRIOR.selftest()
-        chk(f"前版 {PRIOR_PATH.stem[-5:]} 自測過(--deep)", rc0 == 0, f"rc {rc0}")
-    ok = sum(c for _n, c in checks)
-    print(f"[計] {_STEM} {VERSION} 本版 {ok}/{len(checks)} " + ("PASS" if ok == len(checks) else "FAIL")
-          + ("" if deep else " · 前版自測另跑(--selftest --deep,約數分鐘)"))
-    return 0 if ok == len(checks) else 1
+    print(f"=== {ENGINE} · 薄尾自測(舊同義字列 scope · .py 常數正則 AST)===")
+    C = PRIOR
+    glo = {"kind": "SYN", "key": "glossary|MOMENTUM@v0100", "cat": "詞彙表(中英)", "words": ["動能", "MOMENTUM"], "sub": "VCGC", "lamp": "GREEN", "name": "動能"}
+    cen = {"kind": "SYN", "key": "syn|x", "cat": "中央同義冊/rating", "words": ["BUY"], "sub": "VDF"}
+    chk("① scope 規則:glossary|… → legacy.glossary · ins|… → legacy.ins · 分類 中央同義冊/ 的不動 · 已有 scope 的不動 · 候選列不動",
+        legacy_syn_scope(glo) == "legacy.glossary" and legacy_syn_scope(dict(glo, key="ins|2330.TW@v0100")) == "legacy.ins"
+        and legacy_syn_scope(cen) is None and legacy_syn_scope(dict(glo, scope="x")) is None and legacy_syn_scope(dict(glo, asset_intake=True)) is None)
+    cand = {"candidate_id": "mom_alias", "ssot_code": None, "asset_type": "SYNONYM", "owner": "VQG", "source_id": "operator-proposal:t",
+            "source_pointer": "mom_alias", "source_sha256": "a" * 64, "version": "1.0.0", "supersedes": None, "scope": "indicator.names",
+            "semantic_key": "mom", "name": "MOM", "value": "VQG.IND.MOM", "risk_level": "MED", "environment": "via_core", "libraries": [],
+            "aliases": ["MOM", "Momentum", "動能指標"], "positive": [], "negative": []}
+    before = C.make_plan([cand], [], [glo])["results"][0]
+    after = C.make_plan([cand], [], [dict(glo, scope=legacy_syn_scope(glo))])["results"][0]
+    chk("② mom_alias:舊詞彙表列沒 scope → %s %s;補 scope 後 → %s(同字異域各自保留 %s)" % (before["state"], before["reasons"], after["state"], after.get("notes")),
+        before["state"] == "REVIEW" and "LEGACY_ALIAS_SCOPE_UNKNOWN" in before["reasons"] and after["state"] == "READY"
+        and "SAME_WORD_OTHER_SCOPE_RETAINED" in (after.get("notes") or []), (before, after))
+    same = {"kind": "SYN", "key": "x|y", "sub": "VQG", "words": ["MOM"], "scope": "indicator.names", "name": "VQG.IND.OTHER", "lamp": "GREEN"}
+    clash = C.make_plan([cand], [], [same])["results"][0]
+    chk("③ 同 owner 同 scope 的舊列照比目標:目標不同 → 照樣擋(%s %s)—— 不是全面放行" % (clash["state"], clash["reasons"]),
+        clash["state"] in ("REVIEW", "BLOCKED") and "LEGACY_ALIAS_CONFLICT" in clash["reasons"], clash)
+    st = BASE.load_state()
+    syn = [r for r in st["rows"].values() if r.get("kind") == "SYN" and not r.get("asset_intake")]
+    unscoped = [r for r in syn if not r.get("scope") and not str(r.get("cat", "")).startswith(CENTRAL_SYN_PREFIX)]
+    raw = json.loads((HERE / "VIA_Numbering_SSOT_v0100.json").read_text(encoding="utf-8")) if (HERE / "VIA_Numbering_SSOT_v0100.json").is_file() else {}
+    raw_scoped = sum(1 for r in (raw.get("rows") or {}).get("SYN") or [] if "scope" in r and not r.get("asset_intake"))
+    chk("④ 讀冊投影:真倉舊同義字 %d 列,沒 scope 又不在中央同義冊的剩 %d 列 · 存冊本身一字不動(舊同義字列有 scope 欄 %d;候選收件列本來就帶)" % (len(syn), len(unscoped), raw_scoped),
+        syn and not unscoped and raw_scoped == 0 and BASE.load_state is load_state, len(unscoped))
+    try:
+        books = sorted(HERE.glob(C.BOOK_PATTERN), key=_vnum_v0120)
+        assets = C.read_book(books[-1])["assets"] if books else []
+        reg = list(st["rows"].values())
+        legacy = [r for r in reg if not r.get("asset_intake") and r.get("kind") in ("SYN", "RGX")]
+        res = {r["candidate_id"]: r for r in C.make_plan(assets, reg, legacy)["results"]}
+        mom = res.get("mom_alias") or {}
+        chk("⑤ 真候選冊(%s)× 真存冊:mom_alias → %s(manager 照這份計畫發號)" % (books[-1].name if books else "無", mom.get("state")),
+            mom.get("state") in ("READY", "REGISTERED"), mom)
+    except Exception as exc:  # noqa: BLE001
+        chk("⑤ 真候選冊 × 真存冊", False, f"{type(exc).__name__}: {exc}")
+    tree = ast.parse("import re\nclass DataValidator:\n    _TW_TICKER_RE = re.compile(r'^[1-9][0-9]{3}$')\nTW_TICKER_REGEX = r'^[0-9]{4}$'\nX = 1\n")
+    chk("⑥ AST 取 .py 常數:類.名 → re.compile 字面 · 模組層字串 · 非字串 / 找不到 → None",
+        py_constant(tree, "DataValidator._TW_TICKER_RE") == "^[1-9][0-9]{3}$" and py_constant(tree, "TW_TICKER_REGEX") == "^[0-9]{4}$"
+        and py_constant(tree, "X") is None and py_constant(tree, "Nope.A") is None)
+    allrx = [it for it in BASE.r22_items() if it.get("kind") == "RGX"]
+    pys = [it for it in allrx if str(it.get("source", "")).endswith(".py")]
+    got = [it for it in pys if it.get("pattern") or it.get("pattern_ref")]
+    chk("⑦ 真倉 R22 舊正則來源是 .py 的 %d 列:取到原式 / 引用 %d 列(%s)" % (len(pys), len(got), [(x["name"], x.get("pattern") or x.get("pattern_ref")) for x in got][:3]),
+        pys and len(got) == len(pys) and PRIOR.enrich is enrich, [(x.get("source"), x.get("name")) for x in pys if x not in got])
+    items = BASE.synonym_items([])
+    chk("⑧ 收集時同樣補:synonym_items 產出的舊同義字項都有 scope(或屬中央同義冊)· %d 項" % len(items),
+        BASE.synonym_items is synonym_items and all(legacy_syn_scope(i) is None for i in items))
+    text = Path(__file__).read_text(encoding="utf-8")
+    body = text.split("def selftest", 1)[0]
+    chk("⑨ 加速器橋 · 網路橋在 · 不碰 TA-Lib · 本檔不寫任何檔 · 不執行被讀的 .py(只 ast.parse)",
+        "[VIA:ACCEL-BRIDGE" in text and "[VIA:NET-BRIDGE" in text and not re.search(r"^\s*(import|from)\s+talib", text, re.M)
+        and ".write_text(" not in body and "open(" not in body and "exec_module(cache" not in body)
+    rc_prior = 0
+    if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") != "1":
+        keep = (BASE.ENGINE, BASE.load_state, BASE.synonym_items, PRIOR.enrich)
+        BASE.ENGINE, BASE.load_state, BASE.synonym_items, PRIOR.enrich = PRIOR.ENGINE, _LOAD_STATE_V0119, _SYN_ITEMS_ORIG_V0120, _ENRICH_V0119
+        try:
+            rc_prior = PRIOR.selftest()
+        finally:
+            BASE.ENGINE, BASE.load_state, BASE.synonym_items, PRIOR.enrich = keep
+        chk("⑩ 前版鏈 v0119 → … 自測 rc 0;跑完 door 報本尾版、load_state / synonym_items / enrich 仍是本版",
+            rc_prior == 0 and BASE.ENGINE == ENGINE and BASE.load_state is load_state and BASE.synonym_items is synonym_items and PRIOR.enrich is enrich,
+            f"rc {rc_prior}")
+    print(f"  [計] {ENGINE} 本版 {sum(ok)}/{len(ok)} · 前版鏈 {'PASS' if rc_prior == 0 else 'FAIL'} · 合計 {'PASS' if all(ok) else 'FAIL'}")
+    return 0 if all(ok) else 1
 
 
 if __name__ == "__main__":
