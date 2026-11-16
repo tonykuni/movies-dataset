@@ -29,7 +29,7 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 700 · import 0 · 提及 143 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 700 · import 0 · 提及 148 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0184.py(家族 vdf)
@@ -37,7 +37,7 @@
 === VDF_MDL013_ActivateVDF v0119 · 薄尾自測(載工具時生的子行程不再掛工具 · 看門狗 · 前版鏈;沙盒 · 零網路)===
   [OK] ① 本版鉤 / v0115 守門鉤可編譯 · 拿掉本版加的段落 = v0118 鉤 / v0115 鉤原文一字不差 · 標籤照舊
   [資訊] 本機 /usr/local/bin/python3:py-cpuinfo 沒有 → 前版鉤在本機不發作(加速器 import 時 cross_init → detect_simd 會叫它;它用 sys.executable 再起一支 python)
-  [OK] ② 重現工作站:前版鉤 + 會再起 python 的 cpuinfo(替身,上限 4 層)→ 一路遞迴到上限(每層都又載一次加速器)· 1.0 秒 · 深度 4
+  [OK] ② 重現工作站:前版鉤 + 會再起 python 的 cpuinfo(替身,上限 4 層)→ 一路遞迴到上限(每層都又載一次加速器)· 1.1 秒 · 深度 4
   [OK] ③ 本版鉤:同一個 cpuinfo 只起 1 支輔助行程就停 —— 它看到「正在載工具」(母 pid)→ 不掛工具、不再叫 cpuinfo · 輔助收據 1 行 · 0.7 秒
   [OK] ④ 本版鉤照樣掛好工具:加速器已載 · 網路工具用到後 578 個名字 · 起跑沒帶進 pandas · 載完標記已撤 · 工具收據 1 行(輔助行程不混進來)
   [OK] ⑤ 准入閘:輔助行程(帶標記)不排隊、收據記 helper;沒標記的引擎自測照 v0118 排隊
@@ -50,7 +50,7 @@
 === VDF_MDL013_ActivateVDF v0118 · 薄尾自測(准入閘認人看原始命令列;沙盒 · 零網路)===
   [OK] ① 本輪鉤可編譯 · 只換了認人那幾行 + 多一個 _vdf_cmd · 其餘與 v0117 一字不差
   [OK] ② 重現工作站:中央鉤 runpy 接力時 v0117 收據一律記成 sitecustomize.py · 指揮行程也去排隊(1.5 秒)
-  [OK] ③ 本版:指揮行程認得出 → 不等(0.06 秒)· 收據記 VDF_SystemManager_v9999.py engine list
+  [OK] ③ 本版:指揮行程認得出 → 不等(0.04 秒)· 收據記 VDF_SystemManager_v9999.py engine list
   [OK] ④ 本版:引擎自測(帶 -X utf8 直譯器選項)收據記 VDF_ENG998_Big_v0100.py --selftest · 照樣排隊(1.6 秒)
   [OK] ⑤ 本版:載入探針 python -c 記成「-c VDF_ENG998_Big_v0100.py」(看得出是哪支引擎)
   [OK] ⑧ 啟動退役冊在倉:VDF_LaunchRetire_SSOT_v0100.json · ENG070 在冊(since 2026-11-15 · by operator)· 寫明原因與「檔不刪不搬」的理由
@@ -67,7 +67,7 @@
   [OK] ④ 流程 DuckDB 預算先扣保底:每條 1176 MB(前版 1,351)· 說明寫明
   [OK] ⑤ 本輪鉤:准入閘在載工具之前 · 標籤照舊 · 可編譯 · 前版鉤原文一字不少
   [OK] ⑥ 可用低於保底:引擎子行程等到上限(1.6 秒)才起跑 · 照樣跑完 rc 0(不擋、不算失敗)
-  [OK] ⑦ 可用高於保底 → 不等(0.09 秒)· 指揮行程(VDF_SystemManager_*)保底再高也不等(0.04 秒)· VIA_VDF_MEM_ADMIT=0 → 不等(0.08 秒)
+  [OK] ⑦ 可用高於保底 → 不等(0.09 秒)· 指揮行程(VDF_SystemManager_*)保底再高也不等(0.05 秒)· VIA_VDF_MEM_ADMIT=0 → 不等(0.09 秒)
   [OK] ⑧ 每支子行程一行收據:起跑可用 · 保底 · 等了幾秒 · 峰值(引擎那支配了 32 MB 串列 → 峰值 > 20 MB)
   [OK] ⑨ 收尾彙整:子行程 4(工作 3)· 等過 2 支 3.8 秒 · 峰值中位 200 / 最大 480(哪一支)· 指揮行程不算峰值 · 壞行照數不崩 · [記憶體] 子行程 4(引擎工作 3)· 保底 1608 MB · 准入等過 2 支(共 3.8 秒 · 最長 3.2 秒)· 峰值 中位 200 / 九成 480 / 最大 480 MB(VDF_ENG051.py --selftest)
   [OK] ⑩ 沒有收據 → 照實說沒有(不冒充)
@@ -82,7 +82,7 @@
   [OK] ② 總覽頁套 VRN-2 視覺規格(inserted)· ENG236 尾版 VDF_ENG236_FetchMatrixUI v0102
   [OK] ③ 收尾印矩陣一行
   [OK] ③b 收尾 VDF 編號同步一行(VDF_SSOTSync 尾版 sync;只寫 VDF 自己的 registry / contract)· [VDF 編號同步] YELLOW · 登記 2 條(REGEX 1 · SSOT 1)· 已確認 0 · 衝突待人判 0 · 待中央號 2 · 自撞 0 · 冊 VDF_SSOT_Register_v0100.json · 核發冊 尚無(VCGC 還沒核發) · 略過 1(VDF_FetchOne_Matrix_Registry_v0100.json(不在))
-  [OK] ③c 同步出錯 → 紅燈一行照實報(不丟例外、不擋啟動)· [VDF 編號同步] RED · NotADirectoryError: [Errno 20] Not a directory: '/tmp/vdf_act0116_zn956sib/ACTIVATE_VDF_latest.html/VDF/registry'
+  [OK] ③c 同步出錯 → 紅燈一行照實報(不丟例外、不擋啟動)· [VDF 編號同步] RED · NotADirectoryError: [Errno 20] Not a directory: '/tmp/vdf_act0116_uj5subwp/ACTIVATE_VDF_latest.html/VDF/registry'
   [OK] ④ 換裝在位:v0114 全域 OPERATE_LINKS 多一條 · main 叫的 activate = 本版
   [OK] ⑤ VDF 獨立:不匯入他系統程式 · 兩座橋在 · 同意閘不寫
 [計] VDF_MDL013_ActivateVDF v0116 本版 7/7 · PASS
@@ -93,7 +93,7 @@
   [OK] ④ 鎖驗證:原位元相同 = EXACT · CRLF + BOM = EOL_BOM_EQUIVALENT · 改過 = MISMATCH · 冊沒鎖 = NOLOCK
   [OK] ⑤ 本倉工具:加速器 VeritasCeleritas_v1141.py(鎖冊 · EXACT)· 網路工具 VeritasAegisNexus_v1652.py(鎖冊 · EXACT)
   [OK] ⑥ 本輪鉤真的掛上:子行程起跑就有 VeritasCeleritas(已載)+ VeritasAegisNexus(綁最新 · 用到才載 → 用到後 578 個名字)· 起跑沒帶進 pandas · 環境原樣(OMP / POLARS = 1 · NUMEXPR_MAX_THREADS 沒被加)· DuckDB 鉤仍在 · 一行收據
-  [OK] ⑦ VIA_VDF_TOOLS=0 → 不掛(回前版行為)· 收尾彙總 [加速] 子行程 1 個已掛 · 加速器 1/1 · 網路工具 1/1 · 執行緒預算套回 1 · 平均載入 0.134 秒
+  [OK] ⑦ VIA_VDF_TOOLS=0 → 不掛(回前版行為)· 收尾彙總 [加速] 子行程 1 個已掛 · 加速器 1/1 · 網路工具 1/1 · 執行緒預算套回 1 · 平均載入 0.202 秒
   [OK] ⑦b 換在本體模組全域:v0107 hook_dir 真的寫出 v0115 鉤(含 _vdf_tools · 標籤 vdf-activate-v0115)—— 只換抄本的那份寫出來會是 v0107 舊鉤
   [OK] ⑧ 對照只讀本輪的家:只收家裡的庫(倉內 / 擷取家的不收)· 同名取 mega · 一名一檔
   [OK] ⑨ 沒有家 → 照前版(v0113 db_files)
@@ -165,7 +165,7 @@
   [OK] Ⓙ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫;資料庫只唯讀開(read_only=True · 沒有寫入語句)
   [計] VDF_MDL013_ActivateVDF v0111 本版 11/11 · PASS
 === VDF_MDL013_ActivateVDF v0110 · 薄尾自測(㊹ 取代 v0107 ㉚:機器上裝了 VCGC 的 DuckDB 環境鉤也要過;沙盒 · 零網路)===
-  [FAIL] ㊹ 取代 v0107 ㉚:子行程與孫行程的 duckdb.connect() 都生效 —— 鉤 = 境裡原有的 VCGC 鉤(v0107 讓位 · 執行緒由 v0107 補)或 v0107 本輪鉤 · 溢寫夾在本輪流程 temp 下 · 記憶體 = 每條預算 · 執行緒 = 每條執行緒;VIA_DUCK_TEMP=0 → 不掛;起跑實測 GREEN 且三項都 ok · {'境裡原有的鉤': '無', '應生效': 'vdf-activate-v0107', '子': {'hook': 'vdf-activate-v0107', 'threads_hook': None, 'memory_limit': '2.3 GiB', 'threads': '1', '溢寫夾在本輪': True}, '孫': 'vdf-activate-v0107', '關': None, '實測': 'YELLOW'}
+  [FAIL] ㊹ 取代 v0107 ㉚:子行程與孫行程的 duckdb.connect() 都生效 —— 鉤 = 境裡原有的 VCGC 鉤(v0107 讓位 · 執行緒由 v0107 補)或 v0107 本輪鉤 · 溢寫夾在本輪流程 temp 下 · 記憶體 = 每條預算 · 執行緒 = 每條執行緒;VIA_DUCK_TEMP=0 → 不掛;起跑實測 GREEN 且三項都 ok · {'境裡原有的鉤': '無', '應生效': 'vdf-activate-v0107', '子': {'hook': 'vdf-activate-v0107', 'threads_hook': None, 'memory_limit': '2.4 GiB', 'threads': '1', '溢寫夾在本輪': True}, '孫': 'vdf-activate-v0107', '關': None, '實測': 'YELLOW'}
   [OK] ㊺ 委派判定:前版自測只容 v0107 ㉚ 一條失敗(㉚ 加別條 · 只有別條 · 沒失敗 · 回碼不是 1 都不算取代)
   [OK] ㊻ 前版鏈:v0109(溢寫不等)→ v0108(main · db where · db_xcheck)→ v0107(記憶體 / TEMP 鉤:鉤名 · 實測 · 流程環境都在)→ v0106(總覽落檔 _WRITE_REPORT_V0100) · VDF_MDL013_ActivateVDF_v0109.py → VDF_MDL013_ActivateVDF_v0107.py
   [OK] ㊼ 本版一輪的總覽落檔最內層標 v0110(schema · tag · 蓋過 v0107 / v0108 的標)· 總覽落檔 / 頁面函式不換(v0109 ㊶ 照驗)
@@ -176,8 +176,8 @@
 [計] VDF_MDL013_ActivateVDF v0117 前版鏈 rc 1 · FAIL
 [計] VDF_MDL013_ActivateVDF v0118 前版鏈 rc 1 · FAIL
 [計] VDF_MDL013_ActivateVDF v0119 前版鏈 rc 1 · FAIL
-  [VDF engine run] VDF_MDL013_ActivateVDF rc=1 · 19.6s · python base 退路(境未見)
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_DailyBackup_v0100.py(冊上 VIA_Daily | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL245_SDDValidator_v0109.py'] | X-NUM 編號冊號碼 ≠ 冊上代碼(不在位移對照冊):['VCGC-REQ240', 'VCGC-REQ241', 'VCGC-REQ242', 'VCGC-REQ243 | X-REQ 需求代碼不合 [] · 歸屬指到不存在 ['VDF-REQ025→functional modules/VDF/VDF_MDL017_UserApiKeys_v → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 3, 'changed': 8, 'stale': 0, 'expected': 20614, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-  [教訓] 重複出錯:run VDF_SystemManager · rc=1 · (無例外訊息) · 第 8 次 · 帳本 CGC_MDL058(via-lessons)
-[監控] 背景全景監控中 pid 16420 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 538 提交 · 快照 1067.2h · 未推 2 · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [VDF engine run] VDF_MDL013_ActivateVDF rc=1 · 20.2s · python base 退路(境未見)
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VDF_MDL020_DataPlane_v0100.py(冊上 VDF_ | X-REQ 需求代碼不合 [] · 歸屬指到不存在 ['VDF-REQ025→functional modules/VDF/VDF_MDL017_UserApiKeys_v → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 6, 'changed': 14, 'stale': 0, 'expected': 20633, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+  [教訓] 重複出錯:run VDF_SystemManager · rc=1 · (無例外訊息) · 第 11 次 · 帳本 CGC_MDL058(via-lessons)
+[監控] 背景全景監控中 pid 531 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 551 提交 · 快照 1070.3h · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
