@@ -29,21 +29,37 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 693 · import 0 · 提及 133 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 700 · import 0 · 提及 143 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL253_ToolingInventory_v0103.py(家族 core)
-=== CGC_MDL253_ToolingInventory v0103 · 薄尾自測(薄尾鏈認得尾版律)===
-  [OK] ① 尾版律寫法(自己 exec + 照同族 _v*.py 找)認得;真本體裡有 exec 但不找同族 → 不算
-  [OK] ② 尾版律取本體:跳過點名同族版號的 v0101 → 本體 v0100
-  [OK] ③ 實樹 ENG055:鏈從尾版走到本體 v0118(不再停在尾版) · ['v0123', 'v0118']
-  [OK] ④ 換裝在 v0101 模組上(v0101 / v0102 備料卡都經它)
-  ── 前版 [OK] ⑦b 薄尾鏈:ENG055 尾版只蓋閘,參數在本體 → 鏈走到 exec 的本體(v0118)· 收到本體的旗標(--lane …)/ 環境變數 · (['v0123', 'v0118'], 0, ['FRED_API_KEY', 'VIA_L8_BUILTIN'], ['--date', '--export', '--from-file', '--lane', '--market', 
-  ── 前版 [計] CGC_MDL253_ToolingInventory_v0101 本版 11/11 · 前版 PASS · 合計 PASS
-  ── 前版 [計] CGC_MDL253_ToolingInventory_v0102 本版 8/8 · 前版 PASS · 合計 PASS
-  [OK] ⑤ 前版 v0102 自測(含 v0101 ⑦b 實樹 ENG055 備料卡)rc 0 · rc 0
-  [OK] ⑥ 加速器橋 · 網路工具橋在;只讀(不寫檔 · 不執行被讀的檔);不碰 TA-Lib
-  [計] CGC_MDL253_ToolingInventory v0103 本版 6/6 · 前版 PASS · 合計 PASS
+  [via-vcgc run] [流程] 政策過 · CGC_MDL253_ToolingInventory_v0105.py(家族 core)
+=== CGC_MDL253_ToolingInventory v0105 · 薄尾自測(SSOT 引擎全景含前版鏈 · PR #630 Codex P2)===
+  [OK] ① 取前版(glob + 版號小於自己 + spec 載入):尾版自己沒有 SSOT 字面,v0100 本體的引用全記到尾版名下(file / via 指 v0100)
+  [OK] ② 被新版蓋:尾版重新定義 collect → v0100 的 collect 引用標 shadowed(照列不刪);keep 沒被蓋、模組層常數不標
+  [OK] ③ 鏈表 CHAIN_VERSIONS=('0100',) 只走 v0100(v0101 的 VDF_TableHeader 不算);釘名 _STEM + "_v0100.py" 只走 v0100(用法字串裡的 v0101 不算釘名)
+  [OK] ④ 只有網路工具橋在載入(spec_from_file_location 在橋區塊裡)= 本體,不接前版;子行程委派(subprocess + < MY_V)= 取前版 v0106
+  [OK] ⑤ 全景:邊界列記在尾版名下、位置指到 v0100 那一支:行 · 釘舊版訊息寫真正所在的檔 · 摘要有前版鏈繼承數 / 有鏈引擎數 · _selftest_where 這類自測輔助寫暫存夾 = 自測夾具寫(不紅)
+  [OK] ⑥ AST 查詢:繼承來的引用 → 檔:行指到前版那一支,並標「經 尾版」
+  [OK] ⑦ 輸出:csv 多 file / via / shadowed 欄 · html 有「前版鏈」欄與繼承數卡 · json 摘要有 inherited_refs
+  [OK] ⑧ 實樹:CGC_MDL237 尾版現在看得到 v0100 本體讀的 VIA_Central_Params_SSOT / VIA_Policy_Laws_SSOT / VIA_VRN_FieldSpec_SSOT(Codex 舉例)· 鏈 24 支
+  [OK] ⑨ 不退步:v0104 列出的 225 支引擎與它們的冊全在(本版 281 支 · 引用 426 → 1379 · 前版鏈繼承 953 · 有鏈引擎 92 · 鏈壞 0)
+  [OK] ⑩ 加速器橋 · 網路工具橋在;只 ast.parse 不執行被讀的檔;寫檔只在 VCGC 報表夾(write_outputs 三處);不碰 TA-Lib
+  ── 前版 ── 前版 ── 前版 [計] CGC_MDL253_ToolingInventory_v0101 本版 11/11 · 前版 PASS · 合計 PASS
+  ── 前版 ── 前版 ── 前版 [計] CGC_MDL253_ToolingInventory_v0102 本版 8/8 · 前版 PASS · 合計 PASS
+  ── 前版 ── 前版 [計] CGC_MDL253_ToolingInventory v0103 本版 6/6 · 前版 PASS · 合計 PASS
+  ── 前版 [計] CGC_MDL253_ToolingInventory v0104 本版 10/11 · 前版 PASS · 合計 FAIL
+  [FAIL] ⑪ 前版 v0104 自測 rc 0(暫時拿掉本版補丁跑,跑完補回) · rc 1
+  [計] CGC_MDL253_ToolingInventory v0105 本版 10/11 · 前版 rc 1 · 合計 FAIL
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VDF_SystemManager_v0183.py(冊上 VDF_Sys | X-NUM 編號冊號碼 ≠ 冊上代碼:['VCGC-REQ245', 'VCGC-REQ240', 'VCGC-REQ241', 'VCGC-REQ242', 'VCGC- | X-REQ 需求代碼不合 ['VCGC-REQ 跳號'] · 歸屬指到不存在 ['VDF-REQ025→functional modules/VDF/VDF_MDL017_ → via-vcgc sdd check
+  [教訓] 重複出錯:run CGC_MDL253_ToolingInventory · rc=1 · <unknown>:<n>: SyntaxWarning: invalid escape sequence '<path>' · 第 2 次 · 帳本 CGC_MDL058(via-lessons)
+<unknown>:1050: SyntaxWarning: invalid escape sequence '\-'
+<unknown>:1050: SyntaxWarning: invalid escape sequence '\-'
+<unknown>:6: SyntaxWarning: invalid escape sequence '\C'
+<unknown>:6: SyntaxWarning: invalid escape sequence '\C'
+<unknown>:1050: SyntaxWarning: invalid escape sequence '\-'
+<unknown>:1050: SyntaxWarning: invalid escape sequence '\-'
+<unknown>:6: SyntaxWarning: invalid escape sequence '\C'
+<unknown>:6: SyntaxWarning: invalid escape sequence '\C'
 <unknown>:7: SyntaxWarning: invalid escape sequence '\.'
 <unknown>:12: SyntaxWarning: invalid escape sequence '\.'
 <unknown>:6: SyntaxWarning: invalid escape sequence '\.'
@@ -163,4 +179,4 @@
   """券商正典:CJK 別名子字串;拉丁別名詞界;≤3 字拉丁(gs/ms/mq/ubs)大寫獨立詞,或小寫但緊鄰檔名黏接字([_\-0-9]);
 <unknown>:1050: SyntaxWarning: invalid escape sequence '\-'
 <unknown>:1050: SyntaxWarning: invalid escape sequence '\-'
-[監控] 背景全景監控中 pid 495 · 觸碰 run CGC_MDL253_ToolingInventory · 交接閘 RED · 落後 338 提交 · 快照 1011.7h · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[監控] 背景全景監控中 pid 16420 · 觸碰 run CGC_MDL253_ToolingInventory · 交接閘 RED · 落後 538 提交 · 快照 1067.1h · 未推 2 · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
