@@ -54,3 +54,47 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
 **VCGC 全功能串測(VCGC-REQ085;側線 2026-09-30 b)**:`handoff check` 之後跑 `VIA_FROM_VCGC=YES python3 "$V" test --quick`(`enter` 與 PS 操作台也跑同一流程)。
 站表正本 `VIA_VCGC_FunctionInventory_SSOT_v*.json`;新增 / 換版任何 VCGC 指令或模組後跑 `test`(整輪,沒變的站沿用),
 新指令沒登盤點冊 = 黃;改過的尾版會自動跑它的 `--selftest`,版本與 UTC 時間只增寫進 `VIA_VCGC_FunctionLedger_v0100.jsonl`(要一起提交)。
+
+---
+
+**2026-11-16 操作員令(逐題定案;REQ 號與律號待 VCGC 登錄後補。登錄前是「待登需求」,不是律;與上文衝突時以上文與政策冊為準並回報)**
+
+- **解凍**:RC-1 凍結與「新增延後」自本日解除。新增仍走原流程:需求冊 → 工作流冊 → 薄尾新版 → 該系統 manager 實測 → 註冊 / 編號 / SDD → `handoff checkpoint`。
+- **省 Token 全程開著**:token 卡不只是第一步。讀任何約 >200 行的檔、任何資料夾、任何日誌,一律 `read` / `slice` / `digest` / `pack` / `--if-etag` / NLP `--brief`。沒走卡就整檔讀 = 黃,收據要寫理由。每批回報列出用了哪些省 Token 工具。
+- **摘要三數**:任何全景、摘要、貼回包都帶「應掃 / 已掃 / 略過清單」,對不上 = 紅。省 Token 只能壓形式,不能縮範圍。
+- **覆蓋率以生效計**:加速器 / 網路橋要「標記在 + 執行時載得到」才算覆蓋;只有標記 = 黃。
+- **SKIP 不是綠**:缺依賴而跳過 = 黃;設計上不在本倉 = 灰。
+- **自動監控**:VCGC / VDF / VRN-2 各自在自己的入口加 `monitor` 動詞,只彙總既有引擎(UNIT / INTEGRATION / SYSTEM / USER-TEST / 輸出驗證 / HTML U/I 同步;輸入 · 輸出 · 參數 · 時間範圍;MDL · ENG · CLS · FNC · LIB;ENV-LIB;資料庫)。不新增引擎、不跨系統改檔;沒有對應引擎的格子亮灰。
+- **資料邊界**:能離開本機的只有程式碼結構與 schema。市場資料、研報、庫內容不送任何外部模型或代理;Graphify 只跑本機 AST 模式;OmniRoute 不進任何引擎的執行路徑;Claudeflare 不接。
+- **驗收**:入口 MAIN 主機實跑綠 + 輸出對表頭冊驗過 +(VDF)選定範圍內無待補 / 未量 + 操作員用滑鼠走完該系統 U/I。
+- **HTML U/I 已視覺鎖定**:顏色、字體、版面只取 `VIA_UI_FormatLock` / `VIA_UI_Template_SSOT` / 各系統 VisualSpec 的鎖定尾版;只同步內容與修壞掉的,不改任何視覺值。
+- **VDF 擷取範圍**:全部台股全選全擷取;主動式台股 ETF 名冊全選 + 每日持股;加權、櫃買指數每日量價;財報只抓 `3017`、`3324`、`NVDA` 加上 VRN-2 研報出現過的個股(三大報表完整版);國際個股可增減(以 `NVDA` 為範例);其餘全擷取;族群起始時間可改,改一族整族一起改。只改範圍冊,不改擷取引擎邏輯。
+- **一個主工作倉**:本機多份副本只認一份,其餘只標記、不同步改。工作倉在 OneDrive 而 token 紅在 I/O error 屬環境紅:停下回報,不繞過。
+
+**過去一個月反覆重工的六個原因與解法**
+
+1. 規則當天改、當天全面回補 → 新規則先登需求冊,只重跑相依有變的 case(`handoff test <case>`),不全量重跑。
+2. 多線並行撞批號 / 版號 / MDL 號 → 取號前掃 本機 ∪ origin/main;先提交再編號;`audit` 三個 0。
+3. 沒有驗收條件就開工 → 開工前先定 輸入 / 輸出 / 完成條件(可用 `/via-grill` 逐題問到定案);收據帶命令、rc、SHA。
+4. 整檔讀、貼原文、重驗已鎖成功 → 走 token 卡;已鎖且位元沒變的不重驗;`reusable_successes` 直接沿用。
+5. 把標記、單元測試、對話裡的「完成了」當成完成 → 只認生效率、主機實測、`closeout_lamp` 與 SDD。
+6. 同一功能多份(副本倉、`_sha` 分身、相似引擎)→ 先 `chain` 看誰是本體;已有同功能就掛動詞,不另做。
+
+本日交接、給 Cowork 的提示詞與跨 AI 工具矩陣:`VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_Handover_20261116_Night_Closeout.md`。
+
+**2026-11-16 補強(來源:`VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_RecurringIssues_PolicyReview_20261116.md` 的十二個常見問題;同樣是「待登需求」,不是律)**
+
+- **交出前先模擬桌機**:要操作員打的指令,先在容器用「Windows 路徑 + 家目錄當工作目錄 + 落後分支」跑一次;指令開頭自己定位倉根、檢查要跑的檔在不在,不在就印 fetch / switch 那一行。
+- **併線先比兩邊**:動工前 `git fetch origin main` 並比對 本分支 ∪ origin/main 的版號與編號;同名不同內容以 main(已發布)為準,分支內容改發新版號。2026-11-16 實錄:兩線自 11-10 分開,53 檔撞名、`VDF_SystemManager_v0176` 與 `VDF_MDL017` 撞號(清單 `VIA_MergeMain_20261116_Conflicts.json`)。
+- **刪舊版先證明**:在拿掉該檔的副本上把尾版每個動詞實跑一遍才准刪;懶載入、名字釘死前版的都算「用到」。
+- **要求的目標缺一不綠**:輸入名單(代號 / 族群 / 序列)有一個沒結果,總燈不得綠,逐項點名。
+- **掃描用語法樹**:判「有沒有 import / 出網 / 橋」用 AST,不用字串搜尋(VRN `MDL002` 被字串誤判為出網)。
+- **單位與字形先統一**:跨來源比對前讀單位欄,金額統一百萬元(每股值不換);標籤全形轉半形、去空白再查表。
+- **共用冊寫入要鎖**:作業系統檔案鎖 + 唯一暫存檔名 + 原子換檔;不刪別人的鎖。
+- **跨平台位元組**:算雜湊前先統一成 LF;自測放一份 CRLF 檔。
+- **長跑要有心跳、並行要有監工**:子行程每 30 秒內至少一行;過熱減道並暫停最新子行程,冷卻恢復,至少留一支在跑。
+- **入湖範圍**:監控快照、執行紀錄、名單表不當資料入湖;擷取後跑 VDF `datamatrix`,多餘列 > 0 = 黃並點名。
+- **`--help` 不得有副作用**:沒看過的工具先 `read` 骨架,不直接下 `--help`。
+- **新檔不含本機路徑**;**閘收到錯形路徑當場拒絕、零寫入**;**頁面文字與底色對比 ≥ 4.5**。
+
+**每天開機更新**:工作站 `pwsh -NoProfile -ExecutionPolicy Bypass -File "VeritasIntelligenceAnalytics\supportive modules\registry\via_boot_update.ps1"`(每日首跑才實跑;log 在 `VIA_Reports/boot_update_logs/`);容器是同鏈的 `via_boot_update.sh`(SessionStart 喚起)。它照常令自己開同意閘並自補套件,所以 AI 不代跑,由操作員的手啟動。收工跑 `via-vcgc handoff daily`。

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VDF_MDL017_SafeParallelLaunch v0100 — VDF 一支啟動:環境檢查 → 降壓 → 五道並行(壓力自動調節)→ 驗證 → HTML U/I。
+"""VDF_MDL022_SafeParallelLaunch v0100 — VDF 一支啟動:環境檢查 → 降壓 → 五道並行(壓力自動調節)→ 驗證 → HTML U/I。
 
 操作員令(2026-11-14):「指令先進入環境檢查 加速器跟網路工具是否完整導入覆蓋率 100% · 將 CPU/DRAM 的運作壓力下滑 · 善用 TEMP ·
 用 API 擷取成增量擷取資料庫 · VDF 一定要加入加速器、還要加網路工具 · 降低硬體壓力後五個獨立不相關的流程同步進行 · 不燒壞電腦 ·
@@ -18,10 +18,10 @@
      任何時候至少留一支在跑;結束一律全部恢復。逾時整棵子行程樹收掉,照實記。
   ④ 頁:VIA_Reports/vdf/launch/VDF_Launch_latest.html(VCGC 鎖站色票)連到資料範圍矩陣 · 湖狀態 · 擷取頁 · 管理器矩陣頁;自動開瀏覽器。
 rc:0 全綠 · 2 有黃(閘關 / 缺料 / 有多餘)· 1 有紅(環境沒過 / 引擎紅)。
-用法:py VDF_MDL017_SafeParallelLaunch_v0100.py run [--start 2022-01-01] [--slots auto|1-5] [--skip-fetch] [--no-open] [--dry] [--force]
+用法:py VDF_MDL022_SafeParallelLaunch_v0100.py run [--start 2022-01-01] [--slots auto|1-5] [--skip-fetch] [--no-open] [--dry] [--force]
                                                      [--cpu-hard 90] [--cpu-soft 70] [--mem-floor-gb 2] [--timeout 21600]
-      py VDF_MDL017_SafeParallelLaunch_v0100.py check      (只做 ①)
-      py VDF_MDL017_SafeParallelLaunch_v0100.py --selftest
+      py VDF_MDL022_SafeParallelLaunch_v0100.py check      (只做 ①)
+      py VDF_MDL022_SafeParallelLaunch_v0100.py --selftest
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -86,7 +86,7 @@ from pathlib import Path
 
 # ───────── 系統設定(本系統專屬)─────────
 SYSTEM = "VDF"
-STEM = "VDF_MDL017_SafeParallelLaunch"
+STEM = "VDF_MDL022_SafeParallelLaunch"
 VERSION = "v0100"
 TAG = f"{STEM} {VERSION}"
 HERE = Path(__file__).resolve().parent
