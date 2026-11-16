@@ -37,7 +37,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 _STEM = "VRN_SystemManager"
-VERSION = "v0267"
+VERSION = "v0280"
 
 
 def _vnum(p) -> int:
@@ -62,7 +62,7 @@ def __getattr__(name):
     return getattr(PRIOR, name)
 
 
-# ══════════════════════════ v0267:collect() 自報改原生(只讀冊 · 不 import 他系統)+ token 省 Token 動詞(經鎖冊 · 子行程 · 唯讀)══════════════════════════
+# ══════════════════════════ v0280:collect() 自報改原生(只讀冊 · 不 import 他系統)+ token 省 Token 動詞(經鎖冊 · 子行程 · 唯讀)══════════════════════════
 # 操作員 2026-11-14:「SYSTEM MANAGER 應該據最新狀況及政策重寫並導入多個 VCGC TOKEN-SAVING 工具去完成」。
 # 實錄:11/11 依標準重寫時拿掉了 collect()(VCGC 全景 / 啟動門讀的自報介面),VCGC 那一格一直是 NODATA;舊 collect() 的上行七處靠 import VCGC
 # 主控台來算,違反標準 P4。本段:七處改成只讀 VCGC 的冊與檔面文字來判(不 import、不執行);省 Token 工具只經鎖冊解析、以子行程唯讀執行,
@@ -301,3 +301,5 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+# [VIA:REISSUE] 版號重發(2026-11-16 · VRN 自己併 origin/main 前置 · L25 後合者升版 · L123 他系統不代改):本檔原為本線 VRN_SystemManager_v0267(main 同族已發到更大版號或同號異物);只改版號字樣(VERSION 常數 · 前版檔名檢查),版號 v0280。前版 = 檔夾內比本版小的最大版號(現為 main 線尾版)。

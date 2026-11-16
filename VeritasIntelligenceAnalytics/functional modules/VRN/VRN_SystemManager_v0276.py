@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VRN_SystemManager v0264 — 標準 System Manager(依 VIA_SystemManager_Standard_v0100 從頭重作)
+"""VRN_SystemManager v0263 — 標準 System Manager(依 VIA_SystemManager_Standard_v0100 從頭重作)
 
 操作員令(2026-11-11):「確認三個獨立系統三個 main() 三個 system manager · 補齊基本功能 · 更健全 · 遵守更新後獨立系統規範 ·
 沒有誰管誰 · 主導全修正全在我跟 AI · 不符合就從頭規劃標準 system manager 重作」。
-實測缺口(2026-11-11):v0263 實測(容器 2026-11-12):test 把引擎 rc 2(缺件 fitz 等 · L16 ≠ 壞)記成失敗 → 13 支誤紅;本版依 L16 分 PASS / NODATA / ABSENT / GATED / FAIL
+實測缺口(2026-11-11):管理器缺 help / health / test / version(未知動詞會順手寫資產登記冊);操作員 2026-11-11:VRN-2 為主 · VRN-1 補強 · 整合後統稱 VRN(L128)
 本版是 VRN 自己的入口(L120 / L123):
   · 標準動詞本版自己做:help · version · health · engines · records · peers · conform · selftest(本系統另做 test(逐支尾版 --selftest))。
-  · 其餘動詞(前版鏈全部功能)一律以子行程原樣轉交前版 VRN_SystemManager_v0263(參數 · 環境 · rc 不變)—— 只增不減,不可丟失。
+  · 其餘動詞(前版鏈全部功能)一律以子行程原樣轉交前版 VRN_SystemManager_v0262(參數 · 環境 · rc 不變)—— 只增不減,不可丟失。
     標準動詞後加 --legacy 也轉交前版(看前版原本的版本)。
   · 對等:不 import / 不載入其他系統模組(本檔零動態載入);不要求其他系統的放行旗標;peers 只讀對方檔案(不執行對方程式碼、不寫對方)。
   · 編號依 L122 / L125(本檔不寫號冊)。前版檔一字不動(版號律)。不碰 TA-Lib;不讀寫同意閘;零網路。
@@ -90,7 +90,7 @@ SM_CONFIG = {'system': 'VRN',
                    'dir': 'functional modules/VDF',
                    'own_prefixes': ['VDF_'],
                    'reports': ['VIA_Reports/vdf_fetch', 'VIA_Reports/vdf']}}}
-SM_VERSION = "v0264"
+SM_VERSION = "v0276"
 SM_TAG = SM_CONFIG["manager_family"] + " " + SM_VERSION
 SM_HERE = Path(__file__).resolve()
 SM_NATIVE = ("help", "version", "health", "engines", "records", "peers", "conform", "selftest") + tuple(SM_CONFIG["native_extra"])
@@ -319,17 +319,13 @@ def sm_test_native(root: Path, only: str = "", max_n: int = 25, timeout: int = 1
         try:
             r = subprocess.run([sys.executable, str(p), "--selftest"], cwd=tempfile.gettempdir(), capture_output=True, text=True,
                                encoding="utf-8", errors="replace", timeout=timeout, env=sm_child_env())
-            rows.append({"family": fam, "rc": r.returncode, "result": SM_TEST_RC.get(r.returncode, "FAIL")})
+            rows.append({"family": fam, "rc": r.returncode, "result": "PASS" if r.returncode == 0 else "FAIL"})
         except subprocess.TimeoutExpired:
             rows.append({"family": fam, "rc": 124, "result": "TIMEOUT"})
     untested = len(picked) - len(rows)
-    fail = [r for r in rows if r["result"] in ("FAIL", "TIMEOUT")]
-    soft = [r for r in rows if r["result"] in ("NODATA", "ABSENT", "GATED")]
-    lamp = "RED" if fail else ("YELLOW" if untested or soft or not rows else "GREEN")
-    return {"lamp": lamp, "tested": len(rows), "untested": untested, "fail": fail, "soft": soft, "rows": rows}
-
-
-SM_TEST_RC = {0: "PASS", 2: "NODATA", 3: "ABSENT", 4: "GATED"}   # L16 五態碼:2 缺件 / 缺料 ≠ 壞掉 · 3 缺席 · 4 同意閘未開(操作員的手)
+    fail = [r for r in rows if r["result"] != "PASS"]
+    lamp = "RED" if fail else ("YELLOW" if untested or not rows else "GREEN")
+    return {"lamp": lamp, "tested": len(rows), "untested": untested, "fail": fail, "rows": rows}
 
 
 SM_RC = {"GREEN": 0, "RED": 1, "YELLOW": 2, "ABSENT": 3}
@@ -386,8 +382,7 @@ def sm_cmd(verb: str, args: list, root: Path) -> int:
         t = sm_test_native(root, only, mx)
         for x in t["rows"]:
             print(f"  {x['result']:<8}{x['family']} · rc {x['rc']}")
-        print(f"[{SM_TAG}] test {t['lamp']} · 測 {t['tested']} · 通過 {t['tested'] - len(t['fail']) - len(t['soft'])} · 缺件/缺料 {len(t['soft'])}(L16 rc 2/3/4 ≠ 壞)"
-              f" · 失敗 {len(t['fail'])} · 沒測到 {t['untested']}(照實記 NODATA)")
+        print(f"[{SM_TAG}] test {t['lamp']} · 測 {t['tested']} · 沒測到 {t['untested']}(照實記 NODATA)· 失敗 {len(t['fail'])}")
         return SM_RC[t["lamp"]]
     if verb == "status":
         h = sm_health(root)
@@ -425,8 +420,6 @@ def selftest() -> int:
         fam = SM_CONFIG["own_prefixes"][0] + "ENG001_Demo"
         (own / f"{fam}_v0100.py").write_text("import sys\nif '--selftest' in sys.argv: sys.exit(0)\n", encoding="utf-8")
         (own / f"{fam}_v0101.py").write_text("import sys\nif '--selftest' in sys.argv: sys.exit(1)\n", encoding="utf-8")
-        fam2 = SM_CONFIG["own_prefixes"][0] + "ENG002_NeedsLib"
-        (own / f"{fam2}_v0100.py").write_text("import sys\nif '--selftest' in sys.argv: sys.exit(2)\n", encoding="utf-8")
         for name, pc in SM_CONFIG["peers"].items():
             pd = root / pc["dir"]
             pd.mkdir(parents=True, exist_ok=True)
@@ -444,7 +437,7 @@ def selftest() -> int:
         peer_sig = lambda: sorted((str(p), p.read_bytes()) for pc in SM_CONFIG["peers"].values() for p in (root / pc["dir"]).rglob("*") if p.is_file())
         before = peer_sig()
         e = sm_engines(root)
-        ck("engines:只看自己的夾(對等系統的檔不列)· 尾版取最大版號", set(e) == {fam, fam2, SM_CONFIG["manager_family"]}
+        ck("engines:只看自己的夾(對等系統的檔不列)· 尾版取最大版號", set(e) == {fam, SM_CONFIG["manager_family"]}
            and e[fam]["tail_ver"] == 101 and e[fam]["versions"] == 2, sorted(e))
         ck("version:前版找得到且有 main", sm_version_info(root)["prior"] == prior.name and sm_version_info(root)["prior_has_main"])
         ck("records:只列自己的收據", [r["file"] for r in sm_records(root)] == [str((rd / "mine.json").relative_to(root))])
@@ -482,10 +475,7 @@ def selftest() -> int:
         c = sm_conform(root)
         ck("conform:規範動詞全覆蓋 · P1–P8 靜態全過", c["lamp"] == "GREEN", (c.get("missing_verbs"), c.get("bad")))
         t = sm_test_native(root)
-        ck("test(本版):逐支 --selftest · 失敗照實紅", t["lamp"] == "RED" and t["tested"] == 2 and [r["family"] for r in t["fail"]] == [fam], t)
-        t2 = sm_test_native(root, only="NeedsLib")
-        ck("test:rc 2(缺件 / 缺料)記 NODATA 不算失敗 → YELLOW(L16 缺件≠壞)", t2["lamp"] == "YELLOW" and not t2["fail"]
-           and t2["soft"] and t2["soft"][0]["result"] == "NODATA", t2)
+        ck("test(本版):逐支 --selftest · 失敗照實紅", t["lamp"] == "RED" and t["tested"] == 1 and t["fail"][0]["family"] == fam, t)
         keep_here = sys.modules[__name__].__dict__["SM_HERE"]
         try:
             globals()["SM_HERE"] = own / (SM_CONFIG["manager_family"] + "_v0002.py")
@@ -529,3 +519,5 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+# [VIA:REISSUE] 版號重發(2026-11-16 · VRN 自己併 origin/main 前置 · L25 後合者升版 · L123 他系統不代改):本檔原為本線 VRN_SystemManager_v0263(main 同族已發到更大版號或同號異物);只改版號字樣(VERSION 常數 · 前版檔名檢查),版號 v0276。前版 = 檔夾內比本版小的最大版號(現為 main 線尾版)。

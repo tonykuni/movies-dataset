@@ -36,7 +36,7 @@ import re
 import sys
 from pathlib import Path
 
-VERSION = "v0266"
+VERSION = "v0279"
 HERE = Path(__file__).resolve().parent
 _STEM = "VRN_SystemManager"
 
@@ -131,3 +131,5 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+# [VIA:REISSUE] 版號重發(2026-11-16 · VRN 自己併 origin/main 前置 · L25 後合者升版 · L123 他系統不代改):本檔原為本線 VRN_SystemManager_v0266(main 同族已發到更大版號或同號異物);只改版號字樣(VERSION 常數 · 前版檔名檢查),版號 v0279。前版 = 檔夾內比本版小的最大版號(現為 main 線尾版)。
