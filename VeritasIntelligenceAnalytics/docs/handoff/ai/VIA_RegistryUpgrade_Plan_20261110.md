@@ -34,13 +34,13 @@
 建議先做 P1 → P2 → P3(都在 VCGC 自己的編號機制內,直接補 CONST-030 缺口);P4–P7 偏顯示與整合,排後。
 
 ## 四、進度(只增)
-- **P1 完成 · 2026-11-10 17:26 +00:00** · `CGC_MDL237_NumberingSystem_v0120.py` = VIA-VCGC-MDL1637(ENV115)· 自測 20/20 · 前版鏈 v0119 PASS · 交接案 `C-cgc237-v0120-receipts` rc 0。
+- **P1 完成 · 2026-11-10 17:26 +00:00** · `CGC_MDL237_NumberingSystem_v0122.py` = VIA-VCGC-MDL1637(ENV115)· 自測 20/20 · 前版鏈 v0119 PASS · 交接案 `C-cgc237-v0120-receipts` rc 0。
   - 收據帳 `supportive modules/registry/VIA_RegistrationReceipts_v0100.jsonl`(只增;不在號冊夾,號冊一字不動)。
   - 欄:code · book · version · source · registered_at(分鐘 + 時區)· uuid · operator · bytes · format · sha256 · kind(new / version / backfill)· engine · functions(函式子號併母號,不單發)。
   - `--apply` 成功後自動發;重跑零新增;同號同版異 sha 標 conflict 不蓋。`receipts` 檢查:嚴格啟用日起 581 列 · 收據 581 · 缺 0 · 欄不全 0 · 衝突 0 = GREEN。
   - 今天先前編號的 581 列以 `receipts --backfill --apply` 補收據(kind=backfill,時間取 numbered_at);2026-11-10 前的列不回溯。
 - 下一段:P2 檔名規則閘 → P3 衝突 / 重複檢測加強。
-- **P2 完成 · 2026-11-10 17:48 +00:00** · `CGC_MDL237_NumberingSystem_v0121.py` = VIA-VCGC-MDL1638 · 自測 19/19(前版 v0120 20/20)· 交接案 `C-cgc237-v0121-gate`。
+- **P2 完成 · 2026-11-10 17:48 +00:00** · `CGC_MDL237_NumberingSystem_v0123.py` = VIA-VCGC-MDL1638 · 自測 19/19(前版 v0120 20/20)· 交接案 `C-cgc237-v0121-gate`。
   - 閘只管「本批要發號、還沒登過號的程式檔(.py / .ps1)」;已登號舊檔 · 冊 · 文件照前版(不回溯)。
   - N1 檔名 `<族>_v<NNNN>.<py|ps1>` · N2 同族同版已在樹上別處(參考 / 收件 / 報表 / 退役夾除外)= FAIL · N3 同夾同族已有更大版號 = HOLD(`--allow-gap <檔>` 明說補環)。
   - 擋下的檔不給號、其餘照發;全擋 rc 2 一列不寫。每個判定寫只增 LOG `supportive modules/registry/VIA_RegistrationGate_v0100.jsonl`(分鐘時間 · operator · 規則 · 原因)。`gate <檔…>` 只判不寫。

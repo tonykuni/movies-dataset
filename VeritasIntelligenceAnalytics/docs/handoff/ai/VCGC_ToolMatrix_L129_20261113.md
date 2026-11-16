@@ -13,7 +13,7 @@
 | `VIA_Policy_Laws_SSOT_v0125.json` +L133 | 獨立性強化 · 升級不連動 · 修法權(操作員 + AI)· 無衝突出號具法律性 · TA-Lib 不可用不可出現 · 子系統自行註冊 · 命名 `VIA_<系統>_<類>###_<名>_vNNNN` · 顯示走視覺鎖定。L128 已被 optimistic-goodall 分支用掉,跳號 |
 | `VIA_VCGC_ToolNaming_v0100.jsonl`(只增) | 名碼帳:MDL001–259 · SUP001–038(297 列,每列帶中央編號 · 尾版版本 · 時間);留白 10(7 支 CGC 沒版本號 · Celeritas / AegisNexus 沒中央 MDL 號 · FLOW_ENG023 沒號) |
 | `CGC_MDL224_TestAuto_v0107.py` | 串測家族掃描認得 `VIA_VCGC_<MDL|SUP>###_*`(舊家族一個不少)→ 新命名家族自動自測、紀錄冊留版本與時間 |
-| `CGC_MDL279_MCPServer_v0105.py` | 本分支的讀檔三動詞版;practical-pasteur 的 v0103(uploads/latest)先寫 → 那支留 v0103、本支升 v0104(L25)。`.mcp.json` 指 v0104 |
+| `CGC_MDL279_MCPServer_v0106.py` | 本分支的讀檔三動詞版;practical-pasteur 的 v0103(uploads/latest)先寫 → 那支留 v0103、本支升 v0104(L25)。`.mcp.json` 指 v0104 |
 
 自動更新:盤點冊站 `C-tool-matrix-build`(quick)→ 每次 `test --quick` 重出 `VIA_Reports/vcgc/VCGC_ToolMatrix_latest.html`;頁面每 5 分鐘自動重整;本機背景可 `run VIA_VCGC_MDL258_ToolMatrix watch`。
 

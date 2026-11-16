@@ -3,8 +3,8 @@
  "version": "v0153",
  "subsystem": "VCGC",
  "zh": "中央治理 · 中樞工作流",
- "batch": "全景警示清理(2026-11-14):步的正主改指尾版",
- "ts": "2026-11-14T00:31:30Z",
+ "batch": "X-REG:SkillExport 九步引擎指尾版 v0101(舊值留 engine_before)",
+ "ts": "2026-11-13T18:23:39+00:00",
  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
  "sdd": {
   "layers": [
@@ -2936,9 +2936,7 @@
    "spec": {
     "goal": "VDF VRN-2 VQG VAP 各自獨立;互動只走契約冊(誰自報什麼 · 在哪 · 燈怎麼對);VCGC 將來強化只改冊不改系統。",
     "requirements": [
-     "VCGC-REQ209",
-     "VCGC-REQ226",
-     "VCGC-REQ230"
+     "VCGC-REQ209"
     ],
     "acceptance": [
      "五系統都在冊上 · 每收據 path / lamp_key / required",
@@ -2974,7 +2972,7 @@
      "code": "VCGC-WKF032-STP002",
      "alias": "mcp_expose",
      "name": "MCP v0102 露互監 / 備份 / 六項令收據(只讀)",
-     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0105.py",
+     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0106.py",
      "verb": "--serve",
      "inside": "VCGC MCP",
      "evidence": "step:VCGC-WKF032-STP001",
@@ -3773,19 +3771,18 @@
      "alias": "mcp_parity",
      "name": "同一組 MCP 給所有 AI(parity)",
      "what": "via-systemcard · via-vcgc · omniroute → 8 平台;遠端需 HTTPS 隧道(操作員)",
-     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0105.py",
+     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0104.py",
      "verb": "--selftest",
      "inside": "VCGC run",
      "evidence": "self:VIA_MCP_Engine",
-     "engine_external": "../VIA_MCP_Engine/VIA_MCP_Engine_v0103.py",
-     "engine_before_v0153": "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py"
+     "engine_external": "../VIA_MCP_Engine/VIA_MCP_Engine_v0103.py"
     },
     {
      "code": "VCGC-WKF042-STP004",
      "alias": "mcp_file_verbs",
      "name": "MCP 讀檔三動詞(read · slice · digest 委派鎖版 token 工具)",
      "what": "倉內路徑閘(先判倉內外、倉外不透露存在)· .git/ private/ .env* 金鑰檔拒讀 · 鎖冊 sha 不符即停 · rc 0/1/3 是答案",
-     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0105.py",
+     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0106.py",
      "verb": "--selftest",
      "inside": "VCGC run",
      "evidence": "self:CGC_MDL279_MCPServer",
@@ -3813,8 +3810,7 @@
    "spec": {
     "goal": "兩支舊版引擎先複製進影子區(原檔 sha 前後一致)· 逐定義分 SAME / DOC_ONLY / SAME_SIG_DIFF_BODY / DIFF_SIG / ONLY_A / ONLY_B · 合併候選只寫影子區 · 未遷有理由才可能 PROVEN_ZERO_LOSS;證不出零損失的群不准遷(L75)",
     "requirements": [
-     "VCGC-REQ245",
-     "VCGC-REQ242"
+     "VCGC-REQ245"
     ],
     "acceptance": [
      "CGC_MDL281 自測 13/13",
@@ -3976,8 +3972,7 @@
     "requirements": [
      "VCGC-REQ238",
      "VCGC-REQ232",
-     "VCGC-REQ242",
-     "VCGC-REQ236"
+     "VCGC-REQ242"
     ],
     "acceptance": [
      "converge <家族> 13 步全 ✓",
@@ -4176,12 +4171,11 @@
      "alias": "number",
      "name": "編號",
      "what": "先提交再 CGC_MDL237 --apply --scope;audit 遺失 0 · 改身分 0 · 重號 0",
-     "engine": "supportive modules/registry/CGC_MDL237_NumberingSystem_v0122.py",
+     "engine": "supportive modules/registry/CGC_MDL237_NumberingSystem_v0119.py",
      "verb": "--apply --scope",
      "inside": "VCGC run",
      "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
-     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json",
-     "engine_before_v0153": "supportive modules/registry/CGC_MDL237_NumberingSystem_v0119.py"
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
     },
     {
      "code": "VCGC-WKF045-STP004",
@@ -4401,24 +4395,22 @@
      "alias": "number_register",
      "name": "編號 + 註冊",
      "what": "編號 + 註冊",
-     "engine": "supportive modules/registry/CGC_MDL237_NumberingSystem_v0122.py",
+     "engine": "supportive modules/registry/CGC_MDL237_NumberingSystem_v0119.py",
      "verb": "--apply --scope",
      "inside": "VCGC run",
      "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
-     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json",
-     "engine_before_v0153": "supportive modules/registry/CGC_MDL237_NumberingSystem_v0119.py"
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
     },
     {
      "code": "VCGC-WKF046-STP008",
      "alias": "audit",
      "name": "編號稽核 0/0/0",
      "what": "編號稽核 0/0/0",
-     "engine": "supportive modules/registry/CGC_MDL237_NumberingSystem_v0122.py",
+     "engine": "supportive modules/registry/CGC_MDL237_NumberingSystem_v0119.py",
      "verb": "audit",
      "inside": "VCGC run",
      "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
-     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json",
-     "engine_before_v0153": "supportive modules/registry/CGC_MDL237_NumberingSystem_v0119.py"
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
     },
     {
      "code": "VCGC-WKF046-STP009",
@@ -4626,12 +4618,11 @@
      "alias": "toolboard",
      "name": "工具看板",
      "what": "工具看板",
-     "engine": "docs/handoff/ai/VIA_VCGCToolBoard_v0101.py",
+     "engine": "docs/handoff/ai/VIA_VCGCToolBoard_v0100.py",
      "verb": "run",
      "inside": "VCGC run",
      "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
-     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json",
-     "engine_before_v0153": "docs/handoff/ai/VIA_VCGCToolBoard_v0100.py"
+     "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
     },
     {
      "code": "VCGC-WKF047-STP012",
@@ -4643,82 +4634,6 @@
      "inside": "VCGC run",
      "evidence": "self:VIA_VCGC_MDL258_ToolMatrix",
      "evidence_file": "docs/handoff/evidence/C-tool-matrix-v0100.json"
-    }
-   ]
-  },
-  {
-   "code": "VCGC-WKF048",
-   "alias": "ssot_consistency",
-   "name": "多系統 SSOT 一致性:偵測 → 案號 → 裁定 → 複驗",
-   "kind": "procedure",
-   "version": "v0100",
-   "updated_at": "2026-11-13T22:06:35Z",
-   "spec": {
-    "goal": "各系統獨立、互不干涉的前提下,VCGC 只讀各系統自報的冊,證明正則 / 同義字 / 編號在來源之間是否一致;不一致的給內容定址案號,由操作員與 AI 裁定,改冊由該冊的主人出新版號,再由本流程複驗結案。",
-    "requirements": [
-     "VCGC-REQ246"
-    ],
-    "acceptance": [
-     "引擎自測 32/32(30 個失敗情境逐項)",
-     "check 零寫;--apply 只寫自己的案帳與 VIA_Reports/ssot_consistency",
-     "案帳雜湊鏈完整 · 重跑 0 列",
-     "對 VDF / VRN / VAP / VQG 的檔寫入 0"
-    ],
-    "entry": "VIA_FROM_VCGC=YES python3 \"$V\" run VIA_VCGC_MDL262_SSOTConsistencyEngine check  →  view <鍵或概念> · probe <提案檔> · cases · rule <案號> --decision .. --order \"..\" --apply · ledger · fmea",
-    "evidence": "docs/handoff/evidence/C-ssot-consistency-v0100.json",
-    "books": [
-     "supportive modules/registry/VIA_SSOT_ConsistencyEngine_Sources_SSOT_v0100.json",
-     "supportive modules/registry/VIA_SSOT_ConsistencyEngine_FailureModes_SSOT_v0100.json",
-     "supportive modules/registry/VIA_SSOT_ConflictLedger_v0100.jsonl"
-    ]
-   },
-   "plan": {
-    "enter": "各系統自報的冊(來源冊宣告;只讀)",
-    "exit": "燈 + 案號帳 + 血緣檢視",
-    "order": "check → view / probe → rule(操作員原話)→ 該冊主人出新版 → check 複驗結案"
-   },
-   "tests": {
-    "self": "handoff test C-ssot-consistency-v0100",
-    "cross": [
-     "X-REQ-BACK",
-     "案帳雜湊鏈完整 · 重跑 0 列",
-     "與 Python re 差分零不符"
-    ],
-    "real": "容器經主控台實跑 check --apply(真冊 260 資產 · 開案 7)→ ledger GREEN"
-   },
-   "steps": [
-    {
-     "code": "VCGC-WKF048-STP001",
-     "alias": "scc_detect",
-     "name": "只讀各系統自報冊 → 精確證明 → 開案",
-     "what": "正則關係(相等 / 子集 / 交叉 / 互斥 + 見證)· 靜態風險 · 同義字 · 編號交叉檢;不可證 = UNPROVEN 不給綠",
-     "engine": "supportive modules/registry/VIA_VCGC_MDL262_SSOTConsistencyEngine_v0100.py",
-     "verb": "check",
-     "inside": "VCGC run",
-     "evidence": "self:VIA_VCGC_MDL262_SSOTConsistencyEngine",
-     "evidence_file": "docs/handoff/evidence/C-ssot-consistency-v0100.json"
-    },
-    {
-     "code": "VCGC-WKF048-STP002",
-     "alias": "scc_lineage",
-     "name": "多來源血緣與提案沙盒",
-     "what": "view:採信值照位階、同值不併號;probe:提案跟現行冊比(零寫)",
-     "engine": "supportive modules/registry/VIA_VCGC_MDL262_SSOTConsistencyEngine_v0100.py",
-     "verb": "view",
-     "inside": "VCGC run",
-     "evidence": "self:VIA_VCGC_MDL262_SSOTConsistencyEngine",
-     "evidence_file": "docs/handoff/evidence/C-ssot-consistency-v0100.json"
-    },
-    {
-     "code": "VCGC-WKF048-STP003",
-     "alias": "scc_ledger",
-     "name": "案號帳:裁定 · 失效 · 結案",
-     "what": "內容定址案號 · 只增雜湊鏈 · 裁定要帶操作員原話 · 證據變了裁定失效 · 來源缺席不結案",
-     "engine": "supportive modules/registry/VIA_VCGC_MDL262_SSOTConsistencyEngine_v0100.py",
-     "verb": "ledger",
-     "inside": "VCGC run",
-     "evidence": "self:VIA_VCGC_MDL262_SSOTConsistencyEngine",
-     "evidence_file": "docs/handoff/evidence/C-ssot-consistency-v0100.json"
     }
    ]
   }
@@ -4767,11 +4682,9 @@
  "why_v0145": "+WKF039 five_system_activate(五系統啟動 via HTML U/I;REQ216)。操作員 2026-11-10「activate 5 system via html u/i and run」→ VIA_LakeConsole v0101 薄尾:白名單 +6 動作(five_systems · activate_vcgc/vdf/vrn2/vqg/vap)+ 鏈 activate_all · 燈號 +6 盞 · 按鈕列 · 矩陣收據複製 · 逾時依系統。",
  "why_v0146": "只增:+VCGC-WKF042(SystemCard 全景卡 · 自建平台管理者版 · MCP parity);操作員 2026-11-10 四令合一。",
  "why_v0147": "只改 VCGC-WKF029.spec.acceptance[6] 的措辭:舊字「只經 VCGC」是 L120 列管的唯一入口舊字(SDDValidator X-PEER-TEXT YELLOW);發號本來就是 VCGC 的職責(L125),改寫成職責句、意思不變。原句留 acceptance_before_v0147。其餘一字不動。",
- "why_v0148": "SDDValidator X-COL RED:VCGC-WKF042 缺 tests 與步欄 → 照既有交接案補測法(self = 已登的 handoff 案),證據改前綴寫法(self: / step:),原檔案路徑留 evidence_file。其餘一字不動。 另:26 步的 engine 由釘死舊版改指註冊冊尾版(X-REG;舊值留 engine_before);WKF042-STP003 改指 VCGC MCP 伺服器 CGC_MDL279 v0103,樹外 VIA_MCP_Engine 留 engine_external。",
+ "why_v0148": "SDDValidator X-COL RED:VCGC-WKF042 缺 tests 與步欄 → 照既有交接案補測法(self = 已登的 handoff 案),證據改前綴寫法(self: / step:),原檔案路徑留 evidence_file。其餘一字不動。 另:26 步的 engine 由釘死舊版改指註冊冊尾版(X-REG;舊值留 engine_before);WKF042-STP003 改指 VCGC MCP 伺服器 CGC_MDL279 v0104,樹外 VIA_MCP_Engine 留 engine_external。",
  "why_v0149": "SkillExport 九步引擎指到尾版 VIA_SkillExport_v0101.py(薄尾:v0100 動詞全轉接,另加 detect/header/chain);原值留各步 engine_before。SDD X-REG 清紅。",
- "why_v0150": "2026-11-13 SDD X-REG RED:VCGC-WKF036 入口與 STP002 正主釘 VIA_VCGCToolBoard_v0100.py,元件註冊冊登的尾版是 v0101(v0101 薄尾疊 v0100,動詞 run 照舊)→ 改指 v0101(2 處);其餘一字不動;v0149 凍結不改",
+ "why_v0150": "2026-11-13 SDD X-REG RED:VCGC-WKF036 入口與 STP002 正主釘 VIA_VCGCToolBoard_v0100.py,元件註冊冊登的尾版是 v0101(v0101 薄尾疊 v0100,動詞 run 照舊)→ 改指 v0101(2 處);其餘一字不動;v0151 凍結不改",
  "why_v0147_b": "就地只增(本分支未發佈):+VCGC-WKF044 tool_matrix(REQ227–229);WKF032-STP002 · WKF042-STP004 引擎改 MDL279 v0104(L25 撞號升版)。 +VCGC-WKF045 family_converge(13 步 + 20 種失敗可能與解法;操作員 2026-11-13「這個流程很重要 未來常用」)。 +VCGC-WKF046 daily_close · +VCGC-WKF047 daily_open(斜線工具 /vcgc-daily-close · /vcgc-daily-open)。",
- "merge_v0151": "CGC_MDL143_MergeMedic_v0106 branch-merge origin/claude/optimistic-goodall-yhalc5:本版 = 他方尾版 VIA_Workflow_VCGC_SSOT_v0150.json 全部 + 本分支新增(L25 後合者升版;本分支原版號 v0147)",
- "change_v0152": "只增:+VCGC-WKF048(三步)接 VCGC-REQ246;其餘一字不動。",
- "change_v0153": "步的正主改指尾版 VCGC-WKF042-STP003:CGC_MDL279_MCPServer_v0103.py→CGC_MDL279_MCPServer_v0105.py · VCGC-WKF045-STP003:CGC_MDL237_NumberingSystem_v0119.py→CGC_MDL237_NumberingSystem_v0122.py · VCGC-WKF046-STP007:CGC_MDL237_NumberingSystem_v0119.py→CGC_MDL237_NumberingSystem_v0122.py · VCGC-WKF046-STP008:CGC_MDL237_NumberingSystem_v0119.py→CGC_MDL237_NumberingSystem_v0122.py · VCGC-WKF047-STP011:VIA_VCGCToolBoard_v0100.py→VIA_VCGCToolBoard_v0101.py(原值留 engine_before_v0153;SDD X-REG「註冊冊不是尾版」的來源)。其餘一字不動。 另補回指(只增):WKF032 +REQ226 · REQ230;WKF045 +REQ236;WKF043 +REQ242(需求冊 v0255 的 homes 改指這些工作流後,SDD X-REQ-BACK 要求雙向)。"
+ "merge_v0151": "CGC_MDL143_MergeMedic_v0106 branch-merge origin/claude/optimistic-goodall-yhalc5:本版 = 他方尾版 VIA_Workflow_VCGC_SSOT_v0152.json 全部 + 本分支新增(L25 後合者升版;本分支原版號 v0149)"
 }

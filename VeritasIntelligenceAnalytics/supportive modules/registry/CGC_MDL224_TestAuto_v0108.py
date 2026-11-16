@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """CGC_MDL224_TestAuto v0108 — 薄尾(v0107 … v0100 一字不動):更新尾版站(upd:*)認得 SKIP_ENV → 黃,不再一律紅。
 
-操作員 2026-11-13:「修 CGC_MDL237 和 CGC_MDL278 紅燈」。CGC_MDL237 v0122 / CGC_MDL278 v0101 在缺 DuckDB 的環境把
+操作員 2026-11-13:「修 CGC_MDL237 和 CGC_MDL278 紅燈」。CGC_MDL237 v0124 / CGC_MDL278 v0101 在缺 DuckDB 的環境把
 「Regex 證明引擎不在」照實回 rc 2 並印 [SKIP_ENV](黃 ≠ 綠);但 upd:* 站沒有 yellow_rc,rc 2 一律判紅。
 本版只改這一條、而且收得很窄:站 id 以 upd: 開頭 · rc 恰為 2 · 輸出裡有 [SKIP_ENV] 三者同時成立 → YELLOW;
 其餘(rc 2 但沒有 [SKIP_ENV] 的參數錯誤 / 崩潰、其他站、其他 rc)一律照前版 lamp_for。
@@ -102,7 +102,7 @@ def selftest() -> int:
         ok.append(bool(cond))
         print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)[:200]) if note and not cond else ''}")
 
-    upd = {"id": "upd:CGC_MDL237_NumberingSystem_v0122"}
+    upd = {"id": "upd:CGC_MDL237_NumberingSystem_v0124"}
     chk("① 前版鏈自測過(v0107 → v0106 → … → v0100)", rc == 0, f"rc {rc}")
     chk("② upd:* · rc 2 · 有 [SKIP_ENV] → YELLOW", lamp_for(2, upd, "...\n  [SKIP_ENV] DuckDB 不在\n") == "YELLOW")
     chk("③ upd:* · rc 2 · 沒有 [SKIP_ENV](參數錯 / 崩潰)→ 照前版 RED", lamp_for(2, upd, "usage: error") == "RED")

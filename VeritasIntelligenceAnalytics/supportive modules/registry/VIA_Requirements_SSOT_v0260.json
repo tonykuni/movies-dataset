@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
- "version": "v0252",
- "batch": "X-REQ 歸屬格式:19 條需求的 homes 寫了檔案路徑 → 改指工作流代碼(依工作流 spec.requirements 回指),路徑移 homes_files",
- "ts": "2026-11-13T17:30:00Z",
+ "version": "v0260",
+ "batch": "多系統 SSOT 一致性引擎(2026-11-13):+VCGC-REQ246 → VIA_VCGC_MDL262 v0100(前版 v0259)",
+ "ts": "2026-11-13T22:06:35Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -138,9 +138,9 @@
  "status_rule": "COVERED = 有正主執行(律 / 引擎 / 工作流步);RECORDED = 常設令已入冊有代碼,由 AI 程序遵守;PARTIAL / MISSING = 附 next 與 hand(誰的手)",
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
-  "RECORDED": 24,
-  "COVERED": 139,
-  "PARTIAL": 107,
+  "RECORDED": 26,
+  "COVERED": 148,
+  "PARTIAL": 122,
   "MISSING": 1
  },
  "requirements": [
@@ -6341,7 +6341,7 @@
     "docs/handoff/ai/VIA_SettleAll_v0117.py",
     "docs/handoff/ai/VIA_LayerMatrix_v0100.py"
    ],
-   "evidence": "容器 2026-11-06 SettleAll v0117 實跑:容器 2026-11-06 21:20Z 總燈 RED:GREEN ⓪ 根 · ① 環境 · ③ 同步(HEAD 65a8359a2 少 0 多 0)· ④ VDF ui v0168 六燈綠 · ⑨ Agent OS 48 項 失敗 0 錯誤 0 · ⑮ VAP v0302 16/16 · ⑰ VQG→VAP 串接 vqgVerified True · ⑭ 模組矩陣 509 尾版 🟢364 · ⑫ 系統矩陣 15 列 🟢6 🟡5 🔴3;YELLOW ② AST 編譯警告 4(凍結版)· ⑤ VRN-2 沒收尾收據 · ⑧ VQG closeout rc 0(曆推算)· ⑧b 匯出 4 表 · ⓫ 政策全景 L103 沒橋 17 / 65 · ⑯ 衝突 同名 224 撞號 3 撞埠 2;RED ⑥ VCGC(站 11 綠 9 黃 2 紅 0;交接 check 既有紅)· ⑬ VDF 引擎 98 家族 🔴6(curl_cffi / yfinance 容器缺)· ⑩ 報告總 RED;GRAY ⑦ Graphify 隔離環境沒裝;交接案車道轉態(帶理由 · 舊值留 repinned_before · 程式一字不動):VDF vdf_refill / vdf_manager_frozen_sample(釘 v0130 / v0158 單跑讀新冊就紅 → 家族尾版,v0168 鏈逐版印判決行)· VRN-2 provenance(v0256 起 provenance --selftest 進本版自測,來源回歸行不再印 → 認尾版判決行);環境紅(容器缺套件,桌機驗):cov_vrn_eng399(pymupdf 缺 → 7/7 非 8/8)· cov_vrn_eng400(fitz / PIL 缺 → ③–⑦ 跳過 → ⑩ 證據列 < 4;真紅 0)· vdf_fetch_system / vdf_fetch_* / vdf_finstmt_gate2(curl_cffi · yfinance)· vrn_docclass / vrn_plugin_hub / nlp_*(fitz)· tool_coverage_matrix / tool_probe_v0106 ㊱(pwsh);vrn_logic_index:冊過期 updated_n 1 → via_vrn_logic_book build 重建後重測",
+   "evidence": "容器 2026-11-06 SettleAll v0117 實跑:容器 2026-11-06 21:20Z 總燈 RED:GREEN ⓪ 根 · ① 環境 · ③ 同步(HEAD 65a8359a2 少 0 多 0)· ④ VDF ui v0168 六燈綠 · ⑨ Agent OS 48 項 失敗 0 錯誤 0 · ⑮ VAP v0302 16/16 · ⑰ VQG→VAP 串接 vqgVerified True · ⑭ 模組矩陣 509 尾版 🟢364 · ⑫ 系統矩陣 15 列 🟢6 🟡5 🔴3;YELLOW ② AST 編譯警告 4(凍結版)· ⑤ VRN-2 沒收尾收據 · ⑧ VQG closeout rc 0(曆推算)· ⑧b 匯出 4 表 · ⓫ 政策全景 L103 沒橋 17 / 65 · ⑯ 衝突 同名 224 撞號 3 撞埠 2;RED ⑥ VCGC(站 11 綠 9 黃 2 紅 0;交接 check 既有紅)· ⑬ VDF 引擎 98 家族 🔴6(curl_cffi / yfinance 容器缺)· ⑩ 報告總 RED;GRAY ⑦ Graphify 隔離環境沒裝;交接案車道轉態(帶理由 · 舊值留 repinned_before · 程式一字不動):VDF vdf_refill / vdf_manager_frozen_sample(釘 v0130 / v0158 單跑讀新冊就紅 → 家族尾版,v0168 鏈逐版印判決行)· VRN-2 provenance(v0262 起 provenance --selftest 進本版自測,來源回歸行不再印 → 認尾版判決行);環境紅(容器缺套件,桌機驗):cov_vrn_eng399(pymupdf 缺 → 7/7 非 8/8)· cov_vrn_eng400(fitz / PIL 缺 → ③–⑦ 跳過 → ⑩ 證據列 < 4;真紅 0)· vdf_fetch_system / vdf_fetch_* / vdf_finstmt_gate2(curl_cffi · yfinance)· vrn_docclass / vrn_plugin_hub / nlp_*(fitz)· tool_coverage_matrix / tool_probe_v0106 ㊱(pwsh);vrn_logic_index:冊過期 updated_n 1 → via_vrn_logic_book build 重建後重測",
    "next": "桌機:§32 兩行 → 五系統在新尾版上跑 → 貼回;VRN-2:ENG400 v0102(⑩ 門檻照實跑的動作數)可出薄尾;AgentOS v0103 網路橋 · VRN2_UIAction v0108 NOTE 照 REQ187 / REQ188 next。",
    "hand": "AI(VCGC 冊 · 容器實跑)· 操作員(桌機跑)· VRN-2 / VDF(各自車道程式)",
    "ts": "2026-11-06 21:21:00 +0000"
@@ -7191,7 +7191,7 @@
    ]
   },
   {
-   "code": "VRN-REQ020",
+   "code": "VRN-REQ022",
    "subsystem": "VRN",
    "topic": "VRN-2 非個股車道:非個股摘要器 v0310(v0300 同邏輯)整合 · 輸入 PDF / Word / 圖片 / 文字 / 網頁 / 訊息(JSON · .eml · LINE 匯出)/ 筆記 · 一檔一列矩陣(標題 + 四點 + 原句驗證 + 狀態)· 個股報告仍歸 VRN-2 主線",
    "requirement": "操作員 2026-11-12:「非個股 v0300 用在 VRN-2 摘要非個股報告、新聞、訊息;輸入有 PDF word image text,確保 VRN-2 都讀得到,經 v0300 摘要,結果用矩陣輸出;VRN-2 能處理個股報告與非個股報告」",
@@ -7248,7 +7248,7 @@
    ]
   },
   {
-   "code": "VDF-REQ025",
+   "code": "VDF-REQ035",
    "subsystem": "VDF",
    "topic": "VDF 全量實跑 + 邊跑邊修:管理器 test 依 L16 把缺第三方套件崩潰判 ABSENT · ENG089 自測過時門檻修 · 桌機一鍵 VDF 啟動 → 持股率 → 驗證",
    "requirement": "操作員 2026-11-13:「啟動VDF VRN邊跑邊修結果驗證」(桌機唯讀驗證 v0101 黃 2:V3 持股率最新日 2026-09-21 · V4 VRN-2 收據最新 2026-11-04)",
@@ -7296,6 +7296,391 @@
     "functional modules/VRN/VRN_ENG070_YahooConsensus_v0105.py",
     "functional modules/VRN/VRN_ENG062_SummarizerV1_v0114.py"
    ]
+  },
+  {
+   "code": "VCGC-REQ245",
+   "subsystem": "VCGC",
+   "topic": "引擎安全整併:影子隔離 + 逐定義比對 + 零遺失證明(先複製不影響舊的 · 只增不減不重複 · L61/L67/L75)",
+   "requirement": "操作員 2026-11-13:「依照過去規定成功自動註冊的指令具有版本號及時間有編號,先抓取有版本號有編號的引擎有註冊,回顧過去類似引擎,功能只應不減不重複原則注入AST將引擎全面性模塊化簡化後進行安全整併 VCGC應該有相關功能可整合動作 整合要先複製不影響舊的 註冊簡化模跨畫整合合併去重測試」「請撰寫一段 Python 腳本,示範如何建立安全的影子隔離環境,並使用 LibCST 載入兩個舊版引擎檔案,進行函數簽名比對與自動去重」→「接進 VCGC 並補上 MCP 的 read slice digest」",
+   "status": "PARTIAL",
+   "homes": [
+    "CGC_MDL281_ShadowMerge_v0100.py",
+    "VIA_Workflow_VCGC_SSOT_v0153.json"
+   ],
+   "workflow": "VCGC-WKF043",
+   "modules": [
+    "supportive modules/registry/CGC_MDL281_ShadowMerge_v0100.py"
+   ],
+   "evidence": "2026-11-13 容器:CGC_MDL281 v0100 自測 13/13(經 VCGC run;⑫ 薄尾判定真的問鎖版 token 工具 chain);真檔 CGC_MDL143_MergeMedic v0101×v0104 → SAME 11 · SAME_SIG_DIFF_BODY 4 · BLOCKED_NEEDS_RULING · 原檔 sha256 未動;v0104×v0105 → chain 判 v0105 薄尾 · ONLY_B 兩支 RISK(用到前版才有的名字)不搬。去重判準 = 含常數完整 AST(PEIS 正規化會把字串遮成同值,不拿來去重)。LibCST 本境未裝(AI 不裝套件)→ 走標準庫 ast,判準相同;LibCST 取原文那條路未實測。",
+   "next": "逐家族:Graphify 看耦合 → token chain 看薄尾 → run CGC_MDL281_ShadowMerge compare A B;BLOCKED 的群由操作員裁定後才出新版正典(L75 · L61)",
+   "hand": "operator",
+   "quotes": [
+    "操作員 2026-11-13:「依照過去規定成功自動註冊的指令具有版本號及時間有編號,先抓取有版本號有編號的引擎有註冊,回顧過去類似引擎,功能只應不減不重複原則注入AST將引擎全面性模塊化簡化後進行安全整併 VCGC應該有相關功能可整合動作 整合要先複製不影響舊的 註冊簡化模跨畫整合合併去重測試」「請撰寫一段 Python 腳本,示範如何建立安全的影子隔離環境,並使用 LibCST 載入兩個舊版引擎檔案,進行函數簽名比對與自動去重」→「接進 VCGC 並補上 MCP 的 read slice digest」"
+   ]
+  },
+  {
+   "code": "VCGC-REQ224",
+   "subsystem": "VCGC",
+   "topic": "via-vcgc MCP 補 vcgc_read · vcgc_slice · vcgc_digest(鎖版 token 工具 · 只讀 · 倉內路徑閘)",
+   "requirement": "操作員 2026-11-13:「VCGC已經有很多工具可用可擷取使用不用從頭 整理一下VCGC TOKEN SAVING工具看要如何整合 搭配GRAPHIFY OMNIROUTE」→「接進 VCGC 並補上 MCP 的 read slice digest」",
+   "status": "COVERED",
+   "homes": [
+    "CGC_MDL279_MCPServer_v0106.py",
+    "VIA_Workflow_VCGC_SSOT_v0153.json"
+   ],
+   "workflow": "VCGC-WKF042",
+   "modules": [
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0105.py"
+   ],
+   "evidence": "2026-11-13 容器:CGC_MDL279 v0105 自測本版 10 項 + v0102/v0101/v0100 鏈 rc 0(經 VCGC run 取尾版);stdio 真握手 tools 20(+3)· vcgc_slice 回定義 · 倉外路徑一律拒且存在與否同一句 · 鎖冊 sha 不符即停;.mcp.json 指到 v0103",
+   "next": "遠端平台(ChatGPT / Manus / Copilot web)經 VIA_MCP_Engine parity --write 與 HTTPS 隧道(操作員);桌機 Claude Desktop 重新載入 MCP 設定",
+   "hand": "operator",
+   "quotes": [
+    "操作員 2026-11-13:「VCGC已經有很多工具可用可擷取使用不用從頭 整理一下VCGC TOKEN SAVING工具看要如何整合 搭配GRAPHIFY OMNIROUTE」→「接進 VCGC 並補上 MCP 的 read slice digest」"
+   ],
+   "note_20261113b": "MCP 讀檔三動詞版改 v0104(與 practical-pasteur 分支的 v0103 uploads/latest 撞號,L25 後合者升版)"
+  },
+  {
+   "code": "VCGC-REQ225",
+   "subsystem": "VCGC",
+   "topic": "上傳件與 PC 檔導入檢查:有無導入 · 未導入者原樣收容 · 工具有無整合",
+   "requirement": "操作員 2026-11-13:「檢查有無導入」(3 個上傳 zip + Downloads / OneDrive 34 檔清單)「檢視工具有無整合 若無則擷取整合進去」",
+   "status": "PARTIAL",
+   "homes": [
+    "../supportive modules/references/intake/VIA_Uploads_20261113/MANIFEST_uploads_v0100.json",
+    "../docs/handoff/ai/VIA_UploadIntake_20261113.md"
+   ],
+   "evidence": "2026-11-13 容器:上傳 zip 逐檔 blob+sha256 比對 main 與全部遠端分支 → Test Closeout v0100 原樣收容(SHA256SUMS 16/16 · 拋棄式自測 16 ok 1 skip)· WorkbenchLocal v0104 原樣收容(與 practical-pasteur 分支只差換行);PC 34 檔只得檔名:倉內沒有 24 · 已導入 1 · main 同名 8 · 只在分支 1;第二輪:AgentOS + VCGC + SIE v3.0 原樣收容(自帶 QA sha 相符 · 自測 30/32(缺 fastapi)+ agent 12/12);Test Closeout 第二份同 sha 不重收",
+   "next": "PC 檔上傳後逐檔比對收容;Test Closeout 啟用與否由操作員定(與 VCGC closeout · CGC_MDL224 · SDD 重疊);與 optimistic-goodall 分支撞號由合併者依 L25 取聯集",
+   "hand": "operator"
+  },
+  {
+   "code": "VCGC-REQ226",
+   "subsystem": "VCGC",
+   "topic": "MCP 強化:ChatGPT · Gemini · Claude · Manus 存取 PC 檔(遠端唯讀工作夾 · 驗證 · 通道)· MCP TO GITHUB 抓資料引擎",
+   "requirement": "操作員 2026-11-13:「強化 mcp to chatgpt gemini CLAUDE MANUS PC FILE … 全景式讀取分析及上述功能整合 … MCP TO GITHUB 將資料引擎抓進來」「導入」",
+   "status": "PARTIAL",
+   "homes": [
+    "../VIA_MCP_Engine/VIA_MCP_Engine_v0103.py",
+    "CGC_MDL279_MCPServer_v0106.py",
+    "../docs/handoff/ai/VIA_UploadIntake_20261113.md"
+   ],
+   "evidence": "現況已在倉:filesystem(本機讀寫)· GitHub MCP(唯讀 PAT)· 8 平台設定 · supergateway 橋 + OmniRoute · via-vcgc read/slice/digest(REQ224);ChatGPT 分享頁讀不到內容",
+   "next": "撞號定案後:CGC_MDL279 下一版 --files-root(遠端平台唯讀 PC 工作夾全景讀取)· 橋接驗證金鑰;通道 / Access / 金鑰是操作員的手;操作員指名要抓的 GitHub 倉 / 資料引擎",
+   "hand": "operator",
+   "note_20261113b": "MCP 讀檔三動詞版改 v0104(與 practical-pasteur 分支的 v0103 uploads/latest 撞號,L25 後合者升版)"
+  },
+  {
+   "code": "VCGC-REQ227",
+   "subsystem": "VCGC",
+   "topic": "VCGC 工具矩陣 HTML:中央管理 MDL · 省 Token / 支援 SUP · 整合進來 INT · 收尾,隨時自動重出,用操作員視覺鎖定 U/I 顯示",
+   "requirement": "操作員 2026-11-13:「矩陣顯示目前VCGC本身中央控管功能及節省TOKEN工具所有工具即被整合進來的所有工具 為旯將自動隨時更新於HTML矩陣化管理來進行使用」「將我指令視覺鎖定模板整合進來併用它來顯示VCGC進行VCGC收尾」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "../docs/handoff/ai/VIA_VisualLock_v0100.py",
+    "CGC_MDL253_ToolingInventory_v0103.py"
+   ],
+   "evidence": "自測 20/20(含真樹出頁 + 視覺鎖定閘 GREEN + 唯讀);盤點冊站 C-tool-matrix-build(quick)每輪 test --quick 重出 VIA_Reports/vcgc/VCGC_ToolMatrix_latest.html;頁內每 5 分鐘自動重整;watch 動詞給本機背景",
+   "next": "操作員桌機跑 via-vcgc test --quick 或 run VIA_VCGC_MDL258_ToolMatrix build 後開頁",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:56:20Z"
+  },
+  {
+   "code": "VCGC-REQ228",
+   "subsystem": "VCGC",
+   "topic": "命名規定:VIA_<系統>_<類>###_<英文名>_vNNNN · VCGC 中央管理 VIA_VCGC_MDL### · 省 Token / 支援 VIA_VCGC_SUP### · 版本號 · 登錄時間",
+   "requirement": "操作員 2026-11-13:「註冊要求名稱依照規定VIA_VRN_MDL001_FetchingTWSETPEXData_v001.py這是範例不是真的 要依規定命名有版本號有登錄時間避免混亂 VCGC節省或支援工具VIA_VCGC_SUP001_ VCGC本身中央管理VIA_VCGC_MDL001 相同要有版本號 依照命名規定」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "VIA_VCGC_ToolNaming_v0100.jsonl",
+    "CGC_MDL224_TestAuto_v0107.py",
+    "VIA_Policy_Laws_SSOT_v0125.json"
+   ],
+   "evidence": "政策 L133 ⑦;命名帳只增發名(號跟家族走 · 衝突不發 · 沒中央編號 / 沒版本號留白);新家族第一支 VIA_VCGC_MDL258_ToolMatrix;串測 CGC_MDL224 v0107 認得新命名家族",
+   "next": "舊家族不改檔名(L02 · L04 · 薄尾 glob 鏈);主控台經命名帳雙向解析新舊名之前,改用新檔名要操作員逐家族裁定",
+   "hand": "operator",
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:56:20Z"
+  },
+  {
+   "code": "VCGC-REQ229",
+   "subsystem": "VCGC",
+   "topic": "政策強硬化:四(五)系統獨立互不干涉 · VCGC 升級不連動 · 協助性衝突檢 · 操作員與 AI 修法權 · 無衝突出號具法律性 · TA-Lib 不可用不可出現 · 子系統自行註冊 VCGC 檢視登錄",
+   "requirement": "操作員 2026-11-13:「VCGC政策規範強硬化要求所有系統的獨立性互不干涉 VCGC的協助性檢查衝突能力 我跟AI有修政權 當VCGC經過修正無衝突並顯現編號十具法律性 … VCGC升級是為了更方便更強大不是為了更麻煩 故創造獨立性要求 不可用且不可出現任何TA-LIB 被成功使用的引擎模組註冊由子系統自行註冊 VCGC檢視登陸」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Policy_Laws_SSOT_v0125.json",
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py"
+   ],
+   "evidence": "政策 v0118 +L133(政策閘 rc 0);ToolMatrix check:尾版 TA-Lib 程式使用 0 · 命名衝突 0 · 他系統尾版釘 VCGC 版 4 檔(點名不代改)· VCGC 釘他系統 54 家族(黃,VCGC 自己的債)",
+   "next": "他系統(VDF · VRN-2)出新版時拿掉釘 VCGC 版號;VCGC 自己 54 家族出新版時改讀收據 / 走對方 manager",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:56:20Z"
+  },
+  {
+   "code": "VCGC-REQ230",
+   "subsystem": "VCGC",
+   "topic": "整合兩個會話:VCGC 工囊工具列表(claude/practical-pasteur-p67i78)· MCP 架構設計與多 AI 整合(PR #594)",
+   "requirement": "操作員 2026-11-13:「https://claude.ai/code/cshk_01542cbM1czafs7jZH5exynB… https://claude.ai/code/cshk_01542cbLJUivCLvkr4EpMWnt… 整合進來」",
+   "status": "COVERED",
+   "homes": [
+    "CGC_MDL279_MCPServer_v0105.py",
+    "CGC_MDL279_MCPServer_v0106.py",
+    "CGC_MDL233_ToolActivate_v0109.py",
+    "../docs/handoff/ai/VIA_UploadsWorkbench_v0102.py"
+   ],
+   "evidence": "分享連結本身 403 讀不到;對到會話 → MCP 那條 PR #594 早已在 main;工囊那條分支 12 提交 merge 進本分支(聯集);撞號 MDL279 v0103 → 那支留 v0103、讀檔三動詞改 v0104,自測鏈 v0104 → v0100 全 PASS",
+   "next": "本分支合回 main 時,optimistic-goodall-yhalc5 仍另有一支 MDL279 v0103 與主控台 v0193–v0196 撞號(操作員定合併順序)",
+   "hand": "operator",
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:56:20Z"
+  },
+  {
+   "code": "VCGC-REQ231",
+   "subsystem": "VCGC",
+   "topic": "商業化產品號封裝管理模組:有無被整合進 VCGC",
+   "requirement": "操作員 2026-11-13:「檢差商業化產品號封裝管理模組有無被整合」",
+   "status": "PARTIAL",
+   "homes": [
+    "CGC_MDL174_PackagingGate_v0101.py",
+    "CGC_MDL133_ProductGate_v0102.py",
+    "CGC_MDL072_ProductUi_v0100.py",
+    "CGC_MDL036_BuildPkgPointers_v0101.py"
+   ],
+   "evidence": "四個家族都有中央編號(MDL1145 · MDL830 · MDL544 · MDL047)且在工具矩陣裡;但沒有 VCGC 測站、沒有主控台動詞、沒有工作流;最近一次實測帳只有 2026-09-30 基線;Commercial Review 解開版在 review/VIA_VCGC_Commercial_Review_v0100/,8 條候選需求 CAND-VCGC-COM-001…008 仍 PROPOSED_NOT_APPROVED;40 條隔離測試 NOT_RUN;PKG-### 產品號沒有中央發號(號冊沒有 PKG 類);簽章授權未實作",
+   "next": "操作員核准 CAND-VCGC-COM 候選 → 登測站 / 工作流 → 實測;產品號是否立 PKG 類由操作員定",
+   "hand": "operator",
+   "version": "v0100",
+   "updated_at": "2026-11-13T16:56:20Z"
+  },
+  {
+   "code": "VCGC-REQ232",
+   "subsystem": "VCGC",
+   "topic": "全部薄尾家族合併成單檔 · 驗證後刪舊版(VCGC 自己的家族;他系統自行)",
+   "requirement": "操作員 2026-11-13:「繼續 全部薄尾家族合併成單檔 驗證後刪舊版」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "VIA_VCGC_PruneLedger_v0100.jsonl",
+    "VIA_Policy_Laws_SSOT_v0125.json"
+   ],
+   "evidence": "政策 L134;就緒度(VCGC 307 家族):單檔 138 · 可刪舊版 3 · 薄尾待合成 133 · 舊版被點名 33;可刪的 3 族驗證後刪(刪除帳)",
+   "next": "133 族薄尾鏈逐族合成單檔 + CGC_MDL281 零遺失證明 + 自測等價後才刪;33 族先改掉點名舊版的地方",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T17:49:06Z"
+  },
+  {
+   "code": "VCGC-REQ233",
+   "subsystem": "VCGC",
+   "topic": "支援工具(NLP · Layout …)一個發行版 · 他系統各存一份位元組相同副本 · 協調 + 測試後才換版",
+   "requirement": "操作員 2026-11-13:「若請VCGC的工具來支援如NLP LAYOUT工具則 兩者必須相同且整合為一版本相同內容相同個存一個 … VDF VRN VQG VAP若有使用支援工具都在第存一個 避免VCGC升級失敗其他系統全數癱瘓」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "VIA_Policy_Laws_SSOT_v0125.json"
+   ],
+   "evidence": "政策 L134 ④;矩陣「VIA 支援工具」列出他系統直接載入的支援工具(VRN-2 · VDF 載入加速器 / 網路橋 · VRN-2 載入 SUP_MDL749);操作員 2026-11-13 核可發行冊格式(版號 + sha256 + 使用系統)→ VIA_VCGC_SupportRelease_v0100.jsonl",
+   "next": "VCGC 出支援工具發行冊(版號 + sha256);各系統各自存副本並改用自己那份(VCGC 不代改他系統檔);換版走協調 + 測試",
+   "hand": "operator",
+   "version": "v0100",
+   "updated_at": "2026-11-13T18:21:16Z"
+  },
+  {
+   "code": "VCGC-REQ234",
+   "subsystem": "VCGC",
+   "topic": "一鍵布建:全新電腦 → 全部系統工具布建 · 無衝突 · PATH 設定 · 全系統可啟用;只問一題(裝 C 槽?否 → Windows I/O 搜尋 · A/B/C);只用滑鼠",
+   "requirement": "操作員 2026-11-13:「VCGC VDF VRN VQG VAP都是獨立系統都有各自的SYSTEM MANAGER去管控一切包含HTML U/I但最規範視覺統一的HTML U/I統一由VCGC管理 環境與LIB安裝衝突監測 AUTO-DEPLOYING已一個全新電腦布建到所有系統工具布建完畢且沒衝突且設定PATH相關工具完成全部系統都可啟用 裡面只有一像人工輸入就是問使用者是否將系統安裝於C槽若不是則用WINDOWS I/O搜尋確認安裝地點 為簡單化給他一些選項A/B/C 使用者操作只用滑鼠不用鍵盤為最高原則 編號系統優化 完善後收尾VCGC VCGC是工具資訊訊息提供及保存功能給AI看即自動中央控管給我跟AI看 其他沒跟使用者戶度的必要 收尾他」",
+   "status": "RECORDED",
+   "homes": [
+    "CGC_MDL175_AutoDeploy_v0101.py",
+    "CGC_MDL056_InstallGate_v0104.py",
+    "../Install-VIA-Product-v0101.ps1",
+    "../Invoke-VIA-WorkbenchLocal-v0104.ps1"
+   ],
+   "evidence": "既有零件:AutoDeploy v0101 · InstallGate v0104 · Install-VIA-Product v0101 · WorkbenchLocal v0104(一支 PS 全包)· VIA_MCP_Engine(純滑鼠 HTML 範本)",
+   "next": "操作員 2026-11-13:擱置(其餘 VCGC 先收尾);操作員 2026-11-13:「先記錄最後做」—— 排在所有收斂工作之後;下一版布建器(Python 本體 + 純滑鼠 HTML 一題 A/B/C + 新版號 PS 啟動器)· 容器只能自測與乾跑,真裝在操作員電腦(L19)",
+   "hand": "operator",
+   "version": "v0100",
+   "updated_at": "2026-11-13T19:18:01Z"
+  },
+  {
+   "code": "VCGC-REQ235",
+   "subsystem": "VCGC",
+   "topic": "環境與 LIB 安裝衝突監測(撞版 · 撞名 · PATH 遮蔽 · 多境)",
+   "requirement": "操作員 2026-11-13:「VCGC VDF VRN VQG VAP都是獨立系統都有各自的SYSTEM MANAGER去管控一切包含HTML U/I但最規範視覺統一的HTML U/I統一由VCGC管理 環境與LIB安裝衝突監測 AUTO-DEPLOYING已一個全新電腦布建到所有系統工具布建完畢且沒衝突且設定PATH相關工具完成全部系統都可啟用 裡面只有一像人工輸入就是問使用者是否將系統安裝於C槽若不是則用WINDOWS I/O搜尋確認安裝地點 為簡單化給他一些選項A/B/C 使用者操作只用滑鼠不用鍵盤為最高原則 編號系統優化 完善後收尾VCGC VCGC是工具資訊訊息提供及保存功能給AI看即自動中央控管給我跟AI看 其他沒跟使用者戶度的必要 收尾他」",
+   "status": "PARTIAL",
+   "homes": [
+    "CGC_MDL135_EnvGovernance_v0118.py",
+    "CGC_MDL186_EnvGovernance_8Hub_v0101.py",
+    "CGC_MDL273_EnvToolAudit_v0102.py",
+    "CGC_MDL240_EnvManager_v0101.py"
+   ],
+   "evidence": "EnvGovernance(8 樞)· EnvToolAudit · EnvManager 已在;容器境根 NODATA(要操作員電腦的境根)",
+   "next": "併進布建器的監測面板(只讀 · 有衝突不硬裝)· 工具矩陣加「環境衝突」欄",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T18:07:52Z"
+  },
+  {
+   "code": "VCGC-REQ236",
+   "subsystem": "VCGC",
+   "topic": "編號系統優化",
+   "requirement": "操作員 2026-11-13:「VCGC VDF VRN VQG VAP都是獨立系統都有各自的SYSTEM MANAGER去管控一切包含HTML U/I但最規範視覺統一的HTML U/I統一由VCGC管理 環境與LIB安裝衝突監測 AUTO-DEPLOYING已一個全新電腦布建到所有系統工具布建完畢且沒衝突且設定PATH相關工具完成全部系統都可啟用 裡面只有一像人工輸入就是問使用者是否將系統安裝於C槽若不是則用WINDOWS I/O搜尋確認安裝地點 為簡單化給他一些選項A/B/C 使用者操作只用滑鼠不用鍵盤為最高原則 編號系統優化 完善後收尾VCGC VCGC是工具資訊訊息提供及保存功能給AI看即自動中央控管給我跟AI看 其他沒跟使用者戶度的必要 收尾他」",
+   "status": "RECORDED",
+   "homes": [
+    "CGC_MDL237_NumberingSystem_v0119.py",
+    "VIA_VCGC_ToolNaming_v0100.jsonl"
+   ],
+   "evidence": "現況:稽核 遺失 0 · 改身分 0 · 重號 0;冊內不一致 1(既有 · 54 列宣告碼 ≠ 發出號);名碼帳(VIA_VCGC_MDL/SUP)與中央號(VIA-VCGC-MDL####)雙軌已對照",
+   "next": "先解冊內不一致 1 · 中央號與名碼單一查詢入口 · 同號異名組(VCGC 8 · VDF 4 · VRN 2 · SUP 1)交操作員裁定",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T18:07:52Z"
+  },
+  {
+   "code": "VCGC-REQ237",
+   "subsystem": "VCGC",
+   "topic": "各系統 SYSTEM MANAGER 自管(含自己的 HTML U/I);視覺規範統一的 U/I 由 VCGC 管理;VCGC = 工具資訊提供與保存給 AI · 自動中央控管給操作員與 AI",
+   "requirement": "操作員 2026-11-13:「VCGC VDF VRN VQG VAP都是獨立系統都有各自的SYSTEM MANAGER去管控一切包含HTML U/I但最規範視覺統一的HTML U/I統一由VCGC管理 環境與LIB安裝衝突監測 AUTO-DEPLOYING已一個全新電腦布建到所有系統工具布建完畢且沒衝突且設定PATH相關工具完成全部系統都可啟用 裡面只有一像人工輸入就是問使用者是否將系統安裝於C槽若不是則用WINDOWS I/O搜尋確認安裝地點 為簡單化給他一些選項A/B/C 使用者操作只用滑鼠不用鍵盤為最高原則 編號系統優化 完善後收尾VCGC VCGC是工具資訊訊息提供及保存功能給AI看即自動中央控管給我跟AI看 其他沒跟使用者戶度的必要 收尾他」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Policy_Laws_SSOT_v0125.json",
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "../docs/handoff/ai/VIA_VisualLock_v0100.py"
+   ],
+   "evidence": "政策 L135 ① ②;VCGC 工具矩陣(視覺鎖定 · 自動重出 · 收尾分頁)即中央控管畫面",
+   "next": "各系統頁照 VIA_VisualLock 自行套用(VCGC 不代改)",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T18:07:52Z"
+  },
+  {
+   "code": "VCGC-REQ238",
+   "subsystem": "VCGC",
+   "topic": "家族收斂標準工序(13 步)+ 20 種失敗可能與解法 · 常用",
+   "requirement": "操作員 2026-11-13:「注入AST分類編號註冊 模塊化 模組化 簡化 相觀摩主 註冊避免缺漏 整合去重 測試修正成為唯一最強 清點無遺漏 啟動能正常 刪去舊的 這個流程很重要 未來常用 想20個失敗可能性及解決方案加入」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Workflow_VCGC_SSOT_v0153.json",
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "VIA_Policy_Laws_SSOT_v0125.json"
+   ],
+   "evidence": "工作流 VCGC-WKF045(13 步 · F01–F20)· converge <家族> 體檢 · 矩陣「單檔收斂」分頁列失敗可能表 · 政策 L136 ⑦",
+   "next": "逐家族照工序收斂(VCGC-REQ232)",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T18:21:16Z"
+  },
+  {
+   "code": "VCGC-REQ240",
+   "subsystem": "VCGC",
+   "topic": "每日收尾大流程(交接儲存 · 省 Token · Graphify / OmniRoute · 備份 · 本機 ↔ GitHub 一致)+ 斜線工具 /vcgc-daily-close",
+   "requirement": "操作員 2026-11-13:「兩格大流程幫我整合一下 … 每日工作交接儲存流程 … 每日收尾備份及本機GITHUB一致性更新完成 … 隔天每天第一步驟讀取一切昨日備份狀況啟動VCGC所有工具GRAPHIFY/OMNIROUTE最完善化五系統更新流程」「兩格大流程完善後將他CLAUDE TOOL斜線工具化」",
+   "status": "COVERED",
+   "homes": [
+    "../../.claude/skills/vcgc-daily-close/SKILL.md",
+    "VIA_Workflow_VCGC_SSOT_v0153.json"
+   ],
+   "evidence": "工作流 VCGC-WKF046;本倉 .claude/skills(Claude Code 斜線工具,倉內本地化,與 VCGC 指令同一套)",
+   "next": "操作員桌機開 Claude Code 即可打斜線叫用",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T19:18:01Z"
+  },
+  {
+   "code": "VCGC-REQ241",
+   "subsystem": "VCGC",
+   "topic": "每天第一步大流程(讀昨日備份 · 啟動全部工具 · Graphify / OmniRoute · 五系統更新)+ 斜線工具 /vcgc-daily-open",
+   "requirement": "操作員 2026-11-13:「兩格大流程幫我整合一下 … 每日工作交接儲存流程 … 每日收尾備份及本機GITHUB一致性更新完成 … 隔天每天第一步驟讀取一切昨日備份狀況啟動VCGC所有工具GRAPHIFY/OMNIROUTE最完善化五系統更新流程」「兩格大流程完善後將他CLAUDE TOOL斜線工具化」",
+   "status": "COVERED",
+   "homes": [
+    "../../.claude/skills/vcgc-daily-open/SKILL.md",
+    "VIA_Workflow_VCGC_SSOT_v0153.json"
+   ],
+   "evidence": "工作流 VCGC-WKF047;本倉 .claude/skills(Claude Code 斜線工具,倉內本地化,與 VCGC 指令同一套)",
+   "next": "操作員桌機開 Claude Code 即可打斜線叫用",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T19:18:01Z"
+  },
+  {
+   "code": "VCGC-REQ242",
+   "subsystem": "VCGC",
+   "topic": "類似功能全景收斂引擎(清點 → AST / 編號 / 註冊 → TEMP 影子區 → 整合去重 → 一個最強模組)+ /vcgc-converge",
+   "requirement": "操作員 2026-11-13:「系統類似功能全景式模組引擎清點 注入AST分類編號清點說明 註冊 … 複製到TEMP 進行整合去重 … 更新為一個最強模組 … 搭配CLAUDE … 授權自動解決」「提供啟動這個引擎指令 檢查所有指令是否都有注入AST PS/PY檔案都有導入最新加速器 對外擷取資料的引擎是否都有導入最新的網路工具 … BASE / VIA_CORE / VIA_開頭的環境經過衝突偵測機制包含清華/阿里/官方 … 這個在每日收尾備註」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_VCGC_MDL260_ConvergeEngine_v0100.py",
+    "CGC_MDL281_ShadowMerge_v0100.py",
+    "../../.claude/skills/vcgc-converge/SKILL.md"
+   ],
+   "evidence": "全景 308 族 · 8 類似群 · 8 對影子比對全 BLOCKED(照實)· 自測 5/5 · 鎖定閘 GREEN",
+   "next": "見交接待辦",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T19:39:51Z"
+  },
+  {
+   "code": "VCGC-REQ243",
+   "subsystem": "VCGC",
+   "topic": "AST / 加速器 / 網路橋總檢 + 環境衝突偵測(清華 / 阿里 / 官方)→ 新增計畫,列入每日收尾",
+   "requirement": "操作員 2026-11-13:「系統類似功能全景式模組引擎清點 注入AST分類編號清點說明 註冊 … 複製到TEMP 進行整合去重 … 更新為一個最強模組 … 搭配CLAUDE … 授權自動解決」「提供啟動這個引擎指令 檢查所有指令是否都有注入AST PS/PY檔案都有導入最新加速器 對外擷取資料的引擎是否都有導入最新的網路工具 … BASE / VIA_CORE / VIA_開頭的環境經過衝突偵測機制包含清華/阿里/官方 … 這個在每日收尾備註」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VCGC_MDL258_ToolMatrix_v0100.py",
+    "CGC_MDL135_EnvGovernance_v0118.py",
+    "CGC_MDL186_EnvGovernance_8Hub_v0101.py",
+    "../../.claude/skills/vcgc-daily-close/SKILL.md"
+   ],
+   "evidence": "加速器 1676/1706 · 網路橋 55/101 · TA-Lib 0;環境偵測工具已在,容器無境 → 桌機跑(每日收尾 8d)",
+   "next": "見交接待辦",
+   "hand": "AI",
+   "version": "v0100",
+   "updated_at": "2026-11-13T19:39:51Z"
+  },
+  {
+   "code": "VCGC-REQ244",
+   "subsystem": "VCGC",
+   "topic": "跨系統 SSOT 一致性唯讀稽核(代號三型 · 主動 ETF · 期間正規化 · 同義字 · 會計科目)→ 發現登錄待辦、交各系統自修",
+   "requirement": "操作員 2026-11-13:「SSOT REGEX 同義字根據過去紀錄有完善化嗎 財報中的會計科目SSOT是否有完善化 VRN VDF VAP VQG是否有一致性更新 台股三種代碼 主動式台股ETF 相關SSOT 包含輸入 輸出 參數 日期 … 擷取後標準化無前後綴」「過去都有紀錄不要重工」「遵守獨立系統原則」「登錄待辦 交各系統自修 整合去重優化測試無誤收尾VCGC」",
+   "status": "PARTIAL",
+   "homes": [
+    "CGC_MDL247_SSOTPanorama(ssot panorama)",
+    "VRN_FieldRules_SSOT_v0101.json",
+    "functional modules/VDF/VDF_InputUniverse_SSOT_v0104.json",
+    "VIA_DataFrameContract_SSOT_v0100.json(DF04)"
+   ],
+   "evidence": "容器實測 2026-11-13:VRN-2 ENG084 代號 2330.TW / 2330 TT / 00981A → 無前後綴正典碼 ✅;期間 2Q26 / 26Q2 / 2026Q2 / FY26Q2 → 2026-Q2,20260630 / 115-06-30 → 2026-06-30 ✅;6488.TWO 被讀成 .TW · 判上市 ❌;SSOT 全景 正則綠 · 同義字黃 · 上下連結紅",
+   "next": "見交接待辦 VCGC-REQ244:*(各系統自修;VCGC 只攤開不代修,L123)",
+   "hand": "各系統(VRN-2 · VAP · VQG)/ 操作員",
+   "version": "v0100",
+   "updated_at": "2026-11-13T20:26:25Z"
+  },
+  {
+   "code": "VCGC-REQ246",
+   "subsystem": "VCGC",
+   "topic": "多系統 SSOT 一致性引擎:各系統獨立前提下,VCGC 偵測跨來源的正則 / 同義字 / 編號衝突並給案號;衝突由操作員與 AI 裁定;高自動化 · 低風險(30 個失敗情境逐項防護)",
+   "requirement": "操作員 2026-11-13:「母子系統一律獨立性互不影響獨立開發進度 由VCGC進行衝突偵測及給編號 由我跟AI解決衝突 給編號具備政策性 所有都要服從 請協助整合優化最強SSOT ENGINE」「在所有系統獨立性前提政策下建立此系統 高自動化 低風險 想30個潛在失敗因素情境及解決方案完善他」「SSOT引擎在遵守VCGC政策規範下整合進VCGC自動完成VCGC並收尾」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VCGC_MDL262_SSOTConsistencyEngine_v0100.py",
+    "VIA_SSOT_ConsistencyEngine_Sources_SSOT_v0100.json",
+    "VIA_SSOT_ConsistencyEngine_FailureModes_SSOT_v0100.json",
+    "VIA_SSOT_ConflictLedger_v0100.jsonl",
+    "VIA_SSOT_Proposal_TWStockTicker_v0100.json",
+    "VIA_Workflow_VCGC_SSOT_v0154.json"
+   ],
+   "workflow": "VCGC-WKF048",
+   "modules": [
+    "VIA_VCGC_MDL262_SSOTConsistencyEngine_v0100.py"
+   ],
+   "evidence": "2026-11-13 容器:自測 32/32(30 個失敗情境各一項 + 證明器與 re 對答案 + 冊對自測);差分測試 798 式 × 700 字串與 Python re 零不符 · 關係 143 對零錯;真冊零寫檢查約 12 秒 · 資產 260 · 開案 7(紅 0 · 黃 7)· 已自報 4/5 系統 · 全景 read 問題 0;檔名照 L133 由 ToolMatrix naming 判 DECLARED VIA_VCGC_MDL262 · 衝突 0",
+   "next": "① 7 個案待操作員裁定(台股代號三鍵提案 vs LOCKED 3 案 · 兩支 LOCKED 彭博式不等價 1 案 · 36 支驗證式的 \\d 方言漂移 1 案 · 評等一詞兩鍵 1 案 · 見 cases)② VAP 還沒有自報的正則 / 同義字;VDF / VRN / VQG 的 *_NUMBER_REQUEST_latest.json 由各系統自己的 SSOTSync 產出,本檔只讀 ③ 主控台 ssot 門尚未把本引擎排進全景(下一版主控台薄尾)④ 與 VCGC-REQ244(跨系統 SSOT 一致性唯讀稽核)互補:REQ244 發現登錄待辦,本引擎給精確證明與案號;兩者的發現尚未互相對帳"
   }
  ],
  "non_requirements": [
@@ -7405,7 +7790,7 @@
    "reason": "提問;本批答覆:不用外部庫(純 CSS + 頁內小段 JS,離線 · 不裝套件);清單裡 Textual 是終端機 UI、Faiss / scikit-learn 是機器學習、Layout-Parser 是文件影像版面分析,都不是 HTML 排版庫;真要拖放式儀表板再評估 Gridstack.js(MIT,需經 VCGC 工具啟用 + 操作員許可)"
   }
  ],
- "prior": "VIA_Requirements_SSOT_v0251.json",
+ "prior": "VIA_Requirements_SSOT_v0259.json",
  "why_v0104": "側線 i:操作員三則令(全部檢測 · SSOT 六族強化 · 全景上下單向;函式庫建議;盤點缺漏 · 省 Token 再升級 · AI 必用功能)入冊 VCGC-REQ077–083;舊 102 條一字不動",
  "why_v0105": "Codex #377 P1:v0104 已由 PR #376 併入 main,不得就地改;收尾追加的 VCGC-REQ078 範圍令(原話「註冊編號SSOT化更新全部SYNC ALL TO GITHUB」「既有範圍內註冊 不要擴張範圍」· 需求句補「只登本批範圍」· 證據改記範圍外列掛交接待辦)與 reviewed 144 → 149 改以本新版號發布;v0104 與其餘 108 條一字不動",
  "why_v0106": "側線 2026-09-30 a:操作員令重整編號 · 註冊 · SSOT 治理架構與風險 → VCGC-REQ084(PARTIAL:防線落地,對帳與對照表待辦);舊 109 條一字不動",
@@ -7687,8 +8072,10 @@
   }
  ],
  "why_v0247": "只增:導入 VIA_VCGC_Commercial_Review_v0100(22 差異 · 40 隔離測試 NOT_RUN)→ 8 條 CAND-VCGC-COM-* 候選需求登冊待批(不發正式號);REQ221 補 G7 證據。",
- "why_v0249": "只增:+VRN-REQ020 非個股 v0310 整合進 VRN-2 + 多格式讀取 + 矩陣輸出;其餘一字不動。",
+ "why_v0249": "只增:+VRN-REQ022 非個股 v0310 整合進 VRN-2 + 多格式讀取 + 矩陣輸出;其餘一字不動。",
  "why_v0250": "只增:+VCGC-REQ223;其餘一字不動。",
- "why_v0251": "只增:+VDF-REQ025 · +VRN-REQ021;其餘一字不動。",
- "why_v0252": "SDDValidator X-REQ RED:homes 只收工作流 / 步代碼、律號或 VIA_ / docs/ / CLAUDE.md / Master 開頭的冊;19 條寫了檔案路徑(functional modules/ · supportive modules/ · review/ …;檔都在,是格式不合不是遺失)。本版把那些路徑移到 homes_files(不丟),有工作流回指的補上工作流代碼。其餘一字不動。"
+ "why_v0251": "只增:+VDF-REQ035 · +VRN-REQ021;其餘一字不動。",
+ "why_v0252": "SDDValidator X-REQ RED:homes 只收工作流 / 步代碼、律號或 VIA_ / docs/ / CLAUDE.md / Master 開頭的冊;19 條寫了檔案路徑(functional modules/ · supportive modules/ · review/ …;檔都在,是格式不合不是遺失)。本版把那些路徑移到 homes_files(不丟),有工作流回指的補上工作流代碼。其餘一字不動。",
+ "merge_v0253": "CGC_MDL143_MergeMedic_v0106 branch-merge origin/claude/optimistic-goodall-yhalc5:本版 = 他方尾版 VIA_Requirements_SSOT_v0258.json 全部 + 本分支新增(L25 後合者升版;本分支原版號 v0255)",
+ "why_v0254": "只增:+VCGC-REQ246(PARTIAL)多系統 SSOT 一致性引擎 VIA_VCGC_MDL262 v0100;其餘一字不動(v0259 既有的 REQ239 跳號與編號冊錯位沒有在本版處理,見交接待辦)。tally 由 requirements 逐筆重數。"
 }

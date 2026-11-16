@@ -26,7 +26,7 @@ VIA_FROM_VCGC=YES python3 "$V" run CGC_MDL281_ShadowMerge compare <A.py> <B.py> 
 - 證明:parse + compile · A 全數原樣 · B 每個定義原樣在或列「未遷」附理由。全對 = PROVEN_ZERO_LOSS(rc 0),否則 BLOCKED_NEEDS_RULING(rc 1)。
 - LibCST:本境沒裝,AI 不裝套件 → 走標準庫 ast(判準相同)。有 LibCST 時只拿來取帶前置註解的原文;**這條路沒實測**。
 
-**CGC_MDL279_MCPServer v0104**(薄尾;`.mcp.json` 原本還停在 v0101,已指到 v0103)
+**CGC_MDL279_MCPServer v0105**(薄尾;`.mcp.json` 原本還停在 v0101,已指到 v0103)
 
 - `vcgc_read {path, depth?, if_etag?}` · `vcgc_slice {path, name}` · `vcgc_digest {path}`,全部委派鎖版 token 工具(鎖冊 sha 不符即停)。
 - 路徑:先判倉內外(倉外一律拒,不透露存在與否)· `.git/` `private/` `.env*` 金鑰檔拒讀 · 參數照 argv 傳不經殼。
