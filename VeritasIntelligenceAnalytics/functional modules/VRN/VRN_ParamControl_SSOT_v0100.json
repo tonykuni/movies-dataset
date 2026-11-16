@@ -1,0 +1,156 @@
+{
+ "schema": "VRN.ParamControl.v1",
+ "owner": "VRN-2",
+ "version": "v0100",
+ "ts": "2026-11-15T18:09:43Z",
+ "why": "操作員 2026-11-15:「輸入輸出參數時間範圍 有些可以動有些不可以動 都要編號儲存 各自存數量在各自系統中作為列管」「VCGC 只有統一給編號的功能」→ VRN-2 自己存:每個輸入 / 輸出參數與時間範圍一個編號(VRN-PAR-###)· 可動 / 不可動 · 理由 · 版本 · 註冊時間 + 數量;可動的改值 = 出新版冊(舊冊不動);不可動的要改先登衝突由操作員與 AI 裁。",
+ "params": [
+  {
+   "name": "年度擷取科目(同義字)",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "items",
+   "value": "80 項",
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "只增不減(操作員令);既有項不可刪改",
+   "id": "VRN-PAR-001",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "年度欄 REGEX",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "year_regex",
+   "value": {
+    "gregorian": "\\b(?:19|20)\\d{2}\\b",
+    "zh_suffix": "\\d{3,4}(?=年度?|年)",
+    "roc": "\\b\\d{3}\\b",
+    "fiscal": "(?i)FY\\s?\\d{2,4}",
+    "abbr": "'\\d{2}\\b",
+    "quarter_zh": "(\\d{3,4})年第?([1-4一二三四])季",
+    "quarter_us": "\\b(\\d{4})[-\\s]?Q([1-4])\\b",
+    "ended": "(?i)(?:ended)\\s+.{0,20}?(\\d{4})"
+   },
+   "class": "規則",
+   "mutable": true,
+   "why": "只增不減",
+   "id": "VRN-PAR-002",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "EPS 取值律 · labeled",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "eps_rule.labeled",
+   "value": "頁上有標明 基本 / 稀釋 → 照標明的取(fin.eps = 基本;稀釋另存)",
+   "class": "規則",
+   "mutable": false,
+   "why": "操作員 2026-11-15 裁定",
+   "id": "VRN-PAR-003",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "EPS 取值律 · unlabeled_two",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "eps_rule.unlabeled_two",
+   "value": "沒寫清楚、同一期有兩個值 → 取小的(較保守;通常是稀釋),標 UNLABELED_MIN_OF_TWO",
+   "class": "規則",
+   "mutable": false,
+   "why": "操作員 2026-11-15 裁定",
+   "id": "VRN-PAR-004",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "EPS 取值律 · unlabeled_one",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "eps_rule.unlabeled_one",
+   "value": "沒寫清楚、同一期只有一個值 → 取它,但必須標註「基本 / 稀釋區分不明確(財報頁不專業)」UNLABELED_SINGLE",
+   "class": "規則",
+   "mutable": false,
+   "why": "操作員 2026-11-15 裁定",
+   "id": "VRN-PAR-005",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "EPS 取值律 · unlabeled_more",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "eps_rule.unlabeled_more",
+   "value": "同一期三個以上沒標明的值 → 取最小並列出全部候選(UNLABELED_MIN_OF_N),交人看",
+   "class": "規則",
+   "mutable": false,
+   "why": "操作員 2026-11-15 裁定",
+   "id": "VRN-PAR-006",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "EPS 核對容差",
+   "book": "functional modules/VRN/VRN_SystemManager_v0118.py",
+   "path": "classify_eps_kind(tol_abs, tol_rel)",
+   "value": {
+    "tol_abs": 0.01,
+    "tol_rel": 0.005
+   },
+   "class": "規則",
+   "mutable": true,
+   "why": "報表兩位小數進位",
+   "id": "VRN-PAR-007",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "輸出表頭冊",
+   "book": "supportive modules/registry/VIA_Output_Header_SSOT_v0103.json",
+   "path": "VRN 表",
+   "value": "19 張",
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "中央表頭冊(輸出驗證照它)",
+   "id": "VRN-PAR-008",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "報告一行一單位",
+   "book": "functional modules/VRN/VRN2_ReportRows_v0102.py",
+   "path": "unit",
+   "value": "個股一行一報告 · 產業一行一產業 · 其他一行一主題",
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "操作員令",
+   "id": "VRN-PAR-009",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "測試樣本夾",
+   "book": "(桌機)",
+   "path": "C:\\測試樣本報告",
+   "value": "桌機才有",
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "換樣本夾 = 改這一項",
+   "id": "VRN-PAR-010",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  }
+ ],
+ "counts": {
+  "io_params_total": 10,
+  "mutable": 4,
+  "immutable": 6,
+  "by_class": {
+   "輸入參數": 2,
+   "規則": 6,
+   "輸出參數": 2
+  },
+  "code_params_harvested": 393,
+  "code_params_book": "VRN_Param_Registry_v0100.json",
+  "vcgc_prmt_numbered": 44,
+  "vcgc_prmt_book": "VIA_NumberBook_PRMT_v0100.jsonl(VCGC 給號,只讀)"
+ },
+ "conflicts": []
+}

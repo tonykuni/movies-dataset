@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0259",
- "batch": "X-REQ 歸屬格式:19 條需求的 homes 寫了檔案路徑 → 改指工作流代碼(依工作流 spec.requirements 回指),路徑移 homes_files",
- "ts": "2026-11-13T17:30:00Z",
+ "batch": "財報金額單位百萬元 · 顯示規範 · PR 652 Codex 三項修正(2026-11-15):+VDF-REQ034 · VDF-REQ033 補模組(前版 v0253)",
+ "ts": "2026-11-15T18:32:04Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 163,
@@ -139,8 +139,8 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 26,
-  "COVERED": 148,
-  "PARTIAL": 121,
+  "COVERED": 150,
+  "PARTIAL": 130,
   "MISSING": 1
  },
  "requirements": [
@@ -7191,6 +7191,242 @@
    ]
   },
   {
+   "code": "VDF-REQ025",
+   "subsystem": "VDF",
+   "topic": "每個人輸入自己的 API 鑰(個人設定檔)· 環境鑰只當測試鑰",
+   "requirement": "操作員 2026-11-15:「環境鑰用於測試用 最後版本要輸入每個人的API KEY」;存放位置操作員選「個人設定檔(每個 Windows 使用者自己的 %APPDATA%\\VIA\\keys)」",
+   "status": "PARTIAL",
+   "homes": [
+    "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py",
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0110.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py"
+   ],
+   "evidence": "2026-11-15 容器:MDL017 v0100 自測 10/10(暫存夾 · 不碰真個人鑰 · 本行程環境不變);VDF_SystemManager engine run 同結果;順序 個人鑰 → 環境測試鑰 → 舊共用鑰匙檔 → 沒有;run -- <指令> 只在子行程環境放個人鑰。讀 FRED 鑰的 9 支引擎(MDL003 · MDL012 · MDL015 · MDL016 · MDL201 · ENG047 · ENG055 · ENG074 · ENG110)都先讀環境變數 → 經 run 包起來即用個人鑰,引擎一字不動",
+   "next": "桌機每個人:`python VDF_MDL017_UserApiKeys_v0100.py set fred`(隱藏輸入)→ `status` 看「實際會用:個人鑰」→ 以 `run -- python ActivateVDF.py run …` 跑;之後各引擎出新版直接讀個人鑰(可不經 run)、舊共用鑰匙檔改提示搬到個人鑰",
+   "hand": "操作員(每個人輸入自己的鑰)+ AI(引擎逐支接個人鑰)",
+   "why_homes": "VDF 自己的鑰(FRED 只在 VDF 用);不碰同意閘;四系統獨立",
+   "ts": "2026-11-15T05:08:57Z",
+   "updated_at": "2026-11-15T07:45:00Z"
+  },
+  {
+   "code": "VDF-REQ026",
+   "subsystem": "VDF",
+   "topic": "主動式台股 ETF:抓不到每日持股資訊 = 不符合",
+   "requirement": "操作員 2026-11-15:「主動式台股ETF若無法抓取每日持股資訊就代表不符合」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0110.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL010_ActiveETFList_v0101.py",
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0110.py"
+   ],
+   "evidence": "2026-11-15 容器:MDL010 v0101 自測 10/10 + 前版 v0100 7/7(假網路 · 假 ENG051 紀錄 · 零外呼);判定只看 ENG051 自己的擷取紀錄 fetch_status 的最新一輪(自動往前滾 · 不寫死天數):PASS 且持股 > 0 = 符合 · FAIL / 持股 0 = 不符合(附錯誤)· 國外成分(不須每日揭露)= 不符合 · 沒紀錄 = 未判(V8 黃 · 不猜);不符合不是錯(燈不因它紅)。清單本身(列 · 欄 · DuckDB tw_active_etf_list)照 v0100;判定另寫 0-2-ActiveETFList/active_etf_qualified_latest.csv;qualify 動詞不連網重判。擷取冊 VDF_FetchSystem_SSOT_v0109.json 把 010 改指 v0101(擷取系統 v0110 自測 9/9;fixture 離線網 fetch run MDL010 輸出 2/2 · V8 黃)。",
+   "next": "① 桌機開雙閘(操作員的手)跑一輪:010 清單 → ENG051 抓持股 → `VDF_SystemManager fetch run MDL010` 或 `python VDF_MDL010_ActiveETFList_v0101.py qualify` 看真實的符合 / 不符合名單;② 下游(ENG094 活動 · ENG096 指標 · VRN-2 報表)改讀判定檔只用「符合」的(各出新版;待操作員點名先做哪支)",
+   "hand": "操作員(開閘真抓)+ AI(下游逐支改讀判定檔)",
+   "why_homes": "VDF 自己的清單與判定;證據只讀 ENG051 自己寫的紀錄;不碰同意閘;四系統獨立",
+   "ts": "2026-11-15T07:17:01Z",
+   "updated_at": "2026-11-15T07:45:00Z"
+  },
+  {
+   "code": "VDF-REQ027",
+   "subsystem": "VDF",
+   "topic": "統一 SSOT(VDF 三代號宇宙)分給其他系統只讀 · 各系統怎麼展現",
+   "requirement": "操作員 2026-11-15:「實測出錯一切無誤後顯示於HTML介面,然後收工收尾儲存 然後把統一的S S O T分給其他系統看要在其他系統是怎麼展現」;選定的統一 SSOT = VDF 三代號宇宙(個股 · 指數 · 主動式台股 ETF + VDF-REQ026 判定)",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0111.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL018_UniverseShare_v0100.py",
+    "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py"
+   ],
+   "evidence": "2026-11-15 容器:MDL018 v0100 自測 8/8(一份 · sha 鎖 · 版本只增 · latest 原子寫 · verify 改一格即 DIFFERENT · 四系統投影 · U/I);實測抓到 OUT-01 上櫃股 yf 記成 .TW → MDL014 v0101 改照市場(6488.TWO)+ V12,自測 7/7 + 前版 67/67;擷取冊 VDF_FetchSystem_SSOT_v0110.json 014 改指 v0101(擷取系統 9/9 · fixture 實跑 rc 0)。分享冊 VDF_UniverseShare_SSOT_v0100.json(VDF 夾):VCGC 燈與收據 · VRN-2 / VQG 列只帶符合的 ETF · VAP 彙總。容器資料 = 種子冊(AMBER 照實)。",
+   "next": "① 桌機開雙閘真抓(009 · 010 · e232 · ENG051)→ `VDF_MDL018_UniverseShare_v0100.py ui` 出真資料版;② 各系統由自己的 manager 讀 VDF_UniverseShare_latest.json(verify sha)照分享冊 view 展現 —— VCGC · VRN-2 · VQG · VAP 各自的手(L123 不代寫)",
+   "hand": "操作員(開閘真抓)+ 各系統自己(讀 · 展現)",
+   "why_homes": "VDF 發一份;他系統只讀;四系統互不干涉",
+   "ts": "2026-11-15T10:53:10Z",
+   "updated_at": "2026-11-15T10:53:10Z"
+  },
+  {
+   "code": "VDF-REQ028",
+   "subsystem": "VDF",
+   "topic": "資料庫狀態矩陣報告 + 建議 · 套進 VDF HTML U/I(資料庫頁)",
+   "requirement": "操作員 2026-11-15:「Advice, database status with a very well organize matrix report to display if the display effect is good please apply this matrix on the user interface HTml u/i」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0112.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL019_DBStatusMatrix_v0100.py",
+    "functional modules/VDF/VDF_SystemManager_v0182.py"
+   ],
+   "evidence": "2026-11-15 容器:MDL019 v0100 自測 8/8(類別 · 兩張矩陣 · 建議由重到輕 · 資料家沒接上第一條 · U/I · 沒清點 GRAY);桌機 / 手機寬都不橫捲;VDF SystemManager v0182 自測 36/36(v0181 全部 + D1 標準轉交者 · D2 沙盒真渲染 · D3 導覽列)。實跑 db check rc 1(容器 0/5 庫照實紅)· db verify PASS 差異 0 → 資料庫頁 DB_CHECK_latest.html = 狀態矩陣 · 原平表另存 DB_CHECK_table_latest.html。",
+   "next": "桌機 pull 後 ActivateVDF 一輪(資料庫流程 db_check / db_verify)→ 總覽的資料庫頁就是矩陣;照建議第一條處理(真資料家)",
+   "hand": "操作員(桌機真資料)",
+   "why_homes": "VDF 自己的清點報告與資料庫頁;他系統表只讀(L123)",
+   "ts": "2026-11-15T14:00:33Z",
+   "updated_at": "2026-11-15T14:00:33Z"
+  },
+  {
+   "code": "VDF-REQ029",
+   "subsystem": "VDF",
+   "topic": "VDF / VRN-2 實測:資料庫輸出經 DuckDB 現查核對 + 增量維護證明 · 顯示在 VDF HTML U/I",
+   "requirement": "操作員 2026-11-15:「Real test for VRN vdf and ensure database Output verified and maintained and display by duckdb through html u/i」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0112.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL019_DBStatusMatrix_v0100.py",
+    "functional modules/VDF/VDF_SystemManager_v0182.py"
+   ],
+   "evidence": "2026-11-15 容器:MDL019 v0100 加 DuckDB 現查段(唯讀開 .duckdb · parquet 經 read_parquet · 表 / 列 / 欄 / 日期範圍 / 日期數 / 整列重複 / 最新 3 列;清點報告列數逐表對現查;擷取 .duckdb ⇄ 同名 .parquet 對列數;backups/ 只數不列)自測 12/12。實測:VDF 擷取系統 MDL008 v0110 fixture 鏈 9/9 OK · 輸出 23/23 合格 → sandbox 資料家 6 個 .duckdb + 28 個 parquet;重跑一輪 → 48/48 張表列數不變 · 整列重複 0 · .duckdb ⇄ .parquet 18/18 一致(增量維護不重寫)。VDF SystemManager v0182 db check --home <sandbox> rc 1(冊上 5 本庫都要 live 引擎才建,容器 0/5 照實紅)· db verify PASS 差異 0 → 資料庫頁 = 矩陣 + DuckDB 現查段;桌機 / 手機寬不橫捲。VRN-2 自己的 manager:metrics-resolve 乾跑真庫 functional modules/VRN/db/vrn_reports.duckdb CLEAN(74 → 74 列 · 報告 0/50 有變 · 多值 CONFLICT 2 組照標)· 庫檔 md5 不變;manager --selftest rc 0(v0273 8/8 · v0274 9/9 · v0275 8/8)。VDF 不讀 VRN-2 的庫(L123,只看它自報)。",
+   "next": "桌機 pull 後 ActivateVDF 一輪(真資料家)→ 資料庫頁的 DuckDB 現查段直接查真庫;冊上 5 本庫的清點 vs 現查逐表一致才算收",
+   "hand": "操作員(桌機真資料家 · 擷取同意閘由操作員設,AI 不代設)",
+   "why_homes": "VDF 自己的資料庫頁與交接收據;VRN-2 的實測走 VRN-2 自己的 manager(L123)",
+   "ts": "2026-11-15T14:16:53Z",
+   "updated_at": "2026-11-15T14:16:53Z"
+  },
+  {
+   "code": "VDF-REQ030",
+   "subsystem": "VDF",
+   "topic": "VDF System Manager 管理範圍 + 清單輸入閘 + 資料家 parquet 增量庫(不重複擷取)+ 增量匯出 PC / 雲端同步夾 / MCP",
+   "requirement": "操作員 2026-11-15:「用 VCGC 節省工具啟動 將每個系統 SYSTEM MANAGER 該控管的項目範圍 VDF SYSTEM MANAGER 都要有 輸出 PARQUET 增量資料庫可出道各類雲端硬碟 MCP TO THEM AND PC FILE · VDF 重點在於輸入輸出多且複雜 結果也需要整合 · 台股及主動式台股 ETF 清單也要被驗證有效作為輸入 · 輸出 PARQUET 增量維護資料庫不重複擷取 ·(資料家 via_database\\vdf_database 的 tw__ / gl__ parquet 21 檔)· 整理清簡優化再輸出更新快速」;同日補充原則:「全部共享 SSOT REGEX 同義字衝突訊號 · 輸入輸出參數各自子系統留存 · 已成功的現況下若修改則用模塊下新增紀錄更正版本號更新」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0112.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL020_DataPlane_v0100.py",
+    "functional modules/VDF/VDF_SystemManager_v0183.py",
+    "functional modules/VDF/VDF_DataPlane_SSOT_v0100.json"
+   ],
+   "evidence": "2026-11-15 容器:VDF_MDL020_DataPlane v0100 自測 16/16(資料家 · 鍵律 · 首建 / 重跑不動檔 / 只補新鍵 · 同鍵重抓不算新列 · status · 不重複擷取計畫 · 去重 · 匯出 PC / Google 同步夾 + MCP 交接清單與已上傳回寫 · 防呆 · 清單輸入閘 · 管理範圍頁 · 入口旗標 · 共用代碼律 AST 讀 · 參數冊)。VDF_SystemManager v0183 自測 39/39(v0182 全部 + P1 標準轉交者 · P2 沙盒真跑 · P3 導覽列)。沙盒實測(擷取 fixture 輸出排成工作站資料家:output_hub/mega 兩本正典庫):sync 建 4 檔 7,446 列 → 重跑 0 寫 4 不動 → 下一輪擷取後只補 65 列(同鍵重抓 50 列只差擷取時間不收)· status 全綠 · plan 要擷取 0 · 匯出 PC 4 檔 / Google 同步夾 4 檔 → 再匯出 0 複製 · 清單閘(真 fixture 清單)YELLOW(模組自報 V7 / V8 / V9 黃 · 主動式 ETF 合格判定未判 2)· 管理範圍頁桌機 / 手機不橫捲。",
+   "next": "桌機 pull → VDF_SystemManager scope(資料家冊自動選 via_database\\vdf_database)→ parquet plan → parquet sync → parquet export --to <夾|onedrive|gdrive|dropbox>;清單閘綠才拿去擷取",
+   "hand": "操作員(桌機真資料家 · 雲端同步夾 · MCP 上傳由 MCP 端照交接清單做)",
+   "why_homes": "VDF 自己的模組與參數冊;代碼律讀共用的 MDL009 / ENG077(不另寫);他系統不動(L123)",
+   "ts": "2026-11-15T15:04:35Z",
+   "updated_at": "2026-11-15T15:04:35Z"
+  },
+  {
+   "code": "VDF-REQ031",
+   "subsystem": "VDF",
+   "topic": "VDF 一本冊控管輸入參數與輸出 DataFrame · 分批增量(中斷 temp 留得住)· 2022-01-01 起輸出 · 輸出檢視頁 · 子系統名稱不空格",
+   "requirement": "操作員 2026-11-15:「四個子系統名稱字不可空格 VeritasDataForge...只有 VCGC 為 VIA Central Governance Console 分兩大塊 中央控管該有的功能 SSOT 等 及 節省 TOKEN 消耗支援功能等工具 卡片簡單散開說明 矩陣詳細說明 這些搞清楚後整合好 VDF 輸入參數輸出 DATAFRAME 先控管一本 輸出資料庫到 via_database\\vdf_database(tw__ / gl__ 21 檔 · output_hub · temp)以增量擷取 BATCH FETCHING 中斷 TEMP 也會存一部分不全部丟失 然後輸出 2022-01-01~最新的資料 輸出檢視顯示」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0112.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL020_DataPlane_v0101.py",
+    "functional modules/VDF/VDF_DataPlane_SSOT_v0101.json",
+    "functional modules/VDF/VDF_SystemManager_v0183.py"
+   ],
+   "evidence": "2026-11-15 容器:VDF_DataPlane_SSOT_v0101(一本冊:輸入 7 · 輸出 21 個 DataFrame · 擷取起日 2022-01-01 · 前版冊不動)· VDF_MDL020_DataPlane v0101 薄尾(v0100 一字不動)自測 11/11:按月分批 · 每批寫完立刻記檢查點 · 模擬做 3 批就中斷 → temp 留 3 批 + 3 行檢查點、parquet 不半套 → 重跑接續 3 批、合併後 = 來源 2022-01 起全部 · 重複鍵 0 · 冊上鍵 · 晚到舊日期也收 · 沒新鍵不動檔 · 輸出檢視頁(卡片 + DataFrame × 月矩陣)· backfill 清單閘紅就停 · 前版 v0100 16/16。沙盒實測 backfill:真的叫 ENG064 → 同意閘未開照實拒跑(GATED,AI 不代設)→ 分批 sync 照做 → 檢視頁 2022-01 ~ 2026-11 共 59 個月(冊上 21 · 沙盒已有 4)· 桌機 / 手機不橫捲。子系統名稱:VDF 頁首一律 VeritasDataForge(MDL018 / MDL019 / 分享冊未上 main 就地改 · 收據重跑;MDL020 v0100 不改、由 v0101 換頁首);分享冊 VCGC 改 VIA Central Governance Console、VRN-2 改 VeritasReportNova。",
+   "next": "桌機 pull → 開兩道同意閘(操作員自己設)→ VDF_SystemManager parquet backfill --start 2022-01-01 → parquet view 看 21 個輸出逐月覆蓋",
+   "hand": "操作員(桌機真資料家 · 同意閘)",
+   "why_homes": "VDF 自己的冊與模組;擷取用 VDF 自己的 ENG064;他系統名稱不一致(VeritaQuantGuard / VeritasQuantGuard 等)交 VCGC 衝突冊",
+   "ts": "2026-11-15T15:36:44Z",
+   "updated_at": "2026-11-15T15:36:44Z"
+  },
+  {
+   "code": "VDF-REQ032",
+   "subsystem": "VDF",
+   "topic": "輸入輸出註冊帶版本號與註冊時間 · 群組起始日 · 輸入輸出分類矩陣",
+   "requirement": "操作員 2026-11-15:「檔案名稱上註冊時就應該有版本號 註冊時間 輸入輸出參數分類矩陣表也是 VDF 起始時間依照群體集體設定 輸入輸出清單較多來源也多可能要整理仔細」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0113.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_DataPlane_SSOT_v0102.json",
+    "functional modules/VDF/VDF_MDL020_DataPlane_v0102.py"
+   ],
+   "evidence": "2026-11-15 容器:冊 v0102 每個輸入 / 輸出帶 version + registered_at + group · 5 群各自起始日;MDL020 v0102 自測 6/6(含 v0101 11/11):群組起始日同步 · 資料家清單每檔內容版本 v0001→v0002 · 註冊時間留首次 · 檔名協定不變 · parquet io 輸入 7 + 輸出 21 矩陣;管理員 v0183 照 CI 條件 39/39(轉到 v0102)。",
+   "next": "桌機 VDF_SystemManager parquet io --home <資料家>;要改某群起始日 = 出新版冊",
+   "hand": "操作員(桌機真資料家)",
+   "why_homes": "VDF 自己的冊與模組",
+   "ts": "2026-11-15T17:50:48Z",
+   "updated_at": "2026-11-15T17:50:48Z"
+  },
+  {
+   "code": "VDF-REQ033",
+   "subsystem": "VDF",
+   "topic": "財報期別核對:3017 · 3324 · NVDA 累計 / 單季 / 年度",
+   "requirement": "操作員 2026-11-15:「3017 3324 NVDA 財報累計 單季 年度測試」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0114.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0100.py",
+    "functional modules/VDF/VDF_DataPlane_SSOT_v0102.json",
+    "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0101.py",
+    "functional modules/VDF/VDF_FinPeriod_SSOT_v0100.json"
+   ],
+   "evidence": "2026-11-15 容器:MDL021 v0100 自測 8/8(會計年度對齊:曆年 / NVDA 1 月底 · 累計拆單季 · K1 年度 = Q4 累計 · K2 年度 = 四季和 · EPS 季和差 % · K3 拆出 = 報的單季 · 抓錯三種 · 讀正典庫只取 basis=YTD 損益科目)。夾具長表(示例數字,非真財報)經管理員 engine run:3017 / 3324 三科目、NVDA 營收全綠;沙盒資料家沒有財報表 → 照實 GRAY。 v0101(2026-11-15):PR 652 Codex P1 交易所仟元 / yfinance 元換到同一尺度 · P2 全形「基本每股盈餘（元）」正規化 · P2 指定代號整檔缺照列黃;自測 11/11。",
+   "next": "桌機(ENG082 交易所車道 + yfinance 車道抓過之後):VDF_SystemManager engine run VDF_MDL021_FinPeriodCheck run --tickers 3017,3324,NVDA;NVDA 若不在 tw_financial,用 --file 給長表",
+   "hand": "操作員(桌機真財報 · 同意閘)",
+   "why_homes": "VDF 自己的模組;科目對照與會計年度結束月在 VDF 自己的冊",
+   "ts": "2026-11-15T17:50:48Z",
+   "updated_at": "2026-11-15T18:32:04Z"
+  },
+  {
+   "code": "VDF-REQ034",
+   "subsystem": "VDF",
+   "topic": "財報金額單位百萬元 · 顯示千分位小數一位",
+   "requirement": "操作員 2026-11-15:「金額部分用百萬元為單位,小數點後不設限,但顯示要有千分位號,小數點後一位,顯示才規範」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VDF_SSOT_v0114.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0101.py",
+    "functional modules/VDF/VDF_FinPeriod_SSOT_v0100.json",
+    "functional modules/VDF/VDF_ParamControl_SSOT_v0101.json"
+   ],
+   "evidence": "2026-11-15 容器:MDL021 v0101 自測 11/11(⑦ 交易所仟元 → 百萬元 · yfinance 元 → 百萬元 · ⑩ 顯示 26,044.0 / 0.1 / EPS 2.85 · 存值不四捨五入 · ⑪ 單位層冊疊在 VDF_DataPlane_SSOT 尾版之上 · --file unit 欄照換);參數列管 VDF-PAR-033–036。",
+   "next": "桌機真財報跑過後看頁(跟 VDF-REQ033:workstation-real-fin 同一步)",
+   "hand": "AI(已落地)· 操作員(桌機看頁)",
+   "why_homes": "VDF 自己的模組與冊;單位層放新冊 VDF_FinPeriod_SSOT(VDF_DataPlane_SSOT_v0102 不動,MDL020 v0102 自測釘它)",
+   "ts": "2026-11-15T18:32:04Z",
+   "updated_at": "2026-11-15T18:32:04Z"
+  },
+  {
+   "code": "VRN-REQ020",
+   "subsystem": "VRN-2",
+   "topic": "每股盈餘 基本 / 稀釋 沒寫清楚的取值律",
+   "requirement": "操作員 2026-11-15:「SSOT REGEX 同義字 不衝突前提下只增不減 DILUTED EPS / BASIC EPS 若沒寫清楚財報頁有兩個值取小的 但財報頁只有一個取他但須標註兩種區分不明確不專業」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VRN_SSOT_v0110.json"
+   ],
+   "modules": [
+    "functional modules/VRN/knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+    "functional modules/VRN/vrn_fin_extract_v0102.py"
+   ],
+   "evidence": "2026-11-15 容器:擷取冊 v0101 只增 eps_unlabeled + eps_rule(舊 79 項一字不動);擷取器 v0102 自測 9/9(含 v0101 十檢):標明 → BASIC · 沒標明兩值 → 取小 · 一值 → 取並標註「基本 / 稀釋區分不明確(財報頁不專業)」· 英文頁 · 並存用標明的 · 排除字。",
+   "next": "VRN-2 桌機跑真財報頁時照用(擷取器尾版 glob 自動取 v0102)",
+   "hand": "AI",
+   "why_homes": "VRN-2 自己的冊與擷取器(系統各自修)",
+   "ts": "2026-11-15T17:50:48Z",
+   "updated_at": "2026-11-15T17:50:48Z"
+  },
+  {
    "code": "VRN-REQ022",
    "subsystem": "VRN",
    "topic": "VRN-2 非個股車道:非個股摘要器 v0310(v0300 同邏輯)整合 · 輸入 PDF / Word / 圖片 / 文字 / 網頁 / 訊息(JSON · .eml · LINE 匯出)/ 筆記 · 一檔一列矩陣(標題 + 四點 + 原句驗證 + 狀態)· 個股報告仍歸 VRN-2 主線",
@@ -7769,7 +8005,7 @@
    "reason": "提問;本批答覆:不用外部庫(純 CSS + 頁內小段 JS,離線 · 不裝套件);清單裡 Textual 是終端機 UI、Faiss / scikit-learn 是機器學習、Layout-Parser 是文件影像版面分析,都不是 HTML 排版庫;真要拖放式儀表板再評估 Gridstack.js(MIT,需經 VCGC 工具啟用 + 操作員許可)"
   }
  ],
- "prior": "VIA_Requirements_SSOT_v0258.json",
+ "prior": "VIA_Requirements_SSOT_v0254.json",
  "why_v0104": "側線 i:操作員三則令(全部檢測 · SSOT 六族強化 · 全景上下單向;函式庫建議;盤點缺漏 · 省 Token 再升級 · AI 必用功能)入冊 VCGC-REQ077–083;舊 102 條一字不動",
  "why_v0105": "Codex #377 P1:v0104 已由 PR #376 併入 main,不得就地改;收尾追加的 VCGC-REQ078 範圍令(原話「註冊編號SSOT化更新全部SYNC ALL TO GITHUB」「既有範圍內註冊 不要擴張範圍」· 需求句補「只登本批範圍」· 證據改記範圍外列掛交接待辦)與 reviewed 144 → 149 改以本新版號發布;v0104 與其餘 108 條一字不動",
  "why_v0106": "側線 2026-09-30 a:操作員令重整編號 · 註冊 · SSOT 治理架構與風險 → VCGC-REQ084(PARTIAL:防線落地,對帳與對照表待辦);舊 109 條一字不動",
@@ -8051,9 +8287,12 @@
   }
  ],
  "why_v0247": "只增:導入 VIA_VCGC_Commercial_Review_v0100(22 差異 · 40 隔離測試 NOT_RUN)→ 8 條 CAND-VCGC-COM-* 候選需求登冊待批(不發正式號);REQ221 補 G7 證據。",
+ "why_v0250": "只增:+VDF-REQ026(PARTIAL:主動式台股 ETF 抓不到每日持股 = 不符合;MDL010 v0101 V8 + 擷取冊 v0109;桌機真抓與下游改讀待做);VDF-REQ025 / 026 歸屬補工作流冊 VIA_Workflow_VDF_SSOT_v0110.json(WKF018 / WKF019 回指;AGENTS.md 第 3 條 · PR 650 Codex P1);tally 照 requirements 逐筆重數;其餘一字不動。",
+ "why_v0251": "只增:+VDF-REQ027(PARTIAL:統一 SSOT 分享 · MDL018 v0100 · MDL014 v0101 yf 後綴照市場 · 擷取冊 v0110;桌機真資料與各系統自己讀待做);tally 照 requirements 逐筆重數;其餘一字不動。",
+ "why_v0252": "只增:+VDF-REQ028 · +VDF-REQ029 · +VDF-REQ030 · +VDF-REQ031(都 PARTIAL;桌機真資料家待做);tally 照 requirements 逐筆重數;其餘一字不動。",
+ "why_v0253": "v0252 已併進 main → 出新版。只增:+VDF-REQ032 · +VDF-REQ033 · +VRN-REQ020;tally 照 requirements 逐筆重數;其餘一字不動。",
+ "why_v0254": "v0253 已隨 PR 652 併進 main → 出新版。只增:+VDF-REQ034(金額百萬元 · 顯示千分位小數一位);VDF-REQ033 只在 modules 補 MDL021 v0101 與 VDF_FinPeriod_SSOT_v0100、evidence 後面補一句 v0101(PR 652 Codex 三項);tally 照 requirements 逐筆重數;其餘一字不動。",
  "why_v0249": "只增:+VRN-REQ022 非個股 v0310 整合進 VRN-2 + 多格式讀取 + 矩陣輸出;其餘一字不動。",
- "why_v0250": "只增:+VCGC-REQ223;其餘一字不動。",
- "why_v0251": "只增:+VDF-REQ035 · +VRN-REQ021;其餘一字不動。",
- "why_v0252": "SDDValidator X-REQ RED:homes 只收工作流 / 步代碼、律號或 VIA_ / docs/ / CLAUDE.md / Master 開頭的冊;19 條寫了檔案路徑(functional modules/ · supportive modules/ · review/ …;檔都在,是格式不合不是遺失)。本版把那些路徑移到 homes_files(不丟),有工作流回指的補上工作流代碼。其餘一字不動。",
- "merge_v0253": "CGC_MDL143_MergeMedic_v0106 branch-merge origin/claude/optimistic-goodall-yhalc5:本版 = 他方尾版 VIA_Requirements_SSOT_v0258.json 全部 + 本分支新增(L25 後合者升版;本分支原版號 v0255)"
+ "merge_v0253": "CGC_MDL143_MergeMedic_v0106 branch-merge origin/claude/optimistic-goodall-yhalc5:本版 = 他方尾版 VIA_Requirements_SSOT_v0258.json 全部 + 本分支新增(L25 後合者升版;本分支原版號 v0255)",
+ "merge_v0259": "CGC_MDL143_MergeMedic_v0106 branch-merge origin/main:本版 = 他方尾版 VIA_Requirements_SSOT_v0254.json 全部 + 本分支新增(L25 後合者升版;本分支原版號 v0253)"
 }

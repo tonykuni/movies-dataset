@@ -1,0 +1,146 @@
+{
+ "schema": "VIA.VDF.UniverseShare.SSOT.v1",
+ "version": "v0100",
+ "ts": "2026-11-15T09:00:00Z",
+ "owner": "VDF",
+ "why": "操作員 2026-11-15:「實測出錯一切無誤後顯示於HTML介面,然後收工收尾儲存 然後把統一的SSOT分給其他系統看要在其他系統是怎麼展現」;選定的統一 SSOT = VDF 三代號宇宙(個股 · 指數 · 主動式台股 ETF + 本輪 VDF-REQ026 判定)。",
+ "rule": "VDF 只發一份(內容 SHA-256 鎖);VCGC · VRN-2 · VQG · VAP 只讀:讀 latest → 用同一律重算 content_sha256 → 一致才用;不回寫、不改 VDF 的檔、不另存不同版本的副本(要副本就連 sha 一起存)。四系統互不干涉(L123),本冊不寫進他系統的程式或冊。",
+ "bundle": {
+  "dir": "VIA_Reports/vdf/universe_share",
+  "latest": "VDF_UniverseShare_latest.json",
+  "versioned": "VDF_UniverseShare_v{NNNN}.json",
+  "ui": "VDF_UniverseShare_UI.html"
+ },
+ "hash": {
+  "algo": "sha256",
+  "over": "rows",
+  "canonical": "json.dumps(rows, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')"
+ },
+ "columns": [
+  {
+   "key": "group",
+   "zh": "組(IN-01 個股 · IN-02 主動式台股 ETF · IN-03 指數)"
+  },
+  {
+   "key": "code",
+   "zh": "代號(個股 4 碼首碼非 0 · 主動 ETF 00###A · 指數 TAIEX / TPEX)"
+  },
+  {
+   "key": "name",
+   "zh": "名稱"
+  },
+  {
+   "key": "market",
+   "zh": "市場"
+  },
+  {
+   "key": "yf_ticker",
+   "zh": "yfinance 代碼(上市 .TW · 上櫃 .TWO · 指數代理)"
+  },
+  {
+   "key": "bb_ticker",
+   "zh": "Bloomberg 代碼(只加 TT)"
+  },
+  {
+   "key": "industry",
+   "zh": "產業"
+  },
+  {
+   "key": "issuer",
+   "zh": "發行投信"
+  },
+  {
+   "key": "source",
+   "zh": "來源層(LIVE_DB / SEED_BOOK / BOOK_STATIC)"
+  },
+  {
+   "key": "state",
+   "zh": "狀態"
+  },
+  {
+   "key": "qualified",
+   "zh": "主動式台股 ETF 判定(VDF-REQ026;True 符合 / False 不符合 / 空 未判;非 ETF 空)"
+  },
+  {
+   "key": "qualify_reason",
+   "zh": "判定理由"
+  }
+ ],
+ "header_row1": "VERITAS INTELLIGENCE ANALYTICS",
+ "publisher": {
+  "system": "VDF",
+  "row2": "VeritasDataForge",
+  "row3": "資料鍛造 · 三代號宇宙單一真相(個股 · 指數 · 主動式台股 ETF)"
+ },
+ "views": [
+  {
+   "system": "VCGC",
+   "row2": "VIA Central Governance Console",
+   "row3": "中央治理 · 編號 · 收據 · 互相只讀監控",
+   "mode": "manifest",
+   "rows": "none",
+   "shows": [
+    "版本 · 時間 · content_sha256",
+    "總燈 · 各檢燈",
+    "各組列數 · ETF 判定數",
+    "實測收據(handoff test)"
+   ],
+   "why": "VCGC 只看燈與收據、不代修(L123 互相只讀監控);不需要逐列資料"
+  },
+  {
+   "system": "VRN",
+   "label": "VRN-2",
+   "row2": "VeritasReportNova",
+   "row3": "研究報告 · 報表主體 = 個股 · 指數 · 符合的主動式台股 ETF",
+   "mode": "rows",
+   "filter": {
+    "IN-02": "qualified_only"
+   },
+   "columns": [
+    "group",
+    "code",
+    "name",
+    "market",
+    "yf_ticker",
+    "bb_ticker"
+   ],
+   "why": "報表只寫有每日持股的主動 ETF(VDF-REQ026);不符合 / 未判的不進報表主體"
+  },
+  {
+   "system": "VQG",
+   "row2": "VeritaQuantGuard",
+   "row3": "量化分析 · 回測 · 多因子 · 序列輸入",
+   "mode": "rows",
+   "filter": {
+    "IN-02": "qualified_only"
+   },
+   "columns": [
+    "group",
+    "code",
+    "yf_ticker",
+    "market",
+    "source"
+   ],
+   "why": "序列代碼以 yfinance 為鍵(上櫃 .TWO);持股類因子只算符合的 ETF"
+  },
+  {
+   "system": "VAP",
+   "row2": "VeritasAutoPlot",
+   "row3": "視覺化 · 圖表與版面規格 · 展現 VQG 輸出",
+   "mode": "aggregates",
+   "shows": [
+    "各組列數",
+    "各市場列數",
+    "主動 ETF 判定三態"
+   ],
+   "why": "VAP 畫圖用彙總數,不讀逐列"
+  }
+ ],
+ "evidence_cases": [
+  "V-vdf-universe-share-v0100",
+  "V-vdf-threecode-v0101",
+  "V-vdf-active-etf-list-v0101",
+  "V-vdf-fetchsystem-book-v0109",
+  "V-vdf-activate-v0119"
+ ]
+}

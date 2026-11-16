@@ -1,0 +1,652 @@
+{
+ "schema": "VDF.DataPlane.Params.v1",
+ "owner": "VDF",
+ "version": "v0102",
+ "prior": "VDF_DataPlane_SSOT_v0101.json",
+ "ts": "2026-11-15T17:47:00Z",
+ "why": "操作員 2026-11-15:「檔案名稱上註冊時就應該有版本號 註冊時間 輸入輸出參數分類矩陣表也是 VDF 起始時間依照群體集體設定 輸入輸出清單較多來源也多可能要整理仔細 · 3017 3324 NVDA 財報累計 單季 年度測試」。本版只增:每個輸入 / 輸出帶 version + registered_at(首次註冊時間 = v0101 冊時間)+ group;groups(5 群,每群自己的起始日);params.fin_period(會計年度結束月 · 科目對照 · 容差,給 VDF_MDL021);registry_rule(檔名協定不變 —— 下游 ENG065 / ENG079 / VRN2_VDFBridge / VAP 照讀;每檔的版本號與註冊時間記在本冊與資料家清單)。v0101 不動。",
+ "params": {
+  "protocol": {
+   "vdf_tw_market.duckdb": "tw",
+   "vdf_global_market.duckdb": "gl"
+  },
+  "volatile_columns": [
+   "_ingest_ts",
+   "_run_id",
+   "_src",
+   "_src_file",
+   "batch_id",
+   "created_at",
+   "fetch_ts",
+   "fetched_at",
+   "ingest_ts",
+   "ingested_at",
+   "inserted_at",
+   "loaded_at",
+   "run_id",
+   "source_file",
+   "updated_at"
+  ],
+  "date_candidates": [
+   "date",
+   "trade_date",
+   "data_date",
+   "as_of",
+   "asof",
+   "snapshot_date",
+   "report_date",
+   "period",
+   "ym",
+   "month",
+   "dt",
+   "日期"
+  ],
+  "list_fresh_days": {
+   "green": 7,
+   "yellow": 30
+  },
+  "manifest": "VDF_PARQUET_MANIFEST.json",
+  "mcp_handoff": "VDF_PARQUET_MCP_HANDOFF.json",
+  "catalog": "VDF_ParquetDB.duckdb",
+  "fetch": {
+   "start": "2022-01-01",
+   "end": "latest",
+   "batch": "month",
+   "checkpoint_dir": "temp/vdf_parquet_sync",
+   "fetch_engine": "VDF_ENG064_HistoryBackfill",
+   "fetch_note": "ENG064 每批抓完立刻落庫 + checkpoint(中斷零損失,由新到舊);出網要操作員開兩道同意閘,本冊不代設"
+  },
+  "fin_period": {
+   "fy_end_month": {
+    "NVDA": 1
+   },
+   "default_fy_end_month": 12,
+   "items": {
+    "revenue": {
+     "mops": [
+      "營業收入合計",
+      "營業收入"
+     ],
+     "yf": "Revenue"
+    },
+    "net_income": {
+     "mops": [
+      "本期淨利(淨損)",
+      "本期淨利",
+      "本期稅後淨利(淨損)"
+     ],
+     "yf": "Net_Income"
+    },
+    "eps": {
+     "mops": [
+      "基本每股盈餘(元)",
+      "基本每股盈餘"
+     ],
+     "yf": "EPS"
+    }
+   },
+   "tol": {
+    "amount_abs": 1.0,
+    "amount_rel": 0.005,
+    "eps_abs": 0.01,
+    "eps_rel": 0.005,
+    "eps_sum_warn": 0.03
+   },
+   "test_tickers": [
+    "3017",
+    "3324",
+    "NVDA"
+   ],
+   "version": "v0100",
+   "registered_at": "2026-11-15T17:47:00Z"
+  }
+ },
+ "shared_rules_read_from": {
+  "stock_code": "functional modules/VDF/VDF_MDL009_TWStockList_v*.py · SSOT_STOCK_RX(MDL001 鎖定律)",
+  "active_etf_code": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v*.py · A_CODE"
+ },
+ "data_home": {
+  "book": "VDF_DataHome_SSOT_v0101.json",
+  "workstation": "C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_database\\vdf_database",
+  "layout": {
+   "parquet": "<家>\\tw__<表>.parquet · <家>\\gl__<表>.parquet(ENG065 檔名協定)",
+   "canonical_duckdb": "<家>\\output_hub\\**\\vdf_tw_market.duckdb · vdf_global_market.duckdb",
+   "temp": "<家>\\temp(分批檢查點 · 暫存新檔)"
+  }
+ },
+ "inputs": [
+  {
+   "id": "IN-01",
+   "name": "台股清單",
+   "source": "VDF_MDL009_TWStockList → 0-1-TWStockList/tw_stock_list_latest.parquet + verify_report.json",
+   "gate": "VDF_SystemManager inputs(C1 共用代碼律 · C2 不重號 · C3 後綴對市場 · C4 新鮮 · C5 在市 · M0 模組自報)",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z",
+   "io_class": "清單"
+  },
+  {
+   "id": "IN-02",
+   "name": "主動式台股 ETF 清單",
+   "source": "VDF_MDL010_ActiveETFList → 0-2-ActiveETFList/active_etf_list_latest.parquet + verify_report.json",
+   "gate": "同上 + Q1",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z",
+   "io_class": "清單"
+  },
+  {
+   "id": "IN-03",
+   "name": "主動式 ETF 合格判定(VDF-REQ026)",
+   "source": "0-2-ActiveETFList/active_etf_qualified_latest.csv",
+   "gate": "Q1:清單每檔都要有判定",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z",
+   "io_class": "判定"
+  },
+  {
+   "id": "IN-04",
+   "name": "資料家",
+   "source": "VDF_DataHome_SSOT_v0101.json(--home > env VIA_VDF_DB_HOME > 冊)",
+   "gate": "不在 = GRAY 不寫",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z",
+   "io_class": "位置"
+  },
+  {
+   "id": "IN-05",
+   "name": "表冊(寫入引擎)",
+   "source": "supportive modules/registry/VIA_DB_Table_SSOT 尾版",
+   "gate": "不重複擷取計畫用它列寫入引擎",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z",
+   "io_class": "冊"
+  },
+  {
+   "id": "IN-06",
+   "name": "擷取區間",
+   "source": "params.fetch.start 2022-01-01 · end latest(可用 --start / --end 改)",
+   "gate": "—",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z",
+   "io_class": "參數"
+  },
+  {
+   "id": "IN-07",
+   "name": "網路同意閘",
+   "source": "VIA_NET_CONSENT · VIA_SCRAPE_CONSENT(操作員在自己的視窗設)",
+   "gate": "AI 不代設;閘沒開擷取照實被擋,其餘照做",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z",
+   "io_class": "閘"
+  }
+ ],
+ "outputs": [
+  {
+   "id": "OUT-01",
+   "file": "tw__analyst_estimates.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "analyst_estimates",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [
+    "VDF_ENG059"
+   ],
+   "rows_seen_in_db_book": 585,
+   "date_seen": [
+    "2026-08-25",
+    "2026-08-27"
+   ],
+   "group": "G-FUND",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-02",
+   "file": "tw__consensus_daily.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "consensus_daily",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [],
+   "rows_seen_in_db_book": 597,
+   "date_seen": [
+    "2026-08-25",
+    "2026-09-12"
+   ],
+   "group": "G-FUND",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-03",
+   "file": "tw__etf_book.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "etf_book",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [
+    "VDF_ENG077"
+   ],
+   "rows_seen_in_db_book": 2155,
+   "date_seen": null,
+   "group": "G-LIST",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-04",
+   "file": "tw__tw_chip_inst.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_chip_inst",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [
+    "VDF_ENG056",
+    "VDF_ENG081"
+   ],
+   "rows_seen_in_db_book": 1165675,
+   "date_seen": [
+    "2024-01-02",
+    "2026-09-11"
+   ],
+   "group": "G-CHIP",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-05",
+   "file": "tw__tw_chip_margin.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_chip_margin",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [
+    "VDF_ENG056",
+    "VDF_ENG081"
+   ],
+   "rows_seen_in_db_book": 1145409,
+   "date_seen": [
+    "2024-01-02",
+    "2026-09-11"
+   ],
+   "group": "G-CHIP",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-06",
+   "file": "tw__tw_daily_prices.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_daily_prices",
+   "role": "正庫·台股",
+   "key": [
+    "date",
+    "ticker"
+   ],
+   "key_note": "協定 date+ticker(ENG064 / ENG065 律;DDL date · ticker · OHLCV)",
+   "writers": [
+    "VDF_ENG073",
+    "VDF_ENG078"
+   ],
+   "rows_seen_in_db_book": 2128169,
+   "date_seen": [
+    "1900-01-01",
+    "2026-09-11"
+   ],
+   "group": "G-PRICE",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-07",
+   "file": "tw__tw_daytrade_eligible.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_daytrade_eligible",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [],
+   "rows_seen_in_db_book": 6164,
+   "date_seen": [
+    "2026-08-25",
+    "2026-09-03"
+   ],
+   "group": "G-CHIP",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-08",
+   "file": "tw__tw_daytrade_market.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_daytrade_market",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [],
+   "rows_seen_in_db_book": 20,
+   "date_seen": [
+    "2026-08-03",
+    "2026-09-02"
+   ],
+   "group": "G-CHIP",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-09",
+   "file": "tw__tw_listings.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_listings",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [
+    "VDF_ENG081"
+   ],
+   "rows_seen_in_db_book": 1996,
+   "date_seen": null,
+   "group": "G-LIST",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-10",
+   "file": "tw__tw_listings_industry.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_listings_industry",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [],
+   "rows_seen_in_db_book": 1981,
+   "date_seen": null,
+   "group": "G-LIST",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-11",
+   "file": "tw__tw_monthly_revenue.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_monthly_revenue",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [
+    "VDF_ENG063",
+    "VDF_ENG073"
+   ],
+   "rows_seen_in_db_book": 88275,
+   "date_seen": null,
+   "group": "G-FUND",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-12",
+   "file": "tw__tw_rates_cbc.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_rates_cbc",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [],
+   "rows_seen_in_db_book": 308,
+   "date_seen": [
+    "2001-01-01",
+    "2026-08-01"
+   ],
+   "group": "G-MACRO",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-13",
+   "file": "tw__tw_trading_daily.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_trading_daily",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [
+    "VDF_ENG057"
+   ],
+   "rows_seen_in_db_book": 1469025,
+   "date_seen": [
+    "2023-01-03",
+    "2026-09-11"
+   ],
+   "group": "G-PRICE",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-14",
+   "file": "tw__tw_valuation_daily.parquet",
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_valuation_daily",
+   "role": "正庫·台股",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [],
+   "rows_seen_in_db_book": 13778,
+   "date_seen": [
+    "2026-08-24",
+    "2026-09-11"
+   ],
+   "group": "G-PRICE",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-15",
+   "file": "gl__cross_macro.parquet",
+   "db": "vdf_global_market.duckdb",
+   "table": "cross_macro",
+   "role": "正庫·國際",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [],
+   "rows_seen_in_db_book": 6144,
+   "date_seen": [
+    "2018-01-01",
+    "2026-09-11"
+   ],
+   "group": "G-MACRO",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-16",
+   "file": "gl__etf_stats_daily.parquet",
+   "db": "vdf_global_market.duckdb",
+   "table": "etf_stats_daily",
+   "role": "正庫·國際",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [],
+   "rows_seen_in_db_book": 467,
+   "date_seen": [
+    "2026-08-25",
+    "2026-09-12"
+   ],
+   "group": "G-PRICE",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-17",
+   "file": "gl__factset_earnings.parquet",
+   "db": "vdf_global_market.duckdb",
+   "table": "factset_earnings",
+   "role": "正庫·國際",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [],
+   "rows_seen_in_db_book": 4,
+   "date_seen": null,
+   "group": "G-FUND",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-18",
+   "file": "gl__global_daily.parquet",
+   "db": "vdf_global_market.duckdb",
+   "table": "global_daily",
+   "role": "正庫·國際",
+   "key": [
+    "date",
+    "ticker"
+   ],
+   "key_note": "協定 date+ticker(DDL date · ticker · close)",
+   "writers": [
+    "VDF_ENG066"
+   ],
+   "rows_seen_in_db_book": 203924,
+   "date_seen": [
+    "2018-01-01",
+    "2026-09-12"
+   ],
+   "group": "G-PRICE",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-19",
+   "file": "gl__index_valuation_proxy.parquet",
+   "db": "vdf_global_market.duckdb",
+   "table": "index_valuation_proxy",
+   "role": "正庫·國際",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [],
+   "rows_seen_in_db_book": 156,
+   "date_seen": [
+    "2026-08-25",
+    "2026-09-12"
+   ],
+   "group": "G-PRICE",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-20",
+   "file": "gl__sentiment_daily.parquet",
+   "db": "vdf_global_market.duckdb",
+   "table": "sentiment_daily",
+   "role": "正庫·國際",
+   "key": null,
+   "key_note": "冊上沒釘 → 照鍵律推(宣告主鍵 > 協定 date+ticker > 內容鍵);實跑 status 印出用了哪個,要釘就出新版冊",
+   "writers": [
+    "VDF_ENG055",
+    "VDF_ENG229"
+   ],
+   "rows_seen_in_db_book": 264,
+   "date_seen": [
+    "2025-08-25",
+    "2026-09-03"
+   ],
+   "group": "G-MACRO",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  },
+  {
+   "id": "OUT-21",
+   "file": "gl__us_macro.parquet",
+   "db": "vdf_global_market.duckdb",
+   "table": "us_macro",
+   "role": "正庫·國際",
+   "key": [
+    "date",
+    "series"
+   ],
+   "key_note": "DDL date · series · value · fetched_at(fetched_at 是擷取時間不進鍵)",
+   "writers": [
+    "VDF_ENG073"
+   ],
+   "rows_seen_in_db_book": 284805,
+   "date_seen": [
+    "1990-01-01",
+    "2026-09-13"
+   ],
+   "group": "G-MACRO",
+   "version": "v0100",
+   "registered_at": "2026-11-15T15:30:20Z"
+  }
+ ],
+ "groups": {
+  "G-PRICE": {
+   "name": "價量",
+   "start": "2022-01-01",
+   "tables": [
+    "tw_daily_prices",
+    "tw_trading_daily",
+    "global_daily",
+    "tw_valuation_daily",
+    "index_valuation_proxy",
+    "etf_stats_daily"
+   ],
+   "version": "v0100",
+   "registered_at": "2026-11-15T17:47:00Z"
+  },
+  "G-CHIP": {
+   "name": "籌碼 · 當沖",
+   "start": "2022-01-01",
+   "tables": [
+    "tw_chip_inst",
+    "tw_chip_margin",
+    "tw_daytrade_eligible",
+    "tw_daytrade_market"
+   ],
+   "version": "v0100",
+   "registered_at": "2026-11-15T17:47:00Z"
+  },
+  "G-FUND": {
+   "name": "基本面 · 共識",
+   "start": "2022-01-01",
+   "tables": [
+    "tw_monthly_revenue",
+    "analyst_estimates",
+    "consensus_daily",
+    "factset_earnings"
+   ],
+   "version": "v0100",
+   "registered_at": "2026-11-15T17:47:00Z"
+  },
+  "G-MACRO": {
+   "name": "總經 · 情緒 · 利率",
+   "start": "2022-01-01",
+   "tables": [
+    "us_macro",
+    "cross_macro",
+    "sentiment_daily",
+    "tw_rates_cbc"
+   ],
+   "version": "v0100",
+   "registered_at": "2026-11-15T17:47:00Z"
+  },
+  "G-LIST": {
+   "name": "清單 · 主檔(快照)",
+   "start": null,
+   "tables": [
+    "tw_listings",
+    "tw_listings_industry",
+    "etf_book"
+   ],
+   "version": "v0100",
+   "registered_at": "2026-11-15T17:47:00Z"
+  }
+ },
+ "groups_note": "起始日照群組集體設定(操作員令);要改某群起始日 = 出新版冊改那一群的 start。快照群沒有起始日(整份)。命令列 --start 會蓋過全部群(臨時用)。",
+ "registry_rule": {
+  "file_names": "tw__<表>.parquet / gl__<表>.parquet 檔名不帶版號(ENG065 協定;下游照讀,改名會斷)",
+  "versions": "每個輸出的冊上版本 = 本冊 outputs[].version;資料家每個檔另有內容版本(VDF_PARQUET_MANIFEST.json 的 version:內容 sha256 變一次 +1)+ registered_at(首次)+ updated_at",
+  "io_matrix": "VDF_SystemManager parquet io → VIA_Reports/vdf/VDF_IO_MATRIX_latest.html / .json / .csv(輸入 7 + 輸出 21 · 類別 · 群組 · 來源 · 鍵 · 起始 · 版本 · 註冊時間 · 現況)"
+ }
+}
