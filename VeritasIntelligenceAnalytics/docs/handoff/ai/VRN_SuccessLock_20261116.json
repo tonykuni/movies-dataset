@@ -1,0 +1,53 @@
+{
+ "schema": "VIA.VRN.SuccessLock.v1",
+ "at": "2026-11-16T17:11:39Z",
+ "rule": "只增;檔雜湊先把 CRLF 換成 LF 再算 SHA-256(兩個平台同值);鎖的是「這些檔在這個內容下、這些命令跑出這些結果」",
+ "files": [
+  {
+   "path": "functional modules/VRN/VRN_SystemManager_v0276.py",
+   "sha256_lf": "20d0f566313907ed072d0164d21eb11ec7b3f3234703c1796087c9d28a997da6",
+   "vcgc_code": "VIA-VRN-MDL349"
+  },
+  {
+   "path": "functional modules/VRN/VRN_MDL260_SafeParallelLaunch_v0102.py",
+   "sha256_lf": "ed3e090dfee34b7afb984e965d57a7065697cce3d98ecd4f9d2e94aba006dd7b",
+   "vcgc_code": "VIA-VRN-MDL350"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ParamControl_SSOT_v0101.json",
+   "sha256_lf": "310b39f03f8775c153ebf2f7848fb0a45c45b1293a44464670196cc86f33a089",
+   "vcgc_code": null
+  }
+ ],
+ "evidence": [
+  {
+   "cmd": "python VRN_SystemManager_v0276.py --selftest",
+   "rc": 0,
+   "result": "7/7 PASS(含前版 v0275 自測)"
+  },
+  {
+   "cmd": "python VRN_MDL260_SafeParallelLaunch_v0102.py --selftest",
+   "rc": 0,
+   "result": "18/18 PASS(含前版 v0101 自測)"
+  },
+  {
+   "cmd": "python VRN_MDL260_SafeParallelLaunch_v0102.py run --source <24 份真 PDF> --no-open",
+   "rc": 1,
+   "result": "整輪跑完;extract 24 檔 READ 13 · TEXT_DOC 1 · REVIEW 8 · NODATA 2 · ERROR 0;文件整輪 RED(容器缺 pymupdf);兩份報告日期由 2026-10-06 改對為 2025-12-08 / 2025-12-02"
+  },
+  {
+   "cmd": "VCGC run CGC_MDL237_NumberingSystem audit",
+   "rc": 2,
+   "result": "遺失 0 · 改身分 0 · 重號 0 · IMMUT 0;冊內不一致 1(既有)"
+  }
+ ],
+ "locked_success": [
+  "檔名下載時間戳不當報告日期(平行與序跑都生效)",
+  "啟動器 v0102 的分群 · 就緒檢查 · 結果併燈"
+ ],
+ "not_locked": [
+  "整輪總燈(容器 RED,環境缺件)",
+  "桌機實測",
+  "輸出表型別定義"
+ ]
+}
