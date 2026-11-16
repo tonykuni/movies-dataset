@@ -29,10 +29,10 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 693 · import 0 · 提及 132 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 699 · import 0 · 提及 142 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL279_MCPServer_v0103.py(家族 core)
+  [via-vcgc run] [流程] 政策過 · CGC_MDL279_MCPServer_v0104.py(家族 core)
   [OK] ① 找主控台:取 registry 尾版
   [OK] ② initialize:協定版 · tools + resources 能力 · serverInfo vcgc
   [OK] ③ notifications/initialized 不回應 · ping 回 {}
@@ -45,7 +45,7 @@
   [OK] ⑩ 未知方法 → -32601
   [OK] ⑪ stdio 串流:一行一訊息 · 通知不回 · 壞 JSON 回 -32700 · 共 3 回應
   [OK] ⑫ client-config:command python · args 含 --serve 與 --root · 零網路(本檔不 import socket / http / urllib / requests)
-[PASS] CGC_MDL279_MCPServer v0103 --selftest · 12 項 · 不過 0
+[PASS] CGC_MDL279_MCPServer v0104 --selftest · 12 項 · 不過 0
   [OK] ⓐ 工具多 vcgc_mcp_doctor(argv mcp doctor)· via_receipt 的 key 列舉含 16 份新收據
   [OK] ⓑ 資源列 27 份 = v0100 11 + 本版 16 · 新 key 全在 · ['agent-os/selftest', 'graphify/latest', 'matrix/closeout-panorama']
   [OK] ⓒ 讀新資源:站表矩陣 JSON 讀到 · 沒有的(VAP 清冊)照實說還沒有不炸
@@ -55,10 +55,19 @@
   [OK] ⓑ 讀新資源:互監矩陣讀到(VAP GRAY)· 沒有的(backup/check)照實說還沒有不炸
   [OK] ⓒ client-config 的 command 指到本檔(v0102)
 [PASS] CGC_MDL279_MCPServer v0102 --selftest · 本版 3 項 · 不過 0(v0101 鏈 rc 0)
+  [OK] ⓐ 大檔(346917 位元組 > 60000)不再截成壞 JSON:回 EvidencePage · truncated · 有 next_uri
+  [OK] ⓑ 照 next_uri 續讀 11 頁拼回 = 原檔逐位元組相同 · 拼回是合法 JSON(頁界落在中文字中間會退回字元邊界)
+  [OK] ⓒ via_receipt 帶 offset/limit:工具回同一種頁 · structuredContent 有 next_offset_bytes
+  [OK] ⓓ 帶舊 sha 而來源已變 → 報錯 SOURCE_CHANGED(不默默給新內容)
+  [OK] ⓔ 小檔不帶游標 → 整份原樣回(與前版逐字相同)
+  [OK] ⓕ 根界改 relative_to:兄弟夾「…Analytics2」不再被字串前綴當成根內
+  [OK] ⓖ tools/list 的 via_receipt 多 offset · limit · sha;key enum 照舊
+  [OK] ⓗ tools/call 沒有主控台時照前版回錯;有 rc 時 structuredContent 加 lamp_scope=process_exit_only
+  [OK] ⓘ client-config 的 command 指到本檔(v0103)
+[PASS] CGC_MDL279_MCPServer v0103 --selftest · 本版 9 項 · 不過 0(v0102 鏈 rc 0)
   [OK] ⓐ 資源列 43 份 = 前版 39 + 本版新 4 · 新 key 全在 · via_receipt enum 含新 key
   [OK] ⓑ 讀新資源:啟用矩陣讀到(綠 57)· 沒有的(validate/desktop)照實說還沒有不炸
-  [OK] ⓒ client-config 的 command 指到本檔(v0103)
-[PASS] CGC_MDL279_MCPServer v0103 --selftest · 本版 3 項 · 不過 0(v0102 鏈 rc 0)
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VQG_AllInOne_v0112.py(冊上 VQG_AllInOne | X-NUM 編號冊號碼 ≠ 冊上代碼:['VCGC-REQ245', 'VCGC-REQ240', 'VCGC-REQ241', 'VCGC-REQ242', 'VCGC- | X-REQ 需求代碼不合 ['VCGC-REQ 跳號'] · 歸屬指到不存在 [] · 工作流引用不存在的需求 [] → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 38, 'changed': 20, 'stale': 0, 'expected': 20038, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 508 · 觸碰 run --family · 交接閘 RED · 落後 344 提交 · 快照 1012.8h · 未推 1 · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [OK] ⓒ client-config 的 command 指到本檔(v0104)
+[PASS] CGC_MDL279_MCPServer v0104 --selftest · 本版 3 項 · 不過 0(v0102 鏈 rc 0)
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VQG_AllInOne_v0111.py(冊上 VQG_AllInOne | X-NUM 編號冊號碼 ≠ 冊上代碼:['VCGC-REQ245', 'VCGC-REQ240', 'VCGC-REQ241', 'VCGC-REQ242', 'VCGC- | X-REQ 需求代碼不合 ['VCGC-REQ 跳號'] · 歸屬指到不存在 ['VDF-REQ025→functional modules/VDF/VDF_MDL017_ → via-vcgc sdd check
+[監控] 背景全景監控中 pid 16420 · 觸碰 run --family · 交接閘 RED · 落後 536 提交 · 快照 1066.4h · 未登 2392 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

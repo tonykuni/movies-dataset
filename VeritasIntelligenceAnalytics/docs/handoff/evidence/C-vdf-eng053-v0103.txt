@@ -29,16 +29,16 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 693 · import 0 · 提及 131 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 699 · import 0 · 提及 142 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · VDF_ENG053_ParamEngineMap_v0103.py(家族 core)
-=== VDF_ENG053 參數映射器 v0103 · 薄尾自測(車道源碼實證看穿薄尾;其餘照 v0102)===
-  [OK] ① 重現:v0102 只看尾版原文 → 薄尾前版本體裡的車道字面找不到 · {'lane_only_in_body': []}
-  [OK] ② 本版:薄尾 → 接前版本體一起比 → 命中記在尾版名下 · ['FAM_X_v0102.py']
-  [OK] ③ 不是薄尾的完整本體 → 不往回看舊版(舊版不入工作面)
-  [OK] ④ 實檔:ENG050 v0102 是薄尾 · 接上前版後看得到 'cnyes_consensus'
-  ── 前版 v0102 十一檢(換裝本版 derive_string_consumers 後)──
+=== VDF_ENG053_ParamEngineMap v0103 · 薄尾自測(車道映通沿薄尾前版鏈)===
+  [OK] ① 薄尾往回併前版原文(demo_lane 看得到)· 整版重寫只看自己(舊版的 gone_lane 不算回來)
+  [OK] ② 真倉:READY 車道零未映 · cnyes_consensus 映到 ENG050 尾版(v0102 薄尾 → v0101 分派)
+  [OK] ③ 加速器橋 · 網路工具橋在;不碰 TA-Lib;本檔不寫檔(映射冊照 v0102 run 寫)
+  [OK] ④ 尾版別名表(字面字典)與 v0102 一字不差 · 13 個同義字照收割(VDF_SSOTSync 只看尾版)
+  前版 VDF_ENG053_ParamEngineMap_v0102.py selftest ↓(在役面映通用本版)
   [OK] ① AST 常數收割(僅模組級大寫) 
   [OK] ② argparse CLI 選項收割 
   [OK] ③ 語法壞件誠實跳過 
@@ -51,9 +51,7 @@
   [OK] ⑩ 唯讀保證(收割/四冊零寫入;僅映射冊落盤) 
   [OK] ⑪ 在役面=家族最新(泛化:ENG052 僅 glob 尾版入列) (latest=VDF_ENG052_MegaFetch_v0104.py)
   [計] 十一檢 OK 11 · FAIL 0
-  [OK] ⑤ v0102 十一檢(原本只紅 ⑦)換裝後全過 · rc 0
-  [OK] ⑥ 換裝:v0102 模組的 derive_string_consumers 指本版
-  [計] VDF_ENG053 v0103 薄尾 6/6 · 合計 PASS
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VQG_AllInOne_v0113.py(冊上 VQG_AllInOne | X-NUM 編號冊號碼 ≠ 冊上代碼:['VCGC-REQ245', 'VCGC-REQ240', 'VCGC-REQ241', 'VCGC-REQ242', 'VCGC- | X-REQ 需求代碼不合 ['VCGC-REQ 跳號'] · 歸屬指到不存在 [] · 工作流引用不存在的需求 [] → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 41, 'changed': 20, 'stale': 0, 'expected': 20041, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 508 · 觸碰 run --family · 交接閘 RED · 落後 348 提交 · 快照 1013.2h · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [OK] ⑤ 前版 v0102 自測照過(含 ⑦ READY 車道零缺)
+[計] VDF_ENG053_ParamEngineMap v0103 本版 5/5 · PASS
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VQG_AllInOne_v0111.py(冊上 VQG_AllInOne | X-NUM 編號冊號碼 ≠ 冊上代碼:['VCGC-REQ245', 'VCGC-REQ240', 'VCGC-REQ241', 'VCGC-REQ242', 'VCGC- | X-REQ 需求代碼不合 ['VCGC-REQ 跳號'] · 歸屬指到不存在 ['VDF-REQ025→functional modules/VDF/VDF_MDL017_ → via-vcgc sdd check
+[監控] 背景全景監控中 pid 16420 · 觸碰 run --family · 交接閘 RED · 落後 536 提交 · 快照 1066.4h · 未登 2392 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

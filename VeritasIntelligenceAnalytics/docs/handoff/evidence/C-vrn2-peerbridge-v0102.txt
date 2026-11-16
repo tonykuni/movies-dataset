@@ -29,10 +29,18 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 693 · import 0 · 提及 131 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 699 · import 0 · 提及 142 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VRN2_PeerBridge_v0102.py(家族 core)
+  [via-vcgc run] [流程] 政策過 · VRN2_PeerBridge_v0103.py(家族 core)
+=== VRN2_PeerBridge v0102 · 薄尾自測(整合冊出新版號 · prove 證據入冊;零網路 · 只寫沙盒)===
+  [OK] ① prove 摘要只收借用冊上的能力(z 不收)· 指紋對不上標 pin_mismatch · 留 VRN-1 commit 與「樹未動」
+  [OK] ② 冊夾空 → 寫第一版 v0100
+  [OK] ③ 實質相同(只差時間戳 / 經哪版 CLI)→ 不出新版
+  [OK] ④ 就緒燈 YELLOW → GREEN + prove 證據 → 出 v0101(supersedes v0100)· 舊冊一個位元組都沒動
+  [OK] ⑤ 目標檔已在 → 拒寫(x 模式,絕不覆蓋)
+  [OK] ⑥ 再跑一次同內容 → 不變(最新版是 v0101)
+  [OK] ⑦ CLI:integrate 換成本版 · 其餘動詞照 v0101(gap / prove / readiness)
 [自測] 43/43 PASS
 [整合冊] 能力 23 · {'MATCH': 0, 'BORROWED': 2, 'BY_CONTRACT': 1, 'REVIEW': 0, 'GAP': 20} · 問題 1
   [擋] 沒有主人(會丟失):['output.verify', 'pivot.db', 'ocr.image', 'page.regions', 'title.trim', 'ticker.master', 'firstpage.engine', 'report.db', 'autotest.loop', 'lexicon.valuation', 'evidence.core', 'run.cache', 'temp.store', 'focus.only', 'dataframe.headers', 'local.db', 'ticker.record', 'book.check', 'run.matrix', 'panorama.probe']
@@ -44,6 +52,9 @@
 [整合冊] 能力 23 · {'MATCH': 23, 'BORROWED': 0, 'BY_CONTRACT': 0, 'REVIEW': 0, 'GAP': 0} · 問題 0
 [不覆蓋] functional modules/VRN/ssot/VRN2_IntegrationBook_v0100.json 已存在 —— 只增不減,要換版請出新版號檔
 [自測 v0101] 22/22 PASS
+  [OK] ⑧ 前版 v0101 自測 rc 0(含 v0100)
+  [OK] ⑨ 兩座橋在 · 不匯入他系統 · 不碰 TA-Lib · 同意閘不讀不寫 · 不複製 VRN-1 的檔(本體無 shutil / copy)
+[計] VRN2_PeerBridge v0102 薄尾 9/9 · PASS
   [OK] v0101 自測照過(v0100 43 項 + v0101 22 項) · rc 0
   [OK] 0 項時:列 VRN-1 根 · HEAD · 指紋依據版本 ·   VRN-1 根 /nonexistent-vrn1 · HEAD (讀不到 git) · 指紋依 0993c2d ←
   [OK] 0 項時:逐項列不能借的原因(指紋變了 · 檔不在)· 只列 GAP
@@ -51,7 +62,7 @@
   [OK] 有驗到項目時不囉嗦
   [OK] VRN-1 只讀:本版不寫 VRN-1 樹(無 write / unlink 指向 VRN-1)
   [OK] 不碰 TA-Lib · 不寫同意閘
-  [OK] 尾版保有前版公開名稱(TAILAPI) · 40 支
-[自測 v0102] 8/8 PASS
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VQG_AllInOne_v0111.py(冊上 VQG_AllInOne | X-NUM 編號冊號碼 ≠ 冊上代碼:['VCGC-REQ245', 'VCGC-REQ240', 'VCGC-REQ241', 'VCGC-REQ242', 'VCGC- | X-REQ 需求代碼不合 ['VCGC-REQ 跳號'] · 歸屬指到不存在 [] · 工作流引用不存在的需求 [] → via-vcgc sdd check
-[監控] 背景全景監控中 pid 508 · 觸碰 run --family · 交接閘 RED · 落後 358 提交 · 快照 1015.0h · 未登 2391 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [OK] 尾版保有前版公開名稱(TAILAPI) · 10 支
+[自測 v0103] 8/8 PASS
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_LakeConsole_v0101.py(冊上 VIA_LakeC | X-NUM 編號冊號碼 ≠ 冊上代碼:['VCGC-REQ245', 'VCGC-REQ240', 'VCGC-REQ241', 'VCGC-REQ242', 'VCGC- | X-REQ 需求代碼不合 ['VCGC-REQ 跳號'] · 歸屬指到不存在 ['VDF-REQ025→functional modules/VDF/VDF_MDL017_ → via-vcgc sdd check
+[監控] 背景全景監控中 pid 16420 · 觸碰 run --family · 交接閘 RED · 落後 536 提交 · 快照 1066.5h · 未登 2392 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
