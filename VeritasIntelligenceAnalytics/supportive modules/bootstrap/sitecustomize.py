@@ -73,6 +73,26 @@ def _newest_json(dirpath, prefix):
     return os.path.join(dirpath, names[-1]) if names else None
 
 
+def _pins_from_lock(root):
+    """鎖冊直讀:{工具名: 路徑};鎖冊讀不到回 None(呼叫端退回 CGC_MDL233)。規則同 CGC_MDL233 pinned():冊上 path 在倉裡才算。"""
+    import json as _json
+    lock = _newest_json(os.path.join(root, "supportive modules", "registry"), "VIA_ToolVersion_Lock_v")
+    if not lock:
+        return None
+    try:
+        with open(lock, encoding="utf-8") as fh:
+            book = _json.load(fh)
+    except (OSError, ValueError):
+        return None
+    repo, out = os.path.dirname(root), {}
+    for fam, name in (("accelerator", "VeritasCeleritas"), ("network", "VeritasAegisNexus")):
+        rel = str((book.get(fam) or {}).get("path") or "")
+        p = os.path.join(repo, *rel.split("/")) if rel else ""
+        if p and os.path.isfile(p):
+            out[name] = p
+    return out
+
+
 def _load(path, name):
     import importlib.util
     spec = importlib.util.spec_from_file_location(name, path)
@@ -284,13 +304,21 @@ def _boot():
         # CGC_MDL156 同一把尺);夾裡新放的版號檔沒經 VCGC activate 寫鎖,就不會被掛上。鎖讀不到才退回尾版律。
         pins = {}
         try:
-            act = _newest(os.path.join(sup, "registry"), "CGC_MDL233_ToolActivate_v")
-            if act:
-                mod = _load(act, "via_tool_activate_boot")
-                for fam, name in (("accelerator", "VeritasCeleritas"), ("network", "VeritasAegisNexus")):
-                    p = mod.pinned(fam)
-                    if p:
-                        pins[name] = str(p)
+            # 2026-11-16 桌機實錄(工作倉在 OneDrive):每支 python 一啟動就載 CGC_MDL233 九版薄尾鏈,每版各掃一次 registry 夾
+            # (2,616 檔 · 共約 16 次)只為了問鎖冊兩個路徑 → 啟動極慢、操作員以為卡住。改:直接讀同一本鎖冊
+            # (規則與 CGC_MDL233 pinned() 一字相同:冊上該家族的 path 在倉裡才算),registry 夾只掃 1 次;
+            # 鎖冊讀不到(或設 VIA_BOOT_PINS=chain 要對照)才照舊載 CGC_MDL233。
+            direct = None if os.environ.get("VIA_BOOT_PINS") == "chain" else _pins_from_lock(root)
+            if direct is not None:
+                pins = direct
+            else:
+                act = _newest(os.path.join(sup, "registry"), "CGC_MDL233_ToolActivate_v")
+                if act:
+                    mod = _load(act, "via_tool_activate_boot")
+                    for fam, name in (("accelerator", "VeritasCeleritas"), ("network", "VeritasAegisNexus")):
+                        p = mod.pinned(fam)
+                        if p:
+                            pins[name] = str(p)
         except Exception as exc:
             note.append(f"鎖冊 ABSENT:{type(exc).__name__}")
         tails = {"VeritasCeleritas": pins.get("VeritasCeleritas") or _cel_tail(sup),

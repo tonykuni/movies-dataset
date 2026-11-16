@@ -62,3 +62,18 @@ py "VeritasIntelligenceAnalytics\functional modules\VDF\VDF_MDL016_MacroCrossChe
   ③ 道數夾 3~5;橋閘 / 不重複擷取計畫 / 清單閘 / OmniRoute 四支同時起,橋閘 100% 才擷取 ④ 心跳印每支靜了幾秒與子行程數。
 - 容器驗證:自測 VDF 23/23 · VRN 21/21;用模擬資料家從別的資料夾實跑,順序正確、ActivateVDF 收到 --db-home。容器的紅是環境(同意閘沒開 · 沒裝 yfinance · 假資料家只有一本庫)。
 - 沒驗到的:桌機真資料家的實際內容與速度;`.ps1` 與 Windows 行為。跑完請把最後 30 行或 `VIA_Reports\vdf\launch\VDF_Launch_latest.json` 貼回。
+
+## 2026-11-16 補記二:桌機貼回(同步被擋 · Python 一啟動就卡)
+- **同步被擋是 AI 造成的**:上一輪把容器測試產生的 `VDF/registry/VDF_SSOT_Register_v0113.json` 提交了(e30380b15),撞到桌機自己那一本未追蹤的 v0113,
+  `git checkout --detach` 因此中止,兩支 v0101 啟動器才會「can't open file」。已用還原提交撤回(f9a65276a);桌機那一本不會被動到。
+  往後容器跑測產生的註冊冊一律不提交。
+- **Python 一啟動就卡**:桌機 VRN 啟動器死在 `sitecustomize.py` → `CGC_MDL233_ToolActivate_v0108` → `v0107` 的 `HERE.glob(...)`(按了中斷)。
+  查程式:啟動鉤每支 python 都載 CGC_MDL233 九版薄尾鏈,每版各掃一次 registry 夾(2,616 檔),只為了問鎖冊兩個路徑。
+  改 `supportive modules/bootstrap/sitecustomize.py`(無版號檔,就地改):直接讀同一本鎖冊 `VIA_ToolVersion_Lock_v*.json`,規則與 `pinned()` 相同
+  (冊上 path 在倉裡才算);鎖冊缺 / 壞才退回原本的 CGC_MDL233 路徑;`VIA_BOOT_PINS=chain` 可強制走舊路對照。
+- 容器驗證:兩種模式掛上的是同兩支(`VeritasCeleritas_v1141.py` · `VeritasAegisNexus_v1652.py`);registry 夾掃描 23 次 → 13 次
+  (剩下 10 次是資料家解析 `CGC_MDL123`,桌機有目錄頁 `DATAHOME_CATALOG_latest.json` 時不會走到);啟動 141 ms → 117 ms(關鉤 114 ms)。
+  鎖冊缺 → None、鎖冊壞 → None、冊上路徑不在 → 不採用;掛著鉤跑 `token` rc 0、兩支 v0101 啟動器自測 23/23 · 21/21。
+- **沒驗到的**:桌機實際快多少(容器磁碟快,量不出 OneDrive 的差);桌機生效的是哪一份鉤(traceback 指向 OneDrive 主倉那一份,
+  那份落後 main 86 個提交,要那一份更新、或操作員在自己的視窗把 `PYTHONPATH` / `VIA_ROOT` 指到已更新的工作樹才會生效);
+  `via_boot_update.ps1` 與 v0100 VDF 啟動器「沒印任何東西」的原因沒有證據,只能推測同樣卡在啟動鉤。
