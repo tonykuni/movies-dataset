@@ -315,8 +315,21 @@ def collect() -> dict:
     return out
 
 
+def provenance(args: list) -> int:
+    """同前版:直送 ENG114 尾版(子行程環境帶 VCGC 入口旗標,照 v0265 起的做法);`--selftest` 之後再跑本版自測,回傳碼取大。"""
+    h = PRIOR.host()
+    os.environ.setdefault("VIA_FROM_VCGC", "YES")
+    rc = int(h._load_engine(h.provenance_engine_path()).main(list(args)) or 0)
+    if "--selftest" in args:
+        print("  ── 來源回歸之後:本版管理器自測 ──", flush=True)
+        rc = max(rc, int(selftest() or 0))
+    return rc
+
+
 def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
+    if args[:1] == ["provenance"] and callable(globals().get("provenance")):
+        return globals()["provenance"](args[1:])
     if args == ["--selftest"] or "--selftest" in args[:1]:
         return selftest()
     rc = PRIOR.main(args)
@@ -395,7 +408,8 @@ def selftest() -> int:
     text = Path(__file__).read_text(encoding="utf-8")
     chk("B8 檔面:第 3 行加速器標記 · 自己的語法樹量得到加速器橋 · 零 TA-Lib · 不寫同意閘 · 沒有本機路徑",
         text.splitlines()[2].strip() == "# [VIA:ACCEL-BRIDGE:v0111]" and bridge_scan(text)["accel_import"] and not bridge_scan(text)["net_libs"]
-        and "import " + "talib" not in text and "_CONSENT\"] " + "=" not in text and "/" + "home/" not in text and "\\" + "Users" not in text)
+        and "import " + "talib" not in text and "_CONSENT\"] " + "=" not in text and "/" + "home/" not in text and "\\" + "Users" not in text
+        and callable(globals().get("provenance")) and "VIA_FROM_VCGC" in text)
     print("  ── 前版 %s 自測(本版換裝卸下)──" % PRIOR_PATH.name, flush=True)
     uninstall()
     try:
@@ -409,8 +423,8 @@ def selftest() -> int:
 
 
 if __name__ == "__main__":
-    if sys.argv[1:2] == ["provenance"] and callable(getattr(PRIOR, "provenance", None)):     # 同前版:provenance 先於任何 --selftest 攔截
-        sys.exit(PRIOR.provenance(sys.argv[2:]))
+    if sys.argv[1:2] == ["provenance"]:     # 同前版:provenance 先於任何 --selftest 攔截
+        sys.exit(main(sys.argv[1:]))
     if "--selftest" in sys.argv:
         sys.exit(selftest())
     sys.exit(main(sys.argv[1:]))

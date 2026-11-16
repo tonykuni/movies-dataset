@@ -1,0 +1,18 @@
+# VIA 每日教訓與檢查清單(由帳生成;正本 VIA_DailyLessons_Ledger_v0100.jsonl,只增)
+
+任何 AI 接手:先讀這張表。每列 = 遇到的問題 → 根因 → 怎麼處理 → 下次怎麼檢查(guard)。收工時把當天新的問題照同樣欄位加到帳尾,不改舊列。
+
+| 編號 | 狀態 | 問題 | 根因 | 處理 | 下次怎麼檢查 |
+|---|---|---|---|---|---|
+| LL-20261116-01 | FIXED | 容器跑測產生的登記冊被提交,撞到桌機同名未追蹤檔,git checkout 被擋 | 把執行產物當成果提交 | 還原那筆提交;容器產物跑完即刪、不進版控 | git status 有未追蹤的 *_Register_v*.json / *_Asset_Register_v*.json → 刪,不 add |
+| LL-20261116-02 | FIXED_CONTAINER · 桌機未驗 | 桌機每支 python 一啟動就卡很久 | 啟動鉤為了兩個路徑去載 CGC_MDL233 九版鏈、每版掃一次 registry 夾 | sitecustomize 直接讀鎖冊;鎖冊缺 / 壞才走舊路 | VIA_BOOT_PINS=chain 與預設各跑一次,掛上的工具檔要相同 |
+| LL-20261116-03 | FIXED_CONTAINER · 桌機未驗 | VDF 啟動器 v0100 等於從 2022 整個重抓、又卡又慢 | 繞過正式入口 ActivateVDF,用了倉內空的擷取夾 | v0101 走 ActivateVDF + 操作員的資料家 + 先降壓 + 3~5 道 | 啟動器日誌要看得到 ActivateVDF 與 --db-home |
+| LL-20261116-04 | VRN FIXED · VDF OPEN | 流程回傳碼 0 被當成綠,其實有待看 / 無資料 | 只看 rc 不看結果(extract REVIEW · 矩陣 NODATA · 總經 12 對全 NODATA) | VRN 啟動器 v0102 讀帳與日誌併燈並逐檔點名 | 啟動器總結要有「結果 ·」列;VDF 啟動器同樣要補 |
+| LL-20261116-05 | FIXED | 報告日期判成下載日 | 檔名尾巴的 (YYYYMMDD-HHMMSS) 下載時間戳搶在 6 位數 / 民國日期之前 | VRN 管理器 v0276 先剝時間戳再判 | 帶時間戳與不帶的同一份檔,report_date 要相同 |
+| LL-20261116-06 | FIXED | 薄尾版的修正沒有生效 | 平行子行程用舊版檔起跑;同一個函式名在鏈上兩個模組各有一份 | 子行程改用尾版起跑;鏈上每個同名函式都換 | 不只跑自測,要用真資料實跑後看輸出欄位 |
+| LL-20261116-07 | FIXED · VRN 86/86 · VDF 109/109 | 加速器「覆蓋 100%」不是真的 | 只認標記與具名豁免:MarketFetch v0112 只有標記、ENG112 v0100 完全沒掛 | 引擎矩陣加 accel / net 兩欄(語法樹 + 執行時 + 鎖冊);三支出新版號補上橋 | <管理器尾版> engine-matrix 那一行「加速器生效 N/N」要相等、缺 0 |
+| LL-20261116-08 | FIXED | 偵測誤判一支引擎會出網 | 只看有沒有 import socket;那支是用 socket 擋連線 | 真的開連線(create_connection / socket() 等)才算出網 | 新增偵測規則時放一個反例進自測 |
+| LL-20261116-09 | FIXED | 新尾版被 VCGC 流程閘擋下,發號全部 rc 2 | 尾版檔面少了入口契約(VIA_FROM_VCGC) | 尾版保留前版的 provenance / 入口旗標宣告 | 發號前先跑 CGC_MDL223 gate(),missing 要是空的 |
+| LL-20261116-10 | OPEN | PS 腳本沒有實測、也沒有 PS 加速器模板 | 容器沒有 pwsh;下載 PowerShell 被權限擋下 | 只做靜態檢查並照實標示;待桌機首跑 | 桌機第一次跑若語法錯,貼回錯誤訊息 |
+| LL-20261116-11 | OPEN | 連不到桌機,無法代跑實測 | 雲端工作階段可用的桌機資料夾清單是空的 | 給一行指令由操作員執行;容器先把能驗的驗完 | 桌面端 設定 → Claude Code → Remote Control 有分享資料夾才連得到 |
+| LL-20261116-12 | MITIGATED | 整輪紅燈看起來像程式壞了,其實是缺套件 | 容器沒有 pymupdf,四重點 19/19 失敗 | 啟動器起跑前點名缺的工具與會失敗的步驟 | preflight 有黃 / 紅的「支援工具」列就先補(經 VCGC InstallGate) |

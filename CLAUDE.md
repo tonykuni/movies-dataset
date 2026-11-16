@@ -98,3 +98,5 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
 - **新檔不含本機路徑**;**閘收到錯形路徑當場拒絕、零寫入**;**頁面文字與底色對比 ≥ 4.5**。
 
 **每天開機更新**:工作站 `pwsh -NoProfile -ExecutionPolicy Bypass -File "VeritasIntelligenceAnalytics\supportive modules\registry\via_boot_update.ps1"`(每日首跑才實跑;log 在 `VIA_Reports/boot_update_logs/`);容器是同鏈的 `via_boot_update.sh`(SessionStart 喚起)。它照常令自己開同意閘並自補套件,所以 AI 不代跑,由操作員的手啟動。收工跑 `via-vcgc handoff daily`。
+
+**每日教訓帳(操作員 2026-11-16 令;待登需求)**:接手先讀 `VeritasIntelligenceAnalytics/docs/handoff/daily/VIA_DailyChecklist_latest.md`(問題 → 根因 → 處理 → 下次怎麼檢查);收工把當天新遇到的問題照同樣欄位加到 `VIA_DailyLessons_Ledger_v0100.jsonl` 帳尾(只增、不改舊列),再重生清單。
