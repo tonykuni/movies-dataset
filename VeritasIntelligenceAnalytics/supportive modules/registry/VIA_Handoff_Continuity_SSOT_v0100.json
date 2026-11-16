@@ -6731,6 +6731,25 @@
    "updated_at": "2026-11-16T06:03:59Z",
    "timeout_seconds": 900,
    "registered_at": "2026-11-16T06:03:59Z"
+  },
+  "C-registry-lake-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/VIA_VCGC_MDL263_RegistryLake_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VIA_VCGC_MDL263_RegistryLake v0100 自測 8/8 PASS",
+   "scope": "註冊總帳入湖:號冊 / SSOT / 參數列管 / VQG / 擷取矩陣 / 收據 → 角色分類 → 驗 號 · 時間 · 版本 · 來源 → VIA_ParquetLake 只增入湖(重入 0)→ HTML",
+   "dependencies": [
+    "supportive modules/registry/VIA_VCGC_MDL263_RegistryLake_v0100.py",
+    "supportive modules/VIA_ParquetLake_v0101.py",
+    "supportive modules/VIA_ParquetLake_v0100.py"
+   ],
+   "version": "v0100",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-16T08:20:00Z",
+   "updated_at": "2026-11-16T08:20:00Z"
   }
  },
  "work_items": [
@@ -13035,13 +13054,26 @@
   },
   {
    "id": "VDF:ssotsync-thin-tail-harvest-port",
-   "requirement": "VDF 同義字收割看穿薄尾(本線 VDF_SSOTSync v0101 的功能)",
+   "requirement": "VDF-REQ036",
    "state": "PENDING",
    "case": "C-vdf-ssotsync-v0101",
    "receipt": null,
    "reason": "本線 v0101 與 main v0101 同號異物;疊在 main v0102 上兩支都換 harvest、自測互相打架 → 退役保留原文,待 VDF 自己出下一版(VDF_SSOTSync v0103)整併(L123 VCGC 不代改 VDF)。",
    "evidence": "functional modules/VIA_RetiredEngines/merge20261116_number_collision/README.md",
-   "created_at": "2026-11-16T08:00:00Z"
+   "created_at": "2026-11-16T08:00:00Z",
+   "owner": "VDF",
+   "next": "VDF 出 VDF_SSOTSync v0103(main v0102 之上)併入同義字收割看穿薄尾;自測含 main v0102 ④ 不打架"
+  },
+  {
+   "id": "VCGC-REQ247:registry-lake",
+   "requirement": "VCGC-REQ247",
+   "state": "PENDING",
+   "case": "C-registry-lake-v0100",
+   "receipt": null,
+   "owner": "VCGC",
+   "next": "handoff test C-registry-lake-v0100 → VERIFIED",
+   "reason": "新登錄;收據待本輪 handoff test 寫入",
+   "created_at": "2026-11-16T08:20:00Z"
   }
  ]
 }
