@@ -1,0 +1,113 @@
+{
+  "schema": "VIA.UI.WorkPlatformTemplateLock.v1",
+  "version": "v0101",
+  "prior": "VIA_UI_WorkPlatform_TemplateLock_v0100.json",
+  "status": "LOCKED",
+  "ordered_by": "操作員 2026-11-17「現在的 VIA 現況矩陣視覺化面非常好,將它作為對內工作平台視覺化鎖定模板;非常精確簡單的摘要用卡片的方式,詳細的展現用矩陣,篩選給 AI 回饋的部分再篩選;寧可完善不可遺漏」",
+  "scope": "對內工作平台頁(監控 · 現況矩陣 · 一鍵處理結果 · AI 回饋包)。不是各系統對外報告的版面,也不取代各系統 VisualSpec。",
+  "reference": "VIA 現況矩陣 · 2026-11-17(本冊 css 的字級、間距、表格、燈膠囊、判定條照那一頁;卡片與篩選列是同一套 token 的新增元件)",
+  "tokens_from": {
+    "family": "VIA_UI_Template_SSOT",
+    "pinned": "v0104",
+    "sha256": "16ae212622510cf9bae9a716b87d66ba0308ee24ffb8bd3f15fdd8eae76f9510",
+    "rule": "顏色、字體、字級、邊角一律 var(--token),值只在 token 冊;本冊不存任何色值。token 冊出新版 → 本冊出新版改 pinned。"
+  },
+  "tokens_used": [
+    "bg",
+    "chip",
+    "dim",
+    "font",
+    "fs",
+    "fs-h",
+    "fs-note",
+    "fs-title",
+    "hair",
+    "lamp-gray",
+    "lamp-green",
+    "lamp-red",
+    "lamp-yellow",
+    "lh",
+    "line",
+    "mono",
+    "pad",
+    "panel",
+    "radius",
+    "seal",
+    "serif",
+    "sys-bg",
+    "txt",
+    "w-bold",
+    "w-normal",
+    "zebra"
+  ],
+  "lamp": {
+    "locked": [
+      "lamp-green",
+      "lamp-yellow",
+      "lamp-red",
+      "lamp-gray"
+    ],
+    "label": {
+      "g": "綠",
+      "y": "黃",
+      "r": "紅",
+      "x": "灰"
+    },
+    "text": "panel(白字)· 四色一律 · 操作員 2026-11-17「燈號全部要用白字」",
+    "rule": "燈在第一欄;亮色實心膠囊;燈上的字四色一律白;紅燈慢閃 2.4 秒(prefers-reduced-motion 時不閃);黃格就亮黃,沒證據亮灰不亮綠。"
+  },
+  "page_order": [
+    "header",
+    "verdict",
+    "cards",
+    "feedback",
+    "matrix",
+    "rules"
+  ],
+  "components": {
+    "cards": {
+      "use": "摘要。每張卡只有四樣:燈 · 一個數字 · 一個名稱 · 一行最大宗原因。",
+      "rule": "數字只能由矩陣的列算出來,不得手填;點卡 = 用同一條件篩矩陣;卡片合計必須對得上矩陣列數,對不上整頁亮紅。"
+    },
+    "matrix": {
+      "use": "明細。一列一個項目,欄固定:燈 · 系統 · 區塊 · 項目 · 版本 · 狀態說明 · 時間 · 類別 · 去向。",
+      "rule": "長字自動換行;表頭黏住;寬表在框內捲;先顯示前 200 列,其餘按鈕展開(不是省略)。"
+    },
+    "feedback": {
+      "use": "給 AI 的回饋包(兩段篩選的結果)與三數。",
+      "rule": "包內每一行都能在矩陣找到;被併組或只計數的項目在矩陣『去向』欄看得到。"
+    }
+  },
+  "css": "*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:var(--w-normal) var(--fs)/var(--lh) var(--font)}.wrap{max-width:1180px;margin:0 auto;padding:18px 14px 40px}\nheader{border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:12px}.caps{font:var(--w-normal) var(--fs-note)/1.4 var(--mono);letter-spacing:.08em;color:var(--dim);text-transform:uppercase}\nh1{font:var(--w-bold) var(--fs-title)/1.25 var(--serif);margin:4px 0 6px}h2{font:var(--w-bold) var(--fs-h)/1.3 var(--font);margin:0 0 6px}.note{font-size:var(--fs-note);color:var(--dim)}.mono{font-family:var(--mono)}\n.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px 10px 8px;margin:0 0 10px}\n.verdict{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;background:var(--sys-bg);border:1px solid var(--line);border-left:4px solid var(--seal);border-radius:var(--radius);padding:8px 10px;margin:0 0 10px}\n.verdict b{font:var(--w-bold) var(--fs-h)/1.2 var(--font);color:var(--seal)}.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:var(--fs)}\nth,td{border-bottom:1px solid var(--hair);padding:5px var(--pad);text-align:left;vertical-align:top;overflow-wrap:anywhere}\nth{font:var(--w-bold) var(--fs-note)/1.3 var(--font);color:var(--dim);background:var(--chip);border-bottom:1px solid var(--line);white-space:nowrap}\ntbody tr:nth-child(even) td{background:var(--zebra)}td.l,th.l{width:44px;white-space:nowrap}td.k{white-space:nowrap;font-weight:var(--w-bold)}td.n{white-space:nowrap}\n.lamp{display:inline-block;min-width:30px;padding:1px 7px;border-radius:999px;font:var(--w-bold) var(--fs-note)/1.5 var(--font);color:var(--panel);text-align:center}\n.g{background:var(--lamp-green)}.y{background:var(--lamp-yellow)}.r{background:var(--lamp-red);animation:bl 2.4s ease-in-out infinite}.x{background:var(--lamp-gray)}\n@keyframes bl{0%,100%{opacity:1}50%{opacity:.35}}@media (prefers-reduced-motion:reduce){.r{animation:none}}\n.nav{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}.nav a{font:500 var(--fs-note)/1 var(--mono);color:var(--txt);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 9px;background:var(--panel)}\n.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px;margin:0 0 10px}\n.kc{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:8px 10px;font:inherit;color:inherit;cursor:pointer;min-width:0}\n.kc:hover,.kc:focus-visible{border-color:var(--txt);outline:none}.kc[aria-pressed=\"true\"]{border-color:var(--seal);box-shadow:inset 0 0 0 1px var(--seal)}\n.kc .kn{font:var(--w-bold) var(--fs-title)/1.1 var(--serif);font-variant-numeric:tabular-nums}.kc .kl{font:var(--w-bold) var(--fs)/1.3 var(--font);display:flex;gap:6px;align-items:center}\n.kc .kr{font-size:var(--fs-note);color:var(--dim);overflow-wrap:anywhere}\n.bar{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:end;margin:6px 0 8px}.bar label{display:flex;flex-direction:column;gap:2px;font:var(--w-bold) var(--fs-note)/1.2 var(--font);color:var(--dim)}\n.bar select,.bar input,.bar button{font:var(--w-normal) var(--fs)/1.2 var(--font);padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--txt);min-width:110px}.bar input{min-width:200px}.bar button{cursor:pointer;min-width:0}\n.box{max-height:560px;overflow:auto;border:1px solid var(--hair);border-radius:6px}.box thead th{position:sticky;top:0;z-index:1}.num{font-variant-numeric:tabular-nums}\n.pack{margin:6px 0 0;padding:8px 10px;max-height:420px;overflow:auto;background:var(--chip);border:1px solid var(--hair);border-radius:6px;font:var(--w-normal) var(--fs-note)/1.55 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere}\n@media (max-width:640px){.wrap{padding:12px 8px 30px}.cards{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}}",
+  "css_sha256": "2262e06a97d46c2fce80d42d63781f5eb47ca5f264d0360e291934f2bf584ef2",
+  "contrast": {
+    "min_required": 4.5,
+    "measured": {
+      "txt on bg": 15.32,
+      "txt on panel": 16.86,
+      "dim on bg": 4.92,
+      "dim on panel": 5.41,
+      "dim on chip": 5.14,
+      "seal on sys-bg": 5.38,
+      "panel on lamp-green": 3.3,
+      "panel on lamp-yellow": 2.15,
+      "panel on lamp-red": 4.83,
+      "panel on lamp-gray": 2.54
+    },
+    "note": "操作員 2026-11-17 指定燈號全部白字。白字在綠 3.30 · 黃 2.15 · 灰 2.54 低於 4.5,屬操作員指定的已知項,不是漏檢;燈以外的文字都 ≥ 4.5。v0100 曾把綠 / 黃 / 灰改成深色字,本版收回。"
+  },
+  "not_embedded": "字型檔不內嵌(頁面離線時退到系統字);要內嵌走 token 冊 assets 節。",
+  "history": [
+    {
+      "version": "v0100",
+      "date": "2026-11-17",
+      "what": "首版:把現況矩陣頁的版面定為對內工作平台鎖定模板,加卡片與篩選列元件。"
+    },
+    {
+      "version": "v0101",
+      "date": "2026-11-17",
+      "what": "燈號四色一律白字(操作員令);其餘不變。"
+    }
+  ],
+  "created_at": "2026-11-17T20:30:00+08:00"
+}
