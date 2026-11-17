@@ -1,0 +1,146 @@
+{
+ "schema": "VIA.RC1.LessonRegistry.v1",
+ "version": "v0102",
+ "created_utc": "2026-11-09T05:40Z",
+ "format": [
+  "root_cause",
+  "impact",
+  "resolution",
+  "prevention",
+  "evidence"
+ ],
+ "first_run_exception": "同上",
+ "append_only": true,
+ "entries": [
+  {
+   "id": "LESSON-0001",
+   "title": "Session 遺失",
+   "root_cause": "多 AI 對話各自為政,結論未落地為檔",
+   "impact": "VCGC/VDF/VRN 被 Copilot 重新定義為 Vision/Value/Validation;同一決策重做",
+   "resolution": "RC-1 期間所有 AI 只讀 paste pack;決策只認 PolicySSOT 與 registry 檔",
+   "prevention": "每次 CLOSEOUT 必有 [DELTA] 寫入 ledger;無 ledger 行 = 未發生",
+   "evidence": "Copilot/Gemini 文件中的 VAP/VQG 審計定義 vs 真實子系統 VAP=AutoPlot;本輪上傳 gemini-code-1794143633893.txt 又是一份「Level-0 全權初始化」提示;Review Kit v0106.4 handover 自述 RED/BLOCKED"
+  },
+  {
+   "id": "LESSON-0002",
+   "title": "收尾期間新增架構",
+   "root_cause": "Level-0 授權無凍結層;AI 以「補強」名義造新件",
+   "impact": "v2.0 超級版新增 10 skills、NetAccelerator、Skills Engine,收尾未完先擴張",
+   "resolution": "LAW-10 凌駕 LAW-6;HARD FREEZE 六禁",
+   "prevention": "任何新件先過「是否在 RC-1 僅允許六類」檢查,否則記 CONFLICT 不執行",
+   "evidence": "2026-11-06～09 四份 prompt 新增項目清單;VRN-2 v0147/v0148 線(HTTP workbench);本輪 CONFLICT-00001 / 00003(兩個 AI 各交一套新治理引擎)"
+  },
+  {
+   "id": "LESSON-0003",
+   "title": "多 AI 版本分岔",
+   "root_cause": "同一家族由不同 session 取號,無取號前掃描",
+   "impact": "VRN-2 三條線(Closeout v01xx / v0147–148 停用 / v0149 續行);PR #512 與聊天線同號 v0123、MDL269;本輪 v0193 / v0194 被外部 AI 搶號",
+   "resolution": "共祖 v0244 已合併;≥v0245 單線;同名異內容 = 停,不覆寫",
+   "prevention": "取任何版本號前掃 local ∪ origin/main;已發布者保號,本地改號進 _superseded",
+   "evidence": "VRN_SystemManager v0231→v0243/v0244 合併紀錄;本輪 CONFLICT-00001(repo v0192 ↔ 上傳 v0193/v0194 只共用 2 個定義)· CONFLICT-00005 277 個 _sha 分身 · CONFLICT-00012"
+  },
+  {
+   "id": "LESSON-0004",
+   "title": "GitHub 與本地不同步",
+   "root_cause": "四個本機根(Downloads / C:\\VIA / OneDrive via_0x / C:\\Users\\tonyk\\VIA-VDF-VRN)+ 三個 repo",
+   "impact": "VRN-2 local-only;VDF/VCGC 已上 GitHub;movies-dataset 定為 master 但 OneDrive 為重建地",
+   "resolution": "P1 Repo Matrix 標明每根目錄對應 repo 與角色(master / 重建 / 參考 / 資料家)",
+   "prevention": "上傳規則:本機測過才上;衝突即時解,不留側枝;資料永不進 git",
+   "evidence": "2026-09-30 GitHub master 規則 vs 2026-10-10 OneDrive via_02_vrn 重建決定;本輪:275 遠端分支 · 抽樣 12 支各分岔 1104–3342 提交 · ActivateVRN-2 本倉 v0132 / 本機 v0178"
+  },
+  {
+   "id": "LESSON-0005",
+   "title": "缺少 Done Definition",
+   "root_cause": "只有 VRN-2 有六條 DoD;VDF/VCGC/RC-1 整體無",
+   "impact": "無法判 GO;「做完」由 AI 自報",
+   "resolution": "RC-1 GO 條件即整體 DoD;VDF DoD = reader chain 封印 + 橋接版本化 100%;VCGC DoD = 11 gates + 監控頁不含入口",
+   "prevention": "新任務 S0 必填 SUCCESS=,無 SUCCESS 不進 S1",
+   "evidence": "VRN-2 DoD 2026-10-15 六條;VDF 僅有 Gate 名稱無整體 DoD;本輪「CGE v0400 11 gates SEALED」在樹內只找到 VIACGEOneShotv0400.ps1 一支 + CGE/Console/inventory/manifest.json 0 bytes,佐證不足以判 SEALED"
+  },
+  {
+   "id": "LESSON-0006",
+   "title": "工具自己炸 = 假紅,會遮住後面所有誠實燈",
+   "root_cause": "CGC_MDL245 v0100 三處寫死 (w.get('tests') or {}).get(...);工作流冊 v0133 起 WKF022+ 的 tests 改成 TST 列表,驗證器一碰到就 AttributeError,整輪 X-* 列一條都沒出來,ssot panorama 把「上下連結@VCGC」記 RED(第 203 次)。",
+   "impact": "紅燈指向錯的地方(以為冊壞),真正的兩個缺口(VCGC-WKF025 · VDF-WKF015 沒有 tests 欄)被遮了 200 多輪;RC-1 W0 把它算進 HOLD 條件。",
+   "resolution": "v0107 薄尾:load_books 出口把列表式換成字典視圖(.cases 留原列表 · real 空字串不冒充 ai 實跑),check_columns 逐項驗;修好後 X-COL 第一次誠實標出兩個缺口 → 同輪補 tests(VCGC v0134 · VDF v0107)。",
+   "prevention": "① 檢查器一列一列失敗,不整輪炸(每個 X-* 自己 try,炸了記 RED 附 repr,其餘照跑);② 冊換形狀前先給驗證器一個帶新形狀的自測(薄尾 add-only);③ 連續同一例外出現 >3 次就是工具病不是冊病,先修工具。",
+   "evidence": "RC-1 W0 CONFLICT-00010;MDL245 v0107 自測 ⑧「本體 check(write=False) 整輪跑完不炸」;ssot panorama 2026-11-09 上下連結@VCGC RED → YELLOW(待重驗鎖 4,內容是另一件事)"
+  },
+  {
+   "id": "LESSON-0007",
+   "title": "同版號不同內容(兩個 PR 各出一支 MCPServer v0104)",
+   "root_cause": "取版號只看 main,沒看開著的 PR 分支",
+   "impact": "#655 與 #654 撞版號;任一先併,另一支就變成同名不同義",
+   "resolution": "#655 關閉,同內容改 v0105 疊在 #654 之上(#657)",
+   "prevention": "取任何版號 / 號碼前,先掃 main ∪ 所有開著的 PR 分支(git ls-tree);撞到就往後取",
+   "evidence": "PR #654 · #655 · #657"
+  },
+  {
+   "id": "LESSON-0008",
+   "title": "交付分支被併進 main",
+   "root_cause": "交付件放在一般分支,看起來像可併的 PR",
+   "impact": "claude-deliveries/ 三支 PS 進了 main(#656),會被當成未登檔",
+   "resolution": "不刪(只增不減);交接檔記一筆「交付件,不是系統檔」",
+   "prevention": "交付件只放交付分支、永不開 PR;要開 PR 的分支名不得以 delivery 用途命名",
+   "evidence": "PR #656 · main 82af6c7a"
+  },
+  {
+   "id": "LESSON-0009",
+   "title": "一鍵腳本跑到舊程式",
+   "root_cause": "VDF 工作樹有 9 筆未提交改動,同步被擋,停在 10-21(落後 821 提交)",
+   "impact": "整夜跑的是 VDF_SystemManager v0161,版本 / conform 動詞拒跑",
+   "resolution": "v0102:未提交改動先收起(複本 + patch)→ 還原 → git 切到 origin/main",
+   "prevention": "同步前先報「工作樹 HEAD / 落後幾個 / 未提交幾筆」;擋下時整個貼回包標黃,不默默照舊碼跑",
+   "evidence": "桌機 2026-11-15 16:17 貼回包"
+  },
+  {
+   "id": "LESSON-0010",
+   "title": "單一步驟吃光整道時間上限",
+   "root_cause": "ActivateVDF 單步上限 14400 秒 = 整道上限的大半",
+   "impact": "引擎啟動 2958 秒 + e232 逾時,補缺一輪都沒跑到",
+   "resolution": "殼 420 分 · ActivateVDF 10800 秒 · 補缺每輪 3600 秒",
+   "prevention": "每一步的上限加總要小於整道上限;下游步驟一定輪得到",
+   "evidence": "Invoke-VIA-VDF-ListsFetch v0102"
+  },
+  {
+   "id": "LESSON-0011",
+   "title": "只有註解標記冒充加速器覆蓋",
+   "root_cause": "覆蓋率用字串比對 ACCEL-BRIDGE",
+   "impact": "VQG_AllInOne 文件字串寫了標記但沒匯入,文字比對算合格",
+   "resolution": "改用 ast.parse 認匯入,薄尾沿前版鏈",
+   "prevention": "覆蓋率一律以 AST + 執行時載得到為準;只有標記 = 黃",
+   "evidence": "五系統 AST 覆蓋 2026-11-15"
+  },
+  {
+   "id": "LESSON-0012",
+   "title": "備份 0 檔亮綠",
+   "root_cause": "check 只看 zip 與變動,沒看「有沒有可驗證的檔」",
+   "impact": "空範圍也報「備份完整」",
+   "resolution": "VIA_DailyBackup v0101:0 檔紅、範圍落空黃",
+   "prevention": "每個檢查都要先問「我量到東西了嗎」;量到 0 不是綠",
+   "evidence": "PR #651"
+  },
+  {
+   "id": "LESSON-0013",
+   "title": "大收據被截成壞 JSON",
+   "root_cause": "read_resource 以 60000 字硬切,沒有續讀訊號",
+   "impact": "AI 讀到半份 HANDOFF 卻以為讀完",
+   "resolution": "MCP v0103 分頁讀(位元組游標 + sha + next_uri)",
+   "prevention": "任何截斷都要帶「還有下一段」的訊號",
+   "evidence": "PR #651"
+  },
+  {
+   "id": "LESSON-0014",
+   "title": "把不存在的功能當成缺口",
+   "root_cause": ".claudeignore 不是 Claude Code 的功能",
+   "impact": "工具台把「沒有 .claudeignore」列成黃燈",
+   "resolution": "改用 .claude/settings.json 的 permissions.deny",
+   "prevention": "列缺口前先查官方文件;查不到就標「待查」不標缺",
+   "evidence": "PR #657"
+  }
+ ],
+ "prior": "VIA_RC1_LessonRegistry_v0101.json",
+ "updated_utc": "2026-11-17T12:59Z",
+ "why_v0101": "v0100 已併進 main(PR #613)→ 出新版;+LESSON-0006(工具假紅);五筆舊教訓一字不動。",
+ "why_v0102": "操作員 2026-11-17「既有範疇全景檢修到綠燈」:+LESSON-0007~0014(兩週內的重工與假綠);0001~0006 一字不動;同內容另存 Parquet 供 DuckDB 查(L10 parquet 存 duckdb 管)。"
+}

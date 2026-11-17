@@ -1,0 +1,180 @@
+{
+ "schema": "VIA.FailureModes.v1",
+ "version": "v0100",
+ "made_utc": "2026-11-17T12:59Z",
+ "by": "Claude(claude.ai 專案對話)· 操作員 2026-11-17 令",
+ "why": "參考文件的「SDD-001…020」與 VIA 既有 SDD 檢查(CGC_MDL245)同名不同義 → 改叫 FM-01…20。逐條對到既有偵測器;沒有偵測器的亮灰,不另寫掃描器。拒絕案例 REJ 同理。",
+ "lamp_rule": "GREEN = 有既有偵測器且已在用 · YELLOW = 只有部分或事後才抓得到 · GRAY = 沒有偵測器",
+ "failure_modes": [
+  {
+   "id": "FM-01",
+   "name": "SSOT 漂移(同一份冊兩個版本不同)",
+   "detector": "CGC_MDL247_SSOTPanorama · via-vcgc ssot panorama",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-02",
+   "name": "重號",
+   "detector": "CGC_MDL237_NumberingSystem 編號稽核(遺失 0 · 改身分 0 · 重號 0)",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-03",
+   "name": "AI 知道、文件沒有",
+   "detector": "VIA_RC1_LessonRegistry · 交接檔 · handoff findings",
+   "lamp": "YELLOW"
+  },
+  {
+   "id": "FM-04",
+   "name": "多 AI 版本分岔",
+   "detector": "CGC_MDL283 回饋包(Claude / ChatGPT 讀同一份)· handoff reusable_successes",
+   "lamp": "YELLOW"
+  },
+  {
+   "id": "FM-05",
+   "name": "決策沒有來源",
+   "detector": "VIA_Requirements_SSOT · 政策冊 · 衝突冊(每條決策要有 REQ / L / CONFLICT 號)",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-06",
+   "name": "重複分析吃光 Token",
+   "detector": "CGC_MDL158 read · slice · digest · etag · pack · handoff 可沿用成功",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-07",
+   "name": "同功能兩個 PR",
+   "detector": "沒有偵測器(目前靠交接檔逐 PR 一行)",
+   "lamp": "GRAY"
+  },
+  {
+   "id": "FM-08",
+   "name": "交接中斷",
+   "detector": "handoff check · handoff checkpoint(pending 不能消失)",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-09",
+   "name": "知識只在某一個 AI 裡",
+   "detector": "VIA_RC1_LessonRegistry · via-lessons",
+   "lamp": "YELLOW"
+  },
+  {
+   "id": "FM-10",
+   "name": "改 A 壞 B 的連鎖",
+   "detector": "CGC_MDL223_FlowConsistency(契約針沿薄尾鏈)· 介面契約冊",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-11",
+   "name": "收據缺",
+   "detector": "handoff check · VIA_SystemReceipt_Contract_SSOT · CGC_MDL283 對帳",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-12",
+   "name": "Schema 漂移",
+   "detector": "CGC_MDL249_DataFrameLock(表頭全面覆蓋 + 型別)",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-13",
+   "name": "斷參照(檔或路徑不在)",
+   "detector": "CGC_MDL242_PathVerify",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-14",
+   "name": "MCP 故障",
+   "detector": "CGC_MDL279_MCPServer --selftest · mcp doctor",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-15",
+   "name": "備份缺口",
+   "detector": "VIA_DailyBackup v0101 check · CGC_MDL221_SystemBackup",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-16",
+   "name": "版本曖昧(同版號不同內容)",
+   "detector": "CGC_MDL225_VersionPanorama 只看單一分支;跨開著的 PR 沒有偵測器(LESSON-0007)",
+   "lamp": "YELLOW"
+  },
+  {
+   "id": "FM-17",
+   "name": "情境污染(AI 讀進不該讀的大檔)",
+   "detector": ".claude/settings.json permissions.deny · CLAUDE.md 省 Token 規則 · CGC_MDL283 兩段篩選",
+   "lamp": "YELLOW"
+  },
+  {
+   "id": "FM-18",
+   "name": "殭屍任務(沒人收尾的 pending)",
+   "detector": "handoff pending(只能帶理由轉態)· CGC_MDL283 退步清單",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "FM-19",
+   "name": "越權(跨系統改檔 / AI 改律 / 自行編號)",
+   "detector": "VIA_SystemManager_Standard P4 · 五系統憲法矩陣 · 編號稽核;AI 改律沒有自動偵測",
+   "lamp": "YELLOW"
+  },
+  {
+   "id": "FM-20",
+   "name": "繞過治理(沒過閘就上)",
+   "detector": "CGC_MDL245_SDDValidator · handoff 閘 · 五系統憲法矩陣",
+   "lamp": "GREEN"
+  }
+ ],
+ "rejection_cases": [
+  {
+   "id": "REJ-01",
+   "case": "AI 改政策冊 / 需求冊尾版(不經 VCGC)",
+   "guard": "沒有自動擋;靠 CLAUDE.md 規則 + 衝突檢查事後抓",
+   "lamp": "GRAY"
+  },
+  {
+   "id": "REJ-02",
+   "case": "跨系統寫檔",
+   "guard": "VIA_SystemManager_Standard P4 / P5(跑完對方夾 git 狀態不變)",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "REJ-03",
+   "case": "刪除收據 / 帳本",
+   "guard": "VIA_DailyBackup v0101 check 抓「檔不見」;沒有即時擋",
+   "lamp": "YELLOW"
+  },
+  {
+   "id": "REJ-04",
+   "case": "自行編號 / 偽造號",
+   "guard": "CGC_MDL237 編號稽核(冊外號 = 紅)",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "REJ-05",
+   "case": "代設同意閘(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT)",
+   "guard": "VIA_SystemManager_Standard P8 · 網路工具橋自報雙閘",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "REJ-06",
+   "case": "MCP 唯讀門面接寫入動詞",
+   "guard": "CGC_MDL279 自測 ⑦(白名單外動詞 · 寫冊字樣 → isError)",
+   "lamp": "GREEN"
+  },
+  {
+   "id": "REJ-07",
+   "case": "容器結果冒充主機綠",
+   "guard": "收據 host 欄 · 綠燈判準 G4",
+   "lamp": "YELLOW"
+  },
+  {
+   "id": "REJ-08",
+   "case": "只有註解標記冒充加速器覆蓋",
+   "guard": "五系統 AST 覆蓋(只有標記 = 黃)",
+   "lamp": "GREEN"
+  }
+ ]
+}
