@@ -27,3 +27,4 @@
 | 2026-11-17T13:12:16Z | CGC_MDL283_CardMatrixFeedback_v0102.py | 0102 | VIA-VCGC-MDL1650 | 778aeb091631 | 延伸偵測併進卡片與矩陣 · [主機] · [沒管到] | 自測 9/9(另跑 v0101 鏈 23/23 · v0100 鏈 25/25)· 實跑 3,246 列對帳六條相符 |
 | 2026-11-17T16:22:54Z | CGC_MDL282_LocalMonitor_v0102.py | 0102 | VIA-VCGC-MDL1651 | 49074d9f9992 | 延伸偵測增量快取 · 彙總列標記 | 自測 9/9(另跑 v0101 鏈 25/25 · v0100 鏈 16/16)· 實跑 13.1 秒 → 0.3 秒 |
 | 2026-11-17T16:22:54Z | CGC_MDL283_CardMatrixFeedback_v0103.py | 0103 | VIA-VCGC-MDL1652 | 8d5ff66ece65 | 現況顯示最佳化:彙總列不另計 · 三排卡片 · 收據 STATUS_latest.json · status() · manifest | 自測 20/20(另跑前版鏈 57/57)· 實跑對帳八條相符 |
+| 2026-11-17T16:25:27Z | CGC_MDL283_CardMatrixFeedback_v0103.py | 0103 | VIA-VCGC-MDL1652 | 2cbb8baa1ceb | 現況顯示最佳化(推送前修正後重鎖;同檔以本列為準):彙總列不另計 · 三排卡片 · 收據 · status() · manifest | 自測 21/21(另跑前版鏈 57/57)· 實跑對帳八條相符 |
