@@ -276,6 +276,8 @@ def render(res, cards, pack, css, tpl_note, accel) -> str:
 
 
 PRIOR.monitor = monitor
+# 更新回饋的「仍未解 / 新增 / 修好」也不把彙總列另算一項(彙總列的細項已各自在列)
+P1.delta_lines = (lambda _d: lambda res, prev, actor: _d(dict(res, items=[it for it in res["items"] if not it.get("roll")]), prev, actor))(P1.delta_lines)
 P0.from_localmonitor, P0.stage1, P0.classify, P0.assemble, P0.write_out, P0.render = from_localmonitor, stage1, classify, assemble, write_out, render
 
 
@@ -382,6 +384,8 @@ def selftest() -> int:
         chk("群組卡:每個區塊恰屬一組,合計等於矩陣列數", sum(c["n"] for c in g.values()) == len(r["items"]) and g["模組與號冊"]["n"] == 7, {x: g[x]["n"] for x in g})
         STATE["src"] = "CGC_MDL282_LocalMonitor_v0102 的五個區塊"
         pk = write_out(tmp, r, list(r["head"]), lambda p: render(r, P0.cards_of(r), p, "", "自測", "自測"), "st")
+        dl = (tmp / "FEEDBACK_DELTA_latest.txt").read_text(encoding="utf-8")
+        chk("更新回饋不把彙總列另算", "號冊 · TST" not in dl and "[仍待處理]" in dl, dl[:200])
         rec = json.loads((tmp / "STATUS_latest.json").read_text(encoding="utf-8"))
         chk("收據欄位齊、燈與對帳照實、說明燈的範圍", all(f in rec for f in MANIFEST["receipt_fields"]) and rec["lamp"] == "RED" and rec["ok"] and "不是任何系統的業務驗收" in rec["lamp_scope"],
             [f for f in MANIFEST["receipt_fields"] if f not in rec])
