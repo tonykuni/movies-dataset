@@ -267,7 +267,7 @@ def render(res, cards, pack, css, tpl_note, accel) -> str:
             '<div class="scroll"><table><thead><tr><th class="l">條</th><th>第一段:入選條件</th></tr></thead><tbody>%s</tbody></table></div>'
             '<div class="scroll"><table><thead><tr><th class="l">燈</th><th>對帳</th></tr></thead><tbody>%s</tbody></table></div></details>'
             '</div><script type="application/json" id="d">%s</script><script>%s</script></body></html>') % (
-        css, sel_n, len(res["items"]), E(res["stamp"]), E(where), E(STATE["src"] or res["source"]), E(tpl_note), E(accel), E(ENGINE),
+        css, sel_n, len(res["items"]), E(res["stamp"]), E(where), E((STATE["src"] or res["source"]).replace(" 的五個區塊", "")), E(tpl_note), E(accel), E(ENGINE),
         res["lamp"], LN[res["lamp"]], E(res["why"]), E("NEXT: " + res["next"]),
         "".join(card(c) for c in cards if c["kind"] == "cls"), "".join(card(c) for c in STATE["sys"]), "".join(card(c) for c in STATE["grp"]),
         E("、".join(gaps) if gaps else "沒有(管理面覆蓋全部有來源)" if PRIOR.STATE.get("extra_n") else "這一輪沒有延伸偵測,無從判斷"),
