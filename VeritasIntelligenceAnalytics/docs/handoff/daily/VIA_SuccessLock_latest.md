@@ -22,3 +22,4 @@
 | 2026-11-17T12:32:07Z | CGC_MDL279_MCPServer_v0104.py | 0104 | VIA-VCGC-MDL1647 | f2b508332caa | MCP 唯讀門面多三把回饋鍵(feedback / feedback-delta / feedback-full) | 自測 4/4 · 前版鏈 rc 0 · 未接真的 MCP 客戶端 |
 | 2026-11-17T12:32:07Z | VIA_UI_WorkPlatform_TemplateLock_v0100.json | 0100 | — | 7b44f30e1300 | 對內工作平台模板鎖冊(版面 css 只用 token) | css 與 token 冊雜湊由引擎每輪核 |
 | 2026-11-17T12:32:07Z | VIA_UI_WorkPlatform_TemplateLock_v0101.json | 0101 | — | e8481ef3f86b | 燈號四色一律白字(操作員 2026-11-17 令) | 引擎自測核 css 規則 · 無頭瀏覽器看過 |
+| 2026-11-17T12:33:44Z | CGC_MDL283_CardMatrixFeedback_v0101.py | 0101 | VIA-VCGC-MDL1648 | 8614a630f477 | 成功鎖 · 給動作主力的更新回饋 · 本機免費工具紀錄 · 模組引擎鍵改家族名(推送前修正後重鎖;同檔以本列為準) | 自測 23/23(另跑 v0100 鏈 25/25)· 實跑對帳六條相符 |
