@@ -10,6 +10,7 @@
        對不上或檔不見 = 鎖不成立 → 歸退步、判定紅。本檔只讀這本帳,不寫。
      · 項目層:一個項目只要綠過就鎖進 FEEDBACK_SUCCESSLOCK_<來源>.json;之後不是綠或不見,每一輪都報退步,直到再綠或操作員 release。
        (v0100 只跟上一輪比,隔一輪就忘;鎖檔名不帶來源版號,來源引擎出新版不會把鎖清掉。)
+     · 模組引擎的鍵改用家族名(v0100 用編號,家族登新版就換鍵);編號改放在版本欄。
   ② 給動作主力的更新回饋:FEEDBACK_DELTA_latest.txt —— 這一輪跟上一輪比:修好 / 新增問題 / 退步 / 不見 / 仍未解(數字完整,清單超量時寫明另幾項)。
      --actor claude|chatgpt|<名字>(或環境變數 VIA_ACTOR)寫進表頭與主力帳;Windows 上把「更新回饋 + 回饋包」放進剪貼簿(--no-clip 關)。
      兩個檔都是純文字,Claude 與 ChatGPT 讀同一份;經 VCGC MCP 唯讀門面的鍵是 vcgc/feedback 與 vcgc/feedback-delta(CGC_MDL279 v0104)。
@@ -80,7 +81,7 @@ ITEM_SCHEMA = {"type": "object", "required": ["lamp"], "properties": {
     "section": {"type": "string"}, "system": {"type": "string"}, "id": {"type": ["string", "number"]}, "title": {"type": "string"},
     "detail": {"type": "string"}, "ver": {"type": "string"}, "at": {"type": "string"}, "needs": {"type": "boolean"},
     "lamp": {"enum": ["g", "y", "r", "x", "green", "yellow", "red", "gray", "GREEN", "YELLOW", "RED", "GRAY", "綠", "黃", "紅", "灰"]}}}
-CTX = {"via": None, "out": None, "extras": False, "actor": "", "clip": False, "lock": None, "lock_path": None, "lock_new": 0,
+CTX = {"via": None, "out": None, "extras": False, "famkey": False, "actor": "", "clip": False, "lock": None, "lock_path": None, "lock_new": 0,
        "delta": [], "notes": [], "src": ""}
 _O = {"assemble": PRIOR.assemble, "stage1": PRIOR.stage1, "write_out": PRIOR.write_out, "render": PRIOR.render}
 
@@ -213,6 +214,10 @@ def assemble(raw, source, prev, budget=300, peer=None):
     raw = list(raw)
     CTX["notes"] = []
     CTX["res_line"] = resource_line()  # 先量,工具狀態才知道 psutil 這一輪有沒有用到
+    for r in raw:  # 模組引擎的鍵改用家族名:v0100 用編號當鍵,家族每登一個新版編號就換,會被看成「舊的不見、新的出現」,鎖也跟著失效
+        if CTX.get("famkey") and isinstance(r, dict) and r.get("section") == "模組引擎" and r.get("title") and r.get("id") != r.get("title"):
+            r["ver"] = ("%s %s" % (r.get("ver") or "", r.get("id") or "")).strip()
+            r["id"] = r["title"]
     if CTX.get("src"):
         CTX["notes"].append(validate_items(raw))
     if CTX.get("out") is not None:
@@ -360,7 +365,7 @@ def selftest() -> int:
         if not cond:
             fails.append(name)
     saved = dict(CTX)
-    CTX.update(via=None, out=None, extras=False, lock=None, src="", actor="")
+    CTX.update(via=None, out=None, extras=False, famkey=False, lock=None, src="", actor="")
     chk("v0100 的自測在本版掛上後仍全過", PRIOR.selftest() == 0)
     tmp = Path(tempfile.mkdtemp(prefix="via_cmf101_st_"))
     try:
@@ -413,6 +418,10 @@ def selftest() -> int:
         CTX.update(out=None, lock=None)
         r3 = assemble(list(li.values()), "st3", None, 300)
         chk("檔案層鎖不成立一律歸退步", sum(1 for it in r3["items"] if it["cls"] == "REG") == 2 and r3["lamp"] == "r")
+        CTX.update(famkey=True)
+        e1 = assemble([{"section": "模組引擎", "system": "VCGC", "lamp": "g", "id": "VIA-VCGC-MDL0001", "title": "Fam(MDL)", "ver": "v0100", "detail": "已註冊"}], "st4", None, 300)
+        e2 = assemble([{"section": "模組引擎", "system": "VCGC", "lamp": "g", "id": "VIA-VCGC-MDL0002", "title": "Fam(MDL)", "ver": "v0101", "detail": "已註冊"}], "st4", {e1["items"][0]["key"]: "g"}, 300)
+        chk("模組引擎家族登新版(編號換了)鍵不變,不算不見也不算新出現", e1["items"][0]["key"] == "模組引擎|VCGC|Fam(MDL)" and len(e2["items"]) == 1 and not e2["items"][0]["selected"] and "MDL0002" in e2["items"][0]["ver"])
         ts = tools_state()
         chk("工具清單 20 個,已套用的一定是裝了的", len(ts) == 20 and all(t["have"] for t in ts if t["state"] == "已套用"))
         chk("工具帳與主力帳都有寫(只增)", (tmp / "local_free_tools_ledger.jsonl").read_text(encoding="utf-8").count("\n") == 2 and (tmp / "feedback_actor_ledger.jsonl").exists())
@@ -472,7 +481,7 @@ def main(argv=None) -> int:
         budget = int(opt("--budget") or 300)
     except ValueError:
         budget = 300
-    CTX.update(via=via, out=out, extras=not opt("--in"), src=opt("--in"), actor=(opt("--actor") or os.environ.get("VIA_ACTOR") or "").strip(), clip="--no-clip" not in args)
+    CTX.update(via=via, out=out, extras=not opt("--in"), famkey=not opt("--in"), src=opt("--in"), actor=(opt("--actor") or os.environ.get("VIA_ACTOR") or "").strip(), clip="--no-clip" not in args)
     return PRIOR.run(via, out, opt("--in"), budget, "--no-open" in args)
 
 
