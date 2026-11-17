@@ -1,0 +1,113 @@
+{
+ "schema": "VIA.PolicyLaws.Candidate/1",
+ "candidate": "POL-CAND-20261117-01",
+ "state": "CANDIDATE · 未入冊 · 未發號",
+ "made_at": "2026-11-17T13:00:08Z",
+ "made_by": "Claude(claude.ai 專案對話)· 操作員 2026-11-17 20:49 / 20:55 令",
+ "target_book": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Policy_Laws_SSOT_v*.json(尾版)· 由 VCGC 衝突檢測後發號入冊",
+ "law": {
+  "id": "",
+  "id_proposed": "下一個空號(由 VCGC 發,不自訂)",
+  "key": "PARQUET_STORE_DUCKDB_MANAGE_INCREMENTAL",
+  "cat": "資料 / 儲存",
+  "zh": "【Parquet 存 · DuckDB 管 · 增量律(整合 L10 · L28 · L90)】① 存:五系統的資料一律落成 Parquet(ZSTD),依「資料集 / 日期分區」放在資料家(L10);Parquet 是正典。② 增量:只追加新分區或新批次;同一鍵以最後一批為準,舊批不刪、留在歷史分區;每批寫收據(列數 · 最大日期 · 來源 sha · 批號)。③ 管:DuckDB 只當管理與查詢層(catalog · view · 檢核 · 對帳),直接讀 Parquet,不另存一份資料;寫入採單一寫者。④ 失敗不冒充完成:承 L28,批次先原子落 Parquet(暫存檔 + 改名)再登 catalog,成功才記帳;中斷先重播。⑤ VRN 也照本律(操作員 2026-11-17 裁定 A):L90「VRN 正典 = DuckDB vrn_* 七張表、Parquet 為派生」在下列遷移閘全部過關後由本律取代;過關前 L90 照常有效,L90 原文一字不改。⑥ 本律只定原則;各系統由自己的管理器落實,VCGC 只監看與發號。",
+  "relates": [
+   "L10",
+   "L14",
+   "L28",
+   "L90"
+  ],
+  "origin": "操作員原文 2026-11-17:「PARQUET為資料庫格式增量維護 DUCKDB管理列入政策」;L90 衝突裁定「1. A」(VRN 也改 Parquet 正典)"
+ },
+ "vrn_migration_gates": [
+  {
+   "id": "M1",
+   "name": "先收尾後遷移",
+   "rule": "VRN-2 先以現行 DuckDB 正典通過收尾驗收(G-04),才開始遷移;不在移動中的目標上改儲存"
+  },
+  {
+   "id": "M2",
+   "name": "雙軌期",
+   "rule": "遷移期間 DuckDB vrn_* 七張表只讀保留、一筆不刪;Parquet 正典與之並存"
+  },
+  {
+   "id": "M3",
+   "name": "對等驗證",
+   "rule": "每張表:列數 · 鍵集合 · 逐欄雜湊 三項相同,而且連續 3 輪都相同,才算過"
+  },
+  {
+   "id": "M4",
+   "name": "一個開關切換、一個開關退回",
+   "rule": "正典來源是 VRN 自己參數冊裡的一個參數;退回 = 改回參數,不搬資料"
+  },
+  {
+   "id": "M5",
+   "name": "表頭鎖",
+   "rule": "切換前後都過 CGC_MDL249_DataFrameLock(表頭全面覆蓋 + 型別)"
+  },
+  {
+   "id": "M6",
+   "name": "一次一張表、一個 PR",
+   "rule": "每張表一個薄尾新版 + 一個 PR;前版一字不動;沙盒與桌機自測都過才併"
+  },
+  {
+   "id": "M7",
+   "name": "下游不斷",
+   "rule": "VDF / VAP / VATETF 等讀端在切換前改讀 DuckDB view(view 指向 Parquet),讀端程式不必跟著改"
+  },
+  {
+   "id": "M8",
+   "name": "成功鎖",
+   "rule": "切換後 VRN 的輸出驗證若退步,依 CGC_MDL283 成功鎖報紅,並按 M4 退回"
+  }
+ ],
+ "risk_controls": [
+  {
+   "id": "RK-01",
+   "risk": "改了 A 壞 B(九頭龍)",
+   "control": "只出薄尾新版,前版一字不動;每批只動一個系統;五系統 AST 覆蓋與憲法矩陣前後各跑一次"
+  },
+  {
+   "id": "RK-02",
+   "risk": "撞版號 / 撞號",
+   "control": "取號前先掃 main ∪ 所有開著的 PR(LESSON-0007);號只由 VCGC 用 --scope 發"
+  },
+  {
+   "id": "RK-03",
+   "risk": "假綠",
+   "control": "每盞綠過 G1–G8;不過就降黃,不硬轉綠"
+  },
+  {
+   "id": "RK-04",
+   "risk": "成功丟失",
+   "control": "成功鎖帳只增;退步每輪都報,直到再綠或你 release"
+  },
+  {
+   "id": "RK-05",
+   "risk": "範圍飄移",
+   "control": "只做既有範疇(VCGC / VDF / VRN-2 收尾 + 本計畫列的項);新點子進待辦,不在本輪做"
+  },
+  {
+   "id": "RK-06",
+   "risk": "大改一次到位",
+   "control": "一次一張表、一個 PR(M6);可回退(M4)"
+  },
+  {
+   "id": "RK-07",
+   "risk": "資料遺失",
+   "control": "全程不刪;遷移期雙軌(M2);每日備份 v0101 check 抓「檔不見」"
+  },
+  {
+   "id": "RK-08",
+   "risk": "容器結果當主機結果",
+   "control": "系統級綠一律要 Windows 主機實跑收據(G4)"
+  }
+ ],
+ "needs_ruling": [
+  "本律編號(VCGC 發)",
+  "VRN 遷移由 VRN 線排程(M1 收尾驗收之後)"
+ ],
+ "candidate_version": "v0100",
+ "prior": null,
+ "sha256_of_law_zh": "21febe9146bc8dfb329640f3f881aafa36665bdc9e666fb2f49c59cdf4784587"
+}
