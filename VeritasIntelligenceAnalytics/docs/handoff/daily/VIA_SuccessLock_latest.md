@@ -16,3 +16,12 @@
 | 2026-11-16T19:01:30Z | VRN_ParamControl_SSOT_v0101.json | 0101 | — | 310b39f03f87 | 參數一本 JSON:執行參數 · 輸入分群 · 單檔例外 | 啟動器自測涵蓋 · VRN 自己的冊(VCGC 不發號) |
 | 2026-11-16T19:01:30Z | Invoke-VIA-VrnVdf-HandleAll-v0101.ps1 | 0101 | VIA-CORE-MDL866 | d21b801fcb05 | 一支 PS:同步 · 進環境 · VRN · VDF · 總結;-OpenGates | 只做靜態檢查,未在 PowerShell 實跑 |
 | 2026-11-16T19:01:30Z | sitecustomize.py | 無版號 | VIA-SUP-MDL878 | 2676cd1549c6 | 啟動鉤直讀鎖冊,不再每支 python 載九版鏈 | 容器兩種模式掛上同兩支工具 · 桌機未驗 |
+| 2026-11-17T12:32:07Z | CGC_MDL282_LocalMonitor_v0100.py | 0100 | VIA-VCGC-MDL1645 | 0e863dd1b2af | 本機唯讀現況矩陣:系統 · 工具 · 參數 · 模組引擎 · 收據 | 自測 16/16 · 經主控台實跑 · 骨架卡 問題 0 |
+| 2026-11-17T12:32:07Z | CGC_MDL283_CardMatrixFeedback_v0100.py | 0100 | VIA-VCGC-MDL1646 | 318bc3e7dc6f | 卡片摘要 · 矩陣明細 · AI 回饋兩段篩選(只摺不丟 · 五條對帳) | 自測 25/25 · 實跑 2,520 列收成 60 行、對帳相符 · 無頭瀏覽器開頁無腳本錯誤 |
+| 2026-11-17T12:32:07Z | CGC_MDL283_CardMatrixFeedback_v0101.py | 0101 | VIA-VCGC-MDL1648 | 09c671384efb | 成功鎖 · 給動作主力的更新回饋 · 本機免費工具紀錄 · 回饋包遮家目錄 | 自測 22/22(另跑 v0100 鏈 25/25)· 實跑對帳六條相符 |
+| 2026-11-17T12:32:07Z | CGC_MDL279_MCPServer_v0104.py | 0104 | VIA-VCGC-MDL1647 | f2b508332caa | MCP 唯讀門面多三把回饋鍵(feedback / feedback-delta / feedback-full) | 自測 4/4 · 前版鏈 rc 0 · 未接真的 MCP 客戶端 |
+| 2026-11-17T12:32:07Z | VIA_UI_WorkPlatform_TemplateLock_v0100.json | 0100 | — | 7b44f30e1300 | 對內工作平台模板鎖冊(版面 css 只用 token) | css 與 token 冊雜湊由引擎每輪核 |
+| 2026-11-17T12:32:07Z | VIA_UI_WorkPlatform_TemplateLock_v0101.json | 0101 | — | e8481ef3f86b | 燈號四色一律白字(操作員 2026-11-17 令) | 引擎自測核 css 規則 · 無頭瀏覽器看過 |
+| 2026-11-17T12:33:44Z | CGC_MDL283_CardMatrixFeedback_v0101.py | 0101 | VIA-VCGC-MDL1648 | 8614a630f477 | 成功鎖 · 給動作主力的更新回饋 · 本機免費工具紀錄 · 模組引擎鍵改家族名(推送前修正後重鎖;同檔以本列為準) | 自測 23/23(另跑 v0100 鏈 25/25)· 實跑對帳六條相符 |
+| 2026-11-17T13:12:16Z | CGC_MDL282_LocalMonitor_v0101.py | 0101 | VIA-VCGC-MDL1649 | dade5f0cb2e9 | 現況矩陣補十二塊偵測 + 管理面覆蓋 · 黃燈白字 | 自測 25/25(另跑 v0100 鏈 16/16)· 實跑新增 689 項、對帳相符 |
+| 2026-11-17T13:12:16Z | CGC_MDL283_CardMatrixFeedback_v0102.py | 0102 | VIA-VCGC-MDL1650 | 778aeb091631 | 延伸偵測併進卡片與矩陣 · [主機] · [沒管到] | 自測 9/9(另跑 v0101 鏈 23/23 · v0100 鏈 25/25)· 實跑 3,246 列對帳六條相符 |
