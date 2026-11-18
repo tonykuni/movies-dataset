@@ -1,0 +1,124 @@
+{
+  "engine_id": "VIA-NON-STOCK-SUMMARIZER-INTEGRATED-002",
+  "version": "v0310",
+  "gate": "PASS",
+  "upgrade_reason": "Close v0300 missing bundled reuse/core dependencies so repo/desktop non-stock lane can run standalone.",
+  "compile": "PASS",
+  "reuse_hard_gate": "PASS",
+  "reuse_status": {
+    "core": {
+      "path": "/mnt/data/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310/internal/NON_STOCK_CORE_v0200.py",
+      "exists": true,
+      "sha256": "92f53d82c2facb41e599bf730b8be524901ed5d355aaed22a73444e85dccfa27"
+    },
+    "layout": {
+      "path": "/mnt/data/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310/reuse/vrn2/VRN_M03_PDF_Layout_JSON_v3.py",
+      "exists": true,
+      "sha256": "482e93ce2b53bd72bb85a9f74ad28a4a9315376cc4f07f2acf3fbe24d90bf620"
+    },
+    "repair": {
+      "path": "/mnt/data/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310/reuse/vrn2/VRN_MDL003_TableRestorer.py",
+      "exists": true,
+      "sha256": "e58646f6e84739a6ccd3f61f8d70b458c16e764a0202c5f874f4a839d4150810"
+    },
+    "nlp": {
+      "path": "/mnt/data/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310/reuse/vrn2/VRN_M07_Summarizer.py",
+      "exists": true,
+      "sha256": "8c0c649377bf38651913b0fb8282db8ddbde3739532e8f2f1f6c783bd7b6a768"
+    }
+  },
+  "selftest": {
+    "passed": 5,
+    "total": 5,
+    "checks": [
+      [
+        "layout_loaded",
+        true
+      ],
+      [
+        "repair_loaded",
+        true
+      ],
+      [
+        "nlp_loaded",
+        true
+      ],
+      [
+        "four_point_contract",
+        true
+      ],
+      [
+        "network_off",
+        true
+      ]
+    ]
+  },
+  "real_sample_runs": [
+    {
+      "file": "20260916兆豐台灣產業專題-AI末日論？假的.pdf",
+      "status": "PASS",
+      "report_id": "RPT-66DC802E",
+      "topics": 15,
+      "companies": 3,
+      "evidence": 97,
+      "backend": "VRN2_M03_LAYOUT+MDL003_REPAIR"
+    },
+    {
+      "file": "20260916兆豐台灣產業專題-航太產業.pdf",
+      "status": "PASS",
+      "report_id": "RPT-802B75E7",
+      "topics": 19,
+      "companies": 6,
+      "evidence": 117,
+      "backend": "VRN2_M03_LAYOUT+MDL003_REPAIR"
+    },
+    {
+      "file": "20251205兆豐晨會報告(二)-公司訪談摘要.pdf",
+      "status": "PASS",
+      "report_id": "RPT-2B746DCD",
+      "topics": 6,
+      "companies": 5,
+      "evidence": 63,
+      "backend": "VRN2_M03_LAYOUT+MDL003_REPAIR"
+    },
+    {
+      "file": "20251208_台新台股盤勢分析.pdf",
+      "status": "PASS",
+      "report_id": "RPT-5D370F3F",
+      "topics": 13,
+      "companies": 16,
+      "evidence": 64,
+      "backend": "VRN2_M03_LAYOUT+MDL003_REPAIR"
+    },
+    {
+      "file": "【中信｜債券ETF周報】油價攀升壓抑債市，利率高檔震盪_CTBC260915.pdf",
+      "status": "PASS",
+      "report_id": "RPT-7FAF513D",
+      "topics": 32,
+      "companies": 0,
+      "evidence": 107,
+      "backend": "VRN2_M03_LAYOUT+MDL003_REPAIR"
+    },
+    {
+      "file": "TEST MESSAGE.txt",
+      "status": "PASS",
+      "report_id": "RPT-C81A858C",
+      "topics": 58,
+      "companies": 33,
+      "evidence": 2068,
+      "backend": "text"
+    }
+  ],
+  "summary_contract": "ONE_REPORT_ONE_ROW + ONE_TITLE_FOUR_POINTS + DETAILS_ON_DEMAND",
+  "outputs": [
+    "REPORT_SUMMARY.csv",
+    "TOPIC_DETAIL.csv",
+    "COMPANY_DETAIL.csv",
+    "EVIDENCE_DETAIL.csv",
+    "REPORT_SUMMARY.html",
+    "RESULTS.json"
+  ],
+  "source_mutation": false,
+  "network_allowed": false,
+  "original_pdfs_in_package": false
+}

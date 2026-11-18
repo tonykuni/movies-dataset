@@ -1,0 +1,102 @@
+{
+  "type": "VAP_SPEC_SEMANTIC_NOTES",
+  "status": "唯讀分析註記；非正式 SSOT、非實作驗證",
+  "sources": {
+    "A": "/home/ubuntu/upload/pasted_content.txt",
+    "B": "/home/ubuntu/upload/pasted_content_2.txt",
+    "C": "/home/ubuntu/upload/pasted_content_3.txt"
+  },
+  "scope": "僅附件與使用者更正；無外部搜尋、UI 實作或正式 SSOT 修改；不逐型研究。",
+  "product": "VAP＝資料→專業分析圖→分析堆圖→模板→Dashboard，內建分析；不是 VIA／SSOT 治理頁。",
+  "engine_vs_renderer": {
+    "conclusion": "附件是圖庫／資料形狀／視覺契約，不是計算引擎或 28 型完成實作的證據。",
+    "calculation": "負責資料分類、調整與混頻、分析公式及期間、衍生值與品質狀態；不能因必要欄位名為 sharpe、excess 或 rankIC 就認定公式已定義。",
+    "rendering": "負責將分析結果映射至線、條、軸、色階、遮罩、圖示與互動；不得用畫圖預設值補造金融結果。",
+    "handoff": "建議交接值、單位、頻率、觀測／可用時間、調整基礎、公式參數與推估／缺失狀態；此為分析建議，並非附件已有欄位。",
+    "evidence": ["B:10-63", "C:354-826"]
+  },
+  "clarifications": [
+    {
+      "id": "metric_contract",
+      "kind": "計算缺省",
+      "finding": "滾動報酬、滾動相關、Sharpe、Sortino、alpha／excess、rankIC 只列名稱、欄位及用途，沒有可重現公式與期間。",
+      "confirm": [
+        "報酬採簡單或對數、單期或複利滾動累積、是否年化；視窗是交易筆數或日曆期間、端點及最少樣本。",
+        "Sharpe 的無風險利率與頻率換算、均值／波動計法、年化因子；Sortino 的目標報酬與下行偏差分母；零分母處理。",
+        "alpha 是累積策略減基準、單期超額報酬，還是回歸 alpha；基準、累積起點、期間、費用口徑須明確，不能由名稱選定。",
+        "rankIC 的排序相關定義、截面或時間序列、訊號與未來報酬 lag／期間、樣本池及同名次處理；tStat／pValue 的檢定、自由度及重疊樣本處理。|t|=1.96 只明定畫線，不證明檢定有效。"
+      ],
+      "safe_action": "公式或關鍵參數未定時保留 unknown，不自行套常用期間或金融預設。",
+      "evidence": ["B:40-53", "C:625-744"]
+    },
+    {
+      "id": "price_volume_adjustment",
+      "kind": "計算與資料契約",
+      "finding": "明定 adjClose 優先、無 Adj 用 close、所有價格調整、成交量 split 調整；未交代 OHLC 的調整因子／基準與來源是否已調整。",
+      "confirm": "OHLC 須同一調整基礎；若僅有 Adj Close，如何取得／推導其他價格調整因子？價格含息與 split-only 如何區分？成交量只能依 split 基礎調整，不能直接套含息價格因子，且須防重複調整。",
+      "safe_action": "保留來源與 raw／adj 標記；因子未知不得把 raw OHLC 配 Adj Close 宣稱為一致調整 K 線。",
+      "evidence": ["A:132-144", "B:57-58", "C:289-305", "C:768-783"]
+    },
+    {
+      "id": "mixed_frequency_no_lookahead",
+      "kind": "資料對齊缺省",
+      "finding": "日×月自動對齊、交易日序列與前一交易日價格補值已宣告，但未定義發布／可用時間、交易日曆或資產分類。",
+      "confirm": "混頻需按當時可用時間對齊，不能把月度值提前放入該月交易日；需確認發布落點、跨市場／時區、修訂版本與允許延續的期限。",
+      "safe_action": "不前視；previousTradingDay 僅在已確認為合規價格類時使用，標記 estimated 及來源交易日，不套用至成交量、總經、利率、財務或未知分類；顯示補值不能默認成回測有效觀測。",
+      "evidence": ["A:50-59", "A:137-141", "C:72-80", "C:289-305"]
+    },
+    {
+      "id": "unknown_unsupported",
+      "kind": "保守處置建議",
+      "finding": "附件明定 missingVolume=doNotFill，但未定義其他缺失、未支援計算或零分母狀態。",
+      "safe_action": "成交量不補；缺資料／未定公式用 null＋unknown，能力不存在標 unsupported；不得以 0、假序列、虛構統計量或中性色假裝真實結果。真實 0 須與缺失分開。",
+      "evidence": ["A:56", "A:138", "C:77", "C:294"]
+    },
+    {
+      "id": "correlation_lowerTriangle",
+      "kind": "渲染歧義",
+      "finding": "mask=lowerTriangle 與『下三角遮罩』未明確區分遮掉下三角或保留下三角，也未定義是否含對角。",
+      "confirm": "確認可見側、行列方向、對角及遮罩值；15 級色階的 0..1 是色階位置，不應當成相關係數值域。需確認係數範圍與 zmid=0 的映射，以及 heatmapContrast 是否另改色階。",
+      "safe_action": "計算矩陣與顯示遮罩分離；不刪除矩陣、不猜上／下三角。",
+      "evidence": ["A:93-98", "B:34-35", "C:181-247"]
+    },
+    {
+      "id": "line_width",
+      "kind": "渲染規則優先序",
+      "finding": "width=1／『折線一律線粗 1』與 widthRange=0.5..6、widthStep=0.5 並列；可調範圍不等於允許正式分析圖偏離固定值。",
+      "confirm": "1 是強制值或預設值？範圍只用於設定工具、例外模式還是正式輸出？未確認前不得自行宣稱可任意調線粗。",
+      "evidence": ["A:11-18", "C:19-28"]
+    },
+    {
+      "id": "bar_face_precedence",
+      "kind": "渲染規則優先序",
+      "finding": "barFace=0.6、barFaceDense=0.8，且 edgeRule 明定有框條內 face alpha=0.8；dense 的條件與覆寫優先序未定。",
+      "confirm": "候選解讀是有框用 0.8、dense 用 0.8、其餘用 0.6，但仍需確認有框／dense／圖型 override 的先後；不可將 0.6 全域套用或把 0.8 宣稱全域唯一值。",
+      "evidence": ["A:19-36", "C:30-51"]
+    },
+    {
+      "id": "alpha_corrupted_text",
+      "kind": "規格亂碼",
+      "finding": "Alpha 圖規則原文為『超額報酬置右軸直條(漇2跌綣)』，括號內容不能可靠解析。",
+      "safe_action": "保留亂碼待原作者確認，不擅自修正式 SSOT；左軸累積、右軸直條與紅色 0 軸可讀，通用漲紅跌綠另有明文，但不能冒充已確認的 Alpha 專屬修正文。",
+      "evidence": ["B:48-49", "C:174-179", "C:696-709"]
+    },
+    {
+      "id": "economic_surprise_direction",
+      "kind": "金融語意缺省",
+      "finding": "『實際優於預期標紅』不等於 actual>forecast；importance 紅黃綠是重要度，與預期落差方向不同。",
+      "confirm": "每項指標需定義 higher_is_better、lower_is_better 或無單調方向，以及相等／容忍差；actual／forecast 必須同期間與單位。",
+      "safe_action": "缺 actual、forecast 或方向時落差判讀為 unknown，不替缺值補 0、不判紅綠；重要度仍獨立顯示。",
+      "evidence": ["B:50-51", "C:712-727"]
+    },
+    {
+      "id": "map_network_geometry",
+      "kind": "資料與執行條件缺省",
+      "finding": "只指定 Leaflet、region/value/change、地域範圍與上下三角，沒有 geometry、區域碼連結或底圖網路契約。",
+      "confirm": "region 如何對應座標／邊界 geometry、行政區版本與來源？Leaflet 資源／圖磚是否允許聯網、授權與離線／匯出時如何處理？change 的比較期與單位亦未定。",
+      "safe_action": "不自行下載地圖資產、不臆造座標；缺 geometry 或網路能力要明示 unknown／unsupported，不用空白地圖聲稱支援，也不由附件推定全部離線可用。",
+      "evidence": ["B:37-39", "C:603-616"]
+    }
+  ],
+  "overall": "先澄清會改變金融結果的公式、期間、調整與可用時間，再確認遮罩、線粗、透明度及地圖依賴；以上是契約釐清，不是批准新預設或實作完成聲明。"
+}

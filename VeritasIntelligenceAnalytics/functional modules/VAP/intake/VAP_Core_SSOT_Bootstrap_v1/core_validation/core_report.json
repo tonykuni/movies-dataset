@@ -1,0 +1,574 @@
+{
+  "product": "VeritasAutoPlot",
+  "pipeline": [
+    "data",
+    "analysis",
+    "chart",
+    "analysis_stack",
+    "template",
+    "dashboard"
+  ],
+  "spec_version": "1.0.0",
+  "library_version": "1.0.0",
+  "source_hashes": {
+    "spec": "b69b58faf8ab798c3c3ce1f75fdaeb4a756653f87ef4943f5ff9f5f01ddab244",
+    "chartlib": "060899d6f13819124764d64d9710873db4229985d8df089e8f1a84199e278292"
+  },
+  "declared_chart_count": 28,
+  "core_contract_status": "validated",
+  "verified_chart_engine_count": 0,
+  "scope": "SSOT contract validation and configuration resolution only; no market analysis or chart execution.",
+  "groups": {
+    "single": 5,
+    "stack": 3,
+    "indiv": 2,
+    "dual": 2,
+    "adv": 4,
+    "rolling": 8,
+    "ta": 3,
+    "fund": 1
+  },
+  "catalog": [
+    {
+      "code": "VAP-CH-01",
+      "id": "line",
+      "name": "折線圖",
+      "group_id": "single",
+      "group_name": "單軸",
+      "axes": 1,
+      "data_shape": "series[]",
+      "required_fields": [
+        "date",
+        "value"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-02",
+      "id": "area",
+      "name": "面積折線",
+      "group_id": "single",
+      "group_name": "單軸",
+      "axes": 1,
+      "data_shape": "series",
+      "required_fields": [
+        "date",
+        "value"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-03",
+      "id": "bar",
+      "name": "直條圖",
+      "group_id": "single",
+      "group_name": "單軸",
+      "axes": 1,
+      "data_shape": "categorical",
+      "required_fields": [
+        "label",
+        "value"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-04",
+      "id": "hbar",
+      "name": "橫條圖",
+      "group_id": "single",
+      "group_name": "單軸",
+      "axes": 1,
+      "data_shape": "categorical",
+      "required_fields": [
+        "label",
+        "value"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-05",
+      "id": "scatter",
+      "name": "散點圖",
+      "group_id": "single",
+      "group_name": "單軸",
+      "axes": 1,
+      "data_shape": "xy",
+      "required_fields": [
+        "x",
+        "y"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-06",
+      "id": "sarea",
+      "name": "堆疊面積",
+      "group_id": "stack",
+      "group_name": "堆疊",
+      "axes": 1,
+      "data_shape": "series[]",
+      "required_fields": [
+        "date",
+        "value",
+        "group"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-07",
+      "id": "sbar",
+      "name": "堆疊直條",
+      "group_id": "stack",
+      "group_name": "堆疊",
+      "axes": 1,
+      "data_shape": "categorical[]",
+      "required_fields": [
+        "label",
+        "value",
+        "group"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-08",
+      "id": "sbar100",
+      "name": "百分比堆疊",
+      "group_id": "stack",
+      "group_name": "堆疊",
+      "axes": 1,
+      "data_shape": "categorical[]",
+      "required_fields": [
+        "label",
+        "value",
+        "group"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-09",
+      "id": "multi",
+      "name": "個別小圖",
+      "group_id": "indiv",
+      "group_name": "個別",
+      "axes": 1,
+      "data_shape": "series[]",
+      "required_fields": [
+        "date",
+        "value",
+        "panel"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-10",
+      "id": "gbar",
+      "name": "並列直條",
+      "group_id": "indiv",
+      "group_name": "個別",
+      "axes": 1,
+      "data_shape": "categorical[]",
+      "required_fields": [
+        "label",
+        "value",
+        "group"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-11",
+      "id": "dline",
+      "name": "底色面積 × 對比折線",
+      "group_id": "dual",
+      "group_name": "雙軸",
+      "axes": 2,
+      "data_shape": "series×2",
+      "required_fields": [
+        "date",
+        "left",
+        "right"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-12",
+      "id": "dbarline",
+      "name": "條 + 線 雙軸",
+      "group_id": "dual",
+      "group_name": "雙軸",
+      "axes": 2,
+      "data_shape": "mixed",
+      "required_fields": [
+        "date",
+        "bar",
+        "line"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-13",
+      "id": "evtmx",
+      "name": "事件矩陣",
+      "group_id": "adv",
+      "group_name": "進階",
+      "axes": 1,
+      "data_shape": "series+events",
+      "required_fields": [
+        "date",
+        "value",
+        "events[]"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-14",
+      "id": "corrheat",
+      "name": "相關熱力圖",
+      "group_id": "adv",
+      "group_name": "進階",
+      "axes": 0,
+      "data_shape": "matrix",
+      "required_fields": [
+        "corr"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-15",
+      "id": "brush",
+      "name": "區間量測",
+      "group_id": "adv",
+      "group_name": "進階",
+      "axes": 1,
+      "data_shape": "series",
+      "required_fields": [
+        "date",
+        "value"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-16",
+      "id": "map",
+      "name": "地圖 × 數據",
+      "group_id": "adv",
+      "group_name": "進階",
+      "axes": 0,
+      "data_shape": "geo",
+      "required_fields": [
+        "region",
+        "value",
+        "change"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-17",
+      "id": "roll",
+      "name": "滾動報酬",
+      "group_id": "rolling",
+      "group_name": "滾動績效",
+      "axes": 1,
+      "data_shape": "series",
+      "required_fields": [
+        "date",
+        "return"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-18",
+      "id": "rollcorr",
+      "name": "滾動相關",
+      "group_id": "rolling",
+      "group_name": "滾動績效",
+      "axes": 1,
+      "data_shape": "series×2",
+      "required_fields": [
+        "date",
+        "a",
+        "b"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-19",
+      "id": "rollsharpe",
+      "name": "移動夏普",
+      "group_id": "rolling",
+      "group_name": "滾動績效",
+      "axes": 1,
+      "data_shape": "series",
+      "required_fields": [
+        "date",
+        "sharpe"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-20",
+      "id": "sortino",
+      "name": "Sharpe × Sortino 比較",
+      "group_id": "rolling",
+      "group_name": "滾動績效",
+      "axes": 2,
+      "data_shape": "series×2",
+      "required_fields": [
+        "date",
+        "sharpe",
+        "sortino"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-21",
+      "id": "radar",
+      "name": "風險雷達",
+      "group_id": "rolling",
+      "group_name": "滾動績效",
+      "axes": 0,
+      "data_shape": "radial",
+      "required_fields": [
+        "metric",
+        "value",
+        "benchmark"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-22",
+      "id": "alpha",
+      "name": "Alpha 策略",
+      "group_id": "rolling",
+      "group_name": "滾動績效",
+      "axes": 2,
+      "data_shape": "series×3",
+      "required_fields": [
+        "date",
+        "strategy",
+        "benchmark",
+        "excess"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-23",
+      "id": "econcal",
+      "name": "經濟日曆",
+      "group_id": "rolling",
+      "group_name": "滾動績效",
+      "axes": 0,
+      "data_shape": "events",
+      "required_fields": [
+        "date",
+        "event",
+        "importance",
+        "actual",
+        "forecast",
+        "previous"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-25",
+      "id": "backtest",
+      "name": "回測驗證",
+      "group_id": "rolling",
+      "group_name": "滾動績效",
+      "axes": 2,
+      "data_shape": "matrix+series",
+      "required_fields": [
+        "lag",
+        "rankIC",
+        "tStat",
+        "pValue"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-26",
+      "id": "intraday",
+      "name": "當日走勢 + 成交量",
+      "group_id": "ta",
+      "group_name": "技術分析",
+      "axes": 2,
+      "data_shape": "ohlcv",
+      "required_fields": [
+        "time",
+        "price",
+        "volume"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-27",
+      "id": "candle",
+      "name": "K線 × SMA/EMA/BB × Volume",
+      "group_id": "ta",
+      "group_name": "技術分析",
+      "axes": 2,
+      "data_shape": "ohlcv",
+      "required_fields": [
+        "date",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-28",
+      "id": "spotfut",
+      "name": "現貨 × 期貨",
+      "group_id": "ta",
+      "group_name": "技術分析",
+      "axes": 1,
+      "data_shape": "series[]",
+      "required_fields": [
+        "date",
+        "spot",
+        "futures"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    },
+    {
+      "code": "VAP-CH-24",
+      "id": "consensus",
+      "name": "共識總覽",
+      "group_id": "fund",
+      "group_name": "基本面",
+      "axes": 1,
+      "data_shape": "table",
+      "required_fields": [
+        "dilutedEPS",
+        "targetPrice",
+        "rating",
+        "analystCount",
+        "forwardPER",
+        "forwardPBR"
+      ],
+      "declaration_status": "validated",
+      "computation_status": "not_verified",
+      "renderer_status": "not_verified",
+      "template_status": "not_bound",
+      "execution_status": "declared_only"
+    }
+  ],
+  "tested_at_utc": "2026-11-04T16:57:45.752019+00:00",
+  "tests": {
+    "total": 23,
+    "passed": 23,
+    "failed": 0,
+    "errors": 0,
+    "successful": true
+  }
+}

@@ -1,0 +1,471 @@
+{
+ "schema": "VIA.VCGC.AgentOSIntegration.v1",
+ "version": "v0100",
+ "prior": null,
+ "ts": "2026-11-12T19:23:02+00:00",
+ "source": "操作員 2026-11-12:Agent OS 全功能併入 VCGC · 登錄助手 / SSOT / regex / 同義字 / 27 工具 · Graphify 併入 · 全啟用",
+ "independence": "四系統(VRN-1 · VRN-2 · VDF · VCGC)對等獨立(L123);本冊是 VCGC 自己的冊,不改他系統;Agent OS / Graphify 是 VCGC 的支援工具",
+ "interpretation_27": "27 = 8 Skill + 9 MCP 工具 + 10 slash 技能(AI 解讀;倉內沒有另一份 27 項清單,操作員可更正)",
+ "agent_os": {
+  "file": "supportive modules/agent_os/VIA_AgentOS_v0102.py",
+  "sha256": "1d6d0788144e601c61fb151bb804026afcfd8bac842f39a77aa4177d21dfb2dd",
+  "lines": 4325
+ },
+ "skill_export": "docs/handoff/ai/VIA_SkillExport_v0101.py",
+ "counts": {
+  "skills": 8,
+  "mcp_tools": 9,
+  "slash_skills": 10,
+  "tools_total": 27,
+  "verbs": 14,
+  "modules": 4,
+  "regex": 5,
+  "synonyms": 8
+ },
+ "tools": [
+  {
+   "id": "AOS-SKL-001",
+   "kind": "skill",
+   "name": "via-planner",
+   "title": "VIA Planner",
+   "entry": "skills run via-planner",
+   "inputs": [
+    "objective"
+   ]
+  },
+  {
+   "id": "AOS-SKL-002",
+   "kind": "skill",
+   "name": "via-architect",
+   "title": "VIA Architect",
+   "entry": "skills run via-architect",
+   "inputs": [
+    "requirements"
+   ]
+  },
+  {
+   "id": "AOS-SKL-003",
+   "kind": "skill",
+   "name": "via-decision-log",
+   "title": "VIA Decision Log",
+   "entry": "skills run via-decision-log",
+   "inputs": [
+    "decision",
+    "rationale"
+   ]
+  },
+  {
+   "id": "AOS-SKL-004",
+   "kind": "skill",
+   "name": "via-factor-builder",
+   "title": "VIA Factor Builder",
+   "entry": "skills run via-factor-builder",
+   "inputs": [
+    "hypothesis"
+   ]
+  },
+  {
+   "id": "AOS-SKL-005",
+   "kind": "skill",
+   "name": "via-factor-validator",
+   "title": "VIA Factor Validator",
+   "entry": "skills run via-factor-validator",
+   "inputs": [
+    "factor",
+    "evidence"
+   ]
+  },
+  {
+   "id": "AOS-SKL-006",
+   "kind": "skill",
+   "name": "via-strategy-builder",
+   "title": "VIA Strategy Builder",
+   "entry": "skills run via-strategy-builder",
+   "inputs": [
+    "factor_list"
+   ]
+  },
+  {
+   "id": "AOS-SKL-007",
+   "kind": "skill",
+   "name": "via-code-review",
+   "title": "VIA Code Review",
+   "entry": "skills run via-code-review",
+   "inputs": [
+    "source_code"
+   ]
+  },
+  {
+   "id": "AOS-SKL-008",
+   "kind": "skill",
+   "name": "via-memory-manager",
+   "title": "VIA Memory Manager",
+   "entry": "skills run via-memory-manager",
+   "inputs": [
+    "memory_candidate"
+   ]
+  },
+  {
+   "id": "AOS-MCP-001",
+   "kind": "mcp_tool",
+   "name": "via.integration.status",
+   "title": "VIA 整合狀態",
+   "entry": "mcp serve → tools/call via.integration.status",
+   "cli_equivalent": "status"
+  },
+  {
+   "id": "AOS-MCP-002",
+   "kind": "mcp_tool",
+   "name": "via.skills.list",
+   "title": "列出八個 VIA Skill",
+   "entry": "mcp serve → tools/call via.skills.list",
+   "cli_equivalent": "skills list"
+  },
+  {
+   "id": "AOS-MCP-003",
+   "kind": "mcp_tool",
+   "name": "via.via_ui.status",
+   "title": "VIA HTML UI manifest 狀態",
+   "entry": "mcp serve → tools/call via.via_ui.status",
+   "cli_equivalent": ""
+  },
+  {
+   "id": "AOS-MCP-004",
+   "kind": "mcp_tool",
+   "name": "via.skill.run",
+   "title": "執行單一確定性 VIA Skill",
+   "entry": "mcp serve → tools/call via.skill.run",
+   "cli_equivalent": "skills run"
+  },
+  {
+   "id": "AOS-MCP-005",
+   "kind": "mcp_tool",
+   "name": "via.token.prepare",
+   "title": "Token/Context 準備",
+   "entry": "mcp serve → tools/call via.token.prepare",
+   "cli_equivalent": "context"
+  },
+  {
+   "id": "AOS-MCP-006",
+   "kind": "mcp_tool",
+   "name": "via.policy.authorize",
+   "title": "唯讀 policy 判定",
+   "entry": "mcp serve → tools/call via.policy.authorize",
+   "cli_equivalent": "policy"
+  },
+  {
+   "id": "AOS-MCP-007",
+   "kind": "mcp_tool",
+   "name": "via.sdd.validate",
+   "title": "VIA SDD bridge 驗證",
+   "entry": "mcp serve → tools/call via.sdd.validate",
+   "cli_equivalent": "sdd validate"
+  },
+  {
+   "id": "AOS-MCP-008",
+   "kind": "mcp_tool",
+   "name": "via.vcgc.status",
+   "title": "VCGC 靜態狀態",
+   "entry": "mcp serve → tools/call via.vcgc.status",
+   "cli_equivalent": "vcgc-status"
+  },
+  {
+   "id": "AOS-MCP-009",
+   "kind": "mcp_tool",
+   "name": "via.repo.sync",
+   "title": "本地 GitHub 固定版本檢查",
+   "entry": "mcp serve → tools/call via.repo.sync",
+   "cli_equivalent": "repo-check"
+  },
+  {
+   "id": "AOS-SLS-001",
+   "kind": "slash_skill",
+   "name": "/ast-diag",
+   "title": "ast-driven-diagnosis",
+   "entry": "VIA_SkillExport chain /ast-diag"
+  },
+  {
+   "id": "AOS-SLS-002",
+   "kind": "slash_skill",
+   "name": "/canvas-zen",
+   "title": "minimalist-canvas-design",
+   "entry": "VIA_SkillExport chain /canvas-zen"
+  },
+  {
+   "id": "AOS-SLS-003",
+   "kind": "slash_skill",
+   "name": "/data-pipe",
+   "title": "high-throughput-data-pipeline",
+   "entry": "VIA_SkillExport chain /data-pipe"
+  },
+  {
+   "id": "AOS-SLS-004",
+   "kind": "slash_skill",
+   "name": "/doc-extract",
+   "title": "hybrid-layout-extraction",
+   "entry": "VIA_SkillExport chain /doc-extract"
+  },
+  {
+   "id": "AOS-SLS-005",
+   "kind": "slash_skill",
+   "name": "/entity-norm",
+   "title": "entity-ticker-normalization",
+   "entry": "VIA_SkillExport chain /entity-norm"
+  },
+  {
+   "id": "AOS-SLS-006",
+   "kind": "slash_skill",
+   "name": "/local-env",
+   "title": "local-first-virtualization",
+   "entry": "VIA_SkillExport chain /local-env"
+  },
+  {
+   "id": "AOS-SLS-007",
+   "kind": "slash_skill",
+   "name": "/quant-roll",
+   "title": "dynamic-rolling-analytics",
+   "entry": "VIA_SkillExport chain /quant-roll"
+  },
+  {
+   "id": "AOS-SLS-008",
+   "kind": "slash_skill",
+   "name": "/self-heal",
+   "title": "self-healing-automation",
+   "entry": "VIA_SkillExport chain /self-heal"
+  },
+  {
+   "id": "AOS-SLS-009",
+   "kind": "slash_skill",
+   "name": "/ssot-gov",
+   "title": "ssot-filename-governance",
+   "entry": "VIA_SkillExport chain /ssot-gov"
+  },
+  {
+   "id": "AOS-SLS-010",
+   "kind": "slash_skill",
+   "name": "/token-state",
+   "title": "token-optimized-state",
+   "entry": "VIA_SkillExport chain /token-state"
+  }
+ ],
+ "verbs": [
+  {
+   "id": "AOS-VRB-001",
+   "verb": "selftest",
+   "console": "via-vcgc agentos selftest"
+  },
+  {
+   "id": "AOS-VRB-002",
+   "verb": "status",
+   "console": "via-vcgc agentos status"
+  },
+  {
+   "id": "AOS-VRB-003",
+   "verb": "repo-check",
+   "console": "via-vcgc agentos repo-check"
+  },
+  {
+   "id": "AOS-VRB-004",
+   "verb": "deploy-preflight",
+   "console": "via-vcgc agentos deploy-preflight"
+  },
+  {
+   "id": "AOS-VRB-005",
+   "verb": "sdd",
+   "console": "via-vcgc agentos sdd"
+  },
+  {
+   "id": "AOS-VRB-006",
+   "verb": "skills",
+   "console": "via-vcgc agentos skills"
+  },
+  {
+   "id": "AOS-VRB-007",
+   "verb": "context",
+   "console": "via-vcgc agentos context"
+  },
+  {
+   "id": "AOS-VRB-008",
+   "verb": "policy",
+   "console": "via-vcgc agentos policy"
+  },
+  {
+   "id": "AOS-VRB-009",
+   "verb": "vcgc-status",
+   "console": "via-vcgc agentos vcgc-status"
+  },
+  {
+   "id": "AOS-VRB-010",
+   "verb": "mcp",
+   "console": "via-vcgc agentos mcp"
+  },
+  {
+   "id": "AOS-VRB-011",
+   "verb": "scan",
+   "console": "via-vcgc agentos scan"
+  },
+  {
+   "id": "AOS-VRB-012",
+   "verb": "mounts",
+   "console": "via-vcgc agentos mounts"
+  },
+  {
+   "id": "AOS-VRB-013",
+   "verb": "route",
+   "console": "via-vcgc agentos route"
+  },
+  {
+   "id": "AOS-VRB-014",
+   "verb": "dashboard",
+   "console": "via-vcgc agentos dashboard"
+  }
+ ],
+ "modules": [
+  {
+   "id": "AOS-MOD-001",
+   "module_id": "VIA-MOD-TOKEN-ENGINE-001",
+   "name": "VIA Token Engine",
+   "status": "ACTIVE_SCAFFOLD"
+  },
+  {
+   "id": "AOS-MOD-002",
+   "module_id": "VIA-MOD-AST-INDEX-001",
+   "name": "VIA AST Indexer",
+   "status": "ACTIVE_READ_ONLY"
+  },
+  {
+   "id": "AOS-MOD-003",
+   "module_id": "VIA-MOD-SKILL-REGISTRY-001",
+   "name": "VIA Eight Skill Registry",
+   "status": "ACTIVE_DETERMINISTIC"
+  },
+  {
+   "id": "AOS-MOD-004",
+   "module_id": "VIA-MOD-VCGC-ADAPTER-001",
+   "name": "VCGC Mount Adapter",
+   "status": "UNVERIFIED_NOT_CONNECTED"
+  }
+ ],
+ "regex": [
+  {
+   "id": "AOS-RGX-001",
+   "key": "AOS_SECRET_MASK_01",
+   "var": "SECRET_PATTERNS",
+   "pattern": "(?i)\\bBearer\\s+[A-Za-z0-9._~+/=-]{12,}"
+  },
+  {
+   "id": "AOS-RGX-002",
+   "key": "AOS_SECRET_MASK_02",
+   "var": "SECRET_PATTERNS",
+   "pattern": "\\bsk-[A-Za-z0-9_-]{16,}\\b"
+  },
+  {
+   "id": "AOS-RGX-003",
+   "key": "AOS_SECRET_MASK_03",
+   "var": "SECRET_PATTERNS",
+   "pattern": "(?i)(?P<prefix>\"(?:api[_-]?key|access[_-]?token|refresh[_-]?token|password|client[_-]?secret|authorization|token)\"\\s*:\\s*)\"(?P<value>(?:\\\\.|[^\"\\\\])*)\""
+  },
+  {
+   "id": "AOS-RGX-004",
+   "key": "AOS_SECRET_MASK_04",
+   "var": "SECRET_PATTERNS",
+   "pattern": "(?i)(?P<prefix>(?<![\"\\w])(?:api[_-]?key|access[_-]?token|refresh[_-]?token|password|client[_-]?secret|authorization)\\s*[:=]\\s*)(?:(?P<dq>\"(?:\\\\.|[^\"\\\\])*\"?)|(?P<sq>'(?:\\\\.|[^'\\\\])*'?)|(?P<bare>[^\\s,'\";}]+))"
+  },
+  {
+   "id": "AOS-RGX-005",
+   "key": "AOS_SECRET_MASK_05",
+   "var": "SECRET_PATTERNS",
+   "pattern": "-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----[\\s\\S]*?-----END (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"
+  }
+ ],
+ "synonyms": [
+  {
+   "id": "AOS-SYN-001",
+   "key": "AOS_TOOL_INTEGRATION_STATUS",
+   "aliases": [
+    "via.integration.status",
+    "status",
+    "agentos status"
+   ]
+  },
+  {
+   "id": "AOS-SYN-002",
+   "key": "AOS_TOOL_POLICY_AUTHORIZE",
+   "aliases": [
+    "via.policy.authorize",
+    "policy",
+    "agentos policy"
+   ]
+  },
+  {
+   "id": "AOS-SYN-003",
+   "key": "AOS_TOOL_REPO_SYNC",
+   "aliases": [
+    "via.repo.sync",
+    "repo-check",
+    "agentos repo-check"
+   ]
+  },
+  {
+   "id": "AOS-SYN-004",
+   "key": "AOS_TOOL_SDD_VALIDATE",
+   "aliases": [
+    "via.sdd.validate",
+    "sdd validate",
+    "agentos sdd validate"
+   ]
+  },
+  {
+   "id": "AOS-SYN-005",
+   "key": "AOS_TOOL_SKILL_RUN",
+   "aliases": [
+    "via.skill.run",
+    "skills run",
+    "agentos skills run"
+   ]
+  },
+  {
+   "id": "AOS-SYN-006",
+   "key": "AOS_TOOL_SKILLS_LIST",
+   "aliases": [
+    "via.skills.list",
+    "skills list",
+    "agentos skills list"
+   ]
+  },
+  {
+   "id": "AOS-SYN-007",
+   "key": "AOS_TOOL_TOKEN_PREPARE",
+   "aliases": [
+    "via.token.prepare",
+    "context",
+    "agentos context"
+   ]
+  },
+  {
+   "id": "AOS-SYN-008",
+   "key": "AOS_TOOL_VCGC_STATUS",
+   "aliases": [
+    "via.vcgc.status",
+    "vcgc-status",
+    "agentos vcgc-status"
+   ]
+  }
+ ],
+ "console": {
+  "entry": "via-vcgc agentos <verb> · via-vcgc graphify status|run",
+  "hub": "supportive modules/registry/CGC_MDL280_VCGCAgentOSHub_v0100.py"
+ },
+ "graphify": {
+  "systems": {
+   "VRN": "functional modules/VRN2",
+   "VRN_Shared": "functional modules/VRN",
+   "VDF": "functional modules/VDF",
+   "VCGC": "supportive modules/registry",
+   "VQG": "functional modules/VQG",
+   "AOS": "supportive modules/agent_os"
+  },
+  "version": "0.9.100",
+  "mode": "code-only · GRAPHIFY_BACKEND=none · offline · isolated venv"
+ }
+}

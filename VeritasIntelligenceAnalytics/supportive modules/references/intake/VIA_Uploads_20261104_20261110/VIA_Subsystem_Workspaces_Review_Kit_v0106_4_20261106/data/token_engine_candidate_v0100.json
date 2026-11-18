@@ -1,0 +1,39 @@
+{
+  "schema": "VIA.CandidateToolRegistration/1.0",
+  "candidate_id": "VCGC-MOD-TOKEN-ENGINE-CANDIDATE",
+  "module_id": "VIA-MOD-TOKEN-ENGINE-CANDIDATE",
+  "name": "VIA Agent OS TokenEngine",
+  "engine_version": "1.0.2-hardened",
+  "indexed_at_utc": "2026-11-05T20:42:00+08:00",
+  "registration_status": "CANDIDATE_NOT_FORMALLY_REGISTERED",
+  "owner_approval": "REQUIRED_BEFORE_VCGC_REGISTRY_CHANGE",
+  "source": {"path":"engines/tooling/via_agent_os_unified_readonly_hardened.py","sha256":"ca3c38ee00d2d7df5af71bcaea59ab7e7c73a15ec1d1f7b03218127efaf62af5","provenance":"Existing sandbox hardened derivative; does not prove Tony-NB local copy or GitHub equality"},
+  "description": "VCGC additive candidate: preserve prior VCGC provisioning/installation/governance tools, add local TokenEngine and VIA System Atlas. Not replacement; no existing VCGC engine was modified.",
+  "parameters": [
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"INPUT","kind":"STDIN","name":"context.text","type":"UTF-8 text","default":"required","required":true,"limit":"8 MiB maximum","source_method":"CLI context","notes":"Prepared in memory; no raw-source persistence"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"INPUT","kind":"CLI_FLAG","name":"--query","type":"string","default":"null","required":false,"limit":"one query string","source_method":"CLI context","notes":"Activates selection only together with --allow-lossy and when input is not compactable JSON"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"INPUT","kind":"CLI_FLAG","name":"--allow-lossy","type":"boolean","default":false,"required":false,"limit":"opt-in","source_method":"CLI context","notes":"Explicit permission for lossy query-line extraction"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"INPUT","kind":"CLI_FLAG","name":"--max-lines","type":"integer","default":120,"required":false,"limit":"1..400","source_method":"CLI context","notes":"Caps extracted source lines; hard maximum 400"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"INPUT","kind":"CLI_FLAG","name":"--include-text","type":"boolean","default":false,"required":false,"limit":"opt-in","source_method":"CLI context","notes":"If omitted, emits metadata without prepared_text"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"OUTPUT","kind":"CONTEXT_RESULT","name":"prepared_text","type":"string or omitted","default":null,"required":false,"limit":"returned only when --include-text","source_method":"TokenEngine.prepare","notes":"JSON compact preserves JSON semantics; query extraction is lossy and adds source line numbers"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"OUTPUT","kind":"METRIC","name":"chars_before / chars_after","type":"integer pair","default":null,"required":true,"limit":"per request","source_method":"TokenEngine.prepare","notes":"Measured on redacted source and prepared output"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"OUTPUT","kind":"HEURISTIC","name":"tokens_before_est / tokens_after_est / estimated_savings_percent","type":"integer / integer / percent","default":null,"required":true,"limit":"estimate only","source_method":"estimate_tokens","notes":"ASCII ceil(chars/4); configured CJK codepoints 1.5 each, other codepoints 0.25 each, rounded up; not tokenizer billing"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"OUTPUT","kind":"PROVENANCE","name":"source_hash","type":"SHA-256 prefix","default":null,"required":true,"limit":"64 hex chars","source_method":"stable_hash","notes":"Hash of redacted source; common-pattern redaction is not a complete secret scanner"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"INPUT","kind":"CLI_SUBCOMMAND","name":"skills run JSON stdin","type":"one object","default":"none","required":true,"limit":"one deterministic Skill per invocation","source_method":"run_skill","notes":"No recursive Skills or agent spawning"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"OUTPUT","kind":"CLI_RESULT","name":"8 Skills acceptance","type":"status JSON","default":null,"required":true,"limit":"local fixture checks","source_method":"skills test","notes":"Acceptance results are not remote integration tests"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"INPUT","kind":"CLI_FLAG","name":"scan --root","type":"filesystem path","default":"required","required":true,"limit":"bounded source scan","source_method":"read-only Python AST","notes":"Never imports or executes scanned source"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"OUTPUT","kind":"SCAN_RESULT","name":"AST inventory","type":"JSON/text report","default":"stdout","required":true,"limit":"source/node/depth caps","source_method":"scan","notes":"Optional --out creates a new report outside scanned root"},
+    {"system":"VCGC candidate","module_id":"VIA-MOD-TOKEN-ENGINE-CANDIDATE","direction":"INPUT","kind":"LIBRARY_API","name":"record_provider_usage(provider, model, prompt_tokens, completion_tokens)","type":"caller-supplied usage metadata","default":"not invoked","required":false,"limit":"non-negative token counts","source_method":"library method","notes":"Does not call provider; caller is responsible for persistence/retention"}
+  ],
+  "commands": [
+    {"name":"context","purpose":"redact common secrets; compact valid JSON losslessly; optional lossy query lines"},
+    {"name":"skills test","purpose":"run deterministic acceptance suite for eight Skills"},
+    {"name":"skills run","purpose":"execute one local deterministic Skill with JSON stdin"},
+    {"name":"scan","purpose":"bounded read-only Python AST inventory; never import/execute"}
+  ],
+  "accelerators": {"verified_external_accelerator":null,"installed_or_injected":false},
+  "network_tools": {"installed_or_injected":false,"provider_or_external_calls":0},
+  "integration": {"existing_vcgc_engine_modified":false,"vcgc_runtime_connected":false,"auto_registration":false,"requires_owner_approval":true},
+  "test_evidence": "artifacts/token_tools_receipt_v0104.json; 5 explicit local CLI checks; provider_calls=0",
+  "release_status": "RED / CANDIDATE ONLY"
+}

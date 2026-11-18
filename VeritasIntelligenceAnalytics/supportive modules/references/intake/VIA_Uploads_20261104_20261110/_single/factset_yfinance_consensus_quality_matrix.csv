@@ -1,0 +1,1273 @@
+﻿code,check_id,actual,expected,status,severity,note
+6873,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+6873,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+6873,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+6873,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+6873,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+6873,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+6873,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6873,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6873,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6873,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6873,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6873,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,NO_COVERAGE,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6873,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6873,SYMBOL_MATCHES_URL_CODE,TWS:6873:STOCK,6873,PASS,FAIL,Prevent cross-ticker contamination.
+6873,TARGET_LOW_MEDIAN_HIGH_ORDER,106.0 <= 106.0 <= 106.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+6873,TARGET_ANALYST_COUNT_POSITIVE,1,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+6873,YFINANCE_TICKER_MATCHES_CNYES_MARKET,6873.TW,6873.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+6873,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,106.0 <= 106.0 <= 106.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+6873,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+6873,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+6873,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+6873,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+6873,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+6873,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+6873,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+6873,RATING_COMPONENTS_TIE_TO_TOTAL,1,1,PASS,FAIL,Rating categories must reconcile to analyst total.
+6873,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6873,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6873,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6873,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6873,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+3706,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+3706,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+3706,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+3706,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+3706,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+3706,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+3706,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3706,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3706,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3706,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3706,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3706,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3706,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3706,SYMBOL_MATCHES_URL_CODE,TWS:3706:STOCK,3706,PASS,FAIL,Prevent cross-ticker contamination.
+3706,TARGET_LOW_MEDIAN_HIGH_ORDER,106.36 <= 106.36 <= 106.36,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+3706,TARGET_ANALYST_COUNT_POSITIVE,1,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+3706,YFINANCE_TICKER_MATCHES_CNYES_MARKET,3706.TW,3706.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+3706,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,86.81818 <= 95.45454 <= 106.36,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+3706,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+3706,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+3706,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+3706,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+3706,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+3706,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+3706,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+3706,RATING_COMPONENTS_TIE_TO_TOTAL,1,1,PASS,FAIL,Rating categories must reconcile to analyst total.
+3706,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3706,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3706,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3706,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3706,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+6768,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+6768,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+6768,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+6768,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+6768,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+6768,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+6768,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6768,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6768,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6768,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6768,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6768,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6768,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6768,SYMBOL_MATCHES_URL_CODE,TWS:6768:STOCK,6768,PASS,FAIL,Prevent cross-ticker contamination.
+6768,TARGET_LOW_MEDIAN_HIGH_ORDER,75.4 <= 85.0 <= 98.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+6768,TARGET_ANALYST_COUNT_POSITIVE,3,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+6768,YFINANCE_TICKER_MATCHES_CNYES_MARKET,6768.TW,6768.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+6768,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,79.4 <= 98.0 <= 135.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+6768,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+6768,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+6768,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+6768,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+6768,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+6768,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+6768,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+6768,RATING_COMPONENTS_TIE_TO_TOTAL,3,3,PASS,FAIL,Rating categories must reconcile to analyst total.
+6768,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6768,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6768,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6768,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6768,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+4771,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+4771,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+4771,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+4771,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+4771,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+4771,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+4771,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4771,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4771,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4771,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4771,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4771,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4771,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4771,SYMBOL_MATCHES_URL_CODE,TWS:4771:STOCK,4771,PASS,FAIL,Prevent cross-ticker contamination.
+4771,TARGET_LOW_MEDIAN_HIGH_ORDER,226.0 <= 252.0 <= 274.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+4771,TARGET_ANALYST_COUNT_POSITIVE,5,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+4771,YFINANCE_TICKER_MATCHES_CNYES_MARKET,4771.TW,4771.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+4771,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,226.0 <= 262.0 <= 290.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+4771,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+4771,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+4771,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+4771,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+4771,SOURCE_AGREEMENT_NO_CONFLICT,INCOMPLETE,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+4771,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+4771,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+4771,RATING_COMPONENTS_TIE_TO_TOTAL,5,5,PASS,FAIL,Rating categories must reconcile to analyst total.
+4771,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+4771,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+4771,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+4771,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+4771,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+5274,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+5274,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+5274,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+5274,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+5274,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+5274,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+5274,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5274,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5274,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5274,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5274,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5274,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5274,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5274,SYMBOL_MATCHES_URL_CODE,TWS:5274:STOCK,5274,PASS,FAIL,Prevent cross-ticker contamination.
+5274,TARGET_LOW_MEDIAN_HIGH_ORDER,19200.0 <= 23000.0 <= 26660.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+5274,TARGET_ANALYST_COUNT_POSITIVE,16,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+5274,YFINANCE_TICKER_MATCHES_CNYES_MARKET,5274.TWO,5274.TWO,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+5274,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,17363.637 <= 23000.0 <= 26660.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+5274,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+5274,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+5274,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+5274,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+5274,SOURCE_AGREEMENT_NO_CONFLICT,REVIEW,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+5274,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+5274,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+5274,RATING_COMPONENTS_TIE_TO_TOTAL,16,16,PASS,FAIL,Rating categories must reconcile to analyst total.
+5274,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+5274,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+5274,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+5274,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+5274,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+3014,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+3014,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+3014,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+3014,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+3014,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+3014,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+3014,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3014,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3014,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3014,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3014,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3014,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3014,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3014,SYMBOL_MATCHES_URL_CODE,TWS:3014:STOCK,3014,PASS,FAIL,Prevent cross-ticker contamination.
+3014,TARGET_LOW_MEDIAN_HIGH_ORDER,145.0 <= 145.0 <= 145.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+3014,TARGET_ANALYST_COUNT_POSITIVE,1,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+3014,YFINANCE_TICKER_MATCHES_CNYES_MARKET,3014.TW,3014.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+3014,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,None <= None <= None,low <= median <= high,WARN,WARN,Yahoo coverage may omit one or more target fields.
+3014,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,1,5,WARN,WARN,Required YFinance target and rating fields.
+3014,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+3014,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+3014,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+3014,SOURCE_AGREEMENT_NO_CONFLICT,INCOMPLETE,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+3014,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,INCOMPLETE / 2 sources,PASS / 2 sources,WARN,WARN,Both target ranges and the shared Adj Close benchmark are required.
+3014,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+3014,RATING_COMPONENTS_TIE_TO_TOTAL,1,1,PASS,FAIL,Rating categories must reconcile to analyst total.
+3014,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3014,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3014,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3014,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3014,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+3231,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+3231,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+3231,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+3231,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+3231,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+3231,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+3231,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3231,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3231,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3231,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3231,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3231,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3231,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3231,SYMBOL_MATCHES_URL_CODE,TWS:3231:STOCK,3231,PASS,FAIL,Prevent cross-ticker contamination.
+3231,TARGET_LOW_MEDIAN_HIGH_ORDER,205.0 <= 280.0 <= 400.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+3231,TARGET_ANALYST_COUNT_POSITIVE,17,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+3231,YFINANCE_TICKER_MATCHES_CNYES_MARKET,3231.TW,3231.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+3231,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,188.0 <= 277.5 <= 400.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+3231,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+3231,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+3231,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+3231,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+3231,SOURCE_AGREEMENT_NO_CONFLICT,REVIEW,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+3231,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+3231,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+3231,RATING_COMPONENTS_TIE_TO_TOTAL,18,18,PASS,FAIL,Rating categories must reconcile to analyst total.
+3231,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3231,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3231,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3231,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3231,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+5904,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+5904,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+5904,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+5904,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+5904,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+5904,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+5904,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5904,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5904,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5904,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5904,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5904,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5904,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+5904,SYMBOL_MATCHES_URL_CODE,TWS:5904:STOCK,5904,PASS,FAIL,Prevent cross-ticker contamination.
+5904,TARGET_LOW_MEDIAN_HIGH_ORDER,64.0 <= 73.0 <= 87.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+5904,TARGET_ANALYST_COUNT_POSITIVE,4,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+5904,YFINANCE_TICKER_MATCHES_CNYES_MARKET,5904.TWO,5904.TWO,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+5904,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,50.5 <= 73.0 <= 80.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+5904,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+5904,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+5904,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+5904,SOURCE_RATING_DIRECTIONS_COMPARABLE,MIXED vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+5904,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+5904,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+5904,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+5904,RATING_COMPONENTS_TIE_TO_TOTAL,4,4,PASS,FAIL,Rating categories must reconcile to analyst total.
+5904,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+5904,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+5904,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+5904,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+5904,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+6669,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+6669,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+6669,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+6669,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+6669,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+6669,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+6669,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6669,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6669,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6669,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6669,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6669,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6669,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6669,SYMBOL_MATCHES_URL_CODE,TWS:6669:STOCK,6669,PASS,FAIL,Prevent cross-ticker contamination.
+6669,TARGET_LOW_MEDIAN_HIGH_ORDER,2348.47 <= 2739.04 <= 4000.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+6669,TARGET_ANALYST_COUNT_POSITIVE,19,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+6669,YFINANCE_TICKER_MATCHES_CNYES_MARKET,6669.TW,6669.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+6669,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,2262.9785 <= 2715.5742 <= 4000.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+6669,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+6669,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+6669,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+6669,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+6669,SOURCE_AGREEMENT_NO_CONFLICT,MATCH,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+6669,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+6669,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+6669,RATING_COMPONENTS_TIE_TO_TOTAL,19,19,PASS,FAIL,Rating categories must reconcile to analyst total.
+6669,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6669,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6669,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6669,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6669,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+1319,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+1319,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+1319,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+1319,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+1319,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+1319,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+1319,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1319,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1319,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1319,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1319,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1319,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1319,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1319,SYMBOL_MATCHES_URL_CODE,TWS:1319:STOCK,1319,PASS,FAIL,Prevent cross-ticker contamination.
+1319,TARGET_LOW_MEDIAN_HIGH_ORDER,92.0 <= 102.0 <= 115.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+1319,TARGET_ANALYST_COUNT_POSITIVE,6,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+1319,YFINANCE_TICKER_MATCHES_CNYES_MARKET,1319.TW,1319.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+1319,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,92.0 <= 102.0 <= 135.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+1319,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+1319,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+1319,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+1319,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+1319,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+1319,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+1319,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+1319,RATING_COMPONENTS_TIE_TO_TOTAL,5,5,PASS,FAIL,Rating categories must reconcile to analyst total.
+1319,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+1319,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+1319,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+1319,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+1319,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+3653,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+3653,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+3653,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+3653,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+3653,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+3653,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+3653,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3653,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3653,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3653,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3653,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3653,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3653,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3653,SYMBOL_MATCHES_URL_CODE,TWS:3653:STOCK,3653,PASS,FAIL,Prevent cross-ticker contamination.
+3653,TARGET_LOW_MEDIAN_HIGH_ORDER,6800.0 <= 8800.0 <= 10000.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+3653,TARGET_ANALYST_COUNT_POSITIVE,7,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+3653,YFINANCE_TICKER_MATCHES_CNYES_MARKET,3653.TW,3653.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+3653,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,4500.0 <= 7300.0 <= 10000.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+3653,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+3653,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+3653,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+3653,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+3653,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+3653,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+3653,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+3653,RATING_COMPONENTS_TIE_TO_TOTAL,8,8,PASS,FAIL,Rating categories must reconcile to analyst total.
+3653,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3653,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3653,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3653,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3653,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+6278,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+6278,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+6278,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+6278,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+6278,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+6278,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+6278,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6278,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6278,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6278,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6278,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6278,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6278,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6278,SYMBOL_MATCHES_URL_CODE,TWS:6278:STOCK,6278,PASS,FAIL,Prevent cross-ticker contamination.
+6278,TARGET_LOW_MEDIAN_HIGH_ORDER,370.0 <= 370.0 <= 370.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+6278,TARGET_ANALYST_COUNT_POSITIVE,1,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+6278,YFINANCE_TICKER_MATCHES_CNYES_MARKET,6278.TW,6278.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+6278,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,158.0 <= 264.0 <= 370.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+6278,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+6278,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+6278,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+6278,SOURCE_RATING_DIRECTIONS_COMPARABLE,MIXED vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+6278,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+6278,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+6278,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+6278,RATING_COMPONENTS_TIE_TO_TOTAL,2,2,PASS,FAIL,Rating categories must reconcile to analyst total.
+6278,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6278,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6278,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6278,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6278,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+1590,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+1590,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+1590,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+1590,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+1590,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+1590,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+1590,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1590,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1590,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1590,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1590,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1590,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1590,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1590,SYMBOL_MATCHES_URL_CODE,TWS:1590:STOCK,1590,PASS,FAIL,Prevent cross-ticker contamination.
+1590,TARGET_LOW_MEDIAN_HIGH_ORDER,1430.0 <= 1767.5 <= 2000.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+1590,TARGET_ANALYST_COUNT_POSITIVE,18,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+1590,YFINANCE_TICKER_MATCHES_CNYES_MARKET,1590.TW,1590.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+1590,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,1130.0 <= 1730.0 <= 2000.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+1590,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+1590,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+1590,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+1590,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+1590,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+1590,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+1590,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+1590,RATING_COMPONENTS_TIE_TO_TOTAL,20,20,PASS,FAIL,Rating categories must reconcile to analyst total.
+1590,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2027, 2028, 2029, 2030]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+1590,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+1590,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2027, 2028, 2029, 2030]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+1590,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+1590,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+2317,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+2317,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+2317,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+2317,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+2317,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+2317,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+2317,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2317,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2317,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2317,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2317,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2317,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2317,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2317,SYMBOL_MATCHES_URL_CODE,TWS:2317:STOCK,2317,PASS,FAIL,Prevent cross-ticker contamination.
+2317,TARGET_LOW_MEDIAN_HIGH_ORDER,282.0 <= 360.0 <= 435.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+2317,TARGET_ANALYST_COUNT_POSITIVE,20,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+2317,YFINANCE_TICKER_MATCHES_CNYES_MARKET,2317.TW,2317.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+2317,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,260.0 <= 338.5 <= 435.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+2317,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+2317,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+2317,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+2317,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+2317,SOURCE_AGREEMENT_NO_CONFLICT,REVIEW,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+2317,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+2317,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+2317,RATING_COMPONENTS_TIE_TO_TOTAL,23,23,PASS,FAIL,Rating categories must reconcile to analyst total.
+2317,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2317,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2317,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2317,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2317,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+2382,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+2382,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+2382,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+2382,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+2382,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+2382,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+2382,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2382,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2382,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2382,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2382,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2382,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2382,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2382,SYMBOL_MATCHES_URL_CODE,TWS:2382:STOCK,2382,PASS,FAIL,Prevent cross-ticker contamination.
+2382,TARGET_LOW_MEDIAN_HIGH_ORDER,290.0 <= 435.0 <= 626.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+2382,TARGET_ANALYST_COUNT_POSITIVE,19,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+2382,YFINANCE_TICKER_MATCHES_CNYES_MARKET,2382.TW,2382.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+2382,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,290.0 <= 430.0 <= 626.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+2382,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+2382,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+2382,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+2382,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+2382,SOURCE_AGREEMENT_NO_CONFLICT,MATCH,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+2382,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+2382,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+2382,RATING_COMPONENTS_TIE_TO_TOTAL,20,20,PASS,FAIL,Rating categories must reconcile to analyst total.
+2382,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2382,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2382,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2382,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2382,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+2383,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+2383,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+2383,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+2383,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+2383,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+2383,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+2383,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2383,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2383,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2383,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2383,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2383,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2383,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2383,SYMBOL_MATCHES_URL_CODE,TWS:2383:STOCK,2383,PASS,FAIL,Prevent cross-ticker contamination.
+2383,TARGET_LOW_MEDIAN_HIGH_ORDER,6340.0 <= 8405.0 <= 11700.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+2383,TARGET_ANALYST_COUNT_POSITIVE,20,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+2383,YFINANCE_TICKER_MATCHES_CNYES_MARKET,2383.TW,2383.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+2383,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,6340.0 <= 8462.5 <= 11700.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+2383,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+2383,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+2383,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+2383,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+2383,SOURCE_AGREEMENT_NO_CONFLICT,MATCH,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+2383,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+2383,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+2383,RATING_COMPONENTS_TIE_TO_TOTAL,20,20,PASS,FAIL,Rating categories must reconcile to analyst total.
+2383,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2383,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2383,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2383,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2383,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+6415,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+6415,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+6415,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+6415,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+6415,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+6415,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+6415,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6415,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6415,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6415,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6415,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6415,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6415,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6415,SYMBOL_MATCHES_URL_CODE,TWS:6415:STOCK,6415,PASS,FAIL,Prevent cross-ticker contamination.
+6415,TARGET_LOW_MEDIAN_HIGH_ORDER,480.0 <= 590.0 <= 800.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+6415,TARGET_ANALYST_COUNT_POSITIVE,14,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+6415,YFINANCE_TICKER_MATCHES_CNYES_MARKET,6415.TW,6415.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+6415,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,180.0 <= 590.0 <= 800.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+6415,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+6415,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+6415,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+6415,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+6415,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+6415,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+6415,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+6415,RATING_COMPONENTS_TIE_TO_TOTAL,13,13,PASS,FAIL,Rating categories must reconcile to analyst total.
+6415,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6415,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6415,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6415,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6415,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+2330,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+2330,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+2330,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+2330,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+2330,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+2330,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+2330,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2330,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2330,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2330,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2330,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2330,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2330,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2330,SYMBOL_MATCHES_URL_CODE,TWS:2330:STOCK,2330,PASS,FAIL,Prevent cross-ticker contamination.
+2330,TARGET_LOW_MEDIAN_HIGH_ORDER,2700.0 <= 3300.0 <= 5000.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+2330,TARGET_ANALYST_COUNT_POSITIVE,33,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+2330,YFINANCE_TICKER_MATCHES_CNYES_MARKET,2330.TW,2330.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+2330,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,2700.0 <= 3300.0 <= 5000.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+2330,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+2330,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+2330,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+2330,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+2330,SOURCE_AGREEMENT_NO_CONFLICT,MATCH,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+2330,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+2330,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+2330,RATING_COMPONENTS_TIE_TO_TOTAL,42,42,PASS,FAIL,Rating categories must reconcile to analyst total.
+2330,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2026, 2027, 2028, 2029]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2330,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2330,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2026, 2027, 2028, 2029]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2330,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2330,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+1560,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+1560,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+1560,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+1560,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+1560,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+1560,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+1560,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1560,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1560,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1560,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1560,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1560,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1560,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1560,SYMBOL_MATCHES_URL_CODE,TWS:1560:STOCK,1560,PASS,FAIL,Prevent cross-ticker contamination.
+1560,TARGET_LOW_MEDIAN_HIGH_ORDER,840.0 <= 900.0 <= 1100.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+1560,TARGET_ANALYST_COUNT_POSITIVE,9,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+1560,YFINANCE_TICKER_MATCHES_CNYES_MARKET,1560.TW,1560.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+1560,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,550.0 <= 900.0 <= 1100.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+1560,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+1560,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+1560,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+1560,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+1560,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+1560,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+1560,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+1560,RATING_COMPONENTS_TIE_TO_TOTAL,9,9,PASS,FAIL,Rating categories must reconcile to analyst total.
+1560,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+1560,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+1560,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+1560,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+1560,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+2308,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+2308,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+2308,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+2308,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+2308,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+2308,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+2308,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2308,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2308,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2308,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2308,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2308,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2308,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2308,SYMBOL_MATCHES_URL_CODE,TWS:2308:STOCK,2308,PASS,FAIL,Prevent cross-ticker contamination.
+2308,TARGET_LOW_MEDIAN_HIGH_ORDER,1715.0 <= 2202.5 <= 4120.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+2308,TARGET_ANALYST_COUNT_POSITIVE,22,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+2308,YFINANCE_TICKER_MATCHES_CNYES_MARKET,2308.TW,2308.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+2308,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,1330.0 <= 2357.0 <= 4120.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+2308,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+2308,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+2308,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+2308,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+2308,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+2308,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+2308,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+2308,RATING_COMPONENTS_TIE_TO_TOTAL,23,23,PASS,FAIL,Rating categories must reconcile to analyst total.
+2308,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2026, 2027, 2028, 2029]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2308,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2308,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2026, 2027, 2028, 2029]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2308,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2308,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+3661,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+3661,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+3661,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+3661,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+3661,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+3661,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+3661,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3661,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3661,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3661,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3661,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3661,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3661,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3661,SYMBOL_MATCHES_URL_CODE,TWS:3661:STOCK,3661,PASS,FAIL,Prevent cross-ticker contamination.
+3661,TARGET_LOW_MEDIAN_HIGH_ORDER,5100.0 <= 6000.0 <= 6800.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+3661,TARGET_ANALYST_COUNT_POSITIVE,17,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+3661,YFINANCE_TICKER_MATCHES_CNYES_MARKET,3661.TW,3661.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+3661,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,3755.0027 <= 5944.0 <= 6800.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+3661,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+3661,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+3661,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+3661,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+3661,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+3661,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+3661,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+3661,RATING_COMPONENTS_TIE_TO_TOTAL,17,17,PASS,FAIL,Rating categories must reconcile to analyst total.
+3661,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2027, 2028, 2029, 2030]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3661,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3661,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2027, 2028, 2029, 2030]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3661,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3661,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+3665,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+3665,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+3665,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+3665,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+3665,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+3665,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+3665,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3665,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3665,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3665,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3665,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3665,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3665,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3665,SYMBOL_MATCHES_URL_CODE,TWS:3665:STOCK,3665,PASS,FAIL,Prevent cross-ticker contamination.
+3665,TARGET_LOW_MEDIAN_HIGH_ORDER,2450.0 <= 3300.0 <= 3870.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+3665,TARGET_ANALYST_COUNT_POSITIVE,15,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+3665,YFINANCE_TICKER_MATCHES_CNYES_MARKET,3665.TW,3665.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+3665,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,2450.0 <= 3200.0 <= 3870.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+3665,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+3665,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+3665,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+3665,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+3665,SOURCE_AGREEMENT_NO_CONFLICT,MATCH,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+3665,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+3665,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+3665,RATING_COMPONENTS_TIE_TO_TOTAL,15,15,PASS,FAIL,Rating categories must reconcile to analyst total.
+3665,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3665,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3665,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3665,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3665,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+8210,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+8210,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+8210,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+8210,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+8210,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+8210,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+8210,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8210,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8210,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8210,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8210,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8210,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8210,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8210,SYMBOL_MATCHES_URL_CODE,TWS:8210:STOCK,8210,PASS,FAIL,Prevent cross-ticker contamination.
+8210,TARGET_LOW_MEDIAN_HIGH_ORDER,950.0 <= 1400.0 <= 1600.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+8210,TARGET_ANALYST_COUNT_POSITIVE,9,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+8210,YFINANCE_TICKER_MATCHES_CNYES_MARKET,8210.TW,8210.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+8210,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,950.0 <= 1335.0 <= 1723.44,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+8210,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+8210,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+8210,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+8210,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+8210,SOURCE_AGREEMENT_NO_CONFLICT,REVIEW,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+8210,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+8210,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+8210,RATING_COMPONENTS_TIE_TO_TOTAL,10,10,PASS,FAIL,Rating categories must reconcile to analyst total.
+8210,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+8210,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+8210,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+8210,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+8210,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+8358,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+8358,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+8358,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+8358,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+8358,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+8358,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+8358,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8358,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8358,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8358,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8358,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8358,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8358,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+8358,SYMBOL_MATCHES_URL_CODE,TWS:8358:STOCK,8358,PASS,FAIL,Prevent cross-ticker contamination.
+8358,TARGET_LOW_MEDIAN_HIGH_ORDER,570.0 <= 730.0 <= 940.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+8358,TARGET_ANALYST_COUNT_POSITIVE,5,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+8358,YFINANCE_TICKER_MATCHES_CNYES_MARKET,8358.TWO,8358.TWO,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+8358,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,570.0 <= 675.0 <= 940.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+8358,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+8358,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+8358,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+8358,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+8358,SOURCE_AGREEMENT_NO_CONFLICT,INCOMPLETE,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+8358,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+8358,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+8358,RATING_COMPONENTS_TIE_TO_TOTAL,5,5,PASS,FAIL,Rating categories must reconcile to analyst total.
+8358,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+8358,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+8358,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+8358,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+8358,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+4966,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+4966,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+4966,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+4966,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+4966,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+4966,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+4966,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4966,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4966,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4966,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4966,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4966,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4966,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4966,SYMBOL_MATCHES_URL_CODE,TWS:4966:STOCK,4966,PASS,FAIL,Prevent cross-ticker contamination.
+4966,TARGET_LOW_MEDIAN_HIGH_ORDER,420.0 <= 568.0 <= 700.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+4966,TARGET_ANALYST_COUNT_POSITIVE,15,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+4966,YFINANCE_TICKER_MATCHES_CNYES_MARKET,4966.TWO,4966.TWO,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+4966,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,420.0 <= 549.0 <= 782.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+4966,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+4966,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+4966,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+4966,SOURCE_RATING_DIRECTIONS_COMPARABLE,NEUTRAL vs NEUTRAL,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+4966,SOURCE_AGREEMENT_NO_CONFLICT,REVIEW,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+4966,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+4966,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+4966,RATING_COMPONENTS_TIE_TO_TOTAL,15,15,PASS,FAIL,Rating categories must reconcile to analyst total.
+4966,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+4966,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+4966,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+4966,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+4966,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+6409,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+6409,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+6409,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+6409,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+6409,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+6409,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+6409,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6409,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6409,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6409,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6409,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6409,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6409,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6409,SYMBOL_MATCHES_URL_CODE,TWS:6409:STOCK,6409,PASS,FAIL,Prevent cross-ticker contamination.
+6409,TARGET_LOW_MEDIAN_HIGH_ORDER,980.0 <= 1100.0 <= 1600.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+6409,TARGET_ANALYST_COUNT_POSITIVE,7,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+6409,YFINANCE_TICKER_MATCHES_CNYES_MARKET,6409.TW,6409.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+6409,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,900.0 <= 1050.0 <= 1600.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+6409,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+6409,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+6409,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+6409,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+6409,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+6409,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+6409,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+6409,RATING_COMPONENTS_TIE_TO_TOTAL,7,7,PASS,FAIL,Rating categories must reconcile to analyst total.
+6409,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6409,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6409,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6409,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6409,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+7728,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+7728,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+7728,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+7728,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+7728,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+7728,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+7728,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+7728,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+7728,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+7728,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+7728,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+7728,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+7728,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+7728,SYMBOL_MATCHES_URL_CODE,TWS:7728:STOCK,7728,PASS,FAIL,Prevent cross-ticker contamination.
+7728,TARGET_LOW_MEDIAN_HIGH_ORDER,695.0 <= 695.0 <= 695.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+7728,TARGET_ANALYST_COUNT_POSITIVE,1,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+7728,YFINANCE_TICKER_MATCHES_CNYES_MARKET,7728.TWO,7728.TWO,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+7728,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,666.787 <= 666.787 <= 666.787,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+7728,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+7728,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+7728,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+7728,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+7728,SOURCE_AGREEMENT_NO_CONFLICT,INCOMPLETE,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+7728,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+7728,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 1, 'feHold': 1, 'feMark': 1, 'feMedian': 1, 'feOver': 1, 'feSell': 1, 'feUnder': 1, 'rateDate': 1}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+7728,RATING_COMPONENTS_TIE_TO_TOTAL,1,1,PASS,FAIL,Rating categories must reconcile to analyst total.
+7728,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+7728,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+7728,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+7728,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+7728,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+1476,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+1476,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+1476,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+1476,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+1476,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+1476,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+1476,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1476,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1476,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1476,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1476,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1476,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1476,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1476,SYMBOL_MATCHES_URL_CODE,TWS:1476:STOCK,1476,PASS,FAIL,Prevent cross-ticker contamination.
+1476,TARGET_LOW_MEDIAN_HIGH_ORDER,333.0 <= 403.5 <= 547.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+1476,TARGET_ANALYST_COUNT_POSITIVE,14,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+1476,YFINANCE_TICKER_MATCHES_CNYES_MARKET,1476.TW,1476.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+1476,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,333.0 <= 425.0 <= 601.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+1476,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+1476,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+1476,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+1476,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+1476,SOURCE_AGREEMENT_NO_CONFLICT,REVIEW,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+1476,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+1476,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+1476,RATING_COMPONENTS_TIE_TO_TOTAL,14,14,PASS,FAIL,Rating categories must reconcile to analyst total.
+1476,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+1476,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+1476,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+1476,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+1476,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+2637,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+2637,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+2637,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+2637,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+2637,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+2637,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+2637,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2637,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2637,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2637,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2637,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2637,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2637,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2637,SYMBOL_MATCHES_URL_CODE,TWS:2637:STOCK,2637,PASS,FAIL,Prevent cross-ticker contamination.
+2637,TARGET_LOW_MEDIAN_HIGH_ORDER,96.0 <= 105.0 <= 128.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+2637,TARGET_ANALYST_COUNT_POSITIVE,5,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+2637,YFINANCE_TICKER_MATCHES_CNYES_MARKET,2637.TW,2637.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+2637,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,96.0 <= 105.0 <= 128.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+2637,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+2637,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+2637,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+2637,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+2637,SOURCE_AGREEMENT_NO_CONFLICT,INCOMPLETE,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+2637,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+2637,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+2637,RATING_COMPONENTS_TIE_TO_TOTAL,6,6,PASS,FAIL,Rating categories must reconcile to analyst total.
+2637,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2637,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2637,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2637,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2637,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+2891,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+2891,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+2891,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+2891,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+2891,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+2891,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+2891,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2891,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2891,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2891,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2891,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2891,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2891,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2891,SYMBOL_MATCHES_URL_CODE,TWS:2891:STOCK,2891,PASS,FAIL,Prevent cross-ticker contamination.
+2891,TARGET_LOW_MEDIAN_HIGH_ORDER,63.5 <= 74.0 <= 79.4,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+2891,TARGET_ANALYST_COUNT_POSITIVE,11,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+2891,YFINANCE_TICKER_MATCHES_CNYES_MARKET,2891.TW,2891.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+2891,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,63.5 <= 74.0 <= 79.4,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+2891,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+2891,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+2891,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+2891,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+2891,SOURCE_AGREEMENT_NO_CONFLICT,MATCH,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+2891,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+2891,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+2891,RATING_COMPONENTS_TIE_TO_TOTAL,11,11,PASS,FAIL,Rating categories must reconcile to analyst total.
+2891,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2891,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2891,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2891,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2891,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+6147,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+6147,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+6147,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+6147,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+6147,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+6147,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+6147,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6147,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6147,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6147,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6147,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6147,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6147,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6147,SYMBOL_MATCHES_URL_CODE,TWS:6147:STOCK,6147,PASS,FAIL,Prevent cross-ticker contamination.
+6147,TARGET_LOW_MEDIAN_HIGH_ORDER,230.0 <= 300.0 <= 365.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+6147,TARGET_ANALYST_COUNT_POSITIVE,7,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+6147,YFINANCE_TICKER_MATCHES_CNYES_MARKET,6147.TWO,6147.TWO,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+6147,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,188.0 <= 270.0 <= 365.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+6147,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+6147,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+6147,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+6147,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+6147,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+6147,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+6147,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+6147,RATING_COMPONENTS_TIE_TO_TOTAL,8,8,PASS,FAIL,Rating categories must reconcile to analyst total.
+6147,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6147,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6147,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6147,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6147,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+6526,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+6526,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+6526,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+6526,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+6526,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+6526,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+6526,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6526,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6526,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6526,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6526,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6526,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6526,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6526,SYMBOL_MATCHES_URL_CODE,TWS:6526:STOCK,6526,PASS,FAIL,Prevent cross-ticker contamination.
+6526,TARGET_LOW_MEDIAN_HIGH_ORDER,630.0 <= 755.0 <= 995.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+6526,TARGET_ANALYST_COUNT_POSITIVE,6,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+6526,YFINANCE_TICKER_MATCHES_CNYES_MARKET,6526.TW,6526.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+6526,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,620.0 <= 750.0 <= 995.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+6526,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+6526,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+6526,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+6526,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+6526,SOURCE_AGREEMENT_NO_CONFLICT,INCOMPLETE,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+6526,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+6526,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+6526,RATING_COMPONENTS_TIE_TO_TOTAL,6,6,PASS,FAIL,Rating categories must reconcile to analyst total.
+6526,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6526,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6526,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6526,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6526,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+3605,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+3605,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+3605,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+3605,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+3605,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+3605,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+3605,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3605,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3605,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3605,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3605,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3605,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3605,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3605,SYMBOL_MATCHES_URL_CODE,TWS:3605:STOCK,3605,PASS,FAIL,Prevent cross-ticker contamination.
+3605,TARGET_LOW_MEDIAN_HIGH_ORDER,170.0 <= 170.0 <= 270.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+3605,TARGET_ANALYST_COUNT_POSITIVE,3,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+3605,YFINANCE_TICKER_MATCHES_CNYES_MARKET,3605.TW,3605.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+3605,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,120.0 <= 170.0 <= 270.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+3605,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+3605,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+3605,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+3605,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+3605,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+3605,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+3605,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+3605,RATING_COMPONENTS_TIE_TO_TOTAL,4,4,PASS,FAIL,Rating categories must reconcile to analyst total.
+3605,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3605,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3605,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3605,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3605,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+1303,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+1303,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+1303,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+1303,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+1303,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+1303,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+1303,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1303,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1303,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1303,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1303,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1303,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1303,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+1303,SYMBOL_MATCHES_URL_CODE,TWS:1303:STOCK,1303,PASS,FAIL,Prevent cross-ticker contamination.
+1303,TARGET_LOW_MEDIAN_HIGH_ORDER,375.0 <= 395.0 <= 506.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+1303,TARGET_ANALYST_COUNT_POSITIVE,7,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+1303,YFINANCE_TICKER_MATCHES_CNYES_MARKET,1303.TW,1303.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+1303,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,26.0 <= 390.0 <= 506.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+1303,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+1303,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+1303,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+1303,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+1303,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+1303,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+1303,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+1303,RATING_COMPONENTS_TIE_TO_TOTAL,7,7,PASS,FAIL,Rating categories must reconcile to analyst total.
+1303,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+1303,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+1303,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+1303,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+1303,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+6285,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+6285,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+6285,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+6285,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+6285,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+6285,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+6285,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6285,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6285,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6285,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6285,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6285,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6285,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6285,SYMBOL_MATCHES_URL_CODE,TWS:6285:STOCK,6285,PASS,FAIL,Prevent cross-ticker contamination.
+6285,TARGET_LOW_MEDIAN_HIGH_ORDER,295.0 <= 330.0 <= 380.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+6285,TARGET_ANALYST_COUNT_POSITIVE,5,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+6285,YFINANCE_TICKER_MATCHES_CNYES_MARKET,6285.TW,6285.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+6285,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,270.0 <= 318.5 <= 380.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+6285,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+6285,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+6285,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+6285,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+6285,SOURCE_AGREEMENT_NO_CONFLICT,REVIEW,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+6285,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+6285,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+6285,RATING_COMPONENTS_TIE_TO_TOTAL,6,6,PASS,FAIL,Rating categories must reconcile to analyst total.
+6285,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6285,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6285,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6285,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6285,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+4142,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+4142,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+4142,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+4142,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+4142,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+4142,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+4142,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4142,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4142,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4142,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4142,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4142,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4142,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+4142,SYMBOL_MATCHES_URL_CODE,TWS:4142:STOCK,4142,PASS,FAIL,Prevent cross-ticker contamination.
+4142,TARGET_LOW_MEDIAN_HIGH_ORDER,21.0 <= 21.0 <= 21.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+4142,TARGET_ANALYST_COUNT_POSITIVE,1,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+4142,YFINANCE_TICKER_MATCHES_CNYES_MARKET,4142.TW,4142.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+4142,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,21.0 <= 21.0 <= 21.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+4142,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+4142,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+4142,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+4142,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+4142,SOURCE_AGREEMENT_NO_CONFLICT,INCOMPLETE,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+4142,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+4142,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+4142,RATING_COMPONENTS_TIE_TO_TOTAL,1,1,PASS,FAIL,Rating categories must reconcile to analyst total.
+4142,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+4142,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+4142,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+4142,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+4142,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+6533,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+6533,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+6533,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+6533,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+6533,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+6533,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+6533,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6533,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6533,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6533,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6533,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6533,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6533,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6533,SYMBOL_MATCHES_URL_CODE,TWS:6533:STOCK,6533,PASS,FAIL,Prevent cross-ticker contamination.
+6533,TARGET_LOW_MEDIAN_HIGH_ORDER,430.0 <= 430.0 <= 430.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+6533,TARGET_ANALYST_COUNT_POSITIVE,1,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+6533,YFINANCE_TICKER_MATCHES_CNYES_MARKET,6533.TW,6533.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+6533,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,180.0 <= 305.0 <= 430.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+6533,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+6533,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+6533,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+6533,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+6533,SOURCE_AGREEMENT_NO_CONFLICT,CONFLICT,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+6533,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+6533,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+6533,RATING_COMPONENTS_TIE_TO_TOTAL,1,1,PASS,FAIL,Rating categories must reconcile to analyst total.
+6533,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6533,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6533,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6533,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6533,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+3264,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+3264,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+3264,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+3264,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+3264,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+3264,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+3264,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3264,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3264,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3264,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3264,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3264,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3264,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3264,SYMBOL_MATCHES_URL_CODE,TWS:3264:STOCK,3264,PASS,FAIL,Prevent cross-ticker contamination.
+3264,TARGET_LOW_MEDIAN_HIGH_ORDER,322.0 <= 358.5 <= 395.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+3264,TARGET_ANALYST_COUNT_POSITIVE,2,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+3264,YFINANCE_TICKER_MATCHES_CNYES_MARKET,3264.TWO,3264.TWO,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+3264,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,322.0 <= 358.5 <= 395.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+3264,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+3264,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+3264,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+3264,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+3264,SOURCE_AGREEMENT_NO_CONFLICT,MATCH,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+3264,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+3264,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+3264,RATING_COMPONENTS_TIE_TO_TOTAL,2,2,PASS,FAIL,Rating categories must reconcile to analyst total.
+3264,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3264,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3264,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3264,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3264,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+2606,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+2606,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+2606,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+2606,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+2606,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+2606,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+2606,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2606,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2606,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2606,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2606,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2606,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2606,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+2606,SYMBOL_MATCHES_URL_CODE,TWS:2606:STOCK,2606,PASS,FAIL,Prevent cross-ticker contamination.
+2606,TARGET_LOW_MEDIAN_HIGH_ORDER,75.2 <= 84.0 <= 90.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+2606,TARGET_ANALYST_COUNT_POSITIVE,4,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+2606,YFINANCE_TICKER_MATCHES_CNYES_MARKET,2606.TW,2606.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+2606,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,75.0 <= 80.0 <= 90.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+2606,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+2606,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+2606,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+2606,SOURCE_RATING_DIRECTIONS_COMPARABLE,MIXED vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+2606,SOURCE_AGREEMENT_NO_CONFLICT,INCOMPLETE,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+2606,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+2606,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+2606,RATING_COMPONENTS_TIE_TO_TOTAL,4,4,PASS,FAIL,Rating categories must reconcile to analyst total.
+2606,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2606,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2606,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2024, 2025, 2026, 2027]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+2606,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+2606,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+3017,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+3017,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+3017,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+3017,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+3017,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+3017,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+3017,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3017,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3017,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3017,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3017,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3017,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3017,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+3017,SYMBOL_MATCHES_URL_CODE,TWS:3017:STOCK,3017,PASS,FAIL,Prevent cross-ticker contamination.
+3017,TARGET_LOW_MEDIAN_HIGH_ORDER,3327.0 <= 4340.0 <= 5200.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+3017,TARGET_ANALYST_COUNT_POSITIVE,17,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+3017,YFINANCE_TICKER_MATCHES_CNYES_MARKET,3017.TW,3017.TW,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+3017,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,3327.0 <= 4340.0 <= 5200.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+3017,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+3017,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+3017,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+3017,SOURCE_RATING_DIRECTIONS_COMPARABLE,POSITIVE vs POSITIVE,both normalized,PASS,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+3017,SOURCE_AGREEMENT_NO_CONFLICT,MATCH,MATCH or REVIEW,PASS,WARN,"A conflict is a research flag, not a parser failure."
+3017,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+3017,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+3017,RATING_COMPONENTS_TIE_TO_TOTAL,17,17,PASS,FAIL,Rating categories must reconcile to analyst total.
+3017,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3017,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3017,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+3017,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+3017,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+6143,HTTP_PAGE_200,200,200,PASS,FAIL,page endpoint must return HTTP 200.
+6143,HTTP_TARGET_200,200,200,PASS,FAIL,target endpoint must return HTTP 200.
+6143,HTTP_RATING_200,200,200,PASS,FAIL,rating endpoint must return HTTP 200.
+6143,HTTP_EPS_200,200,200,PASS,FAIL,eps endpoint must return HTTP 200.
+6143,HTTP_SALES_200,200,200,PASS,FAIL,sales endpoint must return HTTP 200.
+6143,HTTP_YFINANCE_200,200,200,PASS,FAIL,yfinance endpoint must return HTTP 200.
+6143,YFINANCE_METHOD_GET_ANALYST_PRICE_TARGETS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6143,YFINANCE_METHOD_GET_EARNINGS_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6143,YFINANCE_METHOD_GET_EPS_REVISIONS,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6143,YFINANCE_METHOD_GET_EPS_TREND,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6143,YFINANCE_METHOD_GET_GROWTH_ESTIMATES,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6143,YFINANCE_METHOD_GET_RECOMMENDATIONS_SUMMARY,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6143,YFINANCE_METHOD_GET_REVENUE_ESTIMATE,PASS,PASS or NO_COVERAGE,PASS,WARN,YFinance method errors are isolated; other sources remain usable.
+6143,SYMBOL_MATCHES_URL_CODE,TWS:6143:STOCK,6143,PASS,FAIL,Prevent cross-ticker contamination.
+6143,TARGET_LOW_MEDIAN_HIGH_ORDER,88.0 <= 91.5 <= 95.0,low <= median <= high,PASS,FAIL,Target valuation ordering sanity check.
+6143,TARGET_ANALYST_COUNT_POSITIVE,2,> 0,PASS,WARN,Some tickers may legitimately have no FactSet target coverage.
+6143,YFINANCE_TICKER_MATCHES_CNYES_MARKET,6143.TWO,6143.TWO,PASS,FAIL,TWSE maps to .TW and TPEX maps to .TWO.
+6143,YFINANCE_TARGET_LOW_MEDIAN_HIGH_ORDER,88.0 <= 91.5 <= 95.0,low <= median <= high,PASS,WARN,Yahoo coverage may omit one or more target fields.
+6143,YFINANCE_CONSENSUS_CORE_FIELDS_COMPLETE,5,5,PASS,WARN,Required YFinance target and rating fields.
+6143,SOURCE_CURRENCIES_MATCH,TWD vs TWD,same non-empty currency,PASS,WARN,Target-price differences are not comparable across currencies.
+6143,SOURCE_COMPARISON_ALL_ITEMS_UNIQUE,"['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']","['CURRENT_PRICE', 'TARGET_LOW', 'TARGET_MEAN', 'TARGET_MEDIAN', 'TARGET_HIGH', 'ANALYST_COUNT', 'RATING']",PASS,FAIL,Every requested target and rating item appears once.
+6143,SOURCE_RATING_DIRECTIONS_COMPARABLE,MIXED vs None,both normalized,WARN,WARN,Raw rating labels are normalized only to Positive / Neutral / Negative.
+6143,SOURCE_AGREEMENT_NO_CONFLICT,INCOMPLETE,MATCH or REVIEW,WARN,WARN,"A conflict is a research flag, not a parser failure."
+6143,TARGET_SPECTRUM_COMPLETE_AND_ALIGNED,PASS / 2 sources,PASS / 2 sources,PASS,WARN,Both target ranges and the shared Adj Close benchmark are required.
+6143,RATING_ARRAY_LENGTHS_EQUAL,"{'feBuy': 4, 'feHold': 4, 'feMark': 4, 'feMedian': 4, 'feOver': 4, 'feSell': 4, 'feUnder': 4, 'rateDate': 4}",all equal,PASS,FAIL,Every rating item must stay aligned by index.
+6143,RATING_COMPONENTS_TIE_TO_TOTAL,2,2,PASS,FAIL,Rating categories must reconcile to analyst total.
+6143,EPS_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6143,EPS_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6143,SALES_ALL_YEAR_ITEMS_UNIQUE,"[2025, 2026, 2027, 2028]",non-empty unique fiscal years,PASS,FAIL,Prevents only-first-item and duplicate-year bugs.
+6143,SALES_CORE_VALUES_COMPLETE,4,4,PASS,FAIL,"Every year item must include low, median and high."
+6143,ONE_MATRIX_ROW_PER_CODE,1,1,PASS,FAIL,Matrix must be de-duplicated by code.
+ALL,RAW_COMPOSITE_KEY_DUPLICATES,0,0,PASS,FAIL,Raw table composite keys must be unique.

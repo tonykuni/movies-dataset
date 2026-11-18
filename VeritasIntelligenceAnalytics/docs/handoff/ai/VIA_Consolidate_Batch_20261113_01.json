@@ -1,0 +1,187 @@
+{
+ "schema": "VIA.Consolidate.Batch.v1",
+ "batch": "20261113_01",
+ "law": "L130(政策冊 v0119→v0120)",
+ "systems": [
+  "VRN",
+  "VDF"
+ ],
+ "gates": {
+  "tail_self_contained": "VRN_ENG397_P1Segment_v0129(2245+ 行完整檔)",
+  "selftest_before": "35/35 PASS",
+  "registered": "見編號冊",
+  "live_refs": "0(程式 · 設定冊 · 交接冊 · 工作流冊;文件 / 歷史收據不算)"
+ },
+ "count": 0,
+ "rows": [],
+ "held_back": "同批候選另有 16 份舊版仍被子系統包冊 / 介面契約冊 / 命名冊 / 引擎目錄 / 參數冊引用,與 14 份凍結複本有路徑引用 → 先出新版冊改指再刪",
+ "restored_after_regression": {
+  "count": 66,
+  "why": "刪後 VRN 全家族實測 ENG087 FAIL:NLP Hub 載入 references/intake 最新套件 VIA_NLP_OneEngine_v1.9.0,被刪的「同內容複本」是套件內的模組檔(__main__ / adapters / audit / cache …),內容雖與 v1.1.0 套件相同,但每個套件都要自己那一份 → 套件樹內的同內容檔不是重複,全數還原;ENG087 回 11/11。",
+  "rule_added": "去重只比對獨立檔(家族版本 / 單檔);套件樹(含 __init__.py 的資料夾與其子樹)內的檔不列入同內容去重",
+  "paths": [
+   "functional modules/VRN/intake/VRN_v0108_Annual/VRN_v0108_Complete_Handover/pack/engine/tools/VIA_NLP_OneEngine_v1_9_0.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/markdown/semantic_reconstruction.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/scripts/build_release.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/scripts/run_tests.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/__init__.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/src/via_nlp_engine/__main__.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/__main__.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/src/via_nlp_engine/adapters.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/adapters.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/api.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/src/via_nlp_engine/audit.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/audit.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/bilingual_ops.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/bundle_ops.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/src/via_nlp_engine/cache.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/cache.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/cli.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/code_reconstruction.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/code_restoration.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/config.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/content_roles.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/context_reconstruction.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/cpu_augmentation.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/discourse.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/discussion_ops.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/engine.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/evaluation.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/function_classifier.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/ingest.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/instruction_ops.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/src/via_nlp_engine/jobs.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/jobs.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/knowledge.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/knowledge_body_ops.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/layout_analysis.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/src/via_nlp_engine/learning.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/learning.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/mindmap_enrichment.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/mindmap_evolution.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/src/via_nlp_engine/model_pool.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/model_pool.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/module_composition.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/provider_registry.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/src/via_nlp_engine/resources.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/resources.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/src/via_nlp_engine/routing.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/routing.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/schemas.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/summarization.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/system_manager.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/table_ops.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/template_reconstruction.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/text_ops.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/src/via_nlp_engine/translation.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/src/via_nlp_engine/translation.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/tests/test_bundle.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/tests/test_engine.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/tests/test_knowledge.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/tests/test_ml.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/tests/test_quality.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/tests/test_v14.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/tests/test_v15.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/tests/test_v16.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/tests/test_v161.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/tests/test_v17.py",
+   "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.9.0/embedded_sources/legacy/tests/test_v18.py"
+  ]
+ },
+ "reverted_rows": [
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0113.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "f8246265d773ff5287d66355a71f11282032bb009e7e9a60ff2e2de3105cb7a9"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0114.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "b00a18cb3deca9bfe654cd14e7673f39263c1f1fee75e5077f672e41584c2289"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0115.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "e2f34a32de3a5232c95d8f34551ab30552a95975b056c148a8b5e2ee2e9f36e2"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0116.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "9a16ef6f9ad382552b3870d9f1cf342a2d3eecd8336035bb18062f165e24d15f"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0117.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "d8917b7d4c2319cff96ca1b9df12fe6ba9283b2e082c6e72545d2d847354998d"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0118.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "0b13df15371f57d92730f50d54ea4b9bc197d42f280cdb8b40ad0caf44ade650"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0119.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "e5cb8ec5f28e9cd48165eae838b484916d4a4a838ee6789100c8f34df6e8983c"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0120.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "ce3fbeb504941cc93ac9026eea4e77da521a0604089db401ca932de95ee2bc9c"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0121.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "667662f7e5268d86d43788f4174e6f1ab93f2e31a70ad65d8643ac4fedbf6055"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0122.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "ab129c7c49607072213999ff4665140b89571ecd3cbcb4b08546343eb31f7478"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0123.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "302cd3ba2e37826adca21840ecee1cc7f1f019deba82a3f3e099e6aeca4c1998"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0124.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "9fee621a3b82c89efd75fd565743a4000a7fcee4867e4205ac553ce097da5e17"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0125.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "4eeb5809713d22c5ba7b56746a1483c7981e31f94c24377b32394e73a2f47160"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0126.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "17652875168c11d6cead14cc806a5ba63e757b7718a6fb727b4efbc0cee4eb7d"
+  },
+  {
+   "path": "functional modules/VRN/VRN_ENG397_P1Segment_v0128.py",
+   "kind": "舊版(尾版自足 · 零活引用)",
+   "keep": "functional modules/VRN/VRN_ENG397_P1Segment_v0129.py",
+   "sha256": "98c310fc262d08fcaeaea0bcb2c184b5f258740fc944f3092f5f703c321ad53a"
+  }
+ ],
+ "reverted": {
+  "at": "2026-11-13",
+  "why": "探測法(尾版自測 + audit hook)抓不到延遲載入的前版:批 02 刪 VRN_SystemManager_v0261 → v0262 匯入即 FileNotFoundError,VRN 管理器啟動即崩。整批還原;rows 清空,桌機刪除腳本跑本批不會刪任何檔。改走操作員令:引擎重寫成新的單檔,實測通過後才退役舊鏈。"
+ }
+}
