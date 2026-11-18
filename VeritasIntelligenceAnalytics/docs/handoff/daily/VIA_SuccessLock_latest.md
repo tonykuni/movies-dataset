@@ -36,3 +36,4 @@
 | 2026-11-18T01:51:19Z | VIA_Requirements_SSOT_v0256.json | 0256 | — | 9ace971be3ad | 需求冊 +VCGC-REQ225(PARTIAL) | 舊 284 條逐項比對相同 · SDD X-REQ-BACK 綠 |
 | 2026-11-18T01:51:19Z | VIA_Workflow_VCGC_SSOT_v0152.json | 0152 | — | f81224971613 | 工作流冊 +VCGC-WKF043(4 步) | 舊 42 條逐項比對相同 · SDD X-CODE · X-ENGINE 綠 |
 | 2026-11-18T01:51:19Z | VIA_VCGC_FunctionInventory_SSOT_v0245.json | 0245 | — | 852f6ef13105 | 盤點冊 +5 站 · +4 工作流步 · manifest 豁免 | 舊 428 站逐項比對相同 · test --quick verb 58/58 · workflow 181/181 |
+| 2026-11-18T02:41:24Z | CGC_MDL283_CardMatrixFeedback_v0104.py | 0104 | VIA-VCGC-MDL1656 | 1effae5975ca | token 冊雜湊先統一成 LF 再算(Windows 上頁面樣式不掉)· 收據 version 寫本版 | 自測 88 項過(含前版鏈;放了一份 CRLF 檔,舊算法會判錯)· 經入口實跑收據 version v0104 |
