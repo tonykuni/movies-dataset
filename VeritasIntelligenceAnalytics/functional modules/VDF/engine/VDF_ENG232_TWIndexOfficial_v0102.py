@@ -14,7 +14,7 @@
        www/zh-tw/indexInfo/inx(開市 · 最高 · 最低 · 收市)+ www/zh-tw/afterTrading/tradingIndex(成交張數 · 金額(仟元))。
      單位統一成與加權相同:volume = 成交張數 × 1000(股)· turnover = 金額(仟元)× 1000(元)。外呼照舊只經統包網路工具(雙閘在工具裡)。
   ② 兩個指數各自算增量起點(各自庫內最新日的隔天;沒有的那個從 BOOT)。已有的那個不重抓。
-  ③ 加權那一半照前版抓(收容件),區間超過 45 天就按月切段、每段寫庫並印一行;櫃買每月寫庫並印一行。
+  ③ 先抓櫃買(每月寫庫並印一行,整段一兩分鐘),再抓加權(收容件,照前版;區間超過 45 天就按月切段、每段寫庫並印一行)。
      被收掉也沒關係:下一次從庫裡最後一天的隔天接著抓。
   ④ 收容件每天還會去打已經 404 的舊端點:同一個端點這一輪從沒成功過、又連兩次拿不到 JSON,這一輪就不再打它
      (不是寫死名單;成功過的端點偶爾空一次照樣繼續打;端點恢復就自動恢復)。
@@ -228,27 +228,7 @@ def run(start=None, end=None, net=None, db=None, dry: bool = False, inner=None, 
             res.update(state="FAIL", note="網路工具缺(要 SUP_MDL740 的 curl_bytes)")
             return res
         BASE._NetHttp.net = net
-    # ── 加權(收容件;照前版;長區間按月切段,每段寫庫)
-    if st["TAIEX"] <= end_s:
-        span = (date.fromisoformat(end_s) - date.fromisoformat(st["TAIEX"])).days
-        chunks = month_chunks(st["TAIEX"], end_s) if span > CHUNK_OVER_DAYS else [(st["TAIEX"], end_s)]
-        if len(chunks) > 1:
-            echo("  [TW 指數] 加權 %s → %s 共 %d 段(按月;每段寫庫)" % (st["TAIEX"], end_s, len(chunks)), flush=True)
-        with _SkipDead(BASE._NetHttp) as guard:
-            for i, (a, b) in enumerate(chunks, 1):
-                r = inner(a, b, net=net, db=db, dry=dry)
-                for k in ("fetched", "added", "calls"):
-                    res[k] += int(r.get(k) or 0)
-                res["by_index"]["TAIEX"]["added"] += int(r.get("added") or 0)
-                res["by_index"]["TAIEX"]["state"] = r.get("state")
-                if len(chunks) > 1:
-                    echo("  [TW 指數] 加權 段 %d/%d %s → %s · %s · 新增 %s" % (i, len(chunks), a, b, r.get("state"), r.get("added", 0)), flush=True)
-                if r.get("state") not in ("OK", "EMPTY", "UP_TO_DATE"):
-                    res.update(state=r.get("state") or "FAIL", stopped_at="TAIEX " + a, note=r.get("note") or r.get("why") or "")
-                    return res
-        if guard.skipped:
-            res["dead_endpoints"] = {k.split("tpex.org.tw")[-1].split("twse.com.tw")[-1]: n for k, n in guard.skipped.items()}
-    # ── 櫃買(櫃買中心現行官方端點;按月)
+    # ── 櫃買先抓(櫃買中心現行官方端點;按月,整段一兩分鐘):不排在加權後面,空庫起跑時不會被加權的長補抓卡住
     if st["TPEX"] <= end_s:
         try:
             h = http if http is not None else BASE._NetHttp()
@@ -274,6 +254,26 @@ def run(start=None, end=None, net=None, db=None, dry: bool = False, inner=None, 
             res["by_index"]["TPEX"]["state"] = "DENY"
             res.update(state="DENY", note=str(exc))
             return res
+    # ── 加權(收容件;照前版;長區間按月切段,每段寫庫)
+    if st["TAIEX"] <= end_s:
+        span = (date.fromisoformat(end_s) - date.fromisoformat(st["TAIEX"])).days
+        chunks = month_chunks(st["TAIEX"], end_s) if span > CHUNK_OVER_DAYS else [(st["TAIEX"], end_s)]
+        if len(chunks) > 1:
+            echo("  [TW 指數] 加權 %s → %s 共 %d 段(按月;每段寫庫)" % (st["TAIEX"], end_s, len(chunks)), flush=True)
+        with _SkipDead(BASE._NetHttp) as guard:
+            for i, (a, b) in enumerate(chunks, 1):
+                r = inner(a, b, net=net, db=db, dry=dry)
+                for k in ("fetched", "added", "calls"):
+                    res[k] += int(r.get(k) or 0)
+                res["by_index"]["TAIEX"]["added"] += int(r.get("added") or 0)
+                res["by_index"]["TAIEX"]["state"] = r.get("state")
+                if len(chunks) > 1:
+                    echo("  [TW 指數] 加權 段 %d/%d %s → %s · %s · 新增 %s" % (i, len(chunks), a, b, r.get("state"), r.get("added", 0)), flush=True)
+                if r.get("state") not in ("OK", "EMPTY", "UP_TO_DATE"):
+                    res.update(state=r.get("state") or "FAIL", stopped_at="TAIEX " + a, note=r.get("note") or r.get("why") or "")
+                    return res
+        if guard.skipped:
+            res["dead_endpoints"] = {k.split("tpex.org.tw")[-1].split("twse.com.tw")[-1]: n for k, n in guard.skipped.items()}
     states = {v["state"] for v in res["by_index"].values()}
     if states <= {"EMPTY", "UP_TO_DATE"} and res["fetched"] == 0:
         res["state"] = "EMPTY" if "EMPTY" in states else "UP_TO_DATE"
