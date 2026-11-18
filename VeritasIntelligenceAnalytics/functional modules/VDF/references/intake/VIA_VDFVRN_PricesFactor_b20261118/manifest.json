@@ -1,0 +1,47 @@
+{
+ "intake_id": "VIA_VDFVRN_PricesFactor_b20261118",
+ "ts": "2026-11-18",
+ "origin": "操作員 2026-11-18 令「VDF 功能性差異部分抓進來 · 不可違反政策」:VIA-VDF-VRN 倉裡 movies-dataset 沒有的兩支 VDF 候選引擎(prices_canonical · factor library)連同它們的候選冊、測試與說明,原樣收件。",
+ "source": {
+  "repo": "tonykuni/VIA-VDF-VRN",
+  "commit": "0993c2d230a2786692110d09e14e69e7cf6f7852",
+  "commit_date": "2026-11-05T20:56:51+08:00",
+  "access": "read-only"
+ },
+ "files": {
+  "engine/VDF_PricesCanonical.py": {
+   "sha256": "37588a1edfdfbe61dc7ae922b2975ee79235ef1d44f596e93688440da9c04726",
+   "bytes": 22716,
+   "from": "functional modules/VDF/engine/VDF_PricesCanonical.py"
+  },
+  "engine/VDF_FactorLibrary.py": {
+   "sha256": "05f2470d368dc589a344450610749de7d61bb0f5553cfbf33ff8375ee5384a28",
+   "bytes": 32151,
+   "from": "functional modules/VDF/engine/VDF_FactorLibrary.py"
+  },
+  "tests/test_VDF_PricesFactorIntegration.py": {
+   "sha256": "bca676a54654a4c5fe13a44aa854df8b172fab5fbd258ace1873d190128ba68a",
+   "bytes": 18774,
+   "from": "functional modules/VDF/tests/test_VDF_PricesFactorIntegration.py"
+  },
+  "config/ssot/VDF_PricesFactorRegistry.candidate.json": {
+   "sha256": "c5c55780c111f938bacbac5638044c1e6547834ea0438a4f0777744c6bc0f9da",
+   "bytes": 9561,
+   "from": "config/ssot/VDF_PricesFactorRegistry.candidate.json"
+  },
+  "docs/VDF_PRICES_CANONICAL_FACTOR_LIBRARY.md": {
+   "sha256": "01cf80b59001f8133b2fed4e93c838ee21860534162fee4030ddda2ddc802f79",
+   "bytes": 3478,
+   "from": "docs/VDF_PRICES_CANONICAL_FACTOR_LIBRARY.md"
+  }
+ },
+ "state": "COLLECTED_NOT_RUN",
+ "verdicts": [
+  "只收件、不啟用、不接線:沒有任何現行 VDF 引擎或管理器讀這個夾;檔案位元組與來源 commit 一致(見 files.sha256)",
+  "VDF_PricesCanonical.py:零網路、零 TA-Lib;讀候選冊 VDF_PricesFactorRegistry.candidate.json(registration_state = CANDIDATE_PENDING_CGC_PROMOTION);要啟用得先由中央發家族號並出 VIA 命名的新版號檔(L04)",
+  "VDF_FactorLibrary.py:def_probe_talib 以 importlib.import_module('talib') 動態匯入 TA-Lib,且自算 RSI / SMA / EMA → 牴觸 L50(TA-Lib 禁用 · 技術指標唯一正主是 QuantGuard);不採用為現行引擎,只留作設計參考。要用它的因子邏輯,得拿掉 TA-Lib 那一道並把指標改走 VDF_ENG086_QuantGuardOneBridge",
+  "來源倉自己的測試 test_VDF_PricesFactorIntegration.py 在雲端沙盒於來源倉原位跑:20 項全過(2026-11-18 · python 3.13);收件夾裡的這份沒有在本倉執行",
+  "三支 .py 來源本身已帶 [VIA:ACCEL-BRIDGE] 與 [VIA:NET-BRIDGE]"
+ ],
+ "not_collected": []
+}
