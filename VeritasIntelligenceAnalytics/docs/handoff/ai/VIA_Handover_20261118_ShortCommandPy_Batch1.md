@@ -6,9 +6,11 @@
 
 | 檔 | 編號 | 做什麼 |
 |---|---|---|
-| `supportive modules/registry/VIA_ShortCommand_PyRoute_SSOT_v0100.json` | VIA-VCGC-SSOT404 | 212 支短指令全列(應掃 212 · 已掃 212 · 略過 0) |
-| `supportive modules/registry/CGC_MDL134_ParallelLanes_v0103.py` | VIA-VCGC-MDL1662 | `cmd list / check / plan / run`;先降壓 → 3~6 道 → 監工 |
+| `supportive modules/registry/VIA_ShortCommand_PyRoute_SSOT_v0100.json` | VIA-VCGC-SSOT409 | 212 支短指令全列(應掃 212 · 已掃 212 · 略過 0) |
+| `supportive modules/registry/CGC_MDL134_ParallelLanes_v0103.py` | VIA-VCGC-MDL1664 | `cmd list / check / plan / run`;先降壓 → 3~6 道 → 監工 |
 | `Register-VIA-Commands-v0279.ps1` | VIA-CORE-MDL868 | 第一批 4 支改成只轉呼叫 Python |
+
+(編號更正:路由冊與 lanes v0103 原記的 SSOT404 / MDL1662 與 main 撞號,已以 main 為準重編成上表的號。)
 
 第一批 4 支:`via-vrnrun`(→ VRN 啟動器)· `via-vdffetch`(→ VDF 啟動器)· `via-six`(→ CGC_MDL127)· `via-panorama-all`(→ `cmd run`,兩步同時跑)。
 VRN / VDF 的兩支直接呼叫各自系統的啟動器,不經 VCGC。

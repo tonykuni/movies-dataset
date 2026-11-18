@@ -52,3 +52,14 @@
 | 2026-11-18T17:22:58Z | VQG_AllInOne_v0112.py | 0112 | VIA-VQG-MDL009 | e6c94589ed64 | 加速器橋補成真的匯入(前版只有標記) | 自測 6/6 · 前版 SHA 釘住 |
 | 2026-11-18T17:22:58Z | VQG_SectorActiveWeight_v0101.py | 0101 | VIA-VQG-MDL010 | ff9f4937ccf2 | 補加速器橋 | 自測 6/6 |
 | 2026-11-18T17:22:58Z | VDF_TW_TickerClass_v0101.py | 0101 | VIA-VDF-MDL295 | 8bb5ae7fa1db | 補加速器橋(v0100 是操作員分支的成果,已併入) | 自測 6/6(含前版 kinds=14) |
+| 2026-11-18T18:40:37Z | CGC_MDL134_ParallelLanes_v0103.py | 0103 | VIA-VCGC-MDL1664 | 4fb2a0997e6f | 更正編號:與 main(#675)撞號,以 main 為準重編;檔內容沒變 | 原記 VIA-VCGC-MDL1662 作廢 → 現為本列編號;雜湊與先前那一列相同 |
+| 2026-11-18T18:40:37Z | CGC_MDL245_SDDValidator_v0109.py | 0109 | VIA-VCGC-MDL1665 | 6aa0b9d90a18 | 更正編號:同上 | 原記 VIA-VCGC-MDL1663 作廢;雜湊與先前那一列相同 |
+| 2026-11-18T18:40:37Z | VIA_ShortCommand_PyRoute_SSOT_v0100.json | 0100 | VIA-VCGC-SSOT409 | be269b34ac86 | 更正編號:同上 | 原記 VIA-VCGC-SSOT404 作廢;雜湊與先前那一列相同 |
+| 2026-11-18T18:40:37Z | VIA_Workflow_VCGC_SSOT_v0155.json | 0155 | VIA-VCGC-SSOT410 | b5c34edeaf13 | 以 main 的 v0154 為底重出:釘死版號的 79 步改取尾版(分支先前的 v0154 / v0155 與 main 撞名,作廢) | 點名以外逐條差異 0 · SDD X-REG 綠 |
+| 2026-11-18T18:40:37Z | VDF_ENG077_ActiveETFUniverse_v0107.py | 0107 | VIA-VDF-ENG373 | 4311df7707c0 | 補記編號(先前那一列寫待編) | 檔內容沒變 |
+| 2026-11-18T18:40:37Z | VDF_ENG055_OmniFetch_v0124.py | 0124 | VIA-VDF-ENG374 | 0efbb5d36071 | 補記編號(先前那一列寫待編) | 檔內容沒變 |
+| 2026-11-18T18:40:37Z | VDF_ENG094_ActiveETFActivity_v0102.py | 0102 | VIA-VDF-ENG375 | 86d69c960844 | VCGC 的 ScrapeGate 尺不在 / 壞掉時改用 VDF 自己的同一把尺 | 自測 7/7(含負控)· 正常樹與拿掉 VCGC 的副本都過 |
+| 2026-11-18T18:40:37Z | VDF_ENG232_TWIndexOfficial_v0102.py | 0102 | VIA-VDF-ENG376 | 42349599810b | 櫃買指數改走現行官方端點 · 兩個指數各自接續 · 按月寫庫並出聲 · 櫃買先抓 | 自測 13/13 · 真跑:櫃買 935 列 2023-01-03 → 2026-11-18(含開高低收與量值) |
+| 2026-11-18T18:40:37Z | VDF_ENG232_TWIndexOfficial_v0103.py | 0103 | VIA-VDF-ENG377 | b709d935f44b | 寫庫前確保欄型 · 加權某月回空就停在那裡不留洞 | 自測 10/10(含負控)· 真跑壞欄型的湖庫:欄型修成 DOUBLE · 加權補進 63 列含法人數字 |
+| 2026-11-18T18:40:37Z | VDF_FetchSystem_SSOT_v0114.json | 0114 | —(VDF 自己的冊;VCGC 邊界閘不代發) | 72d84dbafa51 | 擷取冊尾版:e054 → v0112 worker · e077 → v0107 · e232 → v0103(v0111 ~ v0114 每版只改一列) | 每版點名以外差異 0 · 三支都經 VDF 擷取系統真跑過 |
+| 2026-11-18T18:40:37Z | SUP_MDL744_NLPApplicationHub_v0103.py | 0103 | VIA-SUP-MDL1203 | 5e18c7bb0d9e | 補編號:先補上 VIA_DownloadsSync v0100 / v0101 缺的模組列之後才編得進去 | 稽核 遺失 0 · 改身分 0 · 重號 0;檔內容沒動 |
