@@ -71,6 +71,81 @@ type Frame = {
   skipNoise: boolean;
 };
 
+function lineFrame(price: number | null, adj: number[], line: (number | null)[], index: number, label: string): Frame {
+  const value = line[index] ?? null;
+  return {
+    flag: price == null || value == null ? null : price > value,
+    drive: gap(adj, line),
+    detail: `收盤 ${num(price, 1)}，${label} ${num(value, 1)}。`,
+    sat: null,
+    skipNoise: false,
+  };
+}
+
+function signFrame(line: (number | null)[], index: number, label: string, digits = 2): Frame {
+  const value = line[index] ?? null;
+  return {
+    flag: value == null ? null : value > 0,
+    drive: line,
+    detail: `${label} ${num(value, digits)}。`,
+    sat: null,
+    skipNoise: false,
+  };
+}
+
+function rankFrame(line: (number | null)[], index: number, label: string, side: "高" | "低", digits = 2): Frame {
+  const rank = pctAt(line, index);
+  const value = line[index] ?? null;
+  return {
+    flag: rank == null ? null : side === "高" ? rank >= 80 : rank <= 20,
+    drive: line,
+    detail: `${label} ${num(value, digits)}，分位 ${rank == null ? "—" : rank.toFixed(0)}。`,
+    sat: null,
+    skipNoise: false,
+  };
+}
+
+function extraFrame(id: string, series: MarketSeries, index: number): Frame | null {
+  const price = series.adj[index] ?? null;
+  if (id === "VIA-VQG-SG-TRD007") return lineFrame(price, series.adj, series.dema, index, "20 日雙重指數均線");
+  if (id === "VIA-VQG-SG-TRD008") return lineFrame(price, series.adj, series.tema, index, "20 日三重指數均線");
+  if (id === "VIA-VQG-SG-TRD009") return lineFrame(price, series.adj, series.hma, index, "16 日赫爾均線");
+  if (id === "VIA-VQG-SG-TRD010") {
+    const up = series.aroonUp[index] ?? null;
+    const down = series.aroonDown[index] ?? null;
+    return {
+      flag: up == null || down == null ? null : up > down,
+      drive: series.aroonUp.map((value, i) => (value == null || series.aroonDown[i] == null ? null : value - series.aroonDown[i]!)),
+      detail: `Aroon Up ${num(up, 1)}，Aroon Down ${num(down, 1)}。`,
+      sat: stuck(series.aroonUp, series.adj, index),
+      skipNoise: false,
+    };
+  }
+  if (id === "VIA-VQG-SG-TRD011") return signFrame(series.slope, index, "20 日迴歸斜率", 4);
+  if (id === "VIA-VQG-SG-MOM008") return signFrame(series.momentum, index, "10 日動量", 1);
+  if (id === "VIA-VQG-SG-MOM009") return signFrame(series.ppoHist, index, "PPO 柱");
+  if (id === "VIA-VQG-SG-MOM010") {
+    const row = signFrame(series.tsi, index, "TSI", 1);
+    return { ...row, sat: stuck(series.tsi, series.adj, index) };
+  }
+  if (id === "VIA-VQG-SG-MOM011") {
+    const row = rankFrame(series.ultimate, index, "Ultimate Oscillator", "高", 1);
+    return { ...row, sat: stuck(series.ultimate, series.adj, index) };
+  }
+  if (id === "VIA-VQG-SG-MOM012") return signFrame(series.awesome, index, "Awesome Oscillator", 1);
+  if (id === "VIA-VQG-SG-VOL005") return rankFrame(series.parkinson, index, "Parkinson 波動", "高", 4);
+  if (id === "VIA-VQG-SG-VOL006") return rankFrame(series.ulcer, index, "Ulcer Index", "高", 2);
+  if (id === "VIA-VQG-SG-VOL007") return signFrame(series.chaikin, index, "Chaikin Volatility");
+  if (id === "VIA-VQG-SG-VOL008") return rankFrame(series.closeStd, index, "收盤標準差", "高", 1);
+  if (id === "VIA-VQG-SG-RSK004") return rankFrame(series.downside, index, "下跌偏差", "高", 4);
+  if (id === "VIA-VQG-SG-RSK005") return rankFrame(series.pain, index, "Pain Index", "低", 4);
+  if (id === "VIA-VQG-SG-RSK006") return rankFrame(series.burke, index, "Burke Ratio", "低", 2);
+  if (id === "VIA-VQG-SG-STA001") return rankFrame(series.zscore, index, "Z-Score", "高", 2);
+  if (id === "VIA-VQG-SG-STA002") return lineFrame(price, series.adj, series.median, index, "20 日中位數");
+  if (id === "VIA-VQG-SG-STA003") return rankFrame(series.returnMad, index, "報酬平均絕對離差", "高", 4);
+  return null;
+}
+
 function frameAt(id: string, series: MarketSeries, index: number, drives: Record<string, (number | null)[]>): Frame | null {
   const price = series.adj[index] ?? null;
   if (id === "VIA-VQG-SG-TRD001") {
@@ -136,6 +211,40 @@ function frameAt(id: string, series: MarketSeries, index: number, drives: Record
       skipNoise: false,
     };
   }
+  if (id === "VIA-VQG-SG-TRD006") {
+    const line = series.sma20[index] ?? null;
+    const dev = price == null || line == null || line === 0 ? null : price / line - 1;
+    const rank = pctAt(drives.dev20!, index);
+    return {
+      flag: rank == null ? null : rank >= 80,
+      drive: drives.dev20!,
+      detail: `20 日乖離 ${dev == null ? "—" : (dev * 100).toFixed(2)}%，分位 ${rank == null ? "—" : rank.toFixed(0)}。`,
+      sat: null,
+      skipNoise: false,
+    };
+  }
+  if (id === "VIA-VQG-SG-VOL004") {
+    const rank = pctAt(series.atrS3, index);
+    const value = series.atrS3[index] ?? null;
+    return {
+      flag: rank == null ? null : rank >= 80,
+      drive: series.atrS3,
+      detail: `真實波幅占收盤 ${value == null ? "—" : value.toFixed(4)}，分位 ${rank == null ? "—" : rank.toFixed(0)}。`,
+      sat: null,
+      skipNoise: false,
+    };
+  }
+  if (id === "VIA-VQG-SG-RSK003") {
+    const rank = pctAt(series.sharpe60, index);
+    const value = series.sharpe60[index] ?? null;
+    return {
+      flag: rank == null ? null : rank <= 20,
+      drive: series.sharpe60,
+      detail: `滾動夏普 S2 ${value == null ? "—" : value.toFixed(4)}，分位 ${rank == null ? "—" : rank.toFixed(0)}。`,
+      sat: null,
+      skipNoise: false,
+    };
+  }
   if (id === "VIA-VQG-SG-MOM001" || id === "VIA-VQG-SG-MOM002") {
     const rank = pctAt(series.rsi14, index);
     const high = id.endsWith("001");
@@ -179,6 +288,8 @@ function frameAt(id: string, series: MarketSeries, index: number, drives: Record
       skipNoise: id.endsWith("006"),
     };
   }
+  const extra = extraFrame(id, series, index);
+  if (extra) return extra;
   return null;
 }
 
@@ -204,6 +315,10 @@ export function runTests(defs: SignalDef[], series: MarketSeries): TestRow[] {
     kdGap: series.k.map((value, i) => (value == null || series.d[i] == null ? null : value - series.d[i]!)),
     upGap: gap(series.adj, series.bollUpper),
     downGap: gap(series.bollLower, series.adj),
+    dev20: series.adj.map((price, i) => {
+      const line = series.sma20[i];
+      return price == null || line == null || line === 0 ? null : price / line - 1;
+    }),
   };
   const last = series.adj.length - 1;
   return defs.map((def) => {
@@ -248,4 +363,66 @@ export function runTests(defs: SignalDef[], series: MarketSeries): TestRow[] {
       saturationNow: saturationText(latest?.sat ?? null, applies),
     };
   });
+}
+
+export type CatalogCheck = {
+  id: string;
+  name: string;
+  question: string;
+  status: TestStatus;
+  detail: string;
+};
+
+export function runCatalogTests(input: {
+  rows: { name: string; source: string; frequency: string; evidence: string; code: string }[];
+  groups: { code: string; members: { symbol: string }[] }[];
+  historyOffRoster: number;
+  quotedSymbols: string[];
+}): CatalogCheck[] {
+  const keys = input.rows.map((row) => `${row.name}|${row.source}|${row.frequency}`);
+  const duplicateKeys = keys.length - new Set(keys).size;
+  const codes = [...input.rows.map((row) => row.code), ...input.groups.map((group) => group.code)];
+  const duplicateCodes = codes.filter(Boolean).length - new Set(codes.filter(Boolean)).size;
+  const blank = input.rows.filter((row) => !row.code || !row.evidence).length;
+  const waiting = input.rows.filter((row) => row.evidence !== "T1" && row.evidence !== "SSOT").length;
+  const members = input.groups.flatMap((group) => group.members);
+  const quoted = new Set(input.quotedSymbols);
+  const hit = members.filter((member) => quoted.has(member.symbol)).length;
+  return [
+    {
+      id: "VIA-TST-EXT-001",
+      name: "擷取列是否重複",
+      question: "同一小項目、同一來源、同一頻率，有沒有登錄兩次？",
+      status: duplicateKeys === 0 ? "看得到" : "看不到",
+      detail: duplicateKeys === 0 ? `${keys.length} 列，沒有重複。` : `${duplicateKeys} 個重複。重複的要留下，但不能當成兩筆新資料。`,
+    },
+    {
+      id: "VIA-TST-EXT-002",
+      name: "編碼是否撞號",
+      question: "擷取列和族群有沒有用到同一個編碼？",
+      status: duplicateCodes === 0 && blank === 0 ? "看得到" : "看不到",
+      detail: `${codes.filter(Boolean).length} 個編碼。${duplicateCodes === 0 && blank === 0 ? "沒有撞號，也沒有空號。" : `撞號 ${duplicateCodes}，空號 ${blank}。`}`,
+    },
+    {
+      id: "VIA-TST-EXT-003",
+      name: "證據層有沒有標明",
+      question: "每一列是否寫明現在能不能接到真值？",
+      status: blank === 0 ? "看得到" : "看不到",
+      detail: `${input.rows.length - waiting} 列標成可接真值或骨架。${waiting} 列是待接或推算，不補數字。`,
+    },
+    {
+      id: "VIA-TST-EXT-004",
+      name: "名冊對到今天報價",
+      question: "族群名冊裡，今天有幾檔對到報價？對不到的留空。",
+      status: hit === 0 ? "樣本不足" : "看得到",
+      detail: `${hit} / ${members.length} 檔有報價。沒有報價不算失敗，也不補上。`,
+    },
+    {
+      id: "VIA-TST-EXT-005",
+      name: "舊快照有沒有混進今天",
+      question: "2026-07-18 的五態，有沒有被當成今天的計算結果？",
+      status: "看得到",
+      detail: `分開存放。其中 ${input.historyOffRoster} 個名稱不在目前名冊，不能拿來排今天。`,
+    },
+  ];
 }
