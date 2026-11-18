@@ -100,3 +100,11 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
 **每天開機更新**:工作站 `pwsh -NoProfile -ExecutionPolicy Bypass -File "VeritasIntelligenceAnalytics\supportive modules\registry\via_boot_update.ps1"`(每日首跑才實跑;log 在 `VIA_Reports/boot_update_logs/`);容器是同鏈的 `via_boot_update.sh`(SessionStart 喚起)。它照常令自己開同意閘並自補套件,所以 AI 不代跑,由操作員的手啟動。收工跑 `via-vcgc handoff daily`。
 
 **每日教訓帳(操作員 2026-11-16 令;待登需求)**:接手先讀 `VeritasIntelligenceAnalytics/docs/handoff/daily/VIA_DailyChecklist_latest.md`(問題 → 根因 → 處理 → 下次怎麼檢查);收工把當天新遇到的問題照同樣欄位加到 `VIA_DailyLessons_Ledger_v0100.jsonl` 帳尾(只增、不改舊列),再重生清單。
+
+**2026-11-18 操作員令(待登需求,不是律;與上文衝突時以上文與政策冊為準並回報)**
+
+- **指令模塊化、簡化**:要操作員打的指令一律一行,走各系統入口尾版的動詞;同一件事不給兩種打法。
+- **重複功能先併再簡化**:先 `chain` 看誰是本體;差異補進本體家族的新版號、掛成動詞,不另做一支。刪舊版仍照「刪舊版先證明」。
+- **動語法樹很小心**:注入或改寫一律先複製到 TEMP 做,`ast.parse` 與 `compile` 都過、自測過才落檔;批次修補用 VCGC 的 `CGC_MDL158 fix`(先乾跑看清單,再 `--apply`),收容夾、凍結來源、不在這次範圍的系統不動。
+- **加速器覆蓋全部引擎、網路工具覆蓋對外擷取的引擎(如 VDF)**:以各系統引擎矩陣的 accel / net 兩欄為準(語法樹裡真的匯入 + 執行時載得到 + 鎖冊上的工具檔在);只有標記不算。
+- **啟動順序**:第一步先降 CPU / DRAM 壓力並等系統靜下來 → 依這台機器的能力同時跑 **3~6** 支互不相干的流程 → 監工過熱就減道、暫停最新子行程,冷卻再恢復。這段用 Python 啟動器(`VDF_MDL022_SafeParallelLaunch` / `VRN_MDL260_SafeParallelLaunch` 尾版;VRN 的道數在 `VRN_ParamControl_SSOT` 尾版的 `slots_min` / `slots_max`),PS 只負責進環境與呼叫它。
