@@ -3,8 +3,8 @@
  "version": "v0154",
  "subsystem": "VCGC",
  "zh": "中央治理 · 中樞工作流",
- "batch": "SDD X-REG / X-COL 收尾 2026-11-18",
- "ts": "2026-11-18T16:40:31Z",
+ "batch": "功能一覽(2026-11-19):+VCGC-WKF045(2 步;前版 v0153)",
+ "ts": "2026-11-18T16:55:00Z",
  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
  "sdd": {
   "layers": [
@@ -2972,14 +2972,13 @@
      "code": "VCGC-WKF032-STP002",
      "alias": "mcp_expose",
      "name": "MCP v0102 露互監 / 備份 / 六項令收據(只讀)",
-     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v*.py",
+     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
      "verb": "--serve",
      "inside": "VCGC MCP",
      "evidence": "step:VCGC-WKF032-STP001",
      "evidence_file": "via://mutual/latest · via://backup/check",
      "what": "MCP v0102 露互監 / 備份 / 六項令收據(只讀)",
-     "engine_before": "supportive modules/registry/CGC_MDL279_MCPServer_v0102.py",
-     "pinned_before": "CGC_MDL279_MCPServer_v0103.py"
+     "engine_before": "supportive modules/registry/CGC_MDL279_MCPServer_v0102.py"
     },
     {
      "code": "VCGC-WKF032-STP003",
@@ -3037,37 +3036,34 @@
      "code": "VCGC-WKF033-STP001",
      "alias": "backup",
      "name": "備份(zip + MANIFEST + 入倉 MANIFEST)",
-     "engine": "docs/handoff/ai/VIA_DailyBackup_v*.py",
+     "engine": "docs/handoff/ai/VIA_DailyBackup_v0100.py",
      "verb": "backup",
      "inside": "VCGC",
      "evidence": "self:VIA_DailyBackup",
      "what": "備份(zip + MANIFEST + 入倉 MANIFEST)",
-     "evidence_file": "docs/handoff/backup/BACKUP_MANIFEST_latest.json",
-     "pinned_before": "VIA_DailyBackup_v0100.py"
+     "evidence_file": "docs/handoff/backup/BACKUP_MANIFEST_latest.json"
     },
     {
      "code": "VCGC-WKF033-STP002",
      "alias": "check",
      "name": "檢查備份",
-     "engine": "docs/handoff/ai/VIA_DailyBackup_v*.py",
+     "engine": "docs/handoff/ai/VIA_DailyBackup_v0100.py",
      "verb": "check",
      "inside": "VCGC",
      "evidence": "step:VCGC-WKF033-STP001",
      "evidence_file": "VIA_Reports/backup/CHECK_latest.md",
-     "what": "檢查備份",
-     "pinned_before": "VIA_DailyBackup_v0100.py"
+     "what": "檢查備份"
     },
     {
      "code": "VCGC-WKF033-STP003",
      "alias": "selftest_gate",
      "name": "自測 12 項",
-     "engine": "docs/handoff/ai/VIA_DailyBackup_v*.py",
+     "engine": "docs/handoff/ai/VIA_DailyBackup_v0100.py",
      "verb": "--selftest",
      "inside": "VCGC run",
      "evidence": "step:VCGC-WKF033-STP001",
      "evidence_file": "docs/handoff/evidence/C-daily-backup.json",
-     "what": "自測 12 項",
-     "pinned_before": "VIA_DailyBackup_v0100.py"
+     "what": "自測 12 項"
     }
    ],
    "tests": {
@@ -3278,13 +3274,12 @@
      "code": "VCGC-WKF036-STP001",
      "alias": "backup_check",
      "name": "檢查備份(讀 MANIFEST · 對 sha · zip)",
-     "engine": "docs/handoff/ai/VIA_DailyBackup_v*.py",
+     "engine": "docs/handoff/ai/VIA_DailyBackup_v0100.py",
      "verb": "check",
      "inside": "VCGC",
      "evidence": "self:VIA_DailyBackup",
      "what": "檢查備份(讀 MANIFEST · 對 sha · zip)",
-     "evidence_file": "VIA_Reports/backup/CHECK_latest.json",
-     "pinned_before": "VIA_DailyBackup_v0100.py"
+     "evidence_file": "VIA_Reports/backup/CHECK_latest.json"
     },
     {
      "code": "VCGC-WKF036-STP002",
@@ -3698,36 +3693,33 @@
      "alias": "lock_selftest",
      "name": "鎖定工具自測 8 項",
      "what": "鎖 · 未鎖 · 漂移 · 歷史改寫 · 指紋 · 獨立",
-     "engine": "docs/handoff/ai/VIA_NearCompleteLock_v*.py",
+     "engine": "docs/handoff/ai/VIA_NearCompleteLock_v0100.py",
      "verb": "--selftest",
      "inside": "VCGC run",
      "evidence": "self:VIA_NearCompleteLock",
-     "evidence_file": "docs/handoff/evidence/C-nearcomplete-lock.json",
-     "pinned_before": "VIA_NearCompleteLock_v0100.py"
+     "evidence_file": "docs/handoff/evidence/C-nearcomplete-lock.json"
     },
     {
      "code": "VCGC-WKF041-STP002",
      "alias": "lock_check",
      "name": "重驗鎖檔(check)",
      "what": "每個里程碑 commit / tree / 入口 blob 一字不差",
-     "engine": "docs/handoff/ai/VIA_NearCompleteLock_v*.py",
+     "engine": "docs/handoff/ai/VIA_NearCompleteLock_v0100.py",
      "verb": "check",
      "inside": "VCGC run",
      "evidence": "step:VCGC-WKF041-STP001",
-     "evidence_file": "docs/handoff/ai/VIA_NearCompleteLock_v0100.json",
-     "pinned_before": "VIA_NearCompleteLock_v0100.py"
+     "evidence_file": "docs/handoff/ai/VIA_NearCompleteLock_v0100.json"
     },
     {
      "code": "VCGC-WKF041-STP003",
      "alias": "bridge_audit",
      "name": "雙橋覆蓋稽核(via_bridge_sweeper v0104 · 活樹 100%)",
      "what": "加速 / 網路橋缺件 0 · 豁免照算",
-     "engine": "supportive modules/registry/via_bridge_sweeper_v*.py",
+     "engine": "supportive modules/registry/via_bridge_sweeper_v0104.py",
      "verb": "--audit",
      "inside": "VCGC run",
      "evidence": "self:via_bridge_sweeper",
-     "evidence_file": "docs/handoff/evidence/C-bridge-sweeper-v0104.json",
-     "pinned_before": "via_bridge_sweeper_v0104.py"
+     "evidence_file": "docs/handoff/evidence/C-bridge-sweeper-v0104.json"
     }
    ],
    "tests": {
@@ -3796,12 +3788,11 @@
      "alias": "mcp_parity",
      "name": "同一組 MCP 給所有 AI(parity)",
      "what": "via-systemcard · via-vcgc · omniroute → 8 平台;遠端需 HTTPS 隧道(操作員)",
-     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v*.py",
+     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
      "verb": "--selftest",
      "inside": "VCGC run",
      "evidence": "self:VIA_MCP_Engine",
-     "engine_external": "../VIA_MCP_Engine/VIA_MCP_Engine_v0103.py",
-     "pinned_before": "CGC_MDL279_MCPServer_v0103.py"
+     "engine_external": "../VIA_MCP_Engine/VIA_MCP_Engine_v0103.py"
     }
    ],
    "tests": {
@@ -3854,35 +3845,32 @@
      "alias": "status_feedback",
      "name": "兩段篩選 + 卡片矩陣 + 回饋包 + 收據",
      "what": "第一段選(紅 · 黃 · 變動 · 待裁 · 退步 · 缺證據)→ 第二段分級併組(300 行內,不丟項)→ 鎖定模板頁面 → STATUS_latest.json",
-     "engine": "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v*.py",
+     "engine": "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0103.py",
      "verb": "--selftest",
      "inside": "VCGC run",
-     "evidence": "self:CGC_MDL283_CardMatrixFeedback",
-     "pinned_before": "CGC_MDL283_CardMatrixFeedback_v0103.py"
+     "evidence": "self:CGC_MDL283_CardMatrixFeedback"
     },
     {
      "code": "VCGC-WKF043-STP003",
      "alias": "status_entry",
      "name": "入口 monitor status",
      "what": "跑一輪並印燈 · 各系統 · 跟上一輪比 · 主機 · NEXT;--last 只讀上一輪;monitor 其他子動詞照舊轉交",
-     "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+     "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0197.py",
      "verb": "--selftest",
      "inside": "VCGC",
      "evidence": "self:CGC_MDL149_VeritasCentralGovernanceConsole",
-     "engine_before": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0196.py",
-     "pinned_before": "CGC_MDL149_VeritasCentralGovernanceConsole_v0197.py"
+     "engine_before": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0196.py"
     },
     {
      "code": "VCGC-WKF043-STP004",
      "alias": "status_mcp",
      "name": "MCP 唯讀 via://vcgc/status",
      "what": "收據登成唯讀資源;細項仍讀 vcgc/feedback-delta",
-     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v*.py",
+     "engine": "supportive modules/registry/CGC_MDL279_MCPServer_v0106.py",
      "verb": "--selftest",
      "inside": "VCGC MCP",
      "evidence": "self:CGC_MDL279_MCPServer",
-     "engine_before": "supportive modules/registry/CGC_MDL279_MCPServer_v0105.py",
-     "pinned_before": "CGC_MDL279_MCPServer_v0106.py"
+     "engine_before": "supportive modules/registry/CGC_MDL279_MCPServer_v0105.py"
     }
    ],
    "tests": {
@@ -3928,23 +3916,21 @@
      "alias": "sync_entry",
      "name": "入口 synchronizer(共用段 + VCGC 設定)",
      "what": "步驟兩盞燈 · 頁對收據 · 同儕只讀 · 連結頁 · 收據 · check 零寫入;其餘動詞原樣轉交前版",
-     "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+     "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0198.py",
      "verb": "--selftest",
      "inside": "VCGC",
      "evidence": "self:CGC_MDL149_VeritasCentralGovernanceConsole",
-     "engine_before": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0197.py",
-     "pinned_before": "CGC_MDL149_VeritasCentralGovernanceConsole_v0198.py"
+     "engine_before": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0197.py"
     },
     {
      "code": "VCGC-WKF044-STP002",
      "alias": "sync_manifest",
      "name": "整合說明(零寫入)",
      "what": "synchronizer manifest:步驟 · 頁 · 同儕 · 不做清單 · 收據欄位",
-     "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+     "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0198.py",
      "verb": "synchronizer manifest",
      "inside": "VCGC",
-     "evidence": "self:CGC_MDL149_VeritasCentralGovernanceConsole",
-     "pinned_before": "CGC_MDL149_VeritasCentralGovernanceConsole_v0198.py"
+     "evidence": "self:CGC_MDL149_VeritasCentralGovernanceConsole"
     }
    ],
    "tests": {
@@ -3957,6 +3943,65 @@
     "cross_note": [
      "連結頁的時間與燈 = SYNC_latest.json 的時間與燈(check 會重核 · 不列交叉代碼)"
     ]
+   }
+  },
+  {
+   "code": "VCGC-WKF045",
+   "alias": "function_overview",
+   "name": "功能一覽:讀既有的冊與收據 → 項目冊 → 卡片矩陣正主出頁 → 收據",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-18T16:55:00Z",
+   "spec": {
+    "goal": "一個動詞把 VCGC 自己的全部功能(動詞 · 席位 · 功能卡 · 引擎 · 測試案 · 工作流 · 鎖版工具 · 頁面 · 治理冊 · 需求)放進一頁:卡片看整體、矩陣看細節。",
+    "requirements": [
+     "VCGC-REQ227"
+    ],
+    "acceptance": "每一區一張卡(紅黃綠灰各幾項)· 矩陣每一列有燈、版本、狀態說明、時間 · 沒有收據的給灰不補綠 · 樣式只來自鎖定模板冊 · 頁燈與內容燈分開",
+    "entry": "via-vcgc overview(輸出只寫 VIA_Reports/vcgc;唯讀倉;不執行任何引擎)",
+    "evidence": "VIA_Reports/vcgc/OVERVIEW_latest.json · VCGC_Overview_latest.html · overview/VCGC_OVERVIEW_items.json",
+    "books": [
+     "VIA_UI_WorkPlatform_TemplateLock_v0101.json",
+     "VIA_SystemReceipt_Contract_SSOT_v0103.json",
+     "VIA_VCGC_FunctionInventory_SSOT_v0247.json"
+    ]
+   },
+   "plan": {
+    "enter": "VCGC 入口 overview",
+    "exit": "頁 + 收據(rc 0 = 頁做出來 · 1 = 沒做出來)",
+    "order": "讀冊與收據 → 項目冊(自帶群組與標題)→ CGC_MDL283 尾版 run --in → 落頁 → 收據"
+   },
+   "steps": [
+    {
+     "code": "VCGC-WKF045-STP001",
+     "alias": "overview_entry",
+     "name": "入口 overview(整理項目冊 · 叫卡片矩陣正主 · 收據)",
+     "what": "十一區的項目冊 · 空樹不炸不編列 · 兩盞燈 · 其餘動詞原樣轉交前版",
+     "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0199.py",
+     "verb": "--selftest",
+     "inside": "VCGC",
+     "evidence": "self:CGC_MDL149_VeritasCentralGovernanceConsole",
+     "engine_before": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0198.py"
+    },
+    {
+     "code": "VCGC-WKF045-STP002",
+     "alias": "overview_render",
+     "name": "卡片矩陣正主吃自帶群組與標題的項目冊",
+     "what": "項目冊帶 groups / title 時照它分卡片與標題;沒帶時與前版相同;跑完還原",
+     "engine": "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0105.py",
+     "verb": "--selftest",
+     "inside": "VCGC",
+     "evidence": "self:CGC_MDL283_CardMatrixFeedback",
+     "engine_before": "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0104.py"
+    }
+   ],
+   "tests": {
+    "self": "run CGC_MDL149_VeritasCentralGovernanceConsole_v0199 --selftest(站 C-vcgc-console-v0199)· run CGC_MDL283_CardMatrixFeedback_v0105 --selftest(站 C-vcgc-statusdisplay-v0105)",
+    "cross": [
+     "X-REQ-BACK",
+     "X-ENGINE"
+    ],
+    "real": "容器經入口實跑 overview(不算主機實測);Windows 主機實跑待操作員"
    }
   }
  ],
@@ -4010,5 +4055,5 @@
  "why_v0151": "CGC_MDL246 真冊 V-XREF 紅:tests.cross 只能放 X- 代碼(驗證冊 code_rule)。有正主的換代碼:WKF033「via://backup/check」· WKF036「C-daily-backup check 動詞」→ X-BACKUP;WKF037「DuckDB VIEW 列數 = 主鍵去重」· WKF038「入湖經 VIA_ParquetLake 視圖列數」→ X-LAKE-VIEW(驗證冊 v0102 登記)。沒有交叉核對實作的移出 cross、原文逐字留在 tests.cross_note:WKF032「via://mutual/latest」· WKF034「VAP v0302 --config READY」· WKF035「Playwright 三視窗」· WKF039「五系統進度帳列數 +5 / 次」「矩陣 lamp = 見證步燈」· WKF040「再入庫 0 新增」。其餘一字不動。",
  "why_v0152": "新增 VCGC-WKF043 現況顯示(偵測 → 篩選回饋 → 入口 monitor status → MCP 唯讀);需求 VCGC-REQ225。舊 42 條工作流一字不動。",
  "why_v0153": "新增 VCGC-WKF044 同步台(入口 synchronizer → 整合說明);回指 VCGC-REQ226。前版 43 條一字不動。",
- "why_v0154": "前版已在 main → 出新版。SDD X-REG 點名的步:釘死舊版號的 engine 改成取尾版 _v*(L54 尾版律;原釘的版號留在該步的 pinned_before):VCGC-WKF032-STP002:CGC_MDL279_MCPServer_v0103→v*、VCGC-WKF033-STP001:VIA_DailyBackup_v0100→v*、VCGC-WKF033-STP002:VIA_DailyBackup_v0100→v*、VCGC-WKF033-STP003:VIA_DailyBackup_v0100→v*、VCGC-WKF036-STP001:VIA_DailyBackup_v0100→v*、VCGC-WKF041-STP001:VIA_NearCompleteLock_v0100→v*、VCGC-WKF041-STP002:VIA_NearCompleteLock_v0100→v*、VCGC-WKF041-STP003:via_bridge_sweeper_v0104→v*、VCGC-WKF042-STP003:CGC_MDL279_MCPServer_v0103→v*、VCGC-WKF043-STP002:CGC_MDL283_CardMatrixFeedback_v0103→v*、VCGC-WKF043-STP003:CGC_MDL149_VeritasCentralGovernanceConsole_v0197→v*、VCGC-WKF043-STP004:CGC_MDL279_MCPServer_v0106→v*、VCGC-WKF044-STP001:CGC_MDL149_VeritasCentralGovernanceConsole_v0198→v*、VCGC-WKF044-STP002:CGC_MDL149_VeritasCentralGovernanceConsole_v0198→v*。其餘一字不動。已鎖的工作流尾版換了要重驗,X-LOCK 照舊提醒,這一版沒有代為宣稱已重驗。"
+ "why_v0154": "新增 VCGC-WKF045 功能一覽(入口 overview → 卡片矩陣正主);回指 VCGC-REQ227。前版 44 條一字不動。"
 }

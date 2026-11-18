@@ -3,8 +3,8 @@
  "version": "v0155",
  "subsystem": "VCGC",
  "zh": "中央治理 · 中樞工作流",
- "batch": "SDD X-REG / X-COL 收尾 2026-11-18",
- "ts": "2026-11-18T17:28:47Z",
+ "batch": "SDD X-REG 收尾 2026-11-18",
+ "ts": "2026-11-18T17:59:49Z",
  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
  "sdd": {
   "layers": [
@@ -4021,6 +4021,67 @@
      "連結頁的時間與燈 = SYNC_latest.json 的時間與燈(check 會重核 · 不列交叉代碼)"
     ]
    }
+  },
+  {
+   "code": "VCGC-WKF045",
+   "alias": "function_overview",
+   "name": "功能一覽:讀既有的冊與收據 → 項目冊 → 卡片矩陣正主出頁 → 收據",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-18T16:55:00Z",
+   "spec": {
+    "goal": "一個動詞把 VCGC 自己的全部功能(動詞 · 席位 · 功能卡 · 引擎 · 測試案 · 工作流 · 鎖版工具 · 頁面 · 治理冊 · 需求)放進一頁:卡片看整體、矩陣看細節。",
+    "requirements": [
+     "VCGC-REQ227"
+    ],
+    "acceptance": "每一區一張卡(紅黃綠灰各幾項)· 矩陣每一列有燈、版本、狀態說明、時間 · 沒有收據的給灰不補綠 · 樣式只來自鎖定模板冊 · 頁燈與內容燈分開",
+    "entry": "via-vcgc overview(輸出只寫 VIA_Reports/vcgc;唯讀倉;不執行任何引擎)",
+    "evidence": "VIA_Reports/vcgc/OVERVIEW_latest.json · VCGC_Overview_latest.html · overview/VCGC_OVERVIEW_items.json",
+    "books": [
+     "VIA_UI_WorkPlatform_TemplateLock_v0101.json",
+     "VIA_SystemReceipt_Contract_SSOT_v0103.json",
+     "VIA_VCGC_FunctionInventory_SSOT_v0247.json"
+    ]
+   },
+   "plan": {
+    "enter": "VCGC 入口 overview",
+    "exit": "頁 + 收據(rc 0 = 頁做出來 · 1 = 沒做出來)",
+    "order": "讀冊與收據 → 項目冊(自帶群組與標題)→ CGC_MDL283 尾版 run --in → 落頁 → 收據"
+   },
+   "steps": [
+    {
+     "code": "VCGC-WKF045-STP001",
+     "alias": "overview_entry",
+     "name": "入口 overview(整理項目冊 · 叫卡片矩陣正主 · 收據)",
+     "what": "十一區的項目冊 · 空樹不炸不編列 · 兩盞燈 · 其餘動詞原樣轉交前版",
+     "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+     "verb": "--selftest",
+     "inside": "VCGC",
+     "evidence": "self:CGC_MDL149_VeritasCentralGovernanceConsole",
+     "engine_before": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0198.py",
+     "pinned_before": "CGC_MDL149_VeritasCentralGovernanceConsole_v0199.py"
+    },
+    {
+     "code": "VCGC-WKF045-STP002",
+     "alias": "overview_render",
+     "name": "卡片矩陣正主吃自帶群組與標題的項目冊",
+     "what": "項目冊帶 groups / title 時照它分卡片與標題;沒帶時與前版相同;跑完還原",
+     "engine": "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v*.py",
+     "verb": "--selftest",
+     "inside": "VCGC",
+     "evidence": "self:CGC_MDL283_CardMatrixFeedback",
+     "engine_before": "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0104.py",
+     "pinned_before": "CGC_MDL283_CardMatrixFeedback_v0105.py"
+    }
+   ],
+   "tests": {
+    "self": "run CGC_MDL149_VeritasCentralGovernanceConsole_v0199 --selftest(站 C-vcgc-console-v0199)· run CGC_MDL283_CardMatrixFeedback_v0105 --selftest(站 C-vcgc-statusdisplay-v0105)",
+    "cross": [
+     "X-REQ-BACK",
+     "X-ENGINE"
+    ],
+    "real": "容器經入口實跑 overview(不算主機實測);Windows 主機實跑待操作員"
+   }
   }
  ],
  "prior": "VIA_Workflow_VCGC_SSOT_v0154.json",
@@ -4073,6 +4134,6 @@
  "why_v0151": "CGC_MDL246 真冊 V-XREF 紅:tests.cross 只能放 X- 代碼(驗證冊 code_rule)。有正主的換代碼:WKF033「via://backup/check」· WKF036「C-daily-backup check 動詞」→ X-BACKUP;WKF037「DuckDB VIEW 列數 = 主鍵去重」· WKF038「入湖經 VIA_ParquetLake 視圖列數」→ X-LAKE-VIEW(驗證冊 v0102 登記)。沒有交叉核對實作的移出 cross、原文逐字留在 tests.cross_note:WKF032「via://mutual/latest」· WKF034「VAP v0302 --config READY」· WKF035「Playwright 三視窗」· WKF039「五系統進度帳列數 +5 / 次」「矩陣 lamp = 見證步燈」· WKF040「再入庫 0 新增」。其餘一字不動。",
  "why_v0152": "新增 VCGC-WKF043 現況顯示(偵測 → 篩選回饋 → 入口 monitor status → MCP 唯讀);需求 VCGC-REQ225。舊 42 條工作流一字不動。",
  "why_v0153": "新增 VCGC-WKF044 同步台(入口 synchronizer → 整合說明);回指 VCGC-REQ226。前版 43 條一字不動。",
- "why_v0154": "前版已在 main → 出新版。SDD X-REG 點名的步:釘死舊版號的 engine 改成取尾版 _v*(L54 尾版律;原釘的版號留在該步的 pinned_before):VCGC-WKF032-STP002:CGC_MDL279_MCPServer_v0103→v*、VCGC-WKF033-STP001:VIA_DailyBackup_v0100→v*、VCGC-WKF033-STP002:VIA_DailyBackup_v0100→v*、VCGC-WKF033-STP003:VIA_DailyBackup_v0100→v*、VCGC-WKF036-STP001:VIA_DailyBackup_v0100→v*、VCGC-WKF041-STP001:VIA_NearCompleteLock_v0100→v*、VCGC-WKF041-STP002:VIA_NearCompleteLock_v0100→v*、VCGC-WKF041-STP003:via_bridge_sweeper_v0104→v*、VCGC-WKF042-STP003:CGC_MDL279_MCPServer_v0103→v*、VCGC-WKF043-STP002:CGC_MDL283_CardMatrixFeedback_v0103→v*、VCGC-WKF043-STP003:CGC_MDL149_VeritasCentralGovernanceConsole_v0197→v*、VCGC-WKF043-STP004:CGC_MDL279_MCPServer_v0106→v*、VCGC-WKF044-STP001:CGC_MDL149_VeritasCentralGovernanceConsole_v0198→v*、VCGC-WKF044-STP002:CGC_MDL149_VeritasCentralGovernanceConsole_v0198→v*。其餘一字不動。已鎖的工作流尾版換了要重驗,X-LOCK 照舊提醒,這一版沒有代為宣稱已重驗。",
- "why_v0155": "v0154 之後 VQG_AllInOne 出了 v0112(補加速器橋),SDD X-REG 立刻點名 VCGC-WKF034 / WKF040 六步還釘著 v0111。這一版把本冊所有還釘死版號的 .py 步一次改成取尾版 _v*(L54;以後出新版不再因為釘版而紅),共 63 步、17 個家族;原釘的版號留在各步 pinned_before(v0154 已記過的不覆寫)。其餘一字不動。X-LOCK 照舊提醒已鎖工作流要重驗,本版沒有代為宣稱。"
+ "why_v0154": "新增 VCGC-WKF045 功能一覽(入口 overview → 卡片矩陣正主);回指 VCGC-REQ227。前版 44 條一字不動。",
+ "why_v0155": "以 main 的 v0154 為底(分支上先前同名的 v0154 / v0155 與 main 撞名,以 main 為準、分支內容改發本版)。SDD X-REG 點名:工作流步的 engine 釘死舊版號。這一版把本冊所有還釘死版號的 .py 步一次改成取尾版 _v*(L54 尾版律),共 79 步、23 個家族;原釘的版號留在各步 pinned_before。其餘一字不動。X-LOCK 照舊提醒已鎖工作流要重驗,本版沒有代為宣稱已重驗。"
 }
