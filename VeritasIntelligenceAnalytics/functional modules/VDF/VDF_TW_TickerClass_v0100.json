@@ -1,0 +1,40 @@
+{
+  "schema": "VDF_TW_TickerClass_v0100",
+  "asof": "2026-11-18",
+  "source": "TWSE t187ap47_L + TWSE ETF activeList",
+  "note": "舊 TW_TICKER_REGEX（四碼個股）不刪。本檔只加分類。V 尾碼當日冊上沒有，不收。",
+  "TW_TICKER": {
+    "platform": "TWSE / TPEX Local",
+    "suffix_rule": "none",
+    "unified_regex": "^(?:[1-9]\\d{3}|00\\d{2,4}|00\\d{3}[ABCDKLRTU])$",
+    "by_security_type": {
+      "stock": "^[1-9]\\d{3}$",
+      "passive_equity_etf": "^00\\d{2,4}$",
+      "active_equity_etf": "^00\\d{3}A$",
+      "passive_bond_etf": "^00\\d{3}B$",
+      "active_bond_etf": "^00\\d{3}D$",
+      "leveraged_etf": "^00\\d{3}L$",
+      "inverse_etf": "^00\\d{3}R$",
+      "futures_etf": "^00\\d{3}U$",
+      "balanced_etf": "^00\\d{3}T$",
+      "currency_tranche_etf": "^00\\d{3}[CK]$"
+    }
+  },
+  "TW_YF_TICKER": {
+    "platform": "Yahoo Finance",
+    "suffix_rule": {"TWSE": ".TW", "TPEX": ".TWO"},
+    "unified_regex": "^(?:[1-9]\\d{3}|00\\d{2,4}|00\\d{3}[ABCDKLRTU])\\.(TW|TWO)$"
+  },
+  "TW_BB_TICKER": {
+    "platform": "Bloomberg",
+    "suffix_rule": " TT",
+    "unified_regex": "^(?:[1-9]\\d{3}|00\\d{2,4}|00\\d{3}[ABCDKLRTU]) TT$"
+  },
+  "active_tw_equity_etf": {
+    "code_regex": "^00\\d{3}A$",
+    "etf_class": "domestic",
+    "reject_class": ["foreign", "bfIncome"],
+    "holdings_regex": "^[1-9]\\d{3}$",
+    "rule": "代碼是主動股票 ETF，且 TWSE activeList 的 ETF分類為 domestic。成分股只留四碼台股個股。"
+  }
+}
