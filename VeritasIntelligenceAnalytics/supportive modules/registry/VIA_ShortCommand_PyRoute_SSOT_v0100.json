@@ -1,0 +1,2910 @@
+{
+ "name": "VIA_ShortCommand_PyRoute_SSOT",
+ "version": "v0100",
+ "created_utc": "2026-11-18T16:03:34Z",
+ "purpose": "短指令 → Python 路由冊(操作員 2026-11-18 令:舊短指令背後改走 Python,帶加速器橋,並行照 先降壓 → 3~6 道 → 監工)。只讀冊;CGC_MDL134_ParallelLanes cmd 動詞讀它。",
+ "states": {
+  "PY": "這一輪已改成 Python 路由(steps 可跑)",
+  "PY_ALREADY": "原本就直接呼叫 Python 入口(steps 只供檢查)",
+  "TODO": "還沒改,照 batch 分批",
+  "FORWARD": "只轉呼叫其他短指令,跟著被轉的那支走",
+  "PS_NATIVE": "PS 本職(進環境 / 重載 / 視窗 / git 同步),不改"
+ },
+ "slots": {
+  "min": 3,
+  "max": 6
+ },
+ "inventory": {
+  "source": "Register-VIA-Commands-v0100 … v0278(179 檔;每個名字取最後一次定義)",
+  "scan": "文字剖析,不執行",
+  "should_scan": 212,
+  "skipped": [],
+  "helpers_not_counted": "Invoke-VIA* / Get-VIA* 等 27 支輔助函式不是短指令,不列"
+ },
+ "batches": {
+  "1": "已改(本冊 state=PY)",
+  "2": "單一 Python 入口的外殼,要逐支對參數",
+  "3": "多步編排(All / AllGreen / AllInOne / OneShot / Pipeline)",
+  "4": "先評估還用不用,再決定改或退役(退役照「刪舊版先證明」)"
+ },
+ "routes": [
+  {
+   "name": "activate_vdf",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0278.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_SystemManager_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF",
+     "glob": "VDF_SystemManager_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-aaii",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0246.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG116_AAIIWorkbook_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG116_AAIIWorkbook_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-accel",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL156_VIAAcceleratorControl_v*.py · SUP_MDL737_SuperAccelModule_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL156_VIAAcceleratorControl_v*.py"
+    },
+    {
+     "id": "e2",
+     "dir": "supportive modules",
+     "glob": "SUP_MDL737_SuperAccelModule_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-accel-check",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL117_AccelCoverage_v*.py · CGC_MDL156_VIAAcceleratorControl_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL117_AccelCoverage_v*.py"
+    },
+    {
+     "id": "e2",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL156_VIAAcceleratorControl_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-accel-import",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL142_AccelImport_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL142_AccelImport_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-activate-vcgc",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0270.ps1",
+   "owner": "VCGC",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIAActivateStep、via-vcgc"
+  },
+  {
+   "name": "via-activate-vdf",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0275.ps1",
+   "owner": "VDF",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIACeleritasScoped、via-vcgc、via-vdf-refill"
+  },
+  {
+   "name": "via-akshare",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0244.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG110_AKShareProbe_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG110_AKShareProbe_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-align",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG081_UniverseAlign_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG081_UniverseAlign_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-all",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 3,
+   "reason": "多步編排:要先把步拆成冊再改",
+   "old": "Invoke-VIA-All-v*.ps1"
+  },
+  {
+   "name": "via-allgreen",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 3,
+   "reason": "多步編排:要先把步拆成冊再改",
+   "old": "Invoke-VIA-AllGreen-v*.ps1"
+  },
+  {
+   "name": "via-allinone",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 3,
+   "reason": "多步編排:要先把步拆成冊再改",
+   "old": "Invoke-VIA-AllInOne-v*.ps1"
+  },
+  {
+   "name": "via-analysis",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG068_ETFConsensusAnalysis_v*.py · VDF_ENG069_RevenueConsensusAnalysis_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG068_ETFConsensusAnalysis_v*.py"
+    },
+    {
+     "id": "e2",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG069_RevenueConsensusAnalysis_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-api",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL119_SystemAPI_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL119_SystemAPI_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-autorun",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-accel、via-lanes、via-mobile、via-open"
+  },
+  {
+   "name": "via-bg",
+   "backing": "PY?",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": ""
+  },
+  {
+   "name": "via-boot",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL148_EngineBus_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL148_EngineBus_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-bridge-sweep",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL124_BridgeSweeper_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL124_BridgeSweeper_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-bus",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL148_EngineBus_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL148_EngineBus_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-busui",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-bus、via-open、via-ryg"
+  },
+  {
+   "name": "via-camelot",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0273.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIACeleritasScoped、via-vcgc"
+  },
+  {
+   "name": "via-census",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL148_EngineBus_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL148_EngineBus_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-central",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL157_VIAUniqueEntryControl_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL157_VIAUniqueEntryControl_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-cgconsole",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL150_CentralGovernanceFamily_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL150_CentralGovernanceFamily_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-cgdownward",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL150_CentralGovernanceFamily_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL150_CentralGovernanceFamily_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-cgengine",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL150_CentralGovernanceFamily_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL150_CentralGovernanceFamily_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-cgfamily",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL150_CentralGovernanceFamily_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL150_CentralGovernanceFamily_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-cgrouter",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL150_CentralGovernanceFamily_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL150_CentralGovernanceFamily_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-charter",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL128_SystemCharter_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL128_SystemCharter_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-chip",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG056_ChipBackfill_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG056_ChipBackfill_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-closeout",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL141_ClosingGate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL141_ClosingGate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-cmdcard",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL162_CommandCardFreeze_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL162_CommandCardFreeze_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-cmds",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0267.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-vcgc"
+  },
+  {
+   "name": "via-cnnfg",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0261.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG229_CNNFearGreedHistory_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG229_CNNFearGreedHistory_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-complete",
+   "backing": "PY+PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": "Invoke-VIA-Complete-v*.ps1"
+  },
+  {
+   "name": "via-consensus",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG088_ConsensusFusionBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG088_ConsensusFusionBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-console",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL139_InputConsole_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL139_InputConsole_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-copies",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL144_CopyDoctor_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL144_CopyDoctor_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-datahome",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL123_DataHome_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL123_DataHome_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-daytrade",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG055_OmniFetch_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG055_OmniFetch_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-deadends",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-entry"
+  },
+  {
+   "name": "via-deck",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0250.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL196_RouteDeck_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL196_RouteDeck_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-deploy",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL175_AutoDeploy_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL175_AutoDeploy_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-duck",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0269.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIAScopedVcgc"
+  },
+  {
+   "name": "via-engines",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0268.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIAEngineGate"
+  },
+  {
+   "name": "via-entry",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL136_EntryBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL136_EntryBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-env",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-envgov"
+  },
+  {
+   "name": "via-envgov",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL135_EnvGovernance_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL135_EnvGovernance_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-envgov-auto",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": "Invoke-VIA-EnvGovernance-v*.ps1"
+  },
+  {
+   "name": "via-envpy",
+   "backing": "PY?",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": ""
+  },
+  {
+   "name": "via-envrecover",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL135_EnvGovernance_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL135_EnvGovernance_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-envtools",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL135_EnvGovernance_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL135_EnvGovernance_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-etfhist",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG078_ActiveETFHoldingsHistory_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG078_ActiveETFHoldingsHistory_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-etfhold",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG051_ActiveTWETF_Holdings_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG051_ActiveTWETF_Holdings_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-etfrev",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG076_ETFRevenueMomentum_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG076_ETFRevenueMomentum_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-etfuniv",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG077_ActiveETFUniverse_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG077_ActiveETFUniverse_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-export",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0249.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG118_ExportDesk_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG118_ExportDesk_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-famui",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL138_FamilyUI_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL138_FamilyUI_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-finlex",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "vrn_finlex_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "vrn_finlex_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-finlogic",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PY_ALREADY",
+   "to": "SUP_MDL748_FinancialLogicHub_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/70_VRN_Rules",
+     "glob": "SUP_MDL748_FinancialLogicHub_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-finstat",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG082_FinStatements_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG082_FinStatements_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-firstpage",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG072_FirstPageText_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG072_FirstPageText_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-fixall",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL125_FixAll_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL125_FixAll_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-fplogic",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG086_FirstPageLogicBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG086_FirstPageLogicBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-fred",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG074_FredMacroSSOT_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG074_FredMacroSSOT_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-fresh",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PS_NATIVE",
+   "reason": "視窗 / 環境變數 / 開頁等工作階段動作"
+  },
+  {
+   "name": "via-functional-acceptance",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL154_VIAFunctionalAcceptance_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL154_VIAFunctionalAcceptance_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-fwdval",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0261.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG230_ForwardValuation_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG230_ForwardValuation_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-fwdvintage",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0247.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG117_ForwardVintageDoor_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG117_ForwardVintageDoor_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-gates",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PS_NATIVE",
+   "reason": "視窗 / 環境變數 / 開頁等工作階段動作"
+  },
+  {
+   "name": "via-gle",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PY_ALREADY",
+   "to": "SUP_MDL743_GenericLayoutHub_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/70_VRN_Rules",
+     "glob": "SUP_MDL743_GenericLayoutHub_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-go",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0131.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-fixall、via-reload、via-six"
+  },
+  {
+   "name": "via-govaudit",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL164_GovernanceCompletenessAudit_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL164_GovernanceCompletenessAudit_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-grok",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL136_EntryBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL136_EntryBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-groups",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0269.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIAScopedVcgc"
+  },
+  {
+   "name": "via-groups-ui",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0269.ps1",
+   "owner": "VDF",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": "Invoke-VDF-FetchGroupsUI-v*.ps1"
+  },
+  {
+   "name": "via-handover",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL140_HandoverConsole_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL140_HandoverConsole_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-health",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL114_CommandCenterBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL114_CommandCenterBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-help",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL102_CommandRoster_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL102_CommandRoster_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-iface",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL054_IfaceContract_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL054_IfaceContract_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-in",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0263.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-entry、via-vcgc"
+  },
+  {
+   "name": "via-intake",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 4,
+   "reason": "純 PS 收檔(搬檔),先評估要不要改",
+   "old": "Collect-VIA-Intake-v*.ps1"
+  },
+  {
+   "name": "via-intake-roster",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL122_IntakeRoster_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL122_IntakeRoster_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-lanes",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL134_ParallelLanes_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL134_ParallelLanes_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-lists",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0261.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG231_GlobalListings_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG231_GlobalListings_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-loop",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL129_LifecycleRACI_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL129_LifecycleRACI_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-manager",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PY_ALREADY",
+   "to": "VIA_SYSTEM_MANAGER_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "",
+     "glob": "VIA_SYSTEM_MANAGER_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-managers",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0251.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "CGC_SystemManager_v*.py · VDF_SystemManager_v0105.py · VRN_SystemManager_v0105.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_SystemManager_v*.py"
+    },
+    {
+     "id": "e2",
+     "dir": "functional modules/VDF",
+     "glob": "VDF_SystemManager_v0105.py"
+    },
+    {
+     "id": "e3",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_SystemManager_v0105.py"
+    }
+   ]
+  },
+  {
+   "name": "via-market-lists",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG087_MarketListGovernance_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG087_MarketListGovernance_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-master",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PY_ALREADY",
+   "to": "VIA_SYSTEM_MANAGER_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "",
+     "glob": "VIA_SYSTEM_MANAGER_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-mastercard",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL163_MasterFileCard_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL163_MasterFileCard_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-matrixspec",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL173_MatrixReportSpec_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL173_MatrixReportSpec_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-md",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG075_DocToMarkdown_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG075_DocToMarkdown_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-medic",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL143_MergeMedic_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL143_MergeMedic_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-mobile",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-fixall、via-lanes、via-open、via-productgate"
+  },
+  {
+   "name": "via-monitor",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0269.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIAScopedVcgc"
+  },
+  {
+   "name": "via-netbench",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL126_NetBench_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL126_NetBench_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-nlp",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PY_ALREADY",
+   "to": "SUP_MDL744_NLPApplicationHub_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/70_VRN_Rules",
+     "glob": "SUP_MDL744_NLPApplicationHub_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-nlpunified",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PY_ALREADY",
+   "to": "SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/70_VRN_Rules",
+     "glob": "SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-nlpvrn",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG087_NLPTextSummaryBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG087_NLPTextSummaryBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-oneshot",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 3,
+   "reason": "多步編排:要先把步拆成冊再改",
+   "old": "Invoke-VIA-OneShot-v*.ps1"
+  },
+  {
+   "name": "via-op",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0269.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": "Start-VIA-UIEngine-v*.ps1"
+  },
+  {
+   "name": "via-op-pick",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0269.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": "Start-VIA-UIEngine-v*.ps1"
+  },
+  {
+   "name": "via-op-run",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0269.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": "Start-VIA-UIEngine-v*.ps1"
+  },
+  {
+   "name": "via-open",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PS_NATIVE",
+   "reason": "視窗 / 環境變數 / 開頁等工作階段動作"
+  },
+  {
+   "name": "via-packgate",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL174_PackagingGate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL174_PackagingGate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-panoplan",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL171_PanoramaBatchPlanner_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL171_PanoramaBatchPlanner_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-panorama",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL158_VIAPanoramaAuditRepair_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL158_VIAPanoramaAuditRepair_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-panorama-all",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "via": "Register 尾版 → CGC_MDL134_ParallelLanes cmd run(兩步互不相干,同時跑)",
+   "to": "CGC_MDL156 --selftest ∥ CGC_MDL158 all",
+   "old": "VIA_B535_PANORAMA_ALL_IN_ONE.ps1(內含 git pull)",
+   "args_note": "-Apply · -Fast · -NoOpen · -Workers N(舊寫法照吃);-SkipPull 忽略:同步不在這條路由裡,先自己 via-sync",
+   "arg_map": {
+    "-Apply": "--apply",
+    "-Fast": "--fast",
+    "-NoOpen": "--no-open",
+    "-Workers": "--workers",
+    "-SkipPull": ""
+   },
+   "steps": [
+    {
+     "id": "accel",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL156_VIAAcceleratorControl_v*.py",
+     "args": [
+      "--selftest"
+     ]
+    },
+    {
+     "id": "panorama",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL158_VIAPanoramaAuditRepair_v*.py",
+     "args": [
+      "all"
+     ],
+     "pass_args": true,
+     "default_unless": [
+      {
+       "unless": "--no-open",
+       "add": "--open"
+      }
+     ],
+     "strip": [
+      "--no-open"
+     ]
+    }
+   ],
+   "state": "PY",
+   "batch": 1
+  },
+  {
+   "name": "via-panorama-run",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": "Invoke-VIA-Panorama-v*.ps1"
+  },
+  {
+   "name": "via-peis",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL161_PEISCapabilityEngine_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL161_PEISCapabilityEngine_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-pin",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PS_NATIVE",
+   "reason": "視窗 / 環境變數 / 開頁等工作階段動作"
+  },
+  {
+   "name": "via-pipeline",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 3,
+   "reason": "多步編排:要先把步拆成冊再改",
+   "old": "Invoke-VIA-GroupPipeline-v*.ps1"
+  },
+  {
+   "name": "via-plotlaw",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL118_PlotDataLaw_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL118_PlotDataLaw_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-pmipair",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0245.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG114_PmiPair_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG114_PmiPair_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-ppp",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 4,
+   "reason": "自帶環境建置,先評估",
+   "old": "Invoke-VIA-PDFPlumberPlus-v*.ps1"
+  },
+  {
+   "name": "via-precheck",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0271.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIACeleritasScoped、via-vcgc"
+  },
+  {
+   "name": "via-presync",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PS_NATIVE",
+   "reason": "git 同步(更新倉本身)",
+   "old": "Sync-VIA-Bootstrap-v*.ps1"
+  },
+  {
+   "name": "via-price",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG054_TWDailyBackfill_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG054_TWDailyBackfill_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-productgate",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL133_ProductGate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL133_ProductGate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-projects",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL131_ProjectCompletion_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL131_ProjectCompletion_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-prompt",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL109_PromptManager_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL109_PromptManager_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-psrepair",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": "Invoke-VIA-PSRepair-v*.ps1"
+  },
+  {
+   "name": "via-psrepair-ast",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL146_PsAstRepair_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL146_PsAstRepair_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-pstest",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL145_PsTestGate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL145_PsTestGate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-py",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "通用:跑你給的任何 .py(沒有固定入口)"
+  },
+  {
+   "name": "via-pyprog",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PS_NATIVE",
+   "reason": "PS 進度模組自己的自測",
+   "old": "VIA_PS_PyProgress_Selftest_v*.ps1"
+  },
+  {
+   "name": "via-quantguard",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG086_QuantGuardOneBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG086_QuantGuardOneBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-realtest",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0265.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": "Invoke-VIA-RealTest-v*.ps1"
+  },
+  {
+   "name": "via-rebuild",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL050_EnvRebuild_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL050_EnvRebuild_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-regen",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL167_RegenRevert_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL167_RegenRevert_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-register",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL113_UnifiedRegistry_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL113_UnifiedRegistry_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-reload",
+   "backing": "PY+PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PS_NATIVE",
+   "reason": "重載指令冊 = 在這個 PS 視窗點源,Python 做不到",
+   "old": "VIA.ps1"
+  },
+  {
+   "name": "via-repairprice",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG073_ReportStructuredDB_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG073_ReportStructuredDB_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-repo-optimize",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 4,
+   "reason": "背後是 streamlit 頁,先評估是否還在用",
+   "old": "Invoke-VIA-RepoOptimizer-v*.ps1"
+  },
+  {
+   "name": "via-revfill",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG075_MonthlyRevenueBackfill_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG075_MonthlyRevenueBackfill_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-review",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0266.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": "Invoke-VIA-Review-v*.ps1"
+  },
+  {
+   "name": "via-revphase",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "vdf_tw_monthly_revenue_cross_group_phase_engine_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "",
+     "glob": "vdf_tw_monthly_revenue_cross_group_phase_engine_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-rootcheck",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PS_NATIVE",
+   "reason": "視窗 / 環境變數 / 開頁等工作階段動作"
+  },
+  {
+   "name": "via-rotation",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG072_StoryRotationBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG072_StoryRotationBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-run25",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL160_UIUnifyGate_v*.py · VDF_ENG090_DataCoverageGate_v*.py · VRN_ENG072_FirstPageText_v*.py · VRN_ENG073_ReportStructuredDB_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL160_UIUnifyGate_v*.py"
+    },
+    {
+     "id": "e2",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG090_DataCoverageGate_v*.py"
+    },
+    {
+     "id": "e3",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG072_FirstPageText_v*.py"
+    },
+    {
+     "id": "e4",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG073_ReportStructuredDB_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-rungate",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL137_RunGate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL137_RunGate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-ryg",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL148_EngineBus_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL148_EngineBus_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-samename",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL150_CentralGovernanceFamily_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL150_CentralGovernanceFamily_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-selftest",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL064_SelftestGrid_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL064_SelftestGrid_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-sentiment",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0245.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG115_SentimentFetch_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG115_SentimentFetch_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-six",
+   "backing": "PY+PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "via": "Register 尾版直接呼叫 CGC_MDL127(原本就有的 Python 路;拿掉 --ps 分支)",
+   "to": "CGC_MDL127_SixStreams run",
+   "old": "--ps 時走 Invoke-VIA-SixStreams-v*.ps1",
+   "args_note": "--go · --no-open · --timeout · --max-tests;--ps 會被丟掉並提醒",
+   "steps": [
+    {
+     "id": "six",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL127_SixStreams_v*.py",
+     "args": [
+      "run"
+     ],
+     "pass_args": true,
+     "strip": [
+      "--ps"
+     ]
+    }
+   ],
+   "state": "PY",
+   "batch": 1
+  },
+  {
+   "name": "via-ssot",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL155_VIAUnifiedSSOTAutoCode_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL155_VIAUnifiedSSOTAutoCode_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-ssotadd",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG088_SsotAdditiveBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG088_SsotAdditiveBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-ssotregex",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL115_SSOTRegexDict_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL115_SSOTRegexDict_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-startdate",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0269.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIAScopedVcgc"
+  },
+  {
+   "name": "via-state",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL169_VIAStateMatrix_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL169_VIAStateMatrix_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-status",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL096_SyncStatus_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL096_SyncStatus_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-superhtml",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 4,
+   "reason": "2093 行 · 自帶環境建置,先評估是否還在用",
+   "old": "Invoke-VIA-SuperHtmlParser-v*.ps1"
+  },
+  {
+   "name": "via-sync",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PS_NATIVE",
+   "reason": "git 同步(更新倉本身)",
+   "old": "Sync-VIA-Bootstrap-v*.ps1 · via-sync.ps1"
+  },
+  {
+   "name": "via-system",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL120_SystemUI_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL120_SystemUI_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-talib",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0207.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL151_TaLibGate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "",
+     "glob": "CGC_MDL151_TaLibGate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-taone",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0207.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG083_TALibOneBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "",
+     "glob": "VDF_ENG083_TALibOneBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-tools",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0267.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-vcgc"
+  },
+  {
+   "name": "via-tower-reset",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PS_NATIVE",
+   "reason": "視窗 / 環境變數 / 開頁等工作階段動作"
+  },
+  {
+   "name": "via-tpn",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VAP",
+   "state": "PY_ALREADY",
+   "to": "VAP_ENG011_TemplateRegistry_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VAP/engine",
+     "glob": "VAP_ENG011_TemplateRegistry_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-tw-backfill",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-price"
+  },
+  {
+   "name": "via-twrev",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "PY_ALREADY",
+   "to": "cli.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "",
+     "glob": "cli.py"
+    }
+   ]
+  },
+  {
+   "name": "via-ui",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL160_UIUnifyGate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL160_UIUnifyGate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-ui-all",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0264.ps1",
+   "owner": "CORE",
+   "state": "PS_NATIVE",
+   "reason": "視窗 / 環境變數 / 開頁等工作階段動作"
+  },
+  {
+   "name": "via-uibridge",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL130_UIBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL130_UIBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-uieng",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0269.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIAScopedVcgc"
+  },
+  {
+   "name": "via-uihelp",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0269.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-duck、via-groups、via-groups-ui、via-monitor"
+  },
+  {
+   "name": "via-uiunify",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL160_UIUnifyGate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL160_UIUnifyGate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-unified",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL159_VIAUnifiedConsole_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL159_VIAUnifiedConsole_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-unique-check",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-central"
+  },
+  {
+   "name": "via-unstick",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "TODO",
+   "batch": 4,
+   "reason": "解卡(搬檔 + MergeMedic),先評估",
+   "old": "Invoke-VIA-Unstick-v*.ps1"
+  },
+  {
+   "name": "via-vapone",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VAP",
+   "state": "PY_ALREADY",
+   "to": "VAP_ENG016_AutoplotOne_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VAP/engine",
+     "glob": "VAP_ENG016_AutoplotOne_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vapstack",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VAP",
+   "state": "PY_ALREADY",
+   "to": "VAP_ENG015_SeabornStackBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VAP/engine",
+     "glob": "VAP_ENG015_SeabornStackBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vapval",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VAP",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-closeout"
+  },
+  {
+   "name": "via-vcgc",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0259.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vcgctest",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0260.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL224_TestAuto_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL224_TestAuto_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vdf-extra5",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL148_EngineBus_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL148_EngineBus_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vdf-refill",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0275.ps1",
+   "owner": "VDF",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIACeleritasScoped、via-vcgc"
+  },
+  {
+   "name": "via-vdfarch",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG073_DataArchitecture_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG073_DataArchitecture_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vdfchain",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL170_VDFChainRunner_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL170_VDFChainRunner_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vdfcov",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG090_DataCoverageGate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG090_DataCoverageGate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vdfdb",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG079_LocalDbConsolidate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG079_LocalDbConsolidate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vdfeng",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0268.ps1",
+   "owner": "VDF",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIAEngineGate"
+  },
+  {
+   "name": "via-vdffetch",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "via": "Register 尾版直接呼叫 VDF 自己的啟動器(不經 VCGC)",
+   "to": "VDF_MDL022_SafeParallelLaunch run",
+   "old": "Invoke-VIA-VdfFetch-v*.ps1 → VCGC 主控台",
+   "args_note": "--no-open · --dry · --refill-apply · --db-home;舊的年份 / --limit 不再吃(範圍只看 VDF 範圍冊)",
+   "steps": [
+    {
+     "id": "launch",
+     "dir": "functional modules/VDF",
+     "glob": "VDF_MDL022_SafeParallelLaunch_v*.py",
+     "args": [
+      "run"
+     ],
+     "pass_args": true
+    }
+   ],
+   "state": "PY",
+   "batch": 1
+  },
+  {
+   "name": "via-vdfinc",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG089_IncrementalFetchGate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG089_IncrementalFetchGate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vdfmatrix",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0248.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL195_FetchMatrix_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL195_FetchMatrix_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vdfsys",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_SystemManager_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF",
+     "glob": "VDF_SystemManager_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vdfui",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-famui"
+  },
+  {
+   "name": "via-ves",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL132_VesBridge_v*.py · via_engine_standardizer.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL132_VesBridge_v*.py"
+    },
+    {
+     "id": "e2",
+     "dir": "",
+     "glob": "via_engine_standardizer.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vetf",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VDF",
+   "state": "PY_ALREADY",
+   "to": "VDF_ENG085_VatetfBridge_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG085_VatetfBridge_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrn4",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG080_FourPointDigest_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG080_FourPointDigest_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrnaudit",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "TODO",
+   "batch": 2,
+   "reason": "單一 Python 入口的外殼:要先對參數",
+   "old": "Invoke-VIA-VRNAudit-v*.ps1"
+  },
+  {
+   "name": "via-vrnbook",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "via_vrn_logic_book_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "via_vrn_logic_book_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrnchain",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL172_VRNChainRunner_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL172_VRNChainRunner_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrneng",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0268.ps1",
+   "owner": "VRN",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:Invoke-VIAEngineGate"
+  },
+  {
+   "name": "via-vrnfin",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG090_FinStatementsTemplate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG090_FinStatementsTemplate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrnin",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PS_NATIVE",
+   "reason": "Windows 選檔視窗",
+   "old": "VIA_WinIO_InputPicker_v*.ps1"
+  },
+  {
+   "name": "via-vrnlogic",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG082_ExtractionLogic_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG082_ExtractionLogic_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrnmatrix",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG083_VerifiedMatrix_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG083_VerifiedMatrix_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrnmd",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG072_FirstPageText_v*.py · VRN_ENG085_MarkdownRestore_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG072_FirstPageText_v*.py"
+    },
+    {
+     "id": "e2",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG085_MarkdownRestore_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrnreport",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0257.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG110_TabReport_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG110_TabReport_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrnrules",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "SUP_MDL749_VRNFieldRuleHub_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/70_VRN_Rules",
+     "glob": "SUP_MDL749_VRNFieldRuleHub_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrnrun",
+   "backing": "PS1",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "via": "Register 尾版直接呼叫 VRN 自己的啟動器(不經 VCGC)",
+   "to": "VRN_MDL260_SafeParallelLaunch run",
+   "old": "Invoke-VIA-VRN-v*.ps1 → VRN_AutoTestLoop",
+   "args_note": "--source <夾> · --no-open · --dry;舊的 -Samples / -Quick / -Rounds 不再吃(啟動器自己照 VRN_ParamControl_SSOT 取參數)",
+   "steps": [
+    {
+     "id": "launch",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_MDL260_SafeParallelLaunch_v*.py",
+     "args": [
+      "run"
+     ],
+     "pass_args": true
+    }
+   ],
+   "state": "PY",
+   "batch": 1
+  },
+  {
+   "name": "via-vrnsys",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_SystemManager_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_SystemManager_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrntab",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0252.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VRN_ENG109_TabStore_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG109_TabStore_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrnui",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-famui"
+  },
+  {
+   "name": "via-vrnuni",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "PY_ALREADY",
+   "to": "VIA_VRN_UnifiedReportEngine_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "",
+     "glob": "VIA_VRN_UnifiedReportEngine_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-vrnval",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VRN",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-closeout"
+  },
+  {
+   "name": "via-vtmra",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL152_VtmraGate_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL152_VtmraGate_v*.py"
+    }
+   ]
+  },
+  {
+   "name": "via-webconsole",
+   "backing": "PS-inline",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "CORE",
+   "state": "FORWARD",
+   "reason": "只轉呼叫其他短指令:via-open"
+  },
+  {
+   "name": "via-workflow",
+   "backing": "PY",
+   "defined_in": "Register-VIA-Commands-v0243.ps1",
+   "owner": "VCGC",
+   "state": "PY_ALREADY",
+   "to": "CGC_MDL153_WorkflowComposer_v*.py",
+   "steps": [
+    {
+     "id": "e1",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL153_WorkflowComposer_v*.py"
+    }
+   ]
+  }
+ ]
+}
