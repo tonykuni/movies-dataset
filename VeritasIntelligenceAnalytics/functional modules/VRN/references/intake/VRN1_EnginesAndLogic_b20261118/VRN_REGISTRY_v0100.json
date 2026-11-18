@@ -1,0 +1,1495 @@
+{
+ "schema": "VRN_REGISTRY_v0100",
+ "system": "VRN-1（研究報告）獨立系統",
+ "system_note": "2026-10-15 正名 VRN-1：這是一個有自己 MAIN 的獨立系統，不是誰的子系統。操作員單一入口是 artifacts/VRN-1.ps1（診斷 + 管線都走它）；本檔 VRN_Main_v0100.py 仍是系統的 MAIN，VRN-1.ps1 呼叫它，不取代它。",
+ "report_types": "個股報告或資訊（一個個股）· 產業資訊及展望（多個個股）· 其他投資報告；各走各的處理路徑，見 ssot/VRN_TitleTrim_SSOT_v0100.json#focus.doc_class_policy",
+ "main": "VRN_Main_v0100.py",
+ "launcher": "Invoke-VRN-Main-v0100.ps1",
+ "policy": "VRN 資料夾內每一個檔案都要在這裡；SHA-256 以 LF 行尾計算（Windows CRLF 取出不影響）。未登記、缺檔、內容不符 = FAIL；改了東西就跑 VRN_Main_v0100.py build。",
+ "counts": {
+  "files": 163,
+  "kinds": {
+   "DOC": 1,
+   "ENGINE": 29,
+   "KNOWLEDGE": 3,
+   "LAUNCHER": 2,
+   "MAIN": 1,
+   "OTHER": 1,
+   "REFERENCE_FROZEN": 26,
+   "REGISTRY_BOOK": 1,
+   "SSOT": 78,
+   "TEST": 21
+  }
+ },
+ "files": [
+  {
+   "path": ".gitattributes",
+   "kind": "OTHER",
+   "version": "",
+   "sha256": "79a4ef6037eb1f7bdcb418694265da38a988203ae736e171660f27a8e03439a8",
+   "bytes": 1388,
+   "bridge": "n/a"
+  },
+  {
+   "path": "Invoke-VRN-AutoTest.ps1",
+   "kind": "LAUNCHER",
+   "version": "",
+   "sha256": "923e588d44344eec3eced39b9d05486d013b4fc9d40d54f1beb6cb7cde3c2c3e",
+   "bytes": 12487,
+   "bridge": "PS-ACCEL20",
+   "id": "VRN-PSL001",
+   "category": "LAUNCHER",
+   "module_version": ""
+  },
+  {
+   "path": "Invoke-VRN-Main-v0100.ps1",
+   "kind": "LAUNCHER",
+   "version": "",
+   "sha256": "f991d0163516a754f1dbff3004cc9d58e1285c3651e4cf4ac82b00e18d8d65ee",
+   "bytes": 31648,
+   "bridge": "PS-ACCEL20",
+   "id": "VRN-PSL002",
+   "category": "LAUNCHER",
+   "module_version": ""
+  },
+  {
+   "path": "VRN_Main_v0100.py",
+   "kind": "MAIN",
+   "version": "v0100",
+   "sha256": "d95d7a43400b9148b3c8a7edce44fc0faf412a40c0573d28f67385ece52ea6ca",
+   "bytes": 260169,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-MAN001",
+   "category": "ENTRY",
+   "module_version": "v0100"
+  },
+  {
+   "path": "VRN_SYSTEM_v0100.md",
+   "kind": "DOC",
+   "version": "v0100",
+   "sha256": "03845f5297f286f03f097be4efc3618cdb7a876bdab24cbcaca20bccaf26c89d",
+   "bytes": 371977,
+   "bridge": "n/a"
+  },
+  {
+   "path": "engine/VIA_TW_Ticker_Master_v0210.py",
+   "kind": "ENGINE",
+   "version": "v0210",
+   "sha256": "9da211cd3724d92a99a960edad19774d22ab7bc38ac81b9c7eca719d1f7c31ef",
+   "bytes": 21343,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG005",
+   "category": "SSOT-TICKER",
+   "module_version": "2.1.0"
+  },
+  {
+   "path": "engine/VIA_VRN_FirstPageEngine.py",
+   "kind": "ENGINE",
+   "version": "v0106",
+   "sha256": "a22c803730da01c4bb841ac4a041a38aef908ae7a4dd7171f6b36a49bf21cba3",
+   "bytes": 102827,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG001",
+   "category": "EXTRACT",
+   "module_version": "v0106"
+  },
+  {
+   "path": "engine/VRN_AstId_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "7348bc0534731a0d485dffbeaa34b516b5d38621ecc720b076b0d8724f07a2ce",
+   "bytes": 18581,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG009",
+   "category": "REGISTRY",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_AutoTestLoop.py",
+   "kind": "ENGINE",
+   "version": "v0106",
+   "sha256": "4d039f977ac840314464a1fc672bad842e090781527b4d3687801aaf3e413e38",
+   "bytes": 216031,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG004",
+   "category": "TEST-LOOP",
+   "module_version": "v0106"
+  },
+  {
+   "path": "engine/VRN_BookCheck_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "73089385b6fd5478e9fed0c66d6ba8621bc280cbff085eb8f1d4faff82c3c5e8",
+   "bytes": 30446,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG007",
+   "category": "MEASURE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_DataFrame_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "4040db7df2bd9db75d3251b172854c3cb745f260916988761da27b71419113a7",
+   "bytes": 16873,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG012",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_Evidence_Core.py",
+   "kind": "ENGINE",
+   "version": "",
+   "sha256": "5618ec91288b5a77ddfcd6bf6ad298b6d8b9b41d972a6589f2f15ae7a8419f2e",
+   "bytes": 107851,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG003",
+   "category": "RULES",
+   "module_version": "v0102"
+  },
+  {
+   "path": "engine/VRN_Focus_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "2a3a1654116f7f3798af04dd1cc9b465ecf01e9891bd2b37cee9cb9db8723c54",
+   "bytes": 31439,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG015",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_Integrated_ReportDatabase_Engine.py",
+   "kind": "ENGINE",
+   "version": "v0105",
+   "sha256": "c879af69f37ab54690eff7c295c5e9196b8ebadb96ffb07c1b42820d1d0d1939",
+   "bytes": 168621,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG002",
+   "category": "DATABASE",
+   "module_version": "v0105"
+  },
+  {
+   "path": "engine/VRN_LocalDB_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "c82aafbc9da1b30ae90da812f115ab050274736c1706bdc94e933ff211694b6d",
+   "bytes": 30627,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG010",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_Lock_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "c817ed86b8d92dcf15bdcd360a4acdcb062315058a4b155b474880850251ace0",
+   "bytes": 37359,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG013",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_Matrix_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "8201900770c07f727f5c8fd41c5273303f0b7e700b3672ecb5478d7d2f9e8ed7",
+   "bytes": 27876,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG016",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_Ocr_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "0f67363e2ef57d4ecf0e88c4f944b08c470b9f31b3e7bfa56de8e25399713f97",
+   "bytes": 16178,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG020",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_OutputVerify_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "6bd780042a6f784492251743dfac1fc6b6204c7185b56b9cd694858e51081b8e",
+   "bytes": 95792,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG021",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_PageRegions_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "e45b896384b359a7cde6b75f720bf615a5eafda6b93e291a3681f655a55e6fd0",
+   "bytes": 89282,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG011",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_PanoramaProbe.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "b14e5c24505ffe204114ad9acecd4327cdfe07fa1c384b2083b4f26e7bb12f07",
+   "bytes": 57552,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG006",
+   "category": "PROBE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_PivotDB_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "adadf2a50d1912b308bf64f0e47b1cda82a6afada69e90dd68ea7aef389e0284",
+   "bytes": 43155,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG022",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_RunCache_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "1d5176cfe2d67b4a9b3f68cf77061f9fef16e832a936d756de36417306033fca",
+   "bytes": 45663,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG019",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_TempStore_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "e5d171b4b95083fc4c24e83b2125b5bd9875ec8bbbdc29de84a0a681f7206144",
+   "bytes": 17048,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG008",
+   "category": "RUNTIME",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_TickerRecord_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "5c24766c0bd0f2f95cf517d504f50b84098a04d80f2fc6030904b436ec84ed30",
+   "bytes": 61465,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG017",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_TitleTrim_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "8ecec91389467628691a814bc80dd825bfa46c26bd498709d45d0639617fb46f",
+   "bytes": 165474,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG014",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_ToolBridge_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "12605868014835c428dd00ded2c888f3a24cbfe3436411d3e644a2cbf19e86cb",
+   "bytes": 19833,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG023",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/VRN_TruthMatrix_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "e8f38aa47994f71b5cd53943d9dd3d6c3a0e1d1ba164901a8760eacbe3b6794a",
+   "bytes": 30494,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-ENG018",
+   "category": "ENGINE",
+   "module_version": "v0100"
+  },
+  {
+   "path": "engine/mother/CGC_MDL249_DataFrameLock_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "954147fcfa4766aa8abae512fe8a19b43e4edbf7c2598e7c3ea41d31e989a08f",
+   "bytes": 21016,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-MOM006",
+   "category": "VENDORED",
+   "module_version": "v0100",
+   "vendored_from": "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL249_DataFrameLock_v0100.py@d935c059"
+  },
+  {
+   "path": "engine/mother/VRN_ENG392_TextCompleteness_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "8fa184082104f4fb28a40f18e002045e7c138e44a78d50a39310ca5c93595312",
+   "bytes": 53392,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-MOM001",
+   "category": "VENDORED",
+   "module_version": "v0100",
+   "vendored_from": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG392_TextCompleteness_v0100.py@c88acc4f"
+  },
+  {
+   "path": "engine/mother/VRN_ENG393_DocClassVerify_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "e00d4079e0614e63361ca6153f7aecbda32439fbeaaa37bda1c19b915c414b73",
+   "bytes": 64506,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-MOM002",
+   "category": "VENDORED",
+   "module_version": "v0100",
+   "vendored_from": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py@c88acc4f"
+  },
+  {
+   "path": "engine/mother/VRN_ENG394_LayoutRestore_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "1c0bc7219200b3e06983be694d31aa841fdee63269c77df6de33727bf1903c51",
+   "bytes": 80282,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-MOM003",
+   "category": "VENDORED",
+   "module_version": "v0100",
+   "vendored_from": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py@c88acc4f"
+  },
+  {
+   "path": "engine/mother/VRN_ENG395_ValuationMethodLexicon_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "b9721379022213885274d4a248701ec723707d0105b18ad0e26e2e848262da0e",
+   "bytes": 18109,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-MOM004",
+   "category": "VENDORED",
+   "module_version": "v0100",
+   "vendored_from": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py@c88acc4f"
+  },
+  {
+   "path": "engine/mother/VRN_ENG396_ReportEntities_v0100.py",
+   "kind": "ENGINE",
+   "version": "v0100",
+   "sha256": "ef31803bfa04a99e1e45ef0b845fb285ec7a53671e46d64efe3eced17abccaa4",
+   "bytes": 32698,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-MOM005",
+   "category": "VENDORED",
+   "module_version": "v0100",
+   "vendored_from": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG396_ReportEntities_v0100.py@c88acc4f"
+  },
+  {
+   "path": "knowledge/SYNONYM_LIBRARY_v3.json",
+   "kind": "KNOWLEDGE",
+   "version": "",
+   "sha256": "b180102fcf3e861688742267994749a942ff049a00e311122c5e43b2674bdb31",
+   "bytes": 152899,
+   "bridge": "n/a"
+  },
+  {
+   "path": "knowledge/SYNONYM_LIBRARY_v4.json",
+   "kind": "KNOWLEDGE",
+   "version": "",
+   "sha256": "47051469282c72ddd45f1960cdb0397da82a714e99708da14077ce00596e0636",
+   "bytes": 172418,
+   "bridge": "n/a"
+  },
+  {
+   "path": "knowledge/VRN_WORKFLOW_SPEC_v0200.md",
+   "kind": "KNOWLEDGE",
+   "version": "v0200",
+   "sha256": "22392f70334e746757808716d3b4c69f2b20fe2e1cfd228a77b5ba5dc9a7ab9f",
+   "bytes": 11026,
+   "bridge": "n/a"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/ADDITIVE_CANDIDATE.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "be96ecc5c88dfc8a5ad45b0bcafda15f9837bb02847144fd6291f5e0db2fdf35",
+   "bytes": 19447,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/ALIAS_COMPARISON.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "e2a6d8e29e4f9e5cd97feff2bed5e29e34da1e38974229c57022f84cc3af01b7",
+   "bytes": 71204,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/AUDIT_SUMMARY.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "68ea437767a9a74e948b10132c48ebdb518c1b6f05b072679b1859d5cbd75ccd",
+   "bytes": 1962,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/BASELINE_PROBES.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "ff07345f5d6492f5ac560f0eb86c8df882d303459ffef100ab71794909f88d1a",
+   "bytes": 439,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/CROSS_REGISTRY_CONFLICTS.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "5d9e89788c6ac9005542bd923f894ba23b25cdc85b45a2df5a442fb0f846296f",
+   "bytes": 3348,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/DELIVERY_MANIFEST.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "9a41e66e9ace4ed91ff0987401904cb395aa163861d17c9721b0773dbdff83bc",
+   "bytes": 4007,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/FILENAME_RESULTS.html",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "5ec92a257f5ba799ec81c76c9694158a7bf91ea939050e117ff721b15b2eddd7",
+   "bytes": 16782,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/FILENAME_RESULTS.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "462dd13b0983a2aa9f4741d751ea50ad18090ae34bdcf1cc9e48928784d66fd4",
+   "bytes": 78613,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/README_zh-TW.md",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "aa0acfbe2c4d2bcb6bed61d71ceb10fbaed3a4c7c22f5b5c1e9d40357af73a5d",
+   "bytes": 8562,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/SYNONYM_LIBRARY.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "b180102fcf3e861688742267994749a942ff049a00e311122c5e43b2674bdb31",
+   "bytes": 152899,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/audit_ssot.py",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "72eed7241a37ea24ab883c93efe8523f0bab315a642dae867cad732b6efd9a75",
+   "bytes": 24667,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/baseline_manifest.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "015f0892a67ede3a1193258057a168ba2590ef47e3251966019894928aa09d13",
+   "bytes": 3815,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/sample_filenames.txt",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "a05921ae1a51c6b7138eb478f463a174b59148f386c8e6c63343d81801dd5acd",
+   "bytes": 4236,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/ticker_regexes.py",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "04e19028a01243fc412d413339e2db03cc3f0635cd973a6083d32193b5e5d18d",
+   "bytes": 9396,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/ticker_schema.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "0eb3cf14fa02c03b2dad03fd52ab660d183ce7315dbed28532372492d8d65f8c",
+   "bytes": 7337,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/user_aliases.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "6b5dd73ffa90b5597d4d7113a84e1ae6adc25a3247b74275edddf93865cc1a49",
+   "bytes": 5360,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/_upload/VIA_SSOT_Additive_Audit_v0100_2.zip",
+   "kind": "REFERENCE_FROZEN",
+   "version": "v0100",
+   "sha256": "15a91e9cc7094fd972507603c7785c04e287f74c259289203f9cda36f415bd22",
+   "bytes": 122931,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/baseline/SUP_MDL749_VRNFieldRuleHub_v0110.py",
+   "kind": "REFERENCE_FROZEN",
+   "version": "v0110",
+   "sha256": "ff449434a6827ede3c35d6e3a10a6b880ec31ef012d6e437fe623f22c1ef1a41",
+   "bytes": 114033,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/baseline/VIA_B628_RegexSSOT.md",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "dd2fbd912b40e90c28b4ed0c2999cce5aca08fc7048f5ea378eacad6d637a619",
+   "bytes": 6514,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/baseline/VIA_Financial_Institution_SSOT_v0100.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "v0100",
+   "sha256": "0a9c2244806cceb67a0f0c9d7bb3b4bb2951c937d46d946b9270ebd65b8fed8c",
+   "bytes": 21958,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/baseline/VRN_Broker_Dict_v0100.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "v0100",
+   "sha256": "5dca54748fb1908512f126b3806d1124819a6db9b38ff78a239df46fded23024",
+   "bytes": 12879,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/baseline/VRN_FieldRules_SSOT_v0100.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "v0100",
+   "sha256": "0a232cf325337217e3825e2b24c69b3a6ecaca650f7827f666b5a9c6dedabff7",
+   "bytes": 29339,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/baseline/VRN_Rating_Dict_v0100.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "v0100",
+   "sha256": "7b086887b1ed02d5c4fb43482b7d28439415e7639d884c90e09c478c73f6cf55",
+   "bytes": 3445,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/baseline/VRN_TickerDate_Regex_v0100.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "v0100",
+   "sha256": "405b41dc5e63b437e4f4fa34e5076958cb77a2ca3e8a10689fcafd6807ebc368",
+   "bytes": 2803,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/baseline/broker_list.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "7b9cab8aed8017e3a2ec4485ac8df33899c6e60d71d5e72027c5aed488f83ee3",
+   "bytes": 10200,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "references/intake/VIA_SSOT_Additive_Audit_v0100/baseline/intake_rating.json",
+   "kind": "REFERENCE_FROZEN",
+   "version": "",
+   "sha256": "7b086887b1ed02d5c4fb43482b7d28439415e7639d884c90e09c478c73f6cf55",
+   "bytes": 3445,
+   "bridge": "exempt (frozen)"
+  },
+  {
+   "path": "registry/VRN_BROKER_LIST_v01.json",
+   "kind": "REGISTRY_BOOK",
+   "version": "v01",
+   "sha256": "a1b6f943f1dc9d0e0e9b8a85694416c27c0170b26fdc440a9bc3a5467dcdf8cf",
+   "bytes": 9809,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VIA_SSOT_SynonymUnion_v0107.json",
+   "kind": "SSOT",
+   "version": "v0107",
+   "sha256": "bcf41a05ad42901d5e2a0ac27121e81d5d9bf8ce4c4ccc826bee389d2ac5f558",
+   "bytes": 475708,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VIA_VRN_ExtractRules_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "62e54dd719aaa642a57e5c2a2a3cc4e332c52daf42cedb540fc383e017827e6d",
+   "bytes": 3326,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VIA_VRN_FieldSpec_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "6f37885318219532fa5c08e22f50813d8406e1b1483ea1812ffc0fb1023fdf1d",
+   "bytes": 6832,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VIA_VRN_ReportFieldRules_SSOT_v0101.json",
+   "kind": "SSOT",
+   "version": "v0101",
+   "sha256": "2e9678324573219eebf1777c027feeedf0caa5adf4a151099f7ce430b6cc6ee9",
+   "bytes": 29902,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VIA_Validation_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "db150c47bb367882f9484a988fa5dd42c9730bfd79eaf0fead192ddf7d42cedf",
+   "bytes": 14122,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VIS_VRN_TickerFilenameSSOT_v0100.py",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "83c4a98a8b0f1cd20f87038b806d0db954df244b385f50cd791bc6d037e15d42",
+   "bytes": 7612,
+   "bridge": "ACCEL-BRIDGE"
+  },
+  {
+   "path": "ssot/VRN_03SSOT_PROVENANCE_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "8221de413277db8486e1a5bf363cf7abd9f0f54f2a657c0a893f556a682dd4f4",
+   "bytes": 15438,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_AnnualExtract_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "b02139b50775f6a82b08644dd1d36ee6183ac7af92db6d688a85d68c6cdf6f58",
+   "bytes": 18856,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_BOOKS_PROVENANCE_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "3b24100dd536b01a5c03383b8144bd78643992ab4b757e3339b3a7c64f6a7a49",
+   "bytes": 10382,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Broker_Dict_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "1a7a19643eaf17aebaedf2cb363f912046f0cfd5e0f50613bfc32f0c33e5dfb2",
+   "bytes": 12878,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Broker_Dict_v0103.json",
+   "kind": "SSOT",
+   "version": "v0103",
+   "sha256": "f74e932ec2a9103f56cb8d39e68c03d3c07d70083ef0a5356a57160e0607539d",
+   "bytes": 7004,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Contact_Regex_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "9a2b0198d1f926031263808dbd4386f75b8b7e1cd78f8b1332aac63dc81a446e",
+   "bytes": 1148,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_ENGINES_PROVENANCE_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "49539706428073f16d6ffe510bfde22f5696bd0eff446ac2319eebc2308e1c83",
+   "bytes": 6983,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_EngineLock_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "3bef2aae9aa4ec39ba375b02856338904011183ca6696ac7b1bc8bf45baef37b",
+   "bytes": 14545,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_FieldRules_SSOT_v0101.json",
+   "kind": "SSOT",
+   "version": "v0101",
+   "sha256": "8438cda502883142f56c4b48dd33dc79a891d0669a5a84a29aaf89a0475d1296",
+   "bytes": 40920,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_FinIdentity_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "0c8011da41eea8e7b8a500a97a664b849f8b23d9e20ab53dfe79e004e7d9e116",
+   "bytes": 23432,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_FinLexicon_SSOT_v0109.json",
+   "kind": "SSOT",
+   "version": "v0109",
+   "sha256": "c2d4069863bbda00bb5abd3e87d0588cb5223a4284aa212bfb6ea0371bb69a8d",
+   "bytes": 24572,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_ID_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "20ee3f3f1e1bd58fe4a0f1c4371f9afb5b36f51d8a646202d39af5f234825096",
+   "bytes": 667916,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_LayoutRestore_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "9e9479c551ab83824ebd81ff127a8fe5b61600693838639207f16770f7f44cb0",
+   "bytes": 5943,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Method_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "83fb6308acaa76738682bb4993d470663581351c82261773de8e89e828025e66",
+   "bytes": 14579,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_OperatorLabels_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "c82ca326b5f975aa2570eae41fef4b86e5ae33527564b9c36f47c268ec223fb7",
+   "bytes": 59821,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "fd7345158f144b8ccad225a8b7d46bd1e2b21882f50e3ddc09126148b5c16cb3",
+   "bytes": 47652,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0101.json",
+   "kind": "SSOT",
+   "version": "v0101",
+   "sha256": "3a36a29e29fef641bdb08ccc49f9c5244e358bad74452ed25e12127a00dbb743",
+   "bytes": 61223,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0102.json",
+   "kind": "SSOT",
+   "version": "v0102",
+   "sha256": "faa6e9487823570461e40a4ac170aebf8c23b3f5eec0cbe3cac3298f94ca3828",
+   "bytes": 63538,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0103.json",
+   "kind": "SSOT",
+   "version": "v0103",
+   "sha256": "16fb87b68c0fd3b2b262fa9c03607e31aa720d34542bdc7bc595f83f8f0c4a48",
+   "bytes": 64085,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0104.json",
+   "kind": "SSOT",
+   "version": "v0104",
+   "sha256": "9a37b69db8e72f38bd5319fe2e7b8ed9f66a4e9c1d6b545f14da05a688b89db5",
+   "bytes": 71203,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0105.json",
+   "kind": "SSOT",
+   "version": "v0105",
+   "sha256": "4ac1d60fb1316ce45bd6ea48214e0a575635dbf59d873878b17447e871071315",
+   "bytes": 72511,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0106.json",
+   "kind": "SSOT",
+   "version": "v0106",
+   "sha256": "aedffeeddbbcb35c6f3172aa9098373f15c9fa96238f2ebd634e98eeb5c4a1f1",
+   "bytes": 73614,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0107.json",
+   "kind": "SSOT",
+   "version": "v0107",
+   "sha256": "798cc63b5cf74fb9f0877f9d3d268b1b141e632bff692decbb09fbd5548ce754",
+   "bytes": 75940,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0108.json",
+   "kind": "SSOT",
+   "version": "v0108",
+   "sha256": "7699113e4b2bad749b09c1c9b77057b6299ddf7c824896d241144083f3ac3e56",
+   "bytes": 77914,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0109.json",
+   "kind": "SSOT",
+   "version": "v0109",
+   "sha256": "68cd3f64136dcb45d6f7b68a8220c9756dd3e670e63b100a03af69bbc581dab5",
+   "bytes": 79660,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0110.json",
+   "kind": "SSOT",
+   "version": "v0110",
+   "sha256": "1f80426d41e742f9613b1b29decc6a1d963356db263f71e3b92f35e9fe7d5728",
+   "bytes": 80909,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Output_Header_SSOT_v0111.json",
+   "kind": "SSOT",
+   "version": "v0111",
+   "sha256": "4768fc5dc38d83df31a6241bbe11ba300d0ff7b0b87a71e7158ee0bbc3bf165b",
+   "bytes": 82124,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_REGEX_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "07c01be43854dcbc1c529e80474208c568e636f04aacaf979422846b184ddf7d",
+   "bytes": 360587,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_Rating_Dict_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "778c3cc31b8a191beec2b88a5fc8454dcbf9f7345d30771b19098b5d73bbc762",
+   "bytes": 3444,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_S05_FieldRegistry_v0103.json",
+   "kind": "SSOT",
+   "version": "v0103",
+   "sha256": "3f3df3e1bb742d3ae3834dc307f6cf80fe581c7ad054324cd6953e9d8b2f99a2",
+   "bytes": 208867,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_SSOT_INDEX_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "5a1b04e5a82578a4096e051fce423e61685bee180d152ec775fc4fd8f528d06b",
+   "bytes": 43047,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_SYNONYM_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "5340404c8053ee1901cb13bb27ffa7628c12d0bff52221540578acde322754b1",
+   "bytes": 197726,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_TEMP_POLICY_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "1dfe281113c871d5e26b56fd26c4d140a50df89436eb241ef97c90686cb63f2f",
+   "bytes": 4300,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_TickerRecord_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "9f31face200c336c02b609b7898b8970ea9459f19e80cbf858f56a62916392a6",
+   "bytes": 267233,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_TitleTrim_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "a1d40cc5e07e97997572cf4ba4c80b299d0e33ac7e8be4648377f020b0a0d84a",
+   "bytes": 39360,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/VRN_ToolManifest_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "a0391536792cb1835487501c9f9d5ccd6b3d839ca3b7fd8cc32ea5de8b62ca57",
+   "bytes": 1611,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_Audit_Evidence_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "e317840aa43be4e9c8aaf5b918006d83e2bf4ecb32f336f92dab76f0314dca12",
+   "bytes": 23880,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_BrokerBackfillManifest_v029VRN1C41.json",
+   "kind": "SSOT",
+   "version": "",
+   "sha256": "25917bfbc218f89c17eb3bba3340a56fcaa1f0dcf87427aa4ae74eebb447f05b",
+   "bytes": 1281,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_ChainNodeLedger_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "fada3f606b66cfbbe5000b2cd9144f8f5bcae27d1b452f6fda11bda709ff0a1e",
+   "bytes": 912,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_DocClass_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "2dd5f400e902389245e1e0828386f3085f46365bedde6045a35a8a66e84e6675",
+   "bytes": 21195,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_Essentia_CardBook_VRN_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "1cb37ab1199b8d365ff04ee395ca8f39f2de2aad7ce418b40fe8b8a1866bb18a",
+   "bytes": 229902,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_ExtractionLogic_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "2231965ca6d3fddd943be8fa9c3d14a0848e9a720de243728f8929c6ab02e78c",
+   "bytes": 5661,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_FieldRules_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "a1d74fed91eaf6db057fa6e91c13adefeaf5b157ad58d2d087932527658e1372",
+   "bytes": 53215,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_FieldSpec_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "6f37885318219532fa5c08e22f50813d8406e1b1483ea1812ffc0fb1023fdf1d",
+   "bytes": 6832,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_FileRegistry_Stage_v029VRN1C.csv",
+   "kind": "SSOT",
+   "version": "",
+   "sha256": "c7dca30123acff35f500f05379c12346bf80434232e42f5cfb3cfbefa5b82bd4",
+   "bytes": 128029,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_FinancialSSOT_Manifest_v0000.json",
+   "kind": "SSOT",
+   "version": "v0000",
+   "sha256": "366d47b08cdaf0177a7a8d168ee5a781cc513a8088d4a4811f44c707e869b24e",
+   "bytes": 1812,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_FinancialShown_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "b57e2aae6769e2c5fe5670cdf2ad6043ccb4f2bab2861e688c57141f85340ddd",
+   "bytes": 382,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_Incremental_DB_Result_v0000.json",
+   "kind": "SSOT",
+   "version": "v0000",
+   "sha256": "bd8126054181b401360f6ba391ca21b1397b902b17566865f24da681a78719c6",
+   "bytes": 28415,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_LogicArchitecture_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "bfc204b543945468d49f4bf2c5a8eb06b1119edba80a708fa9f4efb9896c658d",
+   "bytes": 38280,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_MDL117_VRN_Activation_RegistryOnly_Dry_v1_0_27__SUPPORT_RULE__v1_0_v0000.json",
+   "kind": "SSOT",
+   "version": "v0000",
+   "sha256": "4e28537464a42918d614f97a83e84ea187888592b763877d25b6dfeca1a22930",
+   "bytes": 8111,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_MDL133_VRN_v140J_Registry_Sidecar_Write_Gate__SUPPORT_RULE__v140J.json",
+   "kind": "SSOT",
+   "version": "",
+   "sha256": "5c7366ccc49ca1deb0329518d2a449e04166570190eb66096efb48d16a15884b",
+   "bytes": 13124,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_MDL134_VRN_v140I_SSOT_Registry_Pointer_Preview__SUPPORT_RULE__v140I.json",
+   "kind": "SSOT",
+   "version": "",
+   "sha256": "26229ff03f722b992c9533f90e49148654beebdeb7b8fade52e53194ad13eb32",
+   "bytes": 9115,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_MDL203_VRN_MASTER_GOVERNANCE_REGISTRY_v0615703__GOVERNANCE__v0615703.json",
+   "kind": "SSOT",
+   "version": "",
+   "sha256": "d8801ee3644e59d08d8442c2f50fafe4c3051f95907646dde5fbec3df8735f22",
+   "bytes": 16925,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_MDL205_VRN_NoSummarizer_CanonicalManifest_v02__MODULE__v02.json",
+   "kind": "SSOT",
+   "version": "v02",
+   "sha256": "e8f79ce1d60acffc65d0f99bd208cc770875241e9618c7d2a56f2e594f9997f8",
+   "bytes": 2382,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_MatrixApplicability_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "a12f9b4ad83e3bb641183f5e51c59fbb69370455d2fbd240e252c2ef2be95aa2",
+   "bytes": 4533,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_ParquetUnifiedStageManifest_v029VRN1C3.json",
+   "kind": "SSOT",
+   "version": "",
+   "sha256": "591f6d845e31e19052e7412066bd9f71872551a61069b8253bef9049912cfcd7",
+   "bytes": 2717,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_PluginHub_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "0c08f7b25f46b8eb96491a4d71a2245e9345451ee537f04e3bb595ab141aa295",
+   "bytes": 7925,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_Policy_VRNTextScope_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "f35b9f71254fb629e92cbb3baa9f7453fb128052851b8a08486f17db96c4463b",
+   "bytes": 3183,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_ReportEntities_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "4b236f4ae7ec17e66c20f8371cd67acc845f510c5d2899bd891b9d456b8ac6d8",
+   "bytes": 9418,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_ReportFieldRules_SSOT_v0101.json",
+   "kind": "SSOT",
+   "version": "v0101",
+   "sha256": "2e9678324573219eebf1777c027feeedf0caa5adf4a151099f7ce430b6cc6ee9",
+   "bytes": 29902,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_ReportMeasure_v0101.json",
+   "kind": "SSOT",
+   "version": "v0101",
+   "sha256": "20e2d3e942900a2484926f9ba0fa0256fbea7f37944959a174287cc916c163e2",
+   "bytes": 1064,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_Report_Parser_Integrated_SSOT.json",
+   "kind": "SSOT",
+   "version": "",
+   "sha256": "1dac6d5fbbc3aec223e204178d2c97fff1bf927eabe3702452116cb47b2208dc",
+   "bytes": 269559,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_S05_FieldRegistry_v0102.json",
+   "kind": "SSOT",
+   "version": "v0102",
+   "sha256": "0411c27b8b11239e13221cf1bf7616a2046f405d2106fe0fc87b2f853fb94eaa",
+   "bytes": 207815,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_SisterLineage_Sync_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "7f7eb022c95c7640678cefd05579e662e5410fa24d6945614459297ca0dabb8e",
+   "bytes": 5168,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_SourceProvenance_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
+   "bytes": 2183,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_StageAlias_Map_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "2439c6a3cbf44c04e6132a020c890be2eaa546eadf8040c0d1f544d8b36ecdde",
+   "bytes": 1361,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_TabFields_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "1bd62d3132196efce9a4a6cdc125d9b60a413b5e4222a0a4b3406ad4b348d225",
+   "bytes": 1250,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_ValuationMethod_SSOT_v0100.json",
+   "kind": "SSOT",
+   "version": "v0100",
+   "sha256": "9233b770d888229f0923b6383e93c812d4604238a5897746352f5598426d5d57",
+   "bytes": 20333,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_Verified_Module_Registry_v0000.csv",
+   "kind": "SSOT",
+   "version": "v0000",
+   "sha256": "6aac1f7cd690629d3c689264120e12119e1b89fb724e47abdcf3c12ade071803",
+   "bytes": 182092,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/VRN_Workflow_VRN_SSOT_v0105.json",
+   "kind": "SSOT",
+   "version": "v0105",
+   "sha256": "408929870d25116fcf6866efb35985cd2d1e969a15a84b18e0c4b8b830e9f528",
+   "bytes": 21996,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/v2/VRN_ResearchReport_SSOT.record.schema.v2.json",
+   "kind": "SSOT",
+   "version": "",
+   "sha256": "21cb3b253d824b506b0dbebd31b4988e6529305ea112667400e9fa4af56cc0cf",
+   "bytes": 11647,
+   "bridge": "n/a"
+  },
+  {
+   "path": "ssot/03_ssot/v2/generations/VRN_ResearchReport_SSOT.v2.records64.v0155.2f771c00c6dd8d6e.jsonl",
+   "kind": "SSOT",
+   "version": "",
+   "sha256": "893e8bce9569b13db0961f97105cb816f31d96b6476d6842d6e3b0135c0d4ebe",
+   "bytes": 147908,
+   "bridge": "n/a"
+  },
+  {
+   "path": "tests/test_VRN_AutoTestLoop.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "a3b315689b9589368837550c07636c88dc40590c91605504f71f27d7f6ded861",
+   "bytes": 56614,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST001",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_BookCheck.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "55bfd827ab557bba166cdb43a4e3bd18c1697bc217fae9e9d8806ea039478ac7",
+   "bytes": 18711,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST002",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_DataFrame.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "beba518e3029632fee5ebcc468e33bbd12aecdaf45acac5159dfcb2aaa3edd64",
+   "bytes": 20536,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST010",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_Evidence_Core.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "a6bd16077676f041d152bb2b6f36e8783216bf3c4556f08b06e5276e2e200697",
+   "bytes": 25373,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST003",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_FirstPageEngine.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "5383cfab1d02b4cbce6be396f349dee248997fc2884da458fda1adc55a0240a7",
+   "bytes": 27291,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST004",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_Focus.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "e117036676b74b726b2e051834eee84399cd2ac195c27f37adab0cfc84cf7d39",
+   "bytes": 11749,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST013",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_Infra_v0100.py",
+   "kind": "TEST",
+   "version": "v0100",
+   "sha256": "b2df0ec952cd8a5c4bb788f22cd7c4ccff55209f912508d8b12eeaa8ff641068",
+   "bytes": 23319,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST008",
+   "category": "TEST",
+   "module_version": "v0100"
+  },
+  {
+   "path": "tests/test_VRN_Lock.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "ad174d6cce042130efd1a240391b5f5be77f5b5a6afc727aa124b0518c3ba808",
+   "bytes": 9267,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST011",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_Main_v0100.py",
+   "kind": "TEST",
+   "version": "v0100",
+   "sha256": "b2b76a10a671a250b7ac0d3c44cd73b5159b3440f63b7ae57c18867b377146f6",
+   "bytes": 116446,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST005",
+   "category": "TEST",
+   "module_version": "v0100"
+  },
+  {
+   "path": "tests/test_VRN_Matrix.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "14960288557eae69664d218093d0bb28861522769bb92c12aa77d2289cb3bbac",
+   "bytes": 5988,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST014",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_Ocr.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "c7c3782a34bc5299dd31a331258ce41b2261e7ce549949a7e0d5a545a4cc6688",
+   "bytes": 11493,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST018",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_OutputVerify.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "d31f82ffbd1eac4ca664fed96d6d0d88c16d5ceb590c15d79e27c332cae982b9",
+   "bytes": 11184,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST019",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_PageRegions.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "60ed7cb1f0134332fec0ad5efbc372ae557558b9c3fa41f64c1f147628f395a2",
+   "bytes": 31019,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST009",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_PanoramaProbe.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "b6e8aa3beeec372656844de035010392392b95629e2cfa21efbdad4a9fbd7e7e",
+   "bytes": 15126,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST006",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_PivotDB.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "05c405d5039636601840f6b5f9742299ee8e01fef3d0da7dc13d3e33bc760610",
+   "bytes": 7743,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST020",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_ReportDatabase_Engine.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "afce6fc6beebb36dbe74bd16e379146ba0fa4e5b0d4e8f01cb00a5cd13248e0b",
+   "bytes": 50830,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST007",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_RunCache.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "f7ce6f50f8ae39910fe8156c2491442897907ad165746cd0c9b28312f1290649",
+   "bytes": 13404,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST017",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_TickerRecord.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "12cde9db2a5b66b53caae7473fdef2c891bd4527fed569b74ae0f53e591c4065",
+   "bytes": 19164,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST015",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_TitleTrim.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "76851eff57277864568cb8b096a312c13065d5a17644b8fa9b5d28dd2e20ac2d",
+   "bytes": 76444,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST012",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_ToolBridge.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "ea5dcd074e1a1b9cdd378cebf1e546181ce90d5db84c4f9a6f76dba806efe82d",
+   "bytes": 5530,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST021",
+   "category": "TEST",
+   "module_version": ""
+  },
+  {
+   "path": "tests/test_VRN_TruthMatrix.py",
+   "kind": "TEST",
+   "version": "",
+   "sha256": "13de660e63044802e625cd6d2e9948a35e18b9de002d17b72cc335de2d851cbf",
+   "bytes": 5966,
+   "bridge": "ACCEL-BRIDGE",
+   "id": "VRN-TST016",
+   "category": "TEST",
+   "module_version": ""
+  }
+ ]
+}

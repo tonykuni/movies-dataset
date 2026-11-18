@@ -1,0 +1,44 @@
+{
+ "schema": "VIA_ToolManifest/1",
+ "system": "VRN-1",
+ "main": "functional modules/VRN/VRN_Main_v0100.py",
+ "bridge": "VRN_ToolBridge v0100",
+ "root_rule": "相對路徑以工具冊所在的倉為根（工具冊往上三層：functional modules/VRN/ssot）",
+ "rule": "借用端只讀：逐檔核對 sha256（不符 = 不借）· 不改 / 不複製 VRN-1 的檔 · 只寫借用端自己的輸出夾",
+ "offers": [
+  {
+   "id": "table.pivot_db",
+   "file": "functional modules/VRN/engine/VRN_PivotDB_v0100.py",
+   "entry": "build_pivot_db",
+   "signature": "build_pivot_db(facts, out_dir, restored=(), title='', generated_by='') -> summary",
+   "contract": "VIA_PivotFacts/1：facts 一格一列（欄位見 FACT_COLS）· 只收 VERIFIED / CORRECTED、有期間、有數值 · 同格不同值留空列衝突 · 印的位數不同的同一個數取最細的列精度合併 · 寫進呼叫端給的 out_dir（SQLite 一定有 · DuckDB 有才寫 · CSV · Parquet · HTML）",
+   "needs": [
+    "（標準庫）",
+    "duckdb（可無）",
+    "pandas + pyarrow（可無）"
+   ],
+   "selftest": "--selftest",
+   "kind": "python",
+   "ready": true,
+   "why": "",
+   "files": [
+    {
+     "file": "functional modules/VRN/engine/VRN_PivotDB_v0100.py",
+     "sha256": "adadf2a50d1912b308bf64f0e47b1cda82a6afada69e90dd68ea7aef389e0284"
+    }
+   ]
+  }
+ ],
+ "borrows": [
+  {
+   "id": "section.near",
+   "from": "VRN-2",
+   "manifest": "VIA_Reports/vrn2/tools/VRN2_ToolManifest_v0100.json"
+  },
+  {
+   "id": "ocr.image",
+   "from": "VRN-2",
+   "manifest": "VIA_Reports/vrn2/tools/VRN2_ToolManifest_v0100.json"
+  }
+ ]
+}

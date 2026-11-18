@@ -1,0 +1,2382 @@
+{
+ "schema": "VRN_OperatorLabels_SSOT_v0100",
+ "version": "v0100",
+ "ruled_by": "操作員 2026-10-11 上傳 5 支 .py（同一則訊息附上實測 WARN）；檔案本身不收，只收挑過的資料",
+ "how_used": {
+  "operand_labels": "G15 列標 → 運算元：和 AnnualExtract／FinIdentity 的列標一樣，整個列標完全相同才算",
+  "operand_patterns": "前兩者對不到時才用：整個列標 fullmatch（不是子字串，所以 EBT 不會吃到 debt）",
+  "field_crosswalk": "登記：VRN 運算元 ↔ TWSE／twstock／yfinance 欄名（VDF 接官方值時用）",
+  "broker_candidates": "只顯示：上傳檔的券商叫法，VRN 券商字典沒有的列在同義字冊，併不併由操作員裁定"
+ },
+ "sources": [
+  {
+   "file": "InvestmentRegexPattern_VALIDATED.py",
+   "sha256_lf": "e38c179d42524982300c52d582ff220307fdf3ab2df324d382219fdf68eabc88",
+   "used_for": "列標 regex（六張表 141 條，對到 VRN 運算元的部分）"
+  },
+  {
+   "file": "financial_classification_rules.py",
+   "sha256_lf": "11cd18c20daf58abbeed5a87ef637d6d6a2875525b4b59ac0962d05c15cf3b37",
+   "used_for": "TWSE／twstock／yfinance 欄名對照、列標同義字、券商叫法（候選）"
+  },
+  {
+   "file": "financial_data_standardization.py",
+   "sha256_lf": "ddf42b1449448db92ea4feab1829c022eafd0309913539648d839c5fb9399ea1",
+   "used_for": "沒收：兩個版本接在一起、跑不起來；只取『稀釋 EPS ≤ 基本 EPS』這個想法（寫進 FinIdentity）"
+  },
+  {
+   "file": "enhanced_part1_financial_1_.py",
+   "sha256_lf": "1c4faf7d4b6abf7afcbd42a257e5b8be3262911f26e2a2269fc5df6facb857d5",
+   "used_for": "沒收程式：圖檔轉 PDF 但沒有 OCR、會開 LibreOffice 子行程、寫檔；只記下『首頁分區截取』的想法（VRN 已由 ENG394 做）"
+  },
+  {
+   "file": "editable_legacy.py",
+   "sha256_lf": "0b05dd64bb3b01da180bf5123e25f612b0c39c7deba8f2b2bffcc41b023eca2f",
+   "used_for": "沒收：這是 pip 自己的檔（pip/_internal/operations/install/editable_legacy.py）被貼上 VIA 橋；表示有工具改寫了 Python 安裝裡的檔，請操作員檢查"
+  }
+ ],
+ "operand_labels": {
+  "revenue": [
+   "營業收入",
+   "Revenue",
+   "營收",
+   "Sales",
+   "銷售收入",
+   "Net Revenue",
+   "Net Sales",
+   "Total Revenue",
+   "主營業務收入"
+  ],
+  "cogs": [
+   "營業成本",
+   "Cost of Revenue",
+   "COGS",
+   "銷貨成本",
+   "Cost of Goods Sold",
+   "直接成本",
+   "製造成本"
+  ],
+  "gross_profit": [
+   "毛利",
+   "Gross Profit",
+   "營業毛利",
+   "GP",
+   "毛利額",
+   "Gross Income",
+   "毛益",
+   "銷售毛利"
+  ],
+  "opex": [
+   "營業費用",
+   "Operating Expenses",
+   "OpEx",
+   "營運費用",
+   "銷售及管理費用"
+  ],
+  "operating_income": [
+   "營業利益",
+   "Operating Profit",
+   "Operating Income",
+   "EBIT",
+   "營業利潤",
+   "營業獲利",
+   "營業損益",
+   "Operating Earnings"
+  ],
+  "nonop": [
+   "營業外收入",
+   "Non-operating Income",
+   "業外收入",
+   "業外收益"
+  ],
+  "pretax_income": [
+   "稅前純益",
+   "Pre-tax Income",
+   "EBT",
+   "Earnings Before Tax",
+   "稅前盈餘",
+   "稅前利益",
+   "稅前淨利"
+  ],
+  "net_income": [
+   "本期淨利",
+   "Net Income",
+   "Net Profit",
+   "稅後淨利",
+   "淨利",
+   "Profit After Tax",
+   "稅後純益",
+   "歸屬母公司淨利"
+  ],
+  "ebitda": [
+   "EBITDA",
+   "息前稅前折舊攤銷前利益",
+   "稅息折舊攤銷前盈餘"
+  ],
+  "basic_eps": [
+   "每股盈餘",
+   "Basic EPS",
+   "EPS",
+   "基本每股盈餘",
+   "每股稅後盈餘",
+   "每股淨利",
+   "每股純益"
+  ],
+  "diluted_eps": [
+   "稀釋每股盈餘",
+   "Diluted EPS",
+   "完全稀釋EPS",
+   "FD EPS",
+   "稀釋後每股盈餘"
+  ],
+  "dps_cash": [
+   "每股現金股利",
+   "DPS",
+   "Dividend per share",
+   "每股派息",
+   "每股股利"
+  ],
+  "assets": [
+   "資產總額",
+   "Total Assets",
+   "資產總計",
+   "總資產",
+   "資產合計"
+  ],
+  "current_assets": [
+   "流動資產",
+   "Current Assets",
+   "短期資產",
+   "流動資產總額"
+  ],
+  "cash": [
+   "現金及約當現金",
+   "Cash Equivalents",
+   "現金",
+   "貨幣資金"
+  ],
+  "receivables": [
+   "應收帳款",
+   "Accounts Receivable",
+   "A/R",
+   "應收款項"
+  ],
+  "inventory": [
+   "存貨",
+   "Inventory",
+   "商品存貨"
+  ],
+  "ppe": [
+   "不動產廠房設備",
+   "PPE",
+   "Property Plant Equipment",
+   "固定資產"
+  ],
+  "liabilities": [
+   "負債總額",
+   "Total Liabilities",
+   "負債總計",
+   "總負債"
+  ],
+  "current_liab": [
+   "流動負債",
+   "Current Liabilities"
+  ],
+  "st_debt": [
+   "短期借款",
+   "Short Term Debt"
+  ],
+  "lt_debt": [
+   "長期借款",
+   "Long Term Debt"
+  ],
+  "equity_total": [
+   "Total Equity",
+   "Shareholders' Equity",
+   "權益總額",
+   "股東權益總額",
+   "股東權益"
+  ],
+  "retained_earnings": [
+   "保留盈餘",
+   "Retained Earnings",
+   "未分配盈餘",
+   "累計盈餘"
+  ],
+  "bvps": [
+   "每股淨值",
+   "BVPS",
+   "Book Value Per Share",
+   "每股帳面價值",
+   "NAV Per Share",
+   "每股淨資產"
+  ],
+  "shares": [
+   "流通在外股數",
+   "Shares Outstanding",
+   "發行股數",
+   "普通股股數"
+  ],
+  "cfo": [
+   "營業活動現金流",
+   "Operating Cash Flow",
+   "CFO",
+   "OCF",
+   "營運現金流"
+  ],
+  "cfi": [
+   "投資活動現金流",
+   "Investing Cash Flow",
+   "CFI",
+   "投資現金流"
+  ],
+  "cff": [
+   "籌資活動現金流",
+   "Financing Cash Flow",
+   "CFF",
+   "融資現金流"
+  ],
+  "capex": [
+   "資本支出",
+   "CapEx",
+   "Capital Expenditures",
+   "資本性支出"
+  ],
+  "fcf": [
+   "自由現金流",
+   "FCF",
+   "Free Cash Flow",
+   "自由現金流量"
+  ],
+  "dividends_paid": [
+   "現金股利發放",
+   "Dividends Paid",
+   "股息支付",
+   "股利發放"
+  ],
+  "roe": [
+   "ROE",
+   "股東權益報酬率",
+   "Return on Equity",
+   "淨值報酬率",
+   "ROAE",
+   "權益報酬率"
+  ],
+  "roa": [
+   "ROA",
+   "資產報酬率",
+   "Return on Assets",
+   "總資產報酬率",
+   "ROAA"
+  ],
+  "gross_margin": [
+   "毛利率",
+   "Gross Margin",
+   "Gross Profit Margin",
+   "營業毛利率"
+  ],
+  "op_margin": [
+   "營業利益率",
+   "Operating Margin",
+   "EBIT Margin",
+   "營業淨利率"
+  ],
+  "net_margin": [
+   "淨利率",
+   "Net Margin",
+   "Net Profit Margin",
+   "純益率",
+   "NPM"
+  ],
+  "revenue_yoy": [
+   "營收成長率",
+   "Revenue Growth",
+   "營收年增率",
+   "銷售成長率"
+  ],
+  "eps_yoy": [
+   "EPS成長率",
+   "EPS Growth",
+   "每股盈餘成長率"
+  ],
+  "pe": [
+   "本益比",
+   "P/E",
+   "PE Ratio",
+   "PER",
+   "市盈率",
+   "股價盈餘比"
+  ],
+  "pb": [
+   "股價淨值比",
+   "P/B",
+   "PB Ratio",
+   "PBR",
+   "市淨率"
+  ],
+  "ps": [
+   "股價營收比",
+   "P/S",
+   "PS Ratio",
+   "PSR",
+   "市銷率"
+  ],
+  "div_yield": [
+   "股利殖利率",
+   "Dividend Yield",
+   "殖利率",
+   "現金殖利率"
+  ],
+  "debt_ratio": [
+   "負債比率",
+   "Debt Ratio",
+   "負債率",
+   "總負債比率"
+  ],
+  "current_ratio": [
+   "流動比率",
+   "Current Ratio",
+   "短期償債能力"
+  ],
+  "quick_ratio": [
+   "速動比率",
+   "Quick Ratio",
+   "酸性測驗比率"
+  ]
+ },
+ "operand_patterns": {
+  "cash": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.cash（現金及約當現金）"
+   ],
+   "regex": [
+    "現金及約當現金",
+    "現金與約當現金",
+    "現金及現金等價物",
+    "cash\\s*(?:and|&)?\\s*cash\\s*equivalents?",
+    "現金(?:$|[^\\u4e00-\\u9fff])"
+   ]
+  },
+  "st_investments": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.short_term_investment（短期投資）"
+   ],
+   "regex": [
+    "(?:透過損益|透過其他綜合損益)按公允價值衡量之金融資產[－—-]?流動",
+    "按攤銷後成本衡量之金融資產[－—-]?流動",
+    "短期投資",
+    "流動金融資產",
+    "short[- ]?term\\s*investments?",
+    "marketable\\s*securities"
+   ]
+  },
+  "receivables": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.accounts_receivable（應收帳款）"
+   ],
+   "regex": [
+    "應收帳款淨額",
+    "應收帳款[－—-]?淨額",
+    "應收帳款",
+    "accounts?\\s*receivable",
+    "trade\\s*receivables?",
+    "A/R"
+   ]
+  },
+  "inventory": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.inventory（存貨）"
+   ],
+   "regex": [
+    "存貨淨額",
+    "存貨",
+    "inventor(?:y|ies)"
+   ]
+  },
+  "prepaid": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.prepaid_expenses（預付款項）"
+   ],
+   "regex": [
+    "預付款項",
+    "預付費用",
+    "預付貨款",
+    "prepaid\\s*(?:expenses?|items?)"
+   ]
+  },
+  "current_assets": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.total_current_assets（流動資產合計）"
+   ],
+   "regex": [
+    "流動資產[合總]計",
+    "流動資產小計",
+    "total\\s*current\\s*assets?"
+   ]
+  },
+  "lt_investments": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.long_term_investment（長期投資）"
+   ],
+   "regex": [
+    "採用權益法之投資",
+    "長期股權投資",
+    "長期投資",
+    "(?:透過損益|透過其他綜合損益)按公允價值衡量之金融資產[－—-]?非流動",
+    "long[- ]?term\\s*investments?",
+    "equity\\s*method\\s*investments?"
+   ]
+  },
+  "ppe": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.property_plant_equipment（不動產廠房及設備）"
+   ],
+   "regex": [
+    "不動產[、,]?廠房及設備淨額",
+    "不動產[、,]?廠房及設備",
+    "固定資產淨額",
+    "固定資產",
+    "property[,\\s]*plant\\s*(?:and|&)\\s*equipment",
+    "PP&?E",
+    "PPE"
+   ]
+  },
+  "rou": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.right_of_use_assets（使用權資產）"
+   ],
+   "regex": [
+    "使用權資產",
+    "right[- ]?of[- ]?use\\s*assets?",
+    "ROU\\s*assets?"
+   ]
+  },
+  "inv_property": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.investment_property（投資性不動產）"
+   ],
+   "regex": [
+    "投資性不動產",
+    "investment\\s*property"
+   ]
+  },
+  "intangibles": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.intangible_assets（無形資產）"
+   ],
+   "regex": [
+    "無形資產",
+    "intangible\\s*assets?"
+   ]
+  },
+  "dta": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.deferred_tax_assets（遞延所得稅資產）"
+   ],
+   "regex": [
+    "遞延所得稅資產",
+    "遞延稅項資產",
+    "deferred\\s*(?:income\\s*)?tax\\s*assets?"
+   ]
+  },
+  "noncurrent_assets": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.total_non_current_assets（非流動資產合計）"
+   ],
+   "regex": [
+    "非流動資產[合總]計",
+    "非流動資產小計",
+    "total\\s*non[- ]?current\\s*assets?"
+   ]
+  },
+  "assets": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.total_assets（資產總計）"
+   ],
+   "regex": [
+    "資產總[計額]",
+    "資產[合總]計",
+    "total\\s*assets?"
+   ]
+  },
+  "st_debt": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.short_term_borrowings（短期借款）"
+   ],
+   "regex": [
+    "短期借款",
+    "短期銀行借款",
+    "short[- ]?term\\s*(?:borrowings?|loans?|debt)",
+    "bank\\s*(?:borrowings?|loans?)"
+   ]
+  },
+  "accounts_payable": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.accounts_payable（應付帳款）"
+   ],
+   "regex": [
+    "應付帳款",
+    "accounts?\\s*payable",
+    "trade\\s*payables?",
+    "A/P"
+   ]
+  },
+  "other_payables": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.other_payables（其他應付款）"
+   ],
+   "regex": [
+    "其他應付款",
+    "應付費用",
+    "other\\s*payables?",
+    "accrued\\s*expenses?"
+   ]
+  },
+  "contract_liab": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.contract_liabilities（合約負債）"
+   ],
+   "regex": [
+    "合約負債",
+    "contract\\s*liabilit(?:y|ies)"
+   ]
+  },
+  "cpltd": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.current_portion_long_term_debt（一年內到期長期負債）"
+   ],
+   "regex": [
+    "一年內到期長期[負負]債",
+    "一年(?:內|以內)到期(?:之)?長期借款",
+    "current\\s*portion\\s*(?:of\\s*)?long[- ]?term\\s*debt"
+   ]
+  },
+  "lease_liab": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.lease_liabilities_noncurrent（租賃負債-非流動）"
+   ],
+   "regex": [
+    "租賃負債[－—-]?非流動",
+    "lease\\s*liabilit(?:y|ies)[- ]?non[- ]?current"
+   ]
+  },
+  "current_liab": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.total_current_liabilities（流動負債合計）"
+   ],
+   "regex": [
+    "流動負債[合總]計",
+    "流動負債小計",
+    "total\\s*current\\s*liabilit(?:y|ies)"
+   ]
+  },
+  "lt_debt": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.long_term_borrowings（長期借款）"
+   ],
+   "regex": [
+    "長期借款",
+    "長期銀行借款",
+    "long[- ]?term\\s*(?:borrowings?|loans?|debt)"
+   ]
+  },
+  "bonds": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.bonds_payable（應付公司債）"
+   ],
+   "regex": [
+    "應付公司債",
+    "公司債",
+    "bonds?\\s*payable",
+    "corporate\\s*bonds?"
+   ]
+  },
+  "dtl": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.deferred_tax_liabilities（遞延所得稅負債）"
+   ],
+   "regex": [
+    "遞延所得稅負債",
+    "遞延稅項負債",
+    "deferred\\s*(?:income\\s*)?tax\\s*liabilit(?:y|ies)"
+   ]
+  },
+  "noncurrent_liab": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.total_non_current_liabilities（非流動負債合計）"
+   ],
+   "regex": [
+    "非流動負債[合總]計",
+    "非流動負債小計",
+    "total\\s*non[- ]?current\\s*liabilit(?:y|ies)"
+   ]
+  },
+  "liabilities": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.total_liabilities（負債總計）"
+   ],
+   "regex": [
+    "負債總[計額]",
+    "負債[合總]計",
+    "total\\s*liabilit(?:y|ies)"
+   ]
+  },
+  "capital_stock": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.common_stock（普通股股本）"
+   ],
+   "regex": [
+    "普通股股本",
+    "股本",
+    "實收資本",
+    "common\\s*stock",
+    "capital\\s*stock",
+    "share\\s*capital",
+    "paid[- ]?in\\s*capital"
+   ]
+  },
+  "capital_surplus": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.capital_surplus（資本公積）"
+   ],
+   "regex": [
+    "資本公積",
+    "股本溢價",
+    "capital\\s*surplus",
+    "additional\\s*paid[- ]?in\\s*capital",
+    "share\\s*premium"
+   ]
+  },
+  "retained_earnings": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.retained_earnings（保留盈餘）"
+   ],
+   "regex": [
+    "保留盈餘",
+    "累積盈餘",
+    "未分配盈餘",
+    "retained\\s*earnings?",
+    "accumulated\\s*(?:profits?|earnings?)"
+   ]
+  },
+  "treasury": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.treasury_stock（庫藏股票）"
+   ],
+   "regex": [
+    "庫藏股[票]?",
+    "treasury\\s*stock",
+    "treasury\\s*shares?"
+   ]
+  },
+  "nci": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.non_controlling_interest（非控制權益）"
+   ],
+   "regex": [
+    "非控制權益",
+    "少數股權",
+    "minority\\s*interest",
+    "non[- ]?controlling\\s*interest"
+   ]
+  },
+  "equity_total": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.total_equity（權益總計）"
+   ],
+   "regex": [
+    "權益總[計額]",
+    "權益[合總]計",
+    "total\\s*(?:shareholders?['\\s]?)?equity",
+    "total\\s*stockholders?['\\s]?\\s*equity"
+   ]
+  },
+  "total_liabilities_equity": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.total_liabilities_equity（負債及權益總計）"
+   ],
+   "regex": [
+    "負債及權益總[計額]",
+    "負債[及與和]權益[合總]計",
+    "total\\s*liabilit(?:y|ies)\\s*(?:and|&)\\s*(?:shareholders?['\\s]?)?equity"
+   ]
+  },
+  "revenue": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.INCOME_STATEMENT_PATTERNS.revenue（營業收入）"
+   ],
+   "regex": [
+    "營業收入(?:淨額)?",
+    "營業收入[合總]計",
+    "銷貨收入",
+    "營收",
+    "(?:net\\s*)?(?:sales|revenue)",
+    "total\\s*(?:net\\s*)?(?:sales|revenue)"
+   ]
+  },
+  "cogs": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.INCOME_STATEMENT_PATTERNS.cost_of_sales（營業成本）"
+   ],
+   "regex": [
+    "營業成本",
+    "銷貨成本",
+    "服務成本",
+    "cost\\s*of\\s*(?:goods\\s*)?(?:sold|sales|revenue)",
+    "COGS"
+   ]
+  },
+  "gross_profit": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.INCOME_STATEMENT_PATTERNS.gross_profit（營業毛利）"
+   ],
+   "regex": [
+    "營業毛利(?:\\(損\\))?",
+    "毛利(?:\\(損\\))?",
+    "銷貨毛利"
+   ]
+  },
+  "opex": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.INCOME_STATEMENT_PATTERNS.total_operating_expenses（營業費用合計）"
+   ],
+   "regex": [
+    "營業費用[合總]計",
+    "total\\s*operating\\s*expenses?"
+   ]
+  },
+  "operating_income": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.INCOME_STATEMENT_PATTERNS.operating_income（營業利益）"
+   ],
+   "regex": [
+    "營業利益(?:\\(損失\\))?",
+    "營業淨利",
+    "營業損益",
+    "operating\\s*(?:income|profit|loss)",
+    "EBIT(?!DA)"
+   ]
+  },
+  "ebitda": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.INCOME_STATEMENT_PATTERNS.ebitda（稅息折舊攤銷前盈餘）"
+   ],
+   "regex": [
+    "稅息折舊攤銷前(?:盈餘|利潤|損益)",
+    "EBITDA",
+    "earnings?\\s*before\\s*interest\\s*tax\\s*depreciation\\s*amortization"
+   ]
+  },
+  "nonop": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.INCOME_STATEMENT_PATTERNS.non_operating_income（營業外收入及支出）"
+   ],
+   "regex": [
+    "營業外收入及支出(?:淨額)?",
+    "營業外損益",
+    "非營業損益",
+    "non[- ]?operating\\s*(?:income|expenses?)"
+   ]
+  },
+  "pretax_income": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.INCOME_STATEMENT_PATTERNS.income_before_tax（稅前淨利）"
+   ],
+   "regex": [
+    "稅前淨利(?:\\(損\\))?",
+    "稅前利益",
+    "繼續營業單位稅前淨利",
+    "(?:income|profit|earnings?)\\s*before\\s*(?:income\\s*)?tax",
+    "pre[- ]?tax\\s*(?:income|profit)",
+    "EBT"
+   ]
+  },
+  "tax": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.INCOME_STATEMENT_PATTERNS.income_tax（所得稅費用）"
+   ],
+   "regex": [
+    "所得稅(?:費用|利益)",
+    "income\\s*tax\\s*(?:expense|benefit)"
+   ]
+  },
+  "net_income": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.INCOME_STATEMENT_PATTERNS.net_income（本期淨利）",
+    "InvestmentRegexPattern_VALIDATED.INCOME_STATEMENT_PATTERNS.net_income_parent（歸屬母公司淨利）"
+   ],
+   "regex": [
+    "本期淨利(?:\\(損\\))?",
+    "稅後淨利",
+    "淨利(?:\\(損\\))?",
+    "繼續營業單位本期淨利",
+    "net\\s*(?:income|profit|loss)",
+    "(?:income|profit|earnings?)\\s*after\\s*tax",
+    "歸屬於?母公司(?:業主)?(?:之)?(?:本期)?淨利",
+    "母公司淨利",
+    "net\\s*(?:income|profit)\\s*attributable\\s*to\\s*(?:parent|owners?\\s*of\\s*(?:the\\s*)?parent)"
+   ]
+  },
+  "depreciation": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.depreciation（折舊費用）"
+   ],
+   "regex": [
+    "折舊費用",
+    "折舊",
+    "depreciation\\s*(?:expense)?"
+   ]
+  },
+  "amortization": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.amortization（攤銷費用）"
+   ],
+   "regex": [
+    "攤銷費用",
+    "攤銷",
+    "amortization\\s*(?:expense)?"
+   ]
+  },
+  "cfo": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.operating_cash_flow（營業活動淨現金流入(出)）"
+   ],
+   "regex": [
+    "營業活動[之的]?(?:淨)?現金流[入出量]?(?:[合總]計)?",
+    "營運活動現金流量",
+    "(?:net\\s*)?cash\\s*(?:flows?\\s*)?(?:from|provided\\s*by|used\\s*in)\\s*operating\\s*activities",
+    "CFO"
+   ]
+  },
+  "capex": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.capex（購置不動產廠房設備）"
+   ],
+   "regex": [
+    "取得不動產[、,]?廠房及設備",
+    "購置不動產[、,]?廠房及設備",
+    "購買固定資產",
+    "資本支出",
+    "(?:purchase|acquisition)\\s*of\\s*(?:property[,\\s]*plant\\s*(?:and|&)\\s*equipment|PP&?E|fixed\\s*assets?)",
+    "capital\\s*expenditure",
+    "CAPEX"
+   ]
+  },
+  "cfi": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.investing_cash_flow（投資活動淨現金流入(出)）"
+   ],
+   "regex": [
+    "投資活動[之的]?(?:淨)?現金流[入出量]?(?:[合總]計)?",
+    "(?:net\\s*)?cash\\s*(?:flows?\\s*)?(?:from|provided\\s*by|used\\s*in)\\s*investing\\s*activities",
+    "CFI"
+   ]
+  },
+  "dividends_paid": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.dividends_paid（發放現金股利）"
+   ],
+   "regex": [
+    "發放現金股利",
+    "支付股利",
+    "現金股利(?:支付|發放)",
+    "(?:cash\\s*)?dividends?\\s*paid"
+   ]
+  },
+  "cff": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.financing_cash_flow（籌資活動淨現金流入(出)）"
+   ],
+   "regex": [
+    "籌資活動[之的]?(?:淨)?現金流[入出量]?(?:[合總]計)?",
+    "融資活動現金流量",
+    "(?:net\\s*)?cash\\s*(?:flows?\\s*)?(?:from|provided\\s*by|used\\s*in)\\s*financing\\s*activities",
+    "CFF"
+   ]
+  },
+  "net_change_in_cash": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.net_change_in_cash（現金及約當現金淨增減）"
+   ],
+   "regex": [
+    "現金及約當現金(?:之)?(?:淨增減|淨變動|增減數)",
+    "(?:net\\s*)?(?:increase|decrease|change)\\s*in\\s*cash"
+   ]
+  },
+  "cash_begin": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.beginning_cash（期初現金）"
+   ],
+   "regex": [
+    "期初現金及約當現金",
+    "期初現金餘額",
+    "(?:beginning|opening)\\s*cash\\s*(?:balance)?"
+   ]
+  },
+  "cash_end": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.ending_cash（期末現金）"
+   ],
+   "regex": [
+    "期末現金及約當現金",
+    "期末現金餘額",
+    "(?:ending|closing)\\s*cash\\s*(?:balance)?"
+   ]
+  },
+  "fcf": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.free_cash_flow（自由現金流量）"
+   ],
+   "regex": [
+    "自由現金流量?",
+    "free\\s*cash\\s*flow",
+    "FCF"
+   ]
+  },
+  "current_ratio": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.current_ratio（流動比率）"
+   ],
+   "regex": [
+    "流動比率",
+    "current\\s*ratio"
+   ]
+  },
+  "quick_ratio": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.quick_ratio（速動比率）"
+   ],
+   "regex": [
+    "速動比率",
+    "酸性測試比率",
+    "quick\\s*ratio",
+    "acid[- ]?test\\s*ratio"
+   ]
+  },
+  "debt_ratio": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.debt_ratio（負債比率）"
+   ],
+   "regex": [
+    "負債比率",
+    "負債佔資產比率",
+    "debt\\s*ratio",
+    "debt\\s*to\\s*assets?\\s*ratio"
+   ]
+  },
+  "gross_margin": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.gross_margin（毛利率）"
+   ],
+   "regex": [
+    "毛利率",
+    "營業毛利率",
+    "gross\\s*(?:profit\\s*)?margin"
+   ]
+  },
+  "op_margin": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.operating_margin（營業利益率）"
+   ],
+   "regex": [
+    "營業利益率",
+    "營業淨利率",
+    "operating\\s*(?:profit\\s*)?margin"
+   ]
+  },
+  "net_margin": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.net_profit_margin（淨利率）"
+   ],
+   "regex": [
+    "淨利率",
+    "稅後淨利率",
+    "純益率",
+    "net\\s*(?:profit\\s*)?margin"
+   ]
+  },
+  "roe": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.roe（股東權益報酬率）"
+   ],
+   "regex": [
+    "股東權益報酬率",
+    "權益報酬率",
+    "return\\s*on\\s*equity",
+    "ROE"
+   ]
+  },
+  "roa": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.roa（資產報酬率）"
+   ],
+   "regex": [
+    "資產報酬率",
+    "總資產報酬率",
+    "return\\s*on\\s*assets?",
+    "ROA"
+   ]
+  },
+  "asset_turnover": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.asset_turnover（資產週轉率）"
+   ],
+   "regex": [
+    "(?:總)?資產週轉率",
+    "asset\\s*turnover"
+   ]
+  },
+  "inv_turnover": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.inventory_turnover（存貨週轉率）"
+   ],
+   "regex": [
+    "存貨週轉率",
+    "存貨周轉率",
+    "inventory\\s*turnover"
+   ]
+  },
+  "dio": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.inventory_days（平均售貨天數）"
+   ],
+   "regex": [
+    "平均售貨天數",
+    "存貨週轉天數",
+    "days\\s*inventor(?:y|ies)\\s*(?:outstanding)?",
+    "DIO"
+   ]
+  },
+  "ar_turnover": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.receivable_turnover（應收帳款週轉率）"
+   ],
+   "regex": [
+    "應收(?:帳|款項?)款?週轉率",
+    "receivables?\\s*turnover"
+   ]
+  },
+  "dso": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.receivable_days（平均收現天數）"
+   ],
+   "regex": [
+    "平均收現天數",
+    "應收帳款週轉天數",
+    "days\\s*sales\\s*outstanding",
+    "DSO"
+   ]
+  },
+  "dpo": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.payable_days（平均付款天數）"
+   ],
+   "regex": [
+    "平均付款天數",
+    "應付帳款週轉天數",
+    "days\\s*payable\\s*outstanding",
+    "DPO"
+   ]
+  },
+  "ccc": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.cash_conversion_cycle（現金轉換週期）"
+   ],
+   "regex": [
+    "現金(?:轉換|循環)週期",
+    "cash\\s*conversion\\s*cycle",
+    "CCC"
+   ]
+  },
+  "fixed_asset_turnover": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.RATIO_PATTERNS.fixed_asset_turnover（固定資產週轉率）"
+   ],
+   "regex": [
+    "固定資產週轉率",
+    "不動產[、,]?廠房及設備週轉率",
+    "fixed\\s*asset\\s*turnover"
+   ]
+  },
+  "basic_eps": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.eps_basic（基本每股盈餘）"
+   ],
+   "regex": [
+    "基本每股盈餘",
+    "基本每股(?:淨)?(?:利|損)",
+    "每股盈餘[（\\(]基本[）\\)]",
+    "basic\\s*(?:earnings?\\s*per\\s*share|EPS)"
+   ]
+  },
+  "diluted_eps": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.eps_diluted（稀釋每股盈餘）"
+   ],
+   "regex": [
+    "稀釋每股盈餘",
+    "稀釋每股(?:淨)?(?:利|損)",
+    "每股盈餘[（\\(]稀釋[）\\)]",
+    "diluted\\s*(?:earnings?\\s*per\\s*share|EPS)"
+   ]
+  },
+  "bvps": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.book_value_per_share（每股淨值）"
+   ],
+   "regex": [
+    "每股淨值",
+    "每股帳面價值",
+    "book\\s*value\\s*per\\s*share",
+    "BVPS",
+    "NAV\\s*per\\s*share"
+   ]
+  },
+  "cfps": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.operating_cf_per_share（每股營業現金流）"
+   ],
+   "regex": [
+    "每股營業?活動?現金流(?:量)?",
+    "每股營運現金流",
+    "operating\\s*cash\\s*flow\\s*per\\s*share",
+    "CFO\\s*per\\s*share"
+   ]
+  },
+  "dps_cash": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.cash_dividend_per_share（每股現金股利）"
+   ],
+   "regex": [
+    "每股現金股利",
+    "現金股利每股",
+    "cash\\s*dividend\\s*per\\s*share"
+   ]
+  },
+  "rev_ps": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.revenue_per_share（每股營收）"
+   ],
+   "regex": [
+    "每股營(?:業)?收(?:入)?",
+    "revenue\\s*per\\s*share",
+    "sales\\s*per\\s*share"
+   ]
+  },
+  "pe": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.pe_ratio（本益比）"
+   ],
+   "regex": [
+    "本益比",
+    "市盈率",
+    "P/?E\\s*ratio",
+    "price[- ]?(?:to[- ]?)?earnings?\\s*ratio"
+   ]
+  },
+  "pb": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.pb_ratio（股價淨值比）"
+   ],
+   "regex": [
+    "股價淨值比",
+    "市淨率",
+    "P/?B\\s*ratio",
+    "price[- ]?(?:to[- ]?)?book\\s*ratio"
+   ]
+  },
+  "ps": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.ps_ratio（股價營收比）"
+   ],
+   "regex": [
+    "股價營收比",
+    "市銷率",
+    "P/?S\\s*ratio",
+    "price[- ]?(?:to[- ]?)?sales\\s*ratio"
+   ]
+  },
+  "ev_ebitda": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.ev_ebitda（企業價值倍數）"
+   ],
+   "regex": [
+    "企業價值倍數",
+    "EV/?EBITDA",
+    "enterprise\\s*value\\s*(?:to\\s*)?EBITDA"
+   ]
+  },
+  "div_yield": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.dividend_yield（殖利率）"
+   ],
+   "regex": [
+    "(?:現金)?股利?殖利率",
+    "股息(?:收益)?率",
+    "dividend\\s*yield"
+   ]
+  },
+  "payout": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.payout_ratio（配息率）"
+   ],
+   "regex": [
+    "配息率",
+    "股利發放率",
+    "dividend\\s*payout\\s*ratio",
+    "payout\\s*ratio"
+   ]
+  },
+  "revenue_yoy": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.revenue_growth（營收成長率）"
+   ],
+   "regex": [
+    "營收成長率",
+    "營收(?:YoY|YOY|年增|年減|成長)",
+    "revenue\\s*growth",
+    "sales\\s*growth"
+   ]
+  },
+  "eps_yoy": {
+   "from": [
+    "InvestmentRegexPattern_VALIDATED.PER_SHARE_PATTERNS.eps_growth（每股盈餘成長率）"
+   ],
+   "regex": [
+    "每股盈餘成長率",
+    "EPS(?:成長|YoY|年增)",
+    "EPS\\s*growth"
+   ]
+  }
+ },
+ "field_crosswalk": {
+  "revenue": {
+   "twse_tpex": "營業收入",
+   "twstock": "revenue",
+   "yfinance": "totalRevenue",
+   "from": "financial_classification_rules.INCOME_FEATURES.Revenue"
+  },
+  "cogs": {
+   "twse_tpex": "營業成本",
+   "twstock": "cost",
+   "yfinance": "costOfRevenue",
+   "from": "financial_classification_rules.INCOME_FEATURES.CostOfRevenue"
+  },
+  "gross_profit": {
+   "twse_tpex": "營業毛利（毛損）",
+   "twstock": "gross_profit",
+   "yfinance": "grossProfit",
+   "from": "financial_classification_rules.INCOME_FEATURES.GrossProfit"
+  },
+  "opex": {
+   "twse_tpex": "營業費用",
+   "twstock": "operating_expenses",
+   "yfinance": "operatingExpenses",
+   "from": "financial_classification_rules.INCOME_FEATURES.OperatingExpenses"
+  },
+  "operating_income": {
+   "twse_tpex": "營業利益（損失）",
+   "twstock": "operating_income",
+   "yfinance": "operatingIncome",
+   "from": "financial_classification_rules.INCOME_FEATURES.OperatingProfit"
+  },
+  "nonop": {
+   "twse_tpex": "營業外收入及支出",
+   "twstock": "non_operating_income",
+   "yfinance": "otherIncomeExpense",
+   "from": "financial_classification_rules.INCOME_FEATURES.NonOperatingIncome"
+  },
+  "pretax_income": {
+   "twse_tpex": "稅前淨利（淨損）",
+   "twstock": "pretax_income",
+   "yfinance": "incomeBeforeTax",
+   "from": "financial_classification_rules.INCOME_FEATURES.PreTaxIncome"
+  },
+  "net_income": {
+   "twse_tpex": "本期淨利（淨損）",
+   "twstock": "net_income",
+   "yfinance": "netIncome",
+   "from": "financial_classification_rules.INCOME_FEATURES.NetIncome"
+  },
+  "ebitda": {
+   "yfinance": "ebitda",
+   "from": "financial_classification_rules.INCOME_FEATURES.EBITDA"
+  },
+  "basic_eps": {
+   "twse_tpex": "基本每股盈餘",
+   "twstock": "eps",
+   "yfinance": "basicEps",
+   "from": "financial_classification_rules.INCOME_FEATURES.BasicEPS"
+  },
+  "diluted_eps": {
+   "twse_tpex": "稀釋每股盈餘",
+   "twstock": "diluted_eps",
+   "yfinance": "dilutedEps",
+   "from": "financial_classification_rules.INCOME_FEATURES.DilutedEPS"
+  },
+  "dps_cash": {
+   "twse_tpex": "每股現金股利",
+   "twstock": "dividend",
+   "yfinance": "dividendRate",
+   "from": "financial_classification_rules.INCOME_FEATURES.DPS"
+  },
+  "assets": {
+   "twse_tpex": "資產總額",
+   "twstock": "total_assets",
+   "yfinance": "totalAssets",
+   "from": "financial_classification_rules.BALANCE_FEATURES.TotalAssets"
+  },
+  "current_assets": {
+   "twse_tpex": "流動資產",
+   "twstock": "current_assets",
+   "yfinance": "currentAssets",
+   "from": "financial_classification_rules.BALANCE_FEATURES.CurrentAssets"
+  },
+  "cash": {
+   "twse_tpex": "現金及約當現金",
+   "twstock": "cash",
+   "yfinance": "cashAndCashEquivalents",
+   "from": "financial_classification_rules.BALANCE_FEATURES.Cash"
+  },
+  "receivables": {
+   "twse_tpex": "應收帳款",
+   "twstock": "accounts_receivable",
+   "yfinance": "accountsReceivable",
+   "from": "financial_classification_rules.BALANCE_FEATURES.AccountsReceivable"
+  },
+  "inventory": {
+   "twse_tpex": "存貨",
+   "twstock": "inventory",
+   "yfinance": "inventory",
+   "from": "financial_classification_rules.BALANCE_FEATURES.Inventory"
+  },
+  "ppe": {
+   "twse_tpex": "不動產、廠房及設備",
+   "twstock": "ppe",
+   "yfinance": "propertyPlantEquipment",
+   "from": "financial_classification_rules.BALANCE_FEATURES.PPE"
+  },
+  "liabilities": {
+   "twse_tpex": "負債總額",
+   "twstock": "total_liabilities",
+   "yfinance": "totalLiabilities",
+   "from": "financial_classification_rules.BALANCE_FEATURES.TotalLiabilities"
+  },
+  "current_liab": {
+   "twse_tpex": "流動負債",
+   "twstock": "current_liabilities",
+   "yfinance": "currentLiabilities",
+   "from": "financial_classification_rules.BALANCE_FEATURES.CurrentLiabilities"
+  },
+  "st_debt": {
+   "twse_tpex": "短期借款",
+   "twstock": "short_term_debt",
+   "yfinance": "shortTermDebt",
+   "from": "financial_classification_rules.BALANCE_FEATURES.ShortTermDebt"
+  },
+  "lt_debt": {
+   "twse_tpex": "長期借款",
+   "twstock": "long_term_debt",
+   "yfinance": "longTermDebt",
+   "from": "financial_classification_rules.BALANCE_FEATURES.LongTermDebt"
+  },
+  "equity_total": {
+   "twse_tpex": "權益總額",
+   "twstock": "total_equity",
+   "yfinance": "totalStockholderEquity",
+   "from": "financial_classification_rules.BALANCE_FEATURES.TotalEquity"
+  },
+  "retained_earnings": {
+   "twse_tpex": "保留盈餘",
+   "twstock": "retained_earnings",
+   "yfinance": "retainedEarnings",
+   "from": "financial_classification_rules.BALANCE_FEATURES.RetainedEarnings"
+  },
+  "bvps": {
+   "twse_tpex": "每股淨值",
+   "twstock": "bvps",
+   "yfinance": "bookValue",
+   "from": "financial_classification_rules.BALANCE_FEATURES.BVPS"
+  },
+  "shares": {
+   "twse_tpex": "普通股股數",
+   "twstock": "shares_outstanding",
+   "yfinance": "sharesOutstanding",
+   "from": "financial_classification_rules.BALANCE_FEATURES.SharesOutstanding"
+  },
+  "cfo": {
+   "twse_tpex": "營業活動之淨現金流入（流出）",
+   "twstock": "operating_cashflow",
+   "yfinance": "operatingCashflow",
+   "from": "financial_classification_rules.CASHFLOW_FEATURES.OperatingCashFlow"
+  },
+  "cfi": {
+   "twse_tpex": "投資活動之淨現金流入（流出）",
+   "twstock": "investing_cashflow",
+   "yfinance": "investingCashflow",
+   "from": "financial_classification_rules.CASHFLOW_FEATURES.InvestingCashFlow"
+  },
+  "cff": {
+   "twse_tpex": "籌資活動之淨現金流入（流出）",
+   "twstock": "financing_cashflow",
+   "yfinance": "financingCashflow",
+   "from": "financial_classification_rules.CASHFLOW_FEATURES.FinancingCashFlow"
+  },
+  "capex": {
+   "twse_tpex": "資本支出",
+   "twstock": "capex",
+   "yfinance": "capitalExpenditures",
+   "from": "financial_classification_rules.CASHFLOW_FEATURES.CapEx"
+  },
+  "fcf": {
+   "twstock": "fcf",
+   "yfinance": "freeCashflow",
+   "from": "financial_classification_rules.CASHFLOW_FEATURES.FCF"
+  },
+  "dividends_paid": {
+   "twse_tpex": "發放現金股利",
+   "twstock": "dividends_paid",
+   "yfinance": "dividendsPaid",
+   "from": "financial_classification_rules.CASHFLOW_FEATURES.DividendsPaid"
+  },
+  "roe": {
+   "twse_tpex": "股東權益報酬率",
+   "twstock": "roe",
+   "yfinance": "returnOnEquity",
+   "from": "financial_classification_rules.KPI_FEATURES.ROE"
+  },
+  "roa": {
+   "twse_tpex": "資產報酬率",
+   "twstock": "roa",
+   "yfinance": "returnOnAssets",
+   "from": "financial_classification_rules.KPI_FEATURES.ROA"
+  },
+  "gross_margin": {
+   "twse_tpex": "毛利率",
+   "twstock": "gross_margin",
+   "yfinance": "grossMargins",
+   "from": "financial_classification_rules.KPI_FEATURES.GrossMargin"
+  },
+  "op_margin": {
+   "twse_tpex": "營業利益率",
+   "twstock": "operating_margin",
+   "yfinance": "operatingMargins",
+   "from": "financial_classification_rules.KPI_FEATURES.OperatingMargin"
+  },
+  "net_margin": {
+   "twse_tpex": "淨利率",
+   "twstock": "net_margin",
+   "yfinance": "profitMargins",
+   "from": "financial_classification_rules.KPI_FEATURES.NetMargin"
+  },
+  "revenue_yoy": {
+   "twse_tpex": "營收成長率",
+   "twstock": "revenue_growth",
+   "yfinance": "revenueGrowth",
+   "from": "financial_classification_rules.KPI_FEATURES.RevenueGrowth"
+  },
+  "eps_yoy": {
+   "twse_tpex": "EPS成長率",
+   "twstock": "eps_growth",
+   "yfinance": "earningsGrowth",
+   "from": "financial_classification_rules.KPI_FEATURES.EPSGrowth"
+  },
+  "pe": {
+   "twse_tpex": "本益比",
+   "twstock": "pe_ratio",
+   "yfinance": "trailingPE",
+   "from": "financial_classification_rules.KPI_FEATURES.PE"
+  },
+  "pb": {
+   "twse_tpex": "股價淨值比",
+   "twstock": "pb_ratio",
+   "yfinance": "priceToBook",
+   "from": "financial_classification_rules.KPI_FEATURES.PB"
+  },
+  "ps": {
+   "twse_tpex": "股價營收比",
+   "twstock": "ps_ratio",
+   "yfinance": "priceToSales",
+   "from": "financial_classification_rules.KPI_FEATURES.PS"
+  },
+  "div_yield": {
+   "twse_tpex": "現金殖利率",
+   "twstock": "dividend_yield",
+   "yfinance": "dividendYield",
+   "from": "financial_classification_rules.KPI_FEATURES.DividendYield"
+  },
+  "debt_ratio": {
+   "twse_tpex": "負債比率",
+   "twstock": "debt_ratio",
+   "from": "financial_classification_rules.KPI_FEATURES.DebtRatio"
+  },
+  "current_ratio": {
+   "twse_tpex": "流動比率",
+   "twstock": "current_ratio",
+   "yfinance": "currentRatio",
+   "from": "financial_classification_rules.KPI_FEATURES.CurrentRatio"
+  },
+  "quick_ratio": {
+   "twse_tpex": "速動比率",
+   "twstock": "quick_ratio",
+   "yfinance": "quickRatio",
+   "from": "financial_classification_rules.KPI_FEATURES.QuickRatio"
+  }
+ },
+ "broker_candidates": [
+  {
+   "code": "MS",
+   "zh": "摩根士丹利",
+   "en": "Morgan Stanley",
+   "names": [
+    "MS",
+    "Morgan Stanley",
+    "摩根士丹利",
+    "摩根史坦利",
+    "大摩"
+   ],
+   "country": "US"
+  },
+  {
+   "code": "GS",
+   "zh": "高盛",
+   "en": "Goldman Sachs",
+   "names": [
+    "GS",
+    "Goldman Sachs",
+    "Goldman",
+    "高盛",
+    "高盛集團"
+   ],
+   "country": "US"
+  },
+  {
+   "code": "JPM",
+   "zh": "摩根大通",
+   "en": "JPMorgan Chase",
+   "names": [
+    "JPM",
+    "JPMorgan Chase",
+    "JPMorgan",
+    "JP Morgan",
+    "摩根大通",
+    "JP摩根",
+    "小摩"
+   ],
+   "country": "US"
+  },
+  {
+   "code": "CITI",
+   "zh": "花旗銀行",
+   "en": "Citigroup",
+   "names": [
+    "CITI",
+    "Citigroup",
+    "Citi",
+    "花旗銀行",
+    "花旗集團",
+    "花旗"
+   ],
+   "country": "US"
+  },
+  {
+   "code": "BAML",
+   "zh": "美國銀行美林證券",
+   "en": "Bank of America Merrill Lynch",
+   "names": [
+    "BAML",
+    "Bank of America",
+    "BofA",
+    "Merrill Lynch",
+    "美國銀行美林證券",
+    "美林",
+    "美銀美林"
+   ],
+   "country": "US"
+  },
+  {
+   "code": "UBS",
+   "zh": "瑞銀集團",
+   "en": "UBS Group AG",
+   "names": [
+    "UBS",
+    "UBS Group AG",
+    "UBS Group",
+    "瑞銀集團",
+    "瑞銀"
+   ],
+   "country": "CH"
+  },
+  {
+   "code": "CS",
+   "zh": "瑞士信貸",
+   "en": "Credit Suisse",
+   "names": [
+    "CS",
+    "Credit Suisse",
+    "瑞士信貸",
+    "瑞信"
+   ],
+   "country": "CH"
+  },
+  {
+   "code": "DB",
+   "zh": "德意志銀行",
+   "en": "Deutsche Bank",
+   "names": [
+    "DB",
+    "Deutsche Bank",
+    "德意志銀行",
+    "德銀"
+   ],
+   "country": "DE"
+  },
+  {
+   "code": "HSBC",
+   "zh": "滙豐控股",
+   "en": "HSBC Holdings",
+   "names": [
+    "HSBC",
+    "HSBC Holdings",
+    "滙豐控股",
+    "匯豐",
+    "滙豐",
+    "滙豐銀行"
+   ],
+   "country": "UK/HK"
+  },
+  {
+   "code": "BARCLAYS",
+   "zh": "巴克萊銀行",
+   "en": "Barclays",
+   "names": [
+    "BARCLAYS",
+    "Barclays",
+    "巴克萊銀行",
+    "巴克萊"
+   ],
+   "country": "UK"
+  },
+  {
+   "code": "RBC",
+   "zh": "加拿大皇家銀行",
+   "en": "Royal Bank of Canada",
+   "names": [
+    "RBC",
+    "Royal Bank of Canada",
+    "RBC Capital",
+    "加拿大皇家銀行",
+    "RBC資本"
+   ],
+   "country": "CA"
+  },
+  {
+   "code": "NMR",
+   "zh": "野村證券",
+   "en": "Nomura Securities",
+   "names": [
+    "NMR",
+    "Nomura",
+    "Nomura Securities",
+    "野村證券",
+    "野村",
+    "野村控股"
+   ],
+   "country": "JP"
+  },
+  {
+   "code": "MIZUHO",
+   "zh": "みずほ金融集團",
+   "en": "Mizuho Financial Group",
+   "names": [
+    "MIZUHO",
+    "Mizuho",
+    "Mizuho Financial Group",
+    "みずほ金融集團",
+    "瑞穗",
+    "みずほ證券"
+   ],
+   "country": "JP"
+  },
+  {
+   "code": "SMBC",
+   "zh": "三井住友銀行",
+   "en": "Sumitomo Mitsui Banking Corp.",
+   "names": [
+    "SMBC",
+    "Sumitomo Mitsui",
+    "三井住友銀行",
+    "SMBC日興"
+   ],
+   "country": "JP"
+  },
+  {
+   "code": "MUFG",
+   "zh": "三菱UFJ銀行",
+   "en": "Mitsubishi UFJ Financial Group",
+   "names": [
+    "MUFG",
+    "Mitsubishi UFJ",
+    "三菱UFJ銀行",
+    "三菱UFJ摩根士丹利"
+   ],
+   "country": "JP"
+  },
+  {
+   "code": "DAIWA",
+   "zh": "大和證券",
+   "en": "Daiwa Securities",
+   "names": [
+    "DAIWA",
+    "Daiwa",
+    "Daiwa Securities",
+    "大和證券",
+    "大和"
+   ],
+   "country": "JP"
+  },
+  {
+   "code": "YUANTA",
+   "zh": "元大證券",
+   "en": "Yuanta Securities",
+   "names": [
+    "元大",
+    "Yuanta",
+    "Yuanta Securities",
+    "元大證券",
+    "元大投顧",
+    "元大金控"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "FUBON",
+   "zh": "富邦證券",
+   "en": "Fubon Securities",
+   "names": [
+    "富邦",
+    "Fubon",
+    "Fubon Securities",
+    "富邦證券",
+    "富邦投顧",
+    "富邦金控"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "CATHAY",
+   "zh": "國泰證券",
+   "en": "Cathay Securities",
+   "names": [
+    "國泰",
+    "Cathay",
+    "Cathay Securities",
+    "國泰證券",
+    "國泰投顧",
+    "國泰金控"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "SINOPAC",
+   "zh": "永豐金證券",
+   "en": "SinoPac Securities",
+   "names": [
+    "永豐",
+    "SinoPac",
+    "SinoPac Securities",
+    "永豐金證券",
+    "永豐投顧"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "CAPITAL",
+   "zh": "群益證券",
+   "en": "Capital Securities",
+   "names": [
+    "群益",
+    "Capital Securities",
+    "群益證券",
+    "群益投顧"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "KGI",
+   "zh": "凱基證券",
+   "en": "KGI Securities",
+   "names": [
+    "凱基",
+    "KGI",
+    "KGI Securities",
+    "凱基證券",
+    "凱基投顧"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "TAISHIN",
+   "zh": "台新證券",
+   "en": "Taishin Securities",
+   "names": [
+    "台新",
+    "Taishin",
+    "Taishin Securities",
+    "台新證券",
+    "台新投顧"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "FIRST",
+   "zh": "第一金證券",
+   "en": "First Securities",
+   "names": [
+    "First Securities",
+    "第一金證券",
+    "第一金投顧"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "MEGA",
+   "zh": "兆豐證券",
+   "en": "Mega Securities",
+   "names": [
+    "兆豐",
+    "Mega Securities",
+    "兆豐證券",
+    "兆豐投顧"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "SHINKONG",
+   "zh": "新光證券",
+   "en": "Shin Kong Securities",
+   "names": [
+    "新光",
+    "Shin Kong",
+    "Shin Kong Securities",
+    "新光證券",
+    "新光投顧"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "CTBC",
+   "zh": "中國信託證券",
+   "en": "CTBC Securities",
+   "names": [
+    "CTBC",
+    "CTBC Securities",
+    "中國信託證券",
+    "中信投顧"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "ESUN",
+   "zh": "玉山證券",
+   "en": "E.SUN Securities",
+   "names": [
+    "玉山",
+    "ESUN",
+    "E.SUN",
+    "E.SUN Securities",
+    "玉山證券",
+    "玉山投顧"
+   ],
+   "country": "TW"
+  },
+  {
+   "code": "CICC",
+   "zh": "中金公司",
+   "en": "China International Capital Corporation",
+   "names": [
+    "CICC",
+    "China International Capital",
+    "中金公司",
+    "中國國際金融"
+   ],
+   "country": "CN"
+  },
+  {
+   "code": "CITIC",
+   "zh": "中信證券",
+   "en": "CITIC Securities",
+   "names": [
+    "CITIC",
+    "CITIC Securities",
+    "中信證券"
+   ],
+   "country": "CN"
+  },
+  {
+   "code": "HAITONG",
+   "zh": "海通證券",
+   "en": "Haitong Securities",
+   "names": [
+    "Haitong",
+    "Haitong Securities",
+    "海通證券"
+   ],
+   "country": "CN"
+  },
+  {
+   "code": "GUOTAIJUNAN",
+   "zh": "國泰君安證券",
+   "en": "Guotai Junan Securities",
+   "names": [
+    "Guotai Junan",
+    "國泰君安",
+    "國泰君安證券"
+   ],
+   "country": "CN"
+  }
+ ],
+ "dropped": [
+  {
+   "item": "BALANCE_SHEET_PATTERNS.inventory",
+   "regex": "merchandise",
+   "why": "同上"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.inventory",
+   "regex": "原物料",
+   "why": "原物料是存貨的一部分，不是存貨總額"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.inventory",
+   "regex": "在製品",
+   "why": "同上"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.inventory",
+   "regex": "製成品",
+   "why": "同上"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.intangible_assets",
+   "regex": "商譽",
+   "why": "商譽是另一個科目（AnnualExtract goodwill）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.intangible_assets",
+   "regex": "專利權",
+   "why": "無形資產的一部分"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.intangible_assets",
+   "regex": "商標權",
+   "why": "同上"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.intangible_assets",
+   "regex": "goodwill",
+   "why": "商譽是另一個科目"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.intangible_assets",
+   "regex": "patents?",
+   "why": "無形資產的一部分"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.retained_earnings",
+   "regex": "法定盈餘公積",
+   "why": "盈餘公積是另一個科目（AnnualExtract legal_reserve）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.retained_earnings",
+   "regex": "特別盈餘公積",
+   "why": "同上"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.total_equity",
+   "regex": "股東權益[合總]計",
+   "why": "多數報告的股東權益合計是母公司業主權益；權益總額才含非控制權益（只取『權益總計／總額』）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.gross_profit",
+   "regex": "gross\\s*(?:profit|margin)",
+   "why": "gross margin 是毛利率，不是毛利"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.net_income_cf",
+   "why": "名稱寫本期淨利，式子比對的是稅前淨利（上傳檔自己的錯）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.depreciation_amortization",
+   "why": "折舊及攤銷合計：AnnualExtract 把 D&A 放在 depreciation，兩邊混用會讓 EBITDA 驗算重複加，所以不對到"
+  },
+  {
+   "item": "PER_SHARE_PATTERNS.dividend_per_share",
+   "why": "每股股利含股票股利，和每股現金股利（dps_cash）不同"
+  },
+  {
+   "item": "PER_SHARE_PATTERNS.target_price",
+   "why": "不是財報列標（目標價另有冊）"
+  },
+  {
+   "item": "PER_SHARE_PATTERNS.investment_rating",
+   "why": "上傳檔把評等當數字（unit=元）；評等照原文顯示不分類"
+  },
+  {
+   "item": "PER_SHARE_PATTERNS.revenue_growth",
+   "regex": "YoY\\s*[：:]?\\s*[-+]?\\d",
+   "why": "比對的是數字片段，不是列標"
+  },
+  {
+   "item": "INCOME_FEATURES.OperatingExpenses",
+   "label": "SG&A",
+   "why": "同上"
+  },
+  {
+   "item": "INCOME_FEATURES.OperatingExpenses",
+   "label": "管銷費用",
+   "why": "管銷費用不含研發，不是營業費用合計"
+  },
+  {
+   "item": "INCOME_FEATURES.NonOperatingIncome",
+   "label": "Other Income",
+   "why": "其他收入不是營業外收支合計"
+  },
+  {
+   "item": "INCOME_FEATURES.NonOperatingIncome",
+   "label": "投資收益",
+   "why": "投資收益不是營業外收支合計"
+  },
+  {
+   "item": "INCOME_FEATURES.DPS",
+   "label": "股息",
+   "why": "太泛"
+  },
+  {
+   "item": "INCOME_FEATURES.DPS",
+   "label": "現金股利",
+   "why": "可能是總額不是每股"
+  },
+  {
+   "item": "BALANCE_FEATURES.Cash",
+   "label": "Cash",
+   "why": "太泛（現金一詞會撞到現金流）"
+  },
+  {
+   "item": "BALANCE_FEATURES.Inventory",
+   "label": "庫存",
+   "why": "口語，冊上已有存貨"
+  },
+  {
+   "item": "BALANCE_FEATURES.TotalLiabilities",
+   "label": "總負債",
+   "why": "TotalDebt 收了總負債（那是負債總額）"
+  },
+  {
+   "item": "BALANCE_FEATURES.CurrentLiabilities",
+   "label": "短期負債",
+   "why": "不是短期借款"
+  },
+  {
+   "item": "BALANCE_FEATURES.ShortTermDebt",
+   "label": "短期負債",
+   "why": "不是短期借款"
+  },
+  {
+   "item": "BALANCE_FEATURES.LongTermDebt",
+   "label": "長期負債",
+   "why": "不是長期借款"
+  },
+  {
+   "item": "BALANCE_FEATURES.TotalEquity",
+   "label": "股東權益",
+   "why": "多半指母公司業主權益"
+  },
+  {
+   "item": "BALANCE_FEATURES.TotalEquity",
+   "label": "淨資產",
+   "why": "多半指母公司業主權益"
+  },
+  {
+   "item": "BROKER_LIST.CAPITAL",
+   "alias": "Capital",
+   "why": "太泛"
+  },
+  {
+   "item": "BROKER_LIST.FIRST",
+   "alias": "第一",
+   "why": "太泛"
+  },
+  {
+   "item": "BROKER_LIST.FIRST",
+   "alias": "First",
+   "why": "太泛"
+  },
+  {
+   "item": "BROKER_LIST.MEGA",
+   "alias": "Mega",
+   "why": "太泛"
+  },
+  {
+   "item": "BROKER_LIST.CTBC",
+   "alias": "中信",
+   "why": "中信可能是中國信託（CTBC）或中信證券（CITIC）"
+  },
+  {
+   "item": "BROKER_LIST.CITIC",
+   "alias": "中信建投",
+   "why": "中信建投是另一家券商（CSC），不是中信證券"
+  }
+ ],
+ "not_mapped": [
+  {
+   "item": "BALANCE_SHEET_PATTERNS.notes_receivable",
+   "name": "應收票據",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.other_receivables",
+   "name": "其他應收款",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.contract_assets",
+   "name": "合約資產",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.other_current_assets",
+   "name": "其他流動資產",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.other_noncurrent_assets",
+   "name": "其他非流動資產",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.notes_payable",
+   "name": "應付票據",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.other_current_liabilities",
+   "name": "其他流動負債",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.lease_liabilities_current",
+   "name": "租賃負債-流動",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.other_noncurrent_liabilities",
+   "name": "其他非流動負債",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.preferred_stock",
+   "name": "特別股股本",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "BALANCE_SHEET_PATTERNS.other_equity",
+   "name": "其他權益",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.sales_revenue",
+   "name": "銷貨收入",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.service_revenue",
+   "name": "勞務收入",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.selling_expenses",
+   "name": "推銷費用",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.admin_expenses",
+   "name": "管理費用",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.rd_expenses",
+   "name": "研究發展費用",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.interest_income",
+   "name": "利息收入",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.interest_expense",
+   "name": "利息費用",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.other_income",
+   "name": "其他收入",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.other_expenses",
+   "name": "其他支出",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.other_comprehensive_income",
+   "name": "其他綜合損益",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.total_comprehensive_income",
+   "name": "本期綜合損益總額",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "INCOME_STATEMENT_PATTERNS.discontinued_operations",
+   "name": "停業單位損益",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.change_in_receivables",
+   "name": "應收帳款變動",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.change_in_inventory",
+   "name": "存貨變動",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.change_in_payables",
+   "name": "應付帳款變動",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.sale_of_ppe",
+   "name": "處分不動產廠房設備",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.acquisition_of_investments",
+   "name": "取得投資",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.short_term_borrowings_change",
+   "name": "短期借款變動",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.long_term_borrowings_proceeds",
+   "name": "舉借長期借款",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.repayment_of_debt",
+   "name": "償還借款",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.interest_paid",
+   "name": "支付利息",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.income_tax_paid",
+   "name": "支付所得稅",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.stock_issuance",
+   "name": "現金增資",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "CASH_FLOW_PATTERNS.treasury_stock_purchase",
+   "name": "購買庫藏股",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "RATIO_PATTERNS.cash_ratio",
+   "name": "現金比率",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "RATIO_PATTERNS.debt_equity_ratio",
+   "name": "負債權益比率",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "RATIO_PATTERNS.interest_coverage",
+   "name": "利息保障倍數",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "RATIO_PATTERNS.long_term_debt_ratio",
+   "name": "長期資金占固定資產比率",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "RATIO_PATTERNS.roic",
+   "name": "投入資本報酬率",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "RATIO_PATTERNS.payable_turnover",
+   "name": "應付帳款週轉率",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "PER_SHARE_PATTERNS.cash_per_share",
+   "name": "每股現金",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "PER_SHARE_PATTERNS.free_cf_per_share",
+   "name": "每股自由現金流",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "PER_SHARE_PATTERNS.stock_dividend_per_share",
+   "name": "每股股票股利",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "PER_SHARE_PATTERNS.pcf_ratio",
+   "name": "股價現金流量比",
+   "why": "VRN 的驗算式沒有這個運算元（照列，不用）"
+  },
+  {
+   "item": "financial_classification_rules.INCOME_FEATURES.RDExpenses",
+   "why": "VRN 的驗算式沒有這個運算元，或定義有誤（TotalDebt 收了總負債）"
+  },
+  {
+   "item": "financial_classification_rules.BALANCE_FEATURES.TotalDebt",
+   "why": "VRN 的驗算式沒有這個運算元，或定義有誤（TotalDebt 收了總負債）"
+  },
+  {
+   "item": "financial_classification_rules.BALANCE_FEATURES.WeightedAvgShares",
+   "why": "VRN 的驗算式沒有這個運算元，或定義有誤（TotalDebt 收了總負債）"
+  },
+  {
+   "item": "financial_classification_rules.KPI_FEATURES.YOY",
+   "why": "VRN 的驗算式沒有這個運算元，或定義有誤（TotalDebt 收了總負債）"
+  },
+  {
+   "item": "financial_classification_rules.KPI_FEATURES.QOQ",
+   "why": "VRN 的驗算式沒有這個運算元，或定義有誤（TotalDebt 收了總負債）"
+  },
+  {
+   "item": "financial_classification_rules.KPI_FEATURES.DebtToEquity",
+   "why": "VRN 的驗算式沒有這個運算元，或定義有誤（TotalDebt 收了總負債）"
+  }
+ ]
+}

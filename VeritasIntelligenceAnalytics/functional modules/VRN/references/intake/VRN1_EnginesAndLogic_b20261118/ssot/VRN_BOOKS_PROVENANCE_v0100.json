@@ -1,0 +1,182 @@
+{
+  "schema": "VRN_BOOKS_PROVENANCE_v0100",
+  "harvested": "2026-10-10",
+  "ruled_by": "操作員 2026-10-10「擷取其他對話中的BROKER DICT RATING LIST TARGET PRICE DICT EMAIL TEL 所有FINANCIAL ACCOUNT AND VALIDATION METHOD 快整合進入實測階段」",
+  "how_found": "讀其他對話（VRN 線、動詞整合、VDF、VCGC、VRN系統啟動處理、每日交接…）的紀錄找出每一類最新的冊，再到母倉 main（ef8e3ef9）逐檔取原檔；母倉其他 20 條未併分支逐一比過，沒有更新的版本。",
+  "policy": "VRN 自己的副本為準；只增不減；不跑母倉程式碼（只收資料冊）。中央拒絕清單（CGC_MDL177、Overlay deny_keys、SynonymUnion deny）VRN 不套用（操作員 2026-10-10「GF 照原文顯示」）。評等詞表只拿來找字，不分類（操作員 2026-10-10）。",
+  "consumers": {
+    "engine/VRN_Evidence_Core.py": "VRN_FieldRules_SSOT_v0101 · VIA_VRN_ReportFieldRules_SSOT_v0101 · VIA_VRN_FieldSpec_SSOT_v0100（評等找字、網域、職稱、檔名評等格位）",
+    "engine/VRN_BookCheck_v0100.py": "全部（AutoTestLoop G13：拿冊當量尺，只量不改）",
+    "engine/VRN_AutoTestLoop.py": "G12 鏡像缺席時讀 VIA_VRN_FieldSpec_SSOT_v0100"
+  },
+  "books": [
+    {
+      "file": "ssot/VRN_S05_FieldRegistry_v0103.json",
+      "categories": [
+        "RATING LIST",
+        "TARGET PRICE DICT",
+        "EMAIL",
+        "TEL",
+        "FINANCIAL ACCOUNT",
+        "VALIDATION METHOD"
+      ],
+      "mother_repo": "tonykuni/movies-dataset",
+      "mother_path": "VeritasIntelligenceAnalytics/supportive modules/registry/VRN_S05_FieldRegistry_v0103.json",
+      "mother_commit": "ef8e3ef9",
+      "built_by": "VDF（2026-10-10，PR #518：TARGET_PRICE_LABEL 收千分位、EMAIL_FULL 例子裁定）",
+      "contents": "rating_list 47 詞 · target_price_dict 12 同義字 + 前次停用字 · email_domain_to_broker 42 網域 · all_regex 40 條（各帶通過／不通過例子）· basicinfo_fields 30 · financialdata_fields 76（每欄 regex / 同義字 / 驗證方法 / 容差）",
+      "sha256_lf": "3f3df3e1bb742d3ae3834dc307f6cf80fe581c7ad054324cd6953e9d8b2f99a2",
+      "copy": "byte-for-byte"
+    },
+    {
+      "file": "ssot/VRN_Broker_Dict_v0103.json",
+      "categories": [
+        "BROKER DICT"
+      ],
+      "mother_repo": "tonykuni/movies-dataset",
+      "mother_path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_Broker_Dict_v0103.json",
+      "mother_commit": "130040c2",
+      "built_by": "動詞整合（2026-10-05，PR #499）",
+      "contents": "28 家正典（代碼 / 中文名 / 英文名 / 別名，含電郵網域別名 kgieworld / pscnet / merrill）。母倉主線在 7928007e（2026-10-06 VIA closeout night）把這一版刪掉了，主線只剩 v0102；VRN 照只增不減收 v0103（= v0102 + 三個網域別名），從加進來的那一個 commit 取",
+      "sha256_lf": "f74e932ec2a9103f56cb8d39e68c03d3c07d70083ef0a5356a57160e0607539d",
+      "copy": "byte-for-byte"
+    },
+    {
+      "file": "ssot/VIA_SSOT_SynonymUnion_v0107.json",
+      "categories": [
+        "FINANCIAL ACCOUNT",
+        "RATING LIST",
+        "BROKER DICT"
+      ],
+      "mother_repo": "tonykuni/movies-dataset",
+      "mother_path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_SSOT_SynonymUnion_v0107.json",
+      "mother_commit": "ef8e3ef9",
+      "built_by": "動詞整合（2026-10-05，PR #484）",
+      "contents": "fin_account 632 · rating 189 · broker 277 · target_price 29 · job_title 86。內含中央拒絕清單（deny），VRN 不套用",
+      "sha256_lf": "bcf41a05ad42901d5e2a0ac27121e81d5d9bf8ce4c4ccc826bee389d2ac5f558",
+      "copy": "byte-for-byte"
+    },
+    {
+      "file": "ssot/VRN_FieldRules_SSOT_v0101.json",
+      "categories": [
+        "VALIDATION METHOD",
+        "RATING LIST",
+        "TARGET PRICE DICT",
+        "EMAIL",
+        "TEL"
+      ],
+      "mother_repo": "tonykuni/movies-dataset",
+      "mother_path": "VeritasIntelligenceAnalytics/supportive modules/registry/VRN_FieldRules_SSOT_v0101.json",
+      "mother_commit": "ef8e3ef9",
+      "built_by": "動詞整合（2026-10-05，PR #506，批1657）",
+      "contents": "財報恆等式 7 條（GP_SUB 2% · GM_DIV / OPM_DIV / NM_DIV 0.5pp · OP_SUB 2% · BS_ADD 1% · EPS_DIV 3%）與五態；官方核對 AGREE ≤1% / ROUNDING ≤5%；評等 canon_map 6 鍵（加 STRONG_BUY / STRONG_SELL，只加詞）",
+      "sha256_lf": "8438cda502883142f56c4b48dd33dc79a891d0669a5a84a29aaf89a0475d1296",
+      "copy": "byte-for-byte"
+    },
+    {
+      "file": "ssot/VIA_VRN_ReportFieldRules_SSOT_v0101.json",
+      "categories": [
+        "EMAIL",
+        "TEL"
+      ],
+      "mother_repo": "tonykuni/movies-dataset",
+      "mother_path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_VRN_ReportFieldRules_SSOT_v0101.json",
+      "mother_commit": "ef8e3ef9",
+      "built_by": "R36d（2026-10-01）；v0100 為批713 / 714（2026-09-23）",
+      "contents": "電話次序 TPE → HK → HK 手機（弱）→ 台灣手機 → 國際碼，先台後港遮區間，同行要有電話字樣；職稱 zh 43 / en 31；券商網域補遺 16",
+      "sha256_lf": "2e9678324573219eebf1777c027feeedf0caa5adf4a151099f7ce430b6cc6ee9",
+      "copy": "byte-for-byte"
+    },
+    {
+      "file": "ssot/VIA_VRN_FieldSpec_SSOT_v0100.json",
+      "categories": [
+        "VALIDATION METHOD"
+      ],
+      "mother_repo": "tonykuni/movies-dataset",
+      "mother_path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_VRN_FieldSpec_SSOT_v0100.json",
+      "mother_commit": "ef8e3ef9",
+      "built_by": "批712（2026-09-23）",
+      "contents": "15 欄規格與六態（NOT_WIRED / SOURCE_PENDING / GATED / NODATA / PARTIAL / GREEN，GREEN 要 95%）",
+      "sha256_lf": "6f37885318219532fa5c08e22f50813d8406e1b1483ea1812ffc0fb1023fdf1d",
+      "copy": "byte-for-byte"
+    },
+    {
+      "file": "ssot/VIA_VRN_ExtractRules_SSOT_v0100.json",
+      "categories": [
+        "VALIDATION METHOD",
+        "TARGET PRICE DICT"
+      ],
+      "mother_repo": "tonykuni/movies-dataset",
+      "mother_path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_VRN_ExtractRules_SSOT_v0100.json",
+      "mother_commit": "ef8e3ef9",
+      "built_by": "側線 2026-10-03 b，安裝於 PR #499（2026-10-05）",
+      "contents": "R-CMP-01 對照容差（目標價 0.5% · 營收 1% · EPS 1%）· R-TIER OCR 階梯 · R-EPS-01 稀釋 EPS",
+      "sha256_lf": "62e54dd719aaa642a57e5c2a2a3cc4e332c52daf42cedb540fc383e017827e6d",
+      "copy": "byte-for-byte"
+    },
+    {
+      "file": "ssot/VRN_FinLexicon_SSOT_v0109.json",
+      "categories": [
+        "FINANCIAL ACCOUNT"
+      ],
+      "mother_repo": "tonykuni/movies-dataset",
+      "mother_path": "VeritasIntelligenceAnalytics/functional modules/VRN/SSOT/VRN_FinLexicon_SSOT_v0109.json",
+      "mother_commit": "ef8e3ef9",
+      "built_by": "extract loop（2026-10-06 → 2026-10-10，第一到第三批 + 自動採納）",
+      "contents": "89 列 / 76 個正典科目（BS 33 · CF 16 · IS 24 · 比率 9 · 估值 7），中英同義字最長優先；噪音規則 6 條",
+      "sha256_lf": "c2d4069863bbda00bb5abd3e87d0588cb5223a4284aa212bfb6ea0371bb69a8d",
+      "copy": "byte-for-byte"
+    },
+    {
+      "file": "ssot/VRN_Contact_Regex_v0100.json",
+      "categories": [
+        "EMAIL",
+        "TEL",
+        "TARGET PRICE DICT",
+        "RATING LIST"
+      ],
+      "mother_repo": "tonykuni/movies-dataset",
+      "mother_path": "VeritasIntelligenceAnalytics/functional modules/VRN/knowledge/VRN_Contact_Regex_v0100.json",
+      "mother_commit": "ef8e3ef9",
+      "built_by": "operator global.contact.research.v1（2026-09-25）",
+      "contents": "8 條擷取式（目標價、中英評等、券商片段、電郵、台灣手機／市話、香港帶國碼）+ 1 條保留不用（無國碼八碼會咬到股價）",
+      "sha256_lf": "9a2b0198d1f926031263808dbd4386f75b8b7e1cd78f8b1332aac63dc81a446e",
+      "copy": "byte-for-byte"
+    },
+    {
+      "file": "ssot/VIA_Validation_SSOT_v0100.json",
+      "categories": [
+        "VALIDATION METHOD"
+      ],
+      "mother_repo": "tonykuni/movies-dataset",
+      "mother_path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Validation_SSOT_v0100.json",
+      "mother_commit": "ef8e3ef9",
+      "built_by": "S20260929b（2026-09-29）",
+      "contents": "各子系統驗證法登記：VRN 驗證邏輯 5 · 結果驗證 7 · 交叉核對 12；結果態 0–5。登記的擁有者多在母倉，VRN 這裡當清單看",
+      "sha256_lf": "db150c47bb367882f9484a988fa5dd42c9730bfd79eaf0fead192ddf7d42cedf",
+      "copy": "byte-for-byte"
+    }
+  ],
+  "not_taken": [
+    {
+      "what": "VIA_Central_Synonym_Regex_v0107.json（母倉 registry，ef8e3ef9，動詞整合 2026-10-05）",
+      "why": "中央的冊，不是 VRN 的。放進本倉後中央治理 G12 判 8 個同義字多主（冊內裁定 R-SYN-02 / R-SYN-04 與 RATING_CODEBOOK_MASTER 把同一批評等字各列一次）、G14 判 7 條重複 pattern（其中 RX_TEL_TW_ANY、RX_EMAIL_NAMED 等本來就是 VRN 首頁引擎自己的式子，已在 VRN REGEX 冊）。VRN 要的部分別的冊都有：評等字在 S05 rating_list / FieldRules canon_map / SynonymUnion，電話在 ReportFieldRules v0101 與 S05 TEL_TW_FULL，電郵與目標價在 S05。所以不收整本，也不去放寬中央治理閘。"
+    },
+    {
+      "what": "CGC_MDL177 ChinaBrokerPurge、Overlay v0102 deny_keys、SynonymUnion deny / GF_DENY",
+      "why": "VRN 不套中央拒絕清單（操作員「GF 照原文顯示」）"
+    },
+    {
+      "what": "70_VRN_Rules/*.py（VIS_VRN_FinancialSSOT v0608 / v05912、FinancialRescueRules、HistoricalValidationPolicy、SUP_MDL015 / 016 / 748）",
+      "why": "是程式不是冊，鎖檔 sha 全部對不上（母倉 CGC_MDL180 已列 BROKEN / STALE）；同類內容已由 JSON 冊（FinLexicon v0109、FieldRules v0101）涵蓋"
+    },
+    {
+      "what": "CGC_MDL181 / CGC_MDL182 / SUP_MDL749",
+      "why": "VCGC 的工具，留在倉庫根 supportive modules 鏡像；VRN 會互動，不收成自己的"
+    },
+    {
+      "what": "VIA_Financial_Institution_SSOT_v0100.json",
+      "why": "VRN 凍結稽核包 references/intake/VIA_SSOT_Additive_Audit_v0100/baseline 已有同一本"
+    }
+  ]
+}

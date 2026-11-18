@@ -1,0 +1,3139 @@
+{
+ "schema": "VRN_Output_Header_SSOT_v0103",
+ "version": "v0103",
+ "ruled_by": "操作員 2026-10-11：「範圍限縮獨立系統VRN 輸出DATAFRAME 請確認完成」；2026-10-11「只擷取個股報告的標題分拆識別 首頁及年度財報頁…TRIM後分拆識別…正確鎖功能…」",
+ "rule": "VRN 每一張輸出表的表頭正本：欄名、型別（str/int/float/date/datetime/bool）、必填、主鍵、最少列數；中文與顯示名（R-HDR-01：英文首字大寫、程式鍵不動、中文第二行）。G16 把每張表載成 pandas DataFrame，用母倉 CGC_MDL249_DataFrameLock 的 check_table 逐項驗（缺必填欄、多出冊上沒有的欄、型別、必填空、主鍵重複、列數），驗過的 DataFrame 寫成 Parquet 與 CSV。表頭要改就出本冊新版，不在舊版上改。",
+ "same_shape_as": "VIA_Output_Header_SSOT_v0101.json（母倉 supportive modules/registry；欄位 name/dtype/required/key，表 source/min_rows/extra_ok）",
+ "paths": "source.path 相對於該輪的輸出夾（AutoTestLoop 的 round 夾）",
+ "tables": {
+  "vrn_basic_info": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_Integrated_ReportDatabase_Engine.py（G06）",
+   "zh": "基本資料（一份報告一列）",
+   "source": {
+    "kind": "parquet",
+    "path": "vrn_db/StockReportBasicInfo.parquet"
+   },
+   "min_rows": 1,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "FileID",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "檔案編號",
+     "display": "File ID"
+    },
+    {
+     "name": "ReportID",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "報告編號",
+     "display": "Report ID"
+    },
+    {
+     "name": "SourceFileName",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "檔名",
+     "display": "Source File Name"
+    },
+    {
+     "name": "SourcePath",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "檔案路徑",
+     "display": "Source Path"
+    },
+    {
+     "name": "FileHash",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "檔案指紋",
+     "display": "File Hash"
+    },
+    {
+     "name": "TW_TICKER",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "台股代號",
+     "display": "TW TICKER"
+    },
+    {
+     "name": "YF_TICKER",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "Yahoo 代號",
+     "display": "YF TICKER"
+    },
+    {
+     "name": "Market",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "市場",
+     "display": "Market"
+    },
+    {
+     "name": "Name",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "公司名稱",
+     "display": "Name"
+    },
+    {
+     "name": "CompanyNameCandidate",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "公司名稱候選",
+     "display": "Company Name Candidate"
+    },
+    {
+     "name": "Broker",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "券商",
+     "display": "Broker"
+    },
+    {
+     "name": "BrokerCandidate",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "券商候選",
+     "display": "Broker Candidate"
+    },
+    {
+     "name": "ReportDate",
+     "dtype": "date",
+     "required": false,
+     "key": false,
+     "zh": "報告日期",
+     "display": "Report Date"
+    },
+    {
+     "name": "ReportTitle",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "報告標題",
+     "display": "Report Title"
+    },
+    {
+     "name": "ReportType",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "報告類型",
+     "display": "Report Type"
+    },
+    {
+     "name": "Language",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "語言",
+     "display": "Language"
+    },
+    {
+     "name": "Analyst",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "分析師",
+     "display": "Analyst"
+    },
+    {
+     "name": "Department",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "部門",
+     "display": "Department"
+    },
+    {
+     "name": "Rating",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "評等（原文）",
+     "display": "Rating"
+    },
+    {
+     "name": "RatingChange",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "評等變動",
+     "display": "Rating Change"
+    },
+    {
+     "name": "TargetPrice",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "目標價",
+     "display": "Target Price"
+    },
+    {
+     "name": "CurrentPrice",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "現價",
+     "display": "Current Price"
+    },
+    {
+     "name": "UpsideDownsidePct",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "上漲空間 %",
+     "display": "Upside Downside PCT"
+    },
+    {
+     "name": "InvestmentThesis",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Investment Thesis"
+    },
+    {
+     "name": "Industry",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Industry"
+    },
+    {
+     "name": "SubIndustry",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Sub Industry"
+    },
+    {
+     "name": "MarketCap",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Market Cap"
+    },
+    {
+     "name": "ShareCapital",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Share Capital"
+    },
+    {
+     "name": "Chairman",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Chairman"
+    },
+    {
+     "name": "GeneralManager",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "General Manager"
+    },
+    {
+     "name": "Spokesperson",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Spokesperson"
+    },
+    {
+     "name": "ConfidenceScore",
+     "dtype": "float",
+     "required": true,
+     "key": false,
+     "zh": "信心分數",
+     "display": "Confidence Score"
+    },
+    {
+     "name": "ValidationStatus",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "驗證狀態",
+     "display": "Validation Status"
+    },
+    {
+     "name": "ValidationIssues",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "驗證問題",
+     "display": "Validation Issues"
+    },
+    {
+     "name": "EvidenceJson",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Evidence JSON"
+    },
+    {
+     "name": "SourceFormat",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "來源格式",
+     "display": "Source Format"
+    },
+    {
+     "name": "ReportDateDisplay",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Report Date Display"
+    },
+    {
+     "name": "TriCodeVerdict",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "三碼判定",
+     "display": "Tri Code Verdict"
+    },
+    {
+     "name": "RatingFine",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Rating Fine"
+    },
+    {
+     "name": "RatingAction",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Rating Action"
+    },
+    {
+     "name": "BrokerDisplay",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Broker Display"
+    },
+    {
+     "name": "TargetPriceScenarios",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Target Price Scenarios"
+    },
+    {
+     "name": "PartialDates",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Partial Dates"
+    },
+    {
+     "name": "FirstPageEngine",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "First Page Engine"
+    },
+    {
+     "name": "CreatedAt",
+     "dtype": "datetime",
+     "required": true,
+     "key": false,
+     "zh": "建立時間",
+     "display": "Created At"
+    },
+    {
+     "name": "UpdatedAt",
+     "dtype": "datetime",
+     "required": true,
+     "key": false,
+     "zh": "更新時間",
+     "display": "Updated At"
+    },
+    {
+     "name": "RunID",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "批次",
+     "display": "Run ID"
+    },
+    {
+     "name": "SchemaVersion",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "表頭版本",
+     "display": "Schema Version"
+    },
+    {
+     "name": "RatingKey",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Rating Key"
+    },
+    {
+     "name": "BrokerTier",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Broker Tier"
+    },
+    {
+     "name": "BrokerDenied",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Broker Denied"
+    },
+    {
+     "name": "PageDate",
+     "dtype": "date",
+     "required": false,
+     "key": false,
+     "zh": "首頁日期",
+     "display": "Page Date"
+    },
+    {
+     "name": "FilenameDate",
+     "dtype": "date",
+     "required": false,
+     "key": false,
+     "zh": "檔名日期",
+     "display": "Filename Date"
+    },
+    {
+     "name": "DateConflict",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Date Conflict"
+    },
+    {
+     "name": "AnalystEmail",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "分析師電郵",
+     "display": "Analyst Email"
+    },
+    {
+     "name": "CompanyNamePage",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Company Name Page"
+    },
+    {
+     "name": "PageCodes",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Page Codes"
+    },
+    {
+     "name": "EvidenceCore",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Evidence Core"
+    },
+    {
+     "name": "NameDB",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "公司名稱（資料庫）",
+     "display": "Name DB"
+    },
+    {
+     "name": "NameDBSource",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Name DB Source"
+    },
+    {
+     "name": "AdjCloseReportDate",
+     "dtype": "date",
+     "required": false,
+     "key": false,
+     "zh": "ADJ CLOSE 日期（報告日）",
+     "display": "Adj Close Report Date"
+    },
+    {
+     "name": "AdjCloseReport",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "ADJ CLOSE（報告日）",
+     "display": "Adj Close Report"
+    },
+    {
+     "name": "AdjFactorReport",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "調整因子（報告日）",
+     "display": "Adj Factor Report"
+    },
+    {
+     "name": "AdjCloseLatestDate",
+     "dtype": "date",
+     "required": false,
+     "key": false,
+     "zh": "ADJ CLOSE 日期（最新）",
+     "display": "Adj Close Latest Date"
+    },
+    {
+     "name": "AdjCloseLatest",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "ADJ CLOSE（最新）",
+     "display": "Adj Close Latest"
+    },
+    {
+     "name": "AdjFactorLatest",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "調整因子（最新）",
+     "display": "Adj Factor Latest"
+    },
+    {
+     "name": "TargetPriceAdj",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "調整後目標價",
+     "display": "Target Price Adj"
+    },
+    {
+     "name": "UpsideAdjPct",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "調整後上漲空間 %",
+     "display": "Upside Adj PCT"
+    },
+    {
+     "name": "LocalDBStatus",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "本機資料庫狀態",
+     "display": "Local DB Status"
+    },
+    {
+     "name": "LocalDBPath",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "本機資料庫路徑",
+     "display": "Local DB Path"
+    }
+   ]
+  },
+  "vrn_financial_data": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_Integrated_ReportDatabase_Engine.py（G06）",
+   "zh": "財報數字（一格一列）",
+   "source": {
+    "kind": "parquet",
+    "path": "vrn_db/StockReportFinancialData.parquet"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "FinancialRowID",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "財報列編號",
+     "display": "Financial Row ID"
+    },
+    {
+     "name": "FileID",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "檔案編號",
+     "display": "File ID"
+    },
+    {
+     "name": "ReportID",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "報告編號",
+     "display": "Report ID"
+    },
+    {
+     "name": "TW_TICKER",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "台股代號",
+     "display": "TW TICKER"
+    },
+    {
+     "name": "YF_TICKER",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "Yahoo 代號",
+     "display": "YF TICKER"
+    },
+    {
+     "name": "Name",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "公司名稱",
+     "display": "Name"
+    },
+    {
+     "name": "ReportDate",
+     "dtype": "date",
+     "required": false,
+     "key": false,
+     "zh": "報告日期",
+     "display": "Report Date"
+    },
+    {
+     "name": "Broker",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "券商",
+     "display": "Broker"
+    },
+    {
+     "name": "PeriodType",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "期別類型",
+     "display": "Period Type"
+    },
+    {
+     "name": "FiscalYear",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "會計年度",
+     "display": "Fiscal Year"
+    },
+    {
+     "name": "FiscalQuarter",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "季",
+     "display": "Fiscal Quarter"
+    },
+    {
+     "name": "PeriodLabelRaw",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "期別（原文）",
+     "display": "Period Label Raw"
+    },
+    {
+     "name": "EstimateFlag",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "實績／預估",
+     "display": "Estimate Flag"
+    },
+    {
+     "name": "MetricCategory",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "科目類別",
+     "display": "Metric Category"
+    },
+    {
+     "name": "MetricName",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "科目",
+     "display": "Metric Name"
+    },
+    {
+     "name": "MetricNameRaw",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "科目（原文）",
+     "display": "Metric Name Raw"
+    },
+    {
+     "name": "Value",
+     "dtype": "float",
+     "required": true,
+     "key": false,
+     "zh": "數值",
+     "display": "Value"
+    },
+    {
+     "name": "ValueRaw",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "數值（原文）",
+     "display": "Value Raw"
+    },
+    {
+     "name": "Unit",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "單位",
+     "display": "Unit"
+    },
+    {
+     "name": "Currency",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "幣別",
+     "display": "Currency"
+    },
+    {
+     "name": "Scale",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "倍數",
+     "display": "Scale"
+    },
+    {
+     "name": "YoY",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Yo Y"
+    },
+    {
+     "name": "QoQ",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Qo Q"
+    },
+    {
+     "name": "PER",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "PER"
+    },
+    {
+     "name": "PBR",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "PBR"
+    },
+    {
+     "name": "EV_EBITDA",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "EV EBITDA"
+    },
+    {
+     "name": "DividendYield",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Dividend Yield"
+    },
+    {
+     "name": "ROE",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "ROE"
+    },
+    {
+     "name": "ROA",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "ROA"
+    },
+    {
+     "name": "Revenue",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Revenue"
+    },
+    {
+     "name": "GrossProfit",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Gross Profit"
+    },
+    {
+     "name": "GrossMargin",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Gross Margin"
+    },
+    {
+     "name": "OperatingProfit",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Operating Profit"
+    },
+    {
+     "name": "OperatingMargin",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Operating Margin"
+    },
+    {
+     "name": "NetIncome",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Net Income"
+    },
+    {
+     "name": "EPS",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "EPS"
+    },
+    {
+     "name": "TotalAssets",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Total Assets"
+    },
+    {
+     "name": "TotalLiabilities",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Total Liabilities"
+    },
+    {
+     "name": "Equity",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Equity"
+    },
+    {
+     "name": "BookValuePerShare",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Book Value PER Share"
+    },
+    {
+     "name": "OperatingCashFlow",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Operating Cash Flow"
+    },
+    {
+     "name": "Capex",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Capex"
+    },
+    {
+     "name": "FreeCashFlow",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "",
+     "display": "Free Cash Flow"
+    },
+    {
+     "name": "PageNumber",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "頁",
+     "display": "Page Number"
+    },
+    {
+     "name": "TableID",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "表格",
+     "display": "Table ID"
+    },
+    {
+     "name": "RowIndex",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "列",
+     "display": "Row Index"
+    },
+    {
+     "name": "ColumnIndex",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "欄",
+     "display": "Column Index"
+    },
+    {
+     "name": "SourceText",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "原文",
+     "display": "Source Text"
+    },
+    {
+     "name": "ConfidenceScore",
+     "dtype": "float",
+     "required": true,
+     "key": false,
+     "zh": "信心分數",
+     "display": "Confidence Score"
+    },
+    {
+     "name": "ValidationStatus",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "驗證狀態",
+     "display": "Validation Status"
+    },
+    {
+     "name": "ValidationIssues",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "驗證問題",
+     "display": "Validation Issues"
+    },
+    {
+     "name": "CreatedAt",
+     "dtype": "datetime",
+     "required": true,
+     "key": false,
+     "zh": "建立時間",
+     "display": "Created At"
+    },
+    {
+     "name": "UpdatedAt",
+     "dtype": "datetime",
+     "required": true,
+     "key": false,
+     "zh": "更新時間",
+     "display": "Updated At"
+    },
+    {
+     "name": "RunID",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "批次",
+     "display": "Run ID"
+    },
+    {
+     "name": "SchemaVersion",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "表頭版本",
+     "display": "Schema Version"
+    }
+   ]
+  },
+  "vrn_regions_reports": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_PageRegions_v0100.py（G15）",
+   "zh": "每份報告：檔名拆解、類別、拆解結果",
+   "source": {
+    "kind": "sqlite",
+    "path": "VRN_ReportRegions_v0100.sqlite",
+    "table": "reports"
+   },
+   "min_rows": 1,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "狀態",
+     "display": "Status"
+    },
+    {
+     "name": "why",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "說明",
+     "display": "Why"
+    },
+    {
+     "name": "doc_class",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "類別",
+     "display": "Doc Class"
+    },
+    {
+     "name": "doc_class_zh",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "類別（中文）",
+     "display": "Doc Class Zh"
+    },
+    {
+     "name": "class_rule",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "類別規則",
+     "display": "Class Rule"
+    },
+    {
+     "name": "class_confidence",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "類別信心",
+     "display": "Class Confidence"
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "代號",
+     "display": "Ticker"
+    },
+    {
+     "name": "broker_raw",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "券商（檔名）",
+     "display": "Broker Raw"
+    },
+    {
+     "name": "report_date",
+     "dtype": "date",
+     "required": false,
+     "key": false,
+     "zh": "報告日期（檔名）",
+     "display": "Report Date"
+    },
+    {
+     "name": "company_names",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "公司名稱（檔名）",
+     "display": "Company Names"
+    },
+    {
+     "name": "pages",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "頁數",
+     "display": "Pages"
+    },
+    {
+     "name": "regions",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "區數",
+     "display": "Regions"
+    },
+    {
+     "name": "tables",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "表格數",
+     "display": "Tables"
+    },
+    {
+     "name": "rows",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "數字格數",
+     "display": "Rows"
+    },
+    {
+     "name": "checks_pass",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "驗算 PASS",
+     "display": "Checks Pass"
+    },
+    {
+     "name": "checks_fail",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "驗算 FAIL",
+     "display": "Checks Fail"
+    },
+    {
+     "name": "checks_warn",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "驗算 WARN",
+     "display": "Checks Warn"
+    },
+    {
+     "name": "captured_min",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "截取完整度最低 %",
+     "display": "Captured Min"
+    },
+    {
+     "name": "tp_current",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "目標價（本次）",
+     "display": "TP Current"
+    },
+    {
+     "name": "tp_prior",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "目標價（前次）",
+     "display": "TP Prior"
+    },
+    {
+     "name": "tp_direction",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "目標價方向",
+     "display": "TP Direction"
+    },
+    {
+     "name": "valuation_methods",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "評價法詞",
+     "display": "Valuation Methods"
+    },
+    {
+     "name": "valuation_checks",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "評價法驗算",
+     "display": "Valuation Checks"
+    }
+   ]
+  },
+  "vrn_regions_regions": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_PageRegions_v0100.py（G15）",
+   "zh": "版面區：每頁先左右、再上下切",
+   "source": {
+    "kind": "sqlite",
+    "path": "VRN_ReportRegions_v0100.sqlite",
+    "table": "regions"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "seq",
+     "dtype": "int",
+     "required": true,
+     "key": true,
+     "zh": "序號（檔內）",
+     "display": "Seq"
+    },
+    {
+     "name": "page",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "頁",
+     "display": "Page"
+    },
+    {
+     "name": "path",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "切法路徑",
+     "display": "Path"
+    },
+    {
+     "name": "zone",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "區",
+     "display": "Zone"
+    },
+    {
+     "name": "where_",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "位置",
+     "display": "Where "
+    },
+    {
+     "name": "category",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "類別",
+     "display": "Category"
+    },
+    {
+     "name": "left_right",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "左右",
+     "display": "Left Right"
+    },
+    {
+     "name": "top_bottom",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "上下",
+     "display": "Top Bottom"
+    },
+    {
+     "name": "band",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "帶",
+     "display": "Band"
+    },
+    {
+     "name": "x0",
+     "dtype": "float",
+     "required": true,
+     "key": false,
+     "zh": "x0",
+     "display": "X 0"
+    },
+    {
+     "name": "y0",
+     "dtype": "float",
+     "required": true,
+     "key": false,
+     "zh": "y0",
+     "display": "Y 0"
+    },
+    {
+     "name": "x1",
+     "dtype": "float",
+     "required": true,
+     "key": false,
+     "zh": "x1",
+     "display": "X 1"
+    },
+    {
+     "name": "y1",
+     "dtype": "float",
+     "required": true,
+     "key": false,
+     "zh": "y1",
+     "display": "Y 1"
+    }
+   ]
+  },
+  "vrn_regions_tables": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_PageRegions_v0100.py（G15）",
+   "zh": "還原的表格",
+   "source": {
+    "kind": "sqlite",
+    "path": "VRN_ReportRegions_v0100.sqlite",
+    "table": "tables_"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "seq",
+     "dtype": "int",
+     "required": true,
+     "key": true,
+     "zh": "序號（檔內）",
+     "display": "Seq"
+    },
+    {
+     "name": "page",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "頁",
+     "display": "Page"
+    },
+    {
+     "name": "anchor",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "位置",
+     "display": "Anchor"
+    },
+    {
+     "name": "origin",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "來源",
+     "display": "Origin"
+    },
+    {
+     "name": "subcategory",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "次類別",
+     "display": "Subcategory"
+    },
+    {
+     "name": "zone",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "區",
+     "display": "Zone"
+    },
+    {
+     "name": "title",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "標題",
+     "display": "Title"
+    },
+    {
+     "name": "verdict",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "驗算燈號",
+     "display": "Verdict"
+    },
+    {
+     "name": "n_rows",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "列數",
+     "display": "N Rows"
+    },
+    {
+     "name": "n_cols",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "欄數",
+     "display": "N Cols"
+    },
+    {
+     "name": "columns",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "表頭（JSON）",
+     "display": "Columns"
+    },
+    {
+     "name": "cells",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "格（JSON）",
+     "display": "Cells"
+    },
+    {
+     "name": "checks",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "驗算（JSON）",
+     "display": "Checks"
+    },
+    {
+     "name": "issues",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "問題（JSON）",
+     "display": "Issues"
+    }
+   ]
+  },
+  "vrn_regions_rows": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_PageRegions_v0100.py（G15）",
+   "zh": "數字：科目 × 期別 × 數值（原印字串並存）",
+   "source": {
+    "kind": "sqlite",
+    "path": "VRN_ReportRegions_v0100.sqlite",
+    "table": "rows_"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "seq",
+     "dtype": "int",
+     "required": true,
+     "key": true,
+     "zh": "序號（檔內）",
+     "display": "Seq"
+    },
+    {
+     "name": "page",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "頁",
+     "display": "Page"
+    },
+    {
+     "name": "anchor",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "表格",
+     "display": "Anchor"
+    },
+    {
+     "name": "metric_raw",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "科目（原文）",
+     "display": "Metric Raw"
+    },
+    {
+     "name": "metric",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "科目（運算元）",
+     "display": "Metric"
+    },
+    {
+     "name": "block",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "報表",
+     "display": "Block"
+    },
+    {
+     "name": "period_raw",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "期別（原文）",
+     "display": "Period Raw"
+    },
+    {
+     "name": "period",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "期別",
+     "display": "Period"
+    },
+    {
+     "name": "kind",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "實績／預估",
+     "display": "Kind"
+    },
+    {
+     "name": "value",
+     "dtype": "float",
+     "required": true,
+     "key": false,
+     "zh": "數值",
+     "display": "Value"
+    },
+    {
+     "name": "printed",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "原印",
+     "display": "Printed"
+    },
+    {
+     "name": "unit",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "單位",
+     "display": "Unit"
+    }
+   ]
+  },
+  "vrn_regions_checks": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_PageRegions_v0100.py（G15）",
+   "zh": "加減除驗算：每「檔 × 期 × 式」一列",
+   "source": {
+    "kind": "sqlite",
+    "path": "VRN_ReportRegions_v0100.sqlite",
+    "table": "checks"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "period",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "期別",
+     "display": "Period"
+    },
+    {
+     "name": "id",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "式",
+     "display": "ID"
+    },
+    {
+     "name": "zh",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "式（中文）",
+     "display": "Zh"
+    },
+    {
+     "name": "state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "結果",
+     "display": "State"
+    },
+    {
+     "name": "lhs",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "左邊",
+     "display": "Lhs"
+    },
+    {
+     "name": "rhs",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "右邊",
+     "display": "Rhs"
+    },
+    {
+     "name": "diff",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "差",
+     "display": "Diff"
+    },
+    {
+     "name": "tol",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "容差",
+     "display": "Tol"
+    },
+    {
+     "name": "detail",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "說明",
+     "display": "Detail"
+    },
+    {
+     "name": "used",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "用到的數（JSON）",
+     "display": "Used"
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "出處",
+     "display": "Source"
+    }
+   ]
+  },
+  "vrn_regions_sentences": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_PageRegions_v0100.py（G15）",
+   "zh": "本文：一句一列，帶標題與兩種編號",
+   "source": {
+    "kind": "sqlite",
+    "path": "VRN_ReportRegions_v0100.sqlite",
+    "table": "sentences"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "page",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "頁",
+     "display": "Page"
+    },
+    {
+     "name": "no",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "句號",
+     "display": "No"
+    },
+    {
+     "name": "sec_no",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "節.句",
+     "display": "Sec No"
+    },
+    {
+     "name": "title",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "所屬標題",
+     "display": "Title"
+    },
+    {
+     "name": "subcategory",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "次類別",
+     "display": "Subcategory"
+    },
+    {
+     "name": "anchor",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "位置",
+     "display": "Anchor"
+    },
+    {
+     "name": "text",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "句子",
+     "display": "Text"
+    }
+   ]
+  },
+  "vrn_regions_entities": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_PageRegions_v0100.py（G15）",
+   "zh": "公司名稱、目標價、評價法",
+   "source": {
+    "kind": "sqlite",
+    "path": "VRN_ReportRegions_v0100.sqlite",
+    "table": "entities"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "seq",
+     "dtype": "int",
+     "required": true,
+     "key": true,
+     "zh": "序號（檔內）",
+     "display": "Seq"
+    },
+    {
+     "name": "kind",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "種類",
+     "display": "Kind"
+    },
+    {
+     "name": "key",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "鍵",
+     "display": "Key"
+    },
+    {
+     "name": "value",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "值",
+     "display": "Value"
+    },
+    {
+     "name": "detail",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "說明",
+     "display": "Detail"
+    }
+   ]
+  },
+  "vrn_regions_excluded": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_PageRegions_v0100.py（G15）",
+   "zh": "排除區（免責、頁眉頁尾、重複句）",
+   "source": {
+    "kind": "sqlite",
+    "path": "VRN_ReportRegions_v0100.sqlite",
+    "table": "excluded"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "seq",
+     "dtype": "int",
+     "required": true,
+     "key": true,
+     "zh": "序號（檔內）",
+     "display": "Seq"
+    },
+    {
+     "name": "page",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "頁",
+     "display": "Page"
+    },
+    {
+     "name": "anchor",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "位置",
+     "display": "Anchor"
+    },
+    {
+     "name": "reason",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "理由",
+     "display": "Reason"
+    },
+    {
+     "name": "head",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "開頭",
+     "display": "Head"
+    }
+   ]
+  },
+  "vrn_regions_completeness": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_PageRegions_v0100.py（G15）",
+   "zh": "截取完整度：每頁一列",
+   "source": {
+    "kind": "sqlite",
+    "path": "VRN_ReportRegions_v0100.sqlite",
+    "table": "completeness"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "page",
+     "dtype": "int",
+     "required": true,
+     "key": true,
+     "zh": "頁",
+     "display": "Page"
+    },
+    {
+     "name": "src_chars",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "文字層字數",
+     "display": "Src Chars"
+    },
+    {
+     "name": "captured",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "截取 %",
+     "display": "Captured"
+    },
+    {
+     "name": "extracted",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "擷取 %",
+     "display": "Extracted"
+    },
+    {
+     "name": "missing_chars",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "缺字數",
+     "display": "Missing Chars"
+    },
+    {
+     "name": "state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "燈號",
+     "display": "State"
+    },
+    {
+     "name": "missing_text",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "缺的原文",
+     "display": "Missing Text"
+    }
+   ]
+  },
+  "vrn_verified_matrix": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_AutoTestLoop.py（G15 def_write_matrix）",
+   "zh": "驗證矩陣：每檔一列",
+   "source": {
+    "kind": "csv",
+    "path": "VRN_Verified_Matrix_v0105.csv"
+   },
+   "min_rows": 1,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "檔案",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "檔案"
+    },
+    {
+     "name": "類別",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "類別",
+     "display": "類別"
+    },
+    {
+     "name": "代號",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "代號",
+     "display": "代號"
+    },
+    {
+     "name": "公司（檔名）",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "公司（檔名）",
+     "display": "公司（檔名）"
+    },
+    {
+     "name": "券商",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "券商",
+     "display": "券商"
+    },
+    {
+     "name": "日期",
+     "dtype": "date",
+     "required": false,
+     "key": false,
+     "zh": "日期",
+     "display": "日期"
+    },
+    {
+     "name": "評等（原文）",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "評等（原文）",
+     "display": "評等（原文）"
+    },
+    {
+     "name": "目標價",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "目標價",
+     "display": "目標價"
+    },
+    {
+     "name": "現價",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "現價",
+     "display": "現價"
+    },
+    {
+     "name": "三碼",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "三碼",
+     "display": "三碼"
+    },
+    {
+     "name": "NAME",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "NAME",
+     "display": "NAME"
+    },
+    {
+     "name": "ADJ CLOSE（報告日）",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "ADJ CLOSE（報告日）",
+     "display": "ADJ CLOSE（報告日）"
+    },
+    {
+     "name": "調整後目標價",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "調整後目標價",
+     "display": "調整後目標價"
+    },
+    {
+     "name": "資料庫狀態",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "資料庫狀態",
+     "display": "資料庫狀態"
+    },
+    {
+     "name": "冊:券商",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "冊:券商",
+     "display": "冊:券商"
+    },
+    {
+     "name": "冊:電郵",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "冊:電郵",
+     "display": "冊:電郵"
+    },
+    {
+     "name": "冊:電話",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "冊:電話",
+     "display": "冊:電話"
+    },
+    {
+     "name": "冊:評等",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "冊:評等",
+     "display": "冊:評等"
+    },
+    {
+     "name": "冊:目標價",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "冊:目標價",
+     "display": "冊:目標價"
+    },
+    {
+     "name": "狀態",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "狀態",
+     "display": "狀態"
+    },
+    {
+     "name": "頁",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "頁",
+     "display": "頁"
+    },
+    {
+     "name": "左右切頁",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "左右切頁",
+     "display": "左右切頁"
+    },
+    {
+     "name": "上下切頁",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "上下切頁",
+     "display": "上下切頁"
+    },
+    {
+     "name": "資訊區",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "資訊區",
+     "display": "資訊區"
+    },
+    {
+     "name": "本文句",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "本文句",
+     "display": "本文句"
+    },
+    {
+     "name": "圖",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "圖",
+     "display": "圖"
+    },
+    {
+     "name": "排除",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "排除",
+     "display": "排除"
+    },
+    {
+     "name": "表格",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "表格",
+     "display": "表格"
+    },
+    {
+     "name": "數字",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "數字",
+     "display": "數字"
+    },
+    {
+     "name": "對到科目",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "對到科目",
+     "display": "對到科目"
+    },
+    {
+     "name": "驗算 PASS",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "驗算 PASS",
+     "display": "驗算 PASS"
+    },
+    {
+     "name": "WARN",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "WARN",
+     "display": "WARN"
+    },
+    {
+     "name": "FAIL",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "FAIL",
+     "display": "FAIL"
+    },
+    {
+     "name": "UNIT_SCALE",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "UNIT_SCALE",
+     "display": "UNIT_SCALE"
+    },
+    {
+     "name": "INSUFFICIENT",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "INSUFFICIENT",
+     "display": "INSUFFICIENT"
+    },
+    {
+     "name": "截取%",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "截取%",
+     "display": "截取%"
+    },
+    {
+     "name": "目標價 前→今",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "目標價 前→今",
+     "display": "目標價 前→今"
+    },
+    {
+     "name": "評價法",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "評價法",
+     "display": "評價法"
+    },
+    {
+     "name": "方法詞",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "方法詞",
+     "display": "方法詞"
+    },
+    {
+     "name": "說明",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "說明",
+     "display": "說明"
+    }
+   ]
+  },
+  "vrn_verified_identities": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_AutoTestLoop.py（G15 def_write_matrix）",
+   "zh": "加減除驗算矩陣：每「檔 × 期」一列、每條式一欄",
+   "source": {
+    "kind": "csv",
+    "path": "VRN_Verified_Identities_v0105.csv"
+   },
+   "min_rows": 0,
+   "extra_ok": true,
+   "extra_why": "式子欄位依當輪出現的驗算式而定（最多 FinIdentity 的 39 條），所以只鎖「檔案、期別」兩欄",
+   "columns": [
+    {
+     "name": "檔案",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "檔案"
+    },
+    {
+     "name": "期別",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "期別",
+     "display": "期別"
+    }
+   ]
+  },
+  "vrn_title_parts": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_TitleTrim_v0100.py（G17）",
+   "zh": "標題分拆：一份個股報告一列，def02 七段（公司、代碼、市場、類型、核心觀點、評等變動、目標價變動）",
+   "source": {
+    "kind": "json",
+    "path": "titletrim/vrn_title_parts.json"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "title_raw",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "標題（原印）",
+     "display": "Title Raw"
+    },
+    {
+     "name": "title_clean",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "標題（TRIM 後）",
+     "display": "Title Clean"
+    },
+    {
+     "name": "title_source",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "標題來源（def02 次序）",
+     "display": "Title Source"
+    },
+    {
+     "name": "trim_steps",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "TRIM 動到的步驟",
+     "display": "Trim Steps"
+    },
+    {
+     "name": "trim_loss",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "TRIM 少掉的（應為空）",
+     "display": "Trim Loss"
+    },
+    {
+     "name": "engine_title",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "首頁引擎最大字那行",
+     "display": "Engine Title"
+    },
+    {
+     "name": "db_title",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "資料庫引擎 ReportTitle（第一行）",
+     "display": "DB Title"
+    },
+    {
+     "name": "company",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "公司名稱",
+     "display": "Company"
+    },
+    {
+     "name": "company_state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "公司名稱（狀態）",
+     "display": "Company State"
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "股票代碼",
+     "display": "Ticker"
+    },
+    {
+     "name": "ticker_state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "股票代碼（狀態）",
+     "display": "Ticker State"
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "市場",
+     "display": "Market"
+    },
+    {
+     "name": "market_state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "市場（狀態）",
+     "display": "Market State"
+    },
+    {
+     "name": "report_type",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "報告類型",
+     "display": "Report Type"
+    },
+    {
+     "name": "report_type_state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "報告類型（狀態）",
+     "display": "Report Type State"
+    },
+    {
+     "name": "core_view",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "核心觀點",
+     "display": "Core View"
+    },
+    {
+     "name": "core_view_state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "核心觀點（狀態）",
+     "display": "Core View State"
+    },
+    {
+     "name": "rating_action",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "評等變動",
+     "display": "Rating Action"
+    },
+    {
+     "name": "rating_action_state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "評等變動（狀態）",
+     "display": "Rating Action State"
+    },
+    {
+     "name": "tp_change",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "目標價變動",
+     "display": "TP Change"
+    },
+    {
+     "name": "tp_change_state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "目標價變動（狀態）",
+     "display": "TP Change State"
+    }
+   ]
+  },
+  "vrn_trim_parts": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_TitleTrim_v0100.py（G17）",
+   "zh": "部位：標題、首頁基本資料、年度財報每一個值與它的狀態（VERIFIED 才上鎖）",
+   "source": {
+    "kind": "json",
+    "path": "titletrim/vrn_trim_parts.json"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "seq",
+     "dtype": "int",
+     "required": true,
+     "key": true,
+     "zh": "序號（檔內）",
+     "display": "Seq"
+    },
+    {
+     "name": "part",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "部位",
+     "display": "Part"
+    },
+    {
+     "name": "value",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "值",
+     "display": "Value"
+    },
+    {
+     "name": "state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "狀態",
+     "display": "State"
+    },
+    {
+     "name": "why",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "為什麼",
+     "display": "Why"
+    },
+    {
+     "name": "sources",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "各讀法的值（JSON）",
+     "display": "Sources"
+    },
+    {
+     "name": "page",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "頁",
+     "display": "Page"
+    },
+    {
+     "name": "effect",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "TRIM 效果",
+     "display": "Effect"
+    }
+   ]
+  },
+  "vrn_annual_cells": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_TitleTrim_v0100.py（G17）",
+   "zh": "年度財報頁：每一格 TRIM 前後的列標、科目、原印、數值與狀態",
+   "source": {
+    "kind": "json",
+    "path": "titletrim/vrn_annual_cells.json"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "seq",
+     "dtype": "int",
+     "required": true,
+     "key": true,
+     "zh": "序號（檔內）",
+     "display": "Seq"
+    },
+    {
+     "name": "page",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "頁",
+     "display": "Page"
+    },
+    {
+     "name": "anchor",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "表格",
+     "display": "Anchor"
+    },
+    {
+     "name": "label_raw",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "列標（原印）",
+     "display": "Label Raw"
+    },
+    {
+     "name": "label_clean",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "列標（TRIM 後）",
+     "display": "Label Clean"
+    },
+    {
+     "name": "metric_before",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "科目（TRIM 前）",
+     "display": "Metric Before"
+    },
+    {
+     "name": "metric",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "科目",
+     "display": "Metric"
+    },
+    {
+     "name": "block",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "報表區塊",
+     "display": "Block"
+    },
+    {
+     "name": "period_raw",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "期別（原印）",
+     "display": "Period Raw"
+    },
+    {
+     "name": "period",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "期別",
+     "display": "Period"
+    },
+    {
+     "name": "kind",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "實績／預估",
+     "display": "Kind"
+    },
+    {
+     "name": "printed_raw",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "數字（原印）",
+     "display": "Printed Raw"
+    },
+    {
+     "name": "printed_clean",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "數字（TRIM 後）",
+     "display": "Printed Clean"
+    },
+    {
+     "name": "value_before",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "數值（TRIM 前）",
+     "display": "Value Before"
+    },
+    {
+     "name": "value",
+     "dtype": "float",
+     "required": true,
+     "key": false,
+     "zh": "數值",
+     "display": "Value"
+    },
+    {
+     "name": "unit",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "單位",
+     "display": "Unit"
+    },
+    {
+     "name": "effect",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "TRIM 效果",
+     "display": "Effect"
+    },
+    {
+     "name": "db_value",
+     "dtype": "float",
+     "required": false,
+     "key": false,
+     "zh": "資料庫引擎讀到的值（第二讀法）",
+     "display": "DB Value"
+    },
+    {
+     "name": "db_state",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "與資料庫引擎比（AGREE／DISAGREE）",
+     "display": "DB State"
+    },
+    {
+     "name": "state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "狀態",
+     "display": "State"
+    },
+    {
+     "name": "verified_by",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "驗算 PASS 的式子",
+     "display": "Verified By"
+    },
+    {
+     "name": "flagged_by",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "驗算不過的式子",
+     "display": "Flagged By"
+    }
+   ]
+  },
+  "vrn_lock_status": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_Lock_v0100.py（G18）",
+   "zh": "鎖：每個部位這一輪的鎖態（NEW 新鎖、HELD 守住、BROKEN 退步、OPEN 還沒驗證）",
+   "source": {
+    "kind": "json",
+    "path": "titletrim/vrn_lock_status.json"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "seq",
+     "dtype": "int",
+     "required": true,
+     "key": true,
+     "zh": "序號（檔內）",
+     "display": "Seq"
+    },
+    {
+     "name": "file_sha16",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "檔案指紋（前 16 碼）",
+     "display": "File SHA 16"
+    },
+    {
+     "name": "part",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "部位",
+     "display": "Part"
+    },
+    {
+     "name": "value",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "這次的值",
+     "display": "Value"
+    },
+    {
+     "name": "state",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "這次的狀態",
+     "display": "State"
+    },
+    {
+     "name": "lock",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "鎖態",
+     "display": "Lock"
+    },
+    {
+     "name": "locked_value",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "鎖住的值",
+     "display": "Locked Value"
+    },
+    {
+     "name": "detail",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "說明",
+     "display": "Detail"
+    }
+   ]
+  },
+  "vrn_fix_list": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_Lock_v0100.py（G18）",
+   "zh": "待修清單：還沒對的（與退步的）部位，最嚴重的在前",
+   "source": {
+    "kind": "json",
+    "path": "titletrim/vrn_fix_list.json"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "seq",
+     "dtype": "int",
+     "required": true,
+     "key": true,
+     "zh": "序號",
+     "display": "Seq"
+    },
+    {
+     "name": "priority",
+     "dtype": "int",
+     "required": true,
+     "key": false,
+     "zh": "優先（0 最急）",
+     "display": "Priority"
+    },
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "part",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "部位",
+     "display": "Part"
+    },
+    {
+     "name": "state",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "狀態",
+     "display": "State"
+    },
+    {
+     "name": "lock",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "鎖態",
+     "display": "Lock"
+    },
+    {
+     "name": "value",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "值",
+     "display": "Value"
+    },
+    {
+     "name": "why",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "為什麼",
+     "display": "Why"
+    },
+    {
+     "name": "sources",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "各讀法的值（JSON）",
+     "display": "Sources"
+    }
+   ]
+  },
+  "vrn_focus_files": {
+   "subsystem": "VRN",
+   "owner": "engine/VRN_Focus_v0100.py（G19）",
+   "zh": "聚焦：每個檔案處理了什麼（個股報告只留第一頁與年度財報頁，非個股不處理）",
+   "source": {
+    "kind": "json",
+    "path": "focus/vrn_focus_files.json"
+   },
+   "min_rows": 0,
+   "extra_ok": false,
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true,
+     "zh": "檔案",
+     "display": "File"
+    },
+    {
+     "name": "doc_class",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "檔名拆解類別（ENG393）",
+     "display": "Doc Class"
+    },
+    {
+     "name": "kept",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "處理（Y／N）",
+     "display": "Kept"
+    },
+    {
+     "name": "mode",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "方式（PAGES 選頁／WHOLE 整份／NONE 不處理）",
+     "display": "Mode"
+    },
+    {
+     "name": "pages_total",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "原檔頁數",
+     "display": "Pages Total"
+    },
+    {
+     "name": "pages_kept",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "保留頁（原檔頁碼）",
+     "display": "Pages Kept"
+    },
+    {
+     "name": "annual_pages",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "年度財報頁（原檔頁碼）",
+     "display": "Annual Pages"
+    },
+    {
+     "name": "pages_skipped",
+     "dtype": "int",
+     "required": false,
+     "key": false,
+     "zh": "略過頁數",
+     "display": "Pages Skipped"
+    },
+    {
+     "name": "why",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "說明",
+     "display": "Why"
+    },
+    {
+     "name": "review",
+     "dtype": "str",
+     "required": false,
+     "key": false,
+     "zh": "要人看",
+     "display": "Review"
+    },
+    {
+     "name": "sha256",
+     "dtype": "str",
+     "required": true,
+     "key": false,
+     "zh": "原檔 SHA-256",
+     "display": "SHA256"
+    }
+   ]
+  }
+ },
+ "supersedes": "VRN_Output_Header_SSOT_v0102.json（原封保留）",
+ "changes": [
+  "加 5 張表：vrn_title_parts、vrn_trim_parts、vrn_annual_cells（G17 TITLETRIM）、vrn_lock_status、vrn_fix_list（G18 LOCK）",
+  "v0102 加 1 張表：vrn_focus_files（G19 FOCUS，操作員 2026-10-11「只擷取個股報告中的FILENAME / 1ST PAGE / 年度財報頁進行處理」）",
+  "v0103（實測 2026-10-12）：兩欄改成非必填，見 changes_v0103"
+ ],
+ "changes_v0103": [
+  {
+   "table": "vrn_financial_data",
+   "column": "PeriodLabelRaw",
+   "field": "required",
+   "from": true,
+   "to": false,
+   "why": "實測 48 列：資料庫引擎對沒印期別的數字照實留空（引擎輸出，不是表頭錯）"
+  },
+  {
+   "table": "vrn_regions_rows",
+   "column": "metric_raw",
+   "field": "required",
+   "from": true,
+   "to": false,
+   "why": "實測 52 列：表格裡沒有列標的數字照實留空，G17 列 UNMAPPED（不是表頭錯）"
+  }
+ ]
+}

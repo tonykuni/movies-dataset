@@ -1,0 +1,1039 @@
+{
+ "schema": "VRN_TitleTrim_SSOT_v0100",
+ "version": "v0100",
+ "title": {
+  "zone_priority": [
+   "META",
+   "TOP25",
+   "FONT",
+   "FIRST3"
+  ],
+  "zone_priority_zh": {
+   "META": "PDF metadata Title",
+   "TOP25": "第一頁上方25%區域",
+   "FONT": "最大/次大字型",
+   "FIRST3": "前三行含公司+代碼+類型"
+  },
+  "top_fraction": 0.25,
+  "footer_fraction": 0.88,
+  "first_lines": 3,
+  "min_chars": 4,
+  "max_chars": 200,
+  "join_gap_ratio": 1.6,
+  "join_size_ratio": 0.7,
+  "max_join_lines": 3,
+  "metadata_junk_rx": "^(?:microsoft\\s+(?:word|powerpoint|excel)\\s*-.*|untitled.*|document\\d*|.*\\.(?:docx?|pptx?|xlsx?|pdf)|print|title|無標題.*|.*[-_]\\d{6}(?:\\d{2})?|\\s*)$",
+  "metadata_junk_note": "2026-10-20：PDF 屬性 Title 結尾是 6 或 8 碼日期戳（tsmc(2330TW)-JPM-250718）是檔名，不是報告標題，不參加標題候選。",
+  "noise_rx": "^(?:\\d{1,4}\\s*/\\s*\\d{1,4}|page\\s*\\d+.*|第\\s*\\d+\\s*頁.*|https?://\\S+|www\\.\\S+|\\S+@\\S+|[\\d\\s./:-]+)$",
+  "header_words": [
+   "證券投資顧問",
+   "投顧",
+   "研究部",
+   "研究報告",
+   "Securities Research",
+   "Equity Research",
+   "Research",
+   "Investment Consulting",
+   "Taiwan Equity",
+   "Company Report",
+   "公司報告"
+  ],
+  "separators_rx": "^[\\s\\-:|/;,，、；。．.]+|[\\s\\-:|/;,，、；。．.]+$",
+  "score": {
+   "ticker": 4,
+   "company": 3,
+   "report_type": 2,
+   "rating_or_tp": 1,
+   "font1": 3,
+   "font2": 1,
+   "top25": 1,
+   "meta": 1,
+   "header_only": -4,
+   "noise": -9
+  }
+ },
+ "operator": "2026-10-11「\"C:\\測試樣本報告\" 只擷取個股報告的標題分拆識別 首頁及年度財報頁來進行基本資料清理TRIM後分拆識別 實測實修正 正確鎖功能鎖成功部分及引擎 位成功的持續實測實際修正直到輸出正確可驗證無誤」",
+ "ruled_by": [
+  "ssot/VRN_Method_SSOT_v0100.json#def02_title（來源次序、不假設第一行、TRIM 八步、分段次序、台股代碼規則）",
+  "ssot/VRN_Method_SSOT_v0100.json#def02_report_types（報告類型；多個就留候選與信心，不硬選）",
+  "ssot/VRN_Method_SSOT_v0100.json#def03_firstpage_zones / def03_rating（首頁七區、評等三層、上漲空間公式與例子）",
+  "ssot/VRN_Method_SSOT_v0100.json#def05_canonical_fields（對不到的列標 = REVIEW_REQUIRED，不猜）",
+  "ssot/VRN_Method_SSOT_v0100.json#def16_null_semantics（NULL 不改 0、括號負數、三角形符號、倍數不是百分比）",
+  "ssot/VIA_VRN_ExtractRules_SSOT_v0100.json#R-CMP-01（目標價對照容差 0.5%）"
+ ],
+ "policy": "原文永遠保留（raw）；清理後的值另存（clean）；比對用 fold（再小寫）。數字、百分比、負號、幣別一個都不能少（少了 = TRIM_LOSS，紅燈）。只量不改：既有引擎的答案一個字都不動；兩條獨立讀法一致才算驗證通過，才上鎖。",
+ "trim": {
+  "steps": [
+   "全形轉半形",
+   "Unicode NFKC",
+   "異體字修正",
+   "移除重複空格與不可見字元",
+   "統一破折號/冒號/括號",
+   "保留原始大小寫版",
+   "金額/百分比/負號不可刪",
+   "數值版另建原文保留"
+  ],
+  "invisible": [
+   "\u200b",
+   "\u200c",
+   "\u200d",
+   "\u200e",
+   "\u200f",
+   "\u2060",
+   "\u2061",
+   "\u2062",
+   "\u2063",
+   "\u2064",
+   "\ufeff",
+   "\u00ad",
+   "\u202a",
+   "\u202b",
+   "\u202c",
+   "\u202d",
+   "\u202e",
+   "\u2066",
+   "\u2067",
+   "\u2068",
+   "\u2069",
+   "\u180e",
+   "￼"
+  ],
+  "spaces": [
+   "\u00a0",
+   "\u1680",
+   "\u2000",
+   "\u2001",
+   "\u2002",
+   "\u2003",
+   "\u2004",
+   "\u2005",
+   "\u2006",
+   "\u2007",
+   "\u2008",
+   "\u2009",
+   "\u200a",
+   "\u202f",
+   "\u205f",
+   "\u3000",
+   "\t",
+   "\r",
+   "\n",
+   "\u000b",
+   "\f"
+  ],
+  "dash_to": "-",
+  "dashes": [
+   "‐",
+   "‑",
+   "‒",
+   "–",
+   "—",
+   "―",
+   "−",
+   "➖",
+   "﹘",
+   "﹣",
+   "－"
+  ],
+  "colon_to": ":",
+  "colons": [
+   "：",
+   "﹕",
+   "︓",
+   "∶"
+  ],
+  "brackets": {
+   "（": "(",
+   "）": ")",
+   "［": "[",
+   "］": "]",
+   "【": "[",
+   "】": "]",
+   "〔": "[",
+   "〕": "]",
+   "〖": "[",
+   "〗": "]",
+   "﹙": "(",
+   "﹚": ")"
+  },
+  "variants": {
+   "臺": "台",
+   "証": "證",
+   "着": "著",
+   "裏": "裡",
+   "峯": "峰",
+   "綫": "線",
+   "爲": "為",
+   "衆": "眾",
+   "麪": "麵",
+   "⺠": "民",
+   "⻑": "長",
+   "⻝": "食",
+   "⻄": "西",
+   "⻘": "青",
+   "⻆": "角",
+   "⻤": "鬼",
+   "⻨": "麥",
+   "⻩": "黃",
+   "⻬": "齊",
+   "⻮": "齒",
+   "⺩": "王",
+   "⻊": "足"
+  },
+  "variants_note": "異體字只改 clean 與 fold；原文 raw 照印。CJK 部首補充區（U+2E80–2EFF）NFKC 不轉，PDF 抽字常見，逐字列在這裡。",
+  "keep": {
+   "digits": "每個數字",
+   "percent": [
+    "%",
+    "％",
+    "﹪"
+   ],
+   "minus": [
+    "-",
+    "−",
+    "－",
+    "‐",
+    "‑",
+    "‒",
+    "–",
+    "—",
+    "―",
+    "﹣",
+    "(",
+    "（",
+    "﹙"
+   ],
+   "currency": [
+    "$",
+    "＄",
+    "﹩"
+   ]
+  },
+  "unreadable": {
+   "pua": [
+    "E000",
+    "F8FF"
+   ],
+   "note": "私用區字元 = 字型沒有對照表，TRIM 救不回：列 REVIEW（要換抽字或 OCR）"
+  },
+  "number_rx": "(?P<open>\\()?\\s*(?P<sign>[-+])?\\s*(?P<cur>NT\\$|US\\$|HK\\$|RMB|NTD|TWD|\\$)?\\s*(?P<num>\\d{1,3}(?:,\\d{3})+(?:\\.\\d+)?|\\d+(?:\\.\\d+)?)\\s*(?P<unit>%|x|X|倍|元)?\\s*(?P<close>\\))?"
+ },
+ "ticker": {
+  "paren_rx": "[(\\[]\\s*([1-9]\\d{3})\\s*(?:(TT|TW|\\.TWO|\\.TW|-KY|\\s+TT|\\s+TW|\\s+Equity|TT\\s+Equity)\\s*)?[)\\]]",
+  "bloomberg_rx": "(?<![0-9A-Za-z.])([1-9]\\d{3})\\s*(TT|TW\\s+Equity|TT\\s+Equity)(?![A-Za-z])",
+  "yahoo_rx": "(?<![0-9A-Za-z.])([1-9]\\d{3})\\.(TWO|TW)(?![A-Za-z])",
+  "bare_rx": "(?<![0-9A-Za-z.$,])([1-9]\\d{3})(?![0-9A-Za-z.,%])",
+  "year_band": [
+   2021,
+   2030
+  ],
+  "year_band_rule": "2021–2030 的四碼先當年份：檔名代號相同（第二來源）才算代號，否則 REVIEW",
+  "market_of_form": {
+   "TT": "",
+   "TW": "",
+   "TW EQUITY": "",
+   "TT EQUITY": "",
+   ".TW": "TWSE",
+   ".TWO": "TPEX",
+   "-KY": ""
+  },
+  "market_rule": "def02 market_unknown_no_generate：只有 TT（上市上櫃都用 TT）就不產生 .TW／.TWO，市場留空、說明原因"
+ },
+ "report_types_extra": {
+  "COMPANY_UPDATE": [
+   "營運更新",
+   "公司動態",
+   "Company Note",
+   "Update"
+  ],
+  "INITIATION": [
+   "首次評等",
+   "首評",
+   "Initiating Coverage",
+   "Initiation of Coverage",
+   "Initiate Coverage"
+  ],
+  "EARNINGS_REVIEW": [
+   "財報點評",
+   "業績點評",
+   "Earnings Review"
+  ],
+  "CONFERENCE_CALL": [
+   "法說",
+   "Earnings Call",
+   "Analyst Meeting"
+  ]
+ },
+ "rating_action": {
+  "INITIATE": [
+   "首次評等",
+   "初次評等",
+   "首評",
+   "初評",
+   "首次給予",
+   "Initiating Coverage",
+   "Initiate",
+   "Initiating",
+   "Initiation"
+  ],
+  "UPGRADE": [
+   "調升評等",
+   "上調評等",
+   "評等調升",
+   "評等上調",
+   "升評",
+   "調升至",
+   "上調至",
+   "Upgrade",
+   "Upgraded",
+   "Upgrading",
+   "Raise to"
+  ],
+  "DOWNGRADE": [
+   "調降評等",
+   "下調評等",
+   "評等調降",
+   "評等下調",
+   "降評",
+   "調降至",
+   "下調至",
+   "Downgrade",
+   "Downgraded",
+   "Downgrading",
+   "Cut to"
+  ],
+  "MAINTAIN": [
+   "維持",
+   "重申",
+   "續予",
+   "Maintain",
+   "Maintained",
+   "Reiterate",
+   "Reiterated",
+   "Keep",
+   "Retain"
+  ],
+  "SUSPEND": [
+   "暫停評等",
+   "Suspend",
+   "Suspended"
+  ],
+  "NOT_RATED": [
+   "未評等",
+   "Not Rated"
+  ],
+  "window": 8,
+  "rule": "動詞要緊挨評等詞（前 8 字內），或本身就是「首次評等／暫停評等／未評等」這類完整說法；評等照原文印，不分類"
+ },
+ "tp_change": {
+  "words_rx": "(?:目標價|目標價格|TP|Target\\s+Price|Target|Price\\s+Target|PT)",
+  "money_rx": "(?:NT\\$|US\\$|HK\\$|RMB|NTD|TWD|\\$)?\\s*(\\d{1,3}(?:,\\d{3})+(?:\\.\\d+)?|\\d+(?:\\.\\d+)?)\\s*(?:元)?",
+  "up": [
+   "上調",
+   "調升",
+   "調高",
+   "上修",
+   "提高",
+   "提升",
+   "raise",
+   "raised",
+   "raising",
+   "lift",
+   "lifted",
+   "increase",
+   "increased",
+   "up"
+  ],
+  "down": [
+   "下調",
+   "調降",
+   "下修",
+   "降低",
+   "調低",
+   "cut",
+   "cuts",
+   "lower",
+   "lowered",
+   "reduce",
+   "reduced",
+   "trim",
+   "trimmed",
+   "down"
+  ],
+  "same": [
+   "維持",
+   "maintain",
+   "maintained",
+   "unchanged",
+   "keep"
+  ],
+  "from_rx": "(?:由|從|from)",
+  "to_rx": "(?:至|到|to)"
+ },
+ "cover": {
+  "zones": {
+   "TopHeader": "上方 15%：券商、研究部門、報告日期",
+   "TitleZone": "標題：公司、代碼、報告標題",
+   "RatingBox": "評等、目標價、現價、上漲空間",
+   "AnalystBox": "分析師、電子郵件、證照",
+   "KeyMetrics": "EPS、PE、PB、ROE、營收與獲利摘要",
+   "SummaryBox": "投資結論、催化劑、風險",
+   "Footer": "下方 12%：聲明、頁碼"
+  },
+  "header_fraction": 0.15,
+  "labels": {
+   "rating": [
+    "投資評等",
+    "投資評級",
+    "投資建議",
+    "評等",
+    "評級",
+    "Rating",
+    "Recommendation"
+   ],
+   "target_price": [
+    "12個月目標價",
+    "目標價格",
+    "目標價",
+    "12M TP",
+    "12-month TP",
+    "Target Price",
+    "Price Target",
+    "TP"
+   ],
+   "current_price": [
+    "前日收盤價",
+    "收盤價",
+    "現價",
+    "股價",
+    "Closing Price",
+    "Current Price",
+    "Share Price",
+    "Last Price",
+    "Price",
+    "Close"
+   ],
+   "upside": [
+    "潛在上漲空間",
+    "潛在漲幅",
+    "上漲空間",
+    "潛在報酬",
+    "Upside/Downside",
+    "Potential Upside",
+    "Upside"
+   ],
+   "analyst": [
+    "分析師",
+    "研究員",
+    "Analyst"
+   ],
+   "date": [
+    "報告日期",
+    "發布日期",
+    "Report Date",
+    "Date"
+   ]
+  },
+  "zone_of_field": {
+   "rating": "RatingBox",
+   "target_price": "RatingBox",
+   "current_price": "RatingBox",
+   "upside": "RatingBox",
+   "analyst": "AnalystBox",
+   "email": "AnalystBox",
+   "tel": "AnalystBox",
+   "broker": "TopHeader",
+   "date": "TopHeader",
+   "ticker_codes": "TitleZone"
+  },
+  "key_metric_words": [
+   "EPS",
+   "每股盈餘",
+   "本益比",
+   "PE",
+   "P/E",
+   "PB",
+   "P/B",
+   "股價淨值比",
+   "ROE",
+   "股東權益報酬率",
+   "營收",
+   "毛利率"
+  ],
+  "summary_words": [
+   "投資建議",
+   "投資結論",
+   "催化",
+   "風險",
+   "Catalyst",
+   "Risk",
+   "Investment Thesis"
+  ],
+  "footer_words": [
+   "免責",
+   "聲明",
+   "Disclaimer",
+   "Disclosure",
+   "本報告僅供參考",
+   "請參閱"
+  ],
+  "date_rx": [
+   "(?<!\\d)((?:19|20)\\d{2})\\s*[./-]\\s*(0?[1-9]|1[0-2])\\s*[./-]\\s*(0?[1-9]|[12]\\d|3[01])(?!\\d)",
+   "(?<!\\d)((?:19|20)\\d{2})\\s*年\\s*(0?[1-9]|1[0-2])\\s*月\\s*(0?[1-9]|[12]\\d|3[01])\\s*日",
+   "(?<!\\d)(1\\d{2})\\s*[./年-]\\s*(0?[1-9]|1[0-2])\\s*[./月-]\\s*(0?[1-9]|[12]\\d|3[01])\\s*日?(?!\\d)",
+   "(?<!\\d)(0?[1-9]|[12]\\d|3[01])\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\\.?,?\\s+((?:19|20)\\d{2})",
+   "(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\\.?\\s+(0?[1-9]|[12]\\d|3[01]),?\\s+((?:19|20)\\d{2})"
+  ],
+  "email_rx": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+  "tel_rx": "(?:\\+?886[-\\s]?\\(?0?\\d{1,2}\\)?[-\\s]?|\\(0\\d{1,2}\\)\\s?|0\\d{1,2}[-\\s])\\d{3,4}[-\\s]?\\d{3,4}(?:\\s*(?:#|ext\\.?|分機)\\s*\\d{1,6})?",
+  "tel_rule": "第三輪實測：+886 2 2326 9812（國碼後接一、二位區碼）也是電話；區碼可兩位（037、049）",
+  "name_rx": "^([一-鿿]{2,4}|[A-Z][a-z]+(?:[ -][A-Z][a-z]+){1,2})",
+  "value_stop_rx": "\\s{2,}|[|;]|(?=投資評等|評等|目標價|收盤價|現價|股價|潛在|上漲空間|分析師|Rating|Target|Price|Close|Upside|Analyst)",
+  "expected_on_stock": [
+   "broker",
+   "date",
+   "rating",
+   "target_price"
+  ],
+  "real_run_20261012": "C:\\測試樣本報告 實測後修：日期先找標籤行／頁首、跳過事件日期；價格先拿掉日期再讀數字；英文普通字的券商別名要接機構字",
+  "date_rank": {
+   "label": 0,
+   "TopHeader": 1,
+   "TitleZone": 2,
+   "RatingBox": 3,
+   "AnalystBox": 4,
+   "SummaryBox": 4,
+   "KeyMetrics": 5
+  },
+  "date_skip_words": [
+   "法說會",
+   "法說",
+   "股東會",
+   "股東常會",
+   "除息",
+   "除權",
+   "董事會",
+   "發放",
+   "掛牌",
+   "截止",
+   "預計",
+   "將於",
+   "交易日",
+   "Ex-dividend",
+   "AGM",
+   "Earnings call",
+   "Record date"
+  ],
+  "date_like_rx": "(?:19|20)\\d{2}\\s*[/年-]\\s*\\d{1,2}(?:\\s*[/月-]\\s*\\d{1,2}\\s*日?)?|(?:(?:19|20)\\d{2}|1\\d{2})\\.\\d{1,2}\\.\\d{1,2}|1\\d{2}\\s*[/年-]\\s*\\d{1,2}\\s*[/月-]\\s*\\d{1,2}\\s*日?|\\d{1,2}\\s*/\\s*\\d{1,2}\\s*/\\s*(?:19|20)?\\d{2}|(?<![\\d.,])\\d{1,2}/\\d{1,2}(?![\\d.,/])|\\d{1,2}\\s+(?i:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\\.?,?\\s+(?:19|20)\\d{2}|(?i:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\\.?\\s+\\d{1,2},?\\s+(?:19|20)\\d{2}|(?i:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\\.?\\s+(?:19|20)\\d{2}|(?<!\\d)\\d{1,2}\\s*月\\s*\\d{1,2}\\s*日?|(?<!\\d)\\d{1,2}-(?i:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*-\\d{2,4}(?!\\d)|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|SEPT|OCT|NOV|DEC)[a-z]*\\.?\\s+\\d{1,2}(?![\\d,./:])",
+  "date_like_note_r5b": "第五輪重跑（20261012T232328）：凱基報告現價讀成報告日的「日」（19／15／17）——沒有年份的月日（5月19日、May 19、19-May-26）也是日期，價格行先拿掉；英文月份要大寫開頭（may 是普通字）",
+  "tp_declared_none_rx": "^(?:n\\.?\\s?a\\.?(?![a-z])|n/a(?![a-z])|not\\s+applicable|none(?![a-z])|不適用|無目標價|無|未提供|不設)",
+  "tp_declared_none_rule": "第五輪重跑：目標價標籤後面直接寫 n.a.／N/A／不適用（大和 Hold 報告）= 報告寫明沒有目標價：沒印（NOT_PRINTED），不是沒讀到（MISSING）",
+  "date_like_note_r5": "第五輪實測：英文日期（4 Jun 2025、May 19, 2026、Jun 2025）也是日期——價格行先拿掉，免得「日」被當現價（Citi 3231 現價讀成 4）",
+  "date_like_rule": "點號分隔要年月日三段齊（169.5 是價格，不是民國 169 年 5 月）；民國年也要三段",
+  "broker_generic_aliases": [
+   "first",
+   "capital",
+   "president",
+   "concord",
+   "mega",
+   "cs",
+   "db",
+   "ms",
+   "gs",
+   "jp",
+   "ml",
+   "mq",
+   "boa",
+   "gf",
+   "citic",
+   "nmr",
+   "第一",
+   "統一",
+   "大和",
+   "亞東",
+   "大華",
+   "新光",
+   "台新",
+   "元大",
+   "華南",
+   "中信",
+   "國泰"
+  ],
+  "broker_context_rx": "[\\s.]*(?:securities|sec\\b|investment|research|financial|capital markets|證券|投顧|投信|金控|證期|期貨|資本|永昌)",
+  "broker_alias_rule_r6": "第六輪實測：在台新增（台新）、3.37元大致（元大）、中信銀提存（中信）、e-mail 裡的 daiwacm-cathay（cathay）都不是券商——中文別名前面緊接數字不算；e-mail／網址裡的字不算（網域另走合併冊）；台新、元大、華南、中信、國泰要接證券／投顧／永昌等字",
+  "broker_zone_order": [
+   [
+    "TopHeader",
+    "TitleZone",
+    "AnalystBox"
+   ],
+   [
+    "RatingBox",
+    "SummaryBox",
+    "KeyMetrics"
+   ],
+   [
+    "Footer"
+   ]
+  ],
+  "prior_words": [
+   "前次",
+   "前一次",
+   "原",
+   "舊",
+   "上次",
+   "Previous",
+   "Prior",
+   "Old",
+   "Prev"
+  ],
+  "prior_rule": "標籤前面緊接 前次／原／舊／Previous／Prior 的目標價不是現在的目標價（照列在 ENG396 的前→今，不當目標價讀）",
+  "broker_rule": "普通英文字（first、capital、mega、ms、gs…）當券商別名時，後面要接證券／投顧／Securities／Research 等字才算；先看頁首、標題、分析師區，再看內文，免責聲明最後",
+  "real_run_20261012b": "C:\\測試樣本報告 第二輪實測（1b4e718）後修：第一階段的「第一」不是第一金；兆豐「前次投資建議」下一行是前次評等與目標價；「股價10-11x」「12X 26(F) PER」裡的數字不是價格；被研究公司自己的名字（中信金、國泰金）不當券商",
+  "broker_generic_rule_zh": "第一、統一、大和、亞東、大華、新光是常見中文詞（第一季、第一階段、統一規格、新光三越）：當券商別名時後面要接證券／投顧／證期／資本等字；長的別名（第一金、統一投顧）照舊直接算",
+  "knowledge_source": "以下四條照 engine/VRN_Evidence_Core.py 的同一套知識寫成冊（_PREV_LINE_RX、_TP_EXCLUDE_BEFORE、_NOT_PRICE_AFTER、兆豐標籤列、_DATE_EXCLUDE_BEFORE）；TRIM 這條讀法自己讀行、自己判，證據核心不動",
+  "prior_line_rx": "前次投資建議\\s*[:：]?\\s*[\\d./\\-年月日]*\\s*[:：]?\\s*$|前次評等\\s*[:：]?\\s*$",
+  "prior_line_note": "第四輪實測：兆豐完整報告寫「前次投資建議 2025.08.06:」（冒號在日期後面），訪談速報寫「前次投資建議：2025/06/03」，兩種都算",
+  "prior_line_rule": "一行以「前次投資建議：日期」或「前次評等：」結尾，下一行的評等、目標價、價格、日期都是前次的，不讀（兆豐首頁）",
+  "prior_before_rx": "(?:up/downside to|upside to|downside to|previous|prior|old|from|前次投資建議|前次|原先|前一次|上次)\\s*[:：]?\\s*[\\d./\\-年月日]*\\s*[:：]?\\s*$",
+  "tp_from_to_rx": [
+   "(?:from|由|自|原)\\s*(?:NT\\$|US\\$|HK\\$|\\$|TWD|NTD)?\\s*(?P<prior>[0-9][0-9,]*(?:\\.\\d+)?)\\s*(?:元)?\\s*(?:上調|下調|調升|調降|上修|下修|調整|調高|調低)?\\s*(?:to|至|到|為)\\s*(?:NT\\$|US\\$|HK\\$|\\$|TWD|NTD)?\\s*(?P<cur>[0-9][0-9,]*(?:\\.\\d+)?)",
+   "(?:to|至|為)\\s*(?:NT\\$|US\\$|HK\\$|\\$|TWD|NTD)?\\s*(?P<cur>[0-9][0-9,]*(?:\\.\\d+)?)\\s*(?:元)?\\s*[\\(（]?\\s*(?:from|由|原|前次|prev\\.?|previously)\\s*(?:NT\\$|\\$)?\\s*(?P<prior>[0-9][0-9,]*(?:\\.\\d+)?)"
+  ],
+  "tp_from_to_rule": "目標價標籤後面是「from 3,600 to 4,200」「由 125 上調至 145」「to 4,200 from 3,600」：本次是 to／至 後面那個，from／由 的是前次（不讀、記為前次）",
+  "current_price_not_near_rx": "target|目標|12\\s*m\\b|12-month|objective|52\\s*週|52\\s*-?\\s*w(?:ee)?k|52w|區間|range|低\\s*[\\\\/／|]\\s*高|高\\s*[\\\\/／|]\\s*低|high\\s*/\\s*low|low\\s*/\\s*high",
+  "current_price_rule_r6": "第六輪實測：「52 週股價 (低 \\ 高) (NT$): 318.0 -466.0」是一年區間，不是現價（凱基儒鴻讀成 318、貿聯讀成 600）",
+  "current_price_rule_r7": "第七輪實測：TRIM 把連續空白收成一個空白，「投資評等:賣出 目標價:NT$182.5 收盤價:NT$140.4」裡前一欄自己的「目標價」就落進「收盤價」前面 14 字——59 份個股報告的收盤價一份也沒讀到；改判標籤前後**相鄰**才算（標籤後本來就是錨定的）",
+  "upside_max_gap": 20,
+  "upside_rule_r6": "第六輪實測：「potential upside to our mid-term growth rate of 15%」是內文——上漲空間的數字要在標籤後 20 字內",
+  "rating_not_after_rx": "esg|永續|信用|credit|msci|sustainalytics",
+  "rating_rule_r6": "第六輪實測：「ESG 評等社會(S)」不是投資評等；評等照原文印全（區間 → 區間持有）",
+  "rating_word_tails": [
+   "持有",
+   "操作"
+  ],
+  "rating_word_heads": [
+   "區間"
+  ],
+  "date_rule_r6": "第六輪實測：「市值 (NT$bn/US$mn) 150.8 / 4,777」被讀成民國 150 年 8 月 4 日——日期兩個分隔符要相同、點號旁不留空、後面不接千分位、年份不超過明年",
+  "filename_date_send_days": 7,
+  "filename_date_rule": "第六輪實測：晶心科首頁印 2025/12/06（首頁兩條讀法一致），檔名 251208 晚 2 天＝發送日：檔名晚 1–7 天不算不一致，照列",
+  "short_report_rule": "第六輪實測：Note／Memo／Takeaway／訪談這類短評不一定印評等與目標價：沒讀到 = 沒印（NOT_PRINTED），不是 MISSING",
+  "eng396_year_rule": "第六輪實測：ENG396 全文把 2026 讀成 UBS 6409 的目標價：像年份（1990–明年+1 的整數）的全文目標價不投票，照列",
+  "current_price_rule": "現價標籤（price、close…）前後 14 字內**緊鄰**標籤有 target／目標／12M 的不是現價（12M price target NT$4,200 是目標價）；中間只容得下分隔符號，隔著另一個欄位的標籤與數字就不算",
+  "title_engine_junk": {
+   "min_chars": 4,
+   "rule": "首頁引擎最大字不到 4 個字（I）、或帶日期又沒有標題裡的代碼（頁首「國泰證券子公司 2023/10/05」）時像頁首不像標題：照列、不投票"
+  },
+  "tel_value_rule": "電話的值只收主號碼的數字，分機（#、ext、分機）留在原文；帳本與比對都取後 8 碼（國碼、區碼的 0 不算差異）",
+  "real_run_20261012d": "C:\\測試樣本報告 第四輪實測（02cd986）後修：鎖把電話 0223269899 當數字（掉 0、浮點）→ 電話照字串、後 8 碼；分機接進號碼；兆豐「前次投資建議 日期:」冒號在日期後；CLST「TP from 3,600 to 4,200」讀到 3,600；「12M price target」當現價；首頁引擎最大字 I／頁首當標題投票",
+  "prior_before_chars": 22,
+  "not_price_after_rx": "^\\s*(?:%|倍|x(?![a-z])|X(?![a-z])|bn|mn|tr|年|億|萬|百萬|千|m\\b|b\\b|\\(\\s*[AEFPaefp]\\s*\\)|[AEFP](?![A-Za-z])|[-~～–]\\s*\\d+(?:\\.\\d+)?\\s*(?:[xX倍%]))",
+  "not_price_rule": "數字後面接 %、倍、x、億、年…（證據核心 _NOT_PRICE_AFTER），或接 (F)／E 這種年度尾碼、或「10-11x」這種倍數區間，都不是價格",
+  "label_row": {
+   "label_rx": "目標價",
+   "header_lines": 14,
+   "value_rx": "(?:\\$|NT\\$)\\s*(?P<num>[0-9][0-9,]*(?:\\.\\d+)?)(?![0-9])|(?<![0-9(（])(?P<n2>[0-9][0-9,]*(?:\\.\\d+)?)\\s*元",
+   "rule": "頁首一行只有「投資評等 目標價」這種標籤、沒有數字時，值在下一行（兆豐頁首框）"
+  },
+  "date_exclude_before_rx": "(?:前次投資建議|前次|previous|prior|as of|since|截至|price[^)]{0,12}\\(|close\\s*\\(|期間|week of)\\s*[:：]?\\s*$",
+  "real_run_20261012c": "C:\\測試樣本報告 第三輪實測（552f44d）後修：兆豐右側框的「前次投資建議」與下一行中間夾著左欄本文（照 y 排序時不相鄰）→ 用幾何找同一欄的下一行；一份報告兩位分析師（兩個 e-mail）→ 首頁全部收下，引擎讀到其中一個就算一致；電話先看分析師區再看頁尾；未評等（NR）報告沒有目標價是正常；券商沒印在字裡時用 e-mail 網域",
+  "prior_geometry": {
+   "max_gap_lines": 3.0,
+   "rule": "前次投資建議那一行的下一行 = 幾何上在它下方（間距 ≤ 3 行高）、左右重疊、最近的那一行；沒有座標（TXT／DOCX）時照讀取順序取下一行"
+  },
+  "contact_zone_rank": {
+   "AnalystBox": 0,
+   "TopHeader": 1,
+   "TitleZone": 1,
+   "SummaryBox": 2,
+   "KeyMetrics": 2,
+   "RatingBox": 2,
+   "Footer": 3
+  },
+  "contact_rule": "分析師、e-mail、電話：首頁全部收下（all），先分析師區、再頁首、頁尾最後；引擎讀到其中任何一個就算兩條讀法一致，值取共同那一個",
+  "nr_words": [
+   "NR",
+   "N.R.",
+   "NOT_RATED",
+   "未評等",
+   "無評等",
+   "不評等",
+   "Not Rated",
+   "No Rating",
+   "Unrated",
+   "NR_未評等"
+  ],
+  "nr_rule": "標題、檔名、首頁、首頁引擎任何一處說未評等：沒印目標價是 NOT_PRINTED 不是 MISSING；首頁引擎的 MAINTAIN（維持字的預設）不當評等變動的一票",
+  "broker_domain_rule": "首頁字裡沒有券商別名時，用 e-mail 網域（kgi.com → KGI）當首頁的讀法，來源寫明 e-mail 網域",
+  "arith_rule": "目標價、現價、上漲空間三個都印了：兩條讀法讀到的目標價與現價逐對試，只有一對合得上印的上漲空間（1% 內）才各投一票；合不上的不投（不再把反推值當一票）"
+ },
+ "annual": {
+  "statement_words": {
+   "IS": [
+    "損益表",
+    "綜合損益表",
+    "Income Statement",
+    "Profit and Loss",
+    "P&L"
+   ],
+   "BS": [
+    "資產負債表",
+    "Balance Sheet"
+   ],
+   "CF": [
+    "現金流量表",
+    "Cash Flow"
+   ],
+   "RATIO": [
+    "財務比率",
+    "主要比率",
+    "Key Ratios",
+    "Ratios"
+   ],
+   "SUMMARY": [
+    "財務預估",
+    "財務預測",
+    "財務摘要",
+    "Financial Summary",
+    "Key Financials",
+    "Financial Forecast",
+    "Financial Highlights"
+   ]
+  },
+  "min_fy_cells": 6,
+  "min_mapped": 3,
+  "null_tokens": {
+   "NA": [
+    "NA",
+    "N/A",
+    "N.A.",
+    "n.a.",
+    "n/a",
+    "-NA-"
+   ],
+   "NM": [
+    "NM",
+    "N.M.",
+    "n.m.",
+    "nm"
+   ],
+   "DASH": [
+    "-",
+    "--",
+    "---"
+   ],
+   "BLANK": [
+    ""
+   ]
+  },
+  "triangle": [
+   "△",
+   "▲",
+   "▽",
+   "▼"
+  ],
+  "triangle_rule": "def16：三角形方向依券商模板字典判；VRN 沒有該字典 = REVIEW，不猜正負",
+  "fy_rule": "period 為四碼年（2025、FY25、2025E、113年）= 年度；季、半年留在表裡但不算年度格"
+ },
+ "focus": {
+  "doc_class_policy": {
+   "operator": "2026-10-15「VRN-1 可處理多種報告：個股報告或資訊（一個個股）／產業資訊及展望（多個個股）／其他投資報告」",
+   "rule": "每一種 ENG393 DocClass 各有自己的處理路徑，不再是「非個股一律不處理」（那是 2026-10-11 G19 的範圍，現在擴大）。FULL＝首頁＋年度財報頁，一份報告一列（個股）；COVERAGE＝首頁＋帶受評公司證據的頁，每家受評公司一列、共用 ReportID（產業／展望）；REGISTER＝只留首頁取後設資料（檔名、型別、報告日、券商、頁數），不抽財務數字、不抽目標價評等，一份報告一列。沒列在這裡的新類別走 _default＝REGISTER —— 寧可登錄下來讓人看見，也不要靜靜消失。",
+   "STOCK": {
+    "process": "FULL",
+    "rows": "ONE_PER_REPORT",
+    "why": "個股報告：維持 G19 原樣，首頁＋年度財報頁"
+   },
+   "INDUSTRY_OUTLOOK": {
+    "process": "COVERAGE",
+    "rows": "ONE_PER_COVERED_COMPANY",
+    "why": "產業／展望：涵蓋多家公司，每家一列共用同一個 ReportID"
+   },
+   "NEWS_DIGEST": {
+    "process": "REGISTER",
+    "rows": "ONE_PER_REPORT",
+    "why": "新聞摘要：只分類登錄，不抽財務"
+   },
+   "OTHER_INVEST": {
+    "process": "REGISTER",
+    "rows": "ONE_PER_REPORT",
+    "why": "其他投資報告（無關個股）：只分類登錄，不抽財務"
+   },
+   "OTHER": {
+    "process": "REGISTER",
+    "rows": "ONE_PER_REPORT",
+    "why": "未分類：只分類登錄，待操作員裁定"
+   },
+   "_default": {
+    "process": "REGISTER",
+    "rows": "ONE_PER_REPORT",
+    "why": "ENG393 給了沒見過的類別：登錄下來，不靜靜丟掉"
+   }
+  },
+  "coverage": {
+   "keep_first_page": true,
+   "min_codes_on_page": 1,
+   "max_covered": 60,
+   "rule": "受評公司用 VRN_Evidence_Core.page_codes 掃（yfinance 2330.TW／Bloomberg 2330 TT／南亞(1303)／代號 1303，年份已擋）——不在這裡重寫第二套代號規則。留下首頁與任何掃得到代號的頁；代號去重後就是受評公司清單，超過 max_covered 列 REVIEW。",
+   "none_found": "產業／展望報告一個代號都掃不到 = 列 REVIEW（可能是純文字展望，或代號印在圖裡），仍照 REGISTER 登錄報告層"
+  },
+  "operator": "2026-10-11「只擷取個股報告中的FILENAME / 1ST PAGE / 年度財報頁進行處理 其他多餘的」",
+  "rule": "每份檔案先拆檔名（ENG393）：非個股整份不處理、照列原因；個股報告只留第一頁與年度財報頁，其他頁（本文、圖、免責、只有季資料的表…）不處理。保留的頁在 TEMP 另存一份「聚焦副本」給所有引擎讀，原檔一個位元組都不動；頁碼對照（副本第幾頁 = 原檔第幾頁）寫進清單，輸出一律換回原檔頁碼",
+  "keep_first_page": true,
+  "annual_page": {
+   "min_years": 2,
+   "min_numbers": 8,
+   "min_labels": 4,
+   "statement_min_labels": 2
+  },
+  "annual_page_rule": "年度財報頁 = 至少 2 個年度期別（2024A／2025E／FY25／113年…，季與半年不算）+ 至少 8 個數字 + （至少 4 個列標對得到財報科目，或印了報表名稱且至少 2 個列標對得到）",
+  "label_strip_rx": "[\\s\\d,.()%+\\-]+$",
+  "number_rx": "\\(?-?\\d[\\d,]*(?:\\.\\d+)?\\)?%?",
+  "save": {
+   "garbage": 3,
+   "deflate": true,
+   "no_new_id": true
+  },
+  "save_rule": "聚焦副本固定存法（同樣的頁存兩次位元組相同），資料庫引擎的檔案指紋與報告編號才穩定",
+  "images": "個股的影像檔照原檔帶過去（引擎照實列 OCR_REQUIRED）；非個股不帶",
+  "text_files": "DOCX／TXT 沒有頁：個股整份帶過去",
+  "scan_error": "掃頁失敗的個股 PDF 整份帶過去（不漏），並列 REVIEW",
+  "no_annual": "個股報告找不到年度財報頁 = 列 REVIEW（確認報告本來就沒有，或告知是第幾頁）",
+  "period_like_rx": "^(?:FY['’]?\\d{2,4}[AEFPaefp]?|['’]\\d{2}[AEFPaefp]?|\\d{2,4}[AEFPaefp])$|^(?:FY)?\\d{1,2}/\\d{2,4}[AEFPaefp]?$|^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[-\\s'’]?\\d{2,4}[AEFPaefp]?$",
+  "short_report_words": [
+   "Note",
+   "Takeaway",
+   "速報",
+   "快報",
+   "快訊",
+   "Memo",
+   "Flash",
+   "First Take",
+   "Quick Take",
+   "訪談",
+   "拜訪",
+   "NR",
+   "未評等"
+  ],
+  "short_rule": "檔名或標題帶 Note／Takeaway／速報／Memo／NR 的短評，沒有年度財報頁是正常：照列、不算 WARN；完整報告找不到才 WARN",
+  "diagnose": "找不到年度財報頁時寫出最像的那一頁：讀到的期別、沒認出的期別樣子、對不到的列標（下一輪照它修）"
+ },
+ "verify": {
+  "tp_tol_rel": 0.005,
+  "price_tol_rel": 0.005,
+  "upside_tol_pp": 0.5,
+  "upside_implied_tol_rel": 0.01,
+  "upside_implied_rule": "印了上漲空間與現價時，目標價 = 現價 ×（1 + 上漲空間）也算一票（算術讀法）；平手時算術那一方排前面",
+  "upside_rule": "def03：(TargetPrice-CurrentPrice)/CurrentPrice；1450/1200 = 20.8333%，報告印 21% = 合理四捨五入，印 25% = 標記差異",
+  "states": {
+   "VERIFIED": "兩條獨立讀法一致（或加減除驗算 PASS）：上鎖",
+   "SINGLE": "只有一條讀法：值乾淨但沒有第二來源，鎖不住（給 --truth 或補第二來源）",
+   "NOT_PRINTED": "報告上沒有印（選填段落）：不是錯",
+   "CONFLICT": "兩條讀法不一致：列待修",
+   "MISSING": "個股報告該有卻沒讀到（券商、日期、評等、目標價、公司、代碼）：列待修",
+   "REVIEW": "多個候選或要人判（代號落在年份帶、三角形符號、私用區字元、報告類型多於一個）：列待修",
+   "UNMAPPED": "列標對不到科目（def05：REVIEW_REQUIRED，不猜）：列待修",
+   "REPORT_CHECK": "加減除驗算不過：讀錯或報告本身不一致，要人看：列待修",
+   "TRIM_LOSS": "TRIM 弄丟數字／百分比／負號／幣別：紅燈，列待修",
+   "TRIM_REGRESSION": "TRIM 後驗算反而變差：紅燈，列待修"
+  },
+  "lockable": [
+   "VERIFIED"
+  ],
+  "fix_priority": {
+   "TRIM_LOSS": 1,
+   "TRIM_REGRESSION": 1,
+   "CONFLICT": 1,
+   "MISSING": 1,
+   "REVIEW": 2,
+   "UNMAPPED": 2,
+   "REPORT_CHECK": 2,
+   "SINGLE": 3
+  }
+ },
+ "lock": {
+  "ledger_env": "VRN_LOCK_HOME",
+  "ledger_windows": "%LOCALAPPDATA%\\VRN_Main\\locks",
+  "ledger_posix": "~/.local/state/VRN_Main/locks",
+  "ledger_file": "VRN_Lock_Ledger_v0100.json",
+  "history_file": "VRN_Lock_History_v0100.jsonl",
+  "never_inside": "functional modules/VRN（真報告的值不進倉庫；P03 也不會多出未登記的檔）",
+  "key": "檔案 SHA-256 前 16 碼 + 部位（title.ticker、cover.target_price、annual.gross_profit@2025 …）",
+  "rules": [
+   "VERIFIED 的部位第一次出現 = 上鎖（NEW）",
+   "已鎖的部位下次值一樣 = HELD（綠）",
+   "已鎖的部位值變了或不見了 = BROKEN（紅）：退步，擋下；確定要改，操作員用 VRN_Main_v0100.py lock --unlock 解鎖",
+   "引擎的 AST 指紋變了：已鎖部位全部重現 = 換新指紋（黃燈照實寫）；有任何 BROKEN = 紅燈並點名哪支引擎改過",
+   "檔案內容變了（SHA 不同）= 新檔，舊鎖不套用"
+  ],
+  "engine_book": "ssot/VRN_EngineLock_SSOT_v0100.json",
+  "not_engines": [
+   "engine/VRN_AutoTestLoop.py",
+   "engine/VRN_AstId_v0100.py"
+  ],
+  "not_engines_why": "AutoTestLoop 是測試協調器、AstId 是編號工具：不產生報告輸出，不在引擎鎖裡（它們自己有 P11／測試）",
+  "proofs": {
+   "first_page_oracle": {
+    "gate": "P06 ORACLE first_page（106 個檔名對 oracle）",
+    "covers": [
+     "engine/VIA_VRN_FirstPageEngine.py",
+     "engine/VRN_Evidence_Core.py",
+     "engine/VIA_TW_Ticker_Master_v0210.py",
+     "ssot/VIS_VRN_TickerFilenameSSOT_v0100.py",
+     "ssot/VRN_Broker_Dict_v0100.json",
+     "ssot/VRN_Rating_Dict_v0100.json"
+    ]
+   },
+   "database_oracle": {
+    "gate": "P06 ORACLE database（106 個檔名對 oracle）",
+    "covers": [
+     "engine/VRN_Integrated_ReportDatabase_Engine.py"
+    ]
+   },
+   "books": {
+    "gate": "P08 BOOKS（收來的冊自己的例子）+ VRN_BookCheck 自測",
+    "covers": [
+     "engine/VRN_BookCheck_v0100.py",
+     "ssot/VRN_S05_FieldRegistry_v0103.json",
+     "ssot/VIA_VRN_ReportFieldRules_SSOT_v0101.json",
+     "ssot/VRN_FieldRules_SSOT_v0101.json",
+     "ssot/VRN_Broker_Dict_v0103.json",
+     "ssot/VIA_SSOT_SynonymUnion_v0107.json",
+     "ssot/VIA_VRN_FieldSpec_SSOT_v0100.json",
+     "ssot/VIA_VRN_ExtractRules_SSOT_v0100.json",
+     "ssot/VRN_FinLexicon_SSOT_v0109.json"
+    ]
+   },
+   "regions": {
+    "gate": "P14 REGIONS（4 份已知答案報告 + 九張表 DataFrame）",
+    "covers": [
+     "engine/VRN_PageRegions_v0100.py",
+     "engine/mother/VRN_ENG392_TextCompleteness_v0100.py",
+     "engine/mother/VRN_ENG393_DocClassVerify_v0100.py",
+     "engine/mother/VRN_ENG394_LayoutRestore_v0100.py",
+     "engine/mother/VRN_ENG395_ValuationMethodLexicon_v0100.py",
+     "engine/mother/VRN_ENG396_ReportEntities_v0100.py",
+     "engine/VRN_DataFrame_v0100.py",
+     "engine/mother/CGC_MDL249_DataFrameLock_v0100.py",
+     "ssot/VRN_LayoutRestore_SSOT_v0100.json",
+     "ssot/VRN_AnnualExtract_SSOT_v0100.json",
+     "ssot/VRN_Method_SSOT_v0100.json",
+     "ssot/VRN_FinIdentity_SSOT_v0100.json",
+     "ssot/VRN_OperatorLabels_SSOT_v0100.json",
+     "ssot/VRN_Output_Header_SSOT_v0100.json",
+     "ssot/VRN_Output_Header_SSOT_v0101.json"
+    ]
+   },
+   "dataframe": {
+    "gate": "VRN_DataFrame 自測（每一種鎖判）",
+    "covers": [
+     "engine/VRN_DataFrame_v0100.py",
+     "engine/mother/CGC_MDL249_DataFrameLock_v0100.py",
+     "ssot/VRN_Output_Header_SSOT_v0101.json",
+     "ssot/VRN_Output_Header_SSOT_v0102.json",
+     "ssot/VRN_Output_Header_SSOT_v0103.json",
+     "ssot/VRN_Output_Header_SSOT_v0104.json",
+     "ssot/VRN_Output_Header_SSOT_v0105.json",
+     "ssot/VRN_Output_Header_SSOT_v0106.json",
+     "ssot/VRN_Output_Header_SSOT_v0107.json"
+    ]
+   },
+   "titletrim": {
+    "gate": "P15 TITLETRIM（標題字串 + build_fixtures 的亂碼報告，全部已知答案；件數看 detail，不寫死）",
+    "covers": [
+     "engine/VRN_TitleTrim_v0100.py",
+     "ssot/VRN_TitleTrim_SSOT_v0100.json",
+     "ssot/VRN_Method_SSOT_v0100.json",
+     "engine/VIA_VRN_FirstPageEngine.py",
+     "engine/VRN_PageRegions_v0100.py",
+     "ssot/VRN_TickerRecord_SSOT_v0100.json"
+    ]
+   },
+   "lock": {
+    "gate": "VRN_Lock 自測",
+    "covers": [
+     "engine/VRN_Lock_v0100.py"
+    ]
+   },
+   "localdb": {
+    "gate": "VRN_LocalDB 自測（要 duckdb；略過不算證明）",
+    "covers": [
+     "engine/VRN_LocalDB_v0100.py"
+    ]
+   },
+   "tempstore": {
+    "gate": "VRN_TempStore 自測",
+    "covers": [
+     "engine/VRN_TempStore_v0100.py",
+     "ssot/VRN_TEMP_POLICY_v0100.json"
+    ]
+   },
+   "panorama": {
+    "gate": "VRN_PanoramaProbe 自測（檔名契約的已知答案：NFKC、副檔名、日期合法性、代號／券商／報告日）",
+    "covers": [
+     "engine/VRN_PanoramaProbe.py"
+    ]
+   },
+   "ocr": {
+    "gate": "VRN_Ocr 自測（引擎偵測順序、沒有引擎時的退路、結果一律標 source=OCR／lossy_cjk；有引擎時讀回已知文字：數字與拉丁字全中、中文會掉字）",
+    "covers": [
+     "engine/VRN_Ocr_v0100.py"
+    ]
+   },
+   "matrix": {
+    "gate": "VRN_Matrix 自測（核對矩陣：值＋記號＋鎖、中英文對齊、rich 有就用）",
+    "covers": [
+     "engine/VRN_Matrix_v0100.py"
+    ]
+   },
+   "record": {
+    "gate": "VRN_TickerRecord 自測（合併冊與來源冊一致；15 欄紀錄）",
+    "covers": [
+     "engine/VRN_TickerRecord_v0100.py",
+     "ssot/VRN_TickerRecord_SSOT_v0100.json"
+    ]
+   },
+   "outputverify": {
+    "gate": "VRN_OutputVerify 自測（一份畫出來的已知答案 PDF：對 · 錯期間 · 截斷 · 分組表取到舊值 · 並排表取到右表 · 科目歸錯 · 原文沒有 · 期間不明 · HTML 嵌入安全 · 計數 · 段落標題判準與借來的讀法：成長率 / 比率段落底下的金額科目剔除 · 混合單位不判 · 讀法倒了不剔除）",
+    "covers": [
+     "engine/VRN_OutputVerify_v0100.py"
+    ]
+   },
+   "pivotdb": {
+    "gate": "VRN_PivotDB 自測（已知答案：期間鍵 · 只收 VERIFIED / CORRECTED · 年度 / 季度欄依時間排序 · 表層與報告層 PIVOT · 同格不同值留空列衝突 · 印的科目字不同不合併 · 印的位數不同的同一個數取最細 · DuckDB 原生 PIVOT 檢視逐格相同 · 還原表攤平 · HTML 嵌入安全 · 契約不符不寫 · 指紋冪等）",
+    "covers": [
+     "engine/VRN_PivotDB_v0100.py"
+    ]
+   },
+   "toolbridge": {
+    "gate": "VRN_ToolBridge 自測（自己的工具冊：格式 · 沒有時間戳 · check 抓 sha256 不同；借：sha256 相同才借 · 對方標不能用 / 檔改過 → 不借 · 載入不留 __pycache__ · 找不到 VRN-2 → 只用自己的）",
+    "covers": [
+     "engine/VRN_ToolBridge_v0100.py"
+    ]
+   },
+   "runcache": {
+    "gate": "VRN_RunCache 自測（TEMP 快取：鑰匙、命中、資料夾還原改路徑、樣本 SHA 不重讀、刪除規則、資源）",
+    "covers": [
+     "engine/VRN_RunCache_v0100.py"
+    ]
+   },
+   "truthmatrix": {
+    "gate": "VRN_TruthMatrix 自測（母倉首頁矩陣貼文 → G11 真值檔；券商經合併冊；不保證欄標 unknown）",
+    "covers": [
+     "engine/VRN_TruthMatrix_v0100.py",
+     "ssot/VRN_TickerRecord_SSOT_v0100.json"
+    ]
+   },
+   "focus": {
+    "gate": "P17 FOCUS（多頁個股報告只留首頁與年度財報頁、非個股排除、副本位元組固定）",
+    "covers": [
+     "engine/VRN_Focus_v0100.py",
+     "ssot/VRN_TitleTrim_SSOT_v0100.json",
+     "engine/VRN_PageRegions_v0100.py"
+    ]
+   }
+  },
+  "engine_rule": "引擎鎖：已知答案全部通過的引擎記下 AST 指紋（只加註解不改指紋）；之後邏輯一改，check 就紅燈，要先跑 VRN_Main_v0100.py lock 重新驗過已知答案才換鎖"
+ }
+}
