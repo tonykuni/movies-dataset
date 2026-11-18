@@ -29,3 +29,10 @@
 | 2026-11-17T16:22:54Z | CGC_MDL283_CardMatrixFeedback_v0103.py | 0103 | VIA-VCGC-MDL1652 | 8d5ff66ece65 | 現況顯示最佳化:彙總列不另計 · 三排卡片 · 收據 STATUS_latest.json · status() · manifest | 自測 20/20(另跑前版鏈 57/57)· 實跑對帳八條相符 |
 | 2026-11-17T16:25:27Z | CGC_MDL283_CardMatrixFeedback_v0103.py | 0103 | VIA-VCGC-MDL1652 | 2cbb8baa1ceb | 現況顯示最佳化(推送前修正後重鎖;同檔以本列為準):彙總列不另計 · 三排卡片 · 收據 · status() · manifest | 自測 21/21(另跑前版鏈 57/57)· 實跑對帳八條相符 |
 | 2026-11-17T16:28:06Z | CGC_MDL283_CardMatrixFeedback_v0103.py | 0103 | VIA-VCGC-MDL1652 | bd60f3a2d4ba | 現況顯示最佳化(推送版;同檔以本列為準):彙總列不另計 · 三排卡片 · 收據 · status() · manifest | 自測 21/21(另跑前版鏈 57/57)· 實跑對帳八條相符 · 無頭瀏覽器點過三排卡片 |
+| 2026-11-18T01:51:19Z | CGC_MDL149_VeritasCentralGovernanceConsole_v0197.py | 0197 | VIA-VCGC-MDL1653 | d6d7ecfd8665 | 現況顯示接線:monitor status 子動詞(既有 monitor 其他子動詞照舊轉交) | 自測 16/16 · 經入口實跑一輪(收據更新 · rc 與燈一致)· test --quick 該站綠 |
+| 2026-11-18T01:51:19Z | CGC_MDL282_LocalMonitor_v0103.py | 0103 | VIA-VCGC-MDL1655 | 66793f36ed49 | 選配收據不計系統格;自己的收據不讀自己的燈 | 自測 42 項過(含 v0102 · v0101 · v0100 鏈)· 實跑該列為綠且標選配 |
+| 2026-11-18T01:51:19Z | CGC_MDL279_MCPServer_v0106.py | 0106 | VIA-VCGC-MDL1654 | cd30cd88a6a0 | MCP 唯讀資源 +vcgc/status | 本版 6 項過 · v0105 鏈 rc 0 |
+| 2026-11-18T01:51:19Z | VIA_SystemReceipt_Contract_SSOT_v0101.json | 0101 | — | 0e4d98e5344a | 收據契約 +VCGC status-display(選配) | 其餘四節與 VCGC 前兩筆逐項比對相同 |
+| 2026-11-18T01:51:19Z | VIA_Requirements_SSOT_v0256.json | 0256 | — | 9ace971be3ad | 需求冊 +VCGC-REQ225(PARTIAL) | 舊 284 條逐項比對相同 · SDD X-REQ-BACK 綠 |
+| 2026-11-18T01:51:19Z | VIA_Workflow_VCGC_SSOT_v0152.json | 0152 | — | f81224971613 | 工作流冊 +VCGC-WKF043(4 步) | 舊 42 條逐項比對相同 · SDD X-CODE · X-ENGINE 綠 |
+| 2026-11-18T01:51:19Z | VIA_VCGC_FunctionInventory_SSOT_v0245.json | 0245 | — | 852f6ef13105 | 盤點冊 +5 站 · +4 工作流步 · manifest 豁免 | 舊 428 站逐項比對相同 · test --quick verb 58/58 · workflow 181/181 |
