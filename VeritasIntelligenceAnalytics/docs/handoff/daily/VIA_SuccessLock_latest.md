@@ -37,3 +37,6 @@
 | 2026-11-18T01:51:19Z | VIA_Workflow_VCGC_SSOT_v0152.json | 0152 | — | f81224971613 | 工作流冊 +VCGC-WKF043(4 步) | 舊 42 條逐項比對相同 · SDD X-CODE · X-ENGINE 綠 |
 | 2026-11-18T01:51:19Z | VIA_VCGC_FunctionInventory_SSOT_v0245.json | 0245 | — | 852f6ef13105 | 盤點冊 +5 站 · +4 工作流步 · manifest 豁免 | 舊 428 站逐項比對相同 · test --quick verb 58/58 · workflow 181/181 |
 | 2026-11-18T02:41:24Z | CGC_MDL283_CardMatrixFeedback_v0104.py | 0104 | VIA-VCGC-MDL1656 | 1effae5975ca | token 冊雜湊先統一成 LF 再算(Windows 上頁面樣式不掉)· 收據 version 寫本版 | 自測 88 項過(含前版鏈;放了一份 CRLF 檔,舊算法會判錯)· 經入口實跑收據 version v0104 |
+| 2026-11-18T16:13:45Z | CGC_MDL134_ParallelLanes_v0103.py | 0103 | VIA-VCGC-MDL1662 | 4fb2a0997e6f | cmd 動詞:短指令的 Python 路由(list / check / plan / run)· 先降壓 → 3~6 道 → 監工過熱減道、暫停最新子行程、冷卻恢復 | 自測 35/35 · cmd run via-six 實跑綠(71 秒)· cmd run via-panorama-all 兩步同時起跑,兩步都紅(紅在既有問題:收容夾 9 支沒帶橋 · 已修冊回歸 2 筆) |
+| 2026-11-18T16:13:45Z | VIA_ShortCommand_PyRoute_SSOT_v0100.json | 0100 | VIA-VCGC-SSOT404 | be269b34ac86 | 短指令 → Python 路由冊:212 支全列,第一批 4 支有可跑的步 | 應掃 212 · 已掃 212 · 略過 0 · cmd check:這輪改 4(綠 4)· 原本就是 Python 142(綠 135 · 紅 7)· 待改 23 · 轉呼叫 / PS 本職 43 |
+| 2026-11-18T16:13:45Z | Register-VIA-Commands-v0279.ps1 | 0279 | VIA-CORE-MDL868 | 84e18a848dc6 | via-vrnrun · via-vdffetch · via-six · via-panorama-all 改成只轉呼叫 Python 入口 | 靜態檢查:括號引號配對 · 與 v0278 同編碼同換行 · 不含本機路徑;未在主機 PowerShell 實跑(這一列鎖的是檔內容,不是主機驗收) |
