@@ -2,6 +2,8 @@ import type { Reading } from "./engine";
 import type { VqgDef } from "./registry";
 import type { SignalDef } from "./signals";
 import type { TestRow } from "./test-engine";
+import type { TopicRow } from "./topics";
+import type { LibraryNote } from "./libs.server";
 
 export type VersionNote = {
   id: string;
@@ -24,4 +26,6 @@ export type VqgPayload = {
   signals: SignalDef[];
   tests: TestRow[];
   versions: VersionNote[];
+  topics: TopicRow[];
+  libraries: LibraryNote[];
 };
