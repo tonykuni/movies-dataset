@@ -1,0 +1,274 @@
+{
+  "schema": "VDF.PricesFactorRegistry",
+  "schema_version": "1.0.0",
+  "authority": "VIA-SYS-MGR-001",
+  "registration_state": "CANDIDATE_PENDING_CGC_PROMOTION",
+  "parent_ssot": "config/ssot/VIA_SystemMaster.via",
+  "indicator_authority": "config/ssot/VIA_ParameterIndicatorRegistry.via",
+  "canonical_entry": "scripts/VIA-Launch-Console.ps1",
+  "engines": {
+    "prices_canonical": {
+      "candidate_slug": "prices-canonical",
+      "module": "functional modules/VDF/engine/VDF_PricesCanonical.py",
+      "network_default": false
+    },
+    "factor_library": {
+      "candidate_slug": "factor-library",
+      "module": "functional modules/VDF/engine/VDF_FactorLibrary.py",
+      "network_default": false,
+      "input_dataset": "prices_canonical"
+    }
+  },
+  "defaults": {
+    "prices_start_date": "2021-01-01",
+    "factors_start_date": "2023-01-02",
+    "end_date": "LATEST",
+    "warmup_sessions": 240,
+    "horizons": [5, 10, 20, 60, 120, 240],
+    "annualization_sessions": 252,
+    "benchmark_ticker": "^TWII",
+    "risk_free_ticker": "^TNX",
+    "update_mode": "INCREMENTAL",
+    "storage_mode": "LONG_TERM"
+  },
+  "datasets": {
+    "prices_canonical": {
+      "output_database": "VDF_CANONICAL",
+      "table": "prices_canonical",
+      "grain": "market + ticker + data_date",
+      "primary_key": ["market", "ticker", "data_date"],
+      "partition_order": ["market", "year"],
+      "required_long_term_formats": ["parquet", "duckdb"],
+      "optional_formats": ["sqlite"],
+      "one_time_formats": ["csv", "google_sheet"],
+      "csv_encoding": "utf-8-sig",
+      "csv_date_format": "%Y/%m/%d",
+      "duplicate_conflict_policy": "FAIL_CLOSED",
+      "columns": [
+        "dataset_id",
+        "source_id",
+        "source_tier",
+        "market",
+        "asset_type",
+        "ticker",
+        "data_date",
+        "as_of_date",
+        "fetch_time",
+        "run_id",
+        "source_hash",
+        "raw_open",
+        "raw_high",
+        "raw_low",
+        "raw_close",
+        "adj_close_source",
+        "adj_factor",
+        "adj_open",
+        "adj_high",
+        "adj_low",
+        "adj_close",
+        "volume_raw",
+        "daytrade_volume",
+        "volume_ex_daytrade",
+        "trading_value_raw",
+        "daytrade_trading_value",
+        "trading_value_ex_daytrade",
+        "no_trade_confirmed",
+        "price_fill_method",
+        "validation_status",
+        "quality_flag",
+        "year"
+      ]
+    },
+    "factor_library": {
+      "output_database": "VDF_FACTOR",
+      "table": "factor_values",
+      "grain": "market + ticker + data_date + factor_id + factor_version + parameter_set_id",
+      "primary_key": [
+        "market",
+        "ticker",
+        "data_date",
+        "factor_id",
+        "factor_version",
+        "parameter_set_id"
+      ],
+      "partition_order": ["factor_family", "market", "year"],
+      "layout": "LONG",
+      "materialization_mode": "ON_DEMAND_INCREMENTAL",
+      "required_long_term_formats": ["parquet", "duckdb"],
+      "optional_formats": ["sqlite"],
+      "one_time_formats": ["csv", "google_sheet"],
+      "columns": [
+        "dataset_id",
+        "market",
+        "ticker",
+        "data_date",
+        "as_of_date",
+        "calculation_time",
+        "factor_family",
+        "factor_id",
+        "factor_version",
+        "parameter_set_id",
+        "formula_id",
+        "formula_version",
+        "value",
+        "unit",
+        "input_price_mode",
+        "input_volume_mode",
+        "validation_status",
+        "quality_flag",
+        "run_id",
+        "input_run_id",
+        "input_hash",
+        "year"
+      ]
+    }
+  },
+  "field_aliases": {
+    "ticker": ["ticker", "symbol", "stock_id", "stockid", "code", "證券代號", "股票代號"],
+    "data_date": ["data_date", "obs_date", "date", "datetime", "trade_date", "tradedate", "日期", "交易日期"],
+    "raw_open": ["raw_open", "open", "開盤價"],
+    "raw_high": ["raw_high", "high", "最高價"],
+    "raw_low": ["raw_low", "low", "最低價"],
+    "raw_close": ["raw_close", "close", "收盤價"],
+    "adj_close_source": ["adj_close_source", "adj_close", "adjclose", "adjusted_close", "adj", "調整後收盤價"],
+    "volume_raw": ["volume_raw", "volume", "raw_volume", "成交量"],
+    "daytrade_volume": ["daytrade_volume", "day_trade_volume", "當沖量", "當日沖銷交易成交股數"],
+    "volume_ex_daytrade": ["volume_ex_daytrade", "ex_daytrade_volume", "扣當沖量"],
+    "trading_value_raw": ["trading_value_raw", "trading_value", "turnover", "成交值", "成交金額"],
+    "daytrade_trading_value": ["daytrade_trading_value", "daytrade_value", "day_trade_value", "當沖成交值", "當沖成交金額"],
+    "trading_value_ex_daytrade": ["trading_value_ex_daytrade", "ex_daytrade_value", "扣當沖成交值"],
+    "no_trade_confirmed": ["no_trade_confirmed", "confirmed_no_trade", "無成交確認"],
+    "market": ["market", "exchange", "市場"],
+    "asset_type": ["asset_type", "instrument_type", "資產類型"],
+    "source_id": ["source_id", "provider", "來源"],
+    "source_tier": ["source_tier", "來源層級"],
+    "as_of_date": ["as_of_date", "available_at", "可知日"],
+    "fetch_time": ["fetch_time", "ingested_at", "擷取時間"],
+    "run_id": ["run_id", "執行編號"],
+    "source_hash": ["source_hash", "來源雜湊"]
+  },
+  "formulas": {
+    "vdf.price.adj_factor": {
+      "version": "1.0.0",
+      "equation": "adj_close_source / raw_close",
+      "null_policy": "zero or null raw_close => CALC_BLOCKED"
+    },
+    "vdf.price.adj_ohlc": {
+      "version": "1.0.0",
+      "equation": "raw_ohlc * adj_factor; adj_close = adj_close_source",
+      "raw_price_fallback": false
+    },
+    "vdf.volume.ex_daytrade": {
+      "version": "1.0.0",
+      "equation": "volume_raw - daytrade_volume",
+      "forward_fill": false,
+      "raw_fallback": false
+    },
+    "vdf.value.ex_daytrade": {
+      "version": "1.0.0",
+      "equation": "trading_value_raw - daytrade_trading_value",
+      "forward_fill": false,
+      "raw_fallback": false
+    },
+    "vdf.gap.confirmed_no_trade": {
+      "version": "1.0.0",
+      "equation": "adj_ohlc = previous valid adj_close; volume/value fields = 0",
+      "required_evidence": "no_trade_confirmed=true",
+      "unknown_gap_policy": "CALC_BLOCKED"
+    },
+    "vdf.factor.return.simple": {
+      "version": "1.0.0",
+      "equation": "adj_close[t] / adj_close[t-1] - 1"
+    },
+    "vdf.factor.return.log": {
+      "version": "1.0.0",
+      "equation": "ln(adj_close[t] / adj_close[t-1])"
+    },
+    "vdf.factor.price.base100": {
+      "version": "1.0.0",
+      "equation": "100 * adj_close[t] / first_valid_adj_close"
+    },
+    "vdf.factor.momentum": {
+      "version": "1.0.0",
+      "equation": "adj_close[t] / adj_close[t-window] - 1"
+    },
+    "vdf.factor.sma_ratio": {
+      "version": "1.0.0",
+      "equation": "adj_close[t] / mean(adj_close[t-window+1:t]) - 1"
+    },
+    "vdf.factor.realized_volatility": {
+      "version": "1.0.0",
+      "equation": "sample_std(simple_return, window) * sqrt(252)"
+    },
+    "vdf.factor.drawdown": {
+      "version": "1.0.0",
+      "equation": "adj_close[t] / max(adj_close[t-window+1:t]) - 1"
+    },
+    "vdf.factor.rolling_zscore": {
+      "version": "1.0.0",
+      "equation": "(x[t] - mean(x[t-window+1:t])) / sample_std(x, window)"
+    },
+    "vdf.factor.cross_sectional_zscore": {
+      "version": "1.0.0",
+      "equation": "winsorized zscore by data_date + market + factor_id",
+      "minimum_cross_section": 5,
+      "winsor_limits": [0.01, 0.99]
+    }
+  },
+  "factor_families": {
+    "price": ["return.simple.1d", "return.log.1d", "price.normalized.base100"],
+    "momentum": ["momentum.return.{window}d"],
+    "trend": ["trend.sma_ratio.{window}d"],
+    "risk": ["risk.realized_vol.{window}d", "risk.drawdown.{window}d"],
+    "liquidity": ["liquidity.volume_ex_daytrade_zscore.{window}d", "liquidity.value_ex_daytrade_zscore.{window}d"],
+    "technical": ["talib.{indicator}.{parameter_set}.{output}"],
+    "relative": ["relative.beta", "relative.correlation", "relative.excess_return"],
+    "cross_sectional": ["cross_sectional.zscore", "cross_sectional.rank"]
+  },
+  "capability_scope": {
+    "builtin_provider": {
+      "state": "IMPLEMENTED_CANDIDATE",
+      "families": ["price", "momentum", "trend", "risk", "liquidity"]
+    },
+    "talib_provider": {
+      "state": "RUNTIME_CAPABILITY_GATE_REQUIRED",
+      "registry": "config/ssot/VIA_ParameterIndicatorRegistry.via",
+      "missing_function_policy": "BLOCKED",
+      "fallback": "PROHIBITED"
+    },
+    "relative_provider": {
+      "state": "CONTRACT_ONLY",
+      "benchmark": "^TWII",
+      "risk_free": "^TNX"
+    },
+    "cross_sectional_provider": {
+      "state": "CONTRACT_ONLY"
+    }
+  },
+  "input_policy": {
+    "price_mode": "ADJUSTED_OHLC_ONLY",
+    "factor_volume_mode": "EX_DAYTRADE_ONLY",
+    "factor_trading_value_mode": "EX_DAYTRADE_ONLY",
+    "raw_volume_usage": "DISPLAY_AND_AUDIT_ONLY",
+    "raw_trading_value_usage": "DISPLAY_AND_AUDIT_ONLY",
+    "unknown_alias": "FAIL_CLOSED",
+    "unknown_gap": "FAIL_CLOSED",
+    "lookahead": "PROHIBITED",
+    "publication_time_gate": "as_of_date <= calculation_time"
+  },
+  "quality_gates": [
+    "SSOT_RESOLVED",
+    "ALIAS_RESOLVED",
+    "PRIMARY_KEY_UNIQUE",
+    "ADJ_OHLC_VALID",
+    "EX_DAYTRADE_VOLUME_VALID",
+    "EX_DAYTRADE_VALUE_VALID",
+    "NO_VOLUME_FORWARD_FILL",
+    "NO_VALUE_FORWARD_FILL",
+    "NO_LOOKAHEAD",
+    "FORMULA_VERSION_PRESENT",
+    "INPUT_HASH_PRESENT",
+    "PARQUET_ROUNDTRIP",
+    "DUCKDB_SCHEMA_VALID"
+  ]
+}
