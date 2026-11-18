@@ -1,0 +1,65 @@
+{
+  "schema": "VRN_TEMP_POLICY_v0100",
+  "ruled_by": "操作員 2026-10-10「善用TEMP補強記憶體 但刪除原則要建立」",
+  "follows": "母倉 SUP_MDL867_TempSpill v0100（L107 · R-TEMP-01）：同一個 TEMP 根、同一本刪除帳；VRN 用自己的程式（engine/VRN_TempStore_v0100.py），規則更嚴",
+  "root": "環境變數 VIA_TEMP_ROOT；沒設時 %LOCALAPPDATA%\\Temp\\VIA_progress（不在 OneDrive、不進 git）",
+  "layout": "<根>/<工具>/run_<時間>_<行程>/；工具 = VRN_Main 或 VRN_AutoTestLoop；每輪夾先寫擁有者標記 .vrn_temp_owner.json",
+  "while_open": "TMP / TEMP / TMPDIR / POLARS_TEMP_DIR / VIA_DUCKDB_TEMP_DIR 與 Python tempfile 都指到本輪夾；duckdb 落碟也在這裡",
+  "what_goes_in": [
+    "首頁逐行文字（G07 讀到的行，交給 G13 冊式重讀；不必整批留在記憶體）",
+    "AST 注入前的原檔備份（寫回失敗可還原）",
+    "duckdb 查詢落碟（本機資料庫讀名稱、ADJ CLOSE 時）"
+  ],
+  "never_in_temp": [
+    "樣本報告",
+    "輸出報告（HTML / JSON）",
+    "真值檔",
+    "任何 ssot / registry 冊"
+  ],
+  "limits": {
+    "keep_last_runs": 5,
+    "max_gb": 10
+  },
+  "delete_rules": [
+    "① 只刪 TEMP 根下、VRN 自己工具夾裡的 run_* 夾",
+    "② 一定要有 VRN 擁有者標記（.vrn_temp_owner.json，工具名相符）才刪；沒有標記的夾一律不碰",
+    "③ 不跟隨捷徑或符號連結；解析後跑到 TEMP 根外面的不碰",
+    "④ 路徑含 VIA_Reports、supportive modules、functional modules、.git、registry、ssot 的一律不刪（母倉三不刪 + VRN 補）",
+    "⑤ 滾動：每開一輪，同一工具只留最新 N 輪（VIA_TEMP_KEEP，預設 5，含本輪）",
+    "⑥ 容量上限：超過 VIA_TEMP_MAX_GB（預設 10）時從最舊的輪刪起；正在跑的那一輪永遠不刪",
+    "⑦ 每一筆刪除都追加一行到 <根>/purge_ledger.jsonl（時間、工具、夾名、MB、規則）",
+    "⑧ TEMP 只放可以重算的中介；樣本、報告、真值、冊永遠不放進 TEMP",
+    "⑨ 一輪結束就把 TMP / TEMP 還原；設 VRN_TEMP_DROP_AT_END=1 時本輪也一併刪掉（照樣記帳）"
+  ],
+  "env": {
+    "VIA_TEMP_ROOT": "TEMP 根",
+    "VIA_TEMP_KEEP": "保留輪數",
+    "VIA_TEMP_MAX_GB": "容量上限（GB）",
+    "VRN_TEMP_DROP_AT_END": "1 = 本輪結束即刪",
+    "VRN_TEMP_RUN": "目前這一輪的夾（同一行程內的引擎共用）",
+    "VRN_CACHE_HOME": "快取資料夾",
+    "VIA_CACHE_MAX_GB": "快取上限（GB，預設 10）"
+  },
+  "cache": {
+    "ruled_by": "操作員 2026-10-13「善用TEMP強力支援不足的記憶體 過去跑過的資料在輸入還沒換之前不要刪除 TEMP 避免重跑 再進行前檢視一下CPU/記憶體/TEMP加總的能力」",
+    "engine": "engine/VRN_RunCache_v0100.py",
+    "where": "<TEMP 根>/VRN_Main/cache（VRN_CACHE_HOME 可改；不能在 VRN 資料夾裡）；TEMP 清掃只刪 run_* 夾，快取跨輪留著",
+    "what": [
+      "G19 聚焦副本與清單（focus_copies/<樣本組>，同一組樣本同一個夾）",
+      "G06 入庫、G08 冪等（入庫資料夾整夾；裡面寫的輸出路徑還原時換成這一輪的）",
+      "G07 首頁引擎逐檔答案",
+      "G15 版面還原逐檔結果",
+      "P07／G19 樣本 SHA-256（大小與修改時間沒變就不重讀）"
+    ],
+    "key": "輸入檔位元組（SHA-256）＋該步驟的程式（AST 指紋，只加註解不算）＋它讀的冊（全部冊減掉確定沒讀的）＋Python 與套件版本＋影響引擎的環境變數＋本機資料庫檔（入庫）",
+    "delete_rules": [
+      "① 輸入還沒換：不刪",
+      "② 樣本換了：留現在與上一組，其他組的答案與聚焦副本刪",
+      "③ 同一組樣本、引擎或冊改了：該步驟這一輪沒用到的舊答案刪",
+      "④ 超過上限（TEMP 剩餘的 25%，最多 VIA_CACHE_MAX_GB，預設 10 GB）：最久沒用的先刪；這一輪用到的不刪",
+      "⑤ 每一筆刪除追加一行到 <快取>/purge_ledger.jsonl",
+      "⑥ 同時兩個 VRN：後開的不用快取（照常重跑），不互相蓋"
+    ],
+    "off": "-NoCache（啟動器）／--no-cache（VRN_Main run、VRN_AutoTestLoop）：這一輪全部重讀"
+  }
+}

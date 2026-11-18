@@ -1,0 +1,1113 @@
+{
+ "schema": "VRN_FinIdentity_SSOT_v0100",
+ "version": "v0100",
+ "ruled_by": "操作員 2026-10-11：「financial data加減法及除法驗算法自其他抓完備」",
+ "what": "財報加減乘除驗算式，一條一式、每條註明出處。式子取自其他冊（不另發明）；運算元名稱就是 VRN_AnnualExtract_SSOT_v0100.json items[].key，表上的列標靠那本冊的 zh / en 找到運算元。",
+ "reader": "engine/VRN_PageRegions_v0100.py（版面還原後的表格逐期驗算；只量不改，原值一個字都不動）",
+ "operand_book": "VRN_AnnualExtract_SSOT_v0100.json items[].key / zh / en",
+ "extra_operands": {
+  "shares": {
+   "labels_zh": [
+    "流通在外股數",
+    "期末流通在外股數",
+    "加權平均流通在外股數",
+    "加權平均股數",
+    "流通股數",
+    "股數"
+   ],
+   "labels_en": [
+    "Shares Outstanding",
+    "Weighted Average Shares",
+    "Weighted Avg Shares",
+    "Shares"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def12_eps; VRN_AnnualExtract_SSOT_v0100.json formulas.shares_tw",
+   "block": "PERSHARE"
+  },
+  "noncurrent_liab": {
+   "labels_zh": [
+    "非流動負債合計",
+    "非流動負債"
+   ],
+   "labels_en": [
+    "Total Non-Current Liabilities",
+    "Non-Current Liabilities"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def08_balance_identity.sub",
+   "block": "BS"
+  },
+  "pretax_margin": {
+   "labels_zh": [
+    "稅前淨利率",
+    "稅前純益率"
+   ],
+   "labels_en": [
+    "Pretax Margin",
+    "PBT Margin"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def10_margin_rules.pretax_margin",
+   "block": "RATIO"
+  },
+  "price": {
+   "labels_zh": [
+    "股價",
+    "收盤價",
+    "現價"
+   ],
+   "labels_en": [
+    "Share Price",
+    "Price",
+    "Close"
+   ],
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.pe / .pb / .div_yield",
+   "block": "VALUATION"
+  },
+  "cash_begin": {
+   "labels_zh": [
+    "期初現金及約當現金餘額",
+    "期初現金"
+   ],
+   "labels_en": [
+    "Beginning Cash",
+    "Cash at Beginning of Period"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def09_cashflow_identity.core",
+   "block": "CF"
+  },
+  "cash_end": {
+   "labels_zh": [
+    "期末現金及約當現金餘額",
+    "期末現金"
+   ],
+   "labels_en": [
+    "Ending Cash",
+    "Cash at End of Period"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def09_cashflow_identity.core",
+   "block": "CF"
+  },
+  "fx_effect": {
+   "labels_zh": [
+    "匯率變動對現金及約當現金之影響",
+    "匯率影響數",
+    "匯率變動影響"
+   ],
+   "labels_en": [
+    "Effect of Exchange Rate Changes",
+    "FX Effect"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def09_cashflow_identity.core / fx_missing",
+   "block": "CF"
+  },
+  "ebitda": {
+   "labels_zh": [
+    "稅前息前折舊攤銷前利益"
+   ],
+   "labels_en": [
+    "EBITDA"
+   ],
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.ebitda",
+   "block": "IS"
+  },
+  "quick_ratio": {
+   "labels_zh": [
+    "速動比率"
+   ],
+   "labels_en": [
+    "Quick Ratio",
+    "Acid-Test Ratio"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def13_ratios.quick_ratio",
+   "block": "RATIO"
+  },
+  "revenue_yoy": {
+   "labels_zh": [
+    "營收年增率",
+    "營收成長率",
+    "營業收入年增率",
+    "營收YoY"
+   ],
+   "labels_en": [
+    "Revenue Growth",
+    "Revenue YoY",
+    "Sales Growth"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def11_growth.yoy",
+   "block": "RATIO",
+   "growth_of": "revenue"
+  },
+  "gross_profit_yoy": {
+   "labels_zh": [
+    "毛利年增率",
+    "毛利成長率"
+   ],
+   "labels_en": [
+    "Gross Profit Growth"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def11_growth.yoy",
+   "block": "RATIO",
+   "growth_of": "gross_profit"
+  },
+  "operating_income_yoy": {
+   "labels_zh": [
+    "營業利益年增率",
+    "營業利益成長率"
+   ],
+   "labels_en": [
+    "Operating Income Growth",
+    "OP Growth"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def11_growth.yoy",
+   "block": "RATIO",
+   "growth_of": "operating_income"
+  },
+  "net_income_yoy": {
+   "labels_zh": [
+    "稅後淨利年增率",
+    "淨利年增率",
+    "稅後淨利成長率",
+    "淨利成長率"
+   ],
+   "labels_en": [
+    "Net Income Growth",
+    "Net Profit Growth"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def11_growth.yoy",
+   "block": "RATIO",
+   "growth_of": "net_income"
+  },
+  "eps_yoy": {
+   "labels_zh": [
+    "每股盈餘年增率",
+    "EPS年增率",
+    "EPS成長率"
+   ],
+   "labels_en": [
+    "EPS Growth",
+    "EPS YoY"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def11_growth.yoy",
+   "block": "RATIO",
+   "growth_of": "basic_eps"
+  },
+  "net_change_in_cash": {
+   "labels_zh": [
+    "現金及約當現金淨增減",
+    "本期現金及約當現金增加（減少）數",
+    "本期現金及約當現金增減數"
+   ],
+   "labels_en": [
+    "Net Change in Cash",
+    "Net Increase in Cash"
+   ],
+   "source": "VRN_Method_SSOT_v0100.json def09_cashflow_identity.core; 操作員上傳 InvestmentRegexPattern_VALIDATED.CASH_FLOW_PATTERNS.net_change_in_cash",
+   "block": "CF"
+  },
+  "total_liabilities_equity": {
+   "labels_zh": [
+    "負債及權益總計",
+    "負債及權益總額",
+    "負債與權益總計"
+   ],
+   "labels_en": [
+    "Total Liabilities and Equity"
+   ],
+   "source": "操作員上傳 InvestmentRegexPattern_VALIDATED.BALANCE_SHEET_PATTERNS.total_liabilities_equity",
+   "block": "BS"
+  }
+ },
+ "method_labels": {
+  "why": "VRN_Method_SSOT_v0100.json def05_canonical_fields 的列標也收進來（對到 AnnualExtract 的 key）",
+  "map": {
+   "revenue": "revenue",
+   "operating_cost": "cogs",
+   "gross_profit": "gross_profit",
+   "operating_income": "operating_income",
+   "pretax_income": "pretax_income",
+   "net_income": "net_income",
+   "net_income_parent": "net_income",
+   "basic_eps": "basic_eps"
+  }
+ },
+ "tolerance": {
+  "rule": "VRN_Method_SSOT_v0100.json def15_tolerance：Tol = max(絕對容差, 相對容差 × max(|A|,|B|))；差 ≤ Tol = PASS，≤ 3×Tol = WARN，> 3×Tol = FAIL。絕對容差至少是印出來的位數造成的四捨五入（每個運算元 0.5 × 最後一位）",
+  "by_kind": {
+   "amount": {
+    "rel": 0.01
+   },
+   "pct": {
+    "abs": 0.5
+   },
+   "ratio": {
+    "rel": 0.03
+   },
+   "per_share": {
+    "rel": 0.03
+   },
+   "multiple": {
+    "rel": 0.03
+   },
+   "days": {
+    "rel": 0.03
+   }
+  },
+  "from_field_rules": "GP_SUB / OP_SUB 相對 2%、BS_ADD 1%、毛利率類 0.5 個百分點、EPS 3%（VRN_FieldRules_SSOT_v0101.json rules.financial.verify.identities）——同 id 照那本冊",
+  "approx": "approx = 冊上的式子用平均數（ROE、ROA、週轉率），表上只有期末數時差異照列，最多 WARN，不判 FAIL",
+  "unit_scale": "比率差 100 倍（40 vs 0.40）= UNIT_SCALE；每股、股數類差 10 的次方 = UNIT_SCALE ×k，照列不改"
+ },
+ "states": [
+  "PASS",
+  "WARN",
+  "FAIL",
+  "UNIT_SCALE",
+  "INSUFFICIENT",
+  "INCOMPLETE_COMPONENTS",
+  "DIV_ZERO",
+  "NOT_COMPUTABLE_ZERO_BASE",
+  "TURNAROUND_TO_PROFIT",
+  "TURNAROUND_TO_LOSS",
+  "NEG_TO_NEG_ANNOTATED"
+ ],
+ "identities": [
+  {
+   "id": "GP_SUB",
+   "zh": "營業毛利 = 營業收入 − 營業成本",
+   "op": "lin",
+   "target": "gross_profit",
+   "terms": [
+    [
+     1,
+     "revenue"
+    ],
+    [
+     -1,
+     "cogs"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_FieldRules_SSOT_v0101.json rules.financial.verify.identities GP_SUB; VRN_Method_SSOT_v0100.json def07",
+   "tol_rel": 0.02
+  },
+  {
+   "id": "OP_SUB",
+   "zh": "營業利益 = 營業毛利 − 營業費用",
+   "op": "lin",
+   "target": "operating_income",
+   "terms": [
+    [
+     1,
+     "gross_profit"
+    ],
+    [
+     -1,
+     "opex"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_FieldRules_SSOT_v0101.json rules.financial.verify.identities OP_SUB; VRN_Method_SSOT_v0100.json def07",
+   "tol_rel": 0.02
+  },
+  {
+   "id": "PBT_ADD",
+   "zh": "稅前淨利 = 營業利益 + 營業外收支",
+   "op": "lin",
+   "target": "pretax_income",
+   "terms": [
+    [
+     1,
+     "operating_income"
+    ],
+    [
+     1,
+     "nonop"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_Method_SSOT_v0100.json def07_income_arithmetic.pretax_income"
+  },
+  {
+   "id": "NI_SUB",
+   "zh": "稅後淨利 = 稅前淨利 − 所得稅",
+   "op": "lin",
+   "target": "net_income",
+   "terms": [
+    [
+     1,
+     "pretax_income"
+    ],
+    [
+     -1,
+     "tax"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_Method_SSOT_v0100.json def07_income_arithmetic.net_income",
+   "note": "AnnualExtract 的 net_income 同時收「母公司業主淨利」與「本期淨利」；有非控制權益時差異照列"
+  },
+  {
+   "id": "BS_ADD",
+   "zh": "資產總額 = 負債總額 + 權益總額",
+   "op": "lin",
+   "target": "assets",
+   "terms": [
+    [
+     1,
+     "liabilities"
+    ],
+    [
+     1,
+     "equity_total"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_FieldRules_SSOT_v0101.json rules.financial.verify.identities BS_ADD; VRN_Method_SSOT_v0100.json def08.core",
+   "tol_rel": 0.01
+  },
+  {
+   "id": "BS_ASSETS",
+   "zh": "資產總額 = 流動資產 + 非流動資產",
+   "op": "lin",
+   "target": "assets",
+   "terms": [
+    [
+     1,
+     "current_assets"
+    ],
+    [
+     1,
+     "noncurrent_assets"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_Method_SSOT_v0100.json def08_balance_identity.sub"
+  },
+  {
+   "id": "BS_LIAB",
+   "zh": "負債總額 = 流動負債 + 非流動負債",
+   "op": "lin",
+   "target": "liabilities",
+   "terms": [
+    [
+     1,
+     "current_liab"
+    ],
+    [
+     1,
+     "noncurrent_liab"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_Method_SSOT_v0100.json def08_balance_identity.sub"
+  },
+  {
+   "id": "BS_EQUITY",
+   "zh": "權益總額 = 母公司業主權益 + 非控制權益",
+   "op": "lin",
+   "target": "equity_total",
+   "terms": [
+    [
+     1,
+     "parent_equity"
+    ],
+    [
+     1,
+     "nci"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_Method_SSOT_v0100.json def08_balance_identity.sub"
+  },
+  {
+   "id": "CF_ADD",
+   "zh": "期末現金 − 期初現金 = 營業 + 投資 + 籌資現金流 + 匯率影響",
+   "op": "lin",
+   "target": [
+    [
+     1,
+     "cash_end"
+    ],
+    [
+     -1,
+     "cash_begin"
+    ]
+   ],
+   "terms": [
+    [
+     1,
+     "cfo"
+    ],
+    [
+     1,
+     "cfi"
+    ],
+    [
+     1,
+     "cff"
+    ],
+    [
+     1,
+     "fx_effect"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_Method_SSOT_v0100.json def09_cashflow_identity.core",
+   "required_note": {
+    "fx_effect": "INCOMPLETE_COMPONENTS：缺匯率影響欄不可假設為零（def09 fx_missing）"
+   }
+  },
+  {
+   "id": "FCF_ADD",
+   "zh": "自由現金流量 = 營業現金流 − |資本支出|",
+   "op": "lin",
+   "target": "fcf",
+   "terms": [
+    [
+     1,
+     "cfo"
+    ],
+    [
+     -1,
+     "|capex|"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_Method_SSOT_v0100.json def09_cashflow_identity.fcf; VRN_AnnualExtract_SSOT_v0100.json formulas.fcf"
+  },
+  {
+   "id": "EBITDA_ADD",
+   "zh": "EBITDA = 營業利益 + 折舊 + 攤銷",
+   "op": "lin",
+   "target": "ebitda",
+   "terms": [
+    [
+     1,
+     "operating_income"
+    ],
+    [
+     1,
+     "depreciation"
+    ],
+    [
+     1,
+     "amortization"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.ebitda"
+  },
+  {
+   "id": "CF_NET",
+   "zh": "現金淨增減 = 營業 + 投資 + 籌資現金流 + 匯率影響",
+   "op": "lin",
+   "target": "net_change_in_cash",
+   "terms": [
+    [
+     1,
+     "cfo"
+    ],
+    [
+     1,
+     "cfi"
+    ],
+    [
+     1,
+     "cff"
+    ],
+    [
+     1,
+     "fx_effect"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_Method_SSOT_v0100.json def09_cashflow_identity.core（缺匯率影響 = INCOMPLETE_COMPONENTS）; 操作員上傳 InvestmentRegexPattern_VALIDATED 的現金恆等式（補上匯率影響）",
+   "required_note": {
+    "fx_effect": "INCOMPLETE_COMPONENTS：缺匯率影響欄不可假設為零（def09 fx_missing）"
+   }
+  },
+  {
+   "id": "BS_TLE",
+   "zh": "負債及權益總計 = 負債總額 + 權益總額",
+   "op": "lin",
+   "target": "total_liabilities_equity",
+   "terms": [
+    [
+     1,
+     "liabilities"
+    ],
+    [
+     1,
+     "equity_total"
+    ]
+   ],
+   "kind": "amount",
+   "source": "VRN_Method_SSOT_v0100.json def08_balance_identity.core; 操作員上傳 InvestmentRegexPattern_VALIDATED",
+   "tol_rel": 0.01
+  },
+  {
+   "id": "EPS_DIL_LE",
+   "zh": "稀釋每股盈餘 ≤ 基本每股盈餘",
+   "op": "le",
+   "target": "diluted_eps",
+   "terms": [
+    [
+     1,
+     "basic_eps"
+    ]
+   ],
+   "kind": "per_share",
+   "fail_state": "WARN",
+   "source": "VRN_Method_SSOT_v0100.json def12_eps（合理性，不是等式）; 操作員上傳 financial_data_standardization / InvestmentRegexPattern_VALIDATED",
+   "note": "稀釋股數 ≥ 加權股數，所以稀釋 EPS 不會大於基本 EPS（虧損時例外：反稀釋不計入）；違反只到 WARN"
+  },
+  {
+   "id": "CCC_ADD",
+   "zh": "現金循環週期 = 存貨天數 + 應收天數 − 應付天數",
+   "op": "lin",
+   "target": "ccc",
+   "terms": [
+    [
+     1,
+     "dio"
+    ],
+    [
+     1,
+     "dso"
+    ],
+    [
+     -1,
+     "dpo"
+    ]
+   ],
+   "kind": "days",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.ccc"
+  },
+  {
+   "id": "GM_DIV",
+   "zh": "毛利率 = 營業毛利 ÷ 營業收入 × 100",
+   "op": "ratio",
+   "target": "gross_margin",
+   "num": [
+    [
+     1,
+     "gross_profit"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "revenue"
+    ]
+   ],
+   "scale": 100,
+   "kind": "pct",
+   "source": "VRN_FieldRules_SSOT_v0101.json rules.financial.verify.identities GM_DIV; VRN_Method_SSOT_v0100.json def10",
+   "tol_abs": 0.5
+  },
+  {
+   "id": "OPM_DIV",
+   "zh": "營業利益率 = 營業利益 ÷ 營業收入 × 100",
+   "op": "ratio",
+   "target": "op_margin",
+   "num": [
+    [
+     1,
+     "operating_income"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "revenue"
+    ]
+   ],
+   "scale": 100,
+   "kind": "pct",
+   "source": "VRN_FieldRules_SSOT_v0101.json rules.financial.verify.identities OPM_DIV; VRN_Method_SSOT_v0100.json def10",
+   "tol_abs": 0.5
+  },
+  {
+   "id": "PTM_DIV",
+   "zh": "稅前淨利率 = 稅前淨利 ÷ 營業收入 × 100",
+   "op": "ratio",
+   "target": "pretax_margin",
+   "num": [
+    [
+     1,
+     "pretax_income"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "revenue"
+    ]
+   ],
+   "scale": 100,
+   "kind": "pct",
+   "source": "VRN_Method_SSOT_v0100.json def10_margin_rules.pretax_margin"
+  },
+  {
+   "id": "NM_DIV",
+   "zh": "淨利率 = 稅後淨利 ÷ 營業收入 × 100",
+   "op": "ratio",
+   "target": "net_margin",
+   "num": [
+    [
+     1,
+     "net_income"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "revenue"
+    ]
+   ],
+   "scale": 100,
+   "kind": "pct",
+   "source": "VRN_FieldRules_SSOT_v0101.json rules.financial.verify.identities NM_DIV; VRN_Method_SSOT_v0100.json def10",
+   "tol_abs": 0.5
+  },
+  {
+   "id": "EPS_DIV",
+   "zh": "每股盈餘 = 稅後淨利 ÷ 股數",
+   "op": "ratio",
+   "target": "basic_eps|diluted_eps",
+   "num": [
+    [
+     1,
+     "net_income"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "shares"
+    ]
+   ],
+   "scale": 1,
+   "kind": "per_share",
+   "source": "VRN_FieldRules_SSOT_v0101.json rules.financial.verify.identities EPS_DIV; VRN_Method_SSOT_v0100.json def12_eps; engine/VIA_VRN_FirstPageEngine.py FinancialValidation.diluted_eps",
+   "tol_rel": 0.03,
+   "scale_probe": true,
+   "note": "def12：員工認股、可轉債、庫藏股等讓 EPS 是合理性不是等式；稀釋股數不在表上時用流通股數"
+  },
+  {
+   "id": "SHARES_TW",
+   "zh": "流通股數 = 普通股股本 ÷ 10（台灣面額 10 元）",
+   "op": "ratio",
+   "target": "shares",
+   "num": [
+    [
+     1,
+     "capital_stock"
+    ]
+   ],
+   "den": [],
+   "scale": 0.1,
+   "kind": "per_share",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.shares_tw",
+   "scale_probe": true
+  },
+  {
+   "id": "BVPS_DIV",
+   "zh": "每股淨值 = 母公司業主權益 ÷ 股數",
+   "op": "ratio",
+   "target": "bvps",
+   "num": [
+    [
+     1,
+     "parent_equity|equity_total"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "shares"
+    ]
+   ],
+   "scale": 1,
+   "kind": "per_share",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.bvps",
+   "scale_probe": true,
+   "note": "冊上寫勿用權益總額；表上沒有母公司業主權益時才退用權益總額，並註明"
+  },
+  {
+   "id": "CFPS_DIV",
+   "zh": "每股營業現金流 = 營業現金流 ÷ 股數",
+   "op": "ratio",
+   "target": "cfps",
+   "num": [
+    [
+     1,
+     "cfo"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "shares"
+    ]
+   ],
+   "scale": 1,
+   "kind": "per_share",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json items.cfps",
+   "scale_probe": true
+  },
+  {
+   "id": "REVPS_DIV",
+   "zh": "每股營收 = 營業收入 ÷ 股數",
+   "op": "ratio",
+   "target": "rev_ps",
+   "num": [
+    [
+     1,
+     "revenue"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "shares"
+    ]
+   ],
+   "scale": 1,
+   "kind": "per_share",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json items.rev_ps",
+   "scale_probe": true
+  },
+  {
+   "id": "ROE_DIV",
+   "zh": "ROE = 稅後淨利 ÷ 母公司業主權益 × 100",
+   "op": "ratio",
+   "target": "roe",
+   "num": [
+    [
+     1,
+     "net_income"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "parent_equity|equity_total"
+    ]
+   ],
+   "scale": 100,
+   "kind": "pct",
+   "source": "VRN_Method_SSOT_v0100.json def13_ratios.roe; VRN_AnnualExtract_SSOT_v0100.json formulas.roe",
+   "approx": true,
+   "tol_abs": 1.0
+  },
+  {
+   "id": "ROA_DIV",
+   "zh": "ROA = 稅後淨利 ÷ 資產總額 × 100",
+   "op": "ratio",
+   "target": "roa",
+   "num": [
+    [
+     1,
+     "net_income"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "assets"
+    ]
+   ],
+   "scale": 100,
+   "kind": "pct",
+   "source": "VRN_Method_SSOT_v0100.json def13_ratios.roa",
+   "approx": true,
+   "tol_abs": 1.0
+  },
+  {
+   "id": "DEBT_DIV",
+   "zh": "負債比率 = 負債總額 ÷ 資產總額 × 100",
+   "op": "ratio",
+   "target": "debt_ratio",
+   "num": [
+    [
+     1,
+     "liabilities"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "assets"
+    ]
+   ],
+   "scale": 100,
+   "kind": "pct",
+   "source": "VRN_Method_SSOT_v0100.json def13_ratios.debt_ratio"
+  },
+  {
+   "id": "CR_DIV",
+   "zh": "流動比率 = 流動資產 ÷ 流動負債 × 100",
+   "op": "ratio",
+   "target": "current_ratio",
+   "num": [
+    [
+     1,
+     "current_assets"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "current_liab"
+    ]
+   ],
+   "scale": 100,
+   "kind": "pct",
+   "source": "VRN_Method_SSOT_v0100.json def13_ratios.current_ratio; VRN_AnnualExtract_SSOT_v0100.json formulas.current_ratio",
+   "alt_scales_ok": [
+    1
+   ]
+  },
+  {
+   "id": "QR_DIV",
+   "zh": "速動比率 = (流動資產 − 存貨 − 預付) ÷ 流動負債 × 100",
+   "op": "ratio",
+   "target": "quick_ratio",
+   "num": [
+    [
+     1,
+     "current_assets"
+    ],
+    [
+     -1,
+     "inventory"
+    ],
+    [
+     -1,
+     "prepaid"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "current_liab"
+    ]
+   ],
+   "scale": 100,
+   "kind": "pct",
+   "source": "VRN_Method_SSOT_v0100.json def13_ratios.quick_ratio",
+   "alt_scales_ok": [
+    1
+   ]
+  },
+  {
+   "id": "AT_DIV",
+   "zh": "總資產週轉率 = 營業收入 ÷ 資產總額",
+   "op": "ratio",
+   "target": "asset_turnover",
+   "num": [
+    [
+     1,
+     "revenue"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "assets"
+    ]
+   ],
+   "scale": 1,
+   "kind": "ratio",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.asset_turnover",
+   "approx": true
+  },
+  {
+   "id": "DSO_DIV",
+   "zh": "應收天數 = 365 ÷ 應收週轉率",
+   "op": "ratio",
+   "target": "dso",
+   "num": [
+    [
+     365,
+     "1"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "ar_turnover"
+    ]
+   ],
+   "scale": 1,
+   "kind": "days",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.ar_turnover"
+  },
+  {
+   "id": "DIO_DIV",
+   "zh": "存貨天數 = 365 ÷ 存貨週轉率",
+   "op": "ratio",
+   "target": "dio",
+   "num": [
+    [
+     365,
+     "1"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "inv_turnover"
+    ]
+   ],
+   "scale": 1,
+   "kind": "days",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.inv_turnover"
+  },
+  {
+   "id": "PE_DIV",
+   "zh": "本益比 = 股價 ÷ 每股盈餘",
+   "op": "ratio",
+   "target": "pe",
+   "num": [
+    [
+     1,
+     "price"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "basic_eps|diluted_eps"
+    ]
+   ],
+   "scale": 1,
+   "kind": "multiple",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.pe; VRN_Method_SSOT_v0100.json def14_forecast_checks.pe_split"
+  },
+  {
+   "id": "PB_DIV",
+   "zh": "股價淨值比 = 股價 ÷ 每股淨值",
+   "op": "ratio",
+   "target": "pb",
+   "num": [
+    [
+     1,
+     "price"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "bvps"
+    ]
+   ],
+   "scale": 1,
+   "kind": "multiple",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.pb"
+  },
+  {
+   "id": "PS_DIV",
+   "zh": "股價營收比 = 股價 ÷ 每股營收",
+   "op": "ratio",
+   "target": "ps",
+   "num": [
+    [
+     1,
+     "price"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "rev_ps"
+    ]
+   ],
+   "scale": 1,
+   "kind": "multiple",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json items.ps"
+  },
+  {
+   "id": "DY_DIV",
+   "zh": "殖利率 = 每股現金股利 ÷ 股價 × 100",
+   "op": "ratio",
+   "target": "div_yield",
+   "num": [
+    [
+     1,
+     "dps_cash"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "price"
+    ]
+   ],
+   "scale": 100,
+   "kind": "pct",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.div_yield"
+  },
+  {
+   "id": "PAYOUT_DIV",
+   "zh": "配發率 = 每股現金股利 ÷ 每股盈餘 × 100",
+   "op": "ratio",
+   "target": "payout",
+   "num": [
+    [
+     1,
+     "dps_cash"
+    ]
+   ],
+   "den": [
+    [
+     1,
+     "basic_eps|diluted_eps"
+    ]
+   ],
+   "scale": 100,
+   "kind": "pct",
+   "source": "VRN_AnnualExtract_SSOT_v0100.json formulas.payout"
+  },
+  {
+   "id": "YOY",
+   "zh": "年增率 = (本期 − 去年同期) ÷ |去年同期| × 100",
+   "op": "growth",
+   "kind": "pct",
+   "tol_abs": 0.6,
+   "source": "VRN_Method_SSOT_v0100.json def11_growth（六種狀態）; engine/VIA_VRN_FirstPageEngine.py FinancialValidation.historical_yoy",
+   "targets": [
+    "revenue_yoy",
+    "gross_profit_yoy",
+    "operating_income_yoy",
+    "net_income_yoy",
+    "eps_yoy"
+   ]
+  },
+  {
+   "id": "ANNUAL_SUM",
+   "zh": "全年 = 四季加總（損益表、現金流量表；資產負債表不可）",
+   "op": "annual_sum",
+   "kind": "amount",
+   "tol_rel": 0.01,
+   "source": "VRN_Method_SSOT_v0100.json def18_quarter_conversion; engine/VIA_VRN_FirstPageEngine.py FinancialValidation.annual_equals_quarters",
+   "blocks": [
+    "IS",
+    "CF"
+   ]
+  }
+ ],
+ "not_evaluable_here": [
+  {
+   "id": "NI_SPLIT",
+   "why": "本期淨利 = 母公司業主淨利 + 非控制權益淨利（def07 parent_split）：AnnualExtract 把兩種淨利放在同一個 key，表上分不出來就不驗，不猜"
+  },
+  {
+   "id": "IMPLIED_TP",
+   "why": "目標價 ≈ 倍數 × 指標（ReportEntities valuation.check_tol 3%）由 ENG396 valuations 在本文逐句驗，結果放 entities"
+  },
+  {
+   "id": "OFFICIAL_MATCH",
+   "why": "券商實績 vs TWSE/TPEX 官方值（FieldRules v0101 rules.financial.verify.official）要觸網，LIVE 關"
+  }
+ ]
+}

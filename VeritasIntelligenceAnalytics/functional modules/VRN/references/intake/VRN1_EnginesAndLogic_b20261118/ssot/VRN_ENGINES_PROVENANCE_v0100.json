@@ -1,0 +1,118 @@
+{
+ "schema": "VRN_ENGINES_PROVENANCE_v0100",
+ "ruled_by": "操作員 2026-10-11：「檔案名稱拆解 首頁的資訊區 本文區切割資訊區 年度財報告面左頁對切 不同圖在上下切 … 有辦法還原資料轉為資料庫並擷取到對的輸出值並驗算通過 … 評價方法 完整無後自其他vrn vdf抓來 financial data加減法及除法驗算法自其他抓完備」",
+ "why_copied": "母倉已經有這些引擎（ENG392／393／394／395／396），VRN 不另寫第二份：逐位元組收進 engine/mother/，由 engine/VRN_PageRegions_v0100.py 依路徑載入，並把 VRN 自己 ssot/ 的冊交給它們（它們不讀 VRN 以外的地方、不寫任何檔）。",
+ "not_injected": "engine/mother/ 不做 AST 註解注入（要和母倉逐位元組相同）；編號、版本登記在 VRN_REGISTRY_v0100.json 與 VRN_ID_SSOT_v0100.json 的 vendored 段",
+ "not_taken": [
+  {
+   "file": "VRN_ENG394_LayoutRestore_v0102.py",
+   "why": "母倉自己寫「Candidate v0102 … Central registration / Windows and corpus certification are pending」：候選版不收"
+  },
+  {
+   "file": "VRN_ENG072_FirstPageText_v0139.py / VRN_ENG074_FinancialPages_v0114.py",
+   "why": "要母倉的 registry、ENG073、SUP_MDL747/748、hub 等十幾支才跑得動；官方值比對要觸網（LIVE 關）。財報驗算改用 ssot/VRN_FinIdentity_SSOT_v0100.json（式子從這些冊收來）"
+  },
+  {
+   "file": "VRN_ENG394_LayoutRestore_v0101.py",
+   "why": "同一個引擎號（ENG394）兩個檔會讓中央治理 G32 編號衝突（一號一檔；中央治理測試要求 0 衝突）。v0101 是薄尾，它對 v0100 做的四件事（目錄修正、跨頁／同頁去重、兩種編號、截取完整度 ≥ 99.9%）照原樣移植在 engine/VRN_PageRegions_v0100.py 的 tail_v0101，套在 v0100 上的方式和 v0101 套在它的 PRIOR 上一樣"
+  },
+  {
+   "file": "VRN_ENG393_DocClassVerify_v0101.py",
+   "why": "同上（ENG393 一號一檔）。v0101 只在傳入首頁主標題時改變分類；VRN 只傳檔名，結果和 v0100 相同，所以不移植"
+  }
+ ],
+ "mother": {
+  "repo": "tonykuni/movies-dataset",
+  "commit": "c88acc4f"
+ },
+ "engines": [
+  {
+   "id": "VRN-MOM001",
+   "version": "v0100",
+   "file": "engine/mother/VRN_ENG392_TextCompleteness_v0100.py",
+   "mother_path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG392_TextCompleteness_v0100.py",
+   "mother_commit": "c88acc4f",
+   "role": "XY 切（先左右、再上下）、截取完整度的尺",
+   "entry": "xy_cut L331 · _gaps L320",
+   "sha256_lf": "8fa184082104f4fb28a40f18e002045e7c138e44a78d50a39310ca5c93595312"
+  },
+  {
+   "id": "VRN-MOM002",
+   "version": "v0100",
+   "file": "engine/mother/VRN_ENG393_DocClassVerify_v0100.py",
+   "mother_path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py",
+   "mother_commit": "c88acc4f",
+   "role": "DocClass 冊的讀者：檔名 → 個股或其他（只擷取個股報告）",
+   "entry": "classify L300 · ticker_of L200 · ladder L242",
+   "sha256_lf": "e00d4079e0614e63361ca6153f7aecbda32439fbeaaa37bda1c19b915c414b73"
+  },
+  {
+   "id": "VRN-MOM003",
+   "version": "v0100",
+   "file": "engine/mother/VRN_ENG394_LayoutRestore_v0100.py",
+   "mother_path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py",
+   "mother_commit": "c88acc4f",
+   "role": "版面還原本體：區（資訊區 / 本文區 / 圖 / 排除區）、格線表合併格補值與左右上下拆、扁平表、驗算；v0101 薄尾的去重、編號、截取完整度移植在 engine/VRN_PageRegions_v0100.py tail_v0101",
+   "entry": "page_layout L859 · fix_table L702 · validate L500 · text_tables L275",
+   "sha256_lf": "1c0bc7219200b3e06983be694d31aa841fdee63269c77df6de33727bf1903c51"
+  },
+  {
+   "id": "VRN-MOM004",
+   "version": "v0100",
+   "file": "engine/mother/VRN_ENG395_ValuationMethodLexicon_v0100.py",
+   "mother_path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py",
+   "mother_commit": "c88acc4f",
+   "role": "評價法詞典的讀者：16 種方法、約 279 個詞",
+   "entry": "Matcher · build_index L77",
+   "sha256_lf": "b9721379022213885274d4a248701ec723707d0105b18ad0e26e2e848262da0e"
+  },
+  {
+   "id": "VRN-MOM005",
+   "version": "v0100",
+   "file": "engine/mother/VRN_ENG396_ReportEntities_v0100.py",
+   "mother_path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG396_ReportEntities_v0100.py",
+   "mother_commit": "c88acc4f",
+   "role": "公司名稱中英文簡寫、目標價（前次 → 本次）、評價法（倍數 × 指標 ≈ 目標價）",
+   "entry": "company_identity L173 · target_prices L274 · valuations L340",
+   "sha256_lf": "ef31803bfa04a99e1e45ef0b845fb285ec7a53671e46d64efe3eced17abccaa4"
+  },
+  {
+   "id": "VRN-MOM006",
+   "version": "v0100",
+   "file": "engine/mother/CGC_MDL249_DataFrameLock_v0100.py",
+   "mother_path": "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL249_DataFrameLock_v0100.py",
+   "mother_commit": "d935c059",
+   "role": "輸出表頭 → DataFrame 鎖：check_table（缺必填欄 · 多出欄 · 型別 · 必填空 · 主鍵重複 · 列數）；VRN 只叫 check_table（給 frame 時不讀不寫任何檔）",
+   "entry": "check_table · header_sha",
+   "sha256_lf": "954147fcfa4766aa8abae512fe8a19b43e4edbf7c2598e7c3ea41d31e989a08f",
+   "added": "2026-10-11 操作員「範圍限縮獨立系統VRN 輸出DATAFRAME 請確認完成」"
+  }
+ ],
+ "books": [
+  {
+   "file": "ssot/VRN_LayoutRestore_SSOT_v0100.json",
+   "source": "VeritasIntelligenceAnalytics/functional modules/VRN/SSOT/VRN_LayoutRestore_SSOT_v0100.json",
+   "note": "母倉 c88acc4f 逐位元組；內容和 supportive modules/registry/VIA_VRN_LayoutRestore_SSOT_v0100.json 相同（只差排版）",
+   "sha256_lf": "9e9479c551ab83824ebd81ff127a8fe5b61600693838639207f16770f7f44cb0"
+  },
+  {
+   "file": "ssot/VRN_Method_SSOT_v0100.json",
+   "source": "attachments/VRN_Method_SSOT_v0100.json（本倉）",
+   "note": "本倉 attachments 逐位元組（同一份在母倉 supportive modules/references/intake/VIA_GrokConsole_AuroraAcorn_b383/attachments/，內容和母倉 functional modules/VRN/knowledge/ 那份相同）",
+   "sha256_lf": "83fb6308acaa76738682bb4993d470663581351c82261773de8e89e828025e66"
+  },
+  {
+   "file": "ssot/VRN_AnnualExtract_SSOT_v0100.json",
+   "source": "attachments/VRN_AnnualExtract_SSOT_v0100.json（本倉）",
+   "note": "同上",
+   "sha256_lf": "b02139b50775f6a82b08644dd1d36ee6183ac7af92db6d688a85d68c6cdf6f58"
+  }
+ ],
+ "written_by_vrn": [
+  {
+   "file": "ssot/VRN_FinIdentity_SSOT_v0100.json",
+   "what": "財報加減除驗算式 36 條，每條註明出處（FieldRules v0101、Method SSOT def07–def18、AnnualExtract formulas、首頁引擎 FinancialValidation）"
+  }
+ ],
+ "ids": "VRN-MOMnnn：母倉引擎在 VRN 的編號，照本冊次序發、永不回收（新收的接在後面）"
+}

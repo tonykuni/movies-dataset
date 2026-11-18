@@ -1,0 +1,494 @@
+{
+ "schema": "VRN_EngineLock_SSOT_v0100",
+ "version": "v0100",
+ "rule": "引擎鎖：已知答案全部通過的引擎記下 AST 指紋（只加註解不改指紋）；之後邏輯一改，check 就紅燈，要先跑 VRN_Main_v0100.py lock 重新驗過已知答案才換鎖",
+ "locked_at": "2026-10-21T06:53:43",
+ "proofs": {
+  "first_page_oracle": {
+   "gate": "P06 ORACLE first_page（106 個檔名對 oracle）",
+   "ok": true,
+   "detail": "1 項全過"
+  },
+  "database_oracle": {
+   "gate": "P06 ORACLE database（106 個檔名對 oracle）",
+   "ok": true,
+   "detail": "1 項全過"
+  },
+  "books": {
+   "gate": "P08 BOOKS（收來的冊自己的例子）+ VRN_BookCheck 自測",
+   "ok": true,
+   "detail": "P08 3 項全過 · BookCheck [BOOKCHECK] v0100 · 13/13"
+  },
+  "regions": {
+   "gate": "P14 REGIONS（4 份已知答案報告 + 九張表 DataFrame）",
+   "ok": true,
+   "detail": "4 項全過"
+  },
+  "dataframe": {
+   "gate": "VRN_DataFrame 自測（每一種鎖判）",
+   "ok": true,
+   "detail": "[DATAFRAME] VRN_DataFrame v0100 · 14/14"
+  },
+  "titletrim": {
+   "gate": "P15 TITLETRIM（標題字串 + build_fixtures 的亂碼報告，全部已知答案；件數看 detail，不寫死）",
+   "ok": true,
+   "detail": "[TITLETRIM] 164/164"
+  },
+  "lock": {
+   "gate": "VRN_Lock 自測",
+   "ok": true,
+   "detail": "[LOCK] v0100 · 13/13"
+  },
+  "localdb": {
+   "gate": "VRN_LocalDB 自測（要 duckdb；略過不算證明）",
+   "ok": true,
+   "detail": "[LOCALDB] v0100 · 14/14"
+  },
+  "tempstore": {
+   "gate": "VRN_TempStore 自測",
+   "ok": true,
+   "detail": "[TEMPSTORE] v0100 · 6/6"
+  },
+  "panorama": {
+   "gate": "VRN_PanoramaProbe 自測（檔名契約的已知答案：NFKC、副檔名、日期合法性、代號／券商／報告日）",
+   "ok": true,
+   "detail": "[PANORAMA] v0100 · 14/14"
+  },
+  "ocr": {
+   "gate": "VRN_Ocr 自測（引擎偵測順序、沒有引擎時的退路、結果一律標 source=OCR／lossy_cjk；有引擎時讀回已知文字：數字與拉丁字全中、中文會掉字）",
+   "ok": true,
+   "detail": "[OCR] v0100 · 過 7／紅 0／沒驗到 0 · 共 7 · 引擎 pymupdf-tesseract"
+  },
+  "matrix": {
+   "gate": "VRN_Matrix 自測（核對矩陣：值＋記號＋鎖、中英文對齊、rich 有就用）",
+   "ok": true,
+   "detail": "[MATRIX] v0100 · 12/12"
+  },
+  "record": {
+   "gate": "VRN_TickerRecord 自測（合併冊與來源冊一致；15 欄紀錄）",
+   "ok": true,
+   "detail": "[RECORD] v0100 · 19/19"
+  },
+  "outputverify": {
+   "gate": "VRN_OutputVerify 自測（一份畫出來的已知答案 PDF：對 · 錯期間 · 截斷 · 分組表取到舊值 · 並排表取到右表 · 科目歸錯 · 原文沒有 · 期間不明 · HTML 嵌入安全 · 計數 · 段落標題判準與借來的讀法：成長率 / 比率段落底下的金額科目剔除 · 混合單位不判 · 讀法倒了不剔除）",
+   "ok": true,
+   "detail": "[計] VRN_OutputVerify v0100 自測 22/22 · PASS"
+  },
+  "pivotdb": {
+   "gate": "VRN_PivotDB 自測（已知答案：期間鍵 · 只收 VERIFIED / CORRECTED · 年度 / 季度欄依時間排序 · 表層與報告層 PIVOT · 同格不同值留空列衝突 · 印的科目字不同不合併 · 印的位數不同的同一個數取最細 · DuckDB 原生 PIVOT 檢視逐格相同 · 還原表攤平 · HTML 嵌入安全 · 契約不符不寫 · 指紋冪等）",
+   "ok": true,
+   "detail": "[計] VRN_PivotDB v0100 自測 18/18 · PASS"
+  },
+  "toolbridge": {
+   "gate": "VRN_ToolBridge 自測（自己的工具冊：格式 · 沒有時間戳 · check 抓 sha256 不同；借：sha256 相同才借 · 對方標不能用 / 檔改過 → 不借 · 載入不留 __pycache__ · 找不到 VRN-2 → 只用自己的）",
+   "ok": true,
+   "detail": "[計] VRN_ToolBridge v0100 自測 11/11 · PASS"
+  },
+  "runcache": {
+   "gate": "VRN_RunCache 自測（TEMP 快取：鑰匙、命中、資料夾還原改路徑、樣本 SHA 不重讀、刪除規則、資源）",
+   "ok": true,
+   "detail": "[RUNCACHE] v0100 · 23/23"
+  },
+  "truthmatrix": {
+   "gate": "VRN_TruthMatrix 自測（母倉首頁矩陣貼文 → G11 真值檔；券商經合併冊；不保證欄標 unknown）",
+   "ok": true,
+   "detail": "[TRUTHMATRIX] v0100 · 19/19"
+  },
+  "focus": {
+   "gate": "P17 FOCUS（多頁個股報告只留首頁與年度財報頁、非個股排除、副本位元組固定）",
+   "ok": true,
+   "detail": "[FOCUS] v0100 · 14/14"
+  }
+ },
+ "files": {
+  "engine/VIA_TW_Ticker_Master_v0210.py": {
+   "kind": "ast",
+   "sha256": "b29ed68a7adf36578b05cd592ae68a14754e5477b1943c3eb140ad65945668b7",
+   "proofs": [
+    "first_page_oracle"
+   ]
+  },
+  "engine/VIA_VRN_FirstPageEngine.py": {
+   "kind": "ast",
+   "sha256": "f39bc31eab6f42707cc6b444e4775fbaf42faec2cff8b291563f93503d09ec48",
+   "proofs": [
+    "first_page_oracle",
+    "titletrim"
+   ]
+  },
+  "engine/VRN_BookCheck_v0100.py": {
+   "kind": "ast",
+   "sha256": "1dfff92455d90214331ad8feafd19fab0d6472ffdf2f71ae1660b6a8dbb25884",
+   "proofs": [
+    "books"
+   ]
+  },
+  "engine/VRN_DataFrame_v0100.py": {
+   "kind": "ast",
+   "sha256": "f4b6e8a6c6769f2b4e118f895071918795a5a9376eff717086fda79707a99ae3",
+   "proofs": [
+    "regions",
+    "dataframe"
+   ]
+  },
+  "engine/VRN_Evidence_Core.py": {
+   "kind": "ast",
+   "sha256": "8974b2ee69614caf9670e121463191b694b5145d732938cd3add6facfdad2003",
+   "proofs": [
+    "first_page_oracle"
+   ]
+  },
+  "engine/VRN_Focus_v0100.py": {
+   "kind": "ast",
+   "sha256": "c8e02371577bf5c4a062703b05d008247fa83b451c57355fba188ed1bc4c5c1c",
+   "proofs": [
+    "focus"
+   ]
+  },
+  "engine/VRN_Integrated_ReportDatabase_Engine.py": {
+   "kind": "ast",
+   "sha256": "a4e00532970647f62d8165609b376d4d5e7edcdb80eb90d55634a026294cfc1f",
+   "proofs": [
+    "database_oracle"
+   ]
+  },
+  "engine/VRN_LocalDB_v0100.py": {
+   "kind": "ast",
+   "sha256": "74fc645f04efbd304b397f453e4b8758990004541bd9e37f2ae467c018843587",
+   "proofs": [
+    "localdb"
+   ]
+  },
+  "engine/VRN_Lock_v0100.py": {
+   "kind": "ast",
+   "sha256": "5fbb0c57ef632edff8d9f3332aadfe944d7ab17037d276c4975ee2222ebda7e3",
+   "proofs": [
+    "lock"
+   ]
+  },
+  "engine/VRN_Matrix_v0100.py": {
+   "kind": "ast",
+   "sha256": "d8c5c51bebc93e4374b9e9dcbaefe47304ce64080407762b1c396f39d2f0bf87",
+   "proofs": [
+    "matrix"
+   ]
+  },
+  "engine/VRN_Ocr_v0100.py": {
+   "kind": "ast",
+   "sha256": "af34a6ed9ee9846c42ccd59652c4c3e0bc500d4d793f1fb810608b366b824ecb",
+   "proofs": [
+    "ocr"
+   ]
+  },
+  "engine/VRN_OutputVerify_v0100.py": {
+   "kind": "ast",
+   "sha256": "84dc55ad0122a5503e5e75e941d26d5529f6fe72834094518bc5c69bafbf3c44",
+   "proofs": [
+    "outputverify"
+   ]
+  },
+  "engine/VRN_PageRegions_v0100.py": {
+   "kind": "ast",
+   "sha256": "acb07e06996f47af2032595f44f4d2858b407312fc0c90006c28e2b3572d1e91",
+   "proofs": [
+    "regions",
+    "titletrim",
+    "focus"
+   ]
+  },
+  "engine/VRN_PanoramaProbe.py": {
+   "kind": "ast",
+   "sha256": "534b64a805a118348bd7846c928bb777975f43e4037ab5d137289deba0e92bec",
+   "proofs": [
+    "panorama"
+   ]
+  },
+  "engine/VRN_PivotDB_v0100.py": {
+   "kind": "ast",
+   "sha256": "6d74a546a65c2a13e95dbe95fb5ed0c87d4de79ea3fb3dbe1f2f647519d8d16d",
+   "proofs": [
+    "pivotdb"
+   ]
+  },
+  "engine/VRN_RunCache_v0100.py": {
+   "kind": "ast",
+   "sha256": "c15f11d008df9fad98eca0d9080b2d71659e104cad39ceffb427b7a8777eaa70",
+   "proofs": [
+    "runcache"
+   ]
+  },
+  "engine/VRN_TempStore_v0100.py": {
+   "kind": "ast",
+   "sha256": "336e8940eab92ba985390bdcc7bce706a84e9eda1c2b6085003a7bc8efa42383",
+   "proofs": [
+    "tempstore"
+   ]
+  },
+  "engine/VRN_TickerRecord_v0100.py": {
+   "kind": "ast",
+   "sha256": "944d737f0931756680ecc337866d358a0da635200ed45027ab3d5b48de3dc7aa",
+   "proofs": [
+    "record"
+   ]
+  },
+  "engine/VRN_TitleTrim_v0100.py": {
+   "kind": "ast",
+   "sha256": "8d8b55e736224e4adfc9c37d7103e9f9d21102a93efcff96118f6a9ecf7817a9",
+   "proofs": [
+    "titletrim"
+   ]
+  },
+  "engine/VRN_ToolBridge_v0100.py": {
+   "kind": "ast",
+   "sha256": "4fc1477fd5135df138d17d92c15c4de59038d9975ee6208bb8f96da3fef7453c",
+   "proofs": [
+    "toolbridge"
+   ]
+  },
+  "engine/VRN_TruthMatrix_v0100.py": {
+   "kind": "ast",
+   "sha256": "2072315ad8d83dbc8988a7892b20854e33a16e4efefafa1b97d7c324dd78bdb0",
+   "proofs": [
+    "truthmatrix"
+   ]
+  },
+  "engine/mother/CGC_MDL249_DataFrameLock_v0100.py": {
+   "kind": "ast",
+   "sha256": "44fba3af12a2999ee869c04234db5333d5b678b00edea40286d27084bf50f487",
+   "proofs": [
+    "regions",
+    "dataframe"
+   ]
+  },
+  "engine/mother/VRN_ENG392_TextCompleteness_v0100.py": {
+   "kind": "ast",
+   "sha256": "db74536beb6a80371835eedece0e44a5794abe6d47c3b66b29c2bbd63f1d9609",
+   "proofs": [
+    "regions"
+   ]
+  },
+  "engine/mother/VRN_ENG393_DocClassVerify_v0100.py": {
+   "kind": "ast",
+   "sha256": "c7f88e21173ab77678dfd559ee5d3ea566f2891e3be0446cce15af3380662908",
+   "proofs": [
+    "regions"
+   ]
+  },
+  "engine/mother/VRN_ENG394_LayoutRestore_v0100.py": {
+   "kind": "ast",
+   "sha256": "d3ecc86115c071473c0e7a12995bdd67fdea59683ef5c06a893b089acb566f6c",
+   "proofs": [
+    "regions"
+   ]
+  },
+  "engine/mother/VRN_ENG395_ValuationMethodLexicon_v0100.py": {
+   "kind": "ast",
+   "sha256": "de525fb1351a6f0c298fe45d2b4cf6d7b9c9a24dbd37e9809a13ec0522fee1b4",
+   "proofs": [
+    "regions"
+   ]
+  },
+  "engine/mother/VRN_ENG396_ReportEntities_v0100.py": {
+   "kind": "ast",
+   "sha256": "49b0f438eb272e8fad1a8b03d0493aca7f5c1e9db87c93d5f215c29b724f3745",
+   "proofs": [
+    "regions"
+   ]
+  },
+  "ssot/VIA_SSOT_SynonymUnion_v0107.json": {
+   "kind": "json",
+   "sha256": "b8176558c160cd77fb15387450369e10d587e13b214c2d4d4a92eba3c8a791bc",
+   "proofs": [
+    "books"
+   ]
+  },
+  "ssot/VIA_VRN_ExtractRules_SSOT_v0100.json": {
+   "kind": "json",
+   "sha256": "b15a504341bbfaf108284a0d06b75bfd6d4e3b1d08df4d0c83eba4b09f610e77",
+   "proofs": [
+    "books"
+   ]
+  },
+  "ssot/VIA_VRN_FieldSpec_SSOT_v0100.json": {
+   "kind": "json",
+   "sha256": "bbc3982b0dc92d329166ace409a0266bdfc6ba25a3005a49e2498f1e4d6bb586",
+   "proofs": [
+    "books"
+   ]
+  },
+  "ssot/VIA_VRN_ReportFieldRules_SSOT_v0101.json": {
+   "kind": "json",
+   "sha256": "3fb08e874f722e9addcaccfd90153a438ec8c67b9fd73496dad46fd48fcc3819",
+   "proofs": [
+    "books"
+   ]
+  },
+  "ssot/VIS_VRN_TickerFilenameSSOT_v0100.py": {
+   "kind": "ast",
+   "sha256": "770d35005905adf4b2b483584337ea7f91da6f63eb2ea9fc254c23cc467576ea",
+   "proofs": [
+    "first_page_oracle"
+   ]
+  },
+  "ssot/VRN_AnnualExtract_SSOT_v0100.json": {
+   "kind": "json",
+   "sha256": "17b218df66c9d54928ebcd92c7797fcaea80140aeeec31f098340b1d9c8d1fad",
+   "proofs": [
+    "regions"
+   ]
+  },
+  "ssot/VRN_Broker_Dict_v0100.json": {
+   "kind": "json",
+   "sha256": "7185a66fd4800c4b942b1941e97696f34f889fcf13c1e0f500f19a747bf92a27",
+   "proofs": [
+    "first_page_oracle"
+   ]
+  },
+  "ssot/VRN_Broker_Dict_v0103.json": {
+   "kind": "json",
+   "sha256": "15615fa60b55d458d95c91b76827b3139585a221eedca42b2e50c47af6536f70",
+   "proofs": [
+    "books"
+   ]
+  },
+  "ssot/VRN_FieldRules_SSOT_v0101.json": {
+   "kind": "json",
+   "sha256": "762418f864eac964e0811bb16aa712e71ad5bfbf4b961d18f8ac26e59852db9b",
+   "proofs": [
+    "books"
+   ]
+  },
+  "ssot/VRN_FinIdentity_SSOT_v0100.json": {
+   "kind": "json",
+   "sha256": "752f5a0dba03357f22318842f013e6ed0b2abd8bf3c499cc4a628dcb867d908a",
+   "proofs": [
+    "regions"
+   ]
+  },
+  "ssot/VRN_FinLexicon_SSOT_v0109.json": {
+   "kind": "json",
+   "sha256": "c9ca411039b8496703ea5edc06ddc9dd23ff14c8854b856ce09f5fe5329074f2",
+   "proofs": [
+    "books"
+   ]
+  },
+  "ssot/VRN_LayoutRestore_SSOT_v0100.json": {
+   "kind": "json",
+   "sha256": "f180982cde3d775eb7fa8505a5c9043447a2b9ec35b7f3b3bfb5f1fac41546c6",
+   "proofs": [
+    "regions"
+   ]
+  },
+  "ssot/VRN_Method_SSOT_v0100.json": {
+   "kind": "json",
+   "sha256": "1165b303a41216063b2d34fd18d32af02ed77310f7bf9f45f90ff261bc58fb23",
+   "proofs": [
+    "regions",
+    "titletrim"
+   ]
+  },
+  "ssot/VRN_OperatorLabels_SSOT_v0100.json": {
+   "kind": "json",
+   "sha256": "49d3f8429eac72a9a08f9a1804ace52fc01087a7ff1cf23f1648b5ddf351b2dc",
+   "proofs": [
+    "regions"
+   ]
+  },
+  "ssot/VRN_Output_Header_SSOT_v0100.json": {
+   "kind": "json",
+   "sha256": "b30dd9f842d94c0e4dafc36103f5001752e7b30a27eb8ab0baf8d1f2a782b186",
+   "proofs": [
+    "regions"
+   ]
+  },
+  "ssot/VRN_Output_Header_SSOT_v0101.json": {
+   "kind": "json",
+   "sha256": "276474b6bb27f03e5feb7a742ce642dda219a9642d00268de23f35effb71f1ef",
+   "proofs": [
+    "regions",
+    "dataframe"
+   ]
+  },
+  "ssot/VRN_Output_Header_SSOT_v0102.json": {
+   "kind": "json",
+   "sha256": "a004d438278c2dd4f05085982c99587860da9cdab0d660370ca5d0a08053f6ea",
+   "proofs": [
+    "dataframe"
+   ]
+  },
+  "ssot/VRN_Output_Header_SSOT_v0103.json": {
+   "kind": "json",
+   "sha256": "5fc64df0deb50e2b868966fd29b1ea8809e7e7bb09c07e5c7b4beb6eb75a52aa",
+   "proofs": [
+    "dataframe"
+   ]
+  },
+  "ssot/VRN_Output_Header_SSOT_v0104.json": {
+   "kind": "json",
+   "sha256": "35489c685bbb37972b26ad4ea51113e056708f51e801fae0d40b828c04a8bb9d",
+   "proofs": [
+    "dataframe"
+   ]
+  },
+  "ssot/VRN_Output_Header_SSOT_v0105.json": {
+   "kind": "json",
+   "sha256": "f8f64c403229062345ef4150ac583b7d1f53c7ed575678ee9dd6eb8edb60d368",
+   "proofs": [
+    "dataframe"
+   ]
+  },
+  "ssot/VRN_Output_Header_SSOT_v0106.json": {
+   "kind": "json",
+   "sha256": "7f0150e087e3186aa0149e78693e2555c3d335298071277f1f9dc83529be91f4",
+   "proofs": [
+    "dataframe"
+   ]
+  },
+  "ssot/VRN_Output_Header_SSOT_v0107.json": {
+   "kind": "json",
+   "sha256": "6940b3854237ae1e5c64a943be2c8d3d91339dfe843bf6291be03a5946ffc144",
+   "proofs": [
+    "dataframe"
+   ]
+  },
+  "ssot/VRN_Rating_Dict_v0100.json": {
+   "kind": "json",
+   "sha256": "f26f34628283d0785fa85ac75af76ef76842e49d17e4aae90962e1993fa787e0",
+   "proofs": [
+    "first_page_oracle"
+   ]
+  },
+  "ssot/VRN_S05_FieldRegistry_v0103.json": {
+   "kind": "json",
+   "sha256": "e5946cf2e8f995c05c5568e38f65e776b7af3669ffd3aa4a50613281e7d60f3a",
+   "proofs": [
+    "books"
+   ]
+  },
+  "ssot/VRN_TEMP_POLICY_v0100.json": {
+   "kind": "json",
+   "sha256": "d2598325b617b67c42efc72352439499cb1008698cc4b073c812cae740a46f4e",
+   "proofs": [
+    "tempstore"
+   ]
+  },
+  "ssot/VRN_TickerRecord_SSOT_v0100.json": {
+   "kind": "json",
+   "sha256": "0fe06a50923f4aa0313784cb0bbe9a3916cf406a75733a0862b6d14623d5dffe",
+   "proofs": [
+    "titletrim",
+    "record",
+    "truthmatrix"
+   ]
+  },
+  "ssot/VRN_TitleTrim_SSOT_v0100.json": {
+   "kind": "json",
+   "sha256": "5ddca7e907e2a8b4e2830371f3f37ef3496c92148620359af8074f2b11c39205",
+   "proofs": [
+    "titletrim",
+    "focus"
+   ]
+  }
+ },
+ "unlocked": {}
+}
