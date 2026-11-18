@@ -40,3 +40,15 @@
 | 2026-11-18T16:13:45Z | CGC_MDL134_ParallelLanes_v0103.py | 0103 | VIA-VCGC-MDL1662 | 4fb2a0997e6f | cmd 動詞:短指令的 Python 路由(list / check / plan / run)· 先降壓 → 3~6 道 → 監工過熱減道、暫停最新子行程、冷卻恢復 | 自測 35/35 · cmd run via-six 實跑綠(71 秒)· cmd run via-panorama-all 兩步同時起跑,兩步都紅(紅在既有問題:收容夾 9 支沒帶橋 · 已修冊回歸 2 筆) |
 | 2026-11-18T16:13:45Z | VIA_ShortCommand_PyRoute_SSOT_v0100.json | 0100 | VIA-VCGC-SSOT404 | be269b34ac86 | 短指令 → Python 路由冊:212 支全列,第一批 4 支有可跑的步 | 應掃 212 · 已掃 212 · 略過 0 · cmd check:這輪改 4(綠 4)· 原本就是 Python 142(綠 135 · 紅 7)· 待改 23 · 轉呼叫 / PS 本職 43 |
 | 2026-11-18T16:13:45Z | Register-VIA-Commands-v0279.ps1 | 0279 | VIA-CORE-MDL868 | 84e18a848dc6 | via-vrnrun · via-vdffetch · via-six · via-panorama-all 改成只轉呼叫 Python 入口 | 靜態檢查:括號引號配對 · 與 v0278 同編碼同換行 · 不含本機路徑;未在主機 PowerShell 實跑(這一列鎖的是檔內容,不是主機驗收) |
+| 2026-11-18T17:22:58Z | VDF_ENG054_TWDailyBackfill_v0112.py | 0112 | VIA-VDF-ENG372 | 73c55b5b124d | 台股日量價回補一跑就倒的錯修掉(清非主動式 ETF 時少給庫路徑)· worker 動詞 | 自測 12/12(負控重現 TypeError)· 經 VDF 擷取系統真跑:2017 檔自 2022-07-01 起 +2,048,559 列 · 失敗 0 · 275 秒 |
+| 2026-11-18T17:22:58Z | VDF_FetchSystem_SSOT_v0111.json | 0111 | —(VDF 自己的冊;VCGC 邊界閘不代發) | 90f2b8d50bc4 | 擷取冊:e054 指到 v0112 worker(只改這一列) | 其餘 36 支逐項相同 · 擷取系統自測 9/9 · 真跑 e054 rc 0 |
+| 2026-11-18T17:22:58Z | VDF_MDL022_SafeParallelLaunch_v0104.py | 0104 | VIA-VDF-MDL293 | cd4bbe378757 | VDF 自己的啟動器就是入口(子行程帶入口標記)· 總結行印本版 | 自測 8/8 · 真跑:e115 / e116 由 DENY 變 rc 0(e116 寫入 2049 列) |
+| 2026-11-18T17:22:58Z | VDF_ENG077_ActiveETFUniverse_v0107.py | 0107 | 待編 | 4311df7707c0 | VCGC 的 ScrapeGate 尺檔不在 / 壞掉時照樣載得起來(VDF 自己的同一把尺) | 自測 12/12 · 正常樹與拿掉 VCGC 的副本都過 |
+| 2026-11-18T17:22:58Z | VDF_ENG055_OmniFetch_v0124.py | 0124 | 待編 | 0efbb5d36071 | 同上(擷取冊 e055 四列都是這一支) | 自測 8/8 · 正常樹與拿掉 VCGC 的副本都過 |
+| 2026-11-18T17:22:58Z | CGC_MDL245_SDDValidator_v0109.py | 0109 | VIA-VCGC-MDL1663 | 6aa0b9d90a18 | SDD X-REQ:需求歸屬是倉內存在的檔也算 | 自測 12/12 · 真冊 288 條 X-REQ 由紅轉綠 |
+| 2026-11-18T17:22:58Z | VIA_Workflow_VCGC_SSOT_v0154.json | 0154 | VIA-VCGC-SSOT405 | 1fe53636f6b6 | 釘死舊版號的 14 步改取尾版(L54) | 點名以外逐條差異 0 · SDD X-REG 綠 |
+| 2026-11-18T17:22:58Z | VIA_Workflow_VDF_SSOT_v0115.json | 0115 | —(邊界閘擋,VDF 自己登) | 08a3cbcef0d4 | 釘死舊版號的 13 步改取尾版 | 點名以外逐條差異 0 |
+| 2026-11-18T17:22:58Z | VIA_Workflow_VRN_SSOT_v0111.json | 0111 | —(邊界閘擋,VRN 自己登) | c7a3e85640df | VRN-WKF010 補欄 · 2 步改取尾版 | SDD X-COL 由紅轉綠 · tests.real 寫的是容器實跑 |
+| 2026-11-18T17:22:58Z | VQG_AllInOne_v0112.py | 0112 | VIA-VQG-MDL009 | e6c94589ed64 | 加速器橋補成真的匯入(前版只有標記) | 自測 6/6 · 前版 SHA 釘住 |
+| 2026-11-18T17:22:58Z | VQG_SectorActiveWeight_v0101.py | 0101 | VIA-VQG-MDL010 | ff9f4937ccf2 | 補加速器橋 | 自測 6/6 |
+| 2026-11-18T17:22:58Z | VDF_TW_TickerClass_v0101.py | 0101 | VIA-VDF-MDL295 | 8bb5ae7fa1db | 補加速器橋(v0100 是操作員分支的成果,已併入) | 自測 6/6(含前版 kinds=14) |
