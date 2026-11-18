@@ -63,3 +63,4 @@
 | 2026-11-18T18:40:37Z | VDF_ENG232_TWIndexOfficial_v0103.py | 0103 | VIA-VDF-ENG377 | b709d935f44b | 寫庫前確保欄型 · 加權某月回空就停在那裡不留洞 | 自測 10/10(含負控)· 真跑壞欄型的湖庫:欄型修成 DOUBLE · 加權補進 63 列含法人數字 |
 | 2026-11-18T18:40:37Z | VDF_FetchSystem_SSOT_v0114.json | 0114 | —(VDF 自己的冊;VCGC 邊界閘不代發) | 72d84dbafa51 | 擷取冊尾版:e054 → v0112 worker · e077 → v0107 · e232 → v0103(v0111 ~ v0114 每版只改一列) | 每版點名以外差異 0 · 三支都經 VDF 擷取系統真跑過 |
 | 2026-11-18T18:40:37Z | SUP_MDL744_NLPApplicationHub_v0103.py | 0103 | VIA-SUP-MDL1203 | 5e18c7bb0d9e | 補編號:先補上 VIA_DownloadsSync v0100 / v0101 缺的模組列之後才編得進去 | 稽核 遺失 0 · 改身分 0 · 重號 0;檔內容沒動 |
+| 2026-11-18T18:47:04Z | VDF_ENG094_ActiveETFActivity_v0103.py | 0103 | VIA-VDF-ENG378 | d2724a42cb89 | 接回「在尾版上替換 analyze,build 用得到」(v0102 漏了,CI 紅);v0102 的同意尺退路保留 | 自測 8/8(含負控)· 本機重跑 CI 的 test_via_etf_activity 23 項全過 |
