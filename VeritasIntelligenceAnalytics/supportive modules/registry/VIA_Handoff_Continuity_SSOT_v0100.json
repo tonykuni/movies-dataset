@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-19T13:50:00Z",
+ "updated_at": "2026-11-19T14:40:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -2428,14 +2428,16 @@
     "VRN_ENG399_RealTestHarness",
     "--selftest"
    ],
-   "success_marker": "VRN_ENG399_RealTestHarness_v0100 自測 7/7 · PASS",
+   "success_marker": "VRN_ENG399_RealTestHarness_v0100 自測",
    "scope": "VRN_ENG399 實測工作台 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
    "dependencies": [
     "functional modules/VRN/VRN_ENG399_RealTestHarness_v*.py"
    ],
    "timeout_seconds": 900,
    "registered_at": "2026-10-10T08:33:32+00:00",
-   "marker_note": "原標記 8/8,實跑是 7/7 · PASS(2026-11-08 容器實測)"
+   "marker_note": "操作員 2026-11-19 22:10:「1. 甲 2. 依照你建議」:原字樣帶檢查項數(VRN_ENG399_RealTestHarness_v0100 自測 7/7 · PASS),項數會隨環境裝了哪些套件或該引擎加檢查而變,自測全過也對不上。改成不帶項數的那一段;過不過仍要 rc 0(交接閘本來就兩樣都要:字樣 + rc 0),自測有任何一項不過 rc 就不是 0。",
+   "success_marker_before": "VRN_ENG399_RealTestHarness_v0100 自測 7/7 · PASS",
+   "updated_at": "2026-11-19T14:40:00Z"
   },
   "cov_vrn_eng400": {
    "argv": [
@@ -2473,13 +2475,16 @@
     "VRN_OCRPlugins",
     "--selftest"
    ],
-   "success_marker": "[計] VRN_OCRPlugins_v0100 自測 11/11 · PASS",
+   "success_marker": "[計] VRN_OCRPlugins_v0100 自測",
    "scope": "VRN OCR 插件 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
    "dependencies": [
     "functional modules/VRN/VRN_OCRPlugins_v*.py"
    ],
    "timeout_seconds": 900,
-   "registered_at": "2026-10-10T08:33:32+00:00"
+   "registered_at": "2026-10-10T08:33:32+00:00",
+   "success_marker_before": "[計] VRN_OCRPlugins_v0100 自測 11/11 · PASS",
+   "updated_at": "2026-11-19T14:40:00Z",
+   "marker_note": "操作員 2026-11-19 22:10:「1. 甲 2. 依照你建議」:原字樣帶檢查項數([計] VRN_OCRPlugins_v0100 自測 11/11 · PASS),項數會隨環境裝了哪些套件或該引擎加檢查而變,自測全過也對不上。改成不帶項數的那一段;過不過仍要 rc 0(交接閘本來就兩樣都要:字樣 + rc 0),自測有任何一項不過 rc 就不是 0。"
   },
   "cov_mdl186": {
    "argv": [
@@ -8791,12 +8796,17 @@
   {
    "id": "VCGC-REQ174:vcgc_console_v0191",
    "requirement": "VCGC-REQ174",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "owner": "AI",
    "reason": "registry-sync 等 v0159 動詞仍走釘死的 CGC_MDL223 v0100 → VDF 列 RED → 什麼都不寫;v0191 改取尾版 → 已驗:2026-10-07T08:38:28+00:00 rc 0 · 標記見到",
    "next": "無(改本檔或相依後重跑 handoff test vcgc_console_v0191)",
    "case": "vcgc_console_v0191",
-   "receipt": "docs/handoff/evidence/vcgc_console_v0191.json"
+   "receipt": "docs/handoff/evidence/vcgc_console_v0191.json",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ232:C-vcgc-console-v0202",
+   "superseded_at": "2026-11-19T14:40:00Z",
+   "superseded_why": "操作員 2026-11-19 22:10:「1. 甲 2. 依照你建議」(甲:尾版自測只驗本版與直接前版,舊案記成被尾版接手)。這一案指名的舊版自測會重跑整條前版鏈,鏈上 v0187 的第 ⑦ 項釘著「VCGC 自己的 stem 仍走 v0168 規則取尾版」,尾版到 v0202 之後不成立 → v0190 鏈 7/8(容器 2026-11-19 沙盒重放;指名該版單跑也不過)。主控台的功能沒有壞;接手的是尾版 v0202 自己的自測案(14/14)。",
+   "updated_at": "2026-11-19T14:40:00Z"
   },
   {
    "id": "VCGC-REQ174:vrn-watch-scope",
@@ -8993,12 +9003,17 @@
   {
    "id": "VCGC-REQ176:sdd_validator_v0106",
    "requirement": "VCGC-REQ176",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "owner": "AI",
    "reason": "新交接案 sdd_validator_v0106(政策 L120 工作流冊三方對等 · SDD X-PEER) → 已驗:2026-10-10T20:47:08+00:00 rc 0 · 標記見到",
    "next": "handoff test sdd_validator_v0106 實跑轉 VERIFIED",
    "case": "sdd_validator_v0106",
-   "receipt": "docs/handoff/evidence/sdd_validator_v0106.json"
+   "receipt": "docs/handoff/evidence/sdd_validator_v0106.json",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ075:sdd",
+   "superseded_at": "2026-11-19T14:40:00Z",
+   "superseded_why": "操作員 2026-11-19 22:10:「1. 甲 2. 依照你建議」(甲)。v0106 的自測往下跑 v0103 的回歸時,在現在的工作流冊形狀上 AttributeError('list' object has no attribute 'get')(容器 2026-11-19 沙盒重放)。同一段回歸在 sdd 案(指名 v0108,整條前版鏈)是綠的;接手的是 sdd 案。",
+   "updated_at": "2026-11-19T14:40:00Z"
   },
   {
    "id": "VCGC-REQ175:speed",
@@ -10205,10 +10220,15 @@
   {
    "id": "VCGC-REQ184:vcgc_console_v0192",
    "requirement": "VCGC-REQ184",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "case": "vcgc_console_v0192",
    "receipt": "docs/handoff/evidence/vcgc_console_v0192.json",
-   "next": "工作站:VIA_FROM_VCGC=YES via-vcgc mcp serve → Claude Desktop 加 5 個 MCP → ▶ 全部測試啟動 → 套用 → 重啟看 MCP 圖示;Fine-grained 唯讀 PAT 跑唯讀驗證;貼回 → VCGC-REQ184 轉 COVERED"
+   "next": "工作站:VIA_FROM_VCGC=YES via-vcgc mcp serve → Claude Desktop 加 5 個 MCP → ▶ 全部測試啟動 → 套用 → 重啟看 MCP 圖示;Fine-grained 唯讀 PAT 跑唯讀驗證;貼回 → VCGC-REQ184 轉 COVERED",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ232:C-vcgc-console-v0202",
+   "superseded_at": "2026-11-19T14:40:00Z",
+   "superseded_why": "操作員 2026-11-19 22:10:「1. 甲 2. 依照你建議」(甲:尾版自測只驗本版與直接前版,舊案記成被尾版接手)。這一案指名的舊版自測會重跑整條前版鏈,鏈上 v0187 的第 ⑦ 項釘著「VCGC 自己的 stem 仍走 v0168 規則取尾版」,尾版到 v0202 之後不成立 → v0190 鏈 7/8(容器 2026-11-19 沙盒重放;指名該版單跑也不過)。主控台的功能沒有壞;接手的是尾版 v0202 自己的自測案(14/14)。",
+   "updated_at": "2026-11-19T14:40:00Z"
   },
   {
    "id": "VCGC-REQ187:version_panorama_loader",
@@ -10322,10 +10342,15 @@
    "receipt": "docs/handoff/evidence/vcgc_console_v0191.json",
    "reason": "釘舊版單跑讀到新冊 / 看到新尾版就紅(已發布不原地改)→ 交接冊 repinned 改認家族尾版(舊 argv / 標記留 repinned_before)",
    "next": "桌機 handoff test vcgc_console_v0191 同綠",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "verified_at": "2026-11-06T20:12:54+00:00",
    "verified_why": "handoff test vcgc_console_v0191 rc 0 · 標記見到",
-   "registered_at": "2026-11-06T20:19:06+00:00"
+   "registered_at": "2026-11-06T20:19:06+00:00",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ232:C-vcgc-console-v0202",
+   "superseded_at": "2026-11-19T14:40:00Z",
+   "superseded_why": "操作員 2026-11-19 22:10:「1. 甲 2. 依照你建議」(甲:尾版自測只驗本版與直接前版,舊案記成被尾版接手)。這一案指名的舊版自測會重跑整條前版鏈,鏈上 v0187 的第 ⑦ 項釘著「VCGC 自己的 stem 仍走 v0168 規則取尾版」,尾版到 v0202 之後不成立 → v0190 鏈 7/8(容器 2026-11-19 沙盒重放;指名該版單跑也不過)。主控台的功能沒有壞;接手的是尾版 v0202 自己的自測案(14/14)。",
+   "updated_at": "2026-11-19T14:40:00Z"
   },
   {
    "id": "VCGC-REQ187:tool_coverage_matrix",
@@ -12375,10 +12400,10 @@
    "id": "VCGC-REQ236:seq-02-uiengine-chain",
    "requirement": "VCGC-REQ236",
    "state": "PENDING",
-   "owner": "AI(下一批;高耦合,先給做法再動)",
-   "reason": "CGC_MDL261_UIEngine:v0100 ~ v0103 的自測釘著當時的世界(內建範本 · VDF_MDL012 尾版 · 色票),在現在的樹上各有 1 ~ 6 項不過,一路傳到 v0108(4/5)。7 案紅(ui_engine_v0101 ~ v0107)+ 串測唯一的紅站。v0108 已經把模板冊換回那一代,仍不夠",
-   "next": "要操作員裁定做法:(甲)尾版自測只驗本版與直接前版的介面,v0101 ~ v0107 七案記成被 v0108 接手;(乙)逐版補「那一代的世界」夾具。裁定後出 v0109 薄尾",
-   "updated_at": "2026-11-19T13:50:00Z",
+   "owner": "AI(下一批)",
+   "reason": "CGC_MDL261_UIEngine:v0100 ~ v0103 的自測釘著當時的世界(內建範本 · VDF_MDL012 尾版 · 色票),在現在的樹上各有 1 ~ 6 項不過,一路傳到 v0108(4/5)。7 案紅(ui_engine_v0101 ~ v0107)+ 串測唯一的紅站。v0108 已經把模板冊換回那一代,仍不夠 ‖ 2026-11-19 22:10 操作員裁定甲。",
+   "next": "出 CGC_MDL261_UIEngine v0109 薄尾(自測只驗本版執行面與直接前版介面)→ 新案 → ui_engine_v0101 ~ v0107 七案記成被新案接手 → 串測紅站轉綠",
+   "updated_at": "2026-11-19T14:40:00Z",
    "registered_at": "2026-11-19T13:50:00Z"
   },
   {
@@ -12386,9 +12411,9 @@
    "requirement": "VCGC-REQ236",
    "state": "PENDING",
    "owner": "AI(下一批;要等 seq-02 的裁定,同一類問題)",
-   "reason": "主控台 v0187 自測 ⑦ 釘「VCGC 自己的 stem 仍走 v0168 規則取尾版」,尾版到 v0202 後不成立 → v0190 鏈 7/8 → entry · vcgc_console_v0191 · vcgc_console_v0192 三案紅(指名版本也不過)",
-   "next": "與 seq-02 同一個裁定;主控台換版會讓約 150 案收據失效,要跟別的主控台修改湊成一版",
-   "updated_at": "2026-11-19T13:50:00Z",
+   "reason": "主控台 v0187 自測 ⑦ 釘「VCGC 自己的 stem 仍走 v0168 規則取尾版」,尾版到 v0202 後不成立 → v0190 鏈 7/8 → entry · vcgc_console_v0191 · vcgc_console_v0192 三案紅(指名版本也不過) ‖ 2026-11-19 22:10 操作員裁定甲:vcgc_console_v0191 · vcgc_console_v0192 兩案(三筆工作項)已記成被尾版 v0202 的自測案接手。entry 案沒有動:它是 12 筆工作項(VCGC-REQ075 ~ REQ131)的證據,那些需求寫的是「邏輯在主控台自測鏈」;照甲改掉等於那 12 筆以後只剩「尾版自測過」。這一點裁定時沒有攤在操作員面前,所以先停。",
+   "next": "操作員回一句:entry 也照甲(成功字樣改認尾版的 PASS 行),或者留著等主控台下一版把 v0187 ⑦ 那一項處理掉(鏈上其餘檢查項繼續每版重驗)",
+   "updated_at": "2026-11-19T14:40:00Z",
    "registered_at": "2026-11-19T13:50:00Z"
   },
   {
@@ -12404,12 +12429,13 @@
   {
    "id": "VCGC-REQ236:seq-05-env-dependent-marker",
    "requirement": "VCGC-REQ236",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "操作員裁定 → AI",
-   "reason": "cov_vrn_eng399(字樣 7/7,現在印 8/8)· cov_vrn_ocrplugins(字樣 11/11,現在印 12/12):rc 0、自測全過,但成功字樣帶檢查項數,項數會隨環境有沒有某套件或 VRN-2 改檔而變",
-   "next": "裁定:成功字樣改成不帶項數的那一段(例「VRN_OCRPlugins_v0100 自測」+ rc 0),還是照現在的項數改字樣。改字樣等於改驗收條件,不自己決定",
-   "updated_at": "2026-11-19T13:50:00Z",
-   "registered_at": "2026-11-19T13:50:00Z"
+   "reason": "操作員 2026-11-19 22:10:「1. 甲 2. 依照你建議」 → 兩案成功字樣改成不帶項數的那一段(原字樣留在 success_marker_before);handoff test 兩案 rc 0 · 字樣對上(容器)",
+   "next": "—",
+   "updated_at": "2026-11-19T14:40:00Z",
+   "registered_at": "2026-11-19T13:50:00Z",
+   "state_before": "PENDING"
   },
   {
    "id": "VCGC-REQ236:seq-06-slow-selftests",
@@ -12434,12 +12460,13 @@
   {
    "id": "VCGC-REQ236:seq-08-sdd-v0106",
    "requirement": "VCGC-REQ236",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "AI(下一批;同 seq-02 的裁定)",
-   "reason": "sdd_validator_v0106:v0103 的回歸在現在的冊形狀上 AttributeError('list' object has no attribute 'get');v0108 鏈已經會處理,v0106 那一版不會",
-   "next": "照 seq-02 的裁定:記成被 sdd 案(v0108)接手,或補那一代的夾具",
-   "updated_at": "2026-11-19T13:50:00Z",
-   "registered_at": "2026-11-19T13:50:00Z"
+   "reason": "操作員 2026-11-19 22:10:「1. 甲 2. 依照你建議」 → VCGC-REQ176:sdd_validator_v0106 記成被 sdd 案接手(SUPERSEDED,理由與接手者寫在該列)",
+   "next": "—",
+   "updated_at": "2026-11-19T14:40:00Z",
+   "registered_at": "2026-11-19T13:50:00Z",
+   "state_before": "PENDING"
   },
   {
    "id": "VCGC-REQ236:peer-engine-reds",
@@ -12465,10 +12492,10 @@
    "id": "VCGC-REQ236:operator-decisions",
    "requirement": "VCGC-REQ236",
    "state": "PENDING",
-   "owner": "操作員",
-   "reason": "四件要你一句話:① ④ 區 23 個家族還沒編號(全量編號要操作員下令)② 被取代 24 案的成功鎖要不要放 ③ VCGC-REQ046 仍是 MISSING(2026-07-01 至今的實測與 U/I)④ 參數索引冊 13 本內容跟索引記的不一樣、1 本檔不在(要不要重新產生索引)",
-   "next": "逐件回覆;沒回覆之前維持現狀",
-   "updated_at": "2026-11-19T13:50:00Z",
+   "owner": "AI(下一批)+ 操作員(主機)",
+   "reason": "四件要你一句話:① ④ 區 23 個家族還沒編號(全量編號要操作員下令)② 被取代 24 案的成功鎖要不要放 ③ VCGC-REQ046 仍是 MISSING(2026-07-01 至今的實測與 U/I)④ 參數索引冊 13 本內容跟索引記的不一樣、1 本檔不在(要不要重新產生索引) ‖ 2026-11-19 22:10 操作員:「3/4/5 依你建議」。AI 的建議:① 23 個家族只對這 23 家的檔做指定範圍編號(不做全量)② 成功鎖只放「接手者此刻是綠」的那些案,而且要在主機上放(鎖檔在 VIA_Reports,不進倉,容器放了對主機沒有作用)③(REQ046 不在這次裁定內)④ 參數索引冊重新產生成新版,檔不在的 2 本照實留紅。",
+   "next": "AI 下一批做 ① ④;② 等主機連得上或操作員在主機跑;③ 仍待操作員",
+   "updated_at": "2026-11-19T14:40:00Z",
    "registered_at": "2026-11-19T13:50:00Z"
   }
  ]
