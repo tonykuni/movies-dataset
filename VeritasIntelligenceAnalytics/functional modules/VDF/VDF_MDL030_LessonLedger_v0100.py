@@ -281,8 +281,21 @@ def archive_sealed(staging: Path, lake: Path) -> Path | None:
     return out
 
 
+def node_id(kind: str, value: str) -> str:
+    return "%s:%s" % (kind, str(value).strip())
+
+
+def signature_id(signature: str) -> str:
+    return "sig:" + hashlib.sha256(signature.encode("utf-8")).hexdigest()[:12]
+
+
 def export_peers(ledger: Path = LEDGER, dest: Path | None = None) -> dict:
-    """Write the three peer files. Missing products are not an error."""
+    """Write the three peer files. Missing products are not an error.
+
+    Node ids are shared by Graphify, OmniRoute and agent-mem.
+    EXTRACTED means the target is written in the lesson file.
+    A module name is only INFERRED until some source file actually defines it.
+    """
     dest = dest or (HERE / "output_hub" / "mega" / "lesson_peers")
     dest.mkdir(parents=True, exist_ok=True)
     files = sorted(ledger.glob("part_*.parquet"))
@@ -299,33 +312,50 @@ def export_peers(ledger: Path = LEDGER, dest: Path | None = None) -> dict:
             [[p.as_posix() for p in files]],
         ).fetchall()
         con.close()
-    graph_nodes, graph_edges = [], []
+    nodes, edges = {}, {}
     omni, notes = [], []
     for row in lessons:
         lesson_id, module, title, status, codes, signature, cause, steps, source = row
-        node = "lesson:%s" % lesson_id
-        graph_nodes.append({"id": node, "kind": "lesson", "label": title, "status": status,
-                            "file": "kb/lessons/" + source})
-        graph_nodes.append({"id": "module:%s" % module, "kind": "module", "label": module})
-        graph_edges.append({"source": node, "target": "module:%s" % module, "type": "LESSON_FOR",
-                            "confidence": "EXTRACTED"})
-        omni.append({"type": "procedural", "content": "%s\n%s\n%s" % (title, cause, steps),
-                     "metadata": {"lesson_id": lesson_id, "module": module, "error_codes": json.loads(codes),
-                                  "log_signature": signature}})
-        notes.append((lesson_id, title, module, steps, source))
+        lesson = node_id("lesson", lesson_id)
+        module_node = node_id("module", module)
+        file_node = node_id("file", "kb/lessons/" + source)
+        sig_node = signature_id(signature)
+        nodes.setdefault(lesson, {"id": lesson, "kind": "lesson", "label": title, "status": status})
+        nodes.setdefault(file_node, {"id": file_node, "kind": "file", "label": source})
+        nodes.setdefault(module_node, {"id": module_node, "kind": "module", "label": module})
+        nodes.setdefault(sig_node, {"id": sig_node, "kind": "signature", "label": signature})
+        edges.setdefault((lesson, file_node, "HAS_FILE"),
+                         {"source": lesson, "target": file_node, "type": "HAS_FILE", "confidence": "EXTRACTED"})
+        edges.setdefault((lesson, sig_node, "HAS_SIGNATURE"),
+                         {"source": lesson, "target": sig_node, "type": "HAS_SIGNATURE", "confidence": "EXTRACTED"})
+        edges.setdefault((lesson, module_node, "LESSON_FOR"),
+                         {"source": lesson, "target": module_node, "type": "LESSON_FOR", "confidence": "INFERRED"})
+        error_nodes = []
+        for code in json.loads(codes):
+            error_node = node_id("error", code)
+            error_nodes.append(error_node)
+            nodes.setdefault(error_node, {"id": error_node, "kind": "error", "label": code})
+            edges.setdefault((lesson, error_node, "HAS_ERROR"),
+                             {"source": lesson, "target": error_node, "type": "HAS_ERROR", "confidence": "EXTRACTED"})
+        linked = [lesson, file_node, module_node, sig_node] + error_nodes
+        omni.append({
+            "type": "procedural",
+            "content": "%s\n%s\n%s" % (title, cause, steps),
+            "metadata": {"node_id": lesson, "nodes": linked, "lesson_id": lesson_id},
+        })
+        notes.append((lesson, title, module, steps, source, linked))
     graph_path = dest / "vdf_lessons_overlay.json"
-    graph_path.write_text(json.dumps({"nodes": graph_nodes, "edges": graph_edges}, ensure_ascii=False, indent=1),
-                          encoding="utf-8")
+    graph_path.write_text(json.dumps(
+        {"nodes": list(nodes.values()), "edges": list(edges.values())}, ensure_ascii=False, indent=1), encoding="utf-8")
     omni_path = dest / "omniroute_memory.jsonl"
     omni_path.write_text("".join(json.dumps(item, ensure_ascii=False) + "\n" for item in omni), encoding="utf-8")
     mem_dir = dest / "agent_mem"
     mem_dir.mkdir(exist_ok=True)
-    for lesson_id, title, module, steps, source in notes:
-        note = mem_dir / (lesson_id + ".md")
-        note.write_text(
-            "---\ntitle: %s\nmodule: %s\nfiles:\n  - kb/lessons/%s\n---\n\n%s\n" % (title, module, source, steps),
-            encoding="utf-8",
-        )
+    for lesson, title, module, steps, source, linked in notes:
+        body = ["---", "node_id: " + lesson, "module: " + module, "nodes:"]
+        body.extend("  - " + item for item in linked)
+        body.extend(["files:", "  - kb/lessons/" + source, "---", "", steps, ""])
+        (mem_dir / (lesson.split(":", 1)[1] + ".md")).write_text("\n".join(body), encoding="utf-8")
     print("graphify=%s" % graph_path)
     print("omniroute=%s" % omni_path)
     print("agent_mem=%s" % mem_dir)
@@ -361,16 +391,27 @@ def selftest() -> int:
             return 1
         peers = export_peers(root / "ledger", root / "peers")
         overlay = json.loads(peers["graphify"].read_text(encoding="utf-8"))
-        if not any(edge["type"] == "LESSON_FOR" for edge in overlay["edges"]):
-            print("[FAIL] graphify overlay")
+        ids = [node["id"] for node in overlay["nodes"]]
+        if len(ids) != len(set(ids)):
+            print("[FAIL] duplicate node id")
+            return 1
+        lesson = "lesson:LL-20261119-001"
+        by_type = {}
+        for edge in overlay["edges"]:
+            by_type.setdefault(edge["type"], set()).add(edge["confidence"])
+        if by_type.get("LESSON_FOR") != {"INFERRED"} or "EXTRACTED" not in by_type.get("HAS_ERROR", ()):
+            print("[FAIL] confidence", by_type)
+            return 1
+        if lesson not in ids or "error:WinError 32" not in ids:
+            print("[FAIL] node ids", ids)
             return 1
         line = json.loads(peers["omniroute"].read_text(encoding="utf-8").splitlines()[0])
-        if line["type"] != "procedural" or line["metadata"]["lesson_id"] != rec["lesson_id"]:
-            print("[FAIL] omniroute memory")
+        if line["metadata"]["node_id"] != lesson or lesson not in line["metadata"]["nodes"]:
+            print("[FAIL] omniroute node id")
             return 1
         note = (peers["agent_mem"] / "LL-20261119-001.md").read_text(encoding="utf-8")
-        if "files:" not in note or "kb/lessons/" not in note:
-            print("[FAIL] agent-mem note")
+        if "node_id: " + lesson not in note or "error:WinError 32" not in note:
+            print("[FAIL] agent-mem node id")
             return 1
     print("[OK] lesson ledger + graphify overlay + omniroute memory + agent-mem note")
     return 0
