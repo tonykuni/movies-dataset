@@ -39,12 +39,10 @@
   [OK] ④ 'YYYYMMDD' 期間也認(ym 20260201 ≥ 2026-02-01 → 1 列)· 中文欄名照帶
   [OK] ④b 月鍵照月比:'202607' 落在 7/15–7/31 → 1 列 · 7/1–8/10 收 202607 + '2026-08' → 2 列 · 202612 只在 12 月(1)、不被當成 2026-01-02(1 月 0)
   [OK] ④c md 截斷照實:上限 2 列 · 選到 5 列 → 收據 rows 2(= 檔裡 2 列)· truncated True
-  [OK] ⑤ 擋:欄位不在表裡(含注入字串)· 表不在 · 日期格式錯 · 格式不收 → 照實報錯,不拼字串 · ["欄位不在表裡:['close; DROP TABLE x']", '資料庫家 /tmp/vdf_ex237_1zj04n2q/h', '日期寫成 YYYY-MM-DD:2026/01/01', '格式只收 csv · parquet · json · xl']
+  [OK] ⑤ 擋:欄位不在表裡(含注入字串)· 表不在 · 日期格式錯 · 格式不收 → 照實報錯,不拼字串 · ["欄位不在表裡:['close; DROP TABLE x']", '資料庫家 /tmp/vdf_ex237_4epn7mfe/h', '日期寫成 YYYY-MM-DD:2026/01/01', '格式只收 csv · parquet · json · xl']
   [OK] ⑥ 雲端夾:onedrive → %OneDrive%\VDF_Export · gdrive → VIA_GDRIVE_DIR\VDF_Export · 找不到照實報(不亂建)
-  [OK] ⑦ 真的寫進雲端同步夾(/tmp/vdf_ex237_1zj04n2q/OneDriveX/VDF_Export · 5 列)
+  [OK] ⑦ 真的寫進雲端同步夾(/tmp/vdf_ex237_4epn7mfe/OneDriveX/VDF_Export · 5 列)
   [OK] ⑧ 收據:每次一行(12 行)· 列數 · 檔 · SHA-256 · 參數化 SQL(值不進 SQL 字串)
   [OK] ⑨ tables:列出庫 · 表 · 欄位 · 認得的日期欄(date)/ 代號欄(ticker)
   [OK] ⑩ VDF 獨立:不匯入他系統程式 · 兩座橋在 · 零網路 · 同意閘不讀不寫 · 不碰 TA-Lib
 [計] VDF_ENG237_DataExport v0100 自測 12/12 · PASS
-  [同步] SDD 驗證 RED:X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):66 個,例 ['VDF-WKF015', 'VDF-WKF016', → via-vcgc sdd check
-  [沿用] gate_ok · 鑰匙 9744962c0e5b44c4 · 1s 前算的(--fresh 強制重算)
