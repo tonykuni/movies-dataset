@@ -289,6 +289,13 @@ def signature_id(signature: str) -> str:
     return "sig:" + hashlib.sha256(signature.encode("utf-8")).hexdigest()[:12]
 
 
+def _claim(nodes: dict, nid: str, label: str, **fields) -> None:
+    prev = nodes.get(nid)
+    if prev is not None and prev.get("label") != label:
+        raise RuntimeError("node id collision %s" % nid)
+    nodes.setdefault(nid, {"id": nid, "label": label, **fields})
+
+
 def export_peers(ledger: Path = LEDGER, dest: Path | None = None) -> dict:
     """Write the three peer files. Missing products are not an error.
 
@@ -313,17 +320,17 @@ def export_peers(ledger: Path = LEDGER, dest: Path | None = None) -> dict:
         ).fetchall()
         con.close()
     nodes, edges = {}, {}
-    omni, notes = [], []
+    omni, notes, fts_rows = [], [], []
     for row in lessons:
         lesson_id, module, title, status, codes, signature, cause, steps, source = row
         lesson = node_id("lesson", lesson_id)
         module_node = node_id("module", module)
         file_node = node_id("file", "kb/lessons/" + source)
         sig_node = signature_id(signature)
-        nodes.setdefault(lesson, {"id": lesson, "kind": "lesson", "label": title, "status": status})
-        nodes.setdefault(file_node, {"id": file_node, "kind": "file", "label": source})
-        nodes.setdefault(module_node, {"id": module_node, "kind": "module", "label": module})
-        nodes.setdefault(sig_node, {"id": sig_node, "kind": "signature", "label": signature})
+        _claim(nodes, lesson, title, kind="lesson", status=status)
+        _claim(nodes, file_node, source, kind="file")
+        _claim(nodes, module_node, module, kind="module")
+        _claim(nodes, sig_node, signature, kind="signature")
         edges.setdefault((lesson, file_node, "HAS_FILE"),
                          {"source": lesson, "target": file_node, "type": "HAS_FILE", "confidence": "EXTRACTED"})
         edges.setdefault((lesson, sig_node, "HAS_SIGNATURE"),
@@ -334,7 +341,7 @@ def export_peers(ledger: Path = LEDGER, dest: Path | None = None) -> dict:
         for code in json.loads(codes):
             error_node = node_id("error", code)
             error_nodes.append(error_node)
-            nodes.setdefault(error_node, {"id": error_node, "kind": "error", "label": code})
+            _claim(nodes, error_node, code, kind="error")
             edges.setdefault((lesson, error_node, "HAS_ERROR"),
                              {"source": lesson, "target": error_node, "type": "HAS_ERROR", "confidence": "EXTRACTED"})
         codes_text = json.loads(codes)
@@ -354,6 +361,7 @@ def export_peers(ledger: Path = LEDGER, dest: Path | None = None) -> dict:
             },
         })
         notes.append((lesson, title, module, steps, source, linked))
+        fts_rows.append((lesson_id, " ".join(fts_tokens), "%s\n%s" % (cause, steps)))
     graph_path = dest / "vdf_lessons_overlay.json"
     graph_path.write_text(json.dumps({
         "schema": "VDF-LESSON-OVERLAY/1.1",
@@ -371,10 +379,26 @@ def export_peers(ledger: Path = LEDGER, dest: Path | None = None) -> dict:
         body.extend("  - " + item for item in linked)
         body.extend(["files:", "  - kb/lessons/" + source, "---", "", steps, ""])
         (mem_dir / (lesson.split(":", 1)[1] + ".md")).write_text("\n".join(body), encoding="utf-8")
+    fts_path = dest / "lessons_fts.sqlite"
+    _write_fts(fts_path, fts_rows)
     print("graphify=%s" % graph_path)
     print("omniroute=%s" % omni_path)
     print("agent_mem=%s" % mem_dir)
-    return {"graphify": graph_path, "omniroute": omni_path, "agent_mem": mem_dir}
+    print("fts=%s" % fts_path)
+    return {"graphify": graph_path, "omniroute": omni_path, "agent_mem": mem_dir, "fts": fts_path}
+
+
+def _write_fts(path: Path, rows: list) -> None:
+    import sqlite3
+    if path.exists():
+        path.unlink()
+    con = sqlite3.connect(path)
+    con.execute(
+        "CREATE VIRTUAL TABLE lesson_fts USING fts5(lesson_id UNINDEXED, tokens, body, tokenize='trigram')"
+    )
+    con.executemany("INSERT INTO lesson_fts(lesson_id, tokens, body) VALUES (?,?,?)", rows)
+    con.commit()
+    con.close()
 
 
 def selftest() -> int:
@@ -383,6 +407,14 @@ def selftest() -> int:
     if rec["lesson_id"] != "LL-20261119-001" or "WinError 32" not in rec["error_codes"]:
         print("[FAIL] parse")
         return 1
+    try:
+        taken = {}
+        _claim(taken, "sig:aa", "one", kind="signature")
+        _claim(taken, "sig:aa", "two", kind="signature")
+        print("[FAIL] signature collision was kept")
+        return 1
+    except RuntimeError:
+        pass
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         first = compile_lessons(LESSONS, root / "ledger")
@@ -433,6 +465,13 @@ def selftest() -> int:
         note = (peers["agent_mem"] / "LL-20261119-001.md").read_text(encoding="utf-8")
         if "node_id: " + lesson not in note or "error:WinError 32" not in note:
             print("[FAIL] agent-mem node id")
+            return 1
+        import sqlite3
+        hit = sqlite3.connect(peers["fts"]).execute(
+            "SELECT lesson_id FROM lesson_fts WHERE lesson_fts MATCH ?", ('"同一個"',)
+        ).fetchall()
+        if hit != [("LL-20261119-001",)]:
+            print("[FAIL] trigram fts", hit)
             return 1
     print("[OK] lesson ledger + graphify overlay + omniroute memory + agent-mem note")
     return 0

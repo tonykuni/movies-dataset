@@ -93,13 +93,16 @@ def _industry():
 def _discover(book, source, found):
     if not isinstance(book, dict):
         return
+    owner = source.split("_SSOT_")[0]
     for value in book.values():
         if not isinstance(value, list):
             continue
         for row in value:
             if isinstance(row, dict) and isinstance(row.get("id"), str) and row["id"]:
+                bare = row["id"]
                 found.append({
-                    "id": row["id"],
+                    "id": "%s:%s" % (owner, bare),
+                    "bare_id": bare,
                     "name": row.get("name") or row.get("zh") or row.get("item") or "",
                     "class": row.get("class") or "discovered",
                     "mutable": row.get("mutable"),
@@ -170,6 +173,7 @@ def build() -> dict:
         layer = "ELEC" if code in ELEC else "FIN" if code == "17" else "TRAD"
         discovered.append({
             "id": "TW.IND." + code,
+            "bare_id": "TW.IND." + code,
             "name": industry[code],
             "class": layer,
             "mutable": False,
@@ -177,13 +181,30 @@ def build() -> dict:
             "origin": "code",
         })
 
-    by_id = {}
+    by_bare = {}
     for row in discovered:
-        by_id.setdefault(row["id"], []).append(row["source"])
-    conflicts = [{"id": key, "sources": sources} for key, sources in sorted(by_id.items()) if len(set(sources)) > 1]
-    lamp = "RED" if errors else "YELLOW" if conflicts else "GREEN"
+        if row.get("origin") != "ssot":
+            continue
+        by_bare.setdefault(row["bare_id"], []).append(row)
+    conflicts = []
+    for bare, rows in sorted(by_bare.items()):
+        sources = sorted({row["source"] for row in rows})
+        if len(sources) <= 1:
+            continue
+        names = sorted({row["name"] for row in rows})
+        conflicts.append({
+            "id": bare,
+            "kind": "same_subject" if len(names) == 1 else "different_subject",
+            "names": names,
+            "sources": sources,
+        })
+    qualified = [row["id"] for row in discovered]
+    if len(qualified) != len(set(qualified)):
+        errors.append("duplicate qualified parameter id")
+    different = [row["id"] for row in conflicts if row["kind"] == "different_subject"]
+    lamp = "RED" if errors or different else "YELLOW" if conflicts else "GREEN"
     book = {
-        "schema": "VDF-SYSTEM-REGISTRY/1.1",
+        "schema": "VDF-SYSTEM-REGISTRY/1.2",
         "manager": "VDF_MDL029_SystemManager_%s" % VER,
         "at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "engines": len(engines),
@@ -237,7 +258,7 @@ th{font-size:12px;letter-spacing:.04em;color:#5c6770}
         html.escape(book["manager"]), html.escape(book["at"]), html.escape(book["lamp"]),
         book["engines"], len(book["commands"]), len(coded), frozen, len(book["discovered"]), len(book["conflicts"]),
         rows(coded, ["id", "name", "class", "mutable", "source", "value"]),
-        rows(book["conflicts"], ["id", "sources"]) or "<p>none</p>",
+        rows(book["conflicts"], ["id", "kind", "names", "sources"]) or "<p>none</p>",
         rows([{"id": e["id"], "version": e["version"], "commands": " ".join(e["commands"])} for e in book["engine_rows"]],
              ["id", "version", "commands"]),
     )
@@ -248,6 +269,9 @@ def catalog(book=None) -> int:
     print("state=%s lamp=%s engines=%d commands=%d coded=%d discovered=%d conflicts=%d" % (
         book["state"], book["lamp"], book["engines"], len(book["commands"]),
         len(book["coded_parameters"]), len(book["discovered"]), len(book["conflicts"])))
+    bad = [row["id"] for row in book["conflicts"] if row["kind"] == "different_subject"]
+    if bad:
+        print("ambiguous", " ".join(bad))
     for err in book["errors"]:
         print("ERROR", err)
     return 0 if book["state"] == "REGISTERED" else 1
@@ -267,7 +291,15 @@ def monitor(book=None) -> int:
 
 def params(key: str, book=None) -> int:
     book = book or build()
-    hits = [p for p in book["coded_parameters"] + book["discovered"] if key in p["id"]]
+    rows = book["coded_parameters"] + book["discovered"]
+    exact = [row for row in rows if row["id"] == key]
+    bare = [row for row in rows if row.get("bare_id") == key]
+    if not exact and len({row["source"] for row in bare}) > 1:
+        print("AMBIGUOUS", key)
+        for row in bare:
+            print(json.dumps(row, ensure_ascii=False))
+        return 2
+    hits = exact or bare or [row for row in rows if key in row["id"]]
     if not hits:
         print("NONE", key)
         return 1
@@ -287,6 +319,16 @@ def selftest() -> int:
         return 1
     if not any(r["id"] == "TW.IND.24" and r["origin"] == "code" for r in book["discovered"]):
         print("[FAIL] industry code parameter")
+        return 1
+    qualified = [row["id"] for row in book["discovered"]]
+    if len(qualified) != len(set(qualified)):
+        print("[FAIL] qualified ids still collide")
+        return 1
+    if not any(row["id"] == "IN-03" and row["kind"] == "different_subject" for row in book["conflicts"]):
+        print("[FAIL] IN-03 not marked ambiguous")
+        return 1
+    if params("IN-03", book) != 2:
+        print("[FAIL] bare IN-03 should be refused")
         return 1
     rc = monitor(book)
     page = (HERE / "output_hub" / "mega" / "system_registry" / "VDF_SYSTEM_MONITOR.html").read_text(encoding="utf-8")
