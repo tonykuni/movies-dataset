@@ -26,7 +26,7 @@ PARTS = (
     ("sentiment", "VDF_MDL028_SentimentStore_v0100.py", ("selftest",)),
     ("verdict", "VDF_MDL016_MacroCrossCheck_v0100.py", ("--selftest",)),
     ("monitor", "VDF_MDL029_SystemManager_v0101.py", ("selftest",)),
-    ("ledger", "VDF_MDL030_LessonLedger_v0100.py", ("selftest",)),
+    ("ledger", "VDF_MDL030_LessonLedger_v0101.py", ("selftest",)),
 )
 
 
@@ -65,7 +65,7 @@ def run() -> int:
     if rc != 0:
         return rc
     monitor = _load("VDF_MDL029_SystemManager_v0101.py")
-    ledger = _load("VDF_MDL030_LessonLedger_v0100.py")
+    ledger = _load("VDF_MDL030_LessonLedger_v0101.py")
     book = monitor.build()
     monitor.monitor(book)
     ledger.compile_lessons()
