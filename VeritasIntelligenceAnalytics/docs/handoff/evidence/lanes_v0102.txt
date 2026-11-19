@@ -36,7 +36,7 @@
   [OK] ① 鏈冊有 lists 鏈:tw_list 等 datahome · etf_list 等 tw_list(前版 CHAINS 同一本,只增) 
   [OK] ② assign:清單步入 lists 鏈;資料鏈每步 after 含 etf_list(hist_2023 · global · etf_universe · etf_revenue · refail);安裝鏈 opencc 與 datahome 不等 {'datahome': [], 'tw_list': ['datahome'], 'etf_list': ['tw_list'], 'opencc': ['datahome'], 'hist_2023': ['datahome', 'etf_list'], 'global': ['datahome', 'etf_list'], 'etf_universe': ['datahome', 'etf_list'], 'etf_revenue': ['revenue_consensus', 'etf_history', 'etf_list'], 'refail': ['etf_revenue', 'fred', 'pkuseg', 'vap_node', 'etf_list']}
   [OK] ③ select --only 沒列清單步 → 自動帶上(tw_list · etf_list · datahome 之後的依賴邊保留) ['tw_list', 'etf_list', 'hist_2023', 'global']
-  [OK] ④ 排程:清單兩步跑完,資料鏈才起跑(hist_2023 · global · etf_universe 起點 ≥ etf_list 終點;etf_list 起點 ≥ tw_list 終點) {'datahome': 0.0, 'tw_list': 0.03, 'opencc': 0.031, 'etf_list': 0.061, 'global': 0.091, 'hist_2023': 0.091, 'etf_universe': 0.091, 'etf_revenue': 0.091, 'refail': 0.122}
+  [OK] ④ 排程:清單兩步跑完,資料鏈才起跑(hist_2023 · global · etf_universe 起點 ≥ etf_list 終點;etf_list 起點 ≥ tw_list 終點) {'datahome': 0.0, 'opencc': 0.031, 'tw_list': 0.031, 'etf_list': 0.061, 'global': 0.091, 'etf_universe': 0.091, 'hist_2023': 0.091, 'etf_revenue': 0.091, 'refail': 0.122}
   [OK] ⑤ 清單步子行程帶 VIA_FROM_VCGC=YES(入口律);其他步環境不動;前版 make_runner / assign / select 已換成本版 
   [OK] ⑥ 真步冊(CGC_MDL125 尾版):tw_list · etf_list 在 datahome 之後且入 lists 鏈;hist_2023 / global / etf_universe / consensus 都等 etf_list;全部入鏈冊 ['datahome', 'tw_list', 'etf_list', 'opencc', 'pkuseg', 'hist_probe']
   [OK] ⑦ 檔頭:加速器橋 · 網路橋在(__future__ 之後)· 不碰 TA-Lib · 不代設同意閘(只給入口標記)· 本檔不直派子行程 
@@ -53,4 +53,4 @@
   [計] 九檢 OK 9 · FAIL 0
   [OK] ⑧ 前版 CGC_MDL134_ParallelLanes_v0101 自測 rc 0 
   [計] CGC_MDL134_ParallelLanes v0102 薄尾 8/8 · PASS
-  [同步] SDD 驗證 RED:X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):67 個,例 ['VDF-WKF015', 'VDF-WKF016', → via-vcgc sdd check
+  [同步] SDD 驗證 RED:X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):66 個,例 ['VDF-WKF015', 'VDF-WKF016', → via-vcgc sdd check
