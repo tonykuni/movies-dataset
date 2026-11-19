@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-19T08:05:00Z",
+ "updated_at": "2026-11-19T08:20:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -273,7 +273,7 @@
   },
   "sdd": {
    "argv": [
-    "CGC_MDL245_SDDValidator",
+    "CGC_MDL245_SDDValidator_v0108",
     "--selftest"
    ],
    "success_marker": "[交接收尾] fail=0",
@@ -281,7 +281,13 @@
    "dependencies": [
     "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
    ],
-   "timeout_seconds": 180
+   "timeout_seconds": 180,
+   "argv_before": [
+    "CGC_MDL245_SDDValidator",
+    "--selftest"
+   ],
+   "updated_at": "2026-11-19T08:20:00Z",
+   "argv_note": "2026-11-19:這一案的成功字樣「[交接收尾] fail=0」是 v0103 那段回歸印的;尾版 v0109 的自測不再跑前版鏈,所以用家族名(= 尾版)跑永遠對不上。成功字樣不改;改成指名還會跑整條前版鏈的 v0108(容器實測 rc 0 · 字樣對上)。v0109 自己的自測另有 C-vcgc-sdd 系列的案。"
   },
   "panorama": {
    "argv": [
@@ -6170,6 +6176,45 @@
    "updated_at": "2026-11-19T08:05:00Z",
    "timeout_seconds": 300,
    "registered_at": "2026-11-19T08:05:00Z"
+  },
+  "C-vcgc-console-v0202": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0202.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] CGC_MDL149_VeritasCentralGovernanceConsole v0202 selftest · 14/14",
+   "scope": "主控台 v0202:overview Dashboard 三欄設定(十五區各在一欄)· 被取代的交接案亮灰 · 其餘原樣轉交 v0201 · TAILAPI",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0202.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0201.py",
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0108.py",
+    "supportive modules/registry/VIA_UI_WorkPlatform_DashboardLayout_v0100.json"
+   ],
+   "version": "v0202",
+   "updated_at": "2026-11-19T08:20:00Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-19T08:20:00Z"
+  },
+  "C-vcgc-statusdisplay-v0108": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0108.py",
+    "--selftest"
+   ],
+   "success_marker": "[selftest] GREEN · 0 敗 · CGC_MDL283_CardMatrixFeedback_v0108",
+   "scope": "卡片矩陣正主 v0108:項目冊要 Dashboard 版面時重排 · 結構不如預期原樣輸出 · 沒帶時同前版 · 前版鏈 v0107…v0100",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0108.py",
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0107.py",
+    "supportive modules/registry/VIA_UI_WorkPlatform_DashboardLayout_v0100.json"
+   ],
+   "version": "v0108",
+   "updated_at": "2026-11-19T08:20:00Z",
+   "timeout_seconds": 1500,
+   "registered_at": "2026-11-19T08:20:00Z"
   }
  },
  "work_items": [
@@ -12117,11 +12162,11 @@
   {
    "id": "VCGC-REQ228:v-matrix-station",
    "requirement": "VCGC-REQ228",
-   "state": "PENDING",
-   "owner": "操作員(裁定)+ AI",
-   "reason": "清點量到:站 V-matrix 的參數 --no-tests 現行 matrix 動詞不收(v0193 起 matrix 換成另一個功能),用法錯誤被當成黃",
-   "next": "裁定站要測哪一個 matrix(舊的冊 × 啟動矩陣,還是現行的 matrix <action>)→ 盤點冊出新版改參數",
-   "updated_at": "2026-11-19T05:45:00Z",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-19 15:39「你決定自動完成」→ 定案:站改測現行 matrix 動詞的 selftest(盤點冊 v0250;原參數與原因留在站上);用法錯誤不再算黃",
+   "next": "—",
+   "updated_at": "2026-11-19T08:20:00Z",
    "registered_at": "2026-11-19T05:45:00Z"
   },
   {
@@ -12191,6 +12236,50 @@
    "next": "合併後主機 pull → via-vcgc sdd(X-NUM 綠)",
    "updated_at": "2026-11-19T08:05:00Z",
    "registered_at": "2026-11-19T08:05:00Z"
+  },
+  {
+   "id": "VCGC-REQ232:C-vcgc-console-v0202",
+   "requirement": "VCGC-REQ232",
+   "case": "C-vcgc-console-v0202",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 14/14(容器;先在暫存夾跑過才落地)",
+   "next": "—",
+   "receipt": "docs/handoff/evidence/C-vcgc-console-v0202.json",
+   "updated_at": "2026-11-19T08:20:00Z",
+   "registered_at": "2026-11-19T08:20:00Z"
+  },
+  {
+   "id": "VCGC-REQ232:C-vcgc-statusdisplay-v0108",
+   "requirement": "VCGC-REQ232",
+   "case": "C-vcgc-statusdisplay-v0108",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測全過(容器;含前版鏈)",
+   "next": "—",
+   "receipt": "docs/handoff/evidence/C-vcgc-statusdisplay-v0108.json",
+   "updated_at": "2026-11-19T08:20:00Z",
+   "registered_at": "2026-11-19T08:20:00Z"
+  },
+  {
+   "id": "VCGC-REQ232:host-run",
+   "requirement": "VCGC-REQ232",
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "Dashboard 只在容器出過頁",
+   "next": "Windows 主機:via-vcgc test(整輪)→ via-vcgc overview;看過頁面貼回卡",
+   "updated_at": "2026-11-19T08:20:00Z",
+   "registered_at": "2026-11-19T08:20:00Z"
+  },
+  {
+   "id": "VCGC-REQ232:red-yellow-next",
+   "requirement": "VCGC-REQ232",
+   "state": "PENDING",
+   "owner": "AI(下一批)",
+   "reason": "VCGC 自己的紅黃還沒清完",
+   "next": "UIEngine 鏈上舊自測對當時的冊 · ToolingInventory 自測不釘 VDF_SSOTSync_v0100 · 流程閘矩陣 / 步驟矩陣兩頁加產生時間 · 參數索引冊重新產生 · 交接閘綠了之後重驗已鎖工作流",
+   "updated_at": "2026-11-19T08:20:00Z",
+   "registered_at": "2026-11-19T08:20:00Z"
   }
  ]
 }
