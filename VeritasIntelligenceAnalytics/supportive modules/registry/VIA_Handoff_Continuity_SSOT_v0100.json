@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-19T05:45:00Z",
+ "updated_at": "2026-11-19T07:20:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -6091,6 +6091,47 @@
    "updated_at": "2026-11-19T05:45:00Z",
    "timeout_seconds": 1500,
    "registered_at": "2026-11-19T05:45:00Z"
+  },
+  "C-vcgc-console-v0201": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0201.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] CGC_MDL149_VeritasCentralGovernanceConsole v0201 selftest · 16/16",
+   "scope": "主控台 v0201:overview 補參數冊 · 介面契約 · 自己的收據三區 · 每個系統一句話(契約冊 summary)· VDB 的頁 · 其餘原樣轉交 v0200 · TAILAPI",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0201.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0200.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0199.py",
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0107.py",
+    "supportive modules/registry/VIA_SystemReceipt_Contract_SSOT_v0105.json",
+    "supportive modules/registry/VIA_Central_Params_SSOT_v0100.json",
+    "supportive modules/registry/VIA_SystemInterface_Contract_SSOT_v0101.json"
+   ],
+   "version": "v0201",
+   "updated_at": "2026-11-19T07:20:00Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-19T07:20:00Z"
+  },
+  "C-vcgc-statusdisplay-v0107": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0107.py",
+    "--selftest"
+   ],
+   "success_marker": "[selftest] GREEN · 0 敗 · CGC_MDL283_CardMatrixFeedback_v0107",
+   "scope": "卡片矩陣正主 v0107:系統卡寫上每個系統的一句話 · 沒帶時同前版 · 跑完還原 · 前版鏈 v0106…v0100",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0107.py",
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0106.py"
+   ],
+   "version": "v0107",
+   "updated_at": "2026-11-19T07:20:00Z",
+   "timeout_seconds": 1500,
+   "registered_at": "2026-11-19T07:20:00Z"
   }
  },
  "work_items": [
@@ -12040,6 +12081,50 @@
    "next": "裁定站要測哪一個 matrix(舊的冊 × 啟動矩陣,還是現行的 matrix <action>)→ 盤點冊出新版改參數",
    "updated_at": "2026-11-19T05:45:00Z",
    "registered_at": "2026-11-19T05:45:00Z"
+  },
+  {
+   "id": "VCGC-REQ230:C-vcgc-console-v0201",
+   "requirement": "VCGC-REQ230",
+   "case": "C-vcgc-console-v0201",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 16/16(容器;先在暫存夾跑過才落地)",
+   "next": "—",
+   "receipt": "docs/handoff/evidence/C-vcgc-console-v0201.json",
+   "updated_at": "2026-11-19T07:20:00Z",
+   "registered_at": "2026-11-19T07:20:00Z"
+  },
+  {
+   "id": "VCGC-REQ230:C-vcgc-statusdisplay-v0107",
+   "requirement": "VCGC-REQ230",
+   "case": "C-vcgc-statusdisplay-v0107",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測全過(容器;含前版鏈)",
+   "next": "—",
+   "receipt": "docs/handoff/evidence/C-vcgc-statusdisplay-v0107.json",
+   "updated_at": "2026-11-19T07:20:00Z",
+   "registered_at": "2026-11-19T07:20:00Z"
+  },
+  {
+   "id": "VCGC-REQ230:peer-summaries",
+   "requirement": "VCGC-REQ230",
+   "state": "PENDING",
+   "owner": "VQG / VAP 各自的線 · 操作員",
+   "reason": "VQG · VAP · VDB 沒有管理器彙總的收據,系統卡是灰",
+   "next": "各系統自己的管理器出一份彙總收據並登進收據契約冊的 summary;VCGC 不代做",
+   "updated_at": "2026-11-19T07:20:00Z",
+   "registered_at": "2026-11-19T07:20:00Z"
+  },
+  {
+   "id": "VCGC-REQ231:ruling",
+   "requirement": "VCGC-REQ231",
+   "state": "PENDING",
+   "owner": "操作員(裁定)",
+   "reason": "66 個 VDF / VRN 工作流代碼沒有中央號;哨兵綠、衝突 0、申請 0;VCGC 指名對方的冊會被邊界閘擋",
+   "next": "裁定甲(VCGC 只發號不改冊)或乙(各系統提申請 + 收件加兩種型別)",
+   "updated_at": "2026-11-19T07:20:00Z",
+   "registered_at": "2026-11-19T07:20:00Z"
   }
  ]
 }
