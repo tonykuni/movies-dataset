@@ -22,6 +22,20 @@ VIA_FROM_VCGC=YES python3 "$V" token > /tmp/token_card.txt 2>&1; cat /tmp/token_
 - 工具換版只經 `via-vcgc tools activate token <CGC_MDL158_…_vNNNN.py> --apply`;不要自己取尾版。
 - 原檔比卡片小(約 40 行內)直接看;不把原文貼回對話。
 
+**工具優先(操作員 2026-11-19 18:17 令 · VCGC-REQ235;律號待登)**:AI 執行任何指令之前,先讀本檔(CLAUDE.md),再看一次省 Token 與支援工具的註冊清單,有現成功能就優先用它,不自己另寫、不整檔讀。
+
+```bash
+E=$(python3 -c "import json;print(json.load(open('VeritasIntelligenceAnalytics/supportive modules/registry/VIA_ToolVersion_Lock_v0100.json',encoding='utf-8'))['token']['path'])")
+python3 "$E" tools    # 註冊清單:鎖冊每一家的現役檔 · VIA-TOOL 號 · 做什麼 · 何時用 · 指令(三數 應列 · 已列 · 略過)
+python3 "$E" verbs    # 省 Token 工具全部動詞一行一個(read · slice · digest · pack · --if-etag · chain · delta · fix · cache …)
+```
+
+- 清單只讀三本冊合成,不另立正本:鎖冊 `VIA_ToolVersion_Lock_v0100.json`(誰現役)× 引擎版本冊 `VIA_EngineVersion_Register_v0100.json`(VIA-TOOL 號)× AI 功能卡 `VIA_AI_FunctionCard_SSOT` 尾版的 `tool_registry`(每家做什麼 · 何時用 · 指令)。工具換版或新增一家,三本一起更新;清單不是全綠就先回報。
+- 每次接手先 `python3 "$E" delta`(只看跟上一輪比新增 / 已解的問題),不讀整張全景。
+- 清單上的工具功能夠用卻自己另寫(讀表、記憶體控管、出網、PDF / OCR、摘要、日誌摘要)= 黃,收據寫理由。
+- CGC_MDL158 每一版都要在本檔明寫動詞表 `VERBS`(主控台舊本體的省 Token 門用字串找 `"read"` 等字;轉接薄尾漏寫 → status 等動詞 rc 2,2026-11-19 實錄)。
+- **工具新版登候選的號(操作員 2026-11-19 授權「授權 0253,之後同類照前例」)**:VCGC 還沒有發 VIA-TOOL 號的動詞前,工具新版登 `role=candidate` 照 REQ187 / REQ188 前例取號——共用 VIA-TOOL 空間(元件冊 + 引擎版本冊)在 本機 ∪ origin/main ∪ 開著的 PR 最大號之上,寫入後 `run CGC_MDL237_NumberingSystem audit` 的 XCODE / DUPREG 必須 0。只限工具候選列;其他號仍只由 VCGC 編號引擎發。
+
 **先讀骨架卡,不讀原始碼。** 本倉的單檔動輒上千行,整檔讀進來很耗 token。大檔(約 >200 行)或整個資料夾一律先走全景代讀:
 
 ```bash
@@ -128,6 +142,7 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
 1. **已裁定(操作員 2026-11-18)**:授權 AI 開兩道同意閘、經 VCGC 安裝閘(`CGC_MDL056_InstallGate` 尾版)安裝套件、推送到 GitHub 的工作分支,不用逐次再問。界線:安裝只走安裝閘(不直接 pip);開閘只在執行那一步的行程裡設、不寫進任何檔;重建或刪除環境、合併 PR、改 .ps1 既有檔不在這次授權內。每批回報寫明用到哪一項。
 2. 「相同功能只留一個」對上「成功只增不減」「仍被引用的舊模組不搬走」:只留一個是實體刪除,還是留檔標停用?(裁定前:不刪。)
 3. 「SSOT 同一」「透過 VCGC 整合套用」對上「互不干涉」:哪幾本是共用正本、誰能寫?VCGC 的工具能不能直接改 VDF / VRN 的檔?(裁定前:VCGC 工具只在該系統自己的範圍內套用,改到別的系統就還原。)
+   **部分裁定(操作員 2026-11-19 18:10 · VCGC-REQ234)**:「VCGC/VRN/VDF/VAP/VCG 是獨立系統都由各自的 SYSTEM MANAGER 控制一切 · 獨立系統該有的功能分給各自系統 · VCGC 現在也是由一個獨立 VCGC SYSTEM MANAGER 管理(`CGC_SystemManager` 尾版;席位冊 tails.VCGC)· 政策管理大家一樣存取 · SSOT 同一冊 · VCGC 進行收尾」。寫入權沒有改:每個系統只寫自己的冊與夾、讀別人的只讀;「VCG」照錄,疑為 VQG,待確認。
 4. 「不擴大範圍」對上同一則裡的「新增功能」「注入全部」:新增算不算外擴?(裁定前:訊息裡點名的才做。)
 5. 連不到桌機時,「自動完成」做到哪裡算完?(裁定前:容器驗證 + 交一行指令,標未實跑。)
 
