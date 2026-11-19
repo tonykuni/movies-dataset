@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-19T15:05:00Z",
+ "updated_at": "2026-11-19T15:30:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -12577,6 +12577,36 @@
    "receipt": "docs/handoff/evidence/ui_engine_v0109.json",
    "updated_at": "2026-11-19T15:05:00Z",
    "registered_at": "2026-11-19T15:05:00Z"
+  },
+  {
+   "id": "VCGC-REQ236:graphify-omniroute",
+   "requirement": "VCGC-REQ236",
+   "state": "BLOCKED",
+   "owner": "操作員",
+   "reason": "操作員 2026-11-19 22:10「先啟動 graphify omniroute」。Graphify:via-vcgc graphify status = ABSENT(容器沒有隔離環境);照倉內 via_graphify_v0101 的做法下載 graphifyy 0.9.100 並核對 wheel SHA-256 相符,安裝那一步被這個工作階段的權限擋下,沒有裝、沒有畫圖。OmniRoute:裝在操作員桌機(%LOCALAPPDATA%\\VIA\\tools\\OmniRoute · 只建不啟動 · 模型金鑰操作員自填),這個工作階段連不到桌機",
+   "next": "桌機:via-vcgc graphify status 看燈 → 缺就貼 via_graphify_v0101 開機行 → via-vcgc graphify run --system VCGC;OmniRoute 照安裝收據上寫的在該夾 npm run start(或桌機連得上時交給 AI 啟動)",
+   "updated_at": "2026-11-19T15:30:00Z",
+   "registered_at": "2026-11-19T15:30:00Z"
+  },
+  {
+   "id": "VCGC-REQ237:transfer-to-managers",
+   "requirement": "VCGC-REQ237",
+   "state": "PENDING",
+   "owner": "AI(分批)",
+   "reason": "還沒動工;差異表已做(容器 · 各管理器 help 自報;轉交前版的舊動詞沒列進去,動工前要逐支補查)",
+   "next": "VCGC 收尾測試在主機過了之後開第一批(功能一覽 Dashboard → VDF / VRN 各自的管理器)",
+   "updated_at": "2026-11-19T15:30:00Z",
+   "registered_at": "2026-11-19T15:30:00Z"
+  },
+  {
+   "id": "VCGC-REQ238:monitor-shortkey",
+   "requirement": "VCGC-REQ238",
+   "state": "BLOCKED",
+   "owner": "操作員 → AI",
+   "reason": "短令 PY 路由冊 v0101 與 via-lanes cmd run 在 PR #680(開著 · 與 main 有衝突);在它上面加鍵會跟那條線撞",
+   "next": "操作員合併 #680 或說怎麼處理 → AI 在路由冊加 vcgc-monitor 鍵",
+   "updated_at": "2026-11-19T15:30:00Z",
+   "registered_at": "2026-11-19T15:30:00Z"
   }
  ]
 }
