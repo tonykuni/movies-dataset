@@ -202,7 +202,7 @@ def build() -> dict:
     if len(qualified) != len(set(qualified)):
         errors.append("duplicate qualified parameter id")
     different = [row["id"] for row in conflicts if row["kind"] == "different_subject"]
-    lamp = "RED" if errors or different else "YELLOW" if conflicts else "GREEN"
+    lamp = "RED" if errors else "YELLOW" if different or conflicts else "GREEN"
     book = {
         "schema": "VDF-SYSTEM-REGISTRY/1.2",
         "manager": "VDF_MDL029_SystemManager_%s" % VER,
@@ -329,6 +329,9 @@ def selftest() -> int:
         return 1
     if params("IN-03", book) != 2:
         print("[FAIL] bare IN-03 should be refused")
+        return 1
+    if params("VDF_DataPlane:IN-03", book) != 0:
+        print("[FAIL] qualified IN-03")
         return 1
     rc = monitor(book)
     page = (HERE / "output_hub" / "mega" / "system_registry" / "VDF_SYSTEM_MONITOR.html").read_text(encoding="utf-8")
