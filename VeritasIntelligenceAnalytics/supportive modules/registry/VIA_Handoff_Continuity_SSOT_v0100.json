@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-18T16:55:00Z",
+ "updated_at": "2026-11-19T05:45:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -6052,6 +6052,45 @@
    "updated_at": "2026-11-18T16:55:00Z",
    "timeout_seconds": 1500,
    "registered_at": "2026-11-18T16:55:00Z"
+  },
+  "C-vcgc-console-v0200": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0200.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] CGC_MDL149_VeritasCentralGovernanceConsole v0200 selftest · 16/16",
+   "scope": "主控台 v0200:overview 同儕自報列(契約冊驅動 · 灰不補綠)· 系統卡與展開區 · synchronizer 現行入口 = 家族尾版 · 其餘原樣轉交 v0199 · TAILAPI",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0200.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0199.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0198.py",
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0106.py",
+    "supportive modules/registry/VIA_SystemReceipt_Contract_SSOT_v0104.json"
+   ],
+   "version": "v0200",
+   "updated_at": "2026-11-19T05:45:00Z",
+   "timeout_seconds": 900,
+   "registered_at": "2026-11-19T05:45:00Z"
+  },
+  "C-vcgc-statusdisplay-v0106": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0106.py",
+    "--selftest"
+   ],
+   "success_marker": "[selftest] GREEN · 0 敗 · CGC_MDL283_CardMatrixFeedback_v0106",
+   "scope": "卡片矩陣正主 v0106:項目冊自帶系統順序與展開區 · 沒帶時同前版 · 跑完還原 · 前版鏈 v0105…v0100",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0106.py",
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0105.py"
+   ],
+   "version": "v0106",
+   "updated_at": "2026-11-19T05:45:00Z",
+   "timeout_seconds": 1500,
+   "registered_at": "2026-11-19T05:45:00Z"
   }
  },
  "work_items": [
@@ -11957,6 +11996,50 @@
    "next": "Windows 主機:via-vcgc test(整輪,灰的站才有燈)→ via-vcgc overview(頁彈出)→ 貼回卡;過了需求才轉 COVERED",
    "updated_at": "2026-11-18T16:55:00Z",
    "registered_at": "2026-11-18T16:55:00Z"
+  },
+  {
+   "id": "VCGC-REQ228:C-vcgc-console-v0200",
+   "requirement": "VCGC-REQ228",
+   "case": "C-vcgc-console-v0200",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 16/16(容器;先在暫存夾跑過才落地)",
+   "next": "—",
+   "receipt": "docs/handoff/evidence/C-vcgc-console-v0200.json",
+   "updated_at": "2026-11-19T05:45:00Z",
+   "registered_at": "2026-11-19T05:45:00Z"
+  },
+  {
+   "id": "VCGC-REQ228:C-vcgc-statusdisplay-v0106",
+   "requirement": "VCGC-REQ228",
+   "case": "C-vcgc-statusdisplay-v0106",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測全過(容器;含前版鏈)",
+   "next": "—",
+   "receipt": "docs/handoff/evidence/C-vcgc-statusdisplay-v0106.json",
+   "updated_at": "2026-11-19T05:45:00Z",
+   "registered_at": "2026-11-19T05:45:00Z"
+  },
+  {
+   "id": "VCGC-REQ228:host-run",
+   "requirement": "VCGC-REQ228",
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "分系統卡片與同步台入口只在容器跑過;收尾條件要主機實跑 + 頁面看過",
+   "next": "Windows 主機:via-vcgc test(整輪)→ via-vcgc overview → via-vcgc synchronizer;貼回卡。過了需求才轉 COVERED",
+   "updated_at": "2026-11-19T05:45:00Z",
+   "registered_at": "2026-11-19T05:45:00Z"
+  },
+  {
+   "id": "VCGC-REQ228:v-matrix-station",
+   "requirement": "VCGC-REQ228",
+   "state": "PENDING",
+   "owner": "操作員(裁定)+ AI",
+   "reason": "清點量到:站 V-matrix 的參數 --no-tests 現行 matrix 動詞不收(v0193 起 matrix 換成另一個功能),用法錯誤被當成黃",
+   "next": "裁定站要測哪一個 matrix(舊的冊 × 啟動矩陣,還是現行的 matrix <action>)→ 盤點冊出新版改參數",
+   "updated_at": "2026-11-19T05:45:00Z",
+   "registered_at": "2026-11-19T05:45:00Z"
   }
  ]
 }
