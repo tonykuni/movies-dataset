@@ -1,7 +1,7 @@
 {
  "schema": "VIA.VCGC.FunctionInventory.v1",
  "version": "v0249",
- "batch": "每個系統一句話 + 六面三區(2026-11-19):+2 站 · +2 工作流步 · +2 交接案",
+ "batch": "每個系統一句話 + 六面三區(2026-11-19):+2 站 · +2 工作流步 · +2 交接案 · +2 站(編號 v0123 · 互監 v0101)",
  "ts": "2026-11-19T07:20:00Z",
  "prior": "VIA_VCGC_FunctionInventory_SSOT_v0248.json",
  "req": "VCGC-REQ230",
@@ -6415,6 +6415,36 @@
    "deps": [],
    "version": "v0107",
    "updated_at": "2026-11-19T07:20:00Z"
+  },
+  {
+   "id": "C-numbering-v0123",
+   "name": "編號引擎 v0123 自測(同儕工作流只發號不改冊:計畫 · 越界負控 · 不收檔名參數 + 前版鏈)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0123.py",
+    "--selftest"
+   ],
+   "timeout": 1500,
+   "deps": [],
+   "version": "v0123",
+   "updated_at": "2026-11-19T08:05:00Z"
+  },
+  {
+   "id": "C-mutual-monitor-v0101",
+   "name": "互監 v0101 自測(契約冊可多系統節 · 前版自測對它那個年代的冊)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_MutualMonitor_v0101.py",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [],
+   "version": "v0101",
+   "updated_at": "2026-11-19T08:05:00Z"
   }
  ],
  "coverage": {
@@ -7809,6 +7839,14 @@
    "C-vcgc-statusdisplay-v0107": {
     "state": "COVERED",
     "by": "C-vcgc-statusdisplay-v0107"
+   },
+   "C-numbering-v0123": {
+    "state": "COVERED",
+    "by": "C-numbering-v0123"
+   },
+   "C-mutual-monitor-v0101": {
+    "state": "COVERED",
+    "by": "C-mutual-monitor-v0101"
    }
   },
   "workflow": {
@@ -8608,5 +8646,5 @@
  "why_v0246": "新頂層動詞 synchronizer:站 V-synchronizer 跑它的 manifest(零寫入);整輪實跑會寫 VIA_Reports,不設站(站只准唯讀),由自測站 C-vcgc-console-v0198 驗。VCGC-WKF044 兩步各對一站。VDF / VRN-2 的同名動詞在它們自己的管理器上,由各自管理器的自測驗(既有席位站)。前版站一字不動。",
  "why_v0247": "新頂層動詞 overview:實跑會寫 VIA_Reports,不另設唯讀站;由自測站 C-vcgc-console-v0199 驗(自測把頁寫到暫存夾)。卡片矩陣正主換版 → 站 C-vcgc-statusdisplay-v0105。VCGC-WKF045 兩步各對一站。前版站一字不動。交接冊新增的兩案(C-vcgc-console-v0199 · C-vcgc-statusdisplay-v0105)各對同名站。",
  "why_v0248": "主控台與卡片矩陣正主各換一版 → 兩個自測站;沒有新動詞(overview · synchronizer 都是既有的)。VCGC-WKF046 兩步各對一站。前版站一字不動。清點量到但這一版沒有改的:站 V-matrix 的參數 --no-tests 已經不被現行的 matrix 動詞接受(v0193 起 matrix 是另一個功能),用法錯誤被當成黃;待裁定後另出一版。",
- "why_v0249": "主控台與卡片矩陣正主各換一版 → 兩個自測站;沒有新動詞。VCGC-WKF047 兩步各對一站。前版站一字不動(V-matrix 仍待裁定)。"
+ "why_v0249": "主控台與卡片矩陣正主各換一版 → 兩個自測站;沒有新動詞。VCGC-WKF047 兩步各對一站。前版站一字不動(V-matrix 仍待裁定)。 同版補兩站:編號引擎 v0123(--peer-workflows)與互監 v0101(本版還沒推送)。"
 }

@@ -7600,15 +7600,15 @@
     "VIA_Numbering_SSOT_v0100.json"
    ],
    "modules": [
-    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0122.py",
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0123.py",
     "supportive modules/registry/CGC_MDL278_NumberGrant_v0100.py"
    ],
-   "evidence": "容器:run CGC_MDL237_NumberingSystem --apply --scope <兩本工作流冊> → 衝突閘 BLOCK(哨兵 GREEN · GitHub 對齊 GREEN · 子系統邊界 RED);run CGC_MDL278_NumberGrant check → 請求 0 份 · 衝突 0",
-   "next": "操作員裁定走哪一條:甲 = 准 VCGC 對 VDF / VRN 的工作流冊「只發號、不改冊」(改衝突閘的邊界判法,發完量一次對方的冊沒被動);乙 = VDF / VRN-2 各自提核號申請,VCGC 的收件加工作流與步兩種型別",
-   "hand": "操作員(裁定)",
+   "evidence": "操作員 2026-11-19 14:45 裁定甲。容器:run CGC_MDL237_NumberingSystem --apply --peer-workflows → 衝突閘放行(哨兵 GREEN · 子系統邊界 GREEN)· WKF +16 · STP +50 · 遺失 0 · 改身分 0 · 重號 0 · 對方兩本冊雜湊前後相同;SDD X-NUM 轉綠",
+   "next": "主機 pull 之後跑 via-vcgc sdd 確認 X-NUM 綠;VDF / VRN-2 各自的線用自己的 SSOTSync 讀到新號(VCGC 不寫它們的冊)。以後它們的工作流冊再加代碼,VCGC 跑同一個動作",
+   "hand": "操作員(桌機實跑)",
    "why_homes": "號只由中央編號發(VIA_Numbering_SSOT);兩條路都不改這一點",
    "ts": "2026-11-19T07:20:00Z",
-   "updated_at": "2026-11-19T07:20:00Z"
+   "updated_at": "2026-11-19T08:05:00Z"
   }
  ],
  "non_requirements": [
@@ -8010,5 +8010,5 @@
  "why_v0257": "新增三條(三個系統各一個 synchronizer;都 PARTIAL:還沒有主機實跑);舊 285 條一字不動;tally 照 requirements 逐筆重數。",
  "why_v0258": "新增一條(VCGC 功能一覽;PARTIAL:還沒有主機實跑);舊 288 條一字不動;tally 照 requirements 逐筆重數。",
  "why_v0259": "新增兩條(都 PARTIAL:還沒有主機實跑 / 還缺四面);舊 289 條一字不動;tally 照 requirements 逐筆重數。",
- "why_v0260": "新增兩條(都 PARTIAL);VCGC-REQ229 只更新歸屬 / 證據 / 下一步(狀態不變);其餘 290 條一字不動;tally 逐筆重數。"
+ "why_v0260": "新增兩條(都 PARTIAL);VCGC-REQ229 只更新歸屬 / 證據 / 下一步(狀態不變);其餘 290 條一字不動;tally 逐筆重數。 VCGC-REQ231 於同版補上裁定甲與發號結果(本版還沒推送)。"
 }

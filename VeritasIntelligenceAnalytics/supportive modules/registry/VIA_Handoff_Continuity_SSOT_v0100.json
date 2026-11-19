@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-19T07:20:00Z",
+ "updated_at": "2026-11-19T08:05:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -6132,6 +6132,44 @@
    "updated_at": "2026-11-19T07:20:00Z",
    "timeout_seconds": 1500,
    "registered_at": "2026-11-19T07:20:00Z"
+  },
+  "C-numbering-v0123": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0123.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL237_NumberingSystem_v0123 本版 12/12 · PASS",
+   "scope": "編號引擎 v0123:--peer-workflows(VDF / VRN 工作流冊只發號不改冊 · 計畫零寫入 · 發號前後量對方的冊 · 越界負控 · 不收檔名參數)+ 前版 v0122 鏈",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0123.py",
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0122.py"
+   ],
+   "version": "v0123",
+   "updated_at": "2026-11-19T08:05:00Z",
+   "timeout_seconds": 1500,
+   "registered_at": "2026-11-19T08:05:00Z"
+  },
+  "C-mutual-monitor-v0101": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_MutualMonitor_v0101.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_MutualMonitor v0101 selftest · 4/4",
+   "scope": "互監 v0101:真契約冊五個核心節都在(可多不可少)· 規則負控 · 前版 v0100 自測對最後一版五系統的冊 9/9",
+   "dependencies": [
+    "docs/handoff/ai/VIA_MutualMonitor_v0101.py",
+    "docs/handoff/ai/VIA_MutualMonitor_v0100.py",
+    "supportive modules/registry/VIA_SystemReceipt_Contract_SSOT_v0105.json",
+    "supportive modules/registry/VIA_SystemReceipt_Contract_SSOT_v0104.json"
+   ],
+   "version": "v0101",
+   "updated_at": "2026-11-19T08:05:00Z",
+   "timeout_seconds": 300,
+   "registered_at": "2026-11-19T08:05:00Z"
   }
  },
  "work_items": [
@@ -11097,12 +11135,16 @@
    "id": "VCGC-REQ209:C-mutual-monitor",
    "requirement": "VCGC-REQ209",
    "case": "C-mutual-monitor",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "owner": "AI",
    "reason": "操作員 2026-11-09 晚六項令 / 今日收尾 → 新引擎 + 冊;等 handoff test 收據 → handoff test rc 0 · marker true",
    "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
    "receipt": "docs/handoff/evidence/C-mutual-monitor.json",
-   "updated_at": "2026-11-09T16:29:14Z"
+   "updated_at": "2026-11-09T16:29:14Z",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ230:C-mutual-monitor-v0101",
+   "superseded_at": "2026-11-19T08:05:00Z",
+   "superseded_why": "v0100 的自測第 ① 項把「systems 正好五個」寫死;收據契約冊 v0105 照操作員裁示加了 VDB 一節之後,這一案對尾版契約冊不可能再過(容器 2026-11-19 實測 8/9)。功能沒有壞(run 照冊有幾節攤幾節)。不改舊案的成功字樣,改記被取代:v0101 的自測用「五個核心節可多不可少」驗真冊,並讓 v0100 的自測對它那個年代的冊(v0104)照跑 9/9。"
   },
   {
    "id": "VCGC-REQ210:C-daily-backup",
@@ -12119,12 +12161,36 @@
   {
    "id": "VCGC-REQ231:ruling",
    "requirement": "VCGC-REQ231",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-19 14:45 裁定甲;編號引擎 v0123 自測 12/12;容器經入口發號 66 個(WKF 16 · STP 50),對方的冊沒動",
+   "next": "—",
+   "updated_at": "2026-11-19T08:05:00Z",
+   "registered_at": "2026-11-19T07:20:00Z",
+   "case": "C-numbering-v0123",
+   "receipt": "docs/handoff/evidence/C-numbering-v0123.json"
+  },
+  {
+   "id": "VCGC-REQ230:C-mutual-monitor-v0101",
+   "requirement": "VCGC-REQ230",
+   "case": "C-mutual-monitor-v0101",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 4/4(容器)",
+   "next": "—",
+   "receipt": "docs/handoff/evidence/C-mutual-monitor-v0101.json",
+   "updated_at": "2026-11-19T08:05:00Z",
+   "registered_at": "2026-11-19T08:05:00Z"
+  },
+  {
+   "id": "VCGC-REQ231:host-run",
+   "requirement": "VCGC-REQ231",
    "state": "PENDING",
-   "owner": "操作員(裁定)",
-   "reason": "66 個 VDF / VRN 工作流代碼沒有中央號;哨兵綠、衝突 0、申請 0;VCGC 指名對方的冊會被邊界閘擋",
-   "next": "裁定甲(VCGC 只發號不改冊)或乙(各系統提申請 + 收件加兩種型別)",
-   "updated_at": "2026-11-19T07:20:00Z",
-   "registered_at": "2026-11-19T07:20:00Z"
+   "owner": "操作員",
+   "reason": "66 個號是容器發的、推在工作分支;主機還沒看到",
+   "next": "合併後主機 pull → via-vcgc sdd(X-NUM 綠)",
+   "updated_at": "2026-11-19T08:05:00Z",
+   "registered_at": "2026-11-19T08:05:00Z"
   }
  ]
 }
