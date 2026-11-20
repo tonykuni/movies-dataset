@@ -98,3 +98,5 @@
 | 2026-11-20T18:26:01Z | SUP_MDL740_NetUnified_v0120.py | 0120 | VIA-SUP-MDL1204 | 3f640f8627e8 | http_json 先位元組自己解碼 | 自測 8/8 · 開閘重抓名單亂碼 892 → 0 |
 | 2026-11-20T18:26:01Z | VIA_VCGC_ApplyRun_v0107.py | 0107 | VIA-CORE-MDL878 | 562fe603528f | go --via-db · 收尾整份備份 | 自測 8/8 · 前版鏈 v0100–v0106 照過 |
 | 2026-11-20T18:34:45Z | VDF_MDL022_SafeParallelLaunch_v0106.py | 0106 | VIA-VDF-MDL299 | 15fa19bd79aa | Codex P1 / P2:run --dry 名稱反解只數不寫 · --via-db 固定 vdf_database(沒有就建) | 自測 11/11 · 交接案收據 · 串測站 GREEN |
+| 2026-11-20T18:36:26Z | VRN_MDL260_SafeParallelLaunch_v0103.py | 0103 | VIA-VRN-MDL357 | 510925ff0148 | Codex P2:自測守參數冊各組 extract_workers = 1 | 自測 9/9 · 交接案收據 · 串測站 GREEN |
+| 2026-11-20T18:36:26Z | VRN_ParamControl_SSOT_v0103.json | 0103 | VRN-B-0046 | a23ee3addc39 | Codex P2:EQUITY / INDUSTRY / DAILY 組 extract_workers auto → 1 | check:分群 EQUITY extract 行程 1 |
