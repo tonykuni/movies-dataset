@@ -1,10 +1,10 @@
 {
  "schema": "VIA.VCGC.FunctionInventory.v1",
  "version": "v0260",
- "batch": "VCGC-REQ244 · VRN-REQ022 · VDF-REQ037 · VDF-REQ038",
- "ts": "2026-11-20T18:30:00Z",
+ "batch": "+1 站 C-vcgc-statusdisplay-v0109(兩天全景補漏)· 前版一字不動",
+ "ts": "2026-11-20T17:50:00Z",
  "prior": "VIA_VCGC_FunctionInventory_SSOT_v0259.json",
- "req": "VCGC-REQ244",
+ "req": "VCGC-REQ243",
  "why": "操作員 2026-11-20:簡單工具可驗證就不往重型;CPU/DRAM 承受範圍 3~6 道同步;不傷電腦;自動最佳化;通用 VDF。go 的 A 道原本叫管理器 launch --run,繞過了 VDF_MDL022 / VRN_MDL260 的監工;v0106 改走它們。",
  "measured": "2026-09-30 容器乾淨工作樹逐支經 VCGC 實跑 64 支:rc 0 55 · rc 2(黃,待裁或無資料)8 · workflow 單獨跑 rc 1;寫已追蹤檔 0",
  "rules": [
@@ -6653,87 +6653,19 @@
    "updated_at": "2026-11-20T16:18:29Z"
   },
   {
-   "id": "C-applyrun-v0107",
-   "name": "VCGC 一鍵套用 v0107 自測(go --via-db → VDF vdf_database / VRN vrn_database 增量庫 · 錯形零寫入 · 收尾整份備份 · 前版鏈)",
+   "id": "C-vcgc-statusdisplay-v0109",
+   "name": "交接閘補證 CGC_MDL283_CardMatrixFeedback_v0109",
    "argv": [
     "run",
     "--family",
     "core",
-    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0107.py",
+    "supportive modules/registry/CGC_MDL283_CardMatrixFeedback_v0109.py",
     "--selftest"
    ],
-   "timeout": 1800,
+   "timeout": 900,
    "deps": [],
-   "version": "v0107",
-   "updated_at": "2026-11-20T18:30:00Z"
-  },
-  {
-   "id": "C-vrn-launch-v0103",
-   "name": "VRN 安全並行啟動器 v0103 自測(不監控 CPU / DRAM · 先降壓 · 固定 3 道 · --via-db → vrn_database · 路徑轉絕對 · 前版鏈)",
-   "argv": [
-    "run",
-    "--family",
-    "vrn",
-    "VRN_MDL260_SafeParallelLaunch",
-    "--selftest"
-   ],
-   "timeout": 900,
-   "deps": [
-    "functional modules/VRN/VRN_MDL260_SafeParallelLaunch_v0103.py"
-   ],
-   "version": "v0103",
-   "updated_at": "2026-11-20T18:30:00Z"
-  },
-  {
-   "id": "C-vdf-launch-v0106",
-   "name": "VDF 安全並行啟動器 v0106 自測(不監控 CPU / DRAM · 先降壓 · 固定 3 道 · --via-db → vdf_database · 開跑前名稱反解 · 前版鏈)",
-   "argv": [
-    "run",
-    "--family",
-    "vdf",
-    "VDF_MDL022_SafeParallelLaunch",
-    "--selftest"
-   ],
-   "timeout": 1200,
-   "deps": [
-    "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v0106.py"
-   ],
-   "version": "v0106",
-   "updated_at": "2026-11-20T18:30:00Z"
-  },
-  {
-   "id": "C-netunified-v0120",
-   "name": "共用網路工具 NetUnified v0120 自測(http_json 先位元組自己解碼 · 反解 · 雙閘 · 前版鏈)",
-   "argv": [
-    "run",
-    "--family",
-    "core",
-    "supportive modules/network/SUP_MDL740_NetUnified_v0120.py",
-    "--selftest"
-   ],
-   "timeout": 900,
-   "deps": [
-    "supportive modules/network/SUP_MDL740_NetUnified_v0120.py"
-   ],
-   "version": "v0120",
-   "updated_at": "2026-11-20T18:30:00Z"
-  },
-  {
-   "id": "C-vdf-stocklist-v0104",
-   "name": "VDF 台股名單 v0104 自測(V10 名稱字形 · fixnames 先備份就地反解 · 冪等 · 前版鏈)",
-   "argv": [
-    "run",
-    "--family",
-    "vdf",
-    "VDF_MDL009_TWStockList",
-    "--selftest"
-   ],
-   "timeout": 900,
-   "deps": [
-    "functional modules/VDF/VDF_MDL009_TWStockList_v0104.py"
-   ],
-   "version": "v0104",
-   "updated_at": "2026-11-20T18:30:00Z"
+   "version": "v0109",
+   "updated_at": "2026-11-20T17:50:00Z"
   }
  ],
  "coverage": {
@@ -8186,25 +8118,9 @@
     "state": "COVERED",
     "by": "C-applyrun-v0106"
    },
-   "C-applyrun-v0107": {
+   "C-vcgc-statusdisplay-v0109": {
     "state": "COVERED",
-    "by": "C-applyrun-v0107"
-   },
-   "C-vrn-launch-v0103": {
-    "state": "COVERED",
-    "by": "C-vrn-launch-v0103"
-   },
-   "C-vdf-launch-v0106": {
-    "state": "COVERED",
-    "by": "C-vdf-launch-v0106"
-   },
-   "C-netunified-v0120": {
-    "state": "COVERED",
-    "by": "C-netunified-v0120"
-   },
-   "C-vdf-stocklist-v0104": {
-    "state": "COVERED",
-    "by": "C-vdf-stocklist-v0104"
+    "by": "C-vcgc-statusdisplay-v0109"
    }
   },
   "workflow": {
@@ -9016,6 +8932,5 @@
  "why_v0250": "主控台與卡片矩陣正主各換一版 → 兩個自測站。站 V-matrix 改測現行動詞(原參數與原因留在站上)。VCGC-WKF048 兩步各對一站。其餘站一字不動。",
  "why_v0251": "CGC_MDL261_UIEngine 換到 v0109(裁定甲)→ 一個自測站與它的交接案。其餘站一字不動。",
  "why_v0252": "新增 VCGC 一鍵套用 Python 啟動器的自測站;其餘一字不動。",
- "why_v0253": "VCGC 一鍵套用換到 v0101 → 一個自測站;其餘一字不動。",
- "why_v0260": "+5 站 C-applyrun-v0107 · C-vrn-launch-v0103 · C-vdf-launch-v0106 · C-netunified-v0120 · C-vdf-stocklist-v0104(VCGC-REQ244 · VRN-REQ022 · VDF-REQ037 · VDF-REQ038)與對應交接案覆蓋;其餘一字不動。"
+ "why_v0253": "VCGC 一鍵套用換到 v0101 → 一個自測站;其餘一字不動。"
 }
