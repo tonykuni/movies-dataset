@@ -65,3 +65,16 @@
 | 2026-11-18T18:40:37Z | SUP_MDL744_NLPApplicationHub_v0103.py | 0103 | VIA-SUP-MDL1203 | 5e18c7bb0d9e | 補編號:先補上 VIA_DownloadsSync v0100 / v0101 缺的模組列之後才編得進去 | 稽核 遺失 0 · 改身分 0 · 重號 0;檔內容沒動 |
 | 2026-11-18T18:47:04Z | VDF_ENG094_ActiveETFActivity_v0103.py | 0103 | VIA-VDF-ENG378 | d2724a42cb89 | 接回「在尾版上替換 analyze,build 用得到」(v0102 漏了,CI 紅);v0102 的同意尺退路保留 | 自測 8/8(含負控)· 本機重跑 CI 的 test_via_etf_activity 23 項全過 |
 | 2026-11-18T18:58:07Z | VDF_ENG232_TWIndexOfficial_v0104.py | 0104 | VIA-VDF-ENG379 | 875ca00e47f9 | 櫃買某個歷史月份來源回空也停在那裡(PR 審查 P1);擷取冊 v0115 的 e232 指到本版 | 自測 11/11(含負控:前版把洞埋住;來源恢復後補回)· 經擷取系統真跑:加權 2024-01 來源回空 → 停在那裡 rc 2,沒有往後寫 |
+| 2026-11-19T17:34:37Z | VDF_ENG054_TWDailyBackfill_v0113.py | 0113 | VIA-VDF-ENG380 | 9876fa83798c | 起日 2021-01-01 往前補:庫內最早一天晚於起日的標的加進計畫(頭帳記已試過,不重試) | 自測 13/13(含負控)· 經 VDF 啟動器真擷取:tw_daily_prices 2021-01-04 → 2026-11-18 · 1425 個交易日 · 2,695,891 列 · rc 0 |
+| 2026-11-19T17:34:37Z | VDF_ENG232_TWIndexOfficial_v0105.py | 0105 | VIA-VDF-ENG386 | af663fea2632 | 帶 --start 時只抓頭段缺口 + 尾段,不再整段重抓 | 自測 10/10 · 真擷取:櫃買 2021-01 → 2022-07 補進 · 加權 2021-02 來源回空照停(同時段個股擷取把官方源壓住;單跑同月 22 列 OK) |
+| 2026-11-19T17:34:37Z | VDF_ENG060_AdjPriceLayer_v0109.py | 0109 | VIA-VDF-ENG383 | 9afeb1f7d563 | 自測不吃本機狀態:暫存夾造 TW + GL 兩個庫 | 自測 6/6(根因 v0107 L254-255 無條件讀 gl) |
+| 2026-11-19T17:34:37Z | VDF_MDL020_DataPlane_v0103.py | 0103 | VIA-VDF-MDL296 | b214aa1275b4 | 自測不吃本機狀態:清單閘用暫存 VIA/HERE,去掉 VIA_VDF_FETCH_HOME | 自測 6/6 |
+| 2026-11-19T17:34:37Z | VDF_ENG057_TradingValueBackfill_v0112.py | 0112 | VIA-VDF-ENG382 | cbfafa37f1ae | 開始抓時不靠 VCGC 尺檔(系統獨立);同意閘用 VDF 自己的判法 | 自測 7/7 · 拿掉 CGC_*.py 的副本照樣跑到同意閘 · 真擷取 tw_trading_daily 自 2021-01-04 起寫入中 |
+| 2026-11-19T17:34:37Z | VDF_ENG078_ActiveETFHoldingsHistory_v0114.py | 0114 | VIA-VDF-ENG385 | d72255813d7f | 開始抓時不靠 VCGC 尺檔(系統獨立) | 自測 7/7 · 獨立演練與正常樹同結果 · 真擷取 rc 0 |
+| 2026-11-19T17:34:37Z | VDF_FetchSystem_SSOT_v0116.json | 0116 | —(VDF 自己的冊;VCGC 邊界閘不代發) | 849a765a95c3 | e054 → v0113 · e232 → v0105 | 點名以外差異 0 · 真擷取用到 |
+| 2026-11-19T17:34:37Z | VDF_FetchSystem_SSOT_v0117.json | 0117 | —(VDF 自己的冊;VCGC 邊界閘不代發) | d3b2865d2893 | e056 → v0109 · e057 → v0112 · e075 → v0108 · e078 → v0114 | 點名以外差異 0 · 真擷取用到 e057 v0112 / e078 |
+| 2026-11-19T17:34:37Z | VDF_FetchGroups_SSOT_v0103.json | 0103 | —(VDF 自己的冊;VCGC 邊界閘不代發) | 6d6e1cb6ba51 | TW_PRICE_VOL 起日帶到 e054;TW_MONTHLY_REV 加 e075 + --since | 計畫列驗過:e054 ['worker','--start','2021-01-01'] · e075 ['run','--since','2021-01-01'] |
+| 2026-11-19T17:34:37Z | VDF_FetchGroups_SSOT_v0104.json | 0104 | —(VDF 自己的冊;VCGC 邊界閘不代發) | bb816d0a4df7 | TW_CHIP 起日帶到 e056 | 計畫列驗過:e056 ['--start','2021-01-01'] |
+| 2026-11-19T17:51:45Z | VDF_ENG232_TWIndexOfficial_v0106.py | 0106 | VIA-VDF-ENG388 | 5e342ab73be9 | 命令列 run 真的走本版分段(PR 688 P1);看實際日子找中間的洞(P2,> 16 天才算洞);一個指數停了不擋另一個 | 自測 12/12(兩個負控)· 命令列乾跑印 v0106 分段 · 真庫副本:加權 3 洞(2021-01-30→2023-01-02 · 2023-04→07 · 2023-12-30 起)· 櫃買 1 洞(2022-07-30→2023-01-02) |
+| 2026-11-19T17:51:45Z | VDF_ENG054_TWDailyBackfill_v0114.py | 0114 | VIA-VDF-ENG387 | c919ab615f8d | 往前補的試過帳:每批以起日抓回來、不在失敗名單才記(PR 688 P1);帳換新檔 | 自測 12/12(負控:v0113 一排計畫就記 3 檔) |
+| 2026-11-19T17:51:45Z | VDF_FetchSystem_SSOT_v0118.json | 0118 | —(VDF 自己的冊;VCGC 邊界閘不代發) | f22064c02b67 | e054 → v0114 · e232 → v0106 | 點名以外差異 0(10 行 = version + 兩列 file / doc) |
