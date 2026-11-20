@@ -35,14 +35,17 @@
   [OK] ① 最後一行:去色碼、跳過空行
   [OK] ② 檔不在 → 空字串(不丟例外)
   [OK] ③ 心跳「還在跑」那行帶最後一行;其他行原樣
-[VIA_VCGC_ApplyRun v0105] 拒跑 · 資料家目錄不存在:/tmp/applyrun_v0105_4u3nf9jh/不存在的夾(零寫入,沒有跑任何步)
+[VIA_VCGC_ApplyRun v0105] 拒跑 · 資料家目錄不存在:/tmp/applyrun_v0105_aox_7uh4/不存在的夾(零寫入,沒有跑任何步)
   [OK] ④ --data-home 不存在 → 拒跑 rc 2 · 零寫入(沒建輸出夾、沒跑任何步、環境沒改)
-[VIA_VCGC_ApplyRun v0105] 資料家目錄 · /tmp/applyrun_v0105_4u3nf9jh/vdf_database
-[VIA_VCGC_ApplyRun v0105] go 總燈 黃 · 貼回包 /tmp/applyrun_v0105_4u3nf9jh/apply/APPLY_GO_latest.txt · 非 Windows,沒放剪貼簿
-  [OK] ⑤ go:先 A 再 G,K(分兩次叫)· 第二次不再同步 · 子行程看得到資料家目錄
-  [OK] ⑥ 兩份貼回包合成一份(A 那份另存 APPLY_A_latest.txt)· 總燈取最差(黃)
+[VIA_VCGC_ApplyRun v0105] 資料家目錄 · /tmp/applyrun_v0105_aox_7uh4/vdf_database
+[VIA_VCGC_ApplyRun v0105] go 總燈 黃 · 貼回包 /tmp/applyrun_v0105_aox_7uh4/apply/APPLY_GO_latest.txt · 非 Windows,沒放剪貼簿
+  [OK] ⑤ go:先 A 再 G,K(分兩次叫)· 第二次不再同步 · 子行程看得到資料家目錄 · 兩輪都不各自出頁 / 開頁
+  [OK] ⑥ 兩輪合成一份貼回包(A 那份另存 APPLY_A_latest.*)· 總燈取最差(黃)
 [VIA_VCGC_ApplyRun v0105] 資料家目錄 · 沒給 --data-home,照各系統自己的設定
-[VIA_VCGC_ApplyRun v0105] go 總燈 綠 · 貼回包 /tmp/applyrun_v0105_4u3nf9jh/apply/APPLY_GO_latest.txt · 非 Windows,沒放剪貼簿
+[VIA_VCGC_ApplyRun v0105] go 總燈 紅 · 貼回包 /tmp/applyrun_v0105_aox_7uh4/apply/APPLY_GO_latest.txt · 非 Windows,沒放剪貼簿
+  [OK] ⑥b Codex P2 情境:A 紅 · G,K 綠 → 最後的 APPLY_latest.json 也是紅、兩輪步驟都在(不被第二輪蓋成綠)· rc 1
+[VIA_VCGC_ApplyRun v0105] 資料家目錄 · 沒給 --data-home,照各系統自己的設定
+[VIA_VCGC_ApplyRun v0105] go 總燈 綠 · 貼回包 /tmp/applyrun_v0105_aox_7uh4/apply/APPLY_GO_latest.txt · 非 Windows,沒放剪貼簿
   [OK] ⑦ --no-activate:只跑 G,K · 會同步
   [OK] ⑧ 已裝進 v0100 模組全域(run_group 叫到的是本版 run_step)
   [OK] ⑨ 加速器橋真的匯入 · 不碰 TA-Lib · 不設也不寫同意閘 · 不含本機路徑
@@ -63,11 +66,11 @@
   [OK] ② R 道照前版(含 SafeRepair 那一步)· 計畫走 run() 用的那一層 · ['R1-token', 'R1-tools', 'R1-handoff', 'R1-delta', 'R1-report', 'R1-ssot', 'R1-numbering', 'R1-sdd', 'R1-saferepair', 'R1-VDF-health']
   [OK] ③ 加速器橋在 · 不碰 TA-Lib · 沒有色碼
 === VIA_VCGC_ApplyRun v0101 薄尾自測(暫存夾;前版鏈另跑)===
-  [OK] ① 包雜湊對 → 解到指定的倉外夾 · 寫標記 · 已解到 /tmp/via_applyrun101_z53op7au/home/v0100
-  [OK] ② 已解過、雜湊相同 → 沿用不重解 · 已解在 /tmp/via_applyrun101_z53op7au/home/v0100(雜湊相同,沿用)
-  [OK] ③ 雜湊不對 → 不解不跑 · 說明原因 · 包的 SHA-256 不對(0cce1f0d0358…,本檔釘 000000000000…),不解不跑
+  [OK] ① 包雜湊對 → 解到指定的倉外夾 · 寫標記 · 已解到 /tmp/via_applyrun101_5driesxp/home/v0100
+  [OK] ② 已解過、雜湊相同 → 沿用不重解 · 已解在 /tmp/via_applyrun101_5driesxp/home/v0100(雜湊相同,沿用)
+  [OK] ③ 雜湊不對 → 不解不跑 · 說明原因 · 包的 SHA-256 不對(d64766f9487e…,本檔釘 000000000000…),不解不跑
   [OK] ④ 包裡有 .. 路徑 → 拒絕、零寫入 · 包裡有不安全的路徑 1 個(例 ../escape.py),不解
-  [OK] ⑤ 包不在 → 照實說 · 包不在:/tmp/via_applyrun101_z53op7au/none.zip(PR 合併後才有)
+  [OK] ⑤ 包不在 → 照實說 · 包不在:/tmp/via_applyrun101_5driesxp/none.zip(PR 合併後才有)
   [OK] ⑥ 真樹計畫:R 道有 R1-saferepair,排在 SDD 之後 · 輸出在倉外 · 說明寫進 notes · ['R1-token', 'R1-tools', 'R1-handoff', 'R1-delta', 'R1-report', 'R1-ssot', 'R1-numbering', 'R1-sdd', 'R1-saferepair', 'R1-VDF-health', 'R1-VDF-engine-matrix', 'R1-VRN-health']
   [OK] ⑦ 加速器橋在 · 不碰 TA-Lib · 沒有色碼 · 前版的公開名稱都拿得到
 === VIA_VCGC_ApplyRun v0104 自測(暫存夾 · 假入口 · 不連網 · 不碰真樹)===
@@ -77,18 +80,18 @@
   [OK] ④ 紅步的判決行有抓到 · 每步一個日誌檔
   [OK] ⑤ VCGC 動詞改了席位冊 → 跑完還原成提交的內容
   [OK] ⑥ fix --apply 改到 VDF 的檔 → 當場還原、燈紅、寫「越界」;VCGC 自己的改動留著 · ['[計] fake fix --apply FROM=YES', '越界:fix 改到別的系統的檔 VeritasIntelligenceAnalytics/functional modules/VDF/VDF_X_v0100.py → 已用 git 還原(結束碼 0)', 'fix --apply 之後新改動 2 檔 · 其中別的系統 1 檔']
-  [OK] ⑦ 一致性:沒有 origin 也照實寫一行(不丟例外) · 本機 master@f2a8c42 · 找不到 origin/main(沒有遠端或沒 fetch 到),沒法比
+  [OK] ⑦ 一致性:沒有 origin 也照實寫一行(不丟例外) · 本機 master@465c21a · 找不到 origin/main(沒有遠端或沒 fetch 到),沒法比
   [OK] ⑧ 同意閘沒開:E07 ~ E09 不排 · R 只乾跑 fix · 沒工具的兩件照實寫灰
-  [OK] ⑨ 道數 1 ~ 3(依記憶體與加速器預算) · 可用記憶體 13.8 GB → 3 道
-  14:44:11  [一致性] 灰 · 這一輪沒有量(--no-sync)
-  14:44:11  [道數] 可用記憶體 13.8 GB → 3 道 · 你指定 1 · 道:S 三個同步台
-  14:44:11  S · VCGC-sync 開始
-  14:44:11  S · VCGC-sync 綠 · 結束碼 0 · 0 秒
-  14:44:11  S · VDF-sync 開始
-  14:44:11  S · VDF-sync 綠 · 結束碼 0 · 0 秒
-  14:44:11  S · VRN-sync 開始
-  14:44:11  S · VRN-sync 紅 · 結束碼 None · 0 秒
-[VIA_VCGC_ApplyRun v0104] 總燈 紅 · 3 步(綠 2 · 黃 0 · 紅 1)· 貼回包 /tmp/via_applyrun_f8s5v9_r/out/APPLY_latest.txt
+  [OK] ⑨ 道數 1 ~ 3(依記憶體與加速器預算) · 可用記憶體 13.5 GB → 3 道
+  14:52:18  [一致性] 灰 · 這一輪沒有量(--no-sync)
+  14:52:18  [道數] 可用記憶體 13.5 GB → 3 道 · 你指定 1 · 道:S 三個同步台
+  14:52:18  S · VCGC-sync 開始
+  14:52:18  S · VCGC-sync 綠 · 結束碼 0 · 0 秒
+  14:52:18  S · VDF-sync 開始
+  14:52:18  S · VDF-sync 綠 · 結束碼 0 · 0 秒
+  14:52:18  S · VRN-sync 開始
+  14:52:18  S · VRN-sync 紅 · 結束碼 None · 0 秒
+[VIA_VCGC_ApplyRun v0104] 總燈 紅 · 3 步(綠 2 · 黃 0 · 紅 1)· 貼回包 /tmp/via_applyrun_v0gvxks7/out/APPLY_latest.txt
 NEXT: 先看紅的 1 步:VRN-sync
   [OK] ⑩ 一輪跑完:收據 + 貼回包(≤ 300 行 · 末行 NEXT:)· 入口不在的步照實紅 · 結束碼照總燈 · ('紅', 1)
   [OK] ⑪ 加速器橋在 · 不碰 TA-Lib · 本檔沒有色碼 · 不設同意閘
@@ -102,5 +105,6 @@ NEXT: 先看紅的 1 步:VRN-sync
   [OK] ⑤ 前版 VIA_VCGC_ApplyRun_v0103 自測照過
 [PASS] VIA_VCGC_ApplyRun v0104 selftest · 5/5
   [OK] ⑩ 前版 VIA_VCGC_ApplyRun_v0104 自測照過
-[PASS] VIA_VCGC_ApplyRun v0105 selftest · 10/10
-[監控] 已在背景起全景監控 pid 7873 · 閒置 1800 秒自停 · 交接閘 RED · 落後 503 提交 · 快照 1169.5h · 未登 2426 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[PASS] VIA_VCGC_ApplyRun v0105 selftest · 11/11
+  [同步] 樹有變 · 註冊冊待同步 {'new': 9, 'changed': 7, 'stale': 0, 'expected': 21082, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 7873 · 觸碰 run --family · 交接閘 RED · 落後 504 提交 · 快照 1169.7h · 未登 2426 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

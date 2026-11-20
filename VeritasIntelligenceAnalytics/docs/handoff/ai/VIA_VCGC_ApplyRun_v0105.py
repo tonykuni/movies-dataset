@@ -11,6 +11,7 @@
   ② `--data-home <夾>`:夾要真的存在才設進本行程的 VIA_DATA_HOME(子行程繼承;不寫任何檔);
      不存在 / 不是資料夾 → 當場拒絕、零寫入(不建 run 夾、不跑任何步)。
   ③ 心跳:每 30 秒那一行後面加上「該步輸出的最後一行」(去色碼、截 120 字),看得出卡在哪。
+  兩輪都不各自出頁;最後把 A 與 G,K 的收據合成一份(總燈取最差)再出一張頁(PR #696 Codex P2:不讓第二輪把 A 的紅蓋成綠)。
 同意閘照 v0104:本檔不設、不寫;要連網擷取由操作員在啟動那一行、只在那個行程裡設。
 用法:python VIA_VCGC_ApplyRun_v0105.py go [--no-activate] [--data-home <夾>] [--lanes N] [--no-open] · --selftest
 """
@@ -31,11 +32,13 @@ except Exception:  # noqa: BLE001
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import importlib.util
+import json
 import os
 import re
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -130,6 +133,30 @@ def to_clipboard(text: str) -> str:
             pass
 
 
+def _read_res(outdir: Path):
+    try:
+        return json.loads((outdir / "APPLY_latest.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def merge_results(a: dict, b: dict) -> dict:
+    """A 道與 G,K 道兩輪收據合成一份:步驟全列、總燈取最差、同步行用 A 那一輪量的(G,K 那輪沒再量)。"""
+    steps = list(a.get("steps") or []) + list(b.get("steps") or [])
+    sync = a.get("sync") or b.get("sync") or {"lamp": "灰", "line": "沒有量"}
+    lamps = [s.get("lamp") for s in steps] + ([b["omniroute"][0]] if b.get("omniroute") else [])
+    lamp = "紅" if any(x in ("紅", "逾時") for x in lamps) else "黃" if ("黃" in lamps or sync.get("lamp") == "黃") else "綠"
+    bad = [s for s in steps if s.get("lamp") in ("紅", "逾時")]
+    nxt = ("先看紅的 %d 步:%s" % (len(bad), " · ".join(s.get("name", "?") for s in bad[:5]))) if bad else (
+        "看黃的步" if lamp == "黃" else "全綠;照實是容器或桌機哪一台跑的要寫明")
+    res = dict(b)
+    res.update(tool=TAG, lamp=lamp, only=list(a.get("only") or []) + list(b.get("only") or []), sync=sync,
+               notes=list(a.get("notes") or []) + list(b.get("notes") or []), steps=steps, next=nxt,
+               lanes_why="A 道 %s · G,K 道 %s" % (a.get("lanes_why", "—"), b.get("lanes_why", "—")),
+               logdir="%s ; %s" % (a.get("logdir", "—"), b.get("logdir", "—")))
+    return res
+
+
 def go_core(via: Path, activate: bool, data_home, want, open_page: bool, runner=None, outdir: Path | None = None) -> int:
     ok, msg = check_data_home(data_home)
     if not ok:
@@ -140,23 +167,33 @@ def go_core(via: Path, activate: bool, data_home, want, open_page: bool, runner=
     print("[%s] 資料家目錄 · %s" % (TAG, msg), flush=True)
     runner = runner or BASE.run
     outdir = outdir or via / "VIA_Reports" / "vcgc" / "apply"
-    rcs, parts = [], []
+    res_a = None
     if activate:
-        rcs.append(runner(via, ["A"], want, open_page=False, outdir=outdir))
-        a_txt = outdir / "APPLY_latest.txt"
-        parts.append(a_txt.read_text(encoding="utf-8", errors="replace") if a_txt.is_file() else "# A 道沒有產出貼回包\n")
-        if a_txt.is_file():
-            shutil.copyfile(a_txt, outdir / "APPLY_A_latest.txt")
-    rcs.append(runner(via, ["G", "K"], want, open_page=open_page, outdir=outdir, do_sync=not activate))
-    gk = outdir / "APPLY_latest.txt"
-    parts.append(gk.read_text(encoding="utf-8", errors="replace") if gk.is_file() else "# G,K 道沒有產出貼回包\n")
-    worst = 1 if 1 in rcs else 2 if 2 in rcs else 0
-    lamp = {0: "綠", 2: "黃", 1: "紅"}[worst]
-    text = "# /go 貼回包 · %s · 總燈 %s · %s\n" % (TAG, lamp, "A 道(啟用)+ G,K 道(驗證)" if activate else "只驗證 G,K 道") + "\n".join(parts)
-    outdir.mkdir(parents=True, exist_ok=True)
+        # 兩輪都不出頁、不開頁;最後把兩輪收據合成一份再出一張頁(不然第二輪會把 A 道的紅蓋掉,頁面看起來是綠的)
+        runner(via, ["A"], want, open_page=False, page=False, outdir=outdir)
+        res_a = _read_res(outdir)
+        for ext in ("txt", "json"):
+            if (outdir / ("APPLY_latest." + ext)).is_file():
+                shutil.copyfile(outdir / ("APPLY_latest." + ext), outdir / ("APPLY_A_latest." + ext))
+    runner(via, ["G", "K"], want, open_page=False, page=False, outdir=outdir, do_sync=not activate)
+    res_b = _read_res(outdir)
+    if res_b is None and res_a is None:
+        print("[%s] go · 兩輪都沒有收據(APPLY_latest.json)· 紅" % TAG, flush=True)
+        return 1
+    if res_a is None and activate:
+        res_a = {"steps": [{"group": "A", "name": "A-收據", "rc": None, "lamp": "紅", "secs": 0, "hits": ["A 道沒有產出收據"]}],
+                 "only": ["A"], "notes": [], "sync": None}
+    res = merge_results(res_a, res_b or {"steps": [{"group": "K", "name": "GK-收據", "rc": None, "lamp": "紅", "secs": 0,
+                                                     "hits": ["G,K 道沒有產出收據"]}], "only": ["G", "K"], "notes": []}) if activate else res_b
+    res["at"] = res.get("at") or time.strftime("%Y-%m-%dT%H:%M:%S")
+    pg = BASE.write_outputs(via, outdir, res, True, open_page)          # 合成後的收據 · 貼回包 · 頁面(一份)
+    lamp = res["lamp"]
+    worst = {"綠": 0, "黃": 2}.get(lamp, 1)
+    body = (outdir / "APPLY_latest.txt").read_text(encoding="utf-8", errors="replace")
+    text = "# /go 貼回包 · %s · 總燈 %s · %s\n" % (TAG, lamp, "A 道(啟用)+ G,K 道(驗證)" if activate else "只驗證 G,K 道") + body
     (outdir / "APPLY_GO_latest.txt").write_text(text, encoding="utf-8")
     clip = to_clipboard(text)
-    print("[%s] go 總燈 %s · 貼回包 %s · %s" % (TAG, lamp, outdir / "APPLY_GO_latest.txt", clip), flush=True)
+    print("[%s] go 總燈 %s · 貼回包 %s · %s%s" % (TAG, lamp, outdir / "APPLY_GO_latest.txt", clip, (" · 頁 %s" % pg) if pg else ""), flush=True)
     return worst
 
 
@@ -193,12 +230,19 @@ def selftest() -> int:
             _PREV_RUN_STEP = saved
         chk("③ 心跳「還在跑」那行帶最後一行;其他行原樣", got == ["A · demo 還在跑 30 秒 · 最後一行:正在處理 MQ-1560", "A · demo 開始"], got)
         calls = []
+        lamp_of = {"A": "黃", "G": "綠"}
 
-        def fake_run(via, only, want, open_page=True, outdir=None, do_sync=True):
-            calls.append((tuple(only), do_sync, os.environ.get("VIA_DATA_HOME")))
+        def fake_run(via, only, want, open_page=True, page=True, outdir=None, do_sync=True):
+            calls.append((tuple(only), do_sync, os.environ.get("VIA_DATA_HOME"), page, open_page))
             outdir.mkdir(parents=True, exist_ok=True)
+            lp = lamp_of["A" if "A" in only else "G"]
+            res = {"tool": "fake", "at": "2026-11-20T00:00:00", "lamp": lp, "only": list(only), "lanes": 1, "lanes_why": "1 道",
+                   "sync": {"lamp": "綠", "line": "fake sync"}, "notes": ["# 道 %s" % ",".join(only)],
+                   "steps": [{"group": only[0], "name": "%s-step" % only[0], "rc": 0 if lp == "綠" else 1, "lamp": lp, "secs": 1, "hits": ["h"]}],
+                   "omniroute": None, "next": "x", "logdir": "L-%s" % only[0]}
+            (outdir / "APPLY_latest.json").write_text(json.dumps(res, ensure_ascii=False), encoding="utf-8")
             (outdir / "APPLY_latest.txt").write_text("# 道 %s\nNEXT: x\n" % ",".join(only), encoding="utf-8")
-            return 2 if "A" in only else 0
+            return 2 if lp == "黃" else 1 if lp == "紅" else 0
         out = t / "apply"
         before_env = os.environ.get("VIA_DATA_HOME")
         rc = go_core(t, True, str(t / "不存在的夾"), None, False, runner=fake_run, outdir=out)
@@ -214,10 +258,18 @@ def selftest() -> int:
             else:
                 os.environ["VIA_DATA_HOME"] = before_env
         txt = (out / "APPLY_GO_latest.txt").read_text(encoding="utf-8")
-        chk("⑤ go:先 A 再 G,K(分兩次叫)· 第二次不再同步 · 子行程看得到資料家目錄",
-            [c[0] for c in calls] == [("A",), ("G", "K")] and calls[1][1] is False and calls[0][2] == str(home.resolve()), calls)
-        chk("⑥ 兩份貼回包合成一份(A 那份另存 APPLY_A_latest.txt)· 總燈取最差(黃)",
-            rc == 2 and "# 道 A" in txt and "# 道 G,K" in txt and "總燈 黃" in txt and (out / "APPLY_A_latest.txt").is_file(), txt[:200])
+        chk("⑤ go:先 A 再 G,K(分兩次叫)· 第二次不再同步 · 子行程看得到資料家目錄 · 兩輪都不各自出頁 / 開頁",
+            [c[0] for c in calls] == [("A",), ("G", "K")] and calls[1][1] is False and calls[0][2] == str(home.resolve())
+            and all(c[3] is False and c[4] is False for c in calls), calls)
+        chk("⑥ 兩輪合成一份貼回包(A 那份另存 APPLY_A_latest.*)· 總燈取最差(黃)",
+            rc == 2 and "# 道 A" in txt and "# 道 G,K" in txt and "總燈 黃" in txt and (out / "APPLY_A_latest.txt").is_file()
+            and (out / "APPLY_A_latest.json").is_file(), txt[:300])
+        lamp_of.update(A="紅", G="綠")
+        calls.clear()
+        rc = go_core(t, True, None, None, False, runner=fake_run, outdir=out)
+        merged = json.loads((out / "APPLY_latest.json").read_text(encoding="utf-8"))
+        chk("⑥b Codex P2 情境:A 紅 · G,K 綠 → 最後的 APPLY_latest.json 也是紅、兩輪步驟都在(不被第二輪蓋成綠)· rc 1",
+            rc == 1 and merged["lamp"] == "紅" and [s["name"] for s in merged["steps"]] == ["A-step", "G-step"], (rc, merged.get("lamp")))
         calls.clear()
         rc = go_core(t, False, None, None, False, runner=fake_run, outdir=out)
         chk("⑦ --no-activate:只跑 G,K · 會同步", [c[0] for c in calls] == [("G", "K")] and calls[0][1] is True and rc == 0, calls)
