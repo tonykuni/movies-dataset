@@ -1,0 +1,25 @@
+{
+ "schema": "VIA.UI.WorkPlatformDashboardLayout.v1",
+ "version": "v0101",
+ "status": "LOCKED",
+ "ordered_by": "操作員 2026-11-19:「U/I 可以接近兩邊邊界近一點,當 DASHBOARD,一頁可彈性地放入不同類型資料型式」「最佳化視覺展現」「你決定自動完成」",
+ "scope": "對內工作平台頁選用的 Dashboard 版面(頁面在 .wrap 上加 .dash 才生效)。只有寬度、格線、比例條、小標;沒選用的頁照模板鎖冊的 1180px。",
+ "base_lock": "VIA_UI_WorkPlatform_TemplateLock_v0101.json",
+ "why_separate": "模板鎖冊不出新版:CGC_MDL283 v0101 的自測釘著「模板鎖尾版是 v0101」,出 v0102 會讓整條前版鏈與釘舊版的交接案一起紅。版面規則另立一冊,模板鎖冊一字不動。",
+ "rule": "本冊的 css 不得出現任何顏色(色碼 · rgb · hsl);顏色只能用模板鎖冊的 token(var(--…));引擎載入時會再驗一次,有顏色就不套。",
+ "classes": {
+  ".wrap.dash": "貼近兩邊",
+  ".sysrow": "系統訊號一排",
+  ".grid3": "功能分欄(窄螢幕收成一欄)",
+  ".mb": "卡片下的紅黃綠灰比例條",
+  ".chip": "資料型式小標",
+  ".focus": "先做這幾件(原因清單;燈 · 類別 · 項數 · 系統區塊 · 原因)",
+  ".fold": "收起來的卡片與回饋",
+  "section.mxw": "矩陣欄寬(項目欄不再被擠成一字一行)"
+ },
+ "css": "/* VIA 對內工作平台 · Dashboard 版面(只有寬度與格線;顏色、字級、燈全部來自 VIA_UI_WorkPlatform_TemplateLock)*/\n.wrap.dash{max-width:none;margin:0;padding:10px 14px 30px}\n.sysrow{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}\n.grid3{display:grid;grid-template-columns:2fr 1.2fr 1.2fr;gap:10px;align-items:start;margin:0 0 10px}\n.grid3>.card{margin:0}\n.grid3 .cards{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));margin:0}\n.grid3 pre{max-height:260px;overflow:auto}\n.mb{display:flex;height:5px;margin-top:4px;border-radius:3px;overflow:hidden}\n.mb i{display:block;height:5px;padding:0;border-radius:0;min-width:0;font-size:0;animation:none}\n.chip{display:inline-block;border:1px solid var(--line);border-radius:10px;padding:0 6px;font-size:10px;font-weight:400;margin-left:6px}\n@media (max-width:1100px){.grid3{grid-template-columns:1fr}}\n/* v0101 · 先做這幾件 · 收合區 · 矩陣欄寬(只有寬度與排列;顏色全來自模板鎖冊)*/\n.focus table{table-layout:fixed;width:100%}\n.focus col.f-l{width:52px}.focus col.f-c{width:64px}.focus col.f-n{width:58px}.focus col.f-s{width:24%}\n.focus summary{cursor:pointer}\n.focus ul{margin:4px 0 2px 18px;padding:0}\n.focus li{margin:1px 0;overflow-wrap:break-word}\n.focus .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}\n.fold>summary{cursor:pointer}\n.fold>h2,.fold .cards{margin-top:8px}\nsection.mxw table{table-layout:fixed;width:100%}\nsection.mxw col.m-l{width:52px}section.mxw col.m-s{width:64px}section.mxw col.m-b{width:104px}section.mxw col.m-i{width:26%}\nsection.mxw col.m-v{width:120px}section.mxw col.m-t{width:150px}section.mxw col.m-c{width:58px}section.mxw col.m-d{width:84px}\nsection.mxw td,section.mxw td.n{white-space:normal;overflow-wrap:break-word;word-break:normal}\nsection.mxw td.mono{overflow-wrap:anywhere}\n",
+ "css_sha256": "554a12c3a5fa07d5f6bd5bdb3fdd99bbc5c2ad173ddbc7bff3d83b786c56aedc",
+ "created_at": "2026-11-21T01:30:00+08:00",
+ "prior": "VIA_UI_WorkPlatform_DashboardLayout_v0100.json",
+ "why_v0101": "操作員 2026-11-21:「VCGC 多整合多彈性,全式卡片或矩陣會昏頭」「優化展現方式」。加三組只有寬度與排列的規則:先做這幾件、收合區、矩陣欄寬(舊版矩陣沒指定欄寬,項目欄被擠成一字一行)。v0100 的規則一字不動照抄在前面;仍不准帶顏色。"
+}
