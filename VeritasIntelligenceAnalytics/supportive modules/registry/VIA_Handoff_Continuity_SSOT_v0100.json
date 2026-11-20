@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-19T15:25:00Z",
+ "updated_at": "2026-11-20T08:20:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -6307,6 +6307,23 @@
    "version": "v0109",
    "updated_at": "2026-11-19T15:05:00Z",
    "registered_at": "2026-11-19T15:05:00Z"
+  },
+  "C-applyrun-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_VCGC_ApplyRun v0100 selftest · 11/11",
+   "scope": "VCGC 一鍵套用 Python 啟動器:判燈 · 自己的入口 · 席位冊還原 · fix 越界還原 · 同意閘 · 貼回包",
+   "dependencies": [
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0100.py"
+   ],
+   "version": "v0100",
+   "timeout_seconds": 600,
+   "updated_at": "2026-11-20T08:20:00Z",
+   "registered_at": "2026-11-20T08:20:00Z"
   }
  },
  "work_items": [
@@ -12627,6 +12644,38 @@
    "next": "備份範圍補上 VIA_NumberBooks/*.jsonl 與倉根的 CLAUDE.md(出備份工具新版或範圍冊新版)→ 重跑 backup / check 要綠;桌機跑 via-vcgc handoff daily 與備份 check",
    "updated_at": "2026-11-19T15:25:00Z",
    "registered_at": "2026-11-19T15:25:00Z"
+  },
+  {
+   "id": "VCGC-REQ239:C-applyrun-v0100",
+   "requirement": "VCGC-REQ239",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 11/11(容器,三次)",
+   "next": "—",
+   "updated_at": "2026-11-20T08:20:00Z",
+   "registered_at": "2026-11-20T08:20:00Z",
+   "case": "C-applyrun-v0100",
+   "receipt": "docs/handoff/evidence/C-applyrun-v0100.json"
+  },
+  {
+   "id": "VCGC-REQ239:host-run",
+   "requirement": "VCGC-REQ239",
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "Python 啟動器只在容器跑過 G 道",
+   "next": "Windows 主機跑 Invoke-VIA-ApplyAll-v0110.ps1 -Only 'G',再 -Only 'R'",
+   "updated_at": "2026-11-20T08:20:00Z",
+   "registered_at": "2026-11-20T08:20:00Z"
+  },
+  {
+   "id": "VCGC-REQ240:approve",
+   "requirement": "VCGC-REQ240",
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "五柱收尾標準是草案",
+   "next": "核定或改",
+   "updated_at": "2026-11-20T08:20:00Z",
+   "registered_at": "2026-11-20T08:20:00Z"
   }
  ]
 }
