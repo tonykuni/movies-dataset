@@ -3,10 +3,10 @@
 """CGC_MDL223_FlowConsistency v0103 — 薄尾:流程閘矩陣頁帶上「產生時間 · 版本」(機讀 meta;前版一字不動,視覺零改)
 操作員 2026-11-20「收尾 VCGC ONLY AND HTML U/I」。VCGC synchronizer(CGC_MDL149 v0198 起)核頁對收據時,
 這張頁沒有收據,只能看頁上有沒有「產生時間」與「版本」(SY_STAMP 時間樣式 + vNNNN);前版的頁兩樣都沒有 → 同步燈黃。
-本版只做一件事:照前版跑完(頁照前版產生),再在頁的 <head> 裡插一行
+本版只做一件事:頁照前版產生,寫頁那一層(本體的 write_page)寫完就在頁的 <head> 裡插一行
   <meta name="via-generated" content="<UTC 時間> · CGC_MDL223_FlowConsistency v0103">
 (已有就換成這一輪的;沒有 <head> 就放最前面)。不加任何樣式、不動任何顏色 / 字體 / 版面(HTML U/I 視覺鎖定)。
-頁沒在這一輪更新(前版沒寫頁)就不蓋章,免得把舊頁冒充成這一輪。其餘公開名稱、main、selftest 全部原樣轉給前版。
+頁沒在這一輪更新(前版沒寫頁)就不蓋章,免得把舊頁冒充成這一輪;前版自測在這一輪重寫了頁也照樣蓋(串測會跑前版自測)。其餘公開名稱、main、selftest 全部原樣轉給前版。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -59,13 +59,19 @@ def __getattr__(name):
 
 def page_path():
     """沿前版鏈找 PAGE(本體才有這個常數)。"""
+    b = page_module()
+    return Path(vars(b)["PAGE"]) if b is not None else None
+
+
+def page_module():
+    """前版鏈上真正寫頁的那一個模組(自己的全域裡有 PAGE 與 write_page;薄尾的 __getattr__ 轉接不算)。"""
     p = PRIOR
     for _ in range(12):
-        if hasattr(p, "PAGE"):
-            return Path(p.PAGE)
-        p = getattr(p, "PRIOR", None) or getattr(p, "_BASE", None)
         if p is None:
-            break
+            return None
+        if "PAGE" in vars(p) and "write_page" in vars(p):
+            return p
+        p = vars(p).get("PRIOR") or vars(p).get("_BASE")
     return None
 
 
@@ -88,6 +94,26 @@ def stamp(path: Path, when: str | None = None) -> bool:
         fh.write(new)
     os.replace(tmp, path)
     return True
+
+
+def _install_stamp():
+    """把蓋章裝在真正寫頁的那一層(主控台的中央頁 / 流程閘直接叫模組函式,不經 main;教訓 LL-20261119-17)。"""
+    b = page_module()
+    if b is None or getattr(vars(b)["write_page"], "_via_stamped", False):
+        return False
+    orig = vars(b)["write_page"]
+
+    def write_page(card, *a, **k):
+        r = orig(card, *a, **k)
+        stamp(Path(vars(b)["PAGE"]))
+        return r
+    write_page._via_stamped = True
+    write_page._via_orig = orig
+    b.write_page = write_page
+    return True
+
+
+_install_stamp()
 
 
 def main() -> int:
@@ -130,8 +156,16 @@ def selftest() -> int:
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑦ 加速器橋真的匯入 · 不碰 TA-Lib · 不含本機路徑", "import VIA_SuperAccel_Module as VIA_ACCEL" in src
         and not re.search(r"^\s*(import|from)\s+talib", src, re.M) and ("C:" + "\\Users") not in src)
+    t0 = time.time()
     rc = PRIOR.selftest()
     chk("⑧ 前版 %s 自測照過" % PRIOR_PATH.stem, rc == 0, "rc %s" % rc)
+    if pg is not None and pg.is_file() and pg.stat().st_mtime >= t0 - 1:
+        stamp(pg)                       # 前版自測這一輪重寫了頁 → 照樣蓋這一輪的章(不然最後寫頁的是沒章的前版)
+    b = page_module()
+    chk("⑩ 寫頁那一層已裝上蓋章(主控台直接叫 write_page 也會蓋)· 原函式保留",
+        b is not None and getattr(vars(b)["write_page"], "_via_stamped", False) and callable(getattr(vars(b)["write_page"], "_via_orig", None)))
+    chk("⑨ 前版自測這一輪若重寫了頁,頁上照樣有本輪的產生時間與版本",
+        pg is None or not pg.is_file() or pg.stat().st_mtime < t0 - 1 or (META_RE.search(pg.read_text(encoding="utf-8")) is not None))
     good = all(ok)
     print("[計] %s %s 本版 %d/%d · %s" % (_STEM, VERSION, sum(ok), len(ok), "PASS" if good else "FAIL"))
     return 0 if good else 1
