@@ -32,6 +32,7 @@ python3 "$E" verbs    # 省 Token 工具全部動詞一行一個(read · slice �
 
 - 清單只讀三本冊合成,不另立正本:鎖冊 `VIA_ToolVersion_Lock_v0100.json`(誰現役)× 引擎版本冊 `VIA_EngineVersion_Register_v0100.json`(VIA-TOOL 號)× AI 功能卡 `VIA_AI_FunctionCard_SSOT` 尾版的 `tool_registry`(每家做什麼 · 何時用 · 指令)。工具換版或新增一家,三本一起更新;清單不是全綠就先回報。
 - 每次接手先 `python3 "$E" delta`(只看跟上一輪比新增 / 已解的問題),不讀整張全景。
+- **合併 / 去重 / 精簡 / 刪舊版(2026-11-20 · VCGC-REQ239)**:動手前 `python3 "$E" clones`(找重複函式;「跨系統只記不併」的不併,獨立律)與 `python3 "$E" baseline`(鎖住介面);做完 `python3 "$E" sigdiff` 必須綠(少一個名稱或參數 = 紅,不得收尾)。找死碼用 `orphans`(只是候選,刪前照「刪舊版先證明」)。推送、打包或交給任何外部工具前跑 `python3 "$E" secrets`(只印遮罩;紅 = 先停)。
 - 清單上的工具功能夠用卻自己另寫(讀表、記憶體控管、出網、PDF / OCR、摘要、日誌摘要)= 黃,收據寫理由。
 - CGC_MDL158 每一版都要在本檔明寫動詞表 `VERBS`(主控台舊本體的省 Token 門用字串找 `"read"` 等字;轉接薄尾漏寫 → status 等動詞 rc 2,2026-11-19 實錄)。
 - **工具新版登候選的號(操作員 2026-11-19 授權「授權 0253,之後同類照前例」)**:VCGC 還沒有發 VIA-TOOL 號的動詞前,工具新版登 `role=candidate` 照 REQ187 / REQ188 前例取號——共用 VIA-TOOL 空間(元件冊 + 引擎版本冊)在 本機 ∪ origin/main ∪ 開著的 PR 最大號之上,寫入後 `run CGC_MDL237_NumberingSystem audit` 的 XCODE / DUPREG 必須 0。只限工具候選列;其他號仍只由 VCGC 編號引擎發。
