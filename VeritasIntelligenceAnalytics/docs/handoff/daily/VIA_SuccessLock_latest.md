@@ -91,3 +91,9 @@
 | 2026-11-20T16:22:49Z | VIA_VCGC_ApplyRun_v0106.py | 0106 | VIA-CORE-MDL877 | 384c4d29fee8 | go 的 A 道改走 VDF_MDL022 / VRN_MDL260 安全並行啟動器(3~6 道 auto · 監工過熱減道 / 暫停)· --vrn-source | 自測 9/9 · 前版鏈 v0100–v0105 · 兩啟動器 check 實跑各自 3 道 · 交接案 C-applyrun-v0106 rc 0 |
 | 2026-11-20T17:22:26Z | CGC_MDL283_CardMatrixFeedback_v0109.py | 0109 | VIA-VCGC-MDL1681 | b58049ad0e0d | 展現精簡:先做這幾件(原因歸組)· 其餘卡片收合 · 矩陣欄寬 · 整頁下載 MD | 自測全過(含 v0108)· 瀏覽器實按下載 MD:現況 3351 列 · 功能一覽 1273 列全在 · 點卡片照樣篩矩陣 · 頁面零錯誤 |
 | 2026-11-20T17:22:26Z | VIA_UI_WorkPlatform_DashboardLayout_v0101.json | 0101 | — | ef5734e7f866 | 版面冊:先做這幾件 · 收合區 · 矩陣欄寬(只有寬度;不帶顏色) | v0100 規則照抄在前 · 無色碼 · 雜湊相符 · 兩頁實套 |
+| 2026-11-20T18:26:01Z | VRN_MDL260_SafeParallelLaunch_v0103.py | 0103 | VIA-VRN-MDL357 | 4f21dfe8448b | 跑的途中不監控 CPU / DRAM · 先降壓 · 固定 3 道 · 路徑轉絕對 · --via-db → vrn_database 增量庫 | 自測 8/8 · 開閘整輪 202 秒 · 降壓 0 次 · 第二輪增量 GREEN 零追加 180 秒 |
+| 2026-11-20T18:26:01Z | VRN_ParamControl_SSOT_v0103.json | 0103 |  | 7c147cc7cde8 | VRN 參數冊:slots 3/3 · extract_workers 1 | check 綠 · 同時道數 3(夾在 3~3) |
+| 2026-11-20T18:26:01Z | VDF_MDL022_SafeParallelLaunch_v0106.py | 0106 | VIA-VDF-MDL299 | b70d4ab776aa | 不監控 · 固定 3 道 · --via-db → vdf_database · 開跑前名稱反解 | 自測 9/9 · 模擬併入 #690 v0105 照過 · check / 橋閘 GREEN |
+| 2026-11-20T18:26:01Z | VDF_MDL009_TWStockList_v0104.py | 0104 | VIA-VDF-MDL298 | 5cdadde36a1f | V10 名稱字形 · fixnames 先備份就地反解 | 自測 13/13 · 開閘實跑 1987 列亂碼 0 · fixnames 庫 2679 列 / 檔 1786 格 剩 0 · 再跑零改動 |
+| 2026-11-20T18:26:01Z | SUP_MDL740_NetUnified_v0120.py | 0120 | VIA-SUP-MDL1204 | 3f640f8627e8 | http_json 先位元組自己解碼 | 自測 8/8 · 開閘重抓名單亂碼 892 → 0 |
+| 2026-11-20T18:26:01Z | VIA_VCGC_ApplyRun_v0107.py | 0107 | VIA-CORE-MDL878 | 562fe603528f | go --via-db · 收尾整份備份 | 自測 8/8 · 前版鏈 v0100–v0106 照過 |
