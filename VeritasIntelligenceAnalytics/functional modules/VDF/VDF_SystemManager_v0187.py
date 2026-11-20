@@ -5,7 +5,8 @@
 操作員 2026-11-20:「給我一個快但安全的擷取指令用 PY 寫用短指令啟動」。
   via-vdf yf-global          = py VDF_MDL022_SafeParallelLaunch 尾版 yf-global(先全面檢查 → 降壓 → 3~5 道 → 合併 → 覆蓋)
   yf-global [參數…]          參數原樣轉交(--slots · --start · --data-home · --dry · --force …;見啟動器說明)
-其餘動詞一律交給 v0186(參數 / rc 不變;只增不減)。不設同意閘、不安裝、本檔不出網;子行程照前版的子行程環境。
+其餘動詞一律交給 v0186(參數 / rc 不變;只增不減)。不設同意閘、不安裝、本檔不出網;子行程照前版的子行程環境
+(v0186 child_env:VIA_NO_OPEN=1;VDF 是獨立系統,不多設 VIA_FROM_VCGC 等他系統入口旗標)。
 自測:python VDF_SystemManager_v0187.py --selftest
 """
 from __future__ import annotations
@@ -87,10 +88,23 @@ def launcher() -> Path:
     return max(hits, key=_vnum)
 
 
+PEER_FLAGS = ("VIA_FROM_VCGC", "VIA_FROM_VDFSM", "VIA_FROM_VRN", "VIA_VCGC_PUSH")   # 他系統入口旗標:子行程不多設(同 v0186 自測 ⑦)
+
+
 def child_env() -> dict:
-    fn = getattr(PRIOR, "sm_child_env", None)
+    """子行程環境沿用前版鏈:v0186 child_env(VIA_NO_OPEN=1 · 只補本系統自己的入口旗標)> sm_child_env > 原環境。"""
     import os
-    return fn() if callable(fn) else dict(os.environ)
+    for name in ("child_env", "sm_child_env"):
+        fn = getattr(PRIOR, name, None)
+        if callable(fn):
+            return fn()
+    return dict(os.environ)
+
+
+def added_peer_flags(env: dict) -> list:
+    import os
+    own = (getattr(PRIOR, "SM_CONFIG", None) or {}).get("own_entry_flag")
+    return [k for k in PEER_FLAGS if k in env and k not in os.environ and k != own]
 
 
 def yf_global(args: list, run=subprocess.run) -> int:
@@ -123,10 +137,12 @@ def selftest() -> int:
     ck("S1 yf-global 轉給啟動器尾版、參數原樣、rc 原樣", rc == 2 and seen["cmd"][2] == str(launcher()) and seen["cmd"][3:] == ["yf-global", "--dry", "--slots", "4"]
        and launcher().name.startswith(LAUNCH_FAMILY), seen.get("cmd"))
     ck("S2 啟動器取尾版(不釘死版號)", _vnum(launcher()) == max(_vnum(p) for p in HERE.glob(LAUNCH_FAMILY + "_v*.py")))
-    ck("S3 子行程環境用前版的(sm_child_env)· 不在本檔寫同意閘", isinstance(seen.get("env"), dict)
+    ck("S3 子行程環境用前版的(child_env)· 不在本檔寫同意閘", isinstance(seen.get("env"), dict)
        and "_CONSENT\"] " + "=" not in Path(__file__).read_text(encoding="utf-8"))
     text = Path(__file__).read_text(encoding="utf-8")
     ck("S4 檔面:加速器橋 · 網路橋 · 沒有本機路徑", "[VIA:ACCEL-BRIDGE:v0100]" in text and "[VIA:NET-BRIDGE:v0100]" in text and "\\" + "Users" not in text)
+    env = child_env()
+    ck("S6 yf-global 子行程環境:VIA_NO_OPEN=1 · 不多設他系統入口旗標(VIA_FROM_VCGC 等)", env.get("VIA_NO_OPEN") == "1" and not added_peer_flags(env), added_peer_flags(env))
     pr = subprocess.run([sys.executable, "-B", str(PRIOR_PATH), "--selftest"], capture_output=True, text=True, encoding="utf-8", errors="replace")
     ck(f"S5 前版 {PRIOR_PATH.name} 自測照過(另起行程)", pr.returncode == 0, (pr.stdout or "")[-240:])
     n = sum(ok)
