@@ -4,7 +4,7 @@
  "version": "v0103",
  "prior": "VRN_ParamControl_SSOT_v0102.json",
  "ts": "2026-11-20T17:35:22Z",
- "why": "操作員 2026-11-20 桌機實跑後:「為何跑這麼久 · 請改為不監控 CPU/DRAM · 一開始降壓力後統一分三步跑」。道數固定 3(不再依 CPU/DRAM 增減);extract 行程固定 1,總並行約 3。前版 v0102 一字不動。",
+ "why": "操作員 2026-11-20 桌機實跑後:「為何跑這麼久 · 請改為不監控 CPU/DRAM · 一開始降壓力後統一分三步跑」。道數固定 3(不再依 CPU/DRAM 增減);extract 行程固定 1,總並行約 3。前版 v0102 一字不動。 組覆寫(EQUITY / INDUSTRY / DAILY 等)的 extract_workers 也改 1,否則組值 auto 蓋過 run_params 的 1(PR #701 Codex P2)。",
  "how_to_edit": [
   "只改值,不改鍵名;改完跑 `python VRN_MDL260_SafeParallelLaunch_v0102.py params` 看生效表(錯鍵 / 錯型別會點名,不會默默吃掉)。",
   "先後:指令列旗標 > file_overrides > input_groups[組].params > run_params > 程式內建預設。",
@@ -54,7 +54,7 @@
    },
    "params": {
     "enabled": true,
-    "extract_workers": "auto",
+    "extract_workers": 1,
     "extract_timeout_s": 7200
    }
   },
@@ -76,7 +76,7 @@
    },
    "params": {
     "enabled": true,
-    "extract_workers": "auto",
+    "extract_workers": 1,
     "extract_timeout_s": 3600
    }
   },
@@ -102,7 +102,7 @@
    },
    "params": {
     "enabled": true,
-    "extract_workers": "auto",
+    "extract_workers": 1,
     "extract_timeout_s": 3600
    }
   },

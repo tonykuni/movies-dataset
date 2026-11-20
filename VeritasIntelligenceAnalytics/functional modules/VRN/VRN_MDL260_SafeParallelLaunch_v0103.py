@@ -211,6 +211,14 @@ def selftest() -> int:
         (Path(td) / "via_database").mkdir()
         n1 = output_dir_env(["run", "--via-db", str(Path(td) / "via_database")], e1)
         n2 = output_dir_env(["run", "--output-dir", str(Path(td) / "沒有" / "out")], e2)
+        try:
+            import json as _js
+            bk = max(HERE.glob("VRN_ParamControl_SSOT_v*.json"), key=_vnum)
+            _b = _js.loads(bk.read_text(encoding="utf-8"))
+            ew = [_b.get("run_params", {}).get("extract_workers")] + [g.get("params", {}).get("extract_workers") for g in _b.get("input_groups", []) if "extract_workers" in g.get("params", {})]
+        except Exception as exc:  # noqa: BLE001
+            bk, ew = None, [repr(exc)]
+        ck("⑨ 參數冊尾版 extract_workers:run 與每個組覆寫都是 1(組值 auto 會蓋過 run 的 1,PR #701 Codex P2)", bk is not None and ew and all(x == 1 for x in ew), (bk and bk.name, ew))
         ck("⑧ --via-db → VRN2_OUTPUT_DIR = <via_database>/vrn_database(建夾);上一層不存在 → 不用、零建夾", e1.get("VRN2_OUTPUT_DIR") == str((Path(td) / "via_database" / "vrn_database").resolve())
            and (Path(td) / "via_database" / "vrn_database").is_dir() and not e2 and not (Path(td) / "沒有").exists(), (n1, n2))
     good = all(ok)
