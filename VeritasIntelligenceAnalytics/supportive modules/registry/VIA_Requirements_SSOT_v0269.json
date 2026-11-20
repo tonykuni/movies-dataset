@@ -1,7 +1,7 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0269",
- "batch": "+VRN-REQ022 · VDF-REQ037 · VDF-REQ038 · VCGC-REQ244(前版 v0268)",
+ "batch": "+VRN-REQ022 · VDF-REQ036 · VDF-REQ037 · VCGC-REQ244(前版 v0268)",
  "ts": "2026-11-20T18:10:00Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
@@ -7862,10 +7862,10 @@
    "updated_at": "2026-11-20T18:10:00Z"
   },
   {
-   "code": "VDF-REQ037",
+   "code": "VDF-REQ036",
    "subsystem": "VDF",
    "topic": "VDF 安全並行啟動器:跑的途中不監控 CPU / DRAM · 開跑前降壓等靜 · 固定 3 道",
-   "requirement": "操作員 2026-11-20 原文:「為何跑這麼久請改為不監控cpu/dram  一開始降壓力後統一分三不跑即可」(桌機 go 實錄:VRN 子行程最多 9 支 · DRAM 可用掉到 0.5 GB · 監工判過熱一直 1 道並反覆暫停,暫停不釋放記憶體 · 約一小時無進度被中斷);同日續令:「vrn開閘授權不要修一半全部都要跑出來自測字修正輸出要驗證無誤」。 操作員同則指明 VDF 通用。→ VDF_MDL022_SafeParallelLaunch v0106 薄尾(v0105 號已被開著的 PR #690 占用):前版鏈每個監工的壓力檢查換成空的;鏈上持有 MIN_SLOTS / MAX_SLOTS 的模組一律 3 / 3(含 #690 v0105 的 yf-global 3~5);開跑前降壓照舊;路徑旗標轉絕對路徑。",
+   "requirement": "操作員 2026-11-20 原文:「為何跑這麼久請改為不監控cpu/dram  一開始降壓力後統一分三不跑即可」(桌機 go 實錄:VRN 子行程最多 9 支 · DRAM 可用掉到 0.5 GB · 監工判過熱一直 1 道並反覆暫停,暫停不釋放記憶體 · 約一小時無進度被中斷);同日續令:「vrn開閘授權不要修一半全部都要跑出來自測字修正輸出要驗證無誤」。 操作員同則指明 VDF 通用。→ VDF_MDL022_SafeParallelLaunch v0106 薄尾(v0105 號已被開著的 PR #690 占用):前版鏈每個監工的壓力檢查換成空的;鏈上持有 MIN_SLOTS / MAX_SLOTS 的模組一律 3 / 3(含 #690 v0105 的 yf-global 3~5);開跑前降壓照舊;路徑旗標轉絕對路徑。 號說明:VDF-REQ036 由編號引擎依序核發(本線先合併者為準);開著的 PR #690 也用了 VDF-REQ036(yf-global),兩邊後合者改發。",
    "status": "PARTIAL",
    "homes": [
     "VIA_Handoff_Continuity_SSOT_v0100.json"
@@ -7881,7 +7881,7 @@
    "updated_at": "2026-11-20T17:45:00Z"
   },
   {
-   "code": "VDF-REQ038",
+   "code": "VDF-REQ037",
    "subsystem": "VDF",
    "topic": "台股名單名稱亂碼:網路工具 http_json 自己解碼 · 名單驗收 V10 名稱字形 · 已入庫亂碼就地反解(fixnames · 先備份 · 冪等)",
    "requirement": "操作員 2026-11-20 原文:「vrn開閘授權不要修一半全部都要跑出來自測字修正輸出要驗證無誤」「VDF/VRN一定要輸出且要做到增量維護不重工 <via_database>」「收尾要注射備份全部 一定要輸出而且驗證 速度是否夠快夠安全」。 容器開閘整輪實錄:VRN ENG049 矩陣名稱「жҢҜжӣң」(6143 振曜);追到 VDF_MDL009 名單 1986 檔有 892 檔上櫃名稱亂碼、驗收卻 GREEN,DuckDB 三天快照各 893 列亂碼。根因:SUP_MDL740 http_json → AegisNexus.fetch_json → resp.text,沒帶 charset 時 requests 猜成 ptcp154 / cp1256。→ SUP_MDL740_NetUnified v0120(http_json 先位元組、json.loads 位元組 / smart_decode;拿不到位元組才退前版並逐字串反解)· VDF_MDL009_TWStockList v0104(讀前份名單時反解名稱 · V10 名稱字形有一列亂碼 = RED 不寫入 · fixnames [--apply]:DuckDB 名單表 + 每日 parquet + csv 就地反解,位元組已丟的以最新正字名單同代號補,先整份備份、寫後再驗、再跑零改動)· VDF_MDL022 v0106 run 開跑前自動 fixnames。",
