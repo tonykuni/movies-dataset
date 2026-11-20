@@ -4,7 +4,7 @@
 v0133→v0134(批552:㉜ 的根因——夾具檔案從來沒被建立過)
   操作員開了 VIA_OCR_TRACE=1(兩層眼罩都拆掉之後)拿到完整訊息:
       FileNotFoundError: [Errno 2] No such file or directory:
-      'C:\...\Temp\tmpya5lal06\任意位置\操作員隨手放的夾\scan65.pdf'
+      'C:\\...\\Temp\tmpya5lal06\\任意位置\\操作員隨手放的夾\\scan65.pdf'
   缺的是 **`far/scan65.pdf`** —— 而那個檔**從來沒被建立過**。夾具只存了 `scan65.png`;
   v0133 之前的註解裡我自己還寫著「far 沒有 scan65.pdf,只有 scan65.png」,㉜/㉞/㉟ 卻照樣拿它當輸入。
   本境為什麼一直綠:這裡一個 OCR 後端都沒有,`ocr_page1` 在碰到檔案**之前**就 SKIP 了——
@@ -21,7 +21,7 @@ v0132→v0133(批551:眼罩有兩層,第二層也是我自己蒙的)
   **開關要一路開到底,不能只開一半**(LL105)。㉜ 本身仍未解。
 v0131→v0132(批550:㉜ 查不下去的原因是我自己把診斷資訊截掉了)
   ㉜ 追了三批,每次拿到的都是同一句 `FileNotFoundError:[Errno 2] No such file or direct` ——
-  因為 tag 用 `str(exc)[:60]`,而 `[Errno 2] No such file or directory: 'C:\...'`
+  因為 tag 用 `str(exc)[:60]`,而 `[Errno 2] No such file or directory: 'C:\\...'`
   **缺的那個檔名剛好在第 60 字之後**,永遠印不出來。我三次猜根因,卻沒發現自己戴著眼罩。
   v0132:① `VIA_OCR_TRACE=1` 時給完整訊息 + 完整 traceback(預設行為零變更,tag 不爆版);
   ② `_page1_pdf` 本來在 try 之外,它炸了 tag 就分不出「切頁失敗」還是「派工失敗」——包起來各給各的字樣;

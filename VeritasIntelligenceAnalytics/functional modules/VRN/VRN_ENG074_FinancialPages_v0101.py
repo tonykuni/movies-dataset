@@ -38,7 +38,7 @@ except Exception:
 
 def _resolve_db(db: Path | None) -> Path | None:
     """批244:庫路徑誠實解析(工作站雙 clone 債——mega 庫可能在
-    Downloads\movies-dataset 替根)。顯式 db=信任直用(selftest 建新
+    Downloads\\movies-dataset 替根)。顯式 db=信任直用(selftest 建新
     庫);預設=主路徑→替根探測;全缺=None 誠實停 rc2 不 traceback。"""
     if db is not None:
         return Path(db)

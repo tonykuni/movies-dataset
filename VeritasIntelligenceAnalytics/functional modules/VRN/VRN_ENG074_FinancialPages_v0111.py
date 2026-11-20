@@ -217,7 +217,7 @@ _TTM_RX = __import__("re").compile(r"^(TTM|LTM)$", __import__("re").I)
 
 
 def _yr4(y: str) -> int:
-    """兩碼年補世紀;民國 3 碼(1[01]\d)轉西元。"""
+    """兩碼年補世紀;民國 3 碼(1[01]\\d)轉西元。"""
     n = int(y)
     if len(y) == 4:
         return n + 1911 if 100 <= n <= 199 else n

@@ -6,7 +6,7 @@ vrn_content_store_v0104 — 對帳綠燈內容落庫 via.duckdb(OneDrive 備份�
 v0103→v0104(操作員令:OneDrive 裡面的備份檔全數刪除):
   新增 --purge-onedrive:刪前強制完整性閘——本機正典與 OneDrive 舊庫
   「表列+逐表行數」全同才放行;dry-run 先列刪除清單(via.duckdb 本體+
-  同夾 *.bak/*.pre_*);--commit 才刪。範圍嚴限 VeritasDataForge\data 夾
+  同夾 *.bak/*.pre_*);--commit 才刪。範圍嚴限 VeritasDataForge\\data 夾
   之 via.duckdb 家族(更大範圍清理需另令明示)。此為操作員明令之刪除,
   完整性閘+雙段確認為紅線護欄。
 v0102→v0103(操作員令 2026-08-12:儲存不落 OneDrive):

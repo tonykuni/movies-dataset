@@ -1047,7 +1047,7 @@ def _subject_spans(text: str) -> list:
 
 
 def _safe_broker_hit(text: str, E=None, veto: set | None = None) -> tuple:
-    """券商正典:CJK 別名子字串;拉丁別名詞界;≤3 字拉丁(gs/ms/mq/ubs)大寫獨立詞,或小寫但緊鄰檔名黏接字([_\-0-9]);
+    """券商正典:CJK 別名子字串;拉丁別名詞界;≤3 字拉丁(gs/ms/mq/ubs)大寫獨立詞,或小寫但緊鄰檔名黏接字([_\\-0-9]);
     泛用英文字要跟 securities/invest。最長別名優先。
     批1657 裁定 #5:包內三守衛入正本——① 標的段先排除(跨距內命中不算;與批537 veto 疊加)
     ② 小寫短碼僅限檔名黏接層(包內全 re.I,正本收窄:「Ms. Wang」散文不中)③ 最長優先照舊。
