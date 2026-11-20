@@ -10,7 +10,8 @@
      開跑前的「降壓 → 等靜」照舊(前版 calm_env / lower_priority 一字不動)。
   ② 道數固定 3:前版鏈上自己持有 MIN_SLOTS / MAX_SLOTS 的模組一律設成 3 / 3(auto 也只會得到 3)。
 號 v0105 已被開著的 PR #690(yf-global)占用,本版取 v0106;前版以 glob 取「比本檔小的最大版」,#690 併入後自動接它。
-  ③ --via-db <via_database>:資料家 = <via_database>/vdf_database;run 開跑前先叫 VDF_MDL009 尾版 fixnames --apply(已入庫亂碼名稱就地反解 · 先整份備份 · 寫後再驗 · 冪等)。
+  ③ --via-db <via_database>:資料家 = <via_database>/vdf_database;run 開跑前先叫 VDF_MDL009 尾版 fixnames --apply(已入庫亂碼名稱就地反解 · 先整份備份 · 寫後再驗 · 冪等;run --dry 只數不寫)。
+     via_database 裡沒有 vdf_database 就建它;資料家永遠是 vdf_database,不退回上一層。
 其餘(就緒檢查 · 工作圖 · 結果併燈 · 頁面 · 指令列)全部轉給前版。
 用法同前版:run … · check · --selftest
 """
@@ -121,7 +122,7 @@ def main(argv=None) -> int:
         return selftest()
     args = abs_paths(via_db_args(args))
     if args[:1] == ["run"]:
-        for line in fix_names_before_run(args):
+        for line in fix_names_before_run(args, dry="--dry" in args):
             print(line, flush=True)
     return PRIOR.main(args)
 
@@ -140,10 +141,12 @@ def via_db_args(args: list) -> list:
     if "--data-home" in rest or not root:
         return rest
     sub = Path(root).expanduser() / DB_SUB
-    return rest + ["--data-home", str(sub if sub.is_dir() else Path(root).expanduser())]
+    if Path(root).expanduser().is_dir():
+        sub.mkdir(exist_ok=True)                       # 資料家固定在 vdf_database(新的 via_database 也一樣;不退回上一層,增量才不會換位置)
+    return rest + ["--data-home", str(sub)]            # via_database 不存在 → 照樣交前版,由前版拒跑並點名
 
 
-def fix_names_before_run(args: list) -> list:
+def fix_names_before_run(args: list, dry: bool = False) -> list:
     """開跑前先把資料家裡已入庫的亂碼名稱就地反解(VDF_MDL009 尾版 fixnames --apply:先整份備份、寫後再驗;冪等,沒亂碼就零寫入)。
     子行程帶本系統入口標記 VIA_FROM_VDFSM(本檔就是 VDF 的入口);不設同意閘。"""
     import subprocess
@@ -162,7 +165,8 @@ def fix_names_before_run(args: list) -> list:
     env = dict(__import__("os").environ, VIA_FROM_VDFSM="YES", PYTHONUTF8="1")
     for r in roots:
         try:
-            cp = subprocess.run([sys.executable, "-B", str(m9[-1]), "fixnames", "--data-home", str(r), "--apply"], cwd=str(r), env=env,
+            cmd = [sys.executable, "-B", str(m9[-1]), "fixnames", "--data-home", str(r)] + ([] if dry else ["--apply"])   # --dry 只數不寫
+            cp = subprocess.run(cmd, cwd=str(r), env=env,
                                 capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
             out += [x for x in cp.stdout.splitlines() if x.strip()][:4] + ([f"[{TAG}] 名稱反解 rc {cp.returncode}(寫後仍有亂碼 → 請看上行點名)"] if cp.returncode else [])
         except Exception as exc:  # noqa: BLE001
@@ -233,9 +237,23 @@ def selftest() -> int:
         (Path(td) / "via_database" / "vdf_database").mkdir(parents=True)
         va = via_db_args(["run", "--via-db", str(Path(td) / "via_database"), "--slots", "auto"])
         vb = via_db_args(["run", "--via-db", str(Path(td) / "via_database"), "--data-home", "X"])
-        ck("⑧ --via-db <via_database> → --data-home <via_database>/vdf_database;已給 --data-home 不蓋", va == ["run", "--slots", "auto", "--data-home", str(Path(td) / "via_database" / "vdf_database")] and vb == ["run", "--data-home", "X"], (va, vb))
+        (Path(td) / "fresh_db").mkdir()
+        vc = via_db_args(["run", "--via-db", str(Path(td) / "fresh_db")])
+        ck("⑧ --via-db <via_database> → --data-home <via_database>/vdf_database;已給 --data-home 不蓋;全新 via_database 也建 vdf_database 並用它(Codex P2:不退回上一層)",
+           va == ["run", "--slots", "auto", "--data-home", str(Path(td) / "via_database" / "vdf_database")] and vb == ["run", "--data-home", "X"]
+           and vc == ["run", "--data-home", str(Path(td) / "fresh_db" / "vdf_database")] and (Path(td) / "fresh_db" / "vdf_database").is_dir(), (va, vb, vc))
         fx = fix_names_before_run(["run", "--data-home", str(Path(td) / "via_database" / "vdf_database")])
         ck("⑨ 開跑前名稱反解:資料家沒有名單庫 → 略過並點名(零寫入)", len(fx) == 1 and "沒有名單庫" in fx[0] and not any((Path(td) / "via_database").rglob("_backup")), fx)
+        import pandas as _pd
+        home = Path(td) / "via_database" / "vdf_database"
+        (home / "0-1-TWStockList").mkdir(parents=True)
+        bad = "振曜".encode("utf-8").decode("ptcp154")
+        _pd.DataFrame([{"date": "2026-11-19", "ticker": "6143", "name": bad}]).to_parquet(home / "0-1-TWStockList" / "tw_stock_list_2026-11-19.parquet", index=False)
+        fd = fix_names_before_run(["run", "--dry", "--data-home", str(home)], dry=True)
+        same = _pd.read_parquet(home / "0-1-TWStockList" / "tw_stock_list_2026-11-19.parquet")["name"].tolist() == [bad]
+        ck("⑩ run --dry:名稱反解只數不寫(Codex P1:不改庫、不建備份)", same and not any(home.rglob("_backup")) and any("乾跑" in x for x in fd), fd)
+        fa = fix_names_before_run(["run", "--data-home", str(home)])
+        ck("⑪ 不是 --dry:照常 --apply(先備份、寫成正字)", _pd.read_parquet(home / "0-1-TWStockList" / "tw_stock_list_2026-11-19.parquet")["name"].tolist() == ["振曜"] and any(home.rglob("_backup")), fa)
     good = all(ok)
     print(f"[計] {TAG} 本版 {sum(ok)}/{len(ok)} · {'PASS' if good else 'FAIL'}", flush=True)
     return 0 if good else 1
