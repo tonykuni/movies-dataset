@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-20T09:40:00Z",
+ "updated_at": "2026-11-20T10:10:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -6396,6 +6396,24 @@
    "timeout_seconds": 900,
    "updated_at": "2026-11-20T09:40:00Z",
    "registered_at": "2026-11-20T09:40:00Z"
+  },
+  "C-applyrun-v0104": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0104.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_VCGC_ApplyRun v0104 selftest · 5/5",
+   "scope": "VCGC 一鍵套用 v0104:A 道啟用 VDF / VRN-2(各自 launch --run · 自己的入口 · 不設同意閘)· A 與 K 分開叫 · 前版鏈",
+   "dependencies": [
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0104.py",
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0103.py"
+   ],
+   "version": "v0104",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-20T10:10:00Z",
+   "registered_at": "2026-11-20T10:10:00Z"
   }
  },
  "work_items": [
@@ -12856,6 +12874,28 @@
    "next": "逐案改宣告 / 重跑;不能寫成收尾成功",
    "updated_at": "2026-11-20T09:40:00Z",
    "registered_at": "2026-11-20T09:40:00Z"
+  },
+  {
+   "id": "VCGC-REQ243:C-applyrun-v0104",
+   "requirement": "VCGC-REQ243",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 5/5(容器,三次)",
+   "next": "—",
+   "updated_at": "2026-11-20T10:10:00Z",
+   "registered_at": "2026-11-20T10:10:00Z",
+   "case": "C-applyrun-v0104",
+   "receipt": "docs/handoff/evidence/C-applyrun-v0104.json"
+  },
+  {
+   "id": "VCGC-REQ243:host-activate",
+   "requirement": "VCGC-REQ243",
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "容器 VDF / VRN-2 都缺套件(launch = ABSENT),啟用只能在主機",
+   "next": "主機跑 Invoke-VIA-ApplyAll-v0113.ps1 -Fetch(A 道 → G,K 道)",
+   "updated_at": "2026-11-20T10:10:00Z",
+   "registered_at": "2026-11-20T10:10:00Z"
   }
  ]
 }
