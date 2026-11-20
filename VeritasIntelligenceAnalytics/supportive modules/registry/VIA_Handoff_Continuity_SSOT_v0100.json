@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-20T13:07:25Z",
+ "updated_at": "2026-11-20T15:08:56Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -6429,6 +6429,40 @@
    "version": "v0102",
    "updated_at": "2026-11-20T13:04:00Z",
    "registered_at": "2026-11-20T13:04:00Z"
+  },
+  "C-applyrun-v0105": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0105.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_VCGC_ApplyRun v0105 selftest · 11/11",
+   "scope": "VCGC 一鍵套用 v0105:go 一個動詞(同步 → A 道啟用 → G,K 道驗證 → 合併貼回包 · 剪貼簿)· --data-home 驗了才用(錯形路徑零寫入)· 心跳帶該步最後一行 · 不設同意閘 · 前版鏈",
+   "dependencies": [
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0105.py",
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0104.py"
+   ],
+   "version": "v0105",
+   "timeout_seconds": 1200,
+   "updated_at": "2026-11-20T14:44:00Z",
+   "registered_at": "2026-11-20T14:44:00Z"
+  },
+  "flow_gate_v0103": {
+   "argv": [
+    "CGC_MDL223_FlowConsistency_v0103",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL223_FlowConsistency v0103 本版 10/10 · PASS",
+   "scope": "流程閘矩陣頁帶產生時間 · 版本(機讀 meta;視覺零改 · 去掉 meta 與原頁逐字相同)· 頁沒在這一輪更新不蓋章 · 前版鏈 v0102 照過",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL223_FlowConsistency_v0103.py",
+    "supportive modules/registry/CGC_MDL223_FlowConsistency_v0102.py"
+   ],
+   "timeout_seconds": 900,
+   "version": "v0103",
+   "updated_at": "2026-11-20T15:08:07Z",
+   "registered_at": "2026-11-20T15:08:07Z"
   }
  },
  "work_items": [
@@ -12923,6 +12957,30 @@
    "updated_at": "2026-11-20T13:07:25Z",
    "registered_at": "2026-11-20T13:07:25Z",
    "receipt": "docs/handoff/evidence/vdf_tickerclass.json"
+  },
+  {
+   "id": "VCGC-REQ243:C-applyrun-v0105",
+   "requirement": "VCGC-REQ243",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 10/10(容器;前版鏈 v0100–v0104 照過)",
+   "next": "—",
+   "updated_at": "2026-11-20T14:44:24Z",
+   "registered_at": "2026-11-20T14:44:00Z",
+   "case": "C-applyrun-v0105",
+   "receipt": "docs/handoff/evidence/C-applyrun-v0105.json"
+  },
+  {
+   "id": "VCGC-REQ228:flow-page-stamp",
+   "requirement": "VCGC-REQ228",
+   "case": "flow_gate_v0103",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 10/10(容器;前版 v0102 9/9 照過)· synchronizer 頁 5/5 綠",
+   "next": "—",
+   "updated_at": "2026-11-20T15:08:56Z",
+   "registered_at": "2026-11-20T15:08:07Z",
+   "receipt": "docs/handoff/evidence/flow_gate_v0103.json"
   }
  ],
  "retired_files": {
