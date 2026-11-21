@@ -100,3 +100,5 @@
 | 2026-11-20T18:34:45Z | VDF_MDL022_SafeParallelLaunch_v0106.py | 0106 | VIA-VDF-MDL299 | 15fa19bd79aa | Codex P1 / P2:run --dry 名稱反解只數不寫 · --via-db 固定 vdf_database(沒有就建) | 自測 11/11 · 交接案收據 · 串測站 GREEN |
 | 2026-11-20T18:36:26Z | VRN_MDL260_SafeParallelLaunch_v0103.py | 0103 | VIA-VRN-MDL357 | 510925ff0148 | Codex P2:自測守參數冊各組 extract_workers = 1 | 自測 9/9 · 交接案收據 · 串測站 GREEN |
 | 2026-11-20T18:36:26Z | VRN_ParamControl_SSOT_v0103.json | 0103 | VRN-B-0046 | a23ee3addc39 | Codex P2:EQUITY / INDUSTRY / DAILY 組 extract_workers auto → 1 | check:分群 EQUITY extract 行程 1 |
+| 2026-11-21T01:29:50Z | VRN_SystemManager_v0279.py | 0279 | VIA-VRN-MDL358 | 36bc80a45516 | VRN 自己發號定案(不等 VCGC 核號) | 自測 10/10 · 交接案收據 · 串測站 GREEN · 實跑 extract 112 號已確認 · 再跑不換版 |
+| 2026-11-21T01:29:50Z | VRN_Asset_Register_v0102.json | 0102 | (VRN 自己的冊) | afda0f933731 | VRN 資產登記:105 冊號 + 7 參數號 全部已確認(VRN 自發)· 號碼同 v0101 | 由 VRN 管理器 v0279 實跑寫出 |
