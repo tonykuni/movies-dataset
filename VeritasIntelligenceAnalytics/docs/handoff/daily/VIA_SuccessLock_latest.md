@@ -108,3 +108,4 @@
 | 2026-11-21T01:53:46Z | VRN_Asset_Register_v0103.json | 0103 | (VRN 自己的冊) | 8b045c46a34d | VRN 資產登記 v0103:112 號已確認(VRN 自發)· 規格 1083 筆(含 v0280) | 由 VRN 管理器 v0280 實跑寫出 |
 | 2026-11-21T02:09:15Z | VDF_SSOTSync_v0103.py | 0103 | VIA-VDF-MDL300 | 0f0ec0f48f22 | VDF 自己發號定案(不等 VCGC 核號) | 自測 7/7 · 交接案收據 · 串測站 GREEN · 實跑 495 條全部已確認 · 再跑不換版 |
 | 2026-11-21T02:09:15Z | VDF_SSOT_Register_v0113.json | 0113 | (VDF 自己的帳) | 76c11fe70cac | VDF 帳本 v0113:495 條已確認(VDF 自發 12 · 先前 VCGC 核發 483 照留)· 號與 ssot_id 不變 | 由 VDF_SSOTSync v0103 實跑寫出 |
+| 2026-11-21T02:15:58Z | VDF_SSOTSync_v0103.py | 0103 | VIA-VDF-MDL300 | b33e5b2cb214 | Codex P2:VDF 自發條目內容有變也升 semver | 自測 8/8 · 交接案收據 · 串測站 GREEN · 真倉 sync 無變更 |
