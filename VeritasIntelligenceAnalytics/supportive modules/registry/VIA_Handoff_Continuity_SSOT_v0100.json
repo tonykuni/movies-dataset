@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-21T03:38:00Z",
+ "updated_at": "2026-11-21T07:10:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -6748,6 +6748,81 @@
    "timeout_seconds": 1500,
    "updated_at": "2026-11-21T03:36:00Z",
    "registered_at": "2026-11-21T03:36:00Z"
+  },
+  "C-vdf-reconcile-v0100": {
+   "argv": [
+    "VDF_MDL032_TWPriceReconcile",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL032_TWPriceReconcile v0100 自測 11/11 · PASS",
+   "scope": "VDF 台股日價官方對帳 v0100 自測(暫存庫 · 休市佔位 · 不符 · 缺 · 帳表 · 冪等 · 回滾)(VDF-REQ042)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL032_TWPriceReconcile_v*.py"
+   ],
+   "version": "v0100",
+   "timeout_seconds": 1500,
+   "updated_at": "2026-11-21T07:05:00Z",
+   "registered_at": "2026-11-21T07:05:00Z"
+  },
+  "C-vdf-tradingvalue-v0113": {
+   "argv": [
+    "VDF_ENG057_TradingValueBackfill",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_ENG057_TradingValueBackfill v0113 本版 9/9 · PASS",
+   "scope": "VDF 官方成交表 v0113 自測(交易日曆 ∪ 官方指數日)(VDF-REQ042)",
+   "dependencies": [
+    "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v*.py"
+   ],
+   "version": "v0113",
+   "timeout_seconds": 1500,
+   "updated_at": "2026-11-21T07:05:00Z",
+   "registered_at": "2026-11-21T07:05:00Z"
+  },
+  "C-vdf-launch-v0108": {
+   "argv": [
+    "VDF_MDL022_SafeParallelLaunch",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL022_SafeParallelLaunch v0108 本版 9/9 · 合計 PASS",
+   "scope": "VDF 安全並行啟動器 v0108 自測(run 後自動官方對帳)(VDF-REQ042)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v*.py"
+   ],
+   "version": "v0108",
+   "timeout_seconds": 1500,
+   "updated_at": "2026-11-21T07:05:00Z",
+   "registered_at": "2026-11-21T07:05:00Z"
+  },
+  "C-vdf-fetchgroups-v0112": {
+   "argv": [
+    "VDF_MDL012_FetchGroups",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL012_FetchGroups v0112 本版 8/8 · PASS",
+   "scope": "VDF 擷取族群 v0112 自測(並行道套擷取冊列 env · VAKE 回資料家)(VDF-REQ042)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v*.py"
+   ],
+   "version": "v0112",
+   "timeout_seconds": 1500,
+   "updated_at": "2026-11-21T07:05:00Z",
+   "registered_at": "2026-11-21T07:05:00Z"
+  },
+  "C-vdf-fetchsystem-v0112": {
+   "argv": [
+    "VDF_MDL008_FetchSystem",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL008_FetchSystem v0112 本版 6/6 · 合計 PASS",
+   "scope": "VDF 擷取系統 v0112 自測(--home 轉絕對路徑)(VDF-REQ042)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py"
+   ],
+   "version": "v0112",
+   "timeout_seconds": 1500,
+   "updated_at": "2026-11-21T07:05:00Z",
+   "registered_at": "2026-11-21T07:05:00Z"
   }
  },
  "work_items": [
@@ -13482,6 +13557,66 @@
    "updated_at": "2026-11-21T03:38:00Z",
    "registered_at": "2026-11-21T03:36:00Z",
    "receipt": "docs/handoff/evidence/C-vdf-launch-v0107.json"
+  },
+  {
+   "id": "VDF-REQ042:C-vdf-reconcile-v0100",
+   "requirement": "VDF-REQ042",
+   "case": "C-vdf-reconcile-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 11/11(容器暫存庫)· 資料家實跑 GREEN:列 2,699,897 → 2,700,232 · 寫後佔位 / 不符 / 缺 / 重複鍵 0 · 抽驗 5 檔與官方逐欄相同",
+   "next": "主機實跑(未在主機實跑)",
+   "updated_at": "2026-11-21T07:10:00Z",
+   "registered_at": "2026-11-21T07:05:00Z",
+   "receipt": "docs/handoff/evidence/C-vdf-reconcile-v0100.json"
+  },
+  {
+   "id": "VDF-REQ042:C-vdf-tradingvalue-v0113",
+   "requirement": "VDF-REQ042",
+   "case": "C-vdf-tradingvalue-v0113",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 9/9(容器;日曆 ∪ 官方指數日 · 範圍外不加 · 指數庫不在照原 · 冪等)",
+   "next": "主機實跑(未在主機實跑)",
+   "updated_at": "2026-11-21T07:10:00Z",
+   "registered_at": "2026-11-21T07:05:00Z",
+   "receipt": "docs/handoff/evidence/C-vdf-tradingvalue-v0113.json"
+  },
+  {
+   "id": "VDF-REQ042:C-vdf-launch-v0108",
+   "requirement": "VDF-REQ042",
+   "case": "C-vdf-launch-v0108",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 9/9(容器;run 後叫 MDL032 尾版 apply · --dry / 沒資料家 / 沒主庫略過 · RED 回 1)",
+   "next": "主機實跑(未在主機實跑)",
+   "updated_at": "2026-11-21T07:10:00Z",
+   "registered_at": "2026-11-21T07:05:00Z",
+   "receipt": "docs/handoff/evidence/C-vdf-launch-v0108.json"
+  },
+  {
+   "id": "VDF-REQ042:C-vdf-fetchgroups-v0112",
+   "requirement": "VDF-REQ042",
+   "case": "C-vdf-fetchgroups-v0112",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 8/8(容器;重現並行道沒帶 VAKE_ROOT · 本版帶 <資料家>/vake)",
+   "next": "主機實跑(未在主機實跑)",
+   "updated_at": "2026-11-21T07:10:00Z",
+   "registered_at": "2026-11-21T07:05:00Z",
+   "receipt": "docs/handoff/evidence/C-vdf-fetchgroups-v0112.json"
+  },
+  {
+   "id": "VDF-REQ042:C-vdf-fetchsystem-v0112",
+   "requirement": "VDF-REQ042",
+   "case": "C-vdf-fetchsystem-v0112",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 6/6(容器;相對 --home 轉絕對 · fixture 子行程落在指定夾)",
+   "next": "主機實跑(未在主機實跑)",
+   "updated_at": "2026-11-21T07:10:00Z",
+   "registered_at": "2026-11-21T07:05:00Z",
+   "receipt": "docs/handoff/evidence/C-vdf-fetchsystem-v0112.json"
   }
  ],
  "retired_files": {
