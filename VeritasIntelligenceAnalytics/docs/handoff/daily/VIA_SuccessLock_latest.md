@@ -111,3 +111,16 @@
 | 2026-11-21T02:15:58Z | VDF_SSOTSync_v0103.py | 0103 | VIA-VDF-MDL300 | b33e5b2cb214 | Codex P2:VDF 自發條目內容有變也升 semver | 自測 8/8 · 交接案收據 · 串測站 GREEN · 真倉 sync 無變更 |
 | 2026-11-21T02:21:49Z | VDF_SSOTSync_v0103.py | 0103 | VIA-VDF-MDL300 | 0f0ec0f48f22 | 還原為已合併位元(同 main);取代本線 02:15:58 那列(那列雜湊是合併後就地改的內容,作廢) | sha 對 main · 自測 7/7 |
 | 2026-11-21T02:21:49Z | VDF_SSOTSync_v0104.py | 0104 | VIA-VDF-MDL301 | af0c0fc65003 | VDF 自發條目內容有變也升 semver(PR #705 Codex P2) | 自測 8/8 · 交接案收據 · 串測站 GREEN |
+| 2026-11-21T02:57:45Z | VDF_MDL009_TWStockList_v0105.py | 0105 | VIA-VDF-MDL302 | 11b2ec223085 | 前版鏈網路入口轉到尾版(MDL010 替身注入恢復) | 自測 5/5 · MDL010 照過 · 交接案收據 · 串測站 GREEN |
+| 2026-11-21T02:57:45Z | VDF_MDL012_FetchGroups_v0111.py | 0111 | VIA-VDF-MDL303 | ec30c7797d27 | 族群冊升版不再讓舊斷言紅(前版鏈冊釘 v0102 · 現役冊驗內容) | 自測 4/4 · 前版鏈全照過 · 交接案收據 · 串測站 GREEN |
+| 2026-11-21T03:40:00Z | VDF_MDL008_FetchSystem_v0111.py | 0111 | VIA-VDF-MDL304 | c7cd2a4ed403 | live 改道收 requests 兩段 timeout(akshare 1.20 預設 (10, 60) 不再 int(tuple) 失敗) | 自測 7/7 · 深測前版鏈 v0108–v0111 照過 · 真網路 175 列 · 交接案收據 · 串測站 GREEN |
+| 2026-11-21T03:40:00Z | VDF_MDL011_AkshareFetcher_v0105.py | 0105 | VIA-VDF-MDL305 | e2e0bd340e66 | 快照 TTL 逐函式覆寫(選單 v0101 統計局 168h · 平常增量不再整批重抓) | 自測 9/9 · 前版鏈 v0104 → v0102 照過 · 交接案收據 · 串測站 GREEN |
+| 2026-11-21T07:05:19Z | VDF_ENG232_TWIndexOfficial_v0107.py | 0107 | VIA-VDF-ENG391 | 14428e6d42bc | 加權休市段不判洞(櫃買交易日曆) | 自測 10/10 · 真庫:春節段 EMPTY 往下 · 2025-02 +19 · 03 +21 · 與櫃買日對齊 |
+| 2026-11-21T07:05:19Z | VDF_ENG066_GlobalUniverse_v0103.py | 0103 | VIA-VDF-ENG390 | 693267f372e4 | 空庫先建 global_daily | 自測 8/8 · 真庫:177,712 列 · 78 檔 · 2018-01-01 → 2026-11-20 |
+| 2026-11-21T07:05:19Z | VDF_MDL022_SafeParallelLaunch_v0107.py | 0107 | VIA-VDF-MDL306 | e9e65e364ad1 | 補標準網路橋 | 自測 5/5 · 前版 11/11 |
+| 2026-11-21T07:05:19Z | VDF_MDL022_SafeParallelLaunch_v0108.py | 0108 | VIA-VDF-MDL309 | 89c046124ad0 | run 後自動官方對帳 | 自測 9/9 |
+| 2026-11-21T07:05:19Z | VDF_MDL012_FetchGroups_v0112.py | 0112 | VIA-VDF-MDL308 | 43d2c187f542 | 並行道套擷取冊列 env(VAKE 回資料家) | 自測 8/8 · 前版鏈照過 |
+| 2026-11-21T07:05:19Z | VDF_MDL008_FetchSystem_v0112.py | 0112 | VIA-VDF-MDL307 | d9f80680c84e | --home 轉絕對路徑 | 自測 6/6 · fixture 子行程落指定夾 |
+| 2026-11-21T07:05:19Z | VDF_ENG057_TradingValueBackfill_v0113.py | 0113 | VIA-VDF-ENG392 | 6b6aebf2585f | 交易日曆 ∪ 官方指數日 | 自測 9/9 |
+| 2026-11-21T07:05:19Z | VDF_MDL032_TWPriceReconcile_v0100.py | 0100 | VIA-VDF-MDL310 | bfc90ee6320b | 台股日價官方對帳(官方值覆蓋) | 自測 11/11 · 資料家實跑 GREEN · 抽驗 5 檔與官方逐欄相同 |
+| 2026-11-21T07:16:31Z | VDF_MDL032_TWPriceReconcile_v0101.py | 0101 | VIA-VDF-MDL311 | f476802fd184 | 刪休市佔位要官方指數日曆證明(Codex P1) | 自測 10/10 · 真庫乾跑冪等 |
