@@ -128,3 +128,4 @@
 | 2026-11-21T10:24:53Z | VIA_RepoSafeSync_v0100.py | 0100 | VIA-CORE-MDL879 | 19153a22cec2 | 桌機倉安全快轉(擋路同名檔先備份 · main 為準) | 自測 10/10 · 桌機版本容器重現快轉成功 |
 | 2026-11-21T10:24:53Z | VIA_VCGC_ApplyRun_v0108.py | 0108 | VIA-CORE-MDL880 | 11899a37e924 | go 先安全同步再跑(更新後尾版重跑) | 自測 9/9 |
 | 2026-11-21T10:52:00Z | VIA_RepoSafeSync_v0101.py | 0101 | VIA-CORE-MDL881 | 6cc0c7cd5fa1 | 桌機倉安全快轉 v0101(被忽略檔 · 暫存區 · -z 路徑) | 自測 9/9 |
+| 2026-11-21T11:04:00Z | VIA_RepoSafeSync_v0102.py | 0102 | VIA-CORE-MDL882 | 3d50b8e42bc2 | 桌機倉安全快轉 v0102(祖孫衝突 · 備份兩夾 · 符號連結) | 自測 10/10 |
