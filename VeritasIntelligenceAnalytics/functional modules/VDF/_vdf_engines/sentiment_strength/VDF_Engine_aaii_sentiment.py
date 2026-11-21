@@ -54,6 +54,7 @@ import io
 from pathlib import Path
 
 import pandas as pd
+import requests
 
 from VDF_Engine_sentiment_strength import def_normalize_percent_column, def_calc_aaii_strength
 
@@ -123,59 +124,15 @@ def def_fetch_aaii_from_local_csv(local_csv: str) -> pd.DataFrame:
     return def_clean_aaii_dataframe(raw)
 
 
-AAII_XLS_URL = "https://www.aaii.com/files/surveys/sentiment.xls"   # 操作員 2026-11-21 指定的官方檔
-
-
-def def_parse_aaii_xls(data: bytes) -> pd.DataFrame:
-    """AAII sentiment.xls:前幾列是標題 / 說明,表頭那一列含 Bullish / Neutral / Bearish;找到那一列當表頭再清理。"""
-    raw = pd.read_excel(io.BytesIO(data), header=None)
-    hdr = None
-    for i in range(min(len(raw), 30)):
-        cells = [str(x).strip().lower() for x in raw.iloc[i].tolist()]
-        if any("bullish" in c for c in cells) and any("bearish" in c for c in cells):
-            hdr = i
-            break
-    if hdr is None:
-        raise ValueError("AAII xls:前 30 列找不到含 Bullish / Bearish 的表頭")
-    body = raw.iloc[hdr + 1:].copy()
-    body.columns = [str(x).strip() for x in raw.iloc[hdr].tolist()]
-    body = body.loc[:, [c for c in body.columns if c and c.lower() != "nan"]]
-    return def_clean_aaii_dataframe(body)
-
-
-def def_fetch_aaii_from_local_xls(local_xls: str) -> pd.DataFrame:
-    path = Path(local_xls)
-    if not path.is_file():
-        raise FileNotFoundError(f"AAII local xls not found: {local_xls}")
-    return def_parse_aaii_xls(path.read_bytes())
-
-
-def def_fetch_aaii_from_xls_url(url: str = AAII_XLS_URL, timeout: int = 60) -> pd.DataFrame:
-    """經統包網路工具抓位元組(雙閘在工具內;不偽裝、不換道直連);被拒就照實報。"""
-    net = _via_net()
-    if net is None or not callable(getattr(net, "http_bytes", None)):
-        raise RuntimeError("VIA 網路工具載不到(via_net_unified_v*.py)· 不換道直連")
-    r = net.http_bytes(url, timeout=timeout)
-    if r.get("state") != "OK" or not r.get("data"):
-        raise RuntimeError(f"VIA 網路工具 {r.get('state')}: {str(r.get('note') or r.get('why') or r.get('error') or '')[:160]}"
-                           "(網站拒絕時:用瀏覽器下載到 下載\\sentiment.xls 或給 local_xls)")
-    return def_parse_aaii_xls(bytes(r["data"]))
-
-
 def def_fetch_aaii_from_html(url: str, timeout: int = 30) -> pd.DataFrame:
     headers = {
         "User-Agent": "Mozilla/5.0 VDF-SentimentStrength/1.0"
     }
 
-    del headers  # 出網一律走統包網路工具(雙閘在工具內;不換道直連,批115 / 2026-11-21 晨檢 A)
-    net = _via_net()
-    if net is None or not callable(getattr(net, "http_text", None)):
-        raise RuntimeError("VIA 網路工具載不到(via_net_unified_v*.py)· 不換道直連")
-    r = net.http_text(url, timeout=timeout)
-    if r.get("state") != "OK" or not r.get("data"):
-        raise RuntimeError(f"VIA 網路工具 {r.get('state')}: {str(r.get('why') or r.get('error') or '')[:160]}")
+    resp = requests.get(url, headers=headers, timeout=timeout)
+    resp.raise_for_status()
 
-    tables = pd.read_html(io.StringIO(r["data"]))
+    tables = pd.read_html(io.StringIO(resp.text))
 
     errors = []
     for table in tables:
@@ -202,20 +159,6 @@ def def_fetch_aaii_sentiment(task: dict) -> pd.DataFrame:
             return def_calc_aaii_strength(df)
         except Exception as exc:
             errors.append(f"local_csv failed: {exc}")
-
-    local_xls = task.get("local_xls") or str(Path.home() / "Downloads" / "sentiment.xls")
-    if Path(local_xls).is_file():
-        try:
-            df = def_fetch_aaii_from_local_xls(local_xls)
-            return def_calc_aaii_strength(df)
-        except Exception as exc:
-            errors.append(f"local_xls failed: {exc}")
-
-    try:
-        df = def_fetch_aaii_from_xls_url(url=task.get("xls_url", AAII_XLS_URL), timeout=max(timeout, 60))
-        return def_calc_aaii_strength(df)
-    except Exception as exc:
-        errors.append(f"xls failed: {exc}")
 
     try:
         df = def_fetch_aaii_from_html(url=url, timeout=timeout)
