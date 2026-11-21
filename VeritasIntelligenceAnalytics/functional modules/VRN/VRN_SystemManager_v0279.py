@@ -250,6 +250,8 @@ def selftest() -> int:
            live and all(x == SELF_STATUS for x in live) and e2["entries"][k0]["status"] == SELF_STATUS and e2["entries"][k0]["no"] == e1["entries"][k0]["no"]
            and len(f2) == len(f1) + 1 and len(f3) == len(f2) and rq2.get("pending") == [] and "VRN 自己發號" in e2.get("rule", ""), (live[:3], len(f1), len(f2), len(f3), rq2))
     src = Path(__file__).read_text(encoding="utf-8")
+    peer = [k for k in ("VIA_FROM_VCGC", "VIA_FROM_VDFSM") if re.search(r"environ(?:\[[\"']%s[\"']\]\s*=|\.setdefault\([\"']%s)" % (k, k), src)]
+    ck("⑦b 不設他系統的入口旗標(VIA_FROM_VCGC · VIA_FROM_VDFSM;本檔是 VRN 自己的入口)", not peer, peer)
     ck("⑦ 加速器橋真的匯入 · 不碰 TA-Lib · 不設同意閘 · 不含本機路徑 · 不改任何前版檔",
        "import VIA_SuperAccel_Module as VIA_ACCEL" in src and not re.search(r"^\s*(import|from)\s+talib", src, re.M)
        and not re.search(r"environ\[[\"']VIA_(NET|SCRAPE)_CONSENT[\"']\]\s*=", src) and ("C:" + "\\Users") not in src and "write_text(" not in src.split("def selftest")[0])
