@@ -123,3 +123,4 @@
 | 2026-11-21T07:05:19Z | VDF_MDL008_FetchSystem_v0112.py | 0112 | VIA-VDF-MDL307 | d9f80680c84e | --home 轉絕對路徑 | 自測 6/6 · fixture 子行程落指定夾 |
 | 2026-11-21T07:05:19Z | VDF_ENG057_TradingValueBackfill_v0113.py | 0113 | VIA-VDF-ENG392 | 6b6aebf2585f | 交易日曆 ∪ 官方指數日 | 自測 9/9 |
 | 2026-11-21T07:05:19Z | VDF_MDL032_TWPriceReconcile_v0100.py | 0100 | VIA-VDF-MDL310 | bfc90ee6320b | 台股日價官方對帳(官方值覆蓋) | 自測 11/11 · 資料家實跑 GREEN · 抽驗 5 檔與官方逐欄相同 |
+| 2026-11-21T07:16:31Z | VDF_MDL032_TWPriceReconcile_v0101.py | 0101 | VIA-VDF-MDL311 | f476802fd184 | 刪休市佔位要官方指數日曆證明(Codex P1) | 自測 10/10 · 真庫乾跑冪等 |
