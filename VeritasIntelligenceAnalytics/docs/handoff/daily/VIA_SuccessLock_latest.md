@@ -130,3 +130,4 @@
 | 2026-11-21T10:52:00Z | VIA_RepoSafeSync_v0101.py | 0101 | VIA-CORE-MDL881 | 6cc0c7cd5fa1 | 桌機倉安全快轉 v0101(被忽略檔 · 暫存區 · -z 路徑) | 自測 9/9 |
 | 2026-11-21T11:04:00Z | VIA_RepoSafeSync_v0102.py | 0102 | VIA-CORE-MDL882 | 3d50b8e42bc2 | 桌機倉安全快轉 v0102(祖孫衝突 · 備份兩夾 · 符號連結) | 自測 10/10 |
 | 2026-11-21T11:22:00Z | VIA_RepoSafeSync_v0103.py | 0103 | VIA-CORE-MDL883 | e2b0a0ee28da | 桌機倉安全快轉 v0103(失敗就停 · 巢狀倉 · 連結 manifest · 大小寫) | 自測 11/11 |
+| 2026-11-21T11:26:00Z | VIA_RepoSafeSync_v0104.py | 0104 | VIA-CORE-MDL884 | e300a053908d | 桌機倉安全快轉 v0104(pathspec 照字面) | 自測 9/9 |
