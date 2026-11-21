@@ -125,3 +125,10 @@
 | 2026-11-21T07:05:19Z | VDF_MDL032_TWPriceReconcile_v0100.py | 0100 | VIA-VDF-MDL310 | bfc90ee6320b | 台股日價官方對帳(官方值覆蓋) | 自測 11/11 · 資料家實跑 GREEN · 抽驗 5 檔與官方逐欄相同 |
 | 2026-11-21T07:16:31Z | VDF_MDL032_TWPriceReconcile_v0101.py | 0101 | VIA-VDF-MDL311 | f476802fd184 | 刪休市佔位要官方指數日曆證明(Codex P1) | 自測 10/10 · 真庫乾跑冪等 |
 | 2026-11-21T07:27:55Z | VRN_ENG049_ContentReconcile_v0106.py | 0106 | VIA-VRN-ENG339 | c7a26b2c7382 | 矩陣 ADJ CLOSE 讀 VDF 官方對帳後日價 | 自測 9/9 · ADJ CLOSE 38/42 · 綠 8 |
+| 2026-11-21T10:24:53Z | VIA_RepoSafeSync_v0100.py | 0100 | VIA-CORE-MDL879 | 19153a22cec2 | 桌機倉安全快轉(擋路同名檔先備份 · main 為準) | 自測 10/10 · 桌機版本容器重現快轉成功 |
+| 2026-11-21T10:24:53Z | VIA_VCGC_ApplyRun_v0108.py | 0108 | VIA-CORE-MDL880 | 11899a37e924 | go 先安全同步再跑(更新後尾版重跑) | 自測 9/9 |
+| 2026-11-21T10:52:00Z | VIA_RepoSafeSync_v0101.py | 0101 | VIA-CORE-MDL881 | 6cc0c7cd5fa1 | 桌機倉安全快轉 v0101(被忽略檔 · 暫存區 · -z 路徑) | 自測 9/9 |
+| 2026-11-21T11:04:00Z | VIA_RepoSafeSync_v0102.py | 0102 | VIA-CORE-MDL882 | 3d50b8e42bc2 | 桌機倉安全快轉 v0102(祖孫衝突 · 備份兩夾 · 符號連結) | 自測 10/10 |
+| 2026-11-21T11:22:00Z | VIA_RepoSafeSync_v0103.py | 0103 | VIA-CORE-MDL883 | e2b0a0ee28da | 桌機倉安全快轉 v0103(失敗就停 · 巢狀倉 · 連結 manifest · 大小寫) | 自測 11/11 |
+| 2026-11-21T11:26:00Z | VIA_RepoSafeSync_v0104.py | 0104 | VIA-CORE-MDL884 | e300a053908d | 桌機倉安全快轉 v0104(pathspec 照字面) | 自測 9/9 |
+| 2026-11-21T11:46:00Z | VIA_RepoSafeSync_v0105.py | 0105 | VIA-CORE-MDL885 | 0c89652eed1d | 桌機倉安全快轉 v0105(檔名位元組原樣 · 找不到就停) | 自測 11/11 |
