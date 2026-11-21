@@ -6500,6 +6500,86 @@
    "timeout_seconds": 900,
    "updated_at": "2026-11-20T17:50:00Z",
    "registered_at": "2026-11-20T17:50:00Z"
+  },
+  "C-vrn-launch-v0103": {
+   "argv": [
+    "VRN_MDL260_SafeParallelLaunch",
+    "--selftest"
+   ],
+   "success_marker": "[計] VRN_MDL260_SafeParallelLaunch v0103 本版 9/9 · PASS",
+   "scope": "VRN 安全並行啟動器 v0103 薄尾:跑的途中不監控 CPU / DRAM(前版鏈監工壓力檢查換空)· 開跑前降壓照舊 · 參數冊 v0103 固定 3 / 3 · 路徑旗標轉絕對 · 前版 v0102 自測照過(VRN-REQ022) · 參數冊 run 與各組 extract_workers 都是 1(PR #701 Codex P2)",
+   "dependencies": [
+    "functional modules/VRN/VRN_MDL260_SafeParallelLaunch_v*.py",
+    "functional modules/VRN/VRN_ParamControl_SSOT_v*.json"
+   ],
+   "version": "v0103",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-20T18:45:00Z",
+   "registered_at": "2026-11-20T17:46:00Z"
+  },
+  "C-vdf-launch-v0106": {
+   "argv": [
+    "VDF_MDL022_SafeParallelLaunch",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL022_SafeParallelLaunch v0106 本版 11/11 · PASS",
+   "scope": "VDF 安全並行啟動器 v0106 薄尾:跑的途中不監控 CPU / DRAM · 開跑前降壓照舊 · 鏈上道數上下限一律 3 / 3 · 路徑旗標轉絕對 · 前版自測照過(VDF-REQ036;v0105 號讓給 PR #690) · run --dry 名稱反解只數不寫 · 全新 via_database 也固定用 vdf_database(PR #701 Codex P1 / P2)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v*.py"
+   ],
+   "version": "v0106",
+   "timeout_seconds": 1200,
+   "updated_at": "2026-11-20T18:40:00Z",
+   "registered_at": "2026-11-20T17:46:00Z"
+  },
+  "C-netunified-v0120": {
+   "argv": [
+    "SUP_MDL740_NetUnified",
+    "--selftest"
+   ],
+   "success_marker": "[計] SUP_MDL740_NetUnified v0120 自測 8/8 · PASS",
+   "scope": "共用網路工具 NetUnified v0120:http_json 先位元組再自己解碼(不吃 requests 猜的字集)· Big5 JSON · 拿不到位元組退前版並逐字串反解 · 雙閘沒開零抓取 · 前版鏈(VDF-REQ037)",
+   "dependencies": [
+    "supportive modules/network/SUP_MDL740_NetUnified_v*.py",
+    "supportive modules/network/SUP_MDL756_SmartDecode_v*.py"
+   ],
+   "version": "v0120",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-20T18:10:00Z",
+   "registered_at": "2026-11-20T18:10:00Z"
+  },
+  "C-vdf-stocklist-v0104": {
+   "argv": [
+    "VDF_MDL009_TWStockList",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL009_TWStockList v0104 本版 13/13 · PASS",
+   "scope": "VDF 台股名單 v0104:前份名單名稱反解 · V10 名稱字形(亂碼 = RED 不寫入)· fixnames 乾跑 / --apply(先備份 · 庫 + parquet + csv 就地反解 · 位元組已丟以最新正字名單補 · 再跑零改動)· 前版鏈(VDF-REQ037)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL009_TWStockList_v*.py"
+   ],
+   "version": "v0104",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-20T18:10:00Z",
+   "registered_at": "2026-11-20T18:10:00Z"
+  },
+  "C-applyrun-v0107": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0107.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_VCGC_ApplyRun v0107 selftest · 8/8",
+   "scope": "VCGC 一鍵套用 v0107:go --via-db → VDF / VRN 啟動器各帶 --via-db(vdf_database · vrn_database 增量庫)· 錯形路徑零寫入 · go 收尾整份備份(G 道 Backup → Backup-check)· 前版鏈(VCGC-REQ244)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0107.py",
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0106.py"
+   ],
+   "version": "v0107",
+   "timeout_seconds": 1800,
+   "updated_at": "2026-11-20T18:10:00Z",
+   "registered_at": "2026-11-20T18:10:00Z"
   }
  },
  "work_items": [
@@ -13042,6 +13122,66 @@
    "registered_at": "2026-11-20T17:50:00Z",
    "case": "C-vcgc-statusdisplay-v0109",
    "receipt": "docs/handoff/evidence/C-vcgc-statusdisplay-v0109.json"
+  },
+  {
+   "id": "VRN-REQ022:C-vrn-launch-v0103",
+   "requirement": "VRN-REQ022",
+   "case": "C-vrn-launch-v0103",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 9/9(容器;前版 v0102 18/18)· 開閘整輪 202 秒 · 降壓 0 次 · 組 extract 行程 1",
+   "next": "主機 go --via-db 實跑(未在主機實跑)",
+   "updated_at": "2026-11-20T18:45:00Z",
+   "registered_at": "2026-11-20T17:46:00Z",
+   "receipt": "docs/handoff/evidence/C-vrn-launch-v0103.json"
+  },
+  {
+   "id": "VDF-REQ036:C-vdf-launch-v0106",
+   "requirement": "VDF-REQ036",
+   "case": "C-vdf-launch-v0106",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 11/11(容器;前版 v0104 8/8)· Codex P1 / P2 修正",
+   "next": "主機 go --via-db 實跑(未在主機實跑)",
+   "updated_at": "2026-11-20T18:40:00Z",
+   "registered_at": "2026-11-20T17:46:00Z",
+   "receipt": "docs/handoff/evidence/C-vdf-launch-v0106.json"
+  },
+  {
+   "id": "VDF-REQ037:C-netunified-v0120",
+   "requirement": "VDF-REQ037",
+   "case": "C-netunified-v0120",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 8/8(容器;前版 v0119 9/9)· 開閘重抓台股名單亂碼 892 → 0",
+   "next": "主機 go --via-db 實跑(未在主機實跑)",
+   "updated_at": "2026-11-20T18:16:00Z",
+   "registered_at": "2026-11-20T18:10:00Z",
+   "receipt": "docs/handoff/evidence/C-netunified-v0120.json"
+  },
+  {
+   "id": "VDF-REQ037:C-vdf-stocklist-v0104",
+   "requirement": "VDF-REQ037",
+   "case": "C-vdf-stocklist-v0104",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 13/13(容器)· 開閘實跑 V10 GREEN · fixnames 實跑剩亂碼 0、再跑零改動",
+   "next": "主機 go --via-db 實跑(未在主機實跑)",
+   "updated_at": "2026-11-20T18:16:00Z",
+   "registered_at": "2026-11-20T18:10:00Z",
+   "receipt": "docs/handoff/evidence/C-vdf-stocklist-v0104.json"
+  },
+  {
+   "id": "VCGC-REQ244:C-applyrun-v0107",
+   "requirement": "VCGC-REQ244",
+   "case": "C-applyrun-v0107",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 8/8(容器;前版鏈 v0100–v0106 照過)",
+   "next": "主機 go --via-db 實跑(未在主機實跑)",
+   "updated_at": "2026-11-20T18:16:00Z",
+   "registered_at": "2026-11-20T18:10:00Z",
+   "receipt": "docs/handoff/evidence/C-applyrun-v0107.json"
   }
  ],
  "retired_files": {

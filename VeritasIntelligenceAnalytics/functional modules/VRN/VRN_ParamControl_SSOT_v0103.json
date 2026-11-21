@@ -1,0 +1,281 @@
+{
+ "schema": "VRN.ParamControl.v1",
+ "owner": "VRN-2",
+ "version": "v0103",
+ "prior": "VRN_ParamControl_SSOT_v0102.json",
+ "ts": "2026-11-20T17:35:22Z",
+ "why": "操作員 2026-11-20 桌機實跑後:「為何跑這麼久 · 請改為不監控 CPU/DRAM · 一開始降壓力後統一分三步跑」。道數固定 3(不再依 CPU/DRAM 增減);extract 行程固定 1,總並行約 3。前版 v0102 一字不動。 組覆寫(EQUITY / INDUSTRY / DAILY 等)的 extract_workers 也改 1,否則組值 auto 蓋過 run_params 的 1(PR #701 Codex P2)。",
+ "how_to_edit": [
+  "只改值,不改鍵名;改完跑 `python VRN_MDL260_SafeParallelLaunch_v0102.py params` 看生效表(錯鍵 / 錯型別會點名,不會默默吃掉)。",
+  "先後:指令列旗標 > file_overrides > input_groups[組].params > run_params > 程式內建預設。",
+  "要換一套設定:複製本檔成下一個版號再改(版號律:已發布的檔不就地改),或用 --params <檔> 指到自己的那一份。",
+  "同意閘(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT)不是參數,不放這裡;只由操作員在自己的視窗設。"
+ ],
+ "precedence": [
+  "cli",
+  "file_overrides",
+  "input_groups.params",
+  "run_params",
+  "builtin"
+ ],
+ "run_params": {
+  "slots": 3,
+  "slots_min": 3,
+  "slots_max": 3,
+  "cpu_soft": 70,
+  "cpu_hard": 90,
+  "mem_floor_gb": 2,
+  "calm_wait_s": 180,
+  "timeout_s": 21600,
+  "extract_workers": 1,
+  "extract_timeout_s": 7200,
+  "run_roundall": true,
+  "run_extract": true
+ },
+ "run_params_doc": {
+  "slots": "同時跑幾支獨立流程;操作員 2026-11-20 定案固定 3(開跑前先降壓等靜,跑的途中不看 CPU / DRAM、不增減道、不暫停)",
+  "cpu_soft": "CPU 高於這個值(%)先等靜;監工看到連續過熱會減道",
+  "cpu_hard": "CPU 高於這個值(%)= 過熱,暫停最新子行程",
+  "mem_floor_gb": "DRAM 可用低於這個值(GB)= 過熱",
+  "calm_wait_s": "第一步降壓後最多等幾秒讓系統靜下來",
+  "timeout_s": "文件整輪(RoundAll)整支的時間上限(秒)",
+  "extract_workers": "管理器 extract 平行行程數;固定 1(避免 extract 自己再開 4 支,與 3 道疊加把 DRAM 吃光——2026-11-20 桌機實錄可用 DRAM 掉到 0.5 GB)",
+  "extract_timeout_s": "每一組 extract 的時間上限(秒)",
+  "run_roundall": "false = 不跑 VRN-2 文件整輪",
+  "run_extract": "false = 不跑管理器 extract"
+ },
+ "input_groups": [
+  {
+   "id": "VRN-GRP-01",
+   "key": "EQUITY",
+   "name": "個股報告",
+   "match": {
+    "ticker": true
+   },
+   "params": {
+    "enabled": true,
+    "extract_workers": 1,
+    "extract_timeout_s": 7200
+   }
+  },
+  {
+   "id": "VRN-GRP-02",
+   "key": "INDUSTRY",
+   "name": "產業 / 專題",
+   "match": {
+    "keywords": [
+     "產業",
+     "專題",
+     "趨勢",
+     "展望",
+     "industry",
+     "sector",
+     "thematic",
+     "outlook"
+    ]
+   },
+   "params": {
+    "enabled": true,
+    "extract_workers": 1,
+    "extract_timeout_s": 3600
+   }
+  },
+  {
+   "id": "VRN-GRP-03",
+   "key": "DAILY",
+   "name": "晨會 / 日報 / 週報 / 盤勢 / 策略",
+   "match": {
+    "keywords": [
+     "晨會",
+     "早報",
+     "日報",
+     "周報",
+     "週報",
+     "盤勢",
+     "解盤",
+     "策略",
+     "daily",
+     "weekly",
+     "morning",
+     "strategy"
+    ]
+   },
+   "params": {
+    "enabled": true,
+    "extract_workers": 1,
+    "extract_timeout_s": 3600
+   }
+  },
+  {
+   "id": "VRN-GRP-04",
+   "key": "OTHER",
+   "name": "其他(檔名認不出類別)",
+   "match": {
+    "else": true
+   },
+   "params": {
+    "enabled": true,
+    "extract_workers": 1,
+    "extract_timeout_s": 3600
+   }
+  }
+ ],
+ "input_groups_doc": {
+  "match": "由上往下第一個符合的組;ticker = 檔名剝掉日期與下載時間戳後有 4 位數代號;keywords = 檔名含任一關鍵字(不分大小寫);else = 其餘",
+  "params.enabled": "false = 這一組整組不跑(檔案不動,只是不送進流程;報表上照實列出略過幾份)",
+  "exts": "啟動器分群只看這些副檔名:.pdf .docx .doc .png .jpg .jpeg .tif .tiff .txt .md"
+ },
+ "file_overrides": {},
+ "file_overrides_doc": "單檔例外:{\"檔名.pdf\": {\"group\": \"EQUITY\"}} 指定分到哪一組,或 {\"檔名.pdf\": {\"enabled\": false}} 這一檔不跑",
+ "params": [
+  {
+   "name": "年度擷取科目(同義字)",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "items",
+   "value": "80 項",
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "只增不減(操作員令);既有項不可刪改",
+   "id": "VRN-PAR-001",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "年度欄 REGEX",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "year_regex",
+   "value": {
+    "gregorian": "\\b(?:19|20)\\d{2}\\b",
+    "zh_suffix": "\\d{3,4}(?=年度?|年)",
+    "roc": "\\b\\d{3}\\b",
+    "fiscal": "(?i)FY\\s?\\d{2,4}",
+    "abbr": "'\\d{2}\\b",
+    "quarter_zh": "(\\d{3,4})年第?([1-4一二三四])季",
+    "quarter_us": "\\b(\\d{4})[-\\s]?Q([1-4])\\b",
+    "ended": "(?i)(?:ended)\\s+.{0,20}?(\\d{4})"
+   },
+   "class": "規則",
+   "mutable": true,
+   "why": "只增不減",
+   "id": "VRN-PAR-002",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "EPS 取值律 · labeled",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "eps_rule.labeled",
+   "value": "頁上有標明 基本 / 稀釋 → 照標明的取(fin.eps = 基本;稀釋另存)",
+   "class": "規則",
+   "mutable": false,
+   "why": "操作員 2026-11-15 裁定",
+   "id": "VRN-PAR-003",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "EPS 取值律 · unlabeled_two",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "eps_rule.unlabeled_two",
+   "value": "沒寫清楚、同一期有兩個值 → 取小的(較保守;通常是稀釋),標 UNLABELED_MIN_OF_TWO",
+   "class": "規則",
+   "mutable": false,
+   "why": "操作員 2026-11-15 裁定",
+   "id": "VRN-PAR-004",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "EPS 取值律 · unlabeled_one",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "eps_rule.unlabeled_one",
+   "value": "沒寫清楚、同一期只有一個值 → 取它,但必須標註「基本 / 稀釋區分不明確(財報頁不專業)」UNLABELED_SINGLE",
+   "class": "規則",
+   "mutable": false,
+   "why": "操作員 2026-11-15 裁定",
+   "id": "VRN-PAR-005",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "EPS 取值律 · unlabeled_more",
+   "book": "knowledge/VRN_AnnualExtract_SSOT_v0101.json",
+   "path": "eps_rule.unlabeled_more",
+   "value": "同一期三個以上沒標明的值 → 取最小並列出全部候選(UNLABELED_MIN_OF_N),交人看",
+   "class": "規則",
+   "mutable": false,
+   "why": "操作員 2026-11-15 裁定",
+   "id": "VRN-PAR-006",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "EPS 核對容差",
+   "book": "functional modules/VRN/VRN_SystemManager_v0118.py",
+   "path": "classify_eps_kind(tol_abs, tol_rel)",
+   "value": {
+    "tol_abs": 0.01,
+    "tol_rel": 0.005
+   },
+   "class": "規則",
+   "mutable": true,
+   "why": "報表兩位小數進位",
+   "id": "VRN-PAR-007",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "輸出表頭冊",
+   "book": "supportive modules/registry/VIA_Output_Header_SSOT_v0103.json",
+   "path": "VRN 表",
+   "value": "19 張",
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "中央表頭冊(輸出驗證照它)",
+   "id": "VRN-PAR-008",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "報告一行一單位",
+   "book": "functional modules/VRN/VRN2_ReportRows_v0102.py",
+   "path": "unit",
+   "value": "個股一行一報告 · 產業一行一產業 · 其他一行一主題",
+   "class": "輸出參數",
+   "mutable": false,
+   "why": "操作員令",
+   "id": "VRN-PAR-009",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  },
+  {
+   "name": "測試樣本夾",
+   "book": "(桌機)",
+   "path": "C:\\測試樣本報告",
+   "value": "桌機才有",
+   "class": "輸入參數",
+   "mutable": true,
+   "why": "換樣本夾 = 改這一項",
+   "id": "VRN-PAR-010",
+   "version": "v0100",
+   "registered_at": "2026-11-15T18:09:43Z"
+  }
+ ],
+ "counts": {
+  "io_params_total": 10,
+  "mutable": 4,
+  "immutable": 6,
+  "by_class": {
+   "輸入參數": 2,
+   "規則": 6,
+   "輸出參數": 2
+  },
+  "code_params_harvested": 393,
+  "code_params_book": "VRN_Param_Registry_v0100.json",
+  "vcgc_prmt_numbered": 44,
+  "vcgc_prmt_book": "VIA_NumberBook_PRMT_v0100.jsonl(VCGC 給號,只讀)",
+  "run_params": 12,
+  "input_groups": 4
+ },
+ "conflicts": []
+}
