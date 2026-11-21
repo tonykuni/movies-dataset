@@ -113,3 +113,5 @@
 | 2026-11-21T02:21:49Z | VDF_SSOTSync_v0104.py | 0104 | VIA-VDF-MDL301 | af0c0fc65003 | VDF 自發條目內容有變也升 semver(PR #705 Codex P2) | 自測 8/8 · 交接案收據 · 串測站 GREEN |
 | 2026-11-21T02:57:45Z | VDF_MDL009_TWStockList_v0105.py | 0105 | VIA-VDF-MDL302 | 11b2ec223085 | 前版鏈網路入口轉到尾版(MDL010 替身注入恢復) | 自測 5/5 · MDL010 照過 · 交接案收據 · 串測站 GREEN |
 | 2026-11-21T02:57:45Z | VDF_MDL012_FetchGroups_v0111.py | 0111 | VIA-VDF-MDL303 | ec30c7797d27 | 族群冊升版不再讓舊斷言紅(前版鏈冊釘 v0102 · 現役冊驗內容) | 自測 4/4 · 前版鏈全照過 · 交接案收據 · 串測站 GREEN |
+| 2026-11-21T03:40:00Z | VDF_MDL008_FetchSystem_v0111.py | 0111 | VIA-VDF-MDL304 | c7cd2a4ed403 | live 改道收 requests 兩段 timeout(akshare 1.20 預設 (10, 60) 不再 int(tuple) 失敗) | 自測 7/7 · 深測前版鏈 v0108–v0111 照過 · 真網路 175 列 · 交接案收據 · 串測站 GREEN |
+| 2026-11-21T03:40:00Z | VDF_MDL011_AkshareFetcher_v0105.py | 0105 | VIA-VDF-MDL305 | e2e0bd340e66 | 快照 TTL 逐函式覆寫(選單 v0101 統計局 168h · 平常增量不再整批重抓) | 自測 9/9 · 前版鏈 v0104 → v0102 照過 · 交接案收據 · 串測站 GREEN |
