@@ -111,3 +111,5 @@
 | 2026-11-21T02:15:58Z | VDF_SSOTSync_v0103.py | 0103 | VIA-VDF-MDL300 | b33e5b2cb214 | Codex P2:VDF 自發條目內容有變也升 semver | 自測 8/8 · 交接案收據 · 串測站 GREEN · 真倉 sync 無變更 |
 | 2026-11-21T02:21:49Z | VDF_SSOTSync_v0103.py | 0103 | VIA-VDF-MDL300 | 0f0ec0f48f22 | 還原為已合併位元(同 main);取代本線 02:15:58 那列(那列雜湊是合併後就地改的內容,作廢) | sha 對 main · 自測 7/7 |
 | 2026-11-21T02:21:49Z | VDF_SSOTSync_v0104.py | 0104 | VIA-VDF-MDL301 | af0c0fc65003 | VDF 自發條目內容有變也升 semver(PR #705 Codex P2) | 自測 8/8 · 交接案收據 · 串測站 GREEN |
+| 2026-11-21T02:57:45Z | VDF_MDL009_TWStockList_v0105.py | 0105 | VIA-VDF-MDL302 | 11b2ec223085 | 前版鏈網路入口轉到尾版(MDL010 替身注入恢復) | 自測 5/5 · MDL010 照過 · 交接案收據 · 串測站 GREEN |
+| 2026-11-21T02:57:45Z | VDF_MDL012_FetchGroups_v0111.py | 0111 | VIA-VDF-MDL303 | ec30c7797d27 | 族群冊升版不再讓舊斷言紅(前版鏈冊釘 v0102 · 現役冊驗內容) | 自測 4/4 · 前版鏈全照過 · 交接案收據 · 串測站 GREEN |
