@@ -8,7 +8,6 @@ v0100 的設計是「VDF-<類>-#### 只是內部追蹤號,ssot_id 由 VCGC 中�
   · 已由 VCGC 核發的條目(「已確認(VCGC)」+ ssot_id)原樣保留 —— 那是歷史,不改寫;之後內容有變照樣升 semver,但直接由 VDF 自己定案。
   · contract/VDF_NUMBER_REQUEST_latest.json 照寫(ActivateVDF 查它在不在),但請號清單空、規則改寫成 VDF 自己定案;不再讀 VCGC 核發冊。
   · 狀態檔 contract/VDF_NUMBER_STATE_latest.json 不寫本機絕對路徑。
-  · VDF 自發條目(沒有 ssot_id)內容有變也升 semver(v0100 只對有中央號的升;PR #705 Codex P2)。
 register 的收割(v0101 / v0102 的 harvest)、登記鍵、號碼規則(鍵不變號不變 · 只增不減 · 內容有變才出新版冊)全部照舊。
 ActivateVDF 每輪呼叫尾版的 sync → 走本版。v0100 本體函式不動,前版自測照舊。
 """
@@ -131,43 +130,8 @@ def self_confirm(vdf: Path = HERE, inplace: bool = False) -> dict:
     return state
 
 
-def _snapshot(vdf: Path) -> dict:
-    reg = BASE.latest_register(vdf)
-    if not reg:
-        return {}
-    ents = json.loads(reg.read_text(encoding="utf-8")).get("entries") or {}
-    return {k: (e.get("fp"), json.dumps(e.get("content"), sort_keys=True, ensure_ascii=False), e.get("semver") or "1.0.0", str(e.get("status", "")), e.get("ssot_id") or "")
-            for k, e in ents.items()}
-
-
-def bump_self_issued(vdf: Path, before: dict) -> int:
-    """v0100 只在有中央號(ssot_id)時才升 semver;VDF 自發的條目沒有 ssot_id → 內容改了版本卻停在原地(PR #705 Codex P2)。
-    這裡補上:本輪內容(指紋 / 內容)有變、前一份是已確認、沒有 ssot_id 的條目 → 升 minor、supersedes = 舊版;直接改 register 剛寫的那一版冊。"""
-    reg = BASE.latest_register(vdf)
-    if not reg or not before:
-        return 0
-    book = json.loads(reg.read_text(encoding="utf-8"))
-    entries = book.get("entries") or {}
-    n = 0
-    for k, e in entries.items():
-        b = before.get(k)
-        if not b or e.get("ssot_id") or not b[3].startswith("已確認"):
-            continue
-        now_sig = (e.get("fp"), json.dumps(e.get("content"), sort_keys=True, ensure_ascii=False))
-        if now_sig != (b[0], b[1]) and (e.get("semver") or "1.0.0") == b[2]:
-            e["supersedes"] = b[2]
-            e["semver"] = BASE._bump(b[2])
-            e["sha256"] = BASE.asset_sha(e)
-            n += 1
-    if n:
-        reg.write_text(json.dumps(book, ensure_ascii=False, indent=1), encoding="utf-8")
-    return n
-
-
 def register(vdf: Path = HERE, items: dict | None = None) -> dict:
-    before = _snapshot(vdf)
     r = BASE.register(vdf, items)                          # 收割(v0102 harvest)· 號碼 · 版冊規則照 v0100
-    r["self_bumped"] = bump_self_issued(vdf, before) if r.get("written") else 0
     r["self_confirm"] = self_confirm(vdf, inplace=bool(r.get("written")))
     return r
 
@@ -258,18 +222,6 @@ def selftest() -> int:
             and last["VDF:SSOT:A"]["no"] == "VDF-SSOT-0001" and req.get("pending") == [] and req.get("ssot_items") == [] and "VDF 自己發號" in req.get("rule", "")
             and "VDF 自發號" in sy["line"] and "待核 0" in sy["line"], (sy["line"], req.get("pending"), last.get("VDF:SSOT:F")))
         chk("⑤ 第二次 sync:登記冊不再出新版(不會每輪換版)", not sy2["register"].get("written") and sy2["apply"]["changed"] == 0, (sy2["register"].get("register"), sy2["apply"].get("changed")))
-        items["VDF:SSOT:F"] = dict(items["VDF:SSOT:F"], fp="f2", content={"x": 66})
-        BASE.harvest = lambda vdf=None: items
-        try:
-            sy3 = sync(vdf)
-            sy4 = sync(vdf)
-        finally:
-            BASE.harvest = keep
-        l3 = json.loads(BASE.latest_register(vdf).read_text(encoding="utf-8"))["entries"]
-        chk("⑤b VDF 自發條目(沒有 ssot_id)內容再改 → semver 1.0.0 → 1.1.0 · supersedes 1.0.0 · 號不變 · 仍已確認 · 不編假中央號;再跑一次不再升(PR #705 Codex P2)",
-            l3["VDF:SSOT:F"]["semver"] == "1.1.0" and l3["VDF:SSOT:F"]["supersedes"] == "1.0.0" and l3["VDF:SSOT:F"]["no"] == "VDF-SSOT-0006"
-            and l3["VDF:SSOT:F"]["status"] == SELF_STATUS and not l3["VDF:SSOT:F"].get("ssot_id") and sy3["register"]["self_bumped"] == 1
-            and not sy4["register"].get("written"), (l3["VDF:SSOT:F"].get("semver"), sy3["register"].get("self_bumped"), sy4["register"].get("written")))
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑥ 加速器橋 + 網路橋在 · 不碰 TA-Lib · 不設同意閘 · 不含本機路徑 · v0100 本體函式沒被換掉",
         "import VIA_SuperAccel_Module as VIA_ACCEL" in src and "[VIA:NET-BRIDGE:v0100]" in src and not re.search(r"^\s*(import|from)\s+talib", src, re.M)

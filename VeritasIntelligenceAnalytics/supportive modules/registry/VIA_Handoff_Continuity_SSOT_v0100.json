@@ -6613,18 +6613,33 @@
   },
   "C-vdf-ssotsync-v0103": {
    "argv": [
-    "VDF_SSOTSync",
+    "functional modules/VDF/VDF_SSOTSync_v0103.py",
     "--selftest"
    ],
-   "success_marker": "[計] VDF_SSOTSync v0103 本版 8/8 · PASS",
-   "scope": "VDF 帳本 v0103:VDF 自己發號定案(待核三種 → 已確認(VDF 自發)· 號不變 · VCGC 已核發的照留 · 請號清單空 · 再跑不換版)· 前版鏈 v0102 → v0100 自測照過(VDF-REQ038) · VDF 自發條目內容有變也升 semver(PR #705 Codex P2)",
+   "success_marker": "[計] VDF_SSOTSync v0103 本版 7/7 · PASS",
+   "scope": "VDF 帳本 v0103(已合併版,位元同 main · SHA 0f0ec0f48f22):VDF 自己發號定案 · 前版鏈 v0102 → v0100 自測照過(VDF-REQ038);semver 修正改發 v0104(PR #705 Codex P2)",
    "dependencies": [
-    "functional modules/VDF/VDF_SSOTSync_v*.py"
+    "functional modules/VDF/VDF_SSOTSync_v0103.py"
    ],
    "version": "v0103",
    "timeout_seconds": 900,
-   "updated_at": "2026-11-21T02:25:00Z",
+   "updated_at": "2026-11-21T02:30:00Z",
    "registered_at": "2026-11-21T02:40:00Z"
+  },
+  "C-vdf-ssotsync-v0104": {
+   "argv": [
+    "VDF_SSOTSync",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_SSOTSync v0104 本版 8/8 · PASS",
+   "scope": "VDF 帳本 v0104:VDF 自發條目(沒有 ssot_id)內容有變也升 semver / supersedes(PR #705 Codex P2)· 其餘照 v0103 · 前版 v0103 自測照過(VDF-REQ038)",
+   "dependencies": [
+    "functional modules/VDF/VDF_SSOTSync_v*.py"
+   ],
+   "version": "v0104",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-21T02:30:00Z",
+   "registered_at": "2026-11-21T02:30:00Z"
   }
  },
  "work_items": [
@@ -13258,11 +13273,22 @@
    "case": "C-vdf-ssotsync-v0103",
    "state": "VERIFIED",
    "owner": "AI",
-   "reason": "自測 8/8(容器;前版鏈 v0102 → v0100 照過)· 實跑 sync:v0113 495 條全部已確認(VDF 自發 12 · 先前 VCGC 核發 483)· 待核 0 · 再跑不換版",
+   "reason": "自測 7/7(v0103 原位元;容器)· 實跑 495 條已確認",
    "next": "主機 ActivateVDF 實跑(未在主機實跑)",
-   "updated_at": "2026-11-21T02:25:00Z",
+   "updated_at": "2026-11-21T02:30:00Z",
    "registered_at": "2026-11-21T02:40:00Z",
    "receipt": "docs/handoff/evidence/C-vdf-ssotsync-v0103.json"
+  },
+  {
+   "id": "VDF-REQ038:C-vdf-ssotsync-v0104",
+   "requirement": "VDF-REQ038",
+   "case": "C-vdf-ssotsync-v0104",
+   "state": "IN_PROGRESS",
+   "owner": "AI",
+   "reason": "新案;待 handoff test 收據",
+   "next": "handoff test C-vdf-ssotsync-v0104",
+   "updated_at": "2026-11-21T02:30:00Z",
+   "registered_at": "2026-11-21T02:30:00Z"
   }
  ],
  "retired_files": {
