@@ -125,3 +125,5 @@
 | 2026-11-21T07:05:19Z | VDF_MDL032_TWPriceReconcile_v0100.py | 0100 | VIA-VDF-MDL310 | bfc90ee6320b | 台股日價官方對帳(官方值覆蓋) | 自測 11/11 · 資料家實跑 GREEN · 抽驗 5 檔與官方逐欄相同 |
 | 2026-11-21T07:16:31Z | VDF_MDL032_TWPriceReconcile_v0101.py | 0101 | VIA-VDF-MDL311 | f476802fd184 | 刪休市佔位要官方指數日曆證明(Codex P1) | 自測 10/10 · 真庫乾跑冪等 |
 | 2026-11-21T07:27:55Z | VRN_ENG049_ContentReconcile_v0106.py | 0106 | VIA-VRN-ENG339 | c7a26b2c7382 | 矩陣 ADJ CLOSE 讀 VDF 官方對帳後日價 | 自測 9/9 · ADJ CLOSE 38/42 · 綠 8 |
+| 2026-11-21T10:24:53Z | VIA_RepoSafeSync_v0100.py | 0100 | VIA-CORE-MDL879 | 19153a22cec2 | 桌機倉安全快轉(擋路同名檔先備份 · main 為準) | 自測 10/10 · 桌機版本容器重現快轉成功 |
+| 2026-11-21T10:24:53Z | VIA_VCGC_ApplyRun_v0108.py | 0108 | VIA-CORE-MDL880 | 11899a37e924 | go 先安全同步再跑(更新後尾版重跑) | 自測 9/9 |
