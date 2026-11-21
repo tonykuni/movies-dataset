@@ -132,3 +132,8 @@
 | 2026-11-21T11:22:00Z | VIA_RepoSafeSync_v0103.py | 0103 | VIA-CORE-MDL883 | e2b0a0ee28da | 桌機倉安全快轉 v0103(失敗就停 · 巢狀倉 · 連結 manifest · 大小寫) | 自測 11/11 |
 | 2026-11-21T11:26:00Z | VIA_RepoSafeSync_v0104.py | 0104 | VIA-CORE-MDL884 | e300a053908d | 桌機倉安全快轉 v0104(pathspec 照字面) | 自測 9/9 |
 | 2026-11-21T11:46:00Z | VIA_RepoSafeSync_v0105.py | 0105 | VIA-CORE-MDL885 | 0c89652eed1d | 桌機倉安全快轉 v0105(檔名位元組原樣 · 找不到就停) | 自測 11/11 |
+| 2026-11-21T15:50:00Z | VDF_ENG240_SP500SectorWeight_v0101.py | 0101 | VIA-VDF-ENG393 | fe11d3eef398 | ENG240 --selftest 薄尾 | 自測 4/4 |
+| 2026-11-21T15:50:00Z | VDF_Engine_aaii_sentiment.py | — | (VDF-REQ043) | d443a0613479 | AAII 走網路工具 + 官方 xls 來源 | AST 加速器匯入 + 載入 |
+| 2026-11-21T15:50:00Z | VDF_Engine_cnn_fear_greed_proxy.py | — | (VDF-REQ043) | 5361e80f80c2 | CNN 代理 yfinance 先過雙閘 | AST 加速器匯入 + 載入 |
+| 2026-11-21T17:05:00Z | VDF_SystemManager_v0188.py | 0188 | VIA-VDF-MDL312 | 40290aa44c01 | VDF monitor 九格(唯讀動詞 + DuckDB / parquet 收據 · 鎖定模板頁) | 自測 12/12 |
+| 2026-11-21T17:05:00Z | VRN_SystemManager_v0281.py | 0281 | VIA-VRN-MDL360 | 5319601f841c | VRN monitor 九格(VRN-2 收據 + 零寫入動詞 · 鎖定模板頁) | 自測 11/11 |
