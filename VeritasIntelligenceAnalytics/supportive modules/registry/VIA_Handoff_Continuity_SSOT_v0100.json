@@ -6583,18 +6583,33 @@
   },
   "C-vrn-manager-v0279": {
    "argv": [
-    "VRN_SystemManager",
+    "functional modules/VRN/VRN_SystemManager_v0279.py",
     "--selftest"
    ],
-   "success_marker": "[計] VRN_SystemManager v0279 本版 11/11 · PASS",
-   "scope": "VRN 管理器 v0279:VRN 自己發號定案(資產登記 · 元件登記狀態 = 已確認(VRN 自發)· 請號清單空 · 再跑不換版)· 鏈上 v0229 / v0231 / v0240 替換都命中 · 前版鏈 v0270–v0278 自測照過(VRN-REQ023) · 沿用下來的舊冊 / 舊參數也轉已確認(PR #702 Codex P2)",
+   "success_marker": "[計] VRN_SystemManager v0279 本版 10/10 · PASS",
+   "scope": "VRN 管理器 v0279(已合併版,位元同 main · SHA 36bc80a45516):VRN 自己發號定案 · 前版鏈 v0270–v0278 自測照過(VRN-REQ023);修正改發 v0280(PR #703 Codex P1)",
    "dependencies": [
-    "functional modules/VRN/VRN_SystemManager_v*.py"
+    "functional modules/VRN/VRN_SystemManager_v0279.py"
    ],
    "version": "v0279",
    "timeout_seconds": 1800,
-   "updated_at": "2026-11-21T01:45:00Z",
+   "updated_at": "2026-11-21T02:05:00Z",
    "registered_at": "2026-11-21T01:30:00Z"
+  },
+  "C-vrn-manager-v0280": {
+   "argv": [
+    "VRN_SystemManager",
+    "--selftest"
+   ],
+   "success_marker": "[計] VRN_SystemManager v0280 本版 12/12 · PASS",
+   "scope": "VRN 管理器 v0280:沿用的舊冊 / 舊參數也轉已確認(PR #702 Codex P2)· 規格冊深拷貝(同家族新版號檔進冊)· 唯一替換者(關掉 v0279 的鉤子)· 前版 v0279 自測照過(VRN-REQ023)",
+   "dependencies": [
+    "functional modules/VRN/VRN_SystemManager_v*.py"
+   ],
+   "version": "v0280",
+   "timeout_seconds": 1800,
+   "updated_at": "2026-11-21T02:05:00Z",
+   "registered_at": "2026-11-21T02:05:00Z"
   }
  },
  "work_items": [
@@ -13204,11 +13219,23 @@
    "case": "C-vrn-manager-v0279",
    "state": "VERIFIED",
    "owner": "AI",
-   "reason": "自測 11/11(容器;前版鏈 v0270–v0278 照過)· 實跑 extract:112 號全部已確認(VRN 自發)· 號碼不變 · 請號清單空 · 再跑不換版",
+   "reason": "自測 10/10(v0279 原位元;容器)· 實跑 112 號已確認",
    "next": "主機實跑(未在主機實跑)",
-   "updated_at": "2026-11-21T01:45:00Z",
+   "updated_at": "2026-11-21T02:05:00Z",
    "registered_at": "2026-11-21T01:30:00Z",
    "receipt": "docs/handoff/evidence/C-vrn-manager-v0279.json"
+  },
+  {
+   "id": "VRN-REQ023:C-vrn-manager-v0280",
+   "requirement": "VRN-REQ023",
+   "case": "C-vrn-manager-v0280",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 12/12(容器;前版 v0279 10/10)· 實跑 extract:VRN_Asset_Register v0103 記到 v0280 · 112 號已確認、號不變 · 再跑不換版",
+   "next": "主機實跑(未在主機實跑)",
+   "updated_at": "2026-11-21T02:10:00Z",
+   "registered_at": "2026-11-21T02:05:00Z",
+   "receipt": "docs/handoff/evidence/C-vrn-manager-v0280.json"
   }
  ],
  "retired_files": {

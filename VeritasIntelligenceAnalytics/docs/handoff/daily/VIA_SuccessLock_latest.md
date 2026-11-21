@@ -103,3 +103,6 @@
 | 2026-11-21T01:29:50Z | VRN_SystemManager_v0279.py | 0279 | VIA-VRN-MDL358 | 36bc80a45516 | VRN 自己發號定案(不等 VCGC 核號) | 自測 10/10 · 交接案收據 · 串測站 GREEN · 實跑 extract 112 號已確認 · 再跑不換版 |
 | 2026-11-21T01:29:50Z | VRN_Asset_Register_v0102.json | 0102 | (VRN 自己的冊) | afda0f933731 | VRN 資產登記:105 冊號 + 7 參數號 全部已確認(VRN 自發)· 號碼同 v0101 | 由 VRN 管理器 v0279 實跑寫出 |
 | 2026-11-21T01:38:57Z | VRN_SystemManager_v0279.py | 0279 | VIA-VRN-MDL358 | 9bba6bc85f31 | Codex P2:沿用下來的舊冊 / 舊參數也轉已確認(號不變) | 自測 11/11 · 交接案收據 · 串測站 GREEN · 實跑 extract 無變更 |
+| 2026-11-21T01:53:46Z | VRN_SystemManager_v0279.py | 0279 | VIA-VRN-MDL358 | 36bc80a45516 | 還原為已合併位元(同 main);取代本線 2026-11-21 01:4x 那列(那列的雜湊是就地改過的內容,已作廢) | sha 對 main · 自測 10/10 |
+| 2026-11-21T01:53:46Z | VRN_SystemManager_v0280.py | 0280 | VIA-VRN-MDL359 | e5f205b84aca | 沿用舊冊 / 舊參數轉已確認 · 規格冊深拷貝 · 唯一替換者 | 自測 12/12 · 交接案收據 · 串測站 GREEN · 實跑 v0103 記到 v0280 · 再跑不換版 |
+| 2026-11-21T01:53:46Z | VRN_Asset_Register_v0103.json | 0103 | (VRN 自己的冊) | 8b045c46a34d | VRN 資產登記 v0103:112 號已確認(VRN 自發)· 規格 1083 筆(含 v0280) | 由 VRN 管理器 v0280 實跑寫出 |
