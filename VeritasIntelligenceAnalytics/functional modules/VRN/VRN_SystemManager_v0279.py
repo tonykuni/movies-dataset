@@ -100,10 +100,6 @@ def transformed(path: Path) -> dict:
     assert n >= 1, "asset_register 規則字串沒命中"
     a, n = re.subn(r"VCGC 偵測三系統無衝突後寫 VCGC_NUMBER_GRANT_latest\.json \{grants:\{key:no\}\} · VRN 讀到才轉已確認", RULING + " · pending 永遠空", a)
     assert n == 1, "核號請求規則字串命中 %d(應 1)" % n
-    norm = '{_k: (dict(_v, status=SELF_STATUS_V0279) if isinstance(_v, dict) and str(_v.get("status", "")).startswith("暫編") else _v) for _k, _v in dict(prev.get("%s") or {}).items()}'
-    a, n5 = re.subn(r'books = dict\(prev\.get\("books"\) or \{\}\)', lambda _m: "books = " + norm % "books", a)
-    a, n6 = re.subn(r'params = dict\(prev\.get\("params"\) or \{\}\)', lambda _m: "params = " + norm % "params", a)
-    assert (n5, n6) == (1, 1), "沿用舊列正規化命中 %s(應 1, 1)" % ((n5, n6),)     # PR #702 Codex P2:本輪沒掃到的舊冊 / 參數也轉已確認(號不變)
     out["asset_register"] = a
     b, n = re.subn(r"待 VCGC 核號 %d\(contract/VRN_NUMBER_REQUEST_latest\.json\)", "VRN 自發號 · 待核 %d(" + RULING + ")", s["asset_lines"])
     assert n == 1, "asset_lines 命中 %d(應 1)" % n
@@ -220,9 +216,7 @@ def selftest() -> int:
         (home / "registry").mkdir()
         (home / "SSOT" / "VRN_Demo_SSOT_v0100.json").write_text('{"a": 1}', encoding="utf-8")
         (home / "registry" / "VRN_Asset_Register_v0100.json").write_text(json.dumps({"schema": "VIA.VRN.AssetRegister.v1", "engines": {}, "books": {
-            "VRN_Demo_SSOT.json": {"no": "VRN-B-0007", "status": OLD_PENDING, "first_seen": "2026-11-01"},
-            "VRN_Gone_SSOT.json": {"no": "VRN-B-0003", "status": OLD_PENDING, "first_seen": "2026-10-01"}}, "params": {
-            "OLD_PARAM": {"no": "VRN-P-0009", "value": "x", "status": OLD_PENDING}}, "specs": {}, "version": "v0100"}, ensure_ascii=False), encoding="utf-8")
+            "VRN_Demo_SSOT.json": {"no": "VRN-B-0007", "status": OLD_PENDING, "first_seen": "2026-11-01"}}, "params": {}, "specs": {}, "version": "v0100"}, ensure_ascii=False), encoding="utf-8")
         o1 = B.asset_register(home)
         regs = sorted((home / "registry").glob("VRN_Asset_Register_v*.json"), key=_vnum)
         d = json.loads(regs[-1].read_text(encoding="utf-8"))
@@ -232,9 +226,6 @@ def selftest() -> int:
         ck("② 資產登記:舊「暫編 · 待 VCGC 核號」→ 已確認(VRN 自發)· 號不變(VRN-B-0007)· 全部狀態都是已確認 · 規則寫 VRN 自己定案",
            o1["changed"] and bs.get("no") == "VRN-B-0007" and bs.get("status") == SELF_STATUS and allst and all(x == SELF_STATUS for x in allst) and "VRN 自己發號" in d.get("rule", ""), (o1, bs, set(allst)))
         ck("③ 核號請求 contract/VRN_NUMBER_REQUEST_latest.json:pending 空 · 規則 = VRN 自己定案", req.get("pending") == {} and "VRN 自己發號" in req.get("rule", ""), req)
-        gone, oldp = d["books"].get("VRN_Gone_SSOT.json", {}), d["params"].get("OLD_PARAM", {})
-        ck("③b 本輪沒掃到、沿用下來的舊冊 / 舊參數也轉已確認(號不變:VRN-B-0003 · VRN-P-0009)(PR #702 Codex P2)",
-           gone.get("no") == "VRN-B-0003" and gone.get("status") == SELF_STATUS and oldp.get("no") == "VRN-P-0009" and oldp.get("status") == SELF_STATUS, (gone, oldp))
         o2 = B.asset_register(home)
         ck("④ 再跑一次:無變更、不出新版(不會每輪換版)", not o2["changed"] and len(sorted((home / "registry").glob("VRN_Asset_Register_v*.json"))) == len(regs), o2)
         lines = B.asset_lines(o2)
