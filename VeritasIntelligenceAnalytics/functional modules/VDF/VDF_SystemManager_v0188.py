@@ -324,6 +324,8 @@ def selftest() -> int:
     body = src.split("def selftest", 1)[0]
     chk("⑧ 加速器橋 · 網路橋在;本動詞不出網(沒有 _via_net() 呼叫)· 不碰 TA-Lib",
         "[VIA:ACCEL-BRIDGE:v0100]" in src and "[VIA:NET-BRIDGE:v0100]" in src and "_via_net()." not in body and "talib" not in body.lower())
+    peer = [k for k in ("VIA_FROM_VCGC", "VIA_FROM_VRN") if re.search(r"environ(?:\[[\"']%s[\"']\]\s*=|\.setdefault\([\"']%s)" % (k, k), body)]
+    chk("⑩ 系統獨立:不設他系統的入口旗標(本檔是 VDF 自己的入口;VCGC 只支援不干涉)", not peer, peer)
     pub = [n for n in dir(PRIOR) if not n.startswith("_") and callable(getattr(PRIOR, n, None))]
     chk("⑨ 尾版保有前版公開名稱(TAILAPI)", all(getattr(sys.modules[__name__], n, None) is not None for n in pub), f"{len(pub)} 支")
     print(f"  [計] {TAG} 本版 {sum(ok)}/{len(ok)} · {'PASS' if all(ok) else 'FAIL'}")
