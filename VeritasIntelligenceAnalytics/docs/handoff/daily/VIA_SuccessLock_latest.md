@@ -144,3 +144,4 @@
 | 2026-11-21T18:45:00Z | VDF_SystemManager_v0190.py | 0190 | VIA-VDF-MDL314 | d574c641402b | VDF monitor 心跳 · 逐動詞起訖 · 單支時限 | 自測 8/8 |
 | 2026-11-21T17:25:00Z | VRN_SystemManager_v0283.py | 0283 | VIA-VRN-MDL362 | 7bd0c95a09c3 | VRN launch 走 TEMP · 起跑前備份 · resources | 自測 21/21 |
 | 2026-11-21T17:45:00Z | VDF_SystemManager_v0191.py | 0191 | VIA-VDF-MDL315 | 370d539518c9 | VDF monitor --json 只留 JSON | 自測 8/8 |
+| 2026-11-21T17:50:00Z | VRN_SystemManager_v0284.py | 0284 | VIA-VRN-MDL363 | d030b13fb5dc | Graphify 看 VRN 自己的燈 · 備份驗過才發布 | 自測 17/17 |
