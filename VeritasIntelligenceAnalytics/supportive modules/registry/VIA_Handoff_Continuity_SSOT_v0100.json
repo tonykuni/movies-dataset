@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-21T07:32:00Z",
+ "updated_at": "2026-11-21T08:12:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -6853,6 +6853,36 @@
    "timeout_seconds": 1500,
    "updated_at": "2026-11-21T07:30:00Z",
    "registered_at": "2026-11-21T07:30:00Z"
+  },
+  "C-reposafesync-v0100": {
+   "argv": [
+    "docs/handoff/ai/VIA_RepoSafeSync_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VIA_RepoSafeSync v0100 自測 10/10 · PASS",
+   "scope": "VIA_RepoSafeSync_v0100.py(VCGC-REQ245)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_RepoSafeSync_v*.py"
+   ],
+   "version": "v0100",
+   "timeout_seconds": 1500,
+   "updated_at": "2026-11-21T08:10:00Z",
+   "registered_at": "2026-11-21T08:10:00Z"
+  },
+  "C-applyrun-v0108": {
+   "argv": [
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v0108.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VIA_VCGC_ApplyRun v0108 本版 9/9 · PASS",
+   "scope": "VIA_VCGC_ApplyRun_v0108.py(VCGC-REQ245)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_VCGC_ApplyRun_v*.py"
+   ],
+   "version": "v0108",
+   "timeout_seconds": 1500,
+   "updated_at": "2026-11-21T08:10:00Z",
+   "registered_at": "2026-11-21T08:10:00Z"
   }
  },
  "work_items": [
@@ -13671,6 +13701,30 @@
    "updated_at": "2026-11-21T07:32:00Z",
    "registered_at": "2026-11-21T07:30:00Z",
    "receipt": "docs/handoff/evidence/C-vrn-eng049-v0106.json"
+  },
+  {
+   "id": "VCGC-REQ245:C-reposafesync-v0100",
+   "requirement": "VCGC-REQ245",
+   "case": "C-reposafesync-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 10/10(容器暫存倉;重現 pull 被擋 · 乾跑零寫入 · 備份後快轉 · 冪等 · 不在 main / 分歧停)· 桌機版本 b579e16f3 容器重現:1 檔擋路,搬走後快轉成功",
+   "next": "主機實跑(未在主機實跑)",
+   "updated_at": "2026-11-21T08:12:00Z",
+   "registered_at": "2026-11-21T08:10:00Z",
+   "receipt": "docs/handoff/evidence/C-reposafesync-v0100.json"
+  },
+  {
+   "id": "VCGC-REQ245:C-applyrun-v0108",
+   "requirement": "VCGC-REQ245",
+   "case": "C-applyrun-v0108",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 9/9(容器;SYNCED 改由尾版重跑 · 其他狀態照常往下 · --no-sync)",
+   "next": "主機實跑(未在主機實跑)",
+   "updated_at": "2026-11-21T08:12:00Z",
+   "registered_at": "2026-11-21T08:10:00Z",
+   "receipt": "docs/handoff/evidence/C-applyrun-v0108.json"
   }
  ],
  "retired_files": {
