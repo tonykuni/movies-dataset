@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-20T17:50:00Z",
+ "updated_at": "2026-11-21T03:30:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -6672,6 +6672,37 @@
    "timeout_seconds": 1200,
    "updated_at": "2026-11-21T03:00:00Z",
    "registered_at": "2026-11-21T03:00:00Z"
+  },
+  "C-vdf-fetchsystem-v0111": {
+   "argv": [
+    "VDF_MDL008_FetchSystem",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL008_FetchSystem v0111 本版 7/7 · 合計 PASS",
+   "scope": "VDF 擷取系統 v0111:akshare 1.20 預設 timeout=(10, 60) 經 live 改道不再 int(tuple) 失敗(重現 + 修正 · 假網路工具子行程探針)· 子行程 = 本版 · 換裝還原(VDF-REQ040)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py"
+   ],
+   "version": "v0111",
+   "timeout_seconds": 1200,
+   "updated_at": "2026-11-21T03:20:00Z",
+   "registered_at": "2026-11-21T03:20:00Z"
+  },
+  "C-vdf-akshare-v0105": {
+   "argv": [
+    "VDF_MDL011_AkshareFetcher",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL011_AkshareFetcher v0105 本版 9/9 · 合計 PASS",
+   "scope": "VDF AkShare 擷取 v0105:選單 snapshot_ttl_hours_by_fn 逐函式快照 TTL(重現全域 24h 整批重抓 · 168h 跳過 · 沒列照全域 · backfill 不看 TTL)· 參數冊尾版帶統計局 168h(VDF-REQ040)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL011_AkshareFetcher_v*.py",
+    "functional modules/VDF/VDF_AkshareSelection_MacroShipping_v*.json"
+   ],
+   "version": "v0105",
+   "timeout_seconds": 1200,
+   "updated_at": "2026-11-21T03:20:00Z",
+   "registered_at": "2026-11-21T03:20:00Z"
   }
  },
  "work_items": [
@@ -13346,6 +13377,30 @@
    "updated_at": "2026-11-21T03:10:00Z",
    "registered_at": "2026-11-21T03:00:00Z",
    "receipt": "docs/handoff/evidence/C-vdf-fetchgroups-v0111.json"
+  },
+  {
+   "id": "VDF-REQ040:C-vdf-fetchsystem-v0111",
+   "requirement": "VDF-REQ040",
+   "case": "C-vdf-fetchsystem-v0111",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 7/7(容器;重現 v0110 改道 int(tuple) TypeError → 本版收成 60 秒 · 子行程 = 本版)· 深測前版鏈 v0108–v0111 照過 · 真網路 macro_china_mobile_number 175 列",
+   "next": "主機實跑(未在主機實跑)",
+   "updated_at": "2026-11-21T03:30:00Z",
+   "registered_at": "2026-11-21T03:20:00Z",
+   "receipt": "docs/handoff/evidence/C-vdf-fetchsystem-v0111.json"
+  },
+  {
+   "id": "VDF-REQ040:C-vdf-akshare-v0105",
+   "requirement": "VDF-REQ040",
+   "case": "C-vdf-akshare-v0105",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "自測 9/9(容器;前版 v0104 → v0102 鏈照過 · 重現全域 24h 整批重抓 · 168h 跳過 · backfill 不看 TTL · 參數冊尾版 v0101 帶統計局 168h)",
+   "next": "主機實跑(未在主機實跑)",
+   "updated_at": "2026-11-21T03:30:00Z",
+   "registered_at": "2026-11-21T03:20:00Z",
+   "receipt": "docs/handoff/evidence/C-vdf-akshare-v0105.json"
   }
  ],
  "retired_files": {
