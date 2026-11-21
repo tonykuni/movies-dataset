@@ -137,3 +137,7 @@
 | 2026-11-21T15:50:00Z | VDF_Engine_cnn_fear_greed_proxy.py | — | (VDF-REQ043) | 5361e80f80c2 | CNN 代理 yfinance 先過雙閘 | AST 加速器匯入 + 載入 |
 | 2026-11-21T17:05:00Z | VDF_SystemManager_v0188.py | 0188 | VIA-VDF-MDL312 | 40290aa44c01 | VDF monitor 九格(唯讀動詞 + DuckDB / parquet 收據 · 鎖定模板頁) | 自測 12/12 |
 | 2026-11-21T17:05:00Z | VRN_SystemManager_v0281.py | 0281 | VIA-VRN-MDL360 | 5319601f841c | VRN monitor 九格(VRN-2 收據 + 零寫入動詞 · 鎖定模板頁) | 自測 11/11 |
+| 2026-11-21T18:00:00Z | VDF_SystemManager_v0189.py | 0189 | VIA-VDF-MDL313 | 91838426564f | VDF monitor 每格看自己的收據年齡(含 parquet) | 自測 10/10 |
+| 2026-11-21T18:00:00Z | VRN_SystemManager_v0282.py | 0282 | VIA-VRN-MDL361 | 07a0bed08e80 | VRN monitor 每格看自己的收據年齡 | 自測 9/9 |
+| 2026-11-21T18:00:00Z | VDF_Engine_aaii_sentiment.py | — | (VDF-REQ043) | 7f205065e65e | 還原 main 原位元組(PR 712 Codex P1:修改開新版;AAII 由 ENG116 負責) | 位元與 main 相同 |
+| 2026-11-21T18:00:00Z | VDF_Engine_cnn_fear_greed_proxy.py | — | (VDF-REQ043) | 05c96473bcb1 | 還原 main 原位元組(PR 712 Codex P1) | 位元與 main 相同 |

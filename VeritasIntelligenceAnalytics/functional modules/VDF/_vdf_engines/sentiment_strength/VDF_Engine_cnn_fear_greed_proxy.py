@@ -57,12 +57,6 @@ from VDF_Engine_sentiment_strength import def_rolling_percentile_score, def_clas
 
 
 def def_fetch_yfinance_close(symbol: str, period: str = "5y", interval: str = "1d") -> pd.Series:
-    net = _via_net()   # 出網先過統包網路工具的雙閘(2026-11-21 晨檢 A;閘沒開 = DENY 零外呼,不換道直連)
-    gate = getattr(net, "gate_state", None) if net is not None else None
-    if not callable(gate):
-        raise RuntimeError("VIA 網路工具載不到(via_net_unified_v*.py)· 不換道直連")
-    if not gate().get("open"):
-        raise RuntimeError("DENY:VIA 網路工具同意閘未開(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT · 操作員決定)")
     import yfinance as yf
 
     df = yf.download(
