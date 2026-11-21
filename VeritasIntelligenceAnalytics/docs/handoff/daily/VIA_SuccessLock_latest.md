@@ -135,3 +135,5 @@
 | 2026-11-21T15:50:00Z | VDF_ENG240_SP500SectorWeight_v0101.py | 0101 | VIA-VDF-ENG393 | fe11d3eef398 | ENG240 --selftest 薄尾 | 自測 4/4 |
 | 2026-11-21T15:50:00Z | VDF_Engine_aaii_sentiment.py | — | (VDF-REQ043) | d443a0613479 | AAII 走網路工具 + 官方 xls 來源 | AST 加速器匯入 + 載入 |
 | 2026-11-21T15:50:00Z | VDF_Engine_cnn_fear_greed_proxy.py | — | (VDF-REQ043) | 5361e80f80c2 | CNN 代理 yfinance 先過雙閘 | AST 加速器匯入 + 載入 |
+| 2026-11-21T17:05:00Z | VDF_SystemManager_v0188.py | 0188 | VIA-VDF-MDL312 | 40290aa44c01 | VDF monitor 九格(唯讀動詞 + DuckDB / parquet 收據 · 鎖定模板頁) | 自測 12/12 |
+| 2026-11-21T17:05:00Z | VRN_SystemManager_v0281.py | 0281 | VIA-VRN-MDL360 | 5319601f841c | VRN monitor 九格(VRN-2 收據 + 零寫入動詞 · 鎖定模板頁) | 自測 11/11 |
