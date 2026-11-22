@@ -25,9 +25,13 @@ permissions:
   pull-requests: read
   statuses: write
 
+# 只有 pull_request(新推送)才取消同一 PR 舊的那一輪(舊 commit 上的檢查本來就作廢)。
+# 留言 / 審查 / resolve 觸發的 Codex 狀態重算每一輪各自一組、不互相取消:幾秒內連來好幾個事件時,
+# 舊設定會把前面幾輪標成 cancelled,PR 檢查列就出現「取消」、mergeable_state 變 unstable(PR 724 實錄)。
+# 幾輪同時跑時可能「舊讀晚寫」:codex_gate.py 的 settle() 寫完再讀一次,不同就照新讀到的重寫,最後留下的一定是最新狀態(PR 725 Codex P2)。
 concurrency:
-  group: pr-guards-${{ github.event.pull_request.number || github.event.issue.number || github.event.inputs.pr }}-${{ github.event_name == 'pull_request' && 'tails' || 'codex' }}
-  cancel-in-progress: true
+  group: pr-guards-${{ github.event.pull_request.number || github.event.issue.number || github.event.inputs.pr }}-${{ github.event_name == 'pull_request' && 'tails' || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   PYTHONUTF8: "1"
