@@ -6,7 +6,7 @@
 操作員 2026-11-22 09:35:「VCGC SYSTEM MANAGER 控有開發支援工具 / 中央控管工具 / U/I 顯示工具及標準視覺鎖定模組 · 獨立系統不可直接影響其他系統 · 收尾」。
   toolbox [check]   四群逐支核:
                       程式(.py)= 尾版在 · 有編號 · 有登錄 · 有交接案 · 有盤點站 · (工具類)引擎版本冊 / 鎖冊 · **獨立性**
-                      冊(.json)= 尾版在 · 有編號 · JSON 讀得懂 · (U/I 冊)四色燈 token 在
+                      冊(.json)= 尾版在 · 需求冊有登記(編號系統只給程式與律條發號,冊本身靠需求冊管)· JSON 讀得懂 · (格式鎖)四色燈 token 在
                     獨立性(只看尾版本身,逐函式):import 他系統模組 = 紅;同一個函式(或模組頂層)裡有寫檔動作又寫著他系統資料夾路徑 = 黃
                     (待人工確認只讀);自測 / 假倉夾具函式不算(它們寫在暫存夾);其餘綠。互相只讀監控是允許的(L123)。
   toolbox run / help / install、connect、guard、fuse、omniroute 照前版;run 與 check 用同一份四群目錄。
@@ -158,6 +158,8 @@ def check(via: Path = VIA_ROOT) -> dict:
         cases = json.dumps(json.loads((via / REG / "VIA_Handoff_Continuity_SSOT_v0100.json").read_text(encoding="utf-8")).get("test_cases", {}), ensure_ascii=False)
     except (OSError, ValueError):
         cases = ""
+    req_p = V117._latest(via, "VIA_Requirements_SSOT_v*.json")
+    reqs = req_p.read_text(encoding="utf-8") if req_p else ""
     inv_p = V117._latest(via, "VIA_VCGC_FunctionInventory_SSOT_v*.json")
     inv = inv_p.read_text(encoding="utf-8") if inv_p else ""
     try:
@@ -177,7 +179,7 @@ def check(via: Path = VIA_ROOT) -> dict:
                 body = json.loads(p.read_text(encoding="utf-8-sig")) if p else None
             except (OSError, ValueError):
                 body = None
-            items = {"尾版在": bool(p), "有編號": bool(p) and rel in nums, "JSON 讀得懂": body is not None}
+            items = {"尾版在": bool(p), "需求冊有登記": bool(p) and t["stem"] in reqs, "JSON 讀得懂": body is not None}
             if t.get("lamp_tokens"):
                 txt = json.dumps(body, ensure_ascii=False) if body is not None else ""
                 items["四色燈 token"] = all(("lamp_" + c) in txt.lower() for c in ("red", "yellow", "green", "gray"))
@@ -253,7 +255,9 @@ def selftest() -> int:
     cat = catalog()
     chk("T5 四群都有工具 · 開發支援 = 前版十個", {t["group"] for t in cat} == set(GROUPS) and sum(t["group"] == "開發支援" for t in cat) == len(V117.TOOLBOX))
     res = check()
-    chk("T6 真倉:每個工具都找得到尾版(沒有紅的「尾版在 ✘」)", all(r["tail"] for r in res["rows"]), [r["key"] for r in res["rows"] if not r["tail"]])
+    books = [r for r in res["rows"] if r["tail"] and r["tail"].endswith(".json")]
+    chk("T6 真倉:每個工具都找得到尾版 · 冊核「需求冊有登記」不核編號", all(r["tail"] for r in res["rows"]) and books
+        and all("需求冊有登記" in r["items"] and "有編號" not in r["items"] for r in books), [r["key"] for r in res["rows"] if not r["tail"]])
     src = Path(__file__).read_text(encoding="utf-8")
     chk("T7 檔面:第 3 行加速器標記 · 零 TA-Lib · 不設同意閘 · 本檔獨立性綠",
         src.splitlines()[2].strip() == "# [VIA:ACCEL-BRIDGE:v0111]" and not re.search(r"^\s*(import|from)\s+talib", src, re.M)
