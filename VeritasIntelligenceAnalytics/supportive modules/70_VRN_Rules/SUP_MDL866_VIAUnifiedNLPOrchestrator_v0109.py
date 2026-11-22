@@ -209,19 +209,59 @@ def unified(path: str, out: str | None = None, quality: str = "balanced") -> dic
             v7.close_engine()
         except Exception:  # noqa: BLE001 — 關引擎失敗不蓋過主結果
             pass
-    q = result.get("quality") or {}
-    gate = str(q.get("gate") or q.get("status") or "").upper()
-    return {"tool": TAG, "verb": "unified", "lamp": "GREEN" if gate in ("PASS", "GREEN", "OK", "") else "YELLOW",
+    q = (result.get("projection") or {}).get("quality") or result.get("quality") or {}   # v8 放在 projection.quality(PR 723 Codex P2)
+    lamp, why = _unified_lamp(q)
+    return {"tool": TAG, "verb": "unified", "lamp": lamp, "why": why,
             "engine": f"v8 → {v7.ENGINE_ID} {v7.ENGINE_VERSION} · via_nlp_engine {VENDOR.name}", "input": str(path),
             "out": str(d), "files": sorted(files), "quality": q}
+
+
+def _unified_lamp(q: dict) -> tuple:
+    """從 v8 的品質報告逐項判燈;報告缺 = 黃(不把「沒有」當成過)。review_required 是 v8 的常數 True,不拿來判。"""
+    if not q:
+        return "YELLOW", ["品質報告缺(projection.quality 不在)"]
+    red, yel = [], []
+    for k in ("v8_source_mutated", "source_text_mutated", "automatic_code_merge", "command_execution_authorized", "ast_execution_authorized"):
+        if q.get(k) is True:
+            red.append(f"{k}=True")
+    ast = q.get("ast_parse_status")
+    if ast not in (None, "PASS", "not_applicable"):
+        yel.append(f"ast_parse_status={ast}")
+    for k in ("body_summary_evidence_integrity", "full_summary_evidence_integrity"):
+        if k in q and q[k] is not True:
+            yel.append(f"{k}={q[k]}")
+    if q.get("mind_map_graph_endpoints_valid") is False:
+        yel.append("mind_map_graph_endpoints_valid=False")
+    if q.get("knowledge_conflicts"):
+        yel.append(f"knowledge_conflicts={q['knowledge_conflicts']}")
+    return ("RED", red + yel) if red else (("YELLOW", yel) if yel else ("GREEN", []))
 
 
 def scan_folder(root: str, out: str | None = None, max_files: int = 5000) -> dict:
     sc = _mod("scan_folder")
     d = _out_dir("scan_folder", out)
     r = sc.scan_folder(root, d, max_files=max_files)
-    return {"tool": TAG, "verb": "scan-folder", "lamp": "YELLOW" if r.get("errors") else "GREEN", "root": str(root), "out": str(d),
+    scanned = (r.get("limits") or {}).get("scanned_files", len(r.get("rows") or []))
+    truncated = scanned >= max_files and _count_files(sc, root, max_files + 1) > max_files   # 掃描器到上限就停、不報錯(PR 723 Codex P2)
+    why = []
+    if truncated:
+        why.append(f"只掃了前 {max_files} 檔,資料夾還有更多(加大 --max-files 再跑)")
+    if r.get("errors"):
+        why.append(f"讀檔錯誤 {len(r['errors'])} 筆")
+    return {"tool": TAG, "verb": "scan-folder", "lamp": "YELLOW" if why else "GREEN", "why": why, "truncated": truncated,
+            "max_files": max_files, "scanned_files": scanned, "root": str(root), "out": str(d),
             "summary": r.get("summary"), "errors": r.get("errors"), "files": sorted(p.name for p in d.iterdir() if p.is_file())}
+
+
+def _count_files(sc, root, stop: int) -> int:
+    """照掃描器同一套排除規則數檔,數到 stop 就停(只判「有沒有超過上限」,不整樹數完)。"""
+    n = 0
+    for _cur, dirs, files in os.walk(Path(root).expanduser().resolve()):
+        dirs[:] = sorted(x for x in dirs if x not in sc.EXCLUDED_DIRS and not x.startswith("."))
+        n += len(files)
+        if n >= stop:
+            return n
+    return n
 
 
 def semantic(request: dict, runtime: str | None = None) -> dict:
@@ -329,9 +369,23 @@ def selftest() -> int:
             and "v8_mind_map.mmd" in r3["files"] and (t / "uni" / "v8_mind_map.mmd").read_text(encoding="utf-8").strip(), r3.get("files"))
         chk("⑤ unified 的引擎執行期夾在輸出夾底下(不寫收容夾)", Path(_mod("unified_v7").RUNTIME_DIR).parent == t / "uni"
             and Path(_mod("unified_v7").VENDOR_CONFIG) == SOURCES["vendor_config"])
+        chk("④b unified 的燈讀 v8 真正的品質報告(projection.quality);報告非空、乾淨輸入 → 綠", r3["quality"] and "ast_parse_status" in r3["quality"]
+            and r3["lamp"] == "GREEN", (r3["lamp"], r3.get("why")))
+        bad = src / "bad.py"
+        bad.write_text("def broken(:\n    return\n", encoding="utf-8")
+        r3b = unified(str(bad), str(t / "uni_bad"))
+        chk("④c PR 723 Codex P2:語法壞的 Python → ast_parse_status=PASS_WITH_REVIEW → 黃(不再回綠)", r3b["lamp"] == "YELLOW"
+            and any("PASS_WITH_REVIEW" in x for x in r3b["why"]), (r3b["lamp"], r3b.get("why")))
+        chk("④d 品質報告缺 → 黃;來源被改 → 紅", _unified_lamp({})[0] == "YELLOW" and _unified_lamp({"v8_source_mutated": True})[0] == "RED")
+        bad.unlink()
         r4 = scan_folder(str(src), str(t / "scan"))
         chk("⑥ scan-folder:矩陣 csv / md / html + 工作流 mmd + folder_scan.json", {"VIA_Module_Matrix.csv", "VIA_Module_Matrix.md", "VIA_Module_Matrix.html",
             "VIA_Folder_Workflow_Chart.mmd", "folder_scan.json"} <= set(r4["files"]), r4["files"])
+        r4b = scan_folder(str(src), str(t / "scan_cap"), max_files=1)
+        chk("⑥b PR 723 Codex P2:兩檔的夾 --max-files 1 → 黃 · truncated · 點名只掃了前 1 檔", r4b["lamp"] == "YELLOW" and r4b["truncated"] is True
+            and r4b["scanned_files"] == 1 and any("前 1 檔" in x for x in r4b["why"]), {k: r4b[k] for k in ("lamp", "why", "truncated", "scanned_files")})
+        chk("⑥c 剛好掃完(檔數 = 上限)→ 不算截斷", scan_folder(str(src), str(t / "scan_eq"), max_files=2)["truncated"] is False
+            and r4["truncated"] is False and r4["lamp"] == "GREEN")
         r5 = semantic({"action": "analyze", "payload": {"text": "台積電宣布擴產,董事會同意資本支出。TSMC will expand capacity."}}, str(t / "vu"))
         chk("⑦ semantic analyze:VUSIPE gate PASS · 知識庫寫在 --runtime", r5.get("gate") == "PASS" and any((t / "vu").rglob("*")), str(r5)[:200])
         r6 = semantic({"action": "capabilities", "payload": {}}, str(t / "vu"))
