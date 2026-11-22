@@ -1,0 +1,2902 @@
+{
+ "schema": "VIA.Workflow.SDD.v1",
+ "version": "v0124",
+ "subsystem": "VDF",
+ "zh": "資料鍛造工作流",
+ "batch": "VDF-REQ045",
+ "ts": "2026-11-22T03:20:00Z",
+ "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
+ "sdd": {
+  "layers": [
+   "spec(目標 · 需求 REQ 代碼 · 驗收)",
+   "plan(進出口 · 順序 · 正主)",
+   "steps(STP 代碼 · 引擎 · 動詞 · 中樞觀測鍵)",
+   "tests(自測 self · 交叉 cross · 實測 real)",
+   "validation(CGC_MDL245 SDD 驗證器 → 燈鎖冊 VIA_LampLock 尾版 wkf 區記成功版本與時間)"
+  ],
+  "code_rule": "工作流 <子系統>-WKF<三碼>;步 <工作流>-STP<三碼>;需求 <子系統>-REQ<三碼>;編號冊全名加 VIA- 前綴(CGC_MDL237 v0104 起 WKF · STP · REQ 三類);只增,舊號不改不刪",
+  "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
+  "evidence_rule": "inside / 站 / 層步要有機器可驗的證據:step:<STP 代碼>(繼承正主步)· self:<引擎 stem | all>(當前 HEAD 的自測)· chain:<vdf|vrn>:<站 | 層>(本輪鏈報告)· git:pushed(HEAD 已在遠端)",
+  "known_open_rule": "已知未綠(known_open)寫在步上:原因 · 誰的手(operator / ai)· 參照;驗證器據此分類,不因寫了就變綠 —— operator 的手可收尾為 CLOSED_WITH_OPERATOR_ITEMS,ai 的手 = 仍 OPEN",
+  "fail_cause_rule": "fail_cause:FAIL 由驗證器讀正主本輪存證追因(dbpanel_absent · pathverify_dbpanel · envmgr_exe_absent · pathverify_traced;後兩種 CGC_MDL245 v0102 起:ENV MANAGER 的 RED 全是 PATH 上找不到的必備執行檔 · 單一路徑驗證每一步 RED 都追得到前兩種因);finding_cause:FINDING 同一套(syncdb_no_target:ENG082 v0111 起的本輪 sync-db 報告 SKIP、目標 0 本 → 資料家空);追得到操作員端成因才標操作員的手,追不到仍是 FAIL / FINDING"
+ },
+ "composed_by": "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0103.json",
+ "workflows": [
+  {
+   "code": "VDF-WKF001",
+   "alias": "loop_vdf",
+   "name": "VDF 迴圈(建庫計畫 → VDF 鏈 → 資料庫無缺漏 → 輸出統一;自己的入口,VCGC 可編排)",
+   "kind": "hub_steps",
+   "spec": {
+    "goal": "VDF 從自己的入口進出(VDF_SystemManager 尾版;也可由 VCGC 編排一輪,L120 三方對等);可單獨跑、可逐站單測;網路只經統包網路工具且同意閘由操作員開",
+    "requirements": [
+     "VCGC-REQ047",
+     "VDF-REQ001",
+     "VDF-REQ003",
+     "VDF-REQ005",
+     "VDF-REQ007",
+     "VDF-REQ008",
+     "VDF-REQ009",
+     "VDF-REQ010"
+    ],
+    "acceptance": [
+     "進口 VDF 自己的入口(或 VCGC 編排一輪)· 出口 VDF 自報(收據 · 清單 · 矩陣 · 燈;他系統只讀)",
+     "separate_test:VDF-WKF002 各站可單測",
+     "資料庫無缺漏(VDF-WKF003)",
+     "每本 .duckdb 每張表 → parquet",
+     "D4 之前 L14 全庫同步(目錄快照含每本庫的四表;DB 面板核對不因缺表而紅)"
+    ]
+   },
+   "plan": {
+    "enter": "VCGC → VDF(建庫計畫或 VRN 經中介要料)",
+    "exit": "VDF → VCGC(庫表 · Parquet · 燈號)",
+    "separate_test": true,
+    "order": "照清單順序(代碼是身分、只增;STP005 L14 排在 STP004 之前);與 VRN-WKF001 互不排序"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF001-STP001",
+     "alias": "D1",
+     "name": "VCGC→VDF 建庫計畫",
+     "engine": "supportive modules/registry/CGC_MDL239_DataBroker_v*.py",
+     "verb": "build [--apply]",
+     "what": "庫表冊「正庫」逐張量在不在 / 新不新;缺的排 VDF 項;需網路者待同意閘",
+     "match": [
+      [
+       "CGC_MDL239_DataBroker",
+       "build"
+      ]
+     ],
+     "finding_hand": "建庫計畫 rc 2 = 有待建表(需網路者待操作員開同意閘 VIA_NET_CONSENT · L07)"
+    },
+    {
+     "code": "VDF-WKF001-STP002",
+     "alias": "D2",
+     "name": "VDF 鏈",
+     "engine": "supportive modules/registry/CGC_MDL170_VDFChainRunner_v*.py",
+     "verb": "run [--resume]",
+     "what": "0a 加速器 · 0b 網路工具 · 0c VDF 獨立性 · 1 ENG053 · 2 ENG073 · 3a ENG061 · 3b ENG062 · 4a ENG090 · 4b ENG089 · 4c ENG091(站表的正主在跑器裡)",
+     "match": [
+      [
+       "CGC_MDL170_VDFChainRunner",
+       "run"
+      ]
+     ],
+     "finding_hand": "鏈 rc 4 = 有站 GATED / NODATA(同意閘 · 沒料);逐站原因看鏈報告"
+    },
+    {
+     "code": "VDF-WKF001-STP003",
+     "alias": "D3",
+     "name": "資料庫無缺漏",
+     "engine": [
+      "supportive modules/registry/CGC_MDL228_VIADBManager_v*.py",
+      "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v*.py",
+      "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v*.py"
+     ],
+     "verb": "panel · plan --deep · roster",
+     "what": "庫表冊 × 目錄核對 · 交易日缺口 · 代號缺漏",
+     "inside": "D2 鏈內(ENG090 站)+ 全景實測 ⑥ DB 面板(PowerShell)",
+     "evidence": "step:VDF-WKF003-STP001"
+    },
+    {
+     "code": "VDF-WKF001-STP005",
+     "alias": "L14",
+     "name": "L14 全庫同步",
+     "engine": "functional modules/VRN/VRN_ENG082_ExtractionLogic_v*.py",
+     "verb": "sync-db",
+     "what": "資料家每本 .duckdb 寫同一份政策 / 交接 / 因子 / 同步對帳四表(L14);排在 D4 之前:DB 面板讀 D4 建的目錄快照,快照要含每本庫(含目錄庫)的四表",
+     "match": [
+      [
+       "VRN_ENG082_ExtractionLogic",
+       "sync-db"
+      ]
+     ],
+     "finding_cause": "syncdb_no_target"
+    },
+    {
+     "code": "VDF-WKF001-STP004",
+     "alias": "D4",
+     "name": "回中樞:輸出統一",
+     "engine": "supportive modules/registry/CGC_MDL238_OperatorConsole_v*.py",
+     "verb": "parquet --apply",
+     "what": "每本 .duckdb 每張表 → parquet;DuckDB 管家 VIEW",
+     "match": [
+      [
+       "CGC_MDL238_OperatorConsole",
+       "parquet"
+      ]
+     ]
+    }
+   ],
+   "tests": {
+    "self": "各步引擎 --selftest",
+    "cross": [
+     "X-CONF",
+     "X-ENGINE",
+     "X-REG",
+     "X-NUM",
+     "X-ACCEL",
+     "X-NET"
+    ],
+    "real": "via-vcgc go(③ 全景實測 ② VDF 鏈)",
+    "real_run": "go"
+   }
+  },
+  {
+   "code": "VDF-WKF002",
+   "alias": "vdf_chain_stations",
+   "name": "VDF 鏈站序(0a 加速器 → 0b 網路 → 0c 獨立性 → 1 → 2 → 3a → 3b → 4a → 4b → 4c)",
+   "kind": "owner_ref",
+   "spec": {
+    "goal": "VDF 鏈逐站可單測;站表正主在跑器,本冊只引用並由驗證器核對一致",
+    "requirements": [
+     "VCGC-REQ048",
+     "VDF-REQ005"
+    ],
+    "acceptance": [
+     "站表 = 跑器 CHAIN(X-OWNER)",
+     "過關站進燈鎖冊 nodes.vdf"
+    ]
+   },
+   "plan": {
+    "owner": "supportive modules/registry/CGC_MDL170_VDFChainRunner_v*.py(CHAIN)",
+    "lock": "VIA_LampLock 尾版 nodes.vdf"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF002-STP001",
+     "alias": "0a",
+     "station": "0a",
+     "evidence": "chain:vdf:0a"
+    },
+    {
+     "code": "VDF-WKF002-STP002",
+     "alias": "0b",
+     "station": "0b",
+     "evidence": "chain:vdf:0b"
+    },
+    {
+     "code": "VDF-WKF002-STP003",
+     "alias": "0c",
+     "station": "0c",
+     "evidence": "chain:vdf:0c"
+    },
+    {
+     "code": "VDF-WKF002-STP004",
+     "alias": "1",
+     "station": "1",
+     "evidence": "chain:vdf:1"
+    },
+    {
+     "code": "VDF-WKF002-STP005",
+     "alias": "2",
+     "station": "2",
+     "evidence": "chain:vdf:2"
+    },
+    {
+     "code": "VDF-WKF002-STP006",
+     "alias": "3a",
+     "station": "3a",
+     "evidence": "chain:vdf:3a"
+    },
+    {
+     "code": "VDF-WKF002-STP007",
+     "alias": "3b",
+     "station": "3b",
+     "evidence": "chain:vdf:3b"
+    },
+    {
+     "code": "VDF-WKF002-STP008",
+     "alias": "4a",
+     "station": "4a",
+     "evidence": "chain:vdf:4a"
+    },
+    {
+     "code": "VDF-WKF002-STP009",
+     "alias": "4b",
+     "station": "4b",
+     "evidence": "chain:vdf:4b"
+    },
+    {
+     "code": "VDF-WKF002-STP010",
+     "alias": "4c",
+     "station": "4c",
+     "evidence": "chain:vdf:4c"
+    }
+   ],
+   "tests": {
+    "self": "CGC_MDL170 --selftest",
+    "cross": [
+     "X-OWNER"
+    ],
+    "real": "CGC_MDL170 run --resume(經 via-vcgc run)"
+   }
+  },
+  {
+   "code": "VDF-WKF003",
+   "alias": "vdf_db_completeness",
+   "name": "資料庫無缺漏(庫表冊 × 目錄 · 交易日缺口 · 代號缺漏)",
+   "kind": "hub_steps",
+   "spec": {
+    "goal": "VDF 資料庫零缺漏:正庫表都在、交易日無缺口、代號(含上市新增 · 下市不蓋)無遺漏",
+    "requirements": [
+     "VCGC-REQ039",
+     "VDF-REQ001",
+     "VDF-REQ002",
+     "VDF-REQ009"
+    ],
+    "acceptance": [
+     "DB 面板核對 GREEN(資料家有庫時)",
+     "ENG089 增量閘計畫無缺",
+     "ENG090 覆蓋閘無缺",
+     "資料家空 = NODATA 附原因,不假綠"
+    ]
+   },
+   "plan": {
+    "enter": "VDF-WKF001-STP003",
+    "exit": "VCGC(燈號)",
+    "order": "面板 → 增量計畫 → 覆蓋"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF003-STP001",
+     "alias": "db_panel",
+     "name": "DB 面板",
+     "engine": "supportive modules/registry/CGC_MDL228_VIADBManager_v*.py",
+     "verb": "panel",
+     "what": "政策 · 目錄 · 資料庫 · 核對 · 湖",
+     "match": [
+      [
+       "CGC_MDL149_VeritasCentralGovernanceConsole",
+       "dbm panel"
+      ]
+     ],
+     "fail_cause": "dbpanel_absent"
+    },
+    {
+     "code": "VDF-WKF003-STP002",
+     "alias": "incremental_gate",
+     "name": "增量抓取閘",
+     "engine": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v*.py",
+     "verb": "plan --deep",
+     "what": "交易日缺口",
+     "inside": "VDF-WKF002 站 4b",
+     "evidence": "chain:vdf:4b"
+    },
+    {
+     "code": "VDF-WKF003-STP003",
+     "alias": "coverage_gate",
+     "name": "覆蓋閘",
+     "engine": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v*.py",
+     "verb": "roster",
+     "what": "代號缺漏",
+     "inside": "VDF-WKF002 站 4a",
+     "evidence": "chain:vdf:4a"
+    }
+   ],
+   "tests": {
+    "self": "各步引擎 --selftest",
+    "cross": [
+     "X-ENGINE",
+     "X-REG",
+     "X-NUM",
+     "X-ACCEL",
+     "X-NET"
+    ],
+    "real": "via-vcgc go(③ 全景實測 ⑥ DB 面板)",
+    "real_run": "go"
+   }
+  },
+  {
+   "code": "VDF-WKF004",
+   "alias": "vdf_daily_update",
+   "name": "VDF 日更(價量增量→籌碼→成交值→對齊核對→架構矩陣)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "VDF 日更",
+    "requirements": [
+     "VDF-REQ006"
+    ],
+    "acceptance": [
+     "各項 rc 0 或誠實四態",
+     "網路項只經統包網路工具 · 同意閘未開 = GATED"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "run",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF004-STP001",
+     "alias": "tw_prices_inc",
+     "item": "tw_prices_inc"
+    },
+    {
+     "code": "VDF-WKF004-STP002",
+     "alias": "tw_chips",
+     "item": "tw_chips"
+    },
+    {
+     "code": "VDF-WKF004-STP003",
+     "alias": "tw_trading_value",
+     "item": "tw_trading_value"
+    },
+    {
+     "code": "VDF-WKF004-STP004",
+     "alias": "tw_align",
+     "item": "tw_align"
+    },
+    {
+     "code": "VDF-WKF004-STP005",
+     "alias": "db_arch",
+     "item": "db_arch"
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vdf_daily_update(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vdf_daily_update"
+  },
+  {
+   "code": "VDF-WKF005",
+   "alias": "vdf_db_governance",
+   "name": "VDF 資料庫治理(三庫盤點→覆蓋摘要→缺口清單→架構矩陣;零網路)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "VDF 資料庫治理(零網路)",
+    "requirements": [],
+    "acceptance": [
+     "各項 rc 0 或誠實四態",
+     "網路項只經統包網路工具 · 同意閘未開 = GATED"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "run",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF005-STP001",
+     "alias": "db_localdb_scan",
+     "item": "db_localdb_scan"
+    },
+    {
+     "code": "VDF-WKF005-STP002",
+     "alias": "db_coverage",
+     "item": "db_coverage"
+    },
+    {
+     "code": "VDF-WKF005-STP003",
+     "alias": "tw_need",
+     "item": "tw_need"
+    },
+    {
+     "code": "VDF-WKF005-STP004",
+     "alias": "db_arch",
+     "item": "db_arch"
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vdf_db_governance(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vdf_db_governance"
+  },
+  {
+   "code": "VDF-WKF006",
+   "alias": "vatetf_pipeline",
+   "name": "VATETF 主動 ETF 應用(宇宙→持股史深→ETF×營收動能→持股×Consensus)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "VATETF 主動 ETF 應用",
+    "requirements": [
+     "VDF-REQ014"
+    ],
+    "acceptance": [
+     "各項 rc 0 或誠實四態",
+     "網路項只經統包網路工具 · 同意閘未開 = GATED"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "run",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF006-STP001",
+     "alias": "etf_universe",
+     "item": "etf_universe"
+    },
+    {
+     "code": "VDF-WKF006-STP002",
+     "alias": "etf_holdings_daily",
+     "item": "etf_holdings_daily"
+    },
+    {
+     "code": "VDF-WKF006-STP003",
+     "alias": "etf_revenue",
+     "item": "etf_revenue"
+    },
+    {
+     "code": "VDF-WKF006-STP004",
+     "alias": "vdf_vetf_consensus",
+     "item": "vdf_vetf_consensus"
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vatetf_pipeline(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vatetf_pipeline"
+  },
+  {
+   "code": "VDF-WKF007",
+   "alias": "vtmra_family",
+   "name": "VTMRA 月營收家族(月營收→史深→ETF 營收動能→TWREV→族群相位)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "VTMRA 月營收家族",
+    "requirements": [],
+    "acceptance": [
+     "各項 rc 0 或誠實四態",
+     "網路項只經統包網路工具 · 同意閘未開 = GATED"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "run",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF007-STP001",
+     "alias": "tw_revenue_codes",
+     "item": "tw_revenue_codes"
+    },
+    {
+     "code": "VDF-WKF007-STP002",
+     "alias": "tw_revenue_backfill",
+     "item": "tw_revenue_backfill"
+    },
+    {
+     "code": "VDF-WKF007-STP003",
+     "alias": "etf_revenue",
+     "item": "etf_revenue"
+    },
+    {
+     "code": "VDF-WKF007-STP004",
+     "alias": "vdf_twrev",
+     "item": "vdf_twrev"
+    },
+    {
+     "code": "VDF-WKF007-STP005",
+     "alias": "vdf_revphase",
+     "item": "vdf_revphase"
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vtmra_family(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vtmra_family"
+  },
+  {
+   "code": "VDF-WKF008",
+   "alias": "vdf_quantguard_features",
+   "name": "QuantGuard 技術指標特徵鏈(資料架構→ENG086 Polars 技術分析與因子;零網路；當沖輸入另走收容鏈)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "QuantGuard 技術指標特徵鏈(TA-Lib 禁用;唯一技術分析路徑)",
+    "requirements": [],
+    "acceptance": [
+     "各項 rc 0 或誠實四態",
+     "網路項只經統包網路工具 · 同意閘未開 = GATED"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "test",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF008-STP001",
+     "alias": "db_arch",
+     "item": "db_arch"
+    },
+    {
+     "code": "VDF-WKF008-STP002",
+     "alias": "vdf_quantguard_one",
+     "item": "vdf_quantguard_one",
+     "known_open": {
+      "hand": "operator",
+      "why": "QuantGuard 缺 polars 等套件(只查不裝;裝件是操作員的手)",
+      "ref": "VCGC-WKF001-STP004"
+     }
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vdf_quantguard_features(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vdf_quantguard_features"
+  },
+  {
+   "code": "VDF-WKF009",
+   "alias": "vdf_daytrade_file_chain",
+   "name": "當沖檔案收容→資料架構重建→QuantGuard 狀態檢查(真實計算另走 vdf_quantguard_run 並明給 --in)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "當沖檔案收容 → 資料架構 → QuantGuard 狀態",
+    "requirements": [],
+    "acceptance": [
+     "各項 rc 0 或誠實四態",
+     "網路項只經統包網路工具 · 同意閘未開 = GATED"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "run",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF009-STP001",
+     "alias": "tw_daytrade_files",
+     "item": "tw_daytrade_files"
+    },
+    {
+     "code": "VDF-WKF009-STP002",
+     "alias": "db_arch",
+     "item": "db_arch"
+    },
+    {
+     "code": "VDF-WKF009-STP003",
+     "alias": "vdf_quantguard_status",
+     "item": "vdf_quantguard_status",
+     "known_open": {
+      "hand": "operator",
+      "why": "QuantGuard 缺 polars 等套件(只查不裝)",
+      "ref": "VCGC-WKF001-STP004"
+     }
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vdf_daytrade_file_chain(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vdf_daytrade_file_chain"
+  },
+  {
+   "code": "VDF-WKF010",
+   "alias": "vdf_market_lists_acceptance",
+   "name": "VDF 中央市場清單驗收(股票全集/主動 ETF/熱門族群去重；2023-01-01 起；離線可驗收)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "中央市場清單驗收(股票全集 · 主動 ETF · 熱門族群)",
+    "requirements": [
+     "VDF-REQ004",
+     "VDF-REQ012",
+     "VDF-REQ014"
+    ],
+    "acceptance": [
+     "各項 rc 0 或誠實四態",
+     "網路項只經統包網路工具 · 同意閘未開 = GATED"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "test",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF010-STP001",
+     "alias": "vdf_market_lists",
+     "item": "vdf_market_lists"
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vdf_market_lists_acceptance(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vdf_market_lists_acceptance"
+  },
+  {
+   "code": "VDF-WKF011",
+   "alias": "vdf_universe_loop",
+   "name": "VDF 輸入範圍迴圈(清單 → 持股 → 價量 / 籌碼 / 成交值 → 對齊 → 指數 → 驗證 → 三方對照 → Parquet → 鎖)",
+   "kind": "hub_steps",
+   "spec": {
+    "goal": "VDF 管理員串起 VDF_InputUniverse_SSOT 的 loop.order;每站引擎自測過就鎖(版號 + 時間進 VIA_LampLock)",
+    "requirements": [
+     "VDF-REQ017"
+    ],
+    "acceptance": [
+     "每站引擎尾版 --selftest rc 0",
+     "universe xcheck:加權三來源 · 三表同日代號數(資料家有庫時)",
+     "universe parquet:CGC_MDL238 寫、讀回列數相同",
+     "SDD lock --apply 後 universe lock = LOCKED",
+     "資料家空 = NODATA 附原因,不假綠"
+    ]
+   },
+   "plan": {
+    "enter": "VDF-WKF010-STP001",
+    "exit": "VCGC(燈號)",
+    "order": "照 VDF_InputUniverse_SSOT loop.order(E-01 … E-11:lock)",
+    "runner": "VDF_SystemManager universe(經 via-vcgc run --family vdf)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF011-STP001",
+     "alias": "universe_book",
+     "name": "輸入範圍冊 · 表頭 · 順序 · 驗證(E-11)",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "--selftest",
+     "what": "universe headers / list / loop / frame / validate / xcheck / parquet / lock",
+     "inside": "VDF-WKF011 引擎自測(sdd selftests)",
+     "evidence": "self:VDF_SystemManager"
+    },
+    {
+     "code": "VDF-WKF011-STP002",
+     "alias": "market_lists",
+     "name": "股票全集 · 主動 ETF 讀取口(E-04)",
+     "engine": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v*.py",
+     "verb": "--selftest",
+     "what": "IN-01 · IN-02 讀取口",
+     "inside": "VDF-WKF011 引擎自測(sdd selftests)",
+     "evidence": "self:VDF_ENG087_MarketListGovernance"
+    },
+    {
+     "code": "VDF-WKF011-STP003",
+     "alias": "etf_universe",
+     "name": "主動 ETF 宇宙(E-02)",
+     "engine": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v*.py",
+     "verb": "--selftest",
+     "what": "IN-02 名單",
+     "inside": "VDF-WKF011 引擎自測(sdd selftests)",
+     "evidence": "self:VDF_ENG077_ActiveETFUniverse"
+    },
+    {
+     "code": "VDF-WKF011-STP004",
+     "alias": "etf_holdings",
+     "name": "主動 ETF 每日持股(E-03)",
+     "engine": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v*.py",
+     "verb": "--selftest",
+     "what": "OUT-03 · OUT-04",
+     "inside": "VDF-WKF011 引擎自測(sdd selftests)",
+     "evidence": "self:VDF_ENG078_ActiveETFHoldingsHistory"
+    },
+    {
+     "code": "VDF-WKF011-STP005",
+     "alias": "prices",
+     "name": "個股價量增量(E-05)",
+     "engine": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v*.py",
+     "verb": "--selftest",
+     "what": "OUT-02 價量",
+     "inside": "VDF-WKF011 引擎自測(sdd selftests)",
+     "evidence": "self:VDF_ENG054_TWDailyBackfill"
+    },
+    {
+     "code": "VDF-WKF011-STP006",
+     "alias": "chips",
+     "name": "籌碼(E-06)",
+     "engine": "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v*.py",
+     "verb": "--selftest",
+     "what": "OUT-02 籌碼",
+     "inside": "VDF-WKF011 引擎自測(sdd selftests)",
+     "evidence": "self:VDF_ENG056_ChipBackfill"
+    },
+    {
+     "code": "VDF-WKF011-STP007",
+     "alias": "trading_value",
+     "name": "成交值(E-07)",
+     "engine": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v*.py",
+     "verb": "--selftest",
+     "what": "OUT-02 成交值",
+     "inside": "VDF-WKF011 引擎自測(sdd selftests)",
+     "evidence": "self:VDF_ENG057_TradingValueBackfill"
+    },
+    {
+     "code": "VDF-WKF011-STP008",
+     "alias": "align",
+     "name": "價量 × 籌碼對齊(E-08)",
+     "engine": "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v*.py",
+     "verb": "--selftest",
+     "what": "對齊核對",
+     "inside": "VDF-WKF011 引擎自測(sdd selftests)",
+     "evidence": "self:VDF_ENG081_UniverseAlign"
+    },
+    {
+     "code": "VDF-WKF011-STP009",
+     "alias": "index_official",
+     "name": "加權 · 櫃買官方日資料(E-10;增量)",
+     "engine": "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v*.py",
+     "verb": "--selftest",
+     "what": "OUT-05",
+     "inside": "VDF-WKF011 引擎自測(sdd selftests)",
+     "evidence": "self:VDF_ENG232_TWIndexOfficial"
+    },
+    {
+     "code": "VDF-WKF011-STP010",
+     "alias": "parity",
+     "name": "兩個管理員互比(CGC_MDL252)",
+     "engine": "supportive modules/registry/CGC_MDL252_ManagerParity_v*.py",
+     "verb": "--selftest",
+     "what": "VDF vs VRN 能力表",
+     "inside": "VDF-WKF011 引擎自測(sdd selftests)",
+     "evidence": "self:CGC_MDL252_ManagerParity"
+    }
+   ],
+   "tests": {
+    "self": "各步引擎 --selftest(sdd selftests)",
+    "cross": [
+     "X-ENGINE",
+     "X-REG",
+     "X-NUM",
+     "X-ACCEL",
+     "X-NET"
+    ],
+    "real": "via-vcgc run --family vdf VDF_SystemManager universe list → validate → xcheck → parquet --apply → lock",
+    "real_run": "go"
+   }
+  },
+  {
+   "code": "VDF-WKF012",
+   "alias": "vdf_live_fill_latest_tools",
+   "name": "VDF 開閘實抓:全部擷取跨入最新加速器與網路工具(requests · urllib · curl_cffi · yfinance)",
+   "kind": "procedure",
+   "spec": {
+    "goal": "MDL008 fetch fill live:子行程從尾版起,所有出網經鎖版網路工具並計數;output_hub 歸位 --home;rc 0 零擷取改判 NODATA",
+    "requirements": [
+     "VCGC-REQ147"
+    ],
+    "acceptance": [
+     "MDL008 尾版 --selftest 全鏈 PASS",
+     "fetch test 整合測試 PASS · 倉內寫入 0",
+     "live 網路計數非 0(requests / net / curl / yf)",
+     "封網 / 假網下 akshare 可 import(curl_cffi 封口屬性可取、呼叫才擋)"
+    ]
+   },
+   "plan": {
+    "enter": "VCGC",
+    "exit": "VCGC",
+    "order": "MDL008 --selftest → fetch test → fetch fill --apply(雙閘本視窗開)→ fill-matrix"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF012-STP001",
+     "alias": "fetch_tail_selftest",
+     "name": "擷取系統尾版自測",
+     "engine": "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py",
+     "verb": "--selftest",
+     "inside": "VCGC run",
+     "evidence": "self:VDF_MDL008_FetchSystem",
+     "what": "live 改道 · 計數 · 歸位 · 封口 · 冊"
+    },
+    {
+     "code": "VDF-WKF012-STP002",
+     "alias": "fetch_integration",
+     "name": "擷取系統整合測試",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "fetch test",
+     "inside": "VCGC run",
+     "evidence": "step:VDF-WKF012-STP001",
+     "what": "七支全鏈 · 輸出契約 · 倉內零寫入 · block 零出網"
+    },
+    {
+     "code": "VDF-WKF012-STP003",
+     "alias": "fetch_fill_live",
+     "name": "開閘補缺實抓",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "fetch fill --apply",
+     "inside": "VCGC run",
+     "evidence": "step:VDF-WKF012-STP002",
+     "what": "只抓不足 · 詳細矩陣 · 報告 _reports/fill_*.json"
+    }
+   ],
+   "tests": {
+    "self": "MDL008 --selftest",
+    "cross": [
+     "X-REQ-BACK"
+    ],
+    "real": "容器實抓:TWSE WAF · Yahoo 429 · 無 FRED 金鑰;工作站實抓待操作員",
+    "real_run": "雙閘本視窗開(操作員的手)"
+   }
+  },
+  {
+   "code": "VDF-WKF013",
+   "alias": "akshare_deep_macro",
+   "name": "AkShare 深度擷取:中國經濟 · 各國經濟 · 航運指數(全歷史 + 參數展開)",
+   "kind": "procedure",
+   "spec": {
+    "goal": "MDL011 deep-macro 照選單正本 backfill:中國宏觀全套 + NBS 十類目錄樹逐葉 · 各國宏觀 / 央行利率 · BDI/BCI/BPI/BCTI/BDTI/WCI 八航線/運價/LPI",
+    "requirements": [
+     "VCGC-REQ149"
+    ],
+    "acceptance": [
+     "MDL011 尾版 --selftest PASS",
+     "deep-macro --plan 零網路列計畫",
+     "live 經鎖版網路工具(curl_cffi 亦改道)· 失敗逐支列出 · 失敗比例 ≤ 選單 fail_tolerance",
+     "DuckDB 目錄 v_<fn> 視圖可查"
+    ]
+   },
+   "plan": {
+    "enter": "VCGC",
+    "exit": "VCGC",
+    "order": "選單正本 → deep-macro --plan → fetch fill 011d(live)→ views"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF013-STP001",
+     "alias": "akshare_tail_selftest",
+     "name": "AkShare 尾版自測",
+     "engine": "functional modules/VDF/VDF_MDL011_AkshareFetcher_v*.py",
+     "verb": "--selftest",
+     "inside": "VCGC run",
+     "evidence": "self:VDF_MDL011_AkshareFetcher",
+     "what": "__rows__ 參數列 · 選單三組 · 計畫零網路"
+    },
+    {
+     "code": "VDF-WKF013-STP002",
+     "alias": "deep_macro_live",
+     "name": "深度實抓",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "fetch fill 011d --apply",
+     "inside": "VCGC run",
+     "evidence": "step:VDF-WKF013-STP001",
+     "what": "中國 / 各國 / 航運全歷史 · 僅增 parquet · DuckDB 目錄"
+    }
+   ],
+   "tests": {
+    "self": "MDL011 --selftest",
+    "cross": [
+     "X-REQ-BACK"
+    ],
+    "real": "容器實抓經鎖版網路工具",
+    "real_run": "雙閘本視窗開"
+   }
+  },
+  {
+   "code": "VDF-WKF014",
+   "alias": "fetch_groups",
+   "name": "擷取大族群:名單增減 · 同一 as-of 日 · DuckDB 監控 · 最佳化",
+   "kind": "procedure",
+   "spec": {
+    "goal": "輸入(名單)與輸出(庫 · 表)按大族群收成一張冊;台股每日 / 月營收 / 指數 / 主動式 ETF 固定全部,其他族群可增減;全族群同一 as-of 日;DuckDB 目錄監控與最佳化",
+    "requirements": [
+     "VCGC-REQ150",
+     "VCGC-REQ151",
+     "VCGC-REQ152",
+     "VCGC-REQ154",
+     "VCGC-REQ177"
+    ],
+    "acceptance": [
+     "MDL012 尾版 --selftest PASS",
+     "FIXED_ALL 拒絕增減(rc 2)",
+     "monitor 逐表 ≤ as-of 截齊、照 cadence / 資料自身間隔給燈;庫不在 = NODATA",
+     "fg_status 只增 · fg_status_latest 視圖",
+     "optimize --apply 被鎖 = LOCKED 跳過、不搶鎖",
+     "ui:左面板(功能 · Live log;左下 GATE · 三系統跳 VCGC / VRN,L121;L120 起沒有母系統)· 右面板第一頁輸入 / 引擎 / 運作 / 結果 · 每族群一頁 · 末頁流程圖 + 六矩陣 · 零 CDN",
+     "啟動指令對接 U/I:Invoke-VDF-FetchGroupsUI -Template 任何範本 → 同一份族群快照;對接快照 SNAPSHOT_latest.json 每次都寫",
+     "族群冊 v0101 四大類;起始日只按大類(start --group 拒絕 rc 2)",
+     "EDITABLE_DEFAULT:TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA,可增減、可還原",
+     "ui-import:只寫差異 · 冪等 · 拒絕單群起始日 / FIXED 成員 / 矩陣群"
+    ]
+   },
+   "plan": {
+    "enter": "VCGC",
+    "exit": "VCGC",
+    "order": "冊 → groups / members → add|remove --apply → asof → run --groups → monitor → optimize → ui → 範本(-Template)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF014-STP001",
+     "alias": "fetch_groups_selftest",
+     "name": "分組尾版自測",
+     "engine": "functional modules/VDF/VDF_MDL012_FetchGroups_v*.py",
+     "verb": "--selftest",
+     "inside": "VCGC run",
+     "evidence": "self:VDF_MDL012_FetchGroups",
+     "what": "族群冊 · 帳本增減 · as-of · run 計畫 · 監控 · query 視圖 · 最佳化"
+    },
+    {
+     "code": "VDF-WKF014-STP002",
+     "alias": "fetch_groups_monitor",
+     "name": "族群監控(同一 as-of)",
+     "engine": "functional modules/VDF/VDF_MDL012_FetchGroups_v*.py",
+     "verb": "monitor --home <輸出根>",
+     "inside": "VCGC run",
+     "evidence": "step:VDF-WKF014-STP001",
+     "what": "VDF_FetchGroups.duckdb fg_status 快照 + _reports/groups_latest.json"
+    },
+    {
+     "code": "VDF-WKF014-STP003",
+     "alias": "fetch_groups_ui",
+     "name": "族群操作頁",
+     "engine": "functional modules/VDF/VDF_MDL012_FetchGroups_v*.py",
+     "verb": "ui --home <輸出根> [--watch 15]",
+     "inside": "VCGC run",
+     "evidence": "step:VDF-WKF014-STP002",
+     "what": "VIA_UI_VDFFetchGroups_v0100.html(SNAPSHOT 內嵌 · file://)"
+    },
+    {
+     "code": "VDF-WKF014-STP004",
+     "alias": "fetch_groups_template",
+     "name": "啟動指令對接 U/I · 自適應範本",
+     "engine": "Invoke-VDF-FetchGroupsUI-v*.ps1",
+     "verb": "-Template <範本> [-Watch 15]",
+     "inside": "VCGC run",
+     "evidence": "step:VDF-WKF014-STP003",
+     "what": "VIA_Reports\\vdf\\ui\\VDF_FetchGroups_<範本>.html + VDF_FetchGroups_SNAPSHOT_latest.json"
+    },
+    {
+     "code": "VDF-WKF014-STP005",
+     "alias": "fetch_groups_categories",
+     "name": "大類 · 預設成員 · 起始日按大類 · U/I 輸入匯入",
+     "engine": "functional modules/VDF/VDF_MDL012_FetchGroups_v*.py",
+     "verb": "start [--category X --set D|default --apply] · ui-import FILE [--apply]",
+     "inside": "VCGC run",
+     "evidence": "step:VDF-WKF014-STP004",
+     "what": "VDF_FetchGroups_MemberLedger_v0100.jsonl(只增:member / start)"
+    }
+   ],
+   "tests": {
+    "self": "MDL012 --selftest",
+    "cross": [
+     "X-REQ-BACK"
+    ],
+    "real": "容器:VAKE 族群實測;工作站:台股 / 國際 / 美國總經庫",
+    "real_run": "monitor / optimize 不連網;run live 要雙閘"
+   }
+  },
+  {
+   "code": "VDF-WKF015",
+   "alias": "three_code_universe",
+   "name": "三種代號當輸入 → OUT-01 三組合一 → 驗證十一項",
+   "kind": "procedure",
+   "spec": {
+    "goal": "任何一個台股代號丟進來都知道它是哪一型、誰負責抓、真相在哪張表;再用一個指令把三組併成冊上的 OUT-01 並跑冊自己的驗證律。",
+    "requirements": [
+     "VDF-REQ022"
+    ],
+    "acceptance": [
+     "代碼律全部讀冊(IN-01 / IN-02 的 code_regex、IN-03 的 members),不在程式裡寫死",
+     "冊自己列的 code_regex_negative 一個都不得被收進該組",
+     "兩條正則互不重疊:0050 既不是個股也不是主動 ETF,判 UNKNOWN 不猜",
+     "IN-02 照冊 exclude 過濾:D 尾(主動債券)與退役冊列的件不得進清單,排除件逐件留 reason",
+     "退役冊 revoked_at 有值 = 不算退役(冊 rule)",
+     "來源梯子 LIVE_DB → SEED_BOOK → BOOK_STATIC → ABSENT;ABSENT 不假填",
+     "用到 SEED_BOOK 的組燈頂到 AMBER —— 種子冊的驗證時間不是今天",
+     "家數低於冊上下限 = AMBER;任一所 0 家 = RED;指數少一個 = RED;主鍵重號 = RED;必填空 = RED",
+     "併出來的欄位 = 冊上 OUT-01 欄位,不多不少",
+     "重抓次序照冊 VDF_FetchSystem_SSOT 的 needs 拓撲(e232 在 009 / 010 之後),不是引擎自己排",
+     "三條禁令用 AST 檢而非字面檢:不碰 TA-Lib · 不派子行程裝件 · 不寫 environ(字面檢會把『我宣告我不做』當成『我做了』)",
+     "U/I 不含 <!doctype / <html / <body;逸出;色值只用 Atlas --vl-*",
+     "寫冊 add-only:同一輸出夾第二次跑出新版號,不覆蓋",
+     "自測 67/67 PASS"
+    ],
+    "entry": "VIA_FROM_VDFSM=YES python3 \"functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0100.py\" build --apply",
+    "evidence": "docs/handoff/evidence/V-threecode-v0100.json · docs/handoff/ai/VDF_ThreeCodeUniverse_UI.html",
+    "books": [
+     "VDF_InputUniverse_SSOT_v0104.json",
+     "VDF_FetchSystem_SSOT_v0107.json",
+     "VDF_ActiveETF_Retired_SSOT_v0100.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "classify → build → validate → plan → ui"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF015-STP001",
+     "alias": "classify",
+     "name": "代號路由(三型 + UNKNOWN,規則讀冊)",
+     "engine": "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py",
+     "verb": "classify <代號…>",
+     "inside": "VDF SystemManager(VIA_FROM_VDFSM=YES)",
+     "evidence": "self:VDF_MDL014_ThreeCodeUniverse",
+     "what": "三型正例全過 · 冊上八個反例全擋"
+    },
+    {
+     "code": "VDF-WKF015-STP002",
+     "alias": "ladder",
+     "name": "來源梯子(LIVE_DB → SEED_BOOK → BOOK_STATIC → ABSENT)",
+     "engine": "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py",
+     "verb": "build",
+     "inside": "VDF SystemManager(VIA_FROM_VDFSM=YES)",
+     "evidence": "self:VDF_MDL014_ThreeCodeUniverse",
+     "what": "IN-01/02 SEED_BOOK · IN-03 BOOK_STATIC"
+    },
+    {
+     "code": "VDF-WKF015-STP003",
+     "alias": "filter",
+     "name": "IN-02 照冊 exclude 過濾(D 尾 · 退役),排除件留 reason",
+     "engine": "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py",
+     "verb": "build",
+     "inside": "VDF SystemManager(VIA_FROM_VDFSM=YES)",
+     "evidence": "self:VDF_MDL014_ThreeCodeUniverse",
+     "what": "38 → 30 keep + 7 D + 1 退役"
+    },
+    {
+     "code": "VDF-WKF015-STP004",
+     "alias": "assemble",
+     "name": "併成 OUT-01(欄位 / 主鍵 / 必填全照冊)",
+     "engine": "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py",
+     "verb": "build",
+     "inside": "VDF SystemManager(VIA_FROM_VDFSM=YES)",
+     "evidence": "self:VDF_MDL014_ThreeCodeUniverse",
+     "what": "13 欄 · seq 連號"
+    },
+    {
+     "code": "VDF-WKF015-STP005",
+     "alias": "validate",
+     "name": "跑冊自己的 OUT-01 驗證律(V1–V11)",
+     "engine": "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py",
+     "verb": "build",
+     "inside": "VDF SystemManager(VIA_FROM_VDFSM=YES)",
+     "evidence": "self:VDF_MDL014_ThreeCodeUniverse",
+     "what": "總燈 AMBER · V3/V4/V6/V11 綠"
+    },
+    {
+     "code": "VDF-WKF015-STP006",
+     "alias": "plan",
+     "name": "重抓次序照冊 needs 拓撲 + 印同意閘指令(不代設)",
+     "engine": "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py",
+     "verb": "plan",
+     "inside": "VDF SystemManager(VIA_FROM_VDFSM=YES)",
+     "evidence": "self:VDF_MDL014_ThreeCodeUniverse",
+     "what": "009 → 010 → e232"
+    },
+    {
+     "code": "VDF-WKF015-STP007",
+     "alias": "ui",
+     "name": "出 Atlas --vl-* 視覺鎖定頁;沒量到照實留白",
+     "engine": "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py",
+     "verb": "ui",
+     "inside": "VDF SystemManager(VIA_FROM_VDFSM=YES)",
+     "evidence": "self:VDF_MDL014_ThreeCodeUniverse",
+     "what": "GRAY 不是綠"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF015-TST001",
+     "case": "V-threecode-v0100",
+     "engine": "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 自測 OK 67 · FAIL 0 · PASS(VIA_FROM_VDFSM=YES)"
+    },
+    {
+     "code": "VDF-WKF015-TST002",
+     "case": "V-vdf-threecode-v0101",
+     "engine": "functional modules/VDF/VDF_MDL014_ThreeCodeUniverse_v0101.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 本版 7/7(V12 yf 後綴照市場)· 前版 67/67"
+    }
+   ],
+   "why_v0107": "補 tests 欄(原缺)"
+  },
+  {
+   "code": "VDF-WKF016",
+   "alias": "macro_hierarchy",
+   "name": "總經序列向下一、二階層探索:冊點分碼成樹 → 探索三車道 → 候選只增 → 操作員選抓",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-09T16:19:09Z",
+   "spec": {
+    "goal": "每個總經家族(PMI · PPI · 就業 · CPI · GDP · 利率 · 房市 · 消費 · 工業)列出一階 / 二階子序列,冊上沒有的用 FRED 目錄 / 關鍵字 / 網頁關鍵字找候選;不自動改擷取冊。",
+    "requirements": [
+     "VDF-REQ023"
+    ],
+    "acceptance": [
+     "樹全來自冊(總經 SSOT 點分碼 + 關鍵字冊 code_prefixes);不寫死",
+     "冊宣告但沒序列 → declared_missing 照實",
+     "FRED 鑰只查有沒有 · 網址與收據遮罩 · 沒鑰 SKIP",
+     "雙閘關 → DENY 不碰 environ",
+     "候選 jsonl 只增去重;FetchGroups 冊一字不動",
+     "AKShare 候選只標 LANE_ONLY",
+     "自測 14/14"
+    ],
+    "entry": "python3 \"functional modules/VDF/VDF_MDL015_MacroHierarchy_v0100.py\" plan|discover [--db-home <庫家>]",
+    "evidence": "VIA_Reports/vdf/macro/VDF_MacroHierarchy_latest.json · docs/handoff/evidence/V-vdf-macro-hierarchy.json",
+    "books": [
+     "VDF_MacroKeyword_SSOT_v0100.json",
+     "VDF_USMacro_Tree_v0100.json",
+     "VDF_USMacro_Detail_Fetch_Roster_v0100.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "操作員(選候選)",
+    "order": "plan(離線)→ discover(桌機 · 閘 + 鑰)→ 候選貼回 → MDL012 edit add --apply"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF016-STP001",
+     "alias": "plan_tree",
+     "name": "離線成樹(家族 / 一階 / 二階 · 標記 · declared_missing)",
+     "engine": "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0102.py",
+     "verb": "plan",
+     "inside": "VDF",
+     "evidence": "step:VDF-WKF016-STP003",
+     "what": "讀冊(總經 SSOT 點分碼 + 關鍵字冊)成家族 / 一階 / 二階樹 · 標記 · 冊宣告沒序列 → declared_missing(離線、只讀)",
+     "evidence_file": "VIA_Reports/vdf/macro/VDF_MacroHierarchy_latest.md"
+    },
+    {
+     "code": "VDF-WKF016-STP002",
+     "alias": "discover_lanes",
+     "name": "探索三車道(fred · akshare · web)→ 候選只增",
+     "engine": "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0102.py",
+     "verb": "discover",
+     "inside": "操作員桌機(雙閘 + FRED 鑰)",
+     "evidence": "step:VDF-WKF016-STP003",
+     "what": "fred · akshare · web 三車道找候選 → 候選 jsonl 只增去重(雙閘 + FRED 鑰;沒鑰 SKIP · 擷取冊不改)",
+     "evidence_file": "VIA_Reports/vdf/macro/macro_hierarchy_candidates_v0100.jsonl"
+    },
+    {
+     "code": "VDF-WKF016-STP003",
+     "alias": "selftest_gate",
+     "name": "自測 14 項",
+     "engine": "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0102.py",
+     "verb": "--selftest",
+     "inside": "VCGC run",
+     "evidence": "self:VDF_MDL015_MacroHierarchy",
+     "what": "自測 14 項(樹來自冊 · declared_missing · 鑰只查有無 · 雙閘關 DENY · 候選只增 · environ 原樣)",
+     "evidence_file": "docs/handoff/evidence/V-vdf-macro-hierarchy.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF016-TST001",
+     "case": "C-macro-hierarchy-selftest",
+     "engine": "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 14/14"
+    },
+    {
+     "code": "VDF-WKF016-TST002",
+     "case": "C-macro-hierarchy-plan-offline",
+     "engine": "functional modules/VDF/VDF_MDL015_MacroHierarchy_v0100.py",
+     "verb": "plan",
+     "expect": "rc 0 · GREEN · 家族 9 · 冊上序列 > 0(離線,不連網)"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF017",
+   "alias": "macro_crosscheck",
+   "name": "AKShare × 官方最新三筆交叉比對 → 警告",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-09T16:19:09Z",
+   "spec": {
+    "goal": "每對(AKShare 函數 ↔ FRED / us_macro 序列)比最新 n 筆:同 / 來源差異(期間標籤 · 單位 · 官方落後)/ AKShare 可疑 / 沒資料;只警告不改資料。",
+    "requirements": [
+     "VDF-REQ024"
+    ],
+    "acceptance": [
+     "對照冊讀冊不寫死(欄名候選 · 轉換 · 容忍)",
+     "六種判決可重現(自測 fixture)",
+     "官方為正本;AKSHARE_SUSPECT = RED",
+     "離線先本機(VAKE · us_macro);--live 才連網(雙閘 + 鑰遮罩)",
+     "自測 16/16"
+    ],
+    "entry": "python3 \"functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0100.py\" run [--db-home <庫家>] [--live]",
+    "evidence": "VIA_Reports/vdf/macro/VDF_MacroCrossCheck_latest.json · docs/handoff/evidence/V-vdf-macro-crosscheck.json",
+    "books": [
+     "VDF_MacroCrossCheck_Pairs_SSOT_v0100.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "run(離線)→ 警告 → 有 NODATA 再 --live(桌機)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF017-STP001",
+     "alias": "run_offline",
+     "name": "離線比對(VAKE v_<fn> × us_macro)",
+     "engine": "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0102.py",
+     "verb": "run",
+     "inside": "VDF",
+     "evidence": "step:VDF-WKF017-STP003",
+     "what": "離線比對 AKShare(VAKE v_<fn>)× 官方(us_macro)最新 n 筆 → 六種判決;沒庫 = NODATA 照實",
+     "evidence_file": "VIA_Reports/vdf/macro/VDF_MacroCrossCheck_latest.md"
+    },
+    {
+     "code": "VDF-WKF017-STP002",
+     "alias": "run_live",
+     "name": "連網補最新(akshare_call + FRED observations)",
+     "engine": "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0102.py",
+     "verb": "run --live",
+     "inside": "操作員桌機(雙閘 + FRED 鑰)",
+     "evidence": "step:VDF-WKF017-STP003",
+     "what": "--live 才連網補最新(akshare_call + FRED observations;雙閘 + 鑰遮罩)· 只警告不改資料",
+     "evidence_file": "VIA_Reports/vdf/macro/VDF_MacroCrossCheck_latest.json"
+    },
+    {
+     "code": "VDF-WKF017-STP003",
+     "alias": "selftest_gate",
+     "name": "自測 16 項",
+     "engine": "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0102.py",
+     "verb": "--selftest",
+     "inside": "VCGC run",
+     "evidence": "self:VDF_MDL016_MacroCrossCheck",
+     "what": "自測 16 項(對照冊讀冊 · 六種判決 fixture · 官方為正本 · 邊界不 import akshare / 不寫 environ)",
+     "evidence_file": "docs/handoff/evidence/V-vdf-macro-crosscheck.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF017-TST001",
+     "case": "C-macro-crosscheck-selftest",
+     "engine": "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 16/16"
+    },
+    {
+     "code": "VDF-WKF017-TST002",
+     "case": "C-macro-crosscheck-offline",
+     "engine": "functional modules/VDF/VDF_MDL016_MacroCrossCheck_v0100.py",
+     "verb": "run",
+     "expect": "rc 0 · 沒庫時每對 NODATA 照實(不假填)· 有庫時六種判決"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF018",
+   "alias": "user_api_keys",
+   "name": "每個人輸入自己的 API 鑰 → 個人鑰優先 → 子行程才帶",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-15T07:45:00Z",
+   "spec": {
+    "goal": "FRED 等 API 鑰存每個使用者自己的設定檔(%APPDATA%\\VIA\\keys);讀鑰順序 個人鑰 → 環境測試鑰 → 舊共用鑰匙檔 → 沒有;run 只在子行程環境放鑰;status 只給指紋不露鑰。",
+    "requirements": [
+     "VDF-REQ025"
+    ],
+    "acceptance": [
+     "隱藏輸入 · 驗格式 · 原子寫 · POSIX 600",
+     "順序可重現(自測 fixture)",
+     "run -- <指令> 本行程環境不變",
+     "status 不露鑰(sha256 前 8 碼)",
+     "自測 10/10"
+    ],
+    "entry": "python \"functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py\" set fred | status | clear fred --yes | run -- <指令>",
+    "evidence": "docs/handoff/evidence/V-vdf-userkeys-v0100.json",
+    "books": []
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "set(每個人)→ status → run -- ActivateVDF"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF018-STP001",
+     "alias": "set_key",
+     "name": "每個人輸入自己的鑰(隱藏輸入)",
+     "engine": "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py",
+     "verb": "set fred",
+     "inside": "操作員桌機(每個人自己)",
+     "evidence": "step:VDF-WKF018-STP003",
+     "what": "隱藏輸入 → 驗格式 → 原子寫進個人設定檔;AI 永不代輸",
+     "evidence_file": "docs/handoff/evidence/V-vdf-userkeys-v0100.json",
+     "known_open": {
+      "why": "個人鑰只能由每個人在桌機自己輸入",
+      "hand": "operator",
+      "ref": "VDF-REQ025:workstation-each-user-key"
+     }
+    },
+    {
+     "code": "VDF-WKF018-STP002",
+     "alias": "run_with_key",
+     "name": "run -- <指令>(只在子行程環境放鑰)",
+     "engine": "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py",
+     "verb": "run --",
+     "inside": "操作員桌機",
+     "evidence": "step:VDF-WKF018-STP003",
+     "what": "照順序解出鑰 → 只放進子行程環境 → 本行程環境不變",
+     "evidence_file": "docs/handoff/evidence/V-vdf-userkeys-v0100.json"
+    },
+    {
+     "code": "VDF-WKF018-STP003",
+     "alias": "selftest_gate",
+     "name": "自測 10 項",
+     "engine": "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL017_UserApiKeys",
+     "what": "自測 10 項(暫存夾 · 不碰真個人鑰 · 順序 · run · status 不露鑰)",
+     "evidence_file": "docs/handoff/evidence/V-vdf-userkeys-v0100.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF018-TST001",
+     "case": "V-vdf-userkeys-v0100",
+     "engine": "functional modules/VDF/VDF_MDL017_UserApiKeys_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 10/10"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF019",
+   "alias": "active_etf_qualify",
+   "name": "主動式台股 ETF 判定:抓不到每日持股 = 不符合",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-15T07:45:00Z",
+   "spec": {
+    "goal": "清單每檔依 ENG051 自己的擷取紀錄 fetch_status 最新一輪判定:PASS 且持股 > 0 = 符合;FAIL / 持股 0 / 國外成分 = 不符合;沒紀錄 = 未判(黃,不猜)。清單本身照 v0100;判定另寫檔;下游只用符合的(待做)。",
+    "requirements": [
+     "VDF-REQ026"
+    ],
+    "acceptance": [
+     "只看最新一輪(自動往前滾 · 不寫死天數)",
+     "不符合不是錯(燈不因它紅);未判 = YELLOW",
+     "清單列 / 欄 / DuckDB 表照 v0100",
+     "判定檔 0-2-ActiveETFList/active_etf_qualified_latest.csv",
+     "qualify 不連網重判",
+     "自測 10/10 + 前版 7/7"
+    ],
+    "entry": "python \"functional modules/VDF/VDF_SystemManager_v0181.py\" fetch run MDL010 --apply | python \"functional modules/VDF/VDF_MDL010_ActiveETFList_v0101.py\" qualify",
+    "evidence": "docs/handoff/evidence/V-vdf-active-etf-list-v0101.json · docs/handoff/evidence/V-vdf-fetchsystem-book-v0109.json",
+    "books": [
+     "functional modules/VDF/VDF_FetchSystem_SSOT_v0109.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "010 清單(V8 用前一輪 ENG051 紀錄)→ ENG051 抓持股 → qualify 重判 → 下游只讀符合的"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF019-STP001",
+     "alias": "list_v8",
+     "name": "010 清單 + V8 判定",
+     "engine": "functional modules/VDF/VDF_MDL010_ActiveETFList_v0101.py",
+     "verb": "run",
+     "inside": "VDF_SystemManager fetch run MDL010(擷取冊 v0109)",
+     "evidence": "step:VDF-WKF019-STP003",
+     "what": "清單照 v0100 生成驗證;V8 讀 ENG051 fetch_status 最新一輪 → 判定檔",
+     "evidence_file": "docs/handoff/evidence/V-vdf-fetchsystem-book-v0109.json",
+     "known_open": {
+      "why": "真判定要桌機開雙閘 + ENG051 真抓的紀錄",
+      "hand": "operator",
+      "ref": "VDF-REQ026:workstation-live-qualify"
+     }
+    },
+    {
+     "code": "VDF-WKF019-STP002",
+     "alias": "qualify",
+     "name": "ENG051 抓完後不連網重判",
+     "engine": "functional modules/VDF/VDF_MDL010_ActiveETFList_v0101.py",
+     "verb": "qualify",
+     "inside": "VDF(總控入口)",
+     "evidence": "step:VDF-WKF019-STP003",
+     "what": "既有清單 + 目前 ENG051 紀錄 → 判定檔;清單檔不動",
+     "evidence_file": "docs/handoff/evidence/V-vdf-active-etf-list-v0101.json"
+    },
+    {
+     "code": "VDF-WKF019-STP003",
+     "alias": "selftest_gate",
+     "name": "自測 10 項 + 前版 7 項",
+     "engine": "functional modules/VDF/VDF_MDL010_ActiveETFList_v0101.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL010_ActiveETFList",
+     "what": "判定六種情形 · V8 燈 · 一輪輸出 · DuckDB 表欄不變 · qualify · 庫後備 · 多根取最新 · 沒紀錄不當機",
+     "evidence_file": "docs/handoff/evidence/V-vdf-active-etf-list-v0101.json"
+    },
+    {
+     "code": "VDF-WKF019-STP004",
+     "alias": "downstream_qualified",
+     "name": "下游只讀符合的(ENG094 · ENG096 · VRN-2 報表)",
+     "engine": "functional modules/VDF/VDF_MDL010_ActiveETFList_v0101.py",
+     "verb": "(待做:各下游出新版讀判定檔)",
+     "inside": "VDF(VRN-2 部分歸 VRN-2 自己的手)",
+     "evidence": "step:VDF-WKF019-STP003",
+     "what": "判定檔已產出;下游改讀只取 qualified=True 待操作員點名先做哪一支",
+     "evidence_file": "docs/handoff/evidence/V-vdf-active-etf-list-v0101.json",
+     "known_open": {
+      "why": "下游還讀整份清單;改讀要各出新版",
+      "hand": "ai",
+      "ref": "VDF-REQ026:downstream-read-qualified"
+     }
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF019-TST001",
+     "case": "V-vdf-active-etf-list-v0101",
+     "engine": "functional modules/VDF/VDF_MDL010_ActiveETFList_v0101.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 10/10 · 前版 7/7"
+    },
+    {
+     "code": "VDF-WKF019-TST002",
+     "case": "V-vdf-fetchsystem-book-v0109",
+     "engine": "functional modules/VDF/VDF_MDL008_FetchSystem_v0110.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 9/9(讀尾版冊 v0109)"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF020",
+   "alias": "universe_share",
+   "name": "統一 SSOT 分享:VDF 三代號宇宙一份 · sha 鎖 · 各系統只讀展現",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-15T10:53:10Z",
+   "spec": {
+    "goal": "MDL014 尾版 OUT-01 + MDL010 尾版判定 → 一份 VDF_UniverseShare(content_sha256);VCGC · VRN-2 · VQG · VAP 讀 latest、重算 sha 一致才用,照分享冊 view 展現;不回寫。",
+    "requirements": [
+     "VDF-REQ027"
+    ],
+    "acceptance": [
+     "一份 · sha 鎖(鍵序無關 · 改一格即不同)",
+     "版本檔只增 + latest 原子寫",
+     "verify 只讀、不需入口標記",
+     "views:VCGC 燈與收據 · VRN-2 / VQG 只帶符合的 ETF · VAP 彙總",
+     "U/I 三行標頭 × 5 · 實測收據 · VDF 鎖定樣式(sha 驗過)",
+     "不寫他系統的程式或冊(L123)",
+     "自測 8/8"
+    ],
+    "entry": "python \"functional modules/VDF/VDF_MDL018_UniverseShare_v0100.py\" ui | build --apply | view <VCGC|VRN-2|VQG|VAP> | verify [檔]",
+    "evidence": "docs/handoff/evidence/V-vdf-universe-share-v0100.json",
+    "books": [
+     "functional modules/VDF/VDF_UniverseShare_SSOT_v0100.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VCGC · VRN-2 · VQG · VAP(各自只讀)",
+    "order": "009 / 010 / e232 → 014(OUT-01)→ ENG051 → MDL018 build --apply / ui → 各系統 verify → 照 view 展現"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF020-STP001",
+     "alias": "build_share",
+     "name": "建一份統一 SSOT(sha 鎖)",
+     "engine": "functional modules/VDF/VDF_MDL018_UniverseShare_v0100.py",
+     "verb": "build --apply",
+     "inside": "VDF_SystemManager / VCGC 入口",
+     "evidence": "step:VDF-WKF020-STP004",
+     "what": "OUT-01 + 判定 → 版本檔 + latest(原子寫)",
+     "evidence_file": "docs/handoff/evidence/V-vdf-universe-share-v0100.json",
+     "known_open": {
+      "why": "真資料要桌機開雙閘真抓(容器 = 種子冊 AMBER)",
+      "hand": "operator",
+      "ref": "VDF-REQ027:workstation-live-share"
+     }
+    },
+    {
+     "code": "VDF-WKF020-STP002",
+     "alias": "ui",
+     "name": "U/I:實測收據 + 統一 SSOT + 四系統預覽",
+     "engine": "functional modules/VDF/VDF_MDL018_UniverseShare_v0100.py",
+     "verb": "ui",
+     "inside": "VDF",
+     "evidence": "step:VDF-WKF020-STP004",
+     "what": "VDF 鎖定樣式 · 三行標頭 × 5 · handoff 收據 · sha 印出",
+     "evidence_file": "docs/handoff/evidence/V-vdf-universe-share-v0100.json"
+    },
+    {
+     "code": "VDF-WKF020-STP003",
+     "alias": "peers_read",
+     "name": "各系統讀 latest → verify → 照 view 展現",
+     "engine": "functional modules/VDF/VDF_MDL018_UniverseShare_v0100.py",
+     "verb": "verify",
+     "inside": "VCGC · VRN-2 · VQG · VAP 各自的 manager",
+     "evidence": "step:VDF-WKF020-STP004",
+     "what": "只讀重算 sha;一致才用;不回寫",
+     "evidence_file": "docs/handoff/evidence/V-vdf-universe-share-v0100.json",
+     "known_open": {
+      "why": "他系統讀取與展現是各系統自己的手(L123 不代寫)",
+      "hand": "operator",
+      "ref": "VDF-REQ027:peers-read-share"
+     }
+    },
+    {
+     "code": "VDF-WKF020-STP004",
+     "alias": "selftest_gate",
+     "name": "自測 8 項",
+     "engine": "functional modules/VDF/VDF_MDL018_UniverseShare_v0100.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL018_UniverseShare",
+     "what": "分享冊 · sha 律 · 實建 · 寫出 / 驗 / 竄改 · 四系統投影 · U/I · 沒收據 GRAY · 獨立",
+     "evidence_file": "docs/handoff/evidence/V-vdf-universe-share-v0100.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF020-TST001",
+     "case": "V-vdf-universe-share-v0100",
+     "engine": "functional modules/VDF/VDF_MDL018_UniverseShare_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 8/8"
+    },
+    {
+     "code": "VDF-WKF020-TST002",
+     "case": "V-vdf-fetchsystem-book-v0110",
+     "engine": "functional modules/VDF/VDF_MDL008_FetchSystem_v0110.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 9/9(讀尾版冊 v0110)"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF021",
+   "alias": "db_status_matrix",
+   "name": "資料庫狀態矩陣:清點 → 核對 → 矩陣頁 + 建議",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-15T14:00:33Z",
+   "spec": {
+    "goal": "db check(冊上每張表)→ db verify(獨立核對)→ MDL019 一頁矩陣(KPI · 建議 · 庫 × 狀態 · 寫入引擎 × 狀態 · 逐表明細 · 他系統表只讀)= VDF 資料庫頁。",
+    "requirements": [
+     "VDF-REQ028"
+    ],
+    "acceptance": [
+     "只讀 VDF 自己的報告",
+     "建議由重到輕(資料家沒接上排第一)",
+     "資料庫頁 = 矩陣頁 · 原平表另存",
+     "rc 照 db check / verify",
+     "管理員仍是標準轉交者",
+     "手機寬不橫捲"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python \"functional modules/VDF/VDF_SystemManager_v0182.py\" db check | db verify(或 VDF_MDL019_DBStatusMatrix_v0100.py render)",
+    "evidence": "docs/handoff/evidence/V-vdf-manager-v0182.json · docs/handoff/evidence/V-vdf-dbmatrix-v0100.json",
+    "books": [
+     "functional modules/VDF/VDF_UI_VisualSpec_SSOT_v0100.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "db check → db verify → 矩陣頁(自動)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF021-STP001",
+     "alias": "db_check",
+     "name": "清點 + 矩陣頁",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "db check",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF021-STP003",
+     "what": "冊上每張表一列 → 轉交那一版寫報告 → 本版叫 MDL019 渲染 → 資料庫頁換矩陣",
+     "evidence_file": "docs/handoff/evidence/V-vdf-manager-v0182.json",
+     "known_open": {
+      "why": "真資料庫在桌機(容器 0/5 庫)",
+      "hand": "operator",
+      "ref": "VDF-REQ028:workstation-real-db"
+     },
+     "pinned_before": "VDF_SystemManager_v0182.py"
+    },
+    {
+     "code": "VDF-WKF021-STP002",
+     "alias": "db_verify",
+     "name": "獨立核對 + 矩陣頁",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "db verify",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF021-STP003",
+     "what": "清點對庫逐欄核對;矩陣的 KPI / 建議帶核對結果",
+     "evidence_file": "docs/handoff/evidence/V-vdf-manager-v0182.json",
+     "pinned_before": "VDF_SystemManager_v0182.py"
+    },
+    {
+     "code": "VDF-WKF021-STP003",
+     "alias": "selftest_gate",
+     "name": "渲染器自測 12 項 + 管理員自測 36 項",
+     "engine": "functional modules/VDF/VDF_MDL019_DBStatusMatrix_v0100.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL019_DBStatusMatrix",
+     "what": "類別 · 矩陣 · 建議 · U/I · GRAY · 獨立;管理員 D1–D3",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dbmatrix-v0100.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF021-TST001",
+     "case": "V-vdf-dbmatrix-v0100",
+     "engine": "functional modules/VDF/VDF_MDL019_DBStatusMatrix_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 12/12"
+    },
+    {
+     "code": "VDF-WKF021-TST002",
+     "case": "V-vdf-manager-v0182",
+     "engine": "functional modules/VDF/VDF_SystemManager_v0182.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 36/36"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF022",
+   "alias": "duckdb_live_verify",
+   "name": "DuckDB 現查:擷取 → 清點 → 核對 → 現查對列數 / 重複 / 兩份落地 → 重跑證明增量維護",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-15T14:16:53Z",
+   "spec": {
+    "goal": "資料庫輸出經 DuckDB 直接查庫核對並證明增量維護不重寫,結果顯示在 VDF 資料庫頁(矩陣頁的 DuckDB 現查段)。",
+    "requirements": [
+     "VDF-REQ029"
+    ],
+    "acceptance": [
+     "DuckDB 只唯讀開",
+     "清點報告列數逐表對現查 · 不一致 = 紅排第一",
+     "擷取 .duckdb ⇄ 同名 .parquet 列數一致",
+     "整列重複 0(有就黃)",
+     "重跑一輪列數不變",
+     "backups/ 只數不列",
+     "鎖住 / 壞檔照實記不擋",
+     "手機寬不橫捲"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python \"functional modules/VDF/VDF_SystemManager_v0182.py\" db check [--home 資料家] → db verify(矩陣頁自動帶 DuckDB 現查段)",
+    "evidence": "docs/handoff/evidence/V-vdf-dbmatrix-v0100.json · docs/handoff/evidence/V-vdf-manager-v0182.json",
+    "books": [
+     "functional modules/VDF/VDF_UI_VisualSpec_SSOT_v0100.json",
+     "supportive modules/registry/VDF_FetchSystem_SSOT_v0110.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "擷取(fixture 沙盒 / 桌機真資料)→ db check → db verify → 矩陣頁 DuckDB 現查 → 重跑比列數"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF022-STP001",
+     "alias": "fetch_fixture",
+     "name": "擷取鏈進資料家",
+     "engine": "functional modules/VDF/VDF_MDL008_FetchSystem_v0110.py",
+     "verb": "run 009 010 001u 002 003 004 005 006 007 --apply --mode fixture --home <dir>",
+     "inside": "VDF_SystemManager fetch",
+     "evidence": "step:VDF-WKF022-STP004",
+     "what": "擷取系統把真管線的輸出(.duckdb + parquet)寫進指定的家;容器用 fixture,桌機用真資料",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dbmatrix-v0100.json",
+     "known_open": {
+      "why": "真資料擷取要網路與同意閘(操作員設,AI 不代設)",
+      "hand": "operator",
+      "ref": "VDF-REQ029:workstation-real-home"
+     }
+    },
+    {
+     "code": "VDF-WKF022-STP002",
+     "alias": "db_check_verify",
+     "name": "清點 + 核對 + 矩陣頁(帶 DuckDB 現查)",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "db check --home <dir> · db verify",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF022-STP004",
+     "what": "冊上每張表清點、獨立核對;矩陣頁的 DuckDB 現查段直接查庫對列數",
+     "evidence_file": "docs/handoff/evidence/V-vdf-manager-v0182.json",
+     "known_open": {
+      "why": "冊上 5 本庫要 live 引擎才建(容器 0/5)",
+      "hand": "operator",
+      "ref": "VDF-REQ028:workstation-real-db"
+     },
+     "pinned_before": "VDF_SystemManager_v0182.py"
+    },
+    {
+     "code": "VDF-WKF022-STP003",
+     "alias": "maintain_rerun",
+     "name": "重跑一輪證明增量維護",
+     "engine": "functional modules/VDF/VDF_MDL008_FetchSystem_v0110.py",
+     "verb": "run … --apply --mode fixture --home <同一個家>",
+     "inside": "VDF_SystemManager fetch",
+     "evidence": "step:VDF-WKF022-STP004",
+     "what": "重跑後每張表列數不變 · 整列重複 0 · .duckdb ⇄ .parquet 一致(2026-11-15 容器:48/48 不變 · 重複 0 · 18/18 一致)",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dbmatrix-v0100.json"
+    },
+    {
+     "code": "VDF-WKF022-STP004",
+     "alias": "selftest_gate",
+     "name": "渲染器自測 12 項(含 DuckDB 現查 ⑨–⑫)",
+     "engine": "functional modules/VDF/VDF_MDL019_DBStatusMatrix_v0100.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL019_DBStatusMatrix",
+     "what": "唯讀開庫 · 日期範圍 / 日期數 · 壞檔不擋 · 清點 vs 現查 · 兩份落地 · 整列重複 · backups 只數",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dbmatrix-v0100.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF022-TST001",
+     "case": "V-vdf-dbmatrix-v0100",
+     "engine": "functional modules/VDF/VDF_MDL019_DBStatusMatrix_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 12/12"
+    },
+    {
+     "code": "VDF-WKF022-TST002",
+     "case": "V-vdf-manager-v0182",
+     "engine": "functional modules/VDF/VDF_SystemManager_v0182.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 36/36"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF023",
+   "alias": "data_plane",
+   "name": "VDF 資料平面:管理範圍 → 清單輸入閘 → 不重複擷取計畫 → parquet 增量同步 → 增量匯出(PC · 雲端同步夾 · MCP)",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-15T15:04:35Z",
+   "spec": {
+    "goal": "VDF System Manager 一處管輸入(清單)→ 擷取 → 正典庫 → 資料家 tw__ / gl__ parquet → 匯出 → 整合;只補新鍵、沒新鍵不動檔、只抓真的缺的。",
+    "requirements": [
+     "VDF-REQ030"
+    ],
+    "acceptance": [
+     "清單閘有紅不拿去擷取",
+     "代碼律讀共用的(MDL009 / ENG077)",
+     "沒新鍵不動檔",
+     "同鍵重抓不算新列",
+     "新檔驗列數 / 重複鍵後原子替換",
+     "正典庫已有 → 只要 sync 不重抓",
+     "匯出只複製 sha256 變了的",
+     "MCP 交接清單不含金鑰",
+     "參數在 VDF 自己的冊",
+     "手機寬不橫捲"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python \"functional modules/VDF/VDF_SystemManager_v0183.py\" scope | inputs | parquet status|plan|sync|export --to <夾|onedrive|gdrive|dropbox>",
+    "evidence": "docs/handoff/evidence/V-vdf-dataplane-v0100.json · docs/handoff/evidence/V-vdf-manager-v0183.json",
+    "books": [
+     "functional modules/VDF/VDF_DataPlane_SSOT_v0100.json",
+     "functional modules/VDF/VDF_DataHome_SSOT_v0101.json",
+     "supportive modules/registry/VIA_DB_Table_SSOT_v0102.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "scope → inputs → parquet plan → (只跑列出的寫入引擎)→ parquet sync → parquet export"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF023-STP001",
+     "alias": "scope",
+     "name": "管理範圍總表 + 頁",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "scope",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF023-STP005",
+     "what": "六項各一燈:輸入 · 擷取 · 正典庫 · parquet · 匯出 · 整合",
+     "evidence_file": "docs/handoff/evidence/V-vdf-manager-v0183.json",
+     "pinned_before": "VDF_SystemManager_v0183.py"
+    },
+    {
+     "code": "VDF-WKF023-STP002",
+     "alias": "inputs",
+     "name": "清單輸入閘",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "inputs",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF023-STP005",
+     "what": "台股 / 主動式 ETF 清單 + 合格判定:共用代碼律 · 不重號 · 後綴對市場 · 新鮮 · 模組自報",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0100.json",
+     "pinned_before": "VDF_SystemManager_v0183.py"
+    },
+    {
+     "code": "VDF-WKF023-STP003",
+     "alias": "plan_sync",
+     "name": "不重複擷取計畫 + 增量同步",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "parquet plan · parquet sync",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF023-STP005",
+     "what": "正典庫已有只 sync;沒新鍵不動檔;只補新鍵",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0100.json",
+     "known_open": {
+      "why": "真資料家與正典庫在桌機",
+      "hand": "operator",
+      "ref": "VDF-REQ030:workstation-real-home"
+     },
+     "pinned_before": "VDF_SystemManager_v0183.py"
+    },
+    {
+     "code": "VDF-WKF023-STP004",
+     "alias": "export",
+     "name": "增量匯出 + MCP 交接清單",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "parquet export --to",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF023-STP005",
+     "what": "只複製 sha256 變了的;MCP 端上傳完寫回已上傳",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0100.json",
+     "pinned_before": "VDF_SystemManager_v0183.py"
+    },
+    {
+     "code": "VDF-WKF023-STP005",
+     "alias": "selftest_gate",
+     "name": "資料平面自測 16 項 + 管理員自測 39 項",
+     "engine": "functional modules/VDF/VDF_MDL020_DataPlane_v*.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL020_DataPlane",
+     "what": "見 VDF-REQ030 evidence",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0100.json",
+     "pinned_before": "VDF_MDL020_DataPlane_v0100.py"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF023-TST001",
+     "case": "V-vdf-dataplane-v0100",
+     "engine": "functional modules/VDF/VDF_MDL020_DataPlane_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 16/16"
+    },
+    {
+     "code": "VDF-WKF023-TST002",
+     "case": "V-vdf-manager-v0183",
+     "engine": "functional modules/VDF/VDF_SystemManager_v0183.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 39/39"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF024",
+   "alias": "batch_backfill_view",
+   "name": "VDF 一本冊 → 清單閘 → ENG064 分批擷取 → 分批 sync(temp 檢查點)→ 2022-01-01 起輸出檢視",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-15T15:36:44Z",
+   "spec": {
+    "goal": "輸入參數與 21 個輸出 DataFrame 由一本冊控管;擷取與輸出都分批、中斷不全丟;輸出 2022-01-01~最新並顯示逐月覆蓋。",
+    "requirements": [
+     "VDF-REQ031"
+    ],
+    "acceptance": [
+     "一本冊:輸入 7 · 輸出 21",
+     "冊上鍵優先",
+     "按月分批 · 每批記檢查點",
+     "中斷後重跑接續、不重做已完成的批",
+     "合併後驗列數 / 重複鍵再原子替換",
+     "只輸出起始月以後、不刪更早的列",
+     "擷取用 ENG064(同意閘操作員設)",
+     "檢視頁卡片 + 矩陣 · 名稱不空格",
+     "手機寬不橫捲"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python \"functional modules/VDF/VDF_SystemManager_v0183.py\" parquet backfill [--start 2022-01-01] [--end YYYY-MM-DD] [--skip-fetch] | parquet sync --start | parquet view",
+    "evidence": "docs/handoff/evidence/V-vdf-dataplane-v0101.json",
+    "books": [
+     "functional modules/VDF/VDF_DataPlane_SSOT_v0101.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "inputs → ENG064 run --start --end → 分批 sync → view"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF024-STP001",
+     "alias": "backfill",
+     "name": "清單閘 → ENG064 擷取 → 分批 sync → 檢視",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "parquet backfill --start 2022-01-01",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF024-STP003",
+     "what": "清單閘紅就停;擷取照 ENG064(每批落庫 + checkpoint);同意閘沒開照實 GATED 仍續做 sync",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0101.json",
+     "known_open": {
+      "why": "真擷取要操作員開同意閘 · 真資料家在桌機",
+      "hand": "operator",
+      "ref": "VDF-REQ031:workstation-backfill-2022"
+     },
+     "pinned_before": "VDF_SystemManager_v0183.py"
+    },
+    {
+     "code": "VDF-WKF024-STP002",
+     "alias": "view",
+     "name": "輸出檢視頁",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "parquet view --start 2022-01-01",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF024-STP003",
+     "what": "卡片(每個輸出)+ 矩陣(輸出 × 月)",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0101.json",
+     "pinned_before": "VDF_SystemManager_v0183.py"
+    },
+    {
+     "code": "VDF-WKF024-STP003",
+     "alias": "selftest_gate",
+     "name": "v0101 自測 11 項(含前版 v0100 16 項)",
+     "engine": "functional modules/VDF/VDF_MDL020_DataPlane_v*.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL020_DataPlane",
+     "what": "見 VDF-REQ031 evidence",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0101.json",
+     "pinned_before": "VDF_MDL020_DataPlane_v0101.py"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF024-TST001",
+     "case": "V-vdf-dataplane-v0101",
+     "engine": "functional modules/VDF/VDF_MDL020_DataPlane_v0101.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 11/11"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF025",
+   "alias": "io_registry",
+   "name": "輸入輸出註冊:版本號 + 註冊時間 · 群組起始日 · 分類矩陣",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-15T17:50:48Z",
+   "spec": {
+    "goal": "每個輸入 / 輸出帶版本號與註冊時間;起始日照群組;一張分類矩陣看全部來源。",
+    "requirements": [
+     "VDF-REQ032"
+    ],
+    "acceptance": [
+     "冊上每項 version + registered_at",
+     "資料家清單每檔內容版本 + 註冊時間",
+     "檔名協定不變",
+     "群組起始日",
+     "矩陣 輸入 7 + 輸出 21"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python \"functional modules/VDF/VDF_SystemManager_v0183.py\" parquet io | parquet sync",
+    "evidence": "docs/handoff/evidence/V-vdf-dataplane-v0102.json",
+    "books": [
+     "functional modules/VDF/VDF_DataPlane_SSOT_v0102.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "冊 → sync(群組起始)→ 清單版本 → io 矩陣"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF025-STP001",
+     "alias": "io",
+     "name": "分類矩陣",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "parquet io",
+     "inside": "VDF_SystemManager",
+     "evidence": "step:VDF-WKF025-STP002",
+     "what": "輸入輸出分類矩陣頁 + JSON + CSV",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0102.json",
+     "known_open": {
+      "why": "真資料家在桌機",
+      "hand": "operator",
+      "ref": "VDF-REQ032:workstation-io"
+     },
+     "pinned_before": "VDF_SystemManager_v0183.py"
+    },
+    {
+     "code": "VDF-WKF025-STP002",
+     "alias": "selftest_gate",
+     "name": "資料平面 v0102 自測 6 項",
+     "engine": "functional modules/VDF/VDF_MDL020_DataPlane_v*.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL020_DataPlane",
+     "what": "見 VDF-REQ032",
+     "evidence_file": "docs/handoff/evidence/V-vdf-dataplane-v0102.json",
+     "pinned_before": "VDF_MDL020_DataPlane_v0102.py"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF025-TST001",
+     "case": "V-vdf-dataplane-v0102",
+     "engine": "functional modules/VDF/VDF_MDL020_DataPlane_v0102.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 6/6"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF026",
+   "alias": "fin_period_check",
+   "name": "財報期別核對:累計 · 單季 · 年度(3017 · 3324 · NVDA)",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-15T18:32:04Z",
+   "spec": {
+    "goal": "交易所累計與 yfinance 單季 / 年度對齊會計年度互核。",
+    "requirements": [
+     "VDF-REQ033"
+    ],
+    "acceptance": [
+     "會計年度結束月照冊",
+     "K1 / K2 / K3",
+     "EPS 季和看差 %",
+     "缺期照列",
+     "庫只唯讀"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python \"functional modules/VDF/VDF_SystemManager_v0183.py\" engine run VDF_MDL021_FinPeriodCheck run [--tickers 3017,3324,NVDA] [--file 長表]",
+    "evidence": "docs/handoff/evidence/V-vdf-finperiod-v0101.json",
+    "books": [
+     "functional modules/VDF/VDF_DataPlane_SSOT_v0102.json",
+     "functional modules/VDF/VDF_FinPeriod_SSOT_v0100.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "ENG082 擷取(桌機)→ MDL021 run → 頁"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF026-STP001",
+     "alias": "run",
+     "name": "核對 + 頁",
+     "engine": "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0101.py",
+     "verb": "run",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "step:VDF-WKF026-STP002",
+     "what": "卡片 + 矩陣",
+     "evidence_file": "docs/handoff/evidence/V-vdf-finperiod-v0101.json",
+     "known_open": {
+      "why": "真財報在桌機(ENG082 交易所 / yfinance 兩車道)",
+      "hand": "operator",
+      "ref": "VDF-REQ033:workstation-real-fin"
+     }
+    },
+    {
+     "code": "VDF-WKF026-STP002",
+     "alias": "selftest_gate",
+     "name": "財報期別核對自測 11 項",
+     "engine": "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0101.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL021_FinPeriodCheck",
+     "what": "見 VDF-REQ033",
+     "evidence_file": "docs/handoff/evidence/V-vdf-finperiod-v0101.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF026-TST001",
+     "case": "V-vdf-finperiod-v0100",
+     "engine": "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 8/8"
+    },
+    {
+     "code": "VDF-WKF026-TST002",
+     "case": "V-vdf-finperiod-v0101",
+     "engine": "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0101.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 11/11"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF027",
+   "alias": "fin_amount_display",
+   "name": "財報金額單位百萬元 · 顯示千分位小數一位",
+   "kind": "rule",
+   "version": "v0100",
+   "updated_at": "2026-11-15T18:32:04Z",
+   "spec": {
+    "goal": "財報金額一律換成百萬元(存值小數不設限),顯示千分位 · 小數一位(EPS 兩位)。",
+    "requirements": [
+     "VDF-REQ034"
+    ],
+    "acceptance": [
+     "交易所仟元 ÷1,000",
+     "yfinance 原幣元 ÷1,000,000",
+     "每股類不換",
+     "存值不四捨五入",
+     "顯示 26,044.0 / EPS 2.85",
+     "單位層冊疊在底冊之上"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python \"functional modules/VDF/VDF_SystemManager_v0183.py\" engine run VDF_MDL021_FinPeriodCheck run [--tickers 3017,3324,NVDA] [--file 長表]",
+    "evidence": "docs/handoff/evidence/V-vdf-finperiod-v0101.json",
+    "books": [
+     "functional modules/VDF/VDF_FinPeriod_SSOT_v0100.json",
+     "functional modules/VDF/VDF_ParamControl_SSOT_v0101.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "讀冊(底冊 + 單位層)→ 換算 → 核對 → 頁(顯示規範)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF027-STP001",
+     "alias": "scale",
+     "name": "單位換算(百萬元)",
+     "engine": "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0101.py",
+     "verb": "run",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "step:VDF-WKF027-STP002",
+     "what": "仟元 / 元 → 百萬元;不認得的單位那列不比",
+     "evidence_file": "docs/handoff/evidence/V-vdf-finperiod-v0101.json"
+    },
+    {
+     "code": "VDF-WKF027-STP002",
+     "alias": "selftest_gate",
+     "name": "單位與顯示自測(⑦ ⑩ ⑪)",
+     "engine": "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0101.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL021_FinPeriodCheck",
+     "what": "見 VDF-REQ034",
+     "evidence_file": "docs/handoff/evidence/V-vdf-finperiod-v0101.json",
+     "known_open": {
+      "why": "真財報頁在桌機看(ENG082 / yfinance 兩車道)",
+      "hand": "operator",
+      "ref": "VDF-REQ033:workstation-real-fin"
+     }
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF027-TST001",
+     "case": "V-vdf-finperiod-v0101",
+     "engine": "functional modules/VDF/VDF_MDL021_FinPeriodCheck_v0101.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 11/11"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF028",
+   "alias": "safe_parallel_launch",
+   "name": "VDF 安全並行啟動器:開跑前降壓等靜 · 固定 3 道 · 途中不監控 CPU / DRAM",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-21T03:32:00Z",
+   "spec": {
+    "goal": "VDF 自己的 Python 啟動器(MDL022 尾版)開跑前降壓等系統靜下來,固定 3 道並行跑互不相干的流程;途中不再監控 CPU / DRAM;--via-db 指向資料家。",
+    "requirements": [
+     "VDF-REQ036"
+    ],
+    "acceptance": [
+     "開跑前降壓等靜",
+     "道數固定 3(--slots auto)",
+     "途中不監控 CPU / DRAM",
+     "--via-db → <db>/vdf_database",
+     "自測 11/11"
+    ],
+    "entry": "VIA_NET_CONSENT=YES VIA_SCRAPE_CONSENT=YES python \"functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v0106.py\" run --start 2021-01-01 --slots auto --no-open",
+    "evidence": "docs/handoff/evidence/C-vdf-launch-v0106.json",
+    "books": [
+     "functional modules/VDF/VDF_FetchGroups_SSOT_v0104.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "降壓 → 3 道並行 → 各步收據"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF028-STP001",
+     "alias": "launcher_selftest",
+     "name": "啟動器自測",
+     "engine": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v*.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL022_SafeParallelLaunch",
+     "what": "降壓 · 3 道 · 不監控 · --via-db",
+     "evidence_file": "docs/handoff/evidence/C-vdf-launch-v0106.json"
+    },
+    {
+     "code": "VDF-WKF028-STP002",
+     "alias": "launcher_run",
+     "name": "開閘增量實跑",
+     "engine": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v*.py",
+     "verb": "run --slots auto --no-open",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "step:VDF-WKF028-STP001",
+     "what": "各步收據 · 容器實跑",
+     "known_open": {
+      "why": "主機實跑待操作員",
+      "hand": "operator",
+      "ref": "VDF-REQ036:host-run"
+     }
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF028-TST001",
+     "case": "C-vdf-launch-v0106",
+     "engine": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v*.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 11/11"
+    },
+    {
+     "code": "VDF-WKF028-TST002",
+     "case": "C-vdf-launch-v0107",
+     "engine": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v0107.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 5/5(前版 11/11)"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF029",
+   "alias": "tw_stock_names_glyph",
+   "name": "台股名單名稱亂碼:網路工具自己解碼 · 名稱字形驗收 · 已入庫亂碼就地反解",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-21T03:32:00Z",
+   "spec": {
+    "goal": "網路工具 http_json 由位元組自己解碼;名單驗收 V10 名稱字形;已入庫的亂碼名稱 fixnames 先備份、就地反解(DuckDB · parquet · csv)、冪等;啟動器每輪先跑 fixnames。",
+    "requirements": [
+     "VDF-REQ037"
+    ],
+    "acceptance": [
+     "http_json 位元組解碼",
+     "V10 名稱字形",
+     "fixnames 先備份 · 冪等",
+     "乾跑不寫"
+    ],
+    "entry": "python \"functional modules/VDF/VDF_MDL009_TWStockList_v0104.py\" fixnames [--apply]",
+    "evidence": "docs/handoff/evidence/C-vdf-stocklist-v0104.json",
+    "books": []
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "網路工具解碼 → 名單驗收 → fixnames"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF029-STP001",
+     "alias": "net_decode",
+     "name": "網路工具解碼自測",
+     "engine": "supportive modules/network/SUP_MDL740_NetUnified_v*.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:SUP_MDL740_NetUnified",
+     "what": "http_json 位元組解碼"
+    },
+    {
+     "code": "VDF-WKF029-STP002",
+     "alias": "fixnames",
+     "name": "名單名稱字形與反解",
+     "engine": "functional modules/VDF/VDF_MDL009_TWStockList_v*.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL009_TWStockList",
+     "what": "V10 · fixnames",
+     "evidence_file": "docs/handoff/evidence/C-vdf-stocklist-v0104.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF029-TST001",
+     "case": "C-netunified-v0120",
+     "engine": "supportive modules/network/SUP_MDL740_NetUnified_v0120.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 8/8"
+    },
+    {
+     "code": "VDF-WKF029-TST002",
+     "case": "C-vdf-stocklist-v0104",
+     "engine": "functional modules/VDF/VDF_MDL009_TWStockList_v0104.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 13/13"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF030",
+   "alias": "vdf_self_numbering",
+   "name": "VDF 自己發號、自己定案(VDF_SSOTSync 帳本)",
+   "kind": "rule",
+   "version": "v0100",
+   "updated_at": "2026-11-21T03:32:00Z",
+   "spec": {
+    "goal": "VDF 帳本的 VDF-<類>-#### 就是 VDF 自己的定案號:待核條目轉「已確認(VDF 自發)」、請號清單空、不再讀 VCGC 核發冊;先前 VCGC 核發的照留;自發條目內容變就升 semver。",
+    "requirements": [
+     "VDF-REQ038"
+    ],
+    "acceptance": [
+     "待核 → 已確認(VDF 自發)",
+     "請號清單空",
+     "VCGC 核發的照留",
+     "自發條目內容變升 semver",
+     "自測 8/8"
+    ],
+    "entry": "python \"functional modules/VDF/VDF_SSOTSync_v0104.py\" sync [--apply]",
+    "evidence": "docs/handoff/evidence/C-vdf-ssotsync-v0104.json",
+    "books": [
+     "functional modules/VDF/registry/VDF_SSOT_Register_v0113.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "掃 → 自發定案 → 寫帳"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF030-STP001",
+     "alias": "ssotsync_selftest",
+     "name": "帳本自測",
+     "engine": "functional modules/VDF/VDF_SSOTSync_v*.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_SSOTSync",
+     "what": "自發定案 · semver",
+     "evidence_file": "docs/handoff/evidence/C-vdf-ssotsync-v0104.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF030-TST001",
+     "case": "C-vdf-ssotsync-v0104",
+     "engine": "functional modules/VDF/VDF_SSOTSync_v0104.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 8/8"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF031",
+   "alias": "vdf_output_fast",
+   "name": "VDF 輸出資料且快:引擎自測紅清零 · 平常增量不重抓 · 失敗序列修正 · 指數 / 國際日價補齊",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-21T03:32:00Z",
+   "spec": {
+    "goal": "VDF 啟動器開閘增量擷取:引擎自測紅燈清零(MDL009 · MDL012);中國宏觀兩段 timeout 不再失敗(MDL008);統計局一週內抓過就跳過(MDL011 + 選單 v0101);加權指數休市不判洞(ENG232);國際日價空庫建表(ENG066);輸出照表驗。",
+    "requirements": [
+     "VDF-REQ039",
+     "VDF-REQ040",
+     "VDF-REQ041"
+    ],
+    "acceptance": [
+     "引擎自測尾版全照過",
+     "中國宏觀 31 條不再 int(tuple) 失敗",
+     "統計局平常增量 TTL 跳過(168h)",
+     "加權指數與櫃買同到最新交易日",
+     "global_daily 空庫可建",
+     "擷取後 datamatrix 多餘列 0 · db check 照實",
+     "空庫 / 增量耗時分開報"
+    ],
+    "entry": "VIA_NET_CONSENT=YES VIA_SCRAPE_CONSENT=YES python \"functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v0106.py\" run --start 2021-01-01 --slots auto --no-open",
+    "evidence": "docs/handoff/evidence/C-vdf-fetchsystem-v0111.json · docs/handoff/evidence/C-vdf-akshare-v0105.json",
+    "books": [
+     "functional modules/VDF/VDF_FetchSystem_SSOT_v0120.json",
+     "functional modules/VDF/VDF_AkshareSelection_MacroShipping_v0101.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "引擎自測 → 開閘增量實跑 → 補指數 / 國際日價 → 輸出驗證"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF031-STP001",
+     "alias": "engine_selftests",
+     "name": "擷取相關引擎尾版自測",
+     "engine": "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_MDL008_FetchSystem",
+     "what": "MDL008 · MDL011 · MDL009 · MDL012 · ENG232 · ENG066 尾版自測"
+    },
+    {
+     "code": "VDF-WKF031-STP002",
+     "alias": "launcher_run",
+     "name": "開閘增量實跑",
+     "engine": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v*.py",
+     "verb": "run --slots auto --no-open",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "step:VDF-WKF031-STP001",
+     "what": "各道收據 · 統計局 TTL 跳過"
+    },
+    {
+     "code": "VDF-WKF031-STP003",
+     "alias": "index_global_refill",
+     "name": "加權指數 / 國際日價補齊",
+     "engine": "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v*.py",
+     "verb": "run",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "step:VDF-WKF031-STP002",
+     "what": "加權與櫃買同到最新交易日 · global_daily 有列"
+    },
+    {
+     "code": "VDF-WKF031-STP004",
+     "alias": "output_verify",
+     "name": "輸出驗證",
+     "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+     "verb": "datamatrix · db check",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "step:VDF-WKF031-STP003",
+     "what": "多餘列 · 缺表 · 落後天 照實",
+     "known_open": {
+      "why": "主機實跑待操作員(桌機庫 · FRED 金鑰)",
+      "hand": "operator",
+      "ref": "VDF-REQ041:host-run"
+     }
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF031-TST001",
+     "case": "C-vdf-stocklist-v0105",
+     "engine": "functional modules/VDF/VDF_MDL009_TWStockList_v0105.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 5/5"
+    },
+    {
+     "code": "VDF-WKF031-TST002",
+     "case": "C-vdf-fetchgroups-v0111",
+     "engine": "functional modules/VDF/VDF_MDL012_FetchGroups_v0111.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 4/4"
+    },
+    {
+     "code": "VDF-WKF031-TST003",
+     "case": "C-vdf-fetchsystem-v0111",
+     "engine": "functional modules/VDF/VDF_MDL008_FetchSystem_v0111.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 7/7"
+    },
+    {
+     "code": "VDF-WKF031-TST004",
+     "case": "C-vdf-akshare-v0105",
+     "engine": "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0105.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 9/9"
+    },
+    {
+     "code": "VDF-WKF031-TST005",
+     "case": "C-vdf-twindex-v0107",
+     "engine": "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v0107.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 10/10"
+    },
+    {
+     "code": "VDF-WKF031-TST006",
+     "case": "C-vdf-globaluniverse-v0103",
+     "engine": "functional modules/VDF/engine/VDF_ENG066_GlobalUniverse_v0103.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 8/8"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF032",
+   "alias": "tw_price_official_reconcile",
+   "name": "台股日價官方對帳:休市佔位刪 · 缺日補 · 不符照官方改(官方值覆蓋 · 先備份 · 可重跑)",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-21T07:16:00Z",
+   "spec": {
+    "goal": "tw_daily_prices 逐日對證交所 / 櫃買官方(tw_trading_daily):官方沒開盤的佔位列刪、官方有我們缺的補、開高低收不符照官方改;adj_close 整段調整保留 / 零星錯值同比校正;每輪 run 後自動跑。",
+    "requirements": [
+     "VDF-REQ042"
+    ],
+    "acceptance": [
+     "寫前整檔備份",
+     "單一交易寫完(失敗整批回滾)",
+     "帳表 tw_price_reconcile_log 逐列舊值 / 新值",
+     "寫後:佔位 0 · 不符 0 · 缺 0 · 重複鍵 0",
+     "冪等(再跑零動作)",
+     "官方表一字不動 · 不出網",
+     "官方交易日曆含指數官方日(e057 v0113)",
+     "擷取道 VAKE 回資料家(MDL012 v0112)",
+     "刪休市佔位前要官方指數日曆另外證明(那天不在指數日曆 · 前後 16 天內有指數日);證不了 = 不刪、照實報"
+    ],
+    "entry": "python \"functional modules/VDF/VDF_MDL032_TWPriceReconcile_v0100.py\" plan|apply --home <資料家>(啟動器 MDL022 v0108 run 後自動 apply)",
+    "evidence": "docs/handoff/evidence/C-vdf-reconcile-v0100.json",
+    "books": [
+     "functional modules/VDF/VDF_FetchSystem_SSOT_v0121.json"
+    ]
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "官方成交表(e057,日曆 ∪ 指數日)→ 日價(e054)→ 對帳(MDL032)→ 法人(e056,日曆取日價)"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF032-STP001",
+     "alias": "official_calendar",
+     "name": "官方成交表交易日曆 ∪ 官方指數日",
+     "engine": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v*.py",
+     "verb": "run",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_ENG057_TradingValueBackfill",
+     "what": "Yahoo 缺的交易日也排官方"
+    },
+    {
+     "code": "VDF-WKF032-STP002",
+     "alias": "reconcile_plan",
+     "name": "對帳乾跑",
+     "engine": "functional modules/VDF/VDF_MDL032_TWPriceReconcile_v*.py",
+     "verb": "plan --home <資料家>",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "step:VDF-WKF032-STP001",
+     "what": "分類計數 · 零寫入"
+    },
+    {
+     "code": "VDF-WKF032-STP003",
+     "alias": "reconcile_apply",
+     "name": "對帳寫入",
+     "engine": "functional modules/VDF/VDF_MDL032_TWPriceReconcile_v*.py",
+     "verb": "apply --home <資料家>",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "step:VDF-WKF032-STP002",
+     "what": "備份 · 單交易 · 帳表 · 寫後驗"
+    },
+    {
+     "code": "VDF-WKF032-STP004",
+     "alias": "launcher_after_run",
+     "name": "啟動器每輪 run 後自動對帳",
+     "engine": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v*.py",
+     "verb": "run",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "step:VDF-WKF032-STP003",
+     "what": "跑後 apply;RED 不藏",
+     "known_open": {
+      "why": "主機實跑待操作員(桌機庫)",
+      "hand": "operator",
+      "ref": "VDF-REQ042:host-run"
+     }
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF032-TST001",
+     "case": "C-vdf-reconcile-v0100",
+     "engine": "functional modules/VDF/VDF_MDL032_TWPriceReconcile_v0100.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 11/11"
+    },
+    {
+     "code": "VDF-WKF032-TST002",
+     "case": "C-vdf-tradingvalue-v0113",
+     "engine": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0113.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 9/9"
+    },
+    {
+     "code": "VDF-WKF032-TST003",
+     "case": "C-vdf-launch-v0108",
+     "engine": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v0108.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 9/9"
+    },
+    {
+     "code": "VDF-WKF032-TST004",
+     "case": "C-vdf-fetchgroups-v0112",
+     "engine": "functional modules/VDF/VDF_MDL012_FetchGroups_v0112.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 8/8"
+    },
+    {
+     "code": "VDF-WKF032-TST005",
+     "case": "C-vdf-fetchsystem-v0112",
+     "engine": "functional modules/VDF/VDF_MDL008_FetchSystem_v0112.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 6/6"
+    },
+    {
+     "code": "VDF-WKF032-TST006",
+     "case": "C-vdf-reconcile-v0101",
+     "engine": "functional modules/VDF/VDF_MDL032_TWPriceReconcile_v0101.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 10/10"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF033",
+   "alias": "sentiment_net_accel",
+   "name": "情緒引擎出網走網路工具 + 加速器 · AAII 官方 xls 來源 · ENG240 --selftest",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-21T17:40:00Z",
+   "spec": {
+    "goal": "VDF 情緒引擎(AAII · CNN 代理)出網一律經統包網路工具雙閘;AAII 讀官方 sentiment.xls(本機檔優先 → 網路工具 → HTML 後備);ENG240 可用 --selftest 單獨實測。",
+    "requirements": [
+     "VDF-REQ043"
+    ],
+    "acceptance": [
+     "頂層沒有直連網路 import(AST)",
+     "加速器 AST 匯入 + 執行時載得到",
+     "閘沒開 = DENY 零外呼",
+     "網站拒絕 = 照實報錯,不偽裝、不換道直連",
+     "本機 下載\\sentiment.xls 在就先讀",
+     "ENG240 --selftest rc 0",
+     "VDF 橋閘 GREEN"
+    ],
+    "entry": "python \"functional modules/VDF/engine/VDF_ENG240_SP500SectorWeight_v0101.py\" --selftest · VDF 啟動器 MDL022 bridge-gate",
+    "evidence": "docs/handoff/evidence/C-vdf-eng240-v0101.json",
+    "books": []
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "本機 xls → 網路工具 xls → 網路工具 HTML → 清理 → 強度"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF033-STP001",
+     "alias": "aaii_sources",
+     "name": "AAII 三來源(本機 xls · 網路工具 xls · HTML)",
+     "engine": "functional modules/VDF/_vdf_engines/sentiment_strength/VDF_Engine_aaii_sentiment.py",
+     "verb": "def_fetch_aaii_sentiment",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "self:VDF_Engine_aaii_sentiment",
+     "what": "雙閘在網路工具內",
+     "known_open": {
+      "why": "aaii.com 對容器回 403;主機要用瀏覽器下載 sentiment.xls",
+      "hand": "operator",
+      "ref": "VDF-REQ043:host-run"
+     },
+     "retired": {
+      "why": "PR 712 Codex P1(AGENTS.md「修改開新版」):aaii / cnn 兩支舊情緒引擎是原地改的 → 還原成 main 原位元組。官方 sentiment.xls 早由現役 VDF_ENG116_AAIIWorkbook 尾版經網路工具抓、寫 DuckDB;那兩支舊引擎除了歷史日誌沒有現役呼叫者 → 不為它們另開新版(避免多頭),AAII 一律由 ENG116 負責。",
+      "at": "2026-11-21T17:40:00Z",
+      "by": "functional modules/VDF/engine/VDF_ENG116_AAIIWorkbook_v*.py"
+     }
+    },
+    {
+     "code": "VDF-WKF033-STP002",
+     "alias": "cnn_gate",
+     "name": "CNN 代理 yfinance 先過雙閘",
+     "engine": "functional modules/VDF/_vdf_engines/sentiment_strength/VDF_Engine_cnn_fear_greed_proxy.py",
+     "verb": "def_fetch_yfinance_close",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "step:VDF-WKF033-STP001",
+     "what": "閘關 = DENY",
+     "retired": {
+      "why": "PR 712 Codex P1(AGENTS.md「修改開新版」):aaii / cnn 兩支舊情緒引擎是原地改的 → 還原成 main 原位元組。官方 sentiment.xls 早由現役 VDF_ENG116_AAIIWorkbook 尾版經網路工具抓、寫 DuckDB;那兩支舊引擎除了歷史日誌沒有現役呼叫者 → 不為它們另開新版(避免多頭),AAII 一律由 ENG116 負責。",
+      "at": "2026-11-21T17:40:00Z",
+      "by": "functional modules/VDF/engine/VDF_ENG116_AAIIWorkbook_v*.py"
+     }
+    },
+    {
+     "code": "VDF-WKF033-STP003",
+     "alias": "eng240_selftest",
+     "name": "ENG240 單獨實測",
+     "engine": "functional modules/VDF/engine/VDF_ENG240_SP500SectorWeight_v*.py",
+     "verb": "--selftest",
+     "inside": "VDF_SystemManager engine run",
+     "evidence": "step:VDF-WKF033-STP002",
+     "what": "v0100 自測 + 本版三檢"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF033-TST001",
+     "case": "C-vdf-eng240-v0101",
+     "engine": "functional modules/VDF/engine/VDF_ENG240_SP500SectorWeight_v0101.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 4/4"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF034",
+   "alias": "system_monitor",
+   "name": "VDF 系統管理器 monitor:九格狀態 · DuckDB · parquet 增量庫 · 鎖定模板頁",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-21T17:30:00Z",
+   "spec": {
+    "goal": "系統管理器一個動詞掌握九格狀態;只彙總既有引擎與收據,不新增引擎;資料庫 / 增量庫狀態顯示在自己的鎖定模板頁",
+    "requirements": [
+     "VDF-REQ044"
+    ],
+    "acceptance": [
+     "只叫零寫入動詞 / 只讀收據",
+     "沒有對應引擎或收據 = 灰",
+     "收據過期 = 黃",
+     "總燈取最差",
+     "頁只用鎖定模板",
+     "不出網 · 不寫別系統的檔",
+     "長跑有心跳(每 20 秒)· 逐動詞起訖 · 單支逾時記黃"
+    ],
+    "entry": "python \"functional modules/VDF/VDF_SystemManager_v0188.py\" monitor [--lanes N] [--json]",
+    "evidence": "docs/handoff/evidence/C-vdf-manager-v0188.json",
+    "books": []
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "收據 → 唯讀動詞並行 → 九格 → 收據 + 頁"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF034-STP001",
+     "alias": "monitor",
+     "name": "monitor 九格",
+     "engine": "functional modules/VDF/VDF_SystemManager_*.py",
+     "verb": "monitor",
+     "inside": "VDF_SystemManager",
+     "evidence": "self:VDF_SystemManager",
+     "what": "唯讀彙總",
+     "known_open": {
+      "why": "主機實跑待操作員",
+      "hand": "operator",
+      "ref": "VDF-REQ044:host-run"
+     }
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF034-TST001",
+     "case": "C-vdf-manager-v0188",
+     "engine": "functional modules/VDF/VDF_SystemManager_v0188.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 12/12"
+    },
+    {
+     "code": "VDF-WKF034-TST002",
+     "case": "C-vdf-manager-v0189",
+     "engine": "functional modules/VDF/VDF_SystemManager_v0189.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 10/10"
+    },
+    {
+     "code": "VDF-WKF034-TST003",
+     "case": "C-vdf-manager-v0190",
+     "engine": "functional modules/VDF/VDF_SystemManager_v0190.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 8/8"
+    },
+    {
+     "code": "VDF-WKF034-TST004",
+     "case": "C-vdf-manager-v0191",
+     "engine": "functional modules/VDF/VDF_SystemManager_v0191.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 8/8"
+    }
+   ]
+  },
+  {
+   "code": "VDF-WKF035",
+   "alias": "bare_except_fix",
+   "name": "VDF MDL004 bare except 改型別",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-22T03:20:00Z",
+   "spec": {
+    "goal": "bare except 改 except Exception,只改型別",
+    "requirements": [
+     "VDF-REQ045"
+    ],
+    "acceptance": [
+     "語法樹:bare 0 · 例外處理數同前版",
+     "其餘一字不動(前版原地不動)",
+     "自測過"
+    ],
+    "entry": "python \"functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0101.py\" --selftest",
+    "evidence": "docs/handoff/evidence/C-vdf-mdl004-v0101.json",
+    "books": []
+   },
+   "plan": {
+    "enter": "VDF",
+    "exit": "VDF",
+    "order": "語法樹定位 → 改型別 → 自測"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF035-STP001",
+     "alias": "selftest",
+     "name": "新版自測",
+     "engine": "functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0101.py",
+     "verb": "--selftest",
+     "inside": "VDF",
+     "evidence": "self:VDF",
+     "what": "自測(含 bare except 檢)"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VDF-WKF035-TST001",
+     "case": "C-vdf-mdl004-v0101",
+     "engine": "functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0101.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 10/10"
+    }
+   ]
+  }
+ ],
+ "prior": "VIA_Workflow_VDF_SSOT_v0123.json",
+ "why_v0101": "VCGC link(母子自動連接):需求冊歸屬指到本冊工作流 / 步而工作流沒回指 → 補進 spec.requirements(只增):VDF-WKF006 ← VDF-REQ014 · VDF-WKF010 ← VDF-REQ014;其餘一字不動",
+ "why_v0102": "R50:加 VDF-WKF011 輸入範圍迴圈(10 步,各步引擎自測過即可由 SDD lock 記版號 + 時間);其餘一字不動(只增)",
+ "why_v0103": "+VDF-WKF012(VCGC-REQ147 開閘實抓全走最新工具)· +VDF-WKF013(VCGC-REQ149 AkShare 深度擷取);PR #446 Codex P1:需求要在工作流冊有回指;其餘一字不動;+VDF-WKF014(VCGC-REQ150 擷取大族群 · 同一 as-of · DuckDB 監控 · 最佳化);VDF-WKF014 +STP003 族群操作頁(VCGC-REQ151)",
+ "why_v0104": "VDF-WKF014 +STP004 啟動指令對接 U/I · 自適應範本(VCGC-REQ152);v0103 已隨 PR #446 發布,出新版不就地改;其餘一字不動;VDF-WKF014 +STP005 大類 · 預設成員 · 起始日按大類 · ui-import(VCGC-REQ154)",
+ "why_v0105": "v0104 已發布 → 出新版;政策 L120 三方對等 / L121 統一版面:VDF-WKF001 目標 · 名稱 · 進出口驗收 與 WKF014 ui 驗收的「只經 VCGC / 母系統」字樣改掉(只改字;代碼 · 步 · match · 引擎一字不動);需求回指只增:WKF014 +VCGC-REQ177(三系統統一 U/I)。操作員 2026-10-10:「不再視為一入口 三系統獨立 政策及全部寫入 VCGC VRN VDF SYSTEM MANAGER獨立互不影響但互相監控而獨立運作功能」(政策 L120)",
+ "why_v0106": "新增 VDF-WKF015 three_code_universe(操作員 2026-11-08 三代號輸入令)。",
+ "why_v0107": "v0106 已發布 → 出新版。只做一件:VDF-WKF015(三種代號)冊上沒有 tests 欄 —— MDL245 v0107 修好列表式崩潰後 X-COL 第一次誠實標出。補 TST001 指向交接冊已有的 V-threecode-v0100(VDF_MDL014 --selftest 67/67,本輪容器重跑仍 67/67)。VDF 的其餘工作流一字不動;本冊是 VDF 車道的 SDD 冊,VCGC 只登錄不代修。",
+ "why_v0108": "+VDF-WKF016 macro_hierarchy · +VDF-WKF017 macro_crosscheck(操作員 2026-11-09 六項令 2 · 3)。",
+ "why_v0109": "SDD X-COL 紅補欄(只增;其餘一字不動):VDF-WKF016 / 017(2026-11-09 新增時缺)補 tests(列表式 TST · 自測 + 離線實跑各一,容器 2026-11-14 實跑 MDL015 自測 14/14 · plan rc 0 GREEN;MDL016 自測 16/16 · run rc 0 NODATA 12/12)· 每步補 what · 證據改成 self: / step: 型別(原檔路徑留 evidence_file)。",
+ "why_v0110": "只增:+VDF-WKF018 user_api_keys(VDF-REQ025;上一輪漏登工作流,AGENTS.md 第 3 條)· +VDF-WKF019 active_etf_qualify(VDF-REQ026;PR 650 Codex P1)。兩條都帶 tests(交接冊已有案)與待辦 known_open(誰的手 · 參照工作項);VDF-WKF001–017 一字不動。",
+ "why_v0111": "只增:+VDF-WKF020 universe_share(VDF-REQ027);VDF-WKF015 +TST002(MDL014 v0101 yf 後綴照市場);步的正主改指尾版(SDD X-REG「註冊冊不是尾版」):WKF015 → MDL014 v0101 · WKF016 → MDL015 v0102 · WKF017 → MDL016 v0102(上一輪出 v0102 時漏改);其餘一字不動。",
+ "why_v0112": "只增:+VDF-WKF021 · +VDF-WKF022 · +VDF-WKF023 · +VDF-WKF024 batch_backfill_view(VDF-REQ031);其餘一字不動。",
+ "why_v0113": "v0112 已併進 main → 出新版。只增:+VDF-WKF025 io_registry(VDF-REQ032)· +VDF-WKF026 fin_period_check(VDF-REQ033);其餘一字不動。",
+ "why_v0114": "v0113 已隨 PR 652 併進 main → 出新版。只增:+VDF-WKF027 fin_amount_display(VDF-REQ034);VDF-WKF026 步的正主改指尾版 MDL021 v0101(SDD X-REG「註冊冊不是尾版」)· +TST002(V-vdf-finperiod-v0101)· books 補 VDF_FinPeriod_SSOT_v0100;其餘一字不動。",
+ "why_v0115": "前版已在 main → 出新版。SDD X-REG 點名的步:釘死舊版號的 engine 改成取尾版 _v*(L54 尾版律;原釘的版號留在該步的 pinned_before):VDF-WKF021-STP001:VDF_SystemManager_v0182→v*、VDF-WKF021-STP002:VDF_SystemManager_v0182→v*、VDF-WKF022-STP002:VDF_SystemManager_v0182→v*、VDF-WKF023-STP001:VDF_SystemManager_v0183→v*、VDF-WKF023-STP002:VDF_SystemManager_v0183→v*、VDF-WKF023-STP003:VDF_SystemManager_v0183→v*、VDF-WKF023-STP004:VDF_SystemManager_v0183→v*、VDF-WKF023-STP005:VDF_MDL020_DataPlane_v0100→v*、VDF-WKF024-STP001:VDF_SystemManager_v0183→v*、VDF-WKF024-STP002:VDF_SystemManager_v0183→v*、VDF-WKF024-STP003:VDF_MDL020_DataPlane_v0101→v*、VDF-WKF025-STP001:VDF_SystemManager_v0183→v*、VDF-WKF025-STP002:VDF_MDL020_DataPlane_v0102→v*。其餘一字不動。已鎖的工作流尾版換了要重驗,X-LOCK 照舊提醒,這一版沒有代為宣稱已重驗。",
+ "why_v0116": "前版已在 main → 出新版。只增:+VDF-WKF028 safe_parallel_launch(VDF-REQ036)· +VDF-WKF029 tw_stock_names_glyph(VDF-REQ037)· +VDF-WKF030 vdf_self_numbering(VDF-REQ038)· +VDF-WKF031 vdf_output_fast(VDF-REQ039 · 040 · 041);每條帶 tests(交接冊已有案)。PR 707 Codex P1:需求冊新登要在工作流冊有回指(AGENTS.md 第 3 條)。VDF-WKF001–027 一字不動。",
+ "why_v0117": "v0116 在開著的 PR 707 上(未併)但已推送 → 出新版。只增:+VDF-WKF032 tw_price_official_reconcile(VDF-REQ042,帶 tests);VDF-WKF001–031 一字不動。",
+ "why_v0118": "VDF-WKF032 +驗收一條 · +TST006(MDL032 v0101 · PR 707 Codex P1);其餘一字不動。",
+ "why_v0119": "只增:+VDF-WKF033 sentiment_net_accel(VDF-REQ043,帶 tests);VDF-WKF001–032 一字不動。",
+ "why_v0120": "只增:+VDF-WKF034 system_monitor(VDF-REQ044,帶 tests);其餘一字不動。",
+ "why_v0121": "VDF-WKF033 的 aaii / cnn 兩步標 retired(原號保留;理由與接手者寫在步上)· VDF-WKF034 +TST002(v0189);其餘一字不動。",
+ "why_v0122": "VDF-WKF034 +TST003(v0190)· 驗收 +心跳一條;其餘一字不動。",
+ "why_v0123": "VDF-WKF034 +TST004(C-vdf-manager-v0191 · monitor --json 只留 JSON);其餘一字不動。",
+ "why_v0124": "+VDF-WKF035(bare except 改型別);其餘一字不動。"
+}
