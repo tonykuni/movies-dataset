@@ -41,10 +41,21 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Guard selftests
-        run: python3 .github/scripts/pr_guard.py --selftest && python3 .github/scripts/codex_gate.py --selftest
+      # 守門程式一律從 base(受信任的那一版)取,不跑 PR 自己帶的版本:PR 換掉 pr_guard.py 也繞不過(PR 717 Codex P1)。
+      # PR 的內容只當 git 物件讀(diff / show),不執行。
+      - name: Load the guard from the base revision
+        run: |
+          mkdir -p "$RUNNER_TEMP/guard"
+          if git cat-file -e "origin/${{ github.base_ref }}:.github/scripts/pr_guard.py" 2>/dev/null; then
+            git show "origin/${{ github.base_ref }}:.github/scripts/pr_guard.py" > "$RUNNER_TEMP/guard/pr_guard.py"
+          else
+            echo "base 上還沒有 pr_guard.py:這次用 PR 帶的版本(只有引入守門的那一支 PR 會走這裡)"
+            cp .github/scripts/pr_guard.py "$RUNNER_TEMP/guard/pr_guard.py"
+          fi
+      - name: Guard selftest (base version)
+        run: python3 "$RUNNER_TEMP/guard/pr_guard.py" --selftest
       - name: Version tails and success locks
-        run: python3 .github/scripts/pr_guard.py --base "origin/${{ github.base_ref }}" --head HEAD
+        run: python3 "$RUNNER_TEMP/guard/pr_guard.py" --repo . --base "origin/${{ github.base_ref }}" --head HEAD
 
   codex-status:
     if: github.event_name != 'issue_comment' || github.event.issue.pull_request

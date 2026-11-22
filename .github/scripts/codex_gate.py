@@ -13,6 +13,23 @@
 環境:GITHUB_TOKEN · GITHUB_REPOSITORY · GITHUB_EVENT_PATH(Actions 自帶)。  自測:--selftest(離線)
 """
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(AGENTS.md:每支新 Python 帶既有加速器橋;graceful 零行為變更) =====
+# 只找「本腳本所在倉」的 VIA 樹(往上找到有 .github 的那一層為止),不會載入別的 checkout(例:CI 裡 PR 的程式)。
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve().parent
+    while _sa_p.parent != _sa_p and not (_sa_p / ".github").is_dir():
+        _sa_p = _sa_p.parent
+    _sa_dir = _sa_p / "VeritasIntelligenceAnalytics" / "supportive modules"
+    if (_sa_dir / "VIA_SuperAccel_Module.py").exists():
+        _sa_sys.path.insert(0, str(_sa_dir))
+        import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+    else:
+        VIA_ACCEL = None
+except Exception:  # noqa: BLE001
+    VIA_ACCEL = None  # graceful:加速器缺席零影響(CI 的 sparse checkout 沒有 VIA 樹)
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import html
 import json
@@ -24,6 +41,17 @@ import urllib.request
 API = os.environ.get("GITHUB_API_URL", "https://api.github.com")
 CONTEXT = "Codex 審查"
 BOT = "chatgpt-codex-connector"
+# 只認這個 App 的確切身分(不是前綴):REST 的 user.login 帶 [bot] 且 type == Bot;GraphQL 的 author.login 不帶 [bot] 且 __typename == Bot。
+# (PR 717 Codex P1:前綴比對讓 chatgpt-codex-connector-evil 之類的帳號能偽造「審完」標記)
+REST_LOGIN = BOT + "[bot]"
+
+
+def is_codex_rest(user: dict) -> bool:
+    return (user or {}).get("login") == REST_LOGIN and (user or {}).get("type") == "Bot"
+
+
+def is_codex_gql(author: dict) -> bool:
+    return (author or {}).get("login") == BOT and (author or {}).get("__typename") == "Bot"
 MARK = re.compile(r"codex-review-state:v1\s*(\{.*?\})\s*-->", re.S)
 
 
@@ -65,14 +93,14 @@ def _req(method, url, token, data=None):
 def unresolved_codex_threads(repo, number, token) -> int:
     owner, name = repo.split("/", 1)
     q = """query($o:String!,$n:String!,$p:Int!,$c:String){repository(owner:$o,name:$n){pullRequest(number:$p){
-      reviewThreads(first:100,after:$c){pageInfo{hasNextPage endCursor} nodes{isResolved comments(first:1){nodes{author{login}}}}}}}}"""
+      reviewThreads(first:100,after:$c){pageInfo{hasNextPage endCursor} nodes{isResolved comments(first:1){nodes{author{login __typename}}}}}}}}"""
     cnt, cur = 0, None
     while True:
         d = _req("POST", f"{API}/graphql", token, {"query": q, "variables": {"o": owner, "n": name, "p": number, "c": cur}})
         rt = d["data"]["repository"]["pullRequest"]["reviewThreads"]
         for t in rt["nodes"]:
-            who = ((t["comments"]["nodes"] or [{}])[0].get("author") or {}).get("login", "")
-            if not t["isResolved"] and who.startswith(BOT):
+            who = (t["comments"]["nodes"] or [{}])[0].get("author") or {}
+            if not t["isResolved"] and is_codex_gql(who):
                 cnt += 1
         if not rt["pageInfo"]["hasNextPage"]:
             return cnt
@@ -84,7 +112,7 @@ def summary_state(repo, number, token) -> dict | None:
     while True:
         cs = _req("GET", f"{API}/repos/{repo}/issues/{number}/comments?per_page=100&page={page}", token)
         for c in cs:
-            if (c.get("user") or {}).get("login", "").startswith(BOT):
+            if is_codex_rest(c.get("user")):
                 s = parse_state(c.get("body"))
                 if s:
                     last = s
@@ -138,6 +166,16 @@ def selftest() -> int:
     unr["code_review"]["has_unresolved_findings"] = True
     chk("⑥ 摘要自己說有未解 → 紅", decide(unr, h, 0)[0] == "failure")
     chk("⑦ 還沒有摘要評論 → 黃", decide(None, h, 0)[0] == "pending" and decide(parse_state("沒標記"), h, 0)[0] == "pending")
+    chk("⑨ PR 717 Codex P1:只認確切的 Codex App 身分(前綴相同的帳號 · 不是 Bot 型別 → 不認)",
+        is_codex_rest({"login": "chatgpt-codex-connector[bot]", "type": "Bot"})
+        and not is_codex_rest({"login": "chatgpt-codex-connector-evil", "type": "User"})
+        and not is_codex_rest({"login": "chatgpt-codex-connector[bot]", "type": "User"})
+        and not is_codex_rest({"login": "chatgpt-codex-connector-evil[bot]", "type": "Bot"})
+        and is_codex_gql({"login": "chatgpt-codex-connector", "__typename": "Bot"})
+        and not is_codex_gql({"login": "chatgpt-codex-connector-evil", "__typename": "User"})
+        and not is_codex_gql({"login": "chatgpt-codex-connector", "__typename": "User"}))
+    _src = open(__file__, encoding="utf-8").read().split("def selftest", 1)[0]
+    chk("⑩ 沒有前綴比對 · 加速器橋在", ".startswith(BOT)" not in _src and "[VIA:ACCEL-BRIDGE:v0100]" in _src)
     chk("⑧ 說明都 ≤ 140 字元", all(len(decide(x, y, z)[1]) <= 140 for x, y, z in ((s, h, 0), (s, "f" * 40, 0), (run, h, 0), (s, h, 9), (None, h, 0))))
     print(f"  [計] codex_gate 自測 {sum(ok)}/{len(ok)} · {'PASS' if all(ok) else 'FAIL'}")
     return 0 if all(ok) else 1

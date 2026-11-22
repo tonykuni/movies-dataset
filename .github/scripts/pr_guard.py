@@ -13,6 +13,23 @@
 唯讀:只讀 git 物件,不改檔、不出網、不執行被檢查的程式。
 """
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(AGENTS.md:每支新 Python 帶既有加速器橋;graceful 零行為變更) =====
+# 只找「本腳本所在倉」的 VIA 樹(往上找到有 .github 的那一層為止),不會載入別的 checkout(例:CI 裡 PR 的程式)。
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve().parent
+    while _sa_p.parent != _sa_p and not (_sa_p / ".github").is_dir():
+        _sa_p = _sa_p.parent
+    _sa_dir = _sa_p / "VeritasIntelligenceAnalytics" / "supportive modules"
+    if (_sa_dir / "VIA_SuperAccel_Module.py").exists():
+        _sa_sys.path.insert(0, str(_sa_dir))
+        import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+    else:
+        VIA_ACCEL = None
+except Exception:  # noqa: BLE001
+    VIA_ACCEL = None  # graceful:加速器缺席零影響(CI 的 sparse checkout 沒有 VIA 樹)
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import argparse
 import hashlib
@@ -192,6 +209,7 @@ def selftest() -> int:
         chk("⑦ 刪掉已鎖成功的檔 → 紅", any("刪了" in x for x in check(d, "main", "pr")["red"]))
         chk("⑧ 回碼:有紅 = 1", main(["--repo", str(d), "--base", "main", "--head", "pr", "--summary", str(d / "s.md")]) == 1
             and "PR 守門 · 紅" in (d / "s.md").read_text(encoding="utf-8"))
+    chk("⑨ 加速器橋在(AGENTS.md:每支新 Python 帶既有加速器橋)", "[VIA:ACCEL-BRIDGE:v0100]" in Path(__file__).read_text(encoding="utf-8"))
     print(f"  [計] pr_guard 自測 {sum(ok)}/{len(ok)} · {'PASS' if all(ok) else 'FAIL'}")
     return 0 if all(ok) else 1
 
