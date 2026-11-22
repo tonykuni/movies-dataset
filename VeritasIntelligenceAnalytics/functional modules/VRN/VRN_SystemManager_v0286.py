@@ -305,10 +305,28 @@ def _capture(fn, *a):
     return rc, buf.getvalue()
 
 
-def cmd_version() -> int:
+def _prior_json(args) -> tuple:
+    """前版 --json 的輸出原樣解析;解析不了就原文放進 prior_text(不丟)。"""
+    rc, out = _capture(PRIOR.main, args)
+    try:
+        return rc, json.loads(out), None
+    except ValueError:
+        return rc, None, out
+
+
+def cmd_version(args=()) -> int:
     cr = chain_report()
+    tail = {"manager": Path(__file__).name, "version": "v%04d" % _vnum(__file__), "sha256": _file_sha(Path(__file__)),
+            "prior": PRIOR_PATH.name, "native_handler": "v%04d" % NATIVE_FLOOR}
+    chain = {"count": cr["count"], "complete": not cr["bad"], "bad": cr["bad"], "versions": [r["version"] for r in cr["rows"]]}
+    if "--json" in args:                                           # 機器可讀:前版每個鍵原樣保留,新資訊加成欄位(PR 724 Codex P2)
+        rc, body, text = _prior_json(["version", "--json"])
+        body = dict(body) if isinstance(body, dict) else {"prior_text": text}
+        body["live_tail"], body["chain"] = tail, chain
+        print(json.dumps(body, ensure_ascii=False, indent=1))
+        return 1 if cr["bad"] else rc
     print("[%s] VRN · 現役尾版 %s · sha %s · 鏈 %d 版(%s → v%04d 原生處理器)· %s" % (
-        TAG, Path(__file__).name, _file_sha(Path(__file__))[:12], cr["count"], cr["tail"], NATIVE_FLOOR,
+        TAG, Path(__file__).name, tail["sha256"][:12], cr["count"], cr["tail"], NATIVE_FLOOR,
         "鏈完整" if not cr["bad"] else "鏈有問題:" + ";".join(cr["bad"][:3])))
     rc, out = _capture(PRIOR.main, ["version"])
     for ln in out.splitlines():
@@ -348,19 +366,46 @@ def cmd_verbs(args) -> int:
     return 0
 
 
-def cmd_health(args) -> int:
-    rc0, out = _capture(PRIOR.main, ["health", *args])
-    for ln in out.splitlines():
-        print("  前版原生處理器 · " + ln)
+def health_extra() -> dict:
     cr = chain_report()
     _, help_out = _capture(PRIOR.main, ["help"])
     help_out += "\n" + " ".join(r["verb"] for r in verb_table() if _vnum("x_" + r["added"]) > NATIVE_FLOOR) + " verbs"
     missing = help_coverage(help_out)
     sc = scan_cache_status()
-    parts = ["鏈 %d/%d 版 ✓" % (cr["count"] - sum(1 for b in cr["bad"] if b.startswith("v")), cr["count"]) if not cr["bad"] else "鏈 ✗ " + ";".join(cr["bad"][:3]),
-             "help 涵蓋 %s" % ("✓" if not missing else "✗ 漏 " + " ".join(missing)),
+    red = ["鏈:" + b for b in cr["bad"]]
+    yellow = (["help 漏列:" + " ".join(missing)] if missing else []) + ([] if sc["in_effect"] else ["引擎矩陣掃描快取沒生效"])
+    return {"chain": {"count": cr["count"], "complete": not cr["bad"], "bad": cr["bad"], "rows": cr["rows"]},
+            "help_missing": missing, "scan_cache": sc, "red": red, "yellow": yellow}
+
+
+def _worst(*lamps) -> str:
+    order = {"GREEN": 0, "GRAY": 0, "YELLOW": 1, "RED": 2}
+    return max(lamps, key=lambda x: order.get(x, 1))
+
+
+def cmd_health(args) -> int:
+    ex = health_extra()
+    own = "RED" if ex["red"] else ("YELLOW" if ex["yellow"] else "GREEN")
+    if "--json" in args:                                           # 機器可讀:前版每個鍵原樣保留,新資訊加成欄位;燈與 red / yellow 合併(PR 724 Codex P2)
+        rc0, body, text = _prior_json(["health", *args])
+        body = dict(body) if isinstance(body, dict) else {"prior_text": text, "lamp": "YELLOW"}
+        prior_lamp = body.get("lamp") or {0: "GREEN", 1: "RED"}.get(rc0, "YELLOW")
+        body["prior_lamp"] = prior_lamp
+        body["lamp"] = _worst(prior_lamp, own)
+        body["red"] = list(body.get("red") or []) + ex["red"]
+        body["yellow"] = list(body.get("yellow") or []) + ex["yellow"]
+        body["live_tail"] = {"manager": Path(__file__).name, "version": "v%04d" % _vnum(__file__)}
+        body["chain"], body["help_missing"], body["scan_cache"] = ex["chain"], ex["help_missing"], ex["scan_cache"]
+        print(json.dumps(body, ensure_ascii=False, indent=1))
+        return {"GREEN": 0, "YELLOW": 2, "RED": 1}.get(body["lamp"], 2)
+    rc0, out = _capture(PRIOR.main, ["health", *args])
+    for ln in out.splitlines():
+        print("  前版原生處理器 · " + ln)
+    ch, sc = ex["chain"], ex["scan_cache"]
+    parts = ["鏈 %d/%d 版 ✓" % (ch["count"], ch["count"]) if ch["complete"] else "鏈 ✗ " + ";".join(ch["bad"][:3]),
+             "help 涵蓋 %s" % ("✓" if not ex["help_missing"] else "✗ 漏 " + " ".join(ex["help_missing"])),
              "引擎矩陣掃描快取 %s · %s 筆" % ("生效" if sc["in_effect"] else "沒生效", sc["entries"] if sc["entries"] is not None else "0")]
-    lamp = "RED" if (cr["bad"] or rc0 == 1) else ("YELLOW" if (missing or not sc["in_effect"] or rc0 not in (0,)) else "GREEN")
+    lamp = _worst({0: "GREEN", 1: "RED"}.get(rc0, "YELLOW"), own)
     print("[%s] health %s · %s" % (TAG, lamp, " · ".join(parts)))
     return {"GREEN": 0, "YELLOW": 2, "RED": 1}[lamp]
 
@@ -372,7 +417,7 @@ def main(argv=None) -> int:
     if not args or args[:1] == ["help"]:
         return cmd_help()
     if args[:1] == ["version"] and "--legacy" not in args:
-        return cmd_version()
+        return cmd_version(args[1:])
     if args[:1] == ["health"] and "--legacy" not in args:
         return cmd_health(args[1:])
     if args[:1] == ["verbs"]:
@@ -473,6 +518,20 @@ def selftest() -> int:
     rch, hlt = _capture(cmd_health, [])
     chk("⑯ health 加鏈健康 · help 涵蓋 · 快取狀態;真樹綠", rch == 0 and "health GREEN" in hlt and "鏈 %d/%d 版 ✓" % (cr["count"], cr["count"]) in hlt
         and "help 涵蓋 ✓" in hlt and "快取 生效" in hlt, hlt[-400:])
+    rvj, vj = _capture(cmd_version, ["--json"])
+    rhj, hj = _capture(cmd_health, ["--json"])
+    try:
+        vjd, hjd = json.loads(vj), json.loads(hj)
+        _, p_v, _ = _prior_json(["version", "--json"])
+        _, p_h, _ = _prior_json(["health", "--json"])
+        keep = all(vjd.get(k) == p_v[k] for k in p_v) and all(k in hjd for k in p_h)
+    except (ValueError, TypeError, KeyError) as exc:
+        vjd, hjd, keep = {}, {}, False
+        print("    json:", type(exc).__name__, str(exc)[:120])
+    chk("⑯b PR 724 Codex P2:version --json / health --json 仍是合法 JSON · 前版每個鍵都在 · 新資訊是欄位(live_tail · chain · help_missing · scan_cache)",
+        rvj == 0 and rhj == 0 and keep and vjd.get("live_tail", {}).get("version") == "v0286" and vjd.get("chain", {}).get("complete") is True
+        and hjd.get("lamp") == "GREEN" and hjd.get("chain", {}).get("complete") is True and hjd.get("help_missing") == [] and "scan_cache" in hjd,
+        (vj[:200], hj[-200:]))
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑰ 加速器橋在 · 不碰 TA-Lib · 不出網", "[VIA:ACCEL-BRIDGE:v0100]" in src and "talib" not in src.split("def selftest", 1)[0].lower()
         and not re.search(r"^\s*(import|from)\s+(requests|urllib|socket|http)\b", src, re.M))
