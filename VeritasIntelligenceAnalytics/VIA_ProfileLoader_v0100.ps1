@@ -25,8 +25,11 @@ foreach ($v in @(
 
 # --- 3. 四個核心短指令(薄層轉呼叫 Python;向下相容舊 9 支別名) ---
 function via-pano {
-    param([switch]$Apply)
-    if ($Apply) { & $PyCmd $ViaHubPy pano --apply } else { & $PyCmd $ViaHubPy pano }
+    param([switch]$Apply, [string]$Scope)
+    $a = @($ViaHubPy, 'pano')
+    if ($Apply) { $a += '--apply' }
+    if (-not [string]::IsNullOrWhiteSpace($Scope)) { $a += @('--scope', $Scope) }
+    & $PyCmd @a
 }
 function via-bak {
     param([string]$Note = 'PS Active Checkpoint')

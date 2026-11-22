@@ -33,6 +33,7 @@ import difflib
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -135,6 +136,16 @@ def read_clipboard_text() -> str:
 
 def _excluded(p: Path) -> bool:
     return any(part in _PANO_EXCLUDE for part in p.parts)
+
+
+def _pathkey(p: Path) -> str:
+    """以完整(resolved)路徑產生穩定鍵,避免同名不同目錄的備份互撞。"""
+    return hashlib.sha1(str(p.resolve()).encode("utf-8")).hexdigest()[:12]
+
+
+def _is_versioned_original(stem: str) -> bool:
+    """尾版正本(..._vNNNN):不就地改寫,應另出新版(獨立性 + 鎖定正本保護)。"""
+    return bool(re.search(r"_v\d{3,}$", stem))
 
 
 # ==============================================================================
@@ -242,25 +253,39 @@ def cmd_boot(show_top_matrix: bool = True) -> int:
 # [ANCHOR: PANORAMA_AUTOFIX] 2. pano:GitHub + PC File 全景 + 一輪 AST 修復
 # ==============================================================================
 class _AstOpenEncodingFixer(ast.NodeTransformer):
-    """純 ast 後援:補文字模式 open() 缺少的 encoding='utf-8'(ast.unparse 會丟註解)。"""
+    """純 ast 後援:僅在 open() 可證明為文字模式時補 encoding='utf-8'(ast.unparse 會丟註解)。
+    模式未知(非字面量)/ 二進位 / encoding 可能以位置(第 4 參)或 **kwargs 提供 → 一律跳過。"""
     def __init__(self) -> None:
         self.fixes: list[str] = []
 
     def visit_Call(self, node: ast.Call) -> ast.AST:
         self.generic_visit(node)
-        if isinstance(node.func, ast.Name) and node.func.id == "open":
-            kw = {k.arg for k in node.keywords if k.arg}
-            is_bin = False
-            if len(node.args) >= 2 and isinstance(node.args[1], ast.Constant) \
-                    and isinstance(node.args[1].value, str) and "b" in node.args[1].value:
-                is_bin = True
-            for k in node.keywords:
-                if k.arg == "mode" and isinstance(k.value, ast.Constant) \
-                        and isinstance(k.value.value, str) and "b" in k.value.value:
-                    is_bin = True
-            if not is_bin and "encoding" not in kw:
-                node.keywords.append(ast.keyword(arg="encoding", value=ast.Constant(value="utf-8")))
-                self.fixes.append(f"L{getattr(node, 'lineno', '?')}")
+        if not (isinstance(node.func, ast.Name) and node.func.id == "open"):
+            return node
+        # encoding 可能是第 4 個位置參數(index 3);有 **kwargs 展開 → 未知,不動
+        if len(node.args) >= 4 or any(k.arg is None for k in node.keywords):
+            return node
+        if any(k.arg == "encoding" for k in node.keywords):
+            return node
+        # 解析 mode:位置 arg[1] 或 mode= kwarg;只接受字面字串,非字面量 → 未知,不動
+        mode_val: str | None = None
+        if len(node.args) >= 2:
+            a1 = node.args[1]
+            if isinstance(a1, ast.Constant) and isinstance(a1.value, str):
+                mode_val = a1.value
+            else:
+                return node
+        for k in node.keywords:
+            if k.arg == "mode":
+                if isinstance(k.value, ast.Constant) and isinstance(k.value.value, str):
+                    mode_val = k.value.value
+                else:
+                    return node
+        # mode_val is None(預設 'r' 文字)或字面字串;含 'b' = 二進位 → 不動
+        if mode_val is not None and "b" in mode_val:
+            return node
+        node.keywords.append(ast.keyword(arg="encoding", value=ast.Constant(value="utf-8")))
+        self.fixes.append(f"L{getattr(node, 'lineno', '?')}")
         return node
 
 
@@ -277,22 +302,36 @@ def _libcst_fix(src: str) -> tuple[str | None, int]:
 
             def leave_Call(self, orig: "_cst.Call", upd: "_cst.Call"):  # noqa: N802
                 func = upd.func
-                if isinstance(func, _cst.Name) and func.value == "open":
-                    has_enc = any(isinstance(a.keyword, _cst.Name) and a.keyword.value == "encoding"
-                                  for a in upd.args if a.keyword)
-                    is_bin = False
-                    for a in upd.args:
-                        v = a.value
-                        if isinstance(v, _cst.SimpleString) and "b" in v.value:
-                            is_bin = True
-                    if not has_enc and not is_bin and len(upd.args) >= 1:
-                        self.n += 1
-                        newarg = _cst.Arg(keyword=_cst.Name("encoding"),
-                                          value=_cst.SimpleString('"utf-8"'),
-                                          equal=_cst.AssignEqual(whitespace_before=_cst.SimpleWhitespace(""),
-                                                                 whitespace_after=_cst.SimpleWhitespace("")))
-                        return upd.with_changes(args=list(upd.args) + [newarg])
-                return upd
+                if not (isinstance(func, _cst.Name) and func.value == "open"):
+                    return upd
+                args = list(upd.args)
+                # **kwargs 展開 → 未知,不動
+                if any(getattr(a, "star", "") == "**" for a in args):
+                    return upd
+                positional = [a for a in args if a.keyword is None and getattr(a, "star", "") == ""]
+                kwargs = {a.keyword.value: a for a in args if a.keyword is not None}
+                # encoding 已以 kwarg 或第 4 個位置參數提供 → 不動
+                if "encoding" in kwargs or len(positional) >= 4:
+                    return upd
+                # 解析 mode:只接受字面字串;非字面量 → 未知,不動;二進位 → 不動
+                mode_node = None
+                if len(positional) >= 2:
+                    mode_node = positional[1].value
+                elif "mode" in kwargs:
+                    mode_node = kwargs["mode"].value
+                if mode_node is not None:
+                    if isinstance(mode_node, _cst.SimpleString):
+                        if "b" in mode_node.value:
+                            return upd
+                    else:
+                        return upd
+                # mode 缺省(文字)或文字字面量 → 補 encoding,保留註解排版
+                self.n += 1
+                newarg = _cst.Arg(keyword=_cst.Name("encoding"),
+                                  value=_cst.SimpleString('"utf-8"'),
+                                  equal=_cst.AssignEqual(whitespace_before=_cst.SimpleWhitespace(""),
+                                                         whitespace_after=_cst.SimpleWhitespace("")))
+                return upd.with_changes(args=args + [newarg])
 
         tr = _T()
         new = mod.visit(tr)
@@ -301,9 +340,21 @@ def _libcst_fix(src: str) -> tuple[str | None, int]:
         return None, 0
 
 
-def cmd_panorama(apply: bool = False) -> int:
+def cmd_panorama(apply: bool = False, scope: str | None = None) -> int:
     ensure_dirs()
     rows: list[dict] = []
+    # 寫入授權:--apply 必須搭配 --scope <授權子目錄>,否則一律只乾跑,絕不整樹改寫。
+    # 且版本化正本(..._vNNNN)永不就地改(另出新版);掃描只在 scope 內,不跨系統。
+    scan_root = (VIA_ROOT / scope).resolve() if scope else VIA_ROOT
+    if scope and (VIA_ROOT not in scan_root.parents and scan_root != VIA_ROOT):
+        rows.append({"category": "SAFETY", "metric": "--scope 越界", "status": "紅燈",
+                     "detail": f"scope 必須在 VIA_ROOT 內:{scope}", "action": "拒絕,只乾跑"})
+        scan_root, scope = VIA_ROOT, None
+    write_ok = bool(apply and scope)
+    if apply and not scope:
+        rows.append({"category": "SAFETY", "metric": "--apply 遭擋(未給 --scope)", "status": "黃燈",
+                     "detail": "整樹改寫會動到他系統/鎖定正本;--apply 需明確 --scope <授權子目錄>",
+                     "action": "例:via-pano -Apply -Scope scripts;本次只乾跑"})
     # 1. GitHub 狀態
     if (VIA_ROOT / ".git").exists():
         _, branch = run_cmd(["git", "rev-parse", "--abbrev-ref", "HEAD"])
@@ -318,11 +369,13 @@ def cmd_panorama(apply: bool = False) -> int:
     else:
         rows.append({"category": "GITHUB", "metric": "Git 檢測", "status": "黃燈",
                      "detail": f"{VIA_ROOT.name} 未初始化 .git", "action": "略過遠端比對"})
-    # 2. 本機 PC File 盤點 + 一輪 AST 修復
-    py_files = [p for p in VIA_ROOT.rglob("*.py") if not _excluded(p)]
-    ps_files = [p for p in VIA_ROOT.rglob("*.ps1") if not _excluded(p)]
+    # 2. PC File 盤點 + 一輪 AST 修復(偵測全景;寫入只在授權 scope 內、跳過版本化正本)
+    py_files = [p for p in scan_root.rglob("*.py") if not _excluded(p)]
+    ps_files = [p for p in scan_root.rglob("*.ps1") if not _excluded(p)]
     syntax_errors: list[str] = []
-    fixed: list[str] = []
+    detected: list[str] = []      # 偵測到可修復
+    written: list[str] = []       # 實際寫入(授權 + 非版本化)
+    skipped_versioned = 0         # 版本化正本:不就地改,另出新版
     engine_used = "libcst(保留註解)" if LIBCST_AVAILABLE else "ast(unparse)"
     for py in py_files:
         try:
@@ -339,22 +392,30 @@ def cmd_panorama(apply: bool = False) -> int:
                     new_src, n = ast.unparse(tree) + "\n", len(tr.fixes)
             if new_src and n:
                 compile(new_src, filename=str(py), mode="exec")  # Hydra 防護:記憶體編譯過才算
-                if apply:
-                    shutil.copy2(py, STATE_DIR / f"{py.name}.pre_ast.bak")
-                    py.write_text(new_src, encoding="utf-8")
-                fixed.append(f"{py.name}({n})")
+                detected.append(f"{py.name}({n})")
+                if write_ok:
+                    if _is_versioned_original(py.stem):
+                        skipped_versioned += 1
+                    else:
+                        shutil.copy2(py, STATE_DIR / f"{_pathkey(py)}__{py.name}.pre_ast.bak")
+                        py.write_text(new_src, encoding="utf-8")
+                        written.append(py.name)
         except SyntaxError as se:
             syntax_errors.append(f"{py.name}:L{se.lineno}")
         except Exception as exc:
             syntax_errors.append(f"{py.name}:{str(exc)[:30]}")
     rows.append({"category": "PC FILE", "metric": "本機腳本資產盤點", "status": "綠燈",
-                 "detail": f"Python: {len(py_files)} 支 | PowerShell: {len(ps_files)} 支",
+                 "detail": f"Python: {len(py_files)} 支 | PowerShell: {len(ps_files)} 支"
+                           f"{' | scope=' + scope if scope else ' | 全景(唯讀偵測)'}",
                  "action": "全數納入全景追蹤"})
+    if write_ok:
+        act = f"已寫入 {len(written)} 檔 · 跳過版本化正本 {skipped_versioned}(另出新版)"
+    else:
+        act = "乾跑偵測;--apply + --scope 才寫(版本化正本永不就地改)"
     rows.append({"category": "AST-FIX", "metric": f"一輪修復({engine_used})",
                  "status": "綠燈" if not syntax_errors else "紅燈",
-                 "detail": f"語法錯誤: {len(syntax_errors)} | 可修復: {len(fixed)} 檔 "
-                           f"({'已寫入' if apply else '乾跑,加 --apply 才寫'}) {', '.join(fixed[:3])}",
-                 "action": "compile() 沙盒過" if not syntax_errors else f"請修: {', '.join(syntax_errors[:3])}"})
+                 "detail": f"語法錯誤: {len(syntax_errors)} | 偵測可修復: {len(detected)} 檔 {', '.join(detected[:3])}",
+                 "action": act if not syntax_errors else f"請修: {', '.join(syntax_errors[:3])}"})
     print_detailed_summary_matrix("VIA PANORAMA — GitHub + PC File 全景檢測與一輪修復矩陣", rows)
     return 1 if syntax_errors else 0
 
@@ -472,16 +533,26 @@ def cmd_ast_inject(target_file: str, symbol_name: str | None, code_snippet: str 
     inj = ast.parse(raw)
     import_nodes = [n for n in inj.body if isinstance(n, (ast.Import, ast.ImportFrom))]
     logic_nodes = [n for n in inj.body if not isinstance(n, (ast.Import, ast.ImportFrom))]
-    detected = [n.name for n in logic_nodes if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
-    targets = {symbol_name} if symbol_name else set(detected)
+    inj_defs = {n.name: n for n in logic_nodes
+                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))}
+    inj_stmts = [n for n in logic_nodes
+                 if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))]
+    targets = {symbol_name} if symbol_name else set(inj_defs)
 
+    # 原位替換:舊定義若在 targets 且注入有同名新定義 → 就地換(保留定義順序),
+    # 不移到檔尾,避免後續 module-level 引用該符號時 NameError。
     new_body: list = []
     replaced: list[str] = []
     for node in orig_tree.body:
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.name in targets:
+        if (isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                and node.name in targets and node.name in inj_defs):
+            new_body.append(inj_defs[node.name])
             replaced.append(node.name)
             continue
         new_body.append(node)
+    # 真正新增的定義(無同名舊定義)+ 注入的其他陳述式 → 插在 __main__ 之前
+    added_defs = [n for name, n in inj_defs.items() if name not in replaced]
+    tail_nodes = added_defs + inj_stmts
     # imports 插在既有 import 之後
     if import_nodes:
         existing = {ast.dump(n) for n in new_body if isinstance(n, (ast.Import, ast.ImportFrom))}
@@ -495,13 +566,12 @@ def cmd_ast_inject(target_file: str, symbol_name: str | None, code_snippet: str 
             if ast.dump(imp) not in existing:
                 new_body.insert(idx, imp)
                 idx += 1
-    # 邏輯節點插在 if __name__ == "__main__": 之前
     insert_idx = len(new_body)
     for i, node in enumerate(new_body):
         if isinstance(node, ast.If) and "__name__" in ast.unparse(node.test) and "__main__" in ast.unparse(node.test):
             insert_idx = i
             break
-    for off, n in enumerate(logic_nodes):
+    for off, n in enumerate(tail_nodes):
         new_body.insert(insert_idx + off, n)
     orig_tree.body = new_body
     ast.fix_missing_locations(orig_tree)
@@ -510,13 +580,14 @@ def cmd_ast_inject(target_file: str, symbol_name: str | None, code_snippet: str 
 
     syms = ", ".join(sorted(targets)) if targets else f"{len(logic_nodes)} 個頂層陳述式"
     print(f"\n[AST-ACCEL] 目標 {target.name} ← {label} | 符號: {syms} | "
-          f"覆寫 {len(replaced)} / 新增 {len(targets) - len(replaced)}")
+          f"原位覆寫 {len(replaced)} / 新增 {len(added_defs)} def + {len(inj_stmts)} 陳述式")
     _show_diff(orig_src, final_src, target.name)
     if not _confirm("確認注入並覆寫目標檔?", assume_yes):
         print("[CANCELLED] 未寫入,原檔不動。")
         return 0
     ensure_dirs()
-    bak = STATE_DIR / f"{target.name}.{datetime.now():%Y%m%d_%H%M%S}.astbak"
+    # 備份鍵以完整路徑 hash + 微秒時戳,避免同名不同目錄互撞、同秒覆寫
+    bak = STATE_DIR / f"{_pathkey(target)}__{target.name}.{datetime.now():%Y%m%d_%H%M%S_%f}.astbak"
     shutil.copy2(target, bak)
     target.write_text(final_src, encoding="utf-8")
     print_detailed_summary_matrix("VIA AST ACCELERATOR — 無損語法樹注入報告", [{
@@ -527,9 +598,10 @@ def cmd_ast_inject(target_file: str, symbol_name: str | None, code_snippet: str 
 
 def cmd_ast_rollback(target_file: str, assume_yes: bool) -> int:
     target = Path(target_file).resolve()
-    baks = sorted(STATE_DIR.glob(f"{target.name}.*.astbak"))
+    # 以完整路徑鍵查詢,只還原「這個路徑」的備份(不會抓到同名不同目錄的檔)
+    baks = sorted(STATE_DIR.glob(f"{_pathkey(target)}__*.astbak"))
     if not baks:
-        print(f"[ERROR] 找不到 {target.name} 的 .astbak 備份(位置: {STATE_DIR})")
+        print(f"[ERROR] 找不到 {target.name}(此路徑)的 .astbak 備份(位置: {STATE_DIR})")
         return 1
     latest = baks[-1]
     old = target.read_text(encoding="utf-8") if target.exists() else ""
@@ -552,7 +624,8 @@ def main() -> int:
     sub = ap.add_subparsers(dest="command", required=True)
     sub.add_parser("boot", help="頂部短指令矩陣 + 晨間前次備份摘要")
     pp = sub.add_parser("pano", help="全景檢視 GitHub + PC File,一輪 AST 修復(預設乾跑)")
-    pp.add_argument("--apply", action="store_true", help="實際寫入修復(預設只乾跑報告)")
+    pp.add_argument("--apply", action="store_true", help="實際寫入修復(需搭配 --scope;預設只乾跑報告)")
+    pp.add_argument("--scope", default=None, help="--apply 時必填:只在此授權子目錄內寫(版本化正本一律跳過、不跨系統)")
     pb = sub.add_parser("bak", help="主動備份 + Graphify + OmniRoute + agency-mem")
     pb.add_argument("--note", default="Routine Active Checkpoint")
     pa = sub.add_parser("ast", help="AST 導入加速器(diff 預覽 + 確認)")
@@ -568,7 +641,7 @@ def main() -> int:
     if args.command == "boot":
         return cmd_boot()
     if args.command == "pano":
-        return cmd_panorama(apply=args.apply)
+        return cmd_panorama(apply=args.apply, scope=args.scope)
     if args.command == "bak":
         return cmd_backup(note=args.note)
     if args.command == "ast":
