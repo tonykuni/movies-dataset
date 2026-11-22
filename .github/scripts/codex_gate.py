@@ -9,6 +9,7 @@
     紅(failure)= 有未解的 Codex 討論串。
   資料來源:Codex 摘要評論裡的 <!-- codex-review-state:v1 {...} --> 標記 + GraphQL reviewThreads(作者 chatgpt-codex-connector、未 resolve)。
   只讀 PR 與評論、只寫一個 commit status;不 checkout PR 的程式、不執行任何 PR 內容。
+  幾輪同時跑時:每輪寫完再讀一次,不同就照新讀到的重寫(settle;舊讀晚寫不會留下過期狀態)。
 
 環境:GITHUB_TOKEN · GITHUB_REPOSITORY · GITHUB_EVENT_PATH(Actions 自帶)。  自測:--selftest(離線)
 """
@@ -137,10 +138,33 @@ def main(argv=None) -> int:
         print(f"PR #{number} 不是 open,略過")
         return 0
     head = pr["head"]["sha"]
-    state, desc = decide(summary_state(repo, number, token), head, unresolved_codex_threads(repo, number, token))
-    _req("POST", f"{API}/repos/{repo}/statuses/{head}", token, {"state": state, "context": CONTEXT, "description": desc[:140]})
+
+    def read():
+        return decide(summary_state(repo, number, token), head, unresolved_codex_threads(repo, number, token))
+
+    def post(state, desc):
+        _req("POST", f"{API}/repos/{repo}/statuses/{head}", token, {"state": state, "context": CONTEXT, "description": desc[:140]})
+
+    state, desc = settle(read, post)
     print(f"PR #{number} · {head[:7]} · {state} · {desc}")
     return 0
+
+
+def settle(read, post, max_rounds: int = 5) -> tuple:
+    """寫狀態後再讀一次,跟剛寫的不同就照新讀到的重寫,直到讀回來跟寫的一致(防舊寫覆蓋新寫,PR 725 Codex P2)。
+
+    幾個留言 / 審查事件同時觸發時,各輪各自跑、不互相取消;一輪讀到舊狀態(running)後才寫,可能蓋掉另一輪已寫的新狀態(success)。
+    每一輪寫完都重讀:最後寫的那一輪,它的重讀發生在它自己的寫之後,所以最後留下的狀態跟重讀當下的 PR 狀態一致。
+    """
+    cur = read()
+    for _ in range(max_rounds):
+        post(*cur)
+        nxt = read()
+        if nxt == cur:
+            return cur
+        cur = nxt
+    post(*cur)
+    return cur
 
 
 def selftest() -> int:
@@ -174,6 +198,21 @@ def selftest() -> int:
         and is_codex_gql({"login": "chatgpt-codex-connector", "__typename": "Bot"})
         and not is_codex_gql({"login": "chatgpt-codex-connector-evil", "__typename": "User"})
         and not is_codex_gql({"login": "chatgpt-codex-connector", "__typename": "User"}))
+    # ⑪ PR 725 Codex P2:A 讀到 running(舊)→ B 讀 completed 寫 success → A 才寫 pending;A 寫完重讀 → 照新狀態重寫 success
+    live = {"state": run}
+    posts = []
+    b_reads = iter([s])
+    a_reads = iter([run, s, s])
+    settle(lambda: decide(next(b_reads, live["state"]), h, 0), lambda st, d: posts.append(("B", st)))     # B:讀 completed → 寫 success → 重讀也是 success
+    settle(lambda: decide(next(a_reads), h, 0), lambda st, d: posts.append(("A", st)))                     # A:先前讀到的 running → 寫 pending → 重讀 completed → 重寫
+    chk("⑪ PR 725 Codex P2:舊讀晚寫會被自己的重讀更正,最後留下 success", posts[-1] == ("A", "success") and ("A", "pending") in posts, posts)
+    seq = iter([("pending", "x"), ("success", "y"), ("success", "y")])
+    got = []
+    settle(lambda: next(seq), lambda st, d: got.append(st))
+    alt = iter([("pending", "x"), ("success", "y")] * 20)
+    got2 = []
+    settle(lambda: next(alt), lambda st, d: got2.append(st), max_rounds=5)
+    chk("⑫ 重讀變了就重寫、一致就停;一直在變也有上限(5 輪 + 收尾 1 次)", got == ["pending", "success"] and len(got2) == 6, (got, got2))
     _src = open(__file__, encoding="utf-8").read().split("def selftest", 1)[0]
     chk("⑩ 沒有前綴比對 · 加速器橋在", ".startswith(BOT)" not in _src and "[VIA:ACCEL-BRIDGE:v0100]" in _src)
     chk("⑧ 說明都 ≤ 140 字元", all(len(decide(x, y, z)[1]) <= 140 for x, y, z in ((s, h, 0), (s, "f" * 40, 0), (run, h, 0), (s, h, 9), (None, h, 0))))
