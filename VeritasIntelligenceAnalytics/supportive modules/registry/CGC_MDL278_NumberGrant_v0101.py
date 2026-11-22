@@ -71,8 +71,14 @@ def selftest() -> int:
         return 1
     out = buf.getvalue()
     fails = [ln for ln in out.splitlines() if "[FAIL]" in ln]
-    # 唯一紅是 ④、形狀 = 套件缺 → REGEX 停 REVIEW(READY 2 · 有 REVIEW),且證明套件確實缺 → 容忍
-    only4 = len(fails) == 1 and "④" in fails[0] and "'READY': 2" in fails[0] and "REVIEW" in fails[0]
+    # 唯一紅是 ④,且形狀 = 套件缺 → REGEX 候選停 REVIEW(READY 2 · REVIEW 1);
+    # 同時 ④ 另外兩項斷言仍成立才容忍 —— 燈仍 YELLOW(非 GREEN 退步)· 舊格式請求仍「無候選契約 1」(非掉件)。
+    # (Codex PR 728 P2:只看 READY 2 會把燈 / 無候選契約 的退步也當成套件缺吞掉。)
+    l4 = fails[0] if fails else ""
+    only4 = (len(fails) == 1 and "④" in l4
+             and "'READY': 2" in l4 and "'REVIEW': 1" in l4
+             and "[VCGC 核號] YELLOW" in l4
+             and "無候選契約 1" in l4)
     tolerated = rc != 0 and proof_absent and only4
     # 印出前版輸出(容忍時把末行 FAIL 判決濾掉,改印 v0101 判決)
     for ln in out.splitlines():
