@@ -1,0 +1,62 @@
+name: PR guards (version tails · success locks · Codex review)
+
+# 2026-11-22 一週重工回顧:最常見的兩種重工在合併前就攔下(說明在兩支腳本的檔頭)。
+#  · version-tails:PR 新增的程式版號插到 base 尾版底下(會悄悄改掉薄尾前版鏈)、或改 / 刪已鎖成功的檔 → 紅。
+#  · codex-status:Codex 沒審完最新 commit / 有未解討論串 → PR 檢查列的「Codex 審查」不是綠。
+# 兩個 job 都只讀 git 物件與 PR 資料;不執行 PR 裡的程式。
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  issue_comment:
+    types: [created, edited]
+  pull_request_review:
+    types: [submitted, dismissed]
+  pull_request_review_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "PR 號碼(resolve 討論串後手動重算 Codex 狀態)"
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: read
+  statuses: write
+
+concurrency:
+  group: pr-guards-${{ github.event.pull_request.number || github.event.issue.number || github.event.inputs.pr }}-${{ github.event_name == 'pull_request' && 'tails' || 'codex' }}
+  cancel-in-progress: true
+
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+jobs:
+  version-tails:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Guard selftests
+        run: python3 .github/scripts/pr_guard.py --selftest && python3 .github/scripts/codex_gate.py --selftest
+      - name: Version tails and success locks
+        run: python3 .github/scripts/pr_guard.py --base "origin/${{ github.base_ref }}" --head HEAD
+
+  codex-status:
+    if: github.event_name != 'issue_comment' || github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: .github/scripts
+      - name: Codex review status on the PR head
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f .github/scripts/codex_gate.py ]; then python3 .github/scripts/codex_gate.py
+          else echo "codex_gate.py 還沒合進 ${{ github.event.repository.default_branch }}:這次略過"; fi
