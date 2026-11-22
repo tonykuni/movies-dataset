@@ -149,3 +149,4 @@
 | 2026-11-22T03:50:00Z | VRN_MDL002_LayoutExtractor_v0101.py | 0101 | VIA-VRN-MDL365 | c51224477ac7 | VRN MDL002 7 處 bare except 改 except Exception | 自測 10/10 |
 | 2026-11-22T03:50:00Z | VDF_MDL004_TWFullMarketEngine_v0101.py | 0101 | VIA-VDF-MDL316 | 32b557a90b39 | VDF MDL004 2 處 bare except 改 except Exception | 自測 10/10 |
 | 2026-11-22T03:40:00Z | SUP_MDL866_VIAUnifiedNLPOrchestrator_v0109.py | 0109 | VIA-SUP-MDL1205 | 3df95cb227fb | NLP 收件整合四動詞(收容夾只讀;合併前依 Codex P2 重鎖) | 自測 21/21 |
+| 2026-11-22T04:44:00Z | VRN_SystemManager_v0286.py | 0286 | VIA-VRN-MDL367 | a153a7f84dc7 | 版本 / 健康看現役尾版與整條鏈 · help 補齊 · verbs · 掃描快取 | 自測 20/20 |
