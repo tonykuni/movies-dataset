@@ -140,7 +140,7 @@
  "tally": {
   "RECORDED": 28,
   "COVERED": 141,
-  "PARTIAL": 160,
+  "PARTIAL": 161,
   "MISSING": 1
  },
  "requirements": [
@@ -8364,6 +8364,26 @@
    "why_homes": "VRN 自己的入口",
    "ts": "2026-11-22T04:33:00Z",
    "updated_at": "2026-11-22T04:33:00Z"
+  },
+  {
+   "code": "VRN-REQ029",
+   "subsystem": "VRN",
+   "topic": "VRN SystemManager v0287:version --json / health --json 仍是合法 JSON(PR 724 Codex P2);v0286 已鎖成功原封不動、修改開新版(PR 724 Codex P1)",
+   "requirement": "PR 724 Codex P2:v0286 的 health --json 把前版 JSON 每行加說明字、尾端接文字摘要;version --json 丟了旗標 → 兩者都不是 JSON(v0285 是)。第一次修在 v0286 原檔上,Codex P1 指出 v0286 已在成功鎖定帳(sha a153a7f84dc7),改了同名同版違反 AGENTS.md「修改開新版;已鎖成功來源維持原樣」→ 四個修補提交以 revert 撤回(v0286 回到鎖定位元),修補改發 v0287(薄尾):--json 時前版原生處理器 JSON 每個鍵原樣保留,新資訊加成欄位 live_tail · chain · help_missing · scan_cache,health 燈取較差、前版燈留在 prior_lamp;文字模式頂端 / 判決行標現役尾版、鏈從本版算起。",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VRN_SSOT_v0119.json"
+   ],
+   "modules": [
+    "functional modules/VRN/VRN_SystemManager_v0287.py"
+   ],
+   "evidence": "容器:v0287 自測 13/13(含 v0286 20/20 原封不動 · 兩個 --json 都能 json.loads · 前版每個鍵與值都在 · 前版輸出壞掉時原文進 prior_text · 鏈 19/19 從本版算起 · verbs 的 version / health 最新處理版 = v0287);v0286 sha 回到 a153a7f84dc7",
+   "next": "主機實跑 version --json / health --json(未在主機實跑)",
+   "hand": "AI + 操作員(主機實跑)",
+   "why_homes": "VRN 自己的入口",
+   "ts": "2026-11-22T05:07:00Z",
+   "updated_at": "2026-11-22T05:07:00Z"
   }
  ],
  "non_requirements": [
@@ -8806,5 +8826,5 @@
  "why_v0299": "+VCGC-REQ250(PR 守門 · Codex 審查狀態);其餘一字不動;tally 逐筆重數。",
  "why_v0300": "+VRN-REQ027 · +VDF-REQ045(bare except 14 處);其餘一字不動;tally 逐筆重數。",
  "why_v0301": "+VCGC-REQ251(桌機 NLP 收件整合);其餘一字不動;tally 逐筆重數。",
- "why_v0302": "+VRN-REQ028(VRN SystemManager v0286 補強);其餘一字不動;tally 逐筆重數。"
+ "why_v0302": "+VRN-REQ028(VRN SystemManager v0286 補強)+VRN-REQ029(v0287 --json 修補;v0286 鎖定不動);其餘一字不動;tally 逐筆重數。"
 }

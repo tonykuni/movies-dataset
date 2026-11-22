@@ -1218,19 +1218,21 @@
    "name": "VRN SystemManager 自檢補強(現役尾版 · 整條鏈 · 動詞表 · 掃描快取)",
    "kind": "procedure",
    "version": "v0100",
-   "updated_at": "2026-11-22T04:33:00Z",
+   "updated_at": "2026-11-22T05:07:00Z",
    "spec": {
     "goal": "管理器講的是現役尾版、核整條鏈、列全動詞、指令不再每次重掃 527 支引擎",
     "requirements": [
-     "VRN-REQ028"
+     "VRN-REQ028",
+     "VRN-REQ029"
     ],
     "acceptance": [
      "version 第一行是現役尾版 · 鏈完整",
      "health 鏈 N/N ✓ · help 涵蓋 ✓ · 快取生效",
      "engine-matrix 與前版逐列相同",
-     "自測過"
+     "自測過",
+     "version --json / health --json 是合法 JSON · 前版鍵全在"
     ],
-    "entry": "python \"functional modules/VRN/VRN_SystemManager_v0286.py\" health · verbs · version",
+    "entry": "python \"functional modules/VRN/VRN_SystemManager_v0287.py\" health · verbs · version(加 --json 機器可讀)",
     "evidence": "docs/handoff/evidence/C-vrn-manager-v0286.json",
     "books": []
    },
@@ -1268,6 +1270,13 @@
      "engine": "functional modules/VRN/VRN_SystemManager_v0286.py",
      "verb": "--selftest",
      "expect": "rc 0 · 20/20"
+    },
+    {
+     "code": "VRN-WKF019-TST002",
+     "case": "C-vrn-manager-v0287",
+     "engine": "functional modules/VRN/VRN_SystemManager_v0287.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 13/13"
     }
    ]
   }
@@ -1290,5 +1299,5 @@
  "why_v0116": "VRN-WKF017 +TST002(C-vrn-manager-v0284)· 驗收 +2 條(PR 715 Codex P2);其餘一字不動。",
  "why_v0117": "VRN-WKF017 +TST003(C-vrn-manager-v0285)· 驗收 +1 條(PR 715 Codex P2);其餘一字不動。",
  "why_v0118": "+VRN-WKF018(bare except 改型別);其餘一字不動。",
- "why_v0119": "+VRN-WKF019(SystemManager v0286 自檢補強);其餘一字不動。"
+ "why_v0119": "+VRN-WKF019(SystemManager v0286 自檢補強 · v0287 --json 修補);其餘一字不動。"
 }
