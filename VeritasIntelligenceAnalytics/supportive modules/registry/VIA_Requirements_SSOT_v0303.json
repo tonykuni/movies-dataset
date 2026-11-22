@@ -8331,7 +8331,8 @@
    "requirement": "操作員 2026-11-22 原文:「用VCGC的全景式檢是分析功能去見及其他節省TOKEN的功能去見識上述功能是否我們現有的引擎有缺漏將它們整合到現有指令 … Invoke-VIA-SuperHtmlParser.ps1」「完全授權整合」。先量(VCGC 省 Token read · 21 夾 · 321 行):via_nlp_engine v1.5/1.8/1.9、MarkdownEditingEngine、SuperHtmlParser、VCGC_LAYOUT_ENGINE、Celeritas、Batch347、spec_extractor/triengine_hub 倉內都已有(多半更新);缺的四件(NLP v5 重建 · v7/v8 合併 · 整夾掃描 · VUSIPE)由操作員推到 intake/nlp-desktop-20261122(41 檔,只收 .py/.ps1)→ 收容夾 NLP_Desktop_b20261122;SUP_MDL866 v0109 掛成動詞(只讀收容件,v7 的 vendor 改指倉內收容件 v1.8.0、執行期夾改到輸出夾);HTTP 控制台(0.0.0.0 · cgi 在 3.13 已移除)不整合。Invoke-VIA-SuperHtmlParser v0101:找 NLP 來源先找倉內收容件(複製出來再 pip -e,不寫倉)。",
    "status": "PARTIAL",
    "homes": [
-    "VIA_Handoff_Continuity_SSOT_v0100.json"
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VCGC_SSOT_v0159.json"
    ],
    "modules": [
     "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0109.py",
@@ -8343,7 +8344,7 @@
    "hand": "AI + 操作員(主機實跑)",
    "why_homes": "NLP 是 VCGC 管的共用工具(鎖冊 nlp);收容件只讀",
    "ts": "2026-11-22T04:30:00Z",
-   "updated_at": "2026-11-22T04:30:00Z"
+   "updated_at": "2026-11-22T07:05:00Z"
   },
   {
    "code": "VRN-REQ028",
@@ -8392,17 +8393,19 @@
    "requirement": "操作員 2026-11-22 原文:「GENERATE A FAST CODE IN PY AND LAUNCG IT TO RUN THE SYSTEM TO GET THE OUTPUT IN TOKEN SAVING WAYS.」量過:主機上每個 via-vcgc run 110~311 秒(容器約 6 秒,其中引擎 0.1 秒;時間在 VCGC 每次的開場),五個 NLP 動詞付五次;PS 一行把日誌存成 .log 被 .gitignore 擋掉。→ VIA_FastRun:自己不是經 VCGC 起的就經 VCGC run 進來一次(開場與流程閘只付一次,擋了照擋);在 VCGC 裡各組開子行程直跑各系統自己的入口(nlp → SUP_MDL866 尾版沿用這一輪 VCGC 旗標;vrn / vdf → 各自的 SystemManager 尾版,子行程拿掉 VCGC 旗標);每項一行(stdout 的 JSON 取燈與要點,stderr 不混入)、摘要三數、全文 .log.txt;--push 用 TEMP worktree 推 intake/fastrun-<時間>(家目錄換 ~)。",
    "status": "PARTIAL",
    "homes": [
-    "VIA_Handoff_Continuity_SSOT_v0100.json"
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VCGC_SSOT_v0159.json"
    ],
    "modules": [
-    "docs/handoff/ai/VIA_FastRun_v0100.py"
+    "docs/handoff/ai/VIA_FastRun_v0100.py",
+    "docs/handoff/ai/VIA_FastRun_v0101.py"
    ],
-   "evidence": "容器:自測 15/15;實跑 10 項(nlp 5 · vrn 3 · vdf 2)總計 18 秒(VCGC 一次約 11 秒 + 工作 7 秒,3 道)· 輸出 12 行 · 應跑 10 已跑 10 略過 0 · 燈黃(詞庫 ABSENT 兩項,預期)",
+   "evidence": "容器:自測 15/15;實跑 10 項(nlp 5 · vrn 3 · vdf 2)總計 18 秒(VCGC 一次約 11 秒 + 工作 7 秒,3 道)· 輸出 12 行 · 應跑 10 已跑 10 略過 0 · 燈黃(詞庫 ABSENT 兩項,預期);v0101(PR 726 Codex P2):每項燈 = JSON 燈與回傳碼取較差(先印綠再逾時 / 失敗不再是綠),自測 9/9(含 v0100 15/15),容器經 VCGC 實跑 10 項 18 秒;工作流冊 v0159 VCGC-WKF049(PR 726 Codex P1)",
    "next": "主機實跑 `python VIA_FastRun_v0100.py --push`(未在主機實跑)",
    "hand": "AI + 操作員(主機實跑)",
    "why_homes": "VCGC 收的入口(只付一次開場)",
    "ts": "2026-11-22T06:53:00Z",
-   "updated_at": "2026-11-22T06:53:00Z"
+   "updated_at": "2026-11-22T07:05:00Z"
   }
  ],
  "non_requirements": [
@@ -8846,5 +8849,5 @@
  "why_v0300": "+VRN-REQ027 · +VDF-REQ045(bare except 14 處);其餘一字不動;tally 逐筆重數。",
  "why_v0301": "+VCGC-REQ251(桌機 NLP 收件整合);其餘一字不動;tally 逐筆重數。",
  "why_v0302": "+VRN-REQ028(VRN SystemManager v0286 補強)+VRN-REQ029(v0287 --json 修補;v0286 鎖定不動);其餘一字不動;tally 逐筆重數。",
- "why_v0303": "+VCGC-REQ252(VIA_FastRun v0100 快跑器);其餘一字不動;tally 逐筆重數。"
+ "why_v0303": "+VCGC-REQ252(VIA_FastRun 快跑器 v0100 / v0101);VCGC-REQ251 補登工作流冊 VCGC v0159;其餘一字不動;tally 逐筆重數。"
 }
