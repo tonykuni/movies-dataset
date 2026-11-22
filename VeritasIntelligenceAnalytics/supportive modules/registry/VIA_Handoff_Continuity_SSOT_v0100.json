@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-22T01:55:00Z",
+ "updated_at": "2026-11-22T01:50:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -7460,6 +7460,24 @@
    "timeout_seconds": 300,
    "updated_at": "2026-11-22T01:55:00Z",
    "registered_at": "2026-11-22T01:55:00Z"
+  },
+  "C-csm-v0118": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_SystemManager_v0118.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_SystemManager v0118 自測 9/9 · PASS",
+   "scope": "VCGC 管理器 v0118:connect 四段(通道 · 工具 · 備份 · 文件類型)· config 只補已存在設定檔;再跑 v0117 鏈",
+   "dependencies": [
+    "supportive modules/registry/CGC_SystemManager_v0118.py",
+    "supportive modules/registry/CGC_SystemManager_v0117.py"
+   ],
+   "version": "v0118",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-22T01:50:00Z",
+   "registered_at": "2026-11-22T01:50:00Z"
   }
  },
  "work_items": [
@@ -14730,6 +14748,48 @@
    "registered_at": "2026-11-22T01:55:00Z",
    "case": "C-installgate-v0104",
    "receipt": "docs/handoff/evidence/C-installgate-v0104.json"
+  },
+  {
+   "id": "VCGC-REQ248:C-csm-v0118",
+   "requirement": "VCGC-REQ248",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "容器自測三次通過",
+   "next": "—",
+   "updated_at": "2026-11-22T01:50:00Z",
+   "registered_at": "2026-11-22T01:50:00Z",
+   "case": "C-csm-v0118",
+   "receipt": "docs/handoff/evidence/C-csm-v0118.json"
+  },
+  {
+   "id": "VCGC-REQ248:host-run",
+   "requirement": "VCGC-REQ248",
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "只在容器跑過",
+   "next": "主機跑 Invoke-VIA-VCGC-Toolbox v0101",
+   "updated_at": "2026-11-22T01:50:00Z",
+   "registered_at": "2026-11-22T01:50:00Z"
+  },
+  {
+   "id": "VCGC-REQ248:ruling-cloud-endpoint",
+   "requirement": "VCGC-REQ248",
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "雲端 AI 要公開 HTTPS 端點,與資料邊界衝突",
+   "next": "操作員裁定",
+   "updated_at": "2026-11-22T01:50:00Z",
+   "registered_at": "2026-11-22T01:50:00Z"
+  },
+  {
+   "id": "VCGC-REQ248:ruling-mcp-read",
+   "requirement": "VCGC-REQ248",
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "MCP 17 工具沒有讀檔工具",
+   "next": "操作員裁定:加只回結構的讀檔工具與否",
+   "updated_at": "2026-11-22T01:50:00Z",
+   "registered_at": "2026-11-22T01:50:00Z"
   }
  ],
  "retired_files": {
