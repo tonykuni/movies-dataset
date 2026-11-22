@@ -1,0 +1,1234 @@
+{
+ "schema": "VIA.Workflow.SDD.v1",
+ "version": "v0118",
+ "subsystem": "VRN",
+ "zh": "研報引擎工作流",
+ "batch": "VRN-REQ027",
+ "ts": "2026-11-22T03:20:00Z",
+ "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
+ "sdd": {
+  "layers": [
+   "spec(目標 · 需求 REQ 代碼 · 驗收)",
+   "plan(進出口 · 順序 · 正主)",
+   "steps(STP 代碼 · 引擎 · 動詞 · 中樞觀測鍵)",
+   "tests(自測 self · 交叉 cross · 實測 real)",
+   "validation(CGC_MDL245 SDD 驗證器 → 燈鎖冊 VIA_LampLock 尾版 wkf 區記成功版本與時間)"
+  ],
+  "code_rule": "工作流 <子系統>-WKF<三碼>;步 <工作流>-STP<三碼>;需求 <子系統>-REQ<三碼>;編號冊全名加 VIA- 前綴(CGC_MDL237 v0104 起 WKF · STP · REQ 三類);只增,舊號不改不刪",
+  "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
+  "evidence_rule": "inside / 站 / 層步要有機器可驗的證據:step:<STP 代碼>(繼承正主步)· self:<引擎 stem | all>(當前 HEAD 的自測)· chain:<vdf|vrn>:<站 | 層>(本輪鏈報告)· git:pushed(HEAD 已在遠端)",
+  "known_open_rule": "已知未綠(known_open)寫在步上:原因 · 誰的手(operator / ai)· 參照;驗證器據此分類,不因寫了就變綠 —— operator 的手可收尾為 CLOSED_WITH_OPERATOR_ITEMS,ai 的手 = 仍 OPEN"
+ },
+ "composed_by": "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0103.json",
+ "workflows": [
+  {
+   "code": "VRN-WKF001",
+   "alias": "loop_vrn",
+   "name": "VRN 迴圈(要料現行經 VCGC 資料中介協助 → 六層鏈 → 全文無遺漏 → 邏輯總檢;自己的入口,VCGC 可編排)",
+   "kind": "hub_steps",
+   "spec": {
+    "goal": "VRN 從自己的入口進出(VRN_SystemManager 尾版;也可由 VCGC 編排一輪,L120 三方對等);要料現行經 CGC_MDL239 資料中介(VCGC 協助,L120 ⑤ 協助不等於控制);L0→L5 不跳層",
+    "requirements": [
+     "VCGC-REQ047",
+     "VDF-REQ008",
+     "VDF-REQ009",
+     "VRN-REQ001",
+     "VRN-REQ003",
+     "VRN-REQ005"
+    ],
+    "acceptance": [
+     "進口 VRN 自己的入口(或 VCGC 編排一輪)· 出口 VRN 自報(收據 · 清單 · 燈;他系統只讀)",
+     "不直讀 VDF 引擎",
+     "L0→L5 依序(VRN-WKF002)",
+     "全文完整才摘要(VRN-WKF003)",
+     "邏輯總檢 talib 0"
+    ]
+   },
+   "plan": {
+    "enter": "VCGC → VRN(樣本夾 · 操作員輸入)",
+    "exit": "VRN → VCGC(擷取 · 驗證 · 摘要 · 燈號)",
+    "ordered": "L0→L5,不跳層",
+    "data_rule": "VRN 要市場 / 財報資料一律經 VCGC 資料中介(CGC_MDL239),不直讀 VDF 引擎",
+    "order": "照 STP 序;與 VDF-WKF001 互不排序"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF001-STP001",
+     "alias": "R1",
+     "name": "VRN 要料經中樞",
+     "engine": "supportive modules/registry/CGC_MDL239_DataBroker_v*.py",
+     "verb": "request / route",
+     "what": "讀庫或轉交 VDF 迴圈,結果回 VRN(現行經 CGC_MDL239 中介;只讀 VDF 自報的庫)",
+     "inside": "R2 鏈內(VRN 引擎在行程內向 CGC_MDL239 要料)",
+     "evidence": "step:VRN-WKF001-STP002"
+    },
+    {
+     "code": "VRN-WKF001-STP002",
+     "alias": "R2",
+     "name": "VRN 六層鏈",
+     "engine": "supportive modules/registry/CGC_MDL172_VRNChainRunner_v*.py",
+     "verb": "run [--resume]",
+     "what": "L0 輸入識別 → L1 擷取 → L2 結構與知識 → L3 驗證 → L4 產出 → L5 儲存;節點的正主 = VIA_VRN_LogicArchitecture_SSOT_v0100.json",
+     "match": [
+      [
+       "CGC_MDL172_VRNChainRunner",
+       "run"
+      ]
+     ],
+     "finding_hand": "鏈 rc 3 = 有節點 ABSENT / GATED / NODATA(缺套件 · 同意閘 · 沒料);逐節點原因看鏈報告"
+    },
+    {
+     "code": "VRN-WKF001-STP003",
+     "alias": "R3",
+     "name": "全文擷取無遺漏",
+     "engine": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
+     "verb": "run",
+     "what": "個股報告只取第 1 頁 · 年度財報全頁先拆左右再拆上下(規則冊 VIA_Policy_VRNTextScope_v0100);完整才摘要",
+     "inside": "R2 鏈內(VRN 邏輯架構冊的節點)",
+     "evidence": "self:VRN_ENG392_TextCompleteness"
+    },
+    {
+     "code": "VRN-WKF001-STP004",
+     "alias": "R4",
+     "name": "VRN 邏輯總檢",
+     "engine": "functional modules/VRN/VRN_ENG113_LogicRollup_v*.py",
+     "verb": "(預設)",
+     "what": "邏輯冊版號 · 節點數 · 缺 0 · talib 0",
+     "match": [
+      [
+       "VRN_ENG113_LogicRollup",
+       null
+      ]
+     ]
+    }
+   ],
+   "tests": {
+    "self": "各步引擎 --selftest",
+    "cross": [
+     "X-CONF",
+     "X-ENGINE",
+     "X-REG",
+     "X-NUM",
+     "X-ACCEL"
+    ],
+    "real": "via-vcgc go(③ 全景實測 ③ VRN 鏈 · ③b 邏輯總檢)",
+    "real_run": "go"
+   }
+  },
+  {
+   "code": "VRN-WKF002",
+   "alias": "vrn_six_layers",
+   "name": "VRN 六層(L0 輸入識別 → L1 擷取 → L2 結構與知識 → L3 驗證 → L4 產出 → L5 儲存)",
+   "kind": "owner_ref",
+   "spec": {
+    "goal": "六層節點的正主是 VRN 邏輯架構冊;本冊只引用層序並由驗證器核對一致",
+    "requirements": [
+     "VCGC-REQ048",
+     "VRN-REQ005",
+     "VRN-REQ006"
+    ],
+    "acceptance": [
+     "層序 = 邏輯架構冊 layers(X-OWNER)",
+     "過關節點進燈鎖冊 nodes.vrn"
+    ]
+   },
+   "plan": {
+    "owner": "supportive modules/registry/VIA_VRN_LogicArchitecture_SSOT_v*.json(layers)",
+    "lock": "VIA_LampLock 尾版 nodes.vrn"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF002-STP001",
+     "alias": "L0",
+     "layer": "L0",
+     "evidence": "chain:vrn:L0"
+    },
+    {
+     "code": "VRN-WKF002-STP002",
+     "alias": "L1",
+     "layer": "L1",
+     "evidence": "chain:vrn:L1"
+    },
+    {
+     "code": "VRN-WKF002-STP003",
+     "alias": "L2",
+     "layer": "L2",
+     "evidence": "chain:vrn:L2"
+    },
+    {
+     "code": "VRN-WKF002-STP004",
+     "alias": "L3",
+     "layer": "L3",
+     "evidence": "chain:vrn:L3"
+    },
+    {
+     "code": "VRN-WKF002-STP005",
+     "alias": "L4",
+     "layer": "L4",
+     "evidence": "chain:vrn:L4"
+    },
+    {
+     "code": "VRN-WKF002-STP006",
+     "alias": "L5",
+     "layer": "L5",
+     "evidence": "chain:vrn:L5"
+    }
+   ],
+   "tests": {
+    "self": "CGC_MDL172 --selftest",
+    "cross": [
+     "X-OWNER"
+    ],
+    "real": "CGC_MDL172 run --resume(經 via-vcgc run)"
+   }
+  },
+  {
+   "code": "VRN-WKF003",
+   "alias": "vrn_text_completeness",
+   "name": "全文擷取無遺漏(範圍 → 版面切割 → 修復 → 品質 → 完整才摘要)",
+   "kind": "hub_steps",
+   "spec": {
+    "goal": "個股報告只取第 1 頁;年度財報全頁先拆左右再拆上下;修復後的文字自己讀得懂、依品質再修;完整才依規定摘要,原文沒有的寫「原文未提及」",
+    "requirements": [
+     "VCGC-REQ059",
+     "VRN-REQ003",
+     "VRN-REQ004",
+     "VRN-REQ006"
+    ],
+    "acceptance": [
+     "範圍規則冊 VIA_Policy_VRNTextScope 尾版",
+     "XY 切割:跨欄帶先切 · 列距閾值",
+     "行合併不黏數字",
+     "摘要無編造"
+    ]
+   },
+   "plan": {
+    "policy": "supportive modules/registry/VIA_Policy_VRNTextScope_v*.json",
+    "enter": "VRN-WKF002 L1",
+    "exit": "VRN-WKF002 L3",
+    "order": "照 STP 序"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF003-STP001",
+     "alias": "scope",
+     "name": "擷取範圍",
+     "engine": "supportive modules/registry/VIA_Policy_VRNTextScope_v*.json",
+     "verb": "(規則冊)",
+     "what": "個股 = 第 1 頁 · 年報 = 全頁",
+     "inside": "VRN_ENG392 讀規則冊",
+     "evidence": "self:VRN_ENG392_TextCompleteness"
+    },
+    {
+     "code": "VRN-WKF003-STP002",
+     "alias": "layout_cut",
+     "name": "版面切割",
+     "engine": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
+     "verb": "run",
+     "what": "先左右再上下(XY-cut)",
+     "inside": "VRN-WKF002 L1 節點",
+     "evidence": "self:VRN_ENG392_TextCompleteness"
+    },
+    {
+     "code": "VRN-WKF003-STP003",
+     "alias": "repair_quality",
+     "name": "修復與品質",
+     "engine": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
+     "verb": "run",
+     "what": "修復狀態分類 · 品質分數 · 依品質再修",
+     "inside": "VRN-WKF002 L1 節點",
+     "evidence": "self:VRN_ENG392_TextCompleteness"
+    },
+    {
+     "code": "VRN-WKF003-STP004",
+     "alias": "summary",
+     "name": "完整才摘要",
+     "engine": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
+     "verb": "run",
+     "what": "摘要只用原文;缺 = 原文未提及",
+     "inside": "VRN-WKF002 L1 節點",
+     "evidence": "self:VRN_ENG392_TextCompleteness"
+    }
+   ],
+   "tests": {
+    "self": "VRN_ENG392 --selftest",
+    "cross": [
+     "X-ENGINE",
+     "X-REG",
+     "X-NUM",
+     "X-ACCEL"
+    ],
+    "real": "C:\\測試樣本報告(工作站)· 容器 input_reports 樣本"
+   }
+  },
+  {
+   "code": "VRN-WKF004",
+   "alias": "vrn_report_chain",
+   "name": "VRN 研報鏈(首頁擷取→基本資訊入庫→財報頁→一題四點→頁面再生)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "VRN 研報鏈",
+    "requirements": [],
+    "acceptance": [
+     "各項 rc 0 或誠實四態",
+     "VRN 要料經 VCGC 中介"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "run",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF004-STP001",
+     "alias": "vrn_firstpage",
+     "item": "vrn_firstpage",
+     "known_open": {
+      "hand": "operator",
+      "why": "首頁擷取 SKIP 1:缺 pdfplumber(裝件)",
+      "ref": "VCGC-WKF001-STP004"
+     }
+    },
+    {
+     "code": "VRN-WKF004-STP002",
+     "alias": "vrn_structdb",
+     "item": "vrn_structdb",
+     "known_open": {
+      "hand": "operator",
+      "why": "ENG073 自測 61/64:㉑㉒㉓ 金融機構 SSOT 三檢需要 pydantic(缺件依批412 一律紅;裝件是操作員的手)。⓬ 命令冊檢查 v0139 起沿 dot-source 鏈讀已轉綠",
+      "ref": "VCGC-WKF001-STP004"
+     }
+    },
+    {
+     "code": "VRN-WKF004-STP003",
+     "alias": "vrn_finpages",
+     "item": "vrn_finpages"
+    },
+    {
+     "code": "VRN-WKF004-STP004",
+     "alias": "vrn_fourpoint",
+     "item": "vrn_fourpoint"
+    },
+    {
+     "code": "VRN-WKF004-STP005",
+     "alias": "vrn_ui",
+     "item": "vrn_ui"
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vrn_report_chain(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vrn_report_chain"
+  },
+  {
+   "code": "VRN-WKF005",
+   "alias": "vrn_logic_nlp",
+   "name": "VRN 邏輯庫×財務邏輯×NLP 摘要(零網路;小數量實測)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "VRN 邏輯庫 × 財務邏輯 × NLP 摘要(零網路)",
+    "requirements": [
+     "VRN-REQ008",
+     "VRN-REQ009",
+     "VRN-REQ010",
+     "VRN-REQ012"
+    ],
+    "acceptance": [
+     "各項 rc 0 或誠實四態",
+     "VRN 要料經 VCGC 中介"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "test",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF005-STP001",
+     "alias": "vrn_logic",
+     "item": "vrn_logic"
+    },
+    {
+     "code": "VRN-WKF005-STP002",
+     "alias": "fin_logic",
+     "item": "fin_logic"
+    },
+    {
+     "code": "VRN-WKF005-STP003",
+     "alias": "vrn_nlp",
+     "item": "vrn_nlp"
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vrn_logic_nlp(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vrn_logic_nlp"
+  },
+  {
+   "code": "VRN-WKF006",
+   "alias": "vrn_firstpage_logic_chain",
+   "name": "首頁擷取→第一頁邏輯補缺(ENG072 sidecar → ENG086 .logic86.json;代碼階梯/券商/評等/目標價/檔名×首頁互核;批522)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "首頁擷取 → 第一頁邏輯補缺",
+    "requirements": [],
+    "acceptance": [
+     "各項 rc 0 或誠實四態",
+     "VRN 要料經 VCGC 中介"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "run",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF006-STP001",
+     "alias": "vrn_firstpage",
+     "item": "vrn_firstpage",
+     "known_open": {
+      "hand": "operator",
+      "why": "首頁擷取 SKIP 1:缺 pdfplumber(裝件)",
+      "ref": "VCGC-WKF001-STP004"
+     }
+    },
+    {
+     "code": "VRN-WKF006-STP002",
+     "alias": "vrn_firstpage_logic",
+     "item": "vrn_firstpage_logic"
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vrn_firstpage_logic_chain(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vrn_firstpage_logic_chain"
+  },
+  {
+   "code": "VRN-WKF007",
+   "alias": "vrn_nlp_vdf_pipeline",
+   "name": "NLP文字修復／證據型摘要→VRN→VDF中央鏈(B529；三頁HTML矩陣；VDF阻擋不假綠)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "NLP 文字修復 / 證據型摘要 → VRN → VDF 中央鏈",
+    "requirements": [],
+    "acceptance": [
+     "各項 rc 0 或誠實四態",
+     "VRN 要料經 VCGC 中介"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "run",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF007-STP001",
+     "alias": "vrn_nlp_vrn_vdf_pipeline",
+     "item": "vrn_nlp_vrn_vdf_pipeline"
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vrn_nlp_vdf_pipeline(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vrn_nlp_vdf_pipeline"
+  },
+  {
+   "code": "VRN-WKF008",
+   "alias": "source_provenance",
+   "name": "四來源證據保留與分立編號",
+   "kind": "procedure",
+   "spec": {
+    "goal": "四來源證據保留與分立編號",
+    "requirements": [
+     "VRN-REQ007"
+    ],
+    "acceptance": [
+     "不修改凍結成功擷取",
+     "交接／驗收分開判定",
+     "缺件或證據過期不假綠"
+    ]
+   },
+   "plan": {
+    "enter": "VCGC",
+    "exit": "VCGC",
+    "order": "照 STP 序；不新增另一個工作流執行者"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF008-STP001",
+     "alias": "manager",
+     "name": "經 VRN Manager 進入",
+     "engine": "functional modules/VRN/VRN_SystemManager_v*.py",
+     "verb": "provenance",
+     "inside": "VCGC run / Manager",
+     "evidence": "self:VRN_SystemManager",
+     "what": "經 VRN Manager 進入；依正主留存證據，未執行者維持 pending"
+    },
+    {
+     "code": "VRN-WKF008-STP002",
+     "alias": "evidence",
+     "name": "來源、空值、交叉比對與完整性",
+     "engine": "functional modules/VRN/VRN_ENG114_SourceProvenance_v*.py",
+     "verb": "--report --source --out",
+     "inside": "VCGC run / Manager",
+     "evidence": "self:VRN_ENG114_SourceProvenance",
+     "what": "來源、空值、交叉比對與完整性；依正主留存證據，未執行者維持 pending"
+    }
+   ],
+   "tests": {
+    "self": "經 VCGC 的 --selftest",
+    "cross": [
+     "X-ENGINE",
+     "X-REG",
+     "X-NUM",
+     "X-ACCEL"
+    ],
+    "real": "docs/handoff/evidence；完整樣本驗收仍按 pending 清單"
+   }
+  },
+  {
+   "code": "VRN-WKF009",
+   "alias": "single_stock_report",
+   "name": "單股研報全流程(檔名→切分→輕先重後→原樣還原→多驗→四點摘要)",
+   "kind": "pipeline",
+   "spec": {
+    "goal": "單一個股研報:由檔名到四點摘要的全流程,VRN System Manager 統轄",
+    "requirements": [
+     "VRN-REQ017"
+    ],
+    "acceptance": [
+     "單股判定正確",
+     "首頁資訊區與財務頁切分零漏區",
+     "輕先重後(重型僅失敗區;DPI 350 僅解析度不足最後)",
+     "表格還原=原樣(寬表+長表+來源證據)",
+     "多重驗證全過才產出(驗算×外部對帳×歷史覆蓋)",
+     "摘要四點每點帶據點,不捏造"
+    ]
+   },
+   "plan": {
+    "enter": "VCGC",
+    "exit": "VCGC",
+    "order": "照 STP 序;單/雙引擎是執行方式,配方存 ENG400 選用在 Manager"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF009-STP001",
+     "alias": "manager_intake",
+     "name": "經 VRN Manager 進站",
+     "engine": "functional modules/VRN/VRN_SystemManager_v*.py",
+     "verb": "intake",
+     "inside": "VCGC run / VRN Manager",
+     "evidence": "self:VRN_SystemManager",
+     "what": "單檔(或整夾)研報進站;單一個股判定(一報一股);配方與調度由 Manager 選用"
+    },
+    {
+     "code": "VRN-WKF009-STP002",
+     "alias": "filename_firstpage",
+     "name": "檔名與首頁資訊段",
+     "engine": "functional modules/VRN/VRN_ENG072_FirstPageText_v*.py",
+     "verb": "first-page",
+     "inside": "VCGC run / VRN Manager",
+     "evidence": "self:VRN_ENG072_FirstPageText",
+     "what": "檔名解析(券商/代號/評等;GF/廣發 DENY 律)→ 首頁頂部左/右/中題名區;主標題律交 ENG393"
+    },
+    {
+     "code": "VRN-WKF009-STP003",
+     "alias": "layout_split",
+     "name": "首頁與財務頁切分",
+     "engine": "functional modules/VRN/VRN_ENG394_LayoutRestore_v*.py",
+     "verb": "layout",
+     "inside": "VCGC run / VRN Manager",
+     "evidence": "self:VRN_ENG394_LayoutRestore",
+     "what": "首頁全元件辨識;資訊區自本文切出(左或右);區內型別分類(矩陣/表格/長句/文字)逐一元件化;財務頁先左右再上下切成視覺元件"
+    },
+    {
+     "code": "VRN-WKF009-STP004",
+     "alias": "component_extract",
+     "name": "四階段配方抽取",
+     "engine": "functional modules/VRN/VRN_ENG400_SixEngineShell_v*.py",
+     "verb": "recipe-default",
+     "inside": "VCGC run / VRN Manager",
+     "evidence": "self:VRN_ENG400_SixEngineShell",
+     "what": "NON-OCR 先行→互補→無文字層才局部輕 OCR→少數失敗區才重型;只有解析度不足最後才 DPI 300→350"
+    },
+    {
+     "code": "VRN-WKF009-STP005",
+     "alias": "table_rebuild",
+     "name": "表格原樣還原",
+     "engine": "functional modules/VRN/VRN_ENG400_SixEngineShell_v*.py",
+     "verb": "table",
+     "inside": "VCGC run / VRN Manager",
+     "evidence": "self:VRN_ENG400_SixEngineShell",
+     "what": "重建回原報樣式:寬表+長表(反 pivot)+來源證據;Camelot/Tabula 雙引擎正主=ENG058 引用"
+    },
+    {
+     "code": "VRN-WKF009-STP006",
+     "alias": "field_validate",
+     "name": "分型驗證與驗算",
+     "engine": "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v*.py",
+     "verb": "validate",
+     "inside": "VCGC run / VRN Manager",
+     "evidence": "self:SUP_MDL749_VRNFieldRuleHub",
+     "what": "長表逐格對帳;倍數交叉驗算沿 ENG394 律(漲跌幅·EPS 成長·隱含常數);資料只取清洗修復後的表"
+    },
+    {
+     "code": "VRN-WKF009-STP007",
+     "alias": "external_reconcile",
+     "name": "外部對帳(派 VDF 車道)",
+     "engine": "functional modules/VRN/VRN_SystemManager_v*.py",
+     "verb": "reconcile",
+     "inside": "VCGC run / VRN Manager",
+     "evidence": "self:VRN_SystemManager",
+     "what": "TWSE/TPEX 股名/中文簡稱;yfinance 調整收盤驗目標價合理性;最新歷史實際覆蓋預期(第一優先);歷史區間長度對帳"
+    },
+    {
+     "code": "VRN-WKF009-STP008",
+     "alias": "summary_four",
+     "name": "左側本文四點摘要",
+     "engine": "functional modules/VRN/VRN_ENG062_SummarizerV1_v*.py",
+     "verb": "summarize",
+     "inside": "VCGC run / VRN Manager",
+     "evidence": "self:VRN_ENG062_SummarizerV1",
+     "what": "①目標價+估值方法與邏輯(ENG395/SUP_MDL749 正名)②本年與未來 EPS+成長動能 ③④其餘擇二;每點帶據點,EXTRACTIVE_SOURCE_LINKED 不捏造"
+    },
+    {
+     "code": "VRN-WKF009-STP009",
+     "alias": "output_evidence",
+     "name": "產出與證據",
+     "engine": "functional modules/VRN/VRN_SystemManager_v*.py",
+     "verb": "closeout",
+     "inside": "VCGC run / VRN Manager",
+     "evidence": "self:VRN_SystemManager",
+     "what": "多重驗證全過才產出;產物鏈 文件ID→頁→區→引擎/插件版本→參數→驗證結果;證據只增"
+    }
+   ],
+   "tests": {
+    "self": "經 VCGC 的 --selftest",
+    "cross": [
+     "X-ENGINE",
+     "X-REG",
+     "X-NUM",
+     "X-ACCEL"
+    ],
+    "real": "測試樣本夾(vrn_sample_reader)+ 真 PDF 逐件認證(pending)"
+   }
+  },
+  {
+   "code": "VRN-WKF010",
+   "alias": "report_lane_check",
+   "name": "VRN-2 個股 / 非個股車道能力檢查(只讀 · 樣本分類矩陣)",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-18T16:40:31Z",
+   "spec": {
+    "goal": "回答「VRN-2 能不能處理個股報告與非個股報告」:個股車道三件(啟動器 · 管理器 · 分類器)· 非個股車道(引擎 · 核心 · manifest · 接線)· 樣本照 v0231 同一套檔名律分類。",
+    "requirements": [
+     "VRN-REQ018"
+    ],
+    "acceptance": [
+     "分類律字面抽自 VRN_SystemManager v0231,不執行管理器",
+     "非個股核心缺 = BLOCKED(整體 YELLOW · 不寫綠)",
+     "啟動器尾版從發布 zip 找(測試工具 zip 不算)",
+     "只讀 VRN-2 自報收據;VCGC 燈另算",
+     "自測 10/10"
+    ],
+    "entry": "python3 \"functional modules/VRN/VRN_ReportLaneCheck_v0100.py\" check [--read-pdf] [--pdf-dir <夾>]",
+    "evidence": "VIA_Reports/vrn2/VRN2_LaneCheck_latest.json · docs/handoff/evidence/V-vrn-lanecheck.json",
+    "books": [
+     "VIA_Handoff_Continuity_SSOT_v0100.json(REQ195 work item)"
+    ]
+   },
+   "plan": {
+    "enter": "VRN",
+    "exit": "VRN",
+    "order": "check → 非個股 BLOCKED 等 NON_STOCK_CORE 上傳 → 接線 → 再 check"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF010-STP001",
+     "alias": "lane_check",
+     "name": "兩條車道 + 樣本分類",
+     "engine": "functional modules/VRN/VRN_ReportLaneCheck_v0100.py",
+     "verb": "check",
+     "inside": "VRN",
+     "evidence": "step:VRN-WKF010-STP002",
+     "what": "只讀:個股車道三件(啟動器 · 管理器 · 分類器)· 非個股車道(引擎 · 核心 · manifest · 接線)在不在;樣本照檔名律分成個股 / 非個股;非個股核心缺 = BLOCKED(整體黃,不寫綠)",
+     "evidence_file": "VIA_Reports/vrn2/VRN2_LaneCheck_latest.md"
+    },
+    {
+     "code": "VRN-WKF010-STP002",
+     "alias": "selftest_gate",
+     "name": "自測 10 項",
+     "engine": "functional modules/VRN/VRN_ReportLaneCheck_v0100.py",
+     "verb": "--selftest",
+     "inside": "VCGC run",
+     "evidence": "self:VRN_ReportLaneCheck",
+     "what": "自測 10 項:分類律字面抽取 · 缺核心 = BLOCKED · 啟動器尾版只認發布 zip · 邊界(不 import 管理器 · 不起子行程 · 不連網 · 不寫 environ)",
+     "evidence_file": "docs/handoff/evidence/V-vrn-lanecheck.json"
+    }
+   ],
+   "tests": {
+    "self": "handoff test V-vrn-lanecheck",
+    "cross": [
+     "X-ENGINE",
+     "X-REG",
+     "X-NUM",
+     "X-ACCEL"
+    ],
+    "real": "容器 2026-11-18:自測 10/10;check --read-pdf 19 份真 PDF → 個股 14 / 非個股 5 · 個股車道 READY(啟動器 v0178)· 非個股車道 BLOCKED(整體黃)。主機未實跑。"
+   }
+  },
+  {
+   "code": "VRN-WKF011",
+   "alias": "report_rows",
+   "name": "報告一行一單位(轉接層):個股 ← VRN-2 主線冊 · 非個股 ← 非個股摘要器 v0310 · 都沒有才暫代 → 原句驗證 → json / csv / parquet / html",
+   "kind": "procedure",
+   "version": "v0101",
+   "updated_at": "2026-11-10T10:05:00Z",
+   "spec": {
+    "goal": "股票與多種非股票報告都能還原文字、抓重點;個股一行一報告、產業一行一產業、其他一行一主題。",
+    "requirements": [
+     "VRN-REQ019"
+    ],
+    "acceptance": [
+     "自測 v0101 12/12 + v0100 鏈",
+     "每行有 source(VRN-2 主線 / 非個股摘要器 v0310 / 暫代 + 原因)",
+     "原句驗證不替上游背書(非原句 = MISMATCH)",
+     "掃描檔 NEEDS_OCR 照實"
+    ],
+    "entry": "python \"functional modules/VRN/VRN2_ReportRows_v0101.py\" run [--pdf-dir D] [--vrn2-books B] [--nonstock-out N] [--out O]",
+    "evidence": "VIA_Reports/vrn2/report_rows/VRN2_ReportRows_latest.{json,csv,parquet,html}",
+    "books": []
+   },
+   "plan": {
+    "enter": "PDF 夾",
+    "exit": "一行一單位冊 + HTML",
+    "order": "read_pdf → restore → lane → build_rows → verify → write"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF011-STP001",
+     "alias": "rows_selftest",
+     "name": "一行一單位自測 11 項",
+     "engine": "functional modules/VRN/VRN2_ReportRows_v*.py",
+     "verb": "--selftest",
+     "inside": "VRN",
+     "evidence": "self:VRN2_ReportRows",
+     "what": "12 項:主線命中 / 缺 → 暫代 · v0310 產業 / 晨會 · 缺 NON_STOCK_CORE → 暫代 · 非原句 MISMATCH · 來源欄 · 只差中文的報告身分不撞 · 空上游保留暫代 · 零網路 · v0100 鏈",
+     "pinned_before": "VRN2_ReportRows_v0101.py"
+    },
+    {
+     "code": "VRN-WKF011-STP002",
+     "alias": "rows_run",
+     "name": "真 PDF 實跑(一行一單位冊)",
+     "engine": "functional modules/VRN/VRN2_ReportRows_v*.py",
+     "verb": "run",
+     "inside": "VRN",
+     "evidence": "step:VRN-WKF011-STP001",
+     "what": "PDF 夾逐份:擷取還原 → VRN-2 車道分類 → 一行一單位 → 原句驗證 → json / csv / parquet / html",
+     "evidence_file": "VIA_Reports/vrn2/report_rows/VRN2_ReportRows_latest.json",
+     "pinned_before": "VRN2_ReportRows_v0101.py"
+    }
+   ],
+   "tests": {
+    "self": "handoff test V-vrn2-reportrows",
+    "cross": [
+     "X-ENGINE",
+     "X-REG",
+     "X-NUM",
+     "X-ACCEL"
+    ],
+    "real": "容器 13 份真 PDF"
+   }
+  },
+  {
+   "code": "VRN-WKF012",
+   "alias": "eps_kind_rule",
+   "name": "財報頁 EPS 基本 / 稀釋取值律",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-15T17:50:48Z",
+   "spec": {
+    "goal": "標明照標明;沒寫清楚兩值取小、一值取並標註區分不明確。",
+    "requirements": [
+     "VRN-REQ020"
+    ],
+    "acceptance": [
+     "冊只增不減",
+     "標明 → BASIC",
+     "兩值 → 取小",
+     "一值 → 標註",
+     "並存用標明的"
+    ],
+    "entry": "python \"functional modules/VRN/vrn_fin_extract_v0102.py\" --file <財報頁.txt> [--fin-out fin.json] | --selftest",
+    "evidence": "docs/handoff/evidence/V-vrn2-finextract-v0102.json",
+    "books": [
+     "functional modules/VRN/knowledge/VRN_AnnualExtract_SSOT_v0101.json"
+    ]
+   },
+   "plan": {
+    "enter": "財報頁文字",
+    "exit": "年度表 + fin 鍵(eps / eps_kind / eps_note)",
+    "order": "v0101 擷取 → EPS 取值律"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF012-STP001",
+     "alias": "selftest_gate",
+     "name": "擷取器 v0102 自測 9 項(含 v0101 十檢)",
+     "engine": "functional modules/VRN/vrn_fin_extract_v0102.py",
+     "verb": "--selftest",
+     "inside": "VRN-2(獨立)",
+     "evidence": "self:vrn_fin_extract",
+     "what": "見 VRN-REQ020",
+     "evidence_file": "docs/handoff/evidence/V-vrn2-finextract-v0102.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VRN-WKF012-TST001",
+     "case": "V-vrn2-finextract-v0102",
+     "engine": "functional modules/VRN/vrn_fin_extract_v0102.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 9/9"
+    }
+   ]
+  },
+  {
+   "code": "VRN-WKF013",
+   "alias": "safe_parallel_launch",
+   "name": "VRN 安全並行啟動器:開跑前降壓等靜 · 固定 3 道 · 途中不監控",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-21T07:30:00Z",
+   "spec": {
+    "goal": "VRN 自己的 Python 啟動器(MDL260 尾版)開跑前降壓,固定 3 道並行;途中不量 CPU / DRAM;--via-db 寫 <via_database>/vrn_database(增量)。",
+    "requirements": [
+     "VRN-REQ022"
+    ],
+    "acceptance": [
+     "開跑前降壓等靜",
+     "道數 3/3(參數冊 slots)",
+     "途中不監控",
+     "--via-db 增量 · 第二輪零追加"
+    ],
+    "entry": "VIA_NET_CONSENT=YES VIA_SCRAPE_CONSENT=YES python \"functional modules/VRN/VRN_MDL260_SafeParallelLaunch_v0103.py\" run --slots auto --no-open --source <scope_in> --via-db <via_database>",
+    "evidence": "docs/handoff/evidence/C-vrn-launch-v0103.json",
+    "books": [
+     "functional modules/VRN/VRN_ParamControl_SSOT_v0103.json"
+    ]
+   },
+   "plan": {
+    "enter": "VRN",
+    "exit": "VRN",
+    "order": "降壓 → 3 道 → 各步收據 → 收尾頁"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF013-STP001",
+     "alias": "launcher_selftest",
+     "name": "啟動器自測",
+     "engine": "functional modules/VRN/VRN_MDL260_SafeParallelLaunch_v*.py",
+     "verb": "--selftest",
+     "inside": "VRN-2(獨立)",
+     "evidence": "self:VRN_MDL260_SafeParallelLaunch",
+     "what": "降壓 · 3 道 · 不監控 · --via-db",
+     "evidence_file": "docs/handoff/evidence/C-vrn-launch-v0103.json"
+    },
+    {
+     "code": "VRN-WKF013-STP002",
+     "alias": "launcher_run",
+     "name": "開閘實跑",
+     "engine": "functional modules/VRN/VRN_MDL260_SafeParallelLaunch_v*.py",
+     "verb": "run --slots auto --no-open",
+     "inside": "VRN-2(獨立)",
+     "evidence": "step:VRN-WKF013-STP001",
+     "what": "容器 2026-11-21:約 4 分鐘",
+     "known_open": {
+      "why": "主機實跑待操作員",
+      "hand": "operator",
+      "ref": "VRN-REQ022:host-run"
+     }
+    }
+   ],
+   "tests": [
+    {
+     "code": "VRN-WKF013-TST001",
+     "case": "C-vrn-launch-v0103",
+     "engine": "functional modules/VRN/VRN_MDL260_SafeParallelLaunch_v0103.py",
+     "verb": "--selftest",
+     "expect": "rc 0"
+    }
+   ]
+  },
+  {
+   "code": "VRN-WKF014",
+   "alias": "vrn_self_numbering",
+   "name": "VRN 自己發號、自己定案(資產登記 · 元件登記 · 請號清單空)",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-21T07:30:00Z",
+   "spec": {
+    "goal": "VRN 的號(引擎 VRN-E · 冊 VRN-B · 參數 VRN-P · 元件 VRN2-<類>)由 VRN 管理器自己發、自己定案;請號清單空;VCGC 只替 VRN 程式檔發 VIA-VRN-* 號。",
+    "requirements": [
+     "VRN-REQ023"
+    ],
+    "acceptance": [
+     "狀態 = 已確認(VRN 自發)",
+     "請號清單空",
+     "保留條目正規化",
+     "規格深拷貝(內容變才出新版)"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python \"functional modules/VRN/VRN_SystemManager_v0280.py\" --selftest",
+    "evidence": "docs/handoff/evidence/C-vrn-manager-v0280.json",
+    "books": [
+     "functional modules/VRN/registry/VRN_Asset_Register_v0103.json"
+    ]
+   },
+   "plan": {
+    "enter": "VRN",
+    "exit": "VRN",
+    "order": "掃 → 自發定案 → 寫登記冊"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF014-STP001",
+     "alias": "manager_selftest",
+     "name": "管理器自測(自發號)",
+     "engine": "functional modules/VRN/VRN_SystemManager_v*.py",
+     "verb": "--selftest",
+     "inside": "VRN-2(獨立)",
+     "evidence": "self:VRN_SystemManager",
+     "what": "自發定案 · 深拷貝",
+     "evidence_file": "docs/handoff/evidence/C-vrn-manager-v0280.json"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VRN-WKF014-TST001",
+     "case": "C-vrn-manager-v0279",
+     "engine": "functional modules/VRN/VRN_SystemManager_v0279.py",
+     "verb": "--selftest",
+     "expect": "rc 0"
+    },
+    {
+     "code": "VRN-WKF014-TST002",
+     "case": "C-vrn-manager-v0280",
+     "engine": "functional modules/VRN/VRN_SystemManager_v0280.py",
+     "verb": "--selftest",
+     "expect": "rc 0"
+    }
+   ]
+  },
+  {
+   "code": "VRN-WKF015",
+   "alias": "matrix_adj_close_from_vdf",
+   "name": "VRN 個股統一矩陣 ADJ CLOSE 讀 VDF 已對官方的台股日價",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-21T07:30:00Z",
+   "spec": {
+    "goal": "ENG049 matrix 的 ADJ CLOSE:前版讀到就用;沒有 → VDF tw_daily_prices 每檔最新一天(adj_close,沒有用 close)· 海外 → VDF FinancialModel daily_history(yf_ticker · Close);只讀、不改 VDF。",
+    "requirements": [
+     "VRN-REQ024"
+    ],
+    "acceptance": [
+     "只讀 VDF(read_only)",
+     "前版讀到的不蓋",
+     "VDF 庫不在 / 被鎖 → 照前版",
+     "來源欄標「VDF 股價(日期)」",
+     "值與 VDF 官方對帳後日價同"
+    ],
+    "entry": "VIA_FROM_VCGC=YES python \"functional modules/VRN/VRN_ENG049_ContentReconcile_v0106.py\" matrix [--vdf-dir D]",
+    "evidence": "docs/handoff/evidence/C-vrn-eng049-v0106.json",
+    "books": []
+   },
+   "plan": {
+    "enter": "VRN 輸出冊 + VDF 自報",
+    "exit": "VIA_Reports/vrn_reconcile_runs/matrix_<ts>",
+    "order": "讀 SSOT → 讀 VDF(只讀)→ 組矩陣 → 燈"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF015-STP001",
+     "alias": "selftest_gate",
+     "name": "ENG049 v0106 自測",
+     "engine": "functional modules/VRN/VRN_ENG049_ContentReconcile_v*.py",
+     "verb": "--selftest",
+     "inside": "VRN-2(獨立)",
+     "evidence": "self:VRN_ENG049_ContentReconcile",
+     "what": "見 VRN-REQ024",
+     "evidence_file": "docs/handoff/evidence/C-vrn-eng049-v0106.json"
+    },
+    {
+     "code": "VRN-WKF015-STP002",
+     "alias": "matrix_run",
+     "name": "矩陣實跑",
+     "engine": "functional modules/VRN/VRN_ENG049_ContentReconcile_v*.py",
+     "verb": "matrix",
+     "inside": "VRN-2(獨立)",
+     "evidence": "step:VRN-WKF015-STP001",
+     "what": "ADJ CLOSE 38/42 · 綠 8",
+     "known_open": {
+      "why": "30 份缺目標價 / 評等(研報抽取)· 主機實跑",
+      "hand": "ai",
+      "ref": "VRN-REQ024:extract-gaps"
+     }
+    }
+   ],
+   "tests": [
+    {
+     "code": "VRN-WKF015-TST001",
+     "case": "C-vrn-eng049-v0106",
+     "engine": "functional modules/VRN/VRN_ENG049_ContentReconcile_v0106.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 9/9"
+    }
+   ]
+  },
+  {
+   "code": "VRN-WKF016",
+   "alias": "system_monitor",
+   "name": "VRN 系統管理器 monitor:九格狀態 · 增量庫 · 鎖定模板頁",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-21T17:40:00Z",
+   "spec": {
+    "goal": "系統管理器一個動詞掌握九格狀態;只彙總既有引擎與收據,不新增引擎;資料庫 / 增量庫狀態顯示在自己的鎖定模板頁",
+    "requirements": [
+     "VRN-REQ025"
+    ],
+    "acceptance": [
+     "只叫零寫入動詞 / 只讀收據",
+     "沒有對應引擎或收據 = 灰",
+     "收據過期 = 黃",
+     "總燈取最差",
+     "頁只用鎖定模板",
+     "不出網 · 不寫別系統的檔"
+    ],
+    "entry": "python \"functional modules/VRN/VRN_SystemManager_v0281.py\" monitor [--lanes N] [--json]",
+    "evidence": "docs/handoff/evidence/C-vrn-manager-v0281.json",
+    "books": []
+   },
+   "plan": {
+    "enter": "VRN",
+    "exit": "VRN",
+    "order": "收據 → 唯讀動詞並行 → 九格 → 收據 + 頁"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF016-STP001",
+     "alias": "monitor",
+     "name": "monitor 九格",
+     "engine": "functional modules/VRN/VRN_SystemManager_*.py",
+     "verb": "monitor",
+     "inside": "VRN_SystemManager",
+     "evidence": "self:VRN_SystemManager",
+     "what": "唯讀彙總",
+     "known_open": {
+      "why": "主機實跑待操作員",
+      "hand": "operator",
+      "ref": "VRN-REQ025:host-run"
+     }
+    }
+   ],
+   "tests": [
+    {
+     "code": "VRN-WKF016-TST001",
+     "case": "C-vrn-manager-v0281",
+     "engine": "functional modules/VRN/VRN_SystemManager_v0281.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 11/11"
+    },
+    {
+     "code": "VRN-WKF016-TST002",
+     "case": "C-vrn-manager-v0282",
+     "engine": "functional modules/VRN/VRN_SystemManager_v0282.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 9/9"
+    }
+   ]
+  },
+  {
+   "code": "VRN-WKF017",
+   "alias": "launch_temp_backup",
+   "name": "VRN launch --run 走 TEMP · 起跑前備份庫 · resources 狀態",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-21T17:50:00Z",
+   "spec": {
+    "goal": "記憶體不足時 DuckDB 溢寫到本機 TEMP(生效才算)· 寫庫前先備份 · 一個動詞看 TEMP / 備份 / Graphify / OmniRoute / agentmemory",
+    "requirements": [
+     "VRN-REQ026"
+    ],
+    "acceptance": [
+     "探針子行程讀回 temp_directory 在本輪夾才算綠(標記不算)",
+     "TEMP / 備份夾不在 OneDrive",
+     "備份逐檔 sha256 驗過 · 留 3 輪 · 空間不夠照實黃",
+     "跑完清本輪溢寫夾",
+     "OmniRoute 不在 VRN 執行路徑(語法樹)",
+     "沒證據的格 = 灰 · 總燈不得綠",
+     "不出網 · 不設他系統旗標",
+     "Graphify 格看 VRN 自己那兩張圖的燈",
+     "備份 sha256 對不上 = 不發布、不修剪、舊備份不動",
+     "備份整段持作業系統檔案鎖;不刪別人正在用的暫存夾"
+    ],
+    "entry": "python \"functional modules/VRN/VRN_SystemManager_v0283.py\" launch --run … · resources [--json]",
+    "evidence": "docs/handoff/evidence/C-vrn-manager-v0283.json",
+    "books": []
+   },
+   "plan": {
+    "enter": "VRN",
+    "exit": "VRN",
+    "order": "備份 → 本輪 TEMP + 鉤 → 探針 → RoundAll → 清溢寫夾 · 收據"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF017-STP001",
+     "alias": "launch_run",
+     "name": "launch --run(備份 + TEMP 鉤)",
+     "engine": "functional modules/VRN/VRN_SystemManager_*.py",
+     "verb": "launch --run",
+     "inside": "VRN_SystemManager",
+     "evidence": "self:VRN_SystemManager",
+     "what": "起跑前備份 · 本輪鉤 · 探針 · 跑完清",
+     "known_open": {
+      "why": "主機實跑待操作員",
+      "hand": "operator",
+      "ref": "VRN-REQ026:host-run"
+     }
+    },
+    {
+     "code": "VRN-WKF017-STP002",
+     "alias": "resources",
+     "name": "resources 七格",
+     "engine": "functional modules/VRN/VRN_SystemManager_*.py",
+     "verb": "resources",
+     "inside": "VRN_SystemManager",
+     "evidence": "self:VRN_SystemManager",
+     "what": "唯讀彙總"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VRN-WKF017-TST001",
+     "case": "C-vrn-manager-v0283",
+     "engine": "functional modules/VRN/VRN_SystemManager_v0283.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 21/21"
+    },
+    {
+     "code": "VRN-WKF017-TST002",
+     "case": "C-vrn-manager-v0284",
+     "engine": "functional modules/VRN/VRN_SystemManager_v0284.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 17/17"
+    },
+    {
+     "code": "VRN-WKF017-TST003",
+     "case": "C-vrn-manager-v0285",
+     "engine": "functional modules/VRN/VRN_SystemManager_v0285.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 13/13"
+    }
+   ]
+  },
+  {
+   "code": "VRN-WKF018",
+   "alias": "bare_except_fix",
+   "name": "VRN 兩支尾版 bare except 改型別",
+   "kind": "procedure",
+   "version": "v0100",
+   "updated_at": "2026-11-22T03:20:00Z",
+   "spec": {
+    "goal": "bare except 改 except Exception,只改型別",
+    "requirements": [
+     "VRN-REQ027"
+    ],
+    "acceptance": [
+     "語法樹:bare 0 · 例外處理數同前版",
+     "其餘一字不動(前版原地不動)",
+     "自測過"
+    ],
+    "entry": "python \"functional modules/VRN/VRN_MDL002_LayoutExtractor_v0101.py\" --selftest · python \"functional modules/VRN/VRN_MDL001_Converter_v0122.py\" --selftest",
+    "evidence": "docs/handoff/evidence/C-vrn-mdl002-v0101.json",
+    "books": []
+   },
+   "plan": {
+    "enter": "VRN",
+    "exit": "VRN",
+    "order": "語法樹定位 → 改型別 → 自測"
+   },
+   "steps": [
+    {
+     "code": "VRN-WKF018-STP001",
+     "alias": "selftest",
+     "name": "新版自測",
+     "engine": "functional modules/VRN/VRN_MDL002_LayoutExtractor_v0101.py",
+     "verb": "--selftest",
+     "inside": "VRN",
+     "evidence": "self:VRN",
+     "what": "自測(含 bare except 檢)"
+    }
+   ],
+   "tests": [
+    {
+     "code": "VRN-WKF018-TST001",
+     "case": "C-vrn-mdl002-v0101",
+     "engine": "functional modules/VRN/VRN_MDL002_LayoutExtractor_v0101.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 10/10"
+    },
+    {
+     "code": "VRN-WKF018-TST002",
+     "case": "C-vrn-mdl001-v0122",
+     "engine": "functional modules/VRN/VRN_MDL001_Converter_v0122.py",
+     "verb": "--selftest",
+     "expect": "⓪ OK(④ 前版就紅 · 容器 PyMuPDF 2.1)"
+    }
+   ]
+  }
+ ],
+ "prior": "VIA_Workflow_VRN_SSOT_v0117.json",
+ "why_v0101": "VRN-WKF004-STP002 已知未綠改為操作員端:ENG073 v0139 命令冊檢查沿鏈讀已轉綠,只剩 ㉑㉒㉓ 缺 pydantic",
+ "why_v0103": "側線 i:VRN-REQ006 回指補齊(需求歸屬 VRN-WKF002 / WKF003,工作流沒回指;SDD v0104 X-REQ-BACK 量到);其餘一字不動",
+ "why_v0104": "VCGC link(母子自動連接):需求冊歸屬指到本冊工作流 / 步而工作流沒回指 → 補進 spec.requirements(只增):VRN-WKF005 ← VRN-REQ008, VRN-REQ009, VRN-REQ010, VRN-REQ012;其餘一字不動",
+ "why_v0105": "操作員口述 2026-10-05:單股研報全流程(檔名→首頁資訊段→LAYOUT 切分→輕先重後抽取→原樣還原→多重驗證→四點摘要)掛 VRN System Manager 轄下;正典 docs/VRN_SINGLE_STOCK_REPORT_PIPELINE_v0100.md",
+ "why_v0106": "v0105 已發布 → 出新版;政策 L120 三方對等:VRN-WKF001 目標 · 名稱 · 進出口驗收 · STP001 說明的「只經 VCGC」字樣改掉(只改字;代碼 · 步 · match · 引擎 · 需求回指一字不動;CGC_MDL239 資料中介照用,定位改為 VCGC 協助)。操作員 2026-10-10:「不再視為一入口 三系統獨立 政策及全部寫入 VCGC VRN VDF SYSTEM MANAGER獨立互不影響但互相監控而獨立運作功能」(政策 L120)",
+ "why_v0107": "+VRN-WKF010 report_lane_check(操作員 2026-11-09 六項令 1)。",
+ "why_v0108": "只增:+VRN-WKF011 報告一行一單位(VRN2_ReportRows v0100);v0107 一字不動(已在 main)",
+ "why_v0109": "只增:VRN-REQ019 改指回既有引擎 —— 操作員 2026-11-10「先前有成過 為何重工」→ YES:VRN2_ReportRows 降為轉接層 v0101(個股取 VRN-2 主線冊 · 非個股取操作員的 v0310 · 兩者沒有時才 v0100 暫代並標來源);前版一字不動",
+ "why_v0110": "v0109 已在 main → 出新版。只增:+VRN-WKF012 eps_kind_rule(VRN-REQ020);其餘一字不動。",
+ "why_v0111": "前版已在 main → 出新版。SDD X-REG 點名的步:釘死舊版號的 engine 改成取尾版 _v*(L54 尾版律;原釘的版號留在該步的 pinned_before):VRN-WKF011-STP001:VRN2_ReportRows_v0101→v*、VRN-WKF011-STP002:VRN2_ReportRows_v0101→v* · VRN-WKF010 補欄(STP001 / STP002 的 what · evidence 改成規定格式並保留原路徑在 evidence_file · tests.self / cross / real)。其餘一字不動。已鎖的工作流尾版換了要重驗,X-LOCK 照舊提醒,這一版沒有代為宣稱已重驗。",
+ "why_v0112": "前版已在 main → 出新版。只增:+VRN-WKF013(VRN-REQ022)· +VRN-WKF014(VRN-REQ023)· +VRN-WKF015(VRN-REQ024);AGENTS.md 第 3 條雙登(VDF 同類 PR 707 Codex P1)。VRN-REQ021 同步台不在本輪範圍,照實留待。VRN-WKF001–012 一字不動。",
+ "why_v0113": "只增:+VRN-WKF016 system_monitor(VRN-REQ025,帶 tests);其餘一字不動。",
+ "why_v0114": "VRN-WKF016 +TST002(v0282);其餘一字不動。",
+ "why_v0115": "+VRN-WKF017(launch 走 TEMP · 起跑前備份 · resources);其餘一字不動。",
+ "why_v0116": "VRN-WKF017 +TST002(C-vrn-manager-v0284)· 驗收 +2 條(PR 715 Codex P2);其餘一字不動。",
+ "why_v0117": "VRN-WKF017 +TST003(C-vrn-manager-v0285)· 驗收 +1 條(PR 715 Codex P2);其餘一字不動。",
+ "why_v0118": "+VRN-WKF018(bare except 改型別);其餘一字不動。"
+}
