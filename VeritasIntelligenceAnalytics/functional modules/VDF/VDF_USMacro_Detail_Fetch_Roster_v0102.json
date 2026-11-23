@@ -1,0 +1,486 @@
+{
+ "schema": "vdf-usmacro-detail-fetch-roster-v1",
+ "source": "批109 操作員令(2026-08-24):「通膨就業都有很詳細的細目,包括 PMI 在內;就業還有各業失業的狀況、勞參率以及職缺率等等都要抓」 ‖ v0101 +Grok intake b383(15)",
+ "policy": "增量冊:不重複 MDL003 既有 46 序列;confidence=CONFIRMED 直抓 / VERIFY_PENDING 首抓時以 FRED API 驗 id,404 即誠實標 BAD_ID 不假抓;全部候 FRED_API_KEY+VIA_NET_CONSENT=YES 法遵雙閘",
+ "engine": "VDF_ENG047_USMacroDetailFetcher.py(via-usmacro)",
+ "sections": {
+  "employment_labor": [
+   {
+    "key": "US.Employ.U6",
+    "fred_id": "U6RATE",
+    "zh": "廣義失業率 U6",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C04"
+   },
+   {
+    "key": "US.Employ.U4",
+    "fred_id": "U4RATE",
+    "zh": "U4(含灰心勞工)",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C04"
+   },
+   {
+    "key": "US.Employ.U5",
+    "fred_id": "U5RATE",
+    "zh": "U5(含邊際附著)",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C04"
+   },
+   {
+    "key": "US.Employ.EmpPopRatio",
+    "fred_id": "EMRATIO",
+    "zh": "就業人口比",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C04"
+   },
+   {
+    "key": "US.Employ.LFPR.PrimeAge",
+    "fred_id": "LNS11300060",
+    "zh": "勞參率 25-54 主力齡",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C04"
+   },
+   {
+    "key": "US.Employ.Claims.Continuing",
+    "fred_id": "CCSA",
+    "zh": "續領失業金",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-L05"
+   },
+   {
+    "key": "US.Employ.Duration.LT5",
+    "fred_id": "UEMPLT5",
+    "zh": "失業 <5 週",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C05"
+   },
+   {
+    "key": "US.Employ.Duration.5to14",
+    "fred_id": "UEMP5TO14",
+    "zh": "失業 5-14 週",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C05"
+   },
+   {
+    "key": "US.Employ.Duration.15to26",
+    "fred_id": "UEMP15T26",
+    "zh": "失業 15-26 週",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C05"
+   },
+   {
+    "key": "US.Employ.Duration.27plus",
+    "fred_id": "UEMP27OV",
+    "zh": "失業 27 週以上",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C05"
+   },
+   {
+    "key": "US.Employ.Duration.MeanWeeks",
+    "fred_id": "UEMPMEAN",
+    "zh": "平均失業週數",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C05"
+   },
+   {
+    "key": "US.Employ.JOLTS.OpeningsRate",
+    "fred_id": "JTSJOR",
+    "zh": "職缺率(開缺率)",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C07"
+   },
+   {
+    "key": "US.Employ.JOLTS.HiresLevel",
+    "fred_id": "JTSHIL",
+    "zh": "僱用數",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C07"
+   },
+   {
+    "key": "US.Employ.JOLTS.HiresRate",
+    "fred_id": "JTSHIR",
+    "zh": "僱用率",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C07"
+   },
+   {
+    "key": "US.Employ.JOLTS.QuitsRate",
+    "fred_id": "JTSQUR",
+    "zh": "離職率(自願)",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-C07"
+   },
+   {
+    "key": "US.Employ.JOLTS.QuitsLevel",
+    "fred_id": "JTSQUL",
+    "zh": "離職數",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-C07"
+   },
+   {
+    "key": "US.Employ.JOLTS.LayoffsRate",
+    "fred_id": "JTSLDR",
+    "zh": "裁員率",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-C07"
+   },
+   {
+    "key": "US.Employ.ByIndustry.Construction",
+    "fred_id": null,
+    "zh": "營建業失業率(各業失業)",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-C19",
+    "note": "FRED LNU043 家族;首抓時 via-net FRED search 定 id"
+   },
+   {
+    "key": "US.Employ.ByIndustry.Manufacturing",
+    "fred_id": null,
+    "zh": "製造業失業率",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-C19"
+   },
+   {
+    "key": "US.Employ.ByIndustry.Retail",
+    "fred_id": null,
+    "zh": "零售業失業率",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-C19"
+   },
+   {
+    "key": "US.Employ.ByIndustry.Leisure",
+    "fred_id": null,
+    "zh": "休閒餐旅失業率",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-C19"
+   },
+   {
+    "key": "US.Employ.Wage.ProductionAHE",
+    "fred_id": "AHETPI",
+    "zh": "生產與非管理職時薪",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-C08"
+   },
+   {
+    "key": "US.Employ.Hours.WeeklyAll",
+    "fred_id": null,
+    "zh": "全體週工時",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-C08"
+   }
+  ],
+  "inflation_detail": [
+   {
+    "key": "US.Prices.CPI.Energy",
+    "fred_id": "CPIENGSL",
+    "zh": "CPI 能源",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-G07"
+   },
+   {
+    "key": "US.Prices.CPI.Food",
+    "fred_id": "CPIUFDSL",
+    "zh": "CPI 食物",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-G07"
+   },
+   {
+    "key": "US.Prices.CPI.Medical",
+    "fred_id": "CPIMEDSL",
+    "zh": "CPI 醫療",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-G07"
+   },
+   {
+    "key": "US.Prices.CPI.Apparel",
+    "fred_id": "CPIAPPSL",
+    "zh": "CPI 服裝",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-G07"
+   },
+   {
+    "key": "US.Prices.CPI.Transport",
+    "fred_id": "CPITRNSL",
+    "zh": "CPI 交通",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-G07"
+   },
+   {
+    "key": "US.Prices.CPI.Shelter",
+    "fred_id": "CUSR0000SAH1",
+    "zh": "CPI 住房(shelter)",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-G08"
+   },
+   {
+    "key": "US.Prices.CPI.OER",
+    "fred_id": null,
+    "zh": "業主約當租金 OER",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-G08"
+   },
+   {
+    "key": "US.Prices.CPI.UsedCars",
+    "fred_id": "CUSR0000SETA02",
+    "zh": "CPI 二手車",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-G08"
+   },
+   {
+    "key": "US.Prices.CPI.Airfare",
+    "fred_id": null,
+    "zh": "CPI 機票",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-G08"
+   },
+   {
+    "key": "US.Prices.CPI.Sticky",
+    "fred_id": "CORESTICKM159SFRBATL",
+    "zh": "黏性核心 CPI(Atlanta Fed)",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-G10"
+   },
+   {
+    "key": "US.Prices.CPI.Median",
+    "fred_id": "MEDCPIM158SFRBCLE",
+    "zh": "中位數 CPI(Cleveland Fed)",
+    "confidence": "CONFIRMED",
+    "maps_to": "US-G14"
+   },
+   {
+    "key": "US.Prices.PCE.TrimmedMean",
+    "fred_id": "PCETRIM12M159SFRBDAL",
+    "zh": "Trimmed Mean PCE(Dallas Fed)",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-G14"
+   },
+   {
+    "key": "US.Prices.PPI.FinalDemand",
+    "fred_id": null,
+    "zh": "PPI 最終需求",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-G11"
+   },
+   {
+    "key": "US.Prices.ImportPrice",
+    "fred_id": null,
+    "zh": "進口物價指數",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-G15"
+   },
+   {
+    "key": "US.Prices.ExportPrice",
+    "fred_id": null,
+    "zh": "出口物價指數",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": "US-G15"
+   }
+  ],
+  "pmi": [
+   {
+    "key": "US.PMI.ISM.Mfg",
+    "fred_id": null,
+    "zh": "ISM 製造業 PMI(含分項)",
+    "confidence": "PROXY_SOURCE",
+    "maps_to": "US-L01/L11",
+    "note": "FRED NAPM 已停供;源=ISM 官網/S&P Global(授權層);候 via-net 合規接"
+   },
+   {
+    "key": "US.PMI.ISM.Services",
+    "fred_id": null,
+    "zh": "ISM 非製造業 PMI(含分項)",
+    "confidence": "PROXY_SOURCE",
+    "maps_to": "US-L02/L12"
+   },
+   {
+    "key": "US.PMI.SPGlobal",
+    "fred_id": null,
+    "zh": "S&P Global 美國 PMI",
+    "confidence": "PROXY_SOURCE",
+    "maps_to": "US-L03"
+   },
+   {
+    "key": "CN.PMI.Official",
+    "fred_id": "CHNMFGPMI",
+    "zh": "中國官方製造業 PMI",
+    "confidence": "COVERED_ELSEWHERE",
+    "maps_to": "GL-14",
+    "note": "MDL003 既有+AKShare GL-14/15 DONE"
+   },
+   {
+    "key": "TW.PMI.CIER",
+    "fred_id": null,
+    "zh": "台灣 CIER PMI/NMI",
+    "confidence": "TODO",
+    "maps_to": "GL-17"
+   }
+  ],
+  "rates_fx_fiscal": [
+   {
+    "key": "US.Rates.DGS1MO",
+    "fred_id": "DGS1MO",
+    "zh": "1M 公債",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts",
+    "yahoo_proxy": null,
+    "yahoo_note": "Yahoo 無此期別(只有 ^IRX 3M · ^FVX 5Y · ^TNX 10Y · ^TYX 30Y);無 FRED key 時此列缺值,照實標黃"
+   },
+   {
+    "key": "US.Rates.DGS1",
+    "fred_id": "DGS1",
+    "zh": "1Y 公債",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts",
+    "yahoo_proxy": null,
+    "yahoo_note": "Yahoo 無此期別(只有 ^IRX 3M · ^FVX 5Y · ^TNX 10Y · ^TYX 30Y);無 FRED key 時此列缺值,照實標黃"
+   },
+   {
+    "key": "US.Rates.DGS3",
+    "fred_id": "DGS3",
+    "zh": "3Y 公債",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts",
+    "yahoo_proxy": null,
+    "yahoo_note": "Yahoo 無此期別(只有 ^IRX 3M · ^FVX 5Y · ^TNX 10Y · ^TYX 30Y);無 FRED key 時此列缺值,照實標黃"
+   },
+   {
+    "key": "US.Rates.DGS7",
+    "fred_id": "DGS7",
+    "zh": "7Y 公債",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts",
+    "yahoo_proxy": null,
+    "yahoo_note": "Yahoo 無此期別(只有 ^IRX 3M · ^FVX 5Y · ^TNX 10Y · ^TYX 30Y);無 FRED key 時此列缺值,照實標黃"
+   },
+   {
+    "key": "US.Rates.DTB3",
+    "fred_id": "DTB3",
+    "zh": "3M T-Bill",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts",
+    "yahoo_proxy": "^IRX",
+    "yahoo_lane": "VDF_ENG066 → gl__global_daily(VIA_Global_Universe_v0100 已收錄)",
+    "yahoo_note": "13 週國庫券殖利率(%)≈3 個月"
+   },
+   {
+    "key": "US.Rates.T5YIE",
+    "fred_id": "T5YIE",
+    "zh": "5Y 損益兩平通膨",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts"
+   },
+   {
+    "key": "US.FX.DEXJPUS",
+    "fred_id": "DEXJPUS",
+    "zh": "JPY/USD",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts",
+    "yahoo_proxy": "JPY=X",
+    "yahoo_lane": "VDF_ENG066 → gl__global_daily(VIA_Global_Universe_v0100 已收錄)",
+    "yahoo_note": "日圓/美元;與 FRED 午盤官價定義接近,Yahoo 為市場報價"
+   },
+   {
+    "key": "US.FX.DEXKOUS",
+    "fred_id": "DEXKOUS",
+    "zh": "KRW/USD",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts",
+    "yahoo_proxy": "KRW=X",
+    "yahoo_lane": "VDF_ENG066 → gl__global_daily(VIA_Global_Universe_v0100 已收錄)",
+    "yahoo_note": "韓元/美元"
+   },
+   {
+    "key": "US.FX.DEXUSEU",
+    "fred_id": "DEXUSEU",
+    "zh": "USD/EUR",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts",
+    "yahoo_proxy": "EURUSD=X",
+    "yahoo_lane": "VDF_ENG066 → gl__global_daily(VIA_Global_Universe_v0100 已收錄)",
+    "yahoo_note": "美元/歐元"
+   },
+   {
+    "key": "US.FX.DEXUSUK",
+    "fred_id": "DEXUSUK",
+    "zh": "USD/GBP",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts",
+    "yahoo_proxy": "GBPUSD=X",
+    "yahoo_lane": "VDF_ENG066 → gl__global_daily(VIA_Global_Universe_v0100 已收錄)",
+    "yahoo_note": "美元/英鎊"
+   },
+   {
+    "key": "US.Fiscal.FYFSD",
+    "fred_id": "FYFSD",
+    "zh": "聯邦盈餘／赤字",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts"
+   },
+   {
+    "key": "US.Fiscal.GFDEBTN",
+    "fred_id": "GFDEBTN",
+    "zh": "聯邦公債餘額",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts"
+   },
+   {
+    "key": "US.Fiscal.GFDEGDQ188S",
+    "fred_id": "GFDEGDQ188S",
+    "zh": "債務／GDP",
+    "confidence": "VERIFY_PENDING",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts"
+   },
+   {
+    "key": "US.Fiscal.MTS.OutlaysByFunction",
+    "fred_id": null,
+    "zh": "支出分項(國防／社保／醫療)",
+    "confidence": "PROXY_SOURCE",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts",
+    "note": "非 FRED 序列;源=US Treasury FiscalData API(Monthly Treasury Statement);ENG047 只抓 FRED,本列只登記不假抓,候合規來源"
+   },
+   {
+    "key": "US.Fiscal.MTS.ReceiptsBySource",
+    "fred_id": null,
+    "zh": "稅收分項(所得／公司／關稅)",
+    "confidence": "PROXY_SOURCE",
+    "maps_to": null,
+    "origin": "Grok intake b383 vdf-mother.ts",
+    "note": "非 FRED 序列;源=US Treasury FiscalData API(Monthly Treasury Statement);ENG047 只抓 FRED,本列只登記不假抓,候合規來源"
+   }
+  ]
+ },
+ "dedupe_note": "MDL003 既有 46 序列(UNRATE/CIVPART/JTSJOL/ICSA/CPIAUCSL/CPILFESL/PCEPI/PCEPILFE/PPIACO/CES0500000003 等)不入本冊=只增不減零重複",
+ "changelog": [
+  {
+   "ts": "2026-08-24",
+   "op": "INIT",
+   "note": "批109:就業 23 項+通膨 15 項+PMI 5 項=43 細目"
+  },
+  {
+   "ts": "2026-11-23T12:30:00Z",
+   "op": "ADD",
+   "note": "VDF-REQ048:自 Grok intake(VIA_GrokConsole_AuroraAcorn_b383/vdf-mother.ts,唯讀抽取)新增 13 FRED(公債 DGS1MO/1/3/7·DTB3·T5YIE;匯率 DEX×4;財政 FYFSD/GFDEBTN/GFDEGDQ188S)=VERIFY_PENDING 首抓驗 id + 2 MTS 財政(PROXY_SOURCE 只登記)。DGS20 已由 ENG055 鏈覆蓋故不入(零重複);Grok 其餘 25 條 VDF 已有。v0100 不動。"
+  },
+  {
+   "ts": "2026-11-23T13:10:00Z",
+   "op": "MAP",
+   "note": "VDF-REQ049:操作員令「利率匯率用 Yahoo Finance」→ 5 列加 yahoo_proxy(DEX×4 → JPY=X/KRW=X/EURUSD=X/GBPUSD=X;DTB3 → ^IRX),皆由 ENG066 既有收錄,不新增擷取;DGS1MO/1/3/7 Yahoo 無期別,照實標。只加欄位,細目數不變(58)。v0101 不動。"
+  }
+ ],
+ "expected_items": 58,
+ "version": "v0102",
+ "prior": "VDF_USMacro_Detail_Fetch_Roster_v0101.json"
+}
