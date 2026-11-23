@@ -143,14 +143,28 @@ def store(main, subs, aaii, out: Path) -> dict:
         con.executemany("INSERT INTO cnn_sub VALUES (?,?,?,?)", subs)
     if aaii:
         con.executemany("INSERT INTO aaii VALUES (?,?,?,?)", aaii)
+    con.execute("""
+        CREATE TABLE sentiment_daily AS
+        SELECT date, 'CNN_FEAR_GREED' AS series, score AS value, rating, 'CNN' AS source FROM cnn
+        UNION ALL
+        SELECT date, indicator, value, rating, 'CNN' FROM cnn_sub
+        UNION ALL
+        SELECT date, 'AAII_BULLISH', bullish, '', 'AAII' FROM aaii
+        UNION ALL
+        SELECT date, 'AAII_NEUTRAL', neutral, '', 'AAII' FROM aaii
+        UNION ALL
+        SELECT date, 'AAII_BEARISH', bearish, '', 'AAII' FROM aaii
+    """)
     files = {
         "cnn": out / "cnn_fear_greed.parquet",
         "sub": out / "cnn_subindicators.parquet",
         "aaii": out / "aaii_sentiment.parquet",
+        "official": out / "gl__sentiment_daily.parquet",
     }
     _copy(con, "cnn", files["cnn"])
     _copy(con, "cnn_sub", files["sub"])
     _copy(con, "aaii", files["aaii"])
+    _copy(con, "sentiment_daily", files["official"])
     con.close()
     return files
 
@@ -281,6 +295,13 @@ def selftest() -> int:
     import tempfile
     with tempfile.TemporaryDirectory() as td:
         files = store(main, subs, [("2022-01-06", 0.3, 0.2, 0.5)], Path(td))
+        import duckdb
+        cols = [r[0] for r in duckdb.connect().execute("DESCRIBE SELECT * FROM read_parquet(?)", [str(files["official"])]).fetchall()]
+        n, k = duckdb.connect().execute(
+            "SELECT count(*), count(DISTINCT (date, series)) FROM read_parquet(?)", [str(files["official"])]).fetchone()
+        if cols != ["date", "series", "value", "rating", "source"] or n != k or n != 1 + len(subs) + 3:
+            print("[FAIL] official frame", cols, n, k)
+            return 1
         page = render(files, {"net_ver": got["net_ver"], "accel_ver": got["accel_ver"], "bridge": got["bridge"], "ms": 1, "via": "test"}, Path(td))
         text = page.read_text(encoding="utf-8")
         if got["net_ver"] not in text or "2022-01-03" not in text and "2022-01-06" not in text:

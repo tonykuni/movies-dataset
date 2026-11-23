@@ -29,6 +29,7 @@ PARTS = (
     ("ledger", "VDF_MDL030_LessonLedger_v0101.py", ("selftest",)),
     ("vqg-vap", "VDF_MDL032_VqgVapBridge_v0100.py", ("selftest",)),
     ("terms", "VDF_MDL033_TermGate_v0100.py", ("selftest",)),
+    ("frames", "VDF_MDL034_FrameAlign_v0100.py", ("selftest",)),
 )
 
 
