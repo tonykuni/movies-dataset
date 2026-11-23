@@ -30,6 +30,7 @@ PARTS = (
     ("vqg-vap", "VDF_MDL032_VqgVapBridge_v0100.py", ("selftest",)),
     ("terms", "VDF_MDL033_TermGate_v0100.py", ("selftest",)),
     ("frames", "VDF_MDL034_FrameAlign_v0100.py", ("selftest",)),
+    ("latest3", "VDF_MDL035_Latest3View_v0100.py", ("selftest",)),
 )
 
 
