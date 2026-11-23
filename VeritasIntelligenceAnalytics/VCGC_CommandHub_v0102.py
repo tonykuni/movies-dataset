@@ -359,6 +359,10 @@ def name_refs(via: Path, names: set[str]) -> dict[str, set]:
 
 
 
+_SNAP_RX = re.compile(r"(^|/)docs/handoff/(history|evidence)/|(^|/)(all_py|receipt|deck)\.json$|(^|/)[0-9a-f]{64}\.json$|"
+                      r"_sha256_(before|after)|(^|/)VIA_Consolidate_Batch_|(^|/)VIA_GovCoreChain_v\d{4}\.json$")
+
+
 def prune_scan(via: Path, systems: list[str] | None = None) -> dict:
     link = _load_token_link(via)
     if link is None:
@@ -390,7 +394,9 @@ def prune_scan(via: Path, systems: list[str] | None = None) -> dict:
         code = sorted(f for f in r if f.endswith((".py", ".ps1", ".psm1")) and not _FROZEN.search(f))
         reg = sorted(f for f in r if f.endswith((".json", ".jsonl")))
         lock = sorted(f for f in r if "lock" in Path(f).name.lower())
-        x["kind"] = ("LOCK_REF" if lock else "UNREF" if not r else "CODE_REF" if code else "REG_REF" if reg else "DOC_REF")
+        live_reg = sorted(f for f in reg if not _SNAP_RX.search(f))
+        x["kind"] = ("LOCK_REF" if lock else "UNREF" if not r else "CODE_REF" if code else "REG_REF" if live_reg
+                     else "SNAP_REF" if reg else "DOC_REF")
         x["refs"] = sorted(r)[:6]
         x["n_refs"] = len(r)
         by[x["kind"]] += 1
@@ -559,15 +565,26 @@ def cmd_prune(systems: list[str] | None, prove: bool, apply: bool, limit: int, k
     rep.update({"at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "eligible": len(elig), "kinds": kinds})
     if prove and elig:
         pv = prune_prove(via, elig)
+        if not pv["proven"] and (pv["failed"] or pv["new_lost"]) and not pv["worse"]:
+            fam_bad = {(str(Path(r).parent), re.sub(r"_v\d{4}$", "", Path(r).stem)) for r in pv["failed"]}
+            lost_names = {Path(p).name for p in pv["new_lost"]}
+            retry = [x for x in elig if (x["dir"], x["family"]) not in fam_bad and Path(x["path"]).name not in lost_names]
+            entries_bad = any(Path(r).stem.startswith(tuple(f for f, _d, _e in SYS_ENTRY.values())) for r in pv["failed"])
+            if retry and len(retry) < len(elig) and not entries_bad:
+                print(f"[prove] 重試一次:剔除不過的家族 {len(fam_bad)} 個 · 牽連遺失 {len(lost_names)} 支 → {len(retry)} 支")
+                pv = prune_prove(via, retry)
         rep["proof"] = {k: v for k, v in pv.items() if k != "proven"}
         rep["proven"] = len(pv["proven"])
         print(f"[prove] 驗 {pv['checked']} 支 · 不過 {len(pv['failed'])} · 證過可退役 {len(pv['proven'])}")
         if apply:
             if pv["failed"]:
                 print("[apply] 有證明不過的家族 → 那些家族的候選不搬;其餘照搬。")
-            ap = prune_apply(via, pv["proven"])
-            rep["applied"] = ap
-            print(f"[apply] 已搬 {ap['moved']} 支 → {ap['dest']}(RETIRE_MANIFEST.json;可單檔找回)")
+            if pv["proven"]:
+                ap = prune_apply(via, pv["proven"])
+                rep["applied"] = ap
+                print(f"[apply] 已搬 {ap['moved']} 支 → {ap['dest']}(RETIRE_MANIFEST.json;可單檔找回)")
+            else:
+                print("[apply] 沒有證過的 → 不搬、不建夾。")
     elif apply:
         print("[apply] 沒帶 --prove → 不搬(刪舊版先證明)。")
     (PRUNE_DIR / "PRUNE_latest.json").write_text(json.dumps(rep, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -575,7 +592,8 @@ def cmd_prune(systems: list[str] | None, prove: bool, apply: bool, limit: int, k
     rows = [{"category": "PRUNE", "metric": s, "lamp": "YELLOW" if by_sys[s] else "GREEN",
              "detail": f"鏈上走不到 {by_sys[s]} 支", "action": SYS_FOLDERS[s]} for s in rep["systems"]]
     rows += [{"category": "KIND", "metric": k, "lamp": "GREEN" if k == "UNREF" else "YELLOW", "detail": f"{n} 支",
-              "action": {"UNREF": "沒人點名 → 可證可搬", "DOC_REF": "只有文件 / 快照提到 → 證過可搬", "REG_REF": "冊 / 快照有列 → VCGC 檢查不變差才搬",
+              "action": {"UNREF": "沒人點名 → 可證可搬", "DOC_REF": "只有文件 / 快照提到 → 證過可搬", "REG_REF": "活的冊有登記(編號冊 / 子系統冊 / 交接冊)→ 先由 VCGC 編號標退役",
+                         "SNAP_REF": "只在歷史快照 / 收據 → 證過可搬",
                          "CODE_REF": "程式點名 → 先遷引用", "LOCK_REF": "鎖定帳點名 → 永不搬(成功只增不減)"}.get(k, "-")} for k, n in rep["by_kind"].items()]
     _rows_print("VCGC 舊版退役閘(刪舊版先證明)", rows, note="預設乾跑 · 以搬代刪")
     print(f"[報告] {PRUNE_DIR / 'PRUNE_latest.json'}\nNEXT: " + ("via-prune --prove" if not prove else
@@ -668,7 +686,7 @@ def main(argv: list[str] | None = None) -> int:
     if v == "prune":
         sysx = [rest[rest.index("--system") + 1].upper()] if "--system" in rest else None
         lim = int(rest[rest.index("--limit") + 1]) if "--limit" in rest else 0
-        kinds = rest[rest.index("--kinds") + 1].split(",") if "--kinds" in rest else ["UNREF", "DOC_REF", "REG_REF"]
+        kinds = rest[rest.index("--kinds") + 1].split(",") if "--kinds" in rest else ["UNREF", "DOC_REF", "SNAP_REF"]
         return cmd_prune(sysx, "--prove" in rest, "--apply" in rest, lim, kinds)
     if v == "boot":
         return PRIOR.cmd_boot()
