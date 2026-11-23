@@ -140,3 +140,11 @@ python "$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VCG
 - **via-prune 舊版退役閘**(刪舊版先證明):鏈判(MDL158 chain 判法)→ 全倉檔名引用 → git worktree 拿掉前後實跑(家族尾版載入 · 五入口自測 · MDL276 lost · 註冊 stale · MDL237 遺失/改身分/重號 · SDD 每條規則)→ 不變差才 `git mv` 到 `functional modules/VIA_RetiredEngines/prune_<時戳>/`(RETIRE_MANIFEST,CGC_MDL276 restore 可找回)。程式點名 / 鎖定帳點名的永不搬。
 
 **工作站一行(貼進 PowerShell;自己找倉、檢查工作樹、切分支、設定)**:見回覆裡的 one-liner。
+
+## 工作站一行(v0105 + 中樞 v0104;倉裡有未提交改動時給選擇題,不丟任何檔)
+
+```powershell
+& { $r = @("$HOME\OneDrive\Documents\movies-dataset", "$HOME\Documents\movies-dataset") | Where-Object { Test-Path "$_\.git" } | Select-Object -First 1; if (-not $r) { Write-Host '[VIA] 找不到 movies-dataset 倉' -ForegroundColor Red; return }; $b = 'claude/sweet-hamilton-gei01h'; git -C $r fetch -q origin $b; if ($LASTEXITCODE) { Write-Host '[VIA] fetch 失敗' -ForegroundColor Red; return }; $d = git -C $r status --porcelain --untracked-files=no; if ($d) { $d; Write-Host '[VIA] 倉裡有上面這些未提交的改動。 1 = 存成本機提交(不推送,隨時可找回)再繼續   2 = 停止' -ForegroundColor Yellow; if ((Read-Host '請選 1 或 2') -ne '1') { Write-Host '[VIA] 已停止,沒動任何檔' -ForegroundColor Yellow; return }; $cur = git -C $r branch --show-current; if (-not $cur) { $cur = "via-local-$(Get-Date -Format yyyyMMddHHmm)"; git -C $r switch -q -c $cur }; git -C $r add -u; git -C $r commit -q -m "workstation local state before switching to $b"; if ($LASTEXITCODE) { Write-Host '[VIA] 本機提交失敗,已停止' -ForegroundColor Red; return }; Write-Host "[VIA] 已存成分支 $cur 上的本機提交(沒推送);要找回:git -C `"$r`" log $cur -1" -ForegroundColor Green }; git -C $r switch -q $b 2>$null; if ($LASTEXITCODE) { git -C $r switch -q -c $b --track "origin/$b" }; if ($LASTEXITCODE) { Write-Host '[VIA] 切換分支失敗' -ForegroundColor Red; return }; git -C $r pull -q --ff-only origin $b; $h = Get-ChildItem "$r\VeritasIntelligenceAnalytics" -Filter 'VCGC_CommandHub_v*.py' | Sort-Object Name | Select-Object -Last 1; Write-Host "[VIA] $($h.FullName)" -ForegroundColor Cyan; python $h.FullName setup }
+```
+
+選 1 = 把那些改動存成「目前分支上的本機提交」(不推送,隨時 git log 找回)再切分支;選 2 = 停止、什麼都不動。
