@@ -3,8 +3,9 @@
 """Read-only bridge from the isolated VDF system to VQG and VAP.
 
 Reads the indicator register, the formula table still stored in VQG code,
-the latest VAP engine tail of each family, and the chart spec. It does not
-import those engines and it does not write their books.
+the latest VAP engine tail of each family, and the sealed chart library.
+VDF fetches into Parquet. VQG reads that store, then defines, calculates,
+backtests and verifies. VAP only presents templates and the chart library.
 
   py -3 VDF_MDL032_VqgVapBridge_v0100.py catalog
   py -3 VDF_MDL032_VqgVapBridge_v0100.py spec VQG.IND.RSI
@@ -13,12 +14,14 @@ import those engines and it does not write their books.
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
 import re
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+PIN = HERE / "intake" / "vap_core_ssot"
 MODS = HERE.parent
 VQG = MODS / "VQG"
 VAP = MODS / "VAP"
@@ -71,6 +74,44 @@ def _core() -> tuple:
     if not merged:
         raise RuntimeError("VQG formulas absent")
     return sources, merged
+
+
+def _official() -> dict:
+    boundary = json.loads((PIN / "boundary.json").read_text(encoding="utf-8"))
+    library = json.loads((PIN / "vap_chartlib.json").read_text(encoding="utf-8"))
+    spec = json.loads((PIN / "vap_spec.json").read_text(encoding="utf-8"))
+    request = json.loads((PIN / "first_chart_request.json").read_text(encoding="utf-8"))
+    charts = [chart for group in library.get("groups") or [] for chart in group.get("charts") or []]
+    codes = [chart.get("code") for chart in charts]
+    problems = []
+    expected = {"VAP-CH-%02d" % i for i in range(1, 29)}
+    if set(codes) != expected or len(codes) != 28:
+        problems.append("official chart library is not the sealed 28")
+    first = next((chart for chart in charts if chart.get("code") == "VAP-CH-01"), None)
+    if not first or first.get("fields") != ["date", "value"] or first.get("axes") != 1 or first.get("dataShape") != "series[]":
+        problems.append("VAP-CH-01 is not date,value series")
+    if spec.get("$schema") != "VIA-VAP-SPEC/1.0" or library.get("$schema") != "VIA-VAP-CHARTLIB/1.0":
+        problems.append("spec schema drifted")
+    if request.get("parameters", {}).get("date_field") != "date" or request.get("parameters", {}).get("value_field") != "value":
+        problems.append("first chart request does not bind date and value")
+    if boundary.get("flow") != ["VDF", "PARQUET", "VQG", "VAP"] or boundary.get("store", {}).get("format") != "parquet":
+        problems.append("role boundary drifted")
+    if "real_quantguard" not in boundary.get("not_verified", []) or boundary.get("test_only_provider_is_deliverable") is not False:
+        problems.append("verification overclaims QuantGuard")
+    sibling = VAP / "intake" / "VAP_Core_SSOT_Bootstrap_v1" / "ssot" / "vap_chartlib.json"
+    if sibling.is_file():
+        other = json.loads(sibling.read_text(encoding="utf-8"))
+        if other != library:
+            problems.append("VAP intake chart library differs from the pin")
+    return {
+        "charts": charts,
+        "boundary": boundary,
+        "hashes": {
+            "chartlib": hashlib.sha256((PIN / "vap_chartlib.json").read_bytes()).hexdigest(),
+            "spec": hashlib.sha256((PIN / "vap_spec.json").read_bytes()).hexdigest(),
+        },
+        "problems": problems,
+    }
 
 
 def build() -> dict:
@@ -141,6 +182,8 @@ def build() -> dict:
         errors.append("charts %d" % len(charts))
 
     indicators = [row for row in entries if row.get("kind") == "indicator"]
+    official = _official()
+    errors.extend(official["problems"])
     return {
         "register": register_path.name,
         "indicators": indicators,
@@ -151,6 +194,9 @@ def build() -> dict:
         "gaps": gaps,
         "spec_sections": sections,
         "charts": charts,
+        "official_charts": official["charts"],
+        "boundary": official["boundary"],
+        "hashes": official["hashes"],
         "errors": errors,
         "state": "ERROR" if errors else "REGISTERED",
     }
@@ -158,9 +204,10 @@ def build() -> dict:
 
 def catalog(book=None) -> int:
     book = book or build()
-    print("state=%s indicators=%d entries=%d vap_engines=%d gaps=%d charts=%d sections=%d" % (
-        book["state"], len(book["indicators"]), book["entries"], len(book["engines"]),
-        len(book["gaps"]), len(book["charts"]), len(book["spec_sections"])))
+    print("state=%s flow=%s indicators=%d official_charts=%d gallery=%d vap_engines=%d gaps=%d" % (
+        book["state"], ">".join(book["boundary"]["flow"]), len(book["indicators"]),
+        len(book["official_charts"]), len(book["charts"]), len(book["engines"]), len(book["gaps"])))
+    print("not_verified", " ".join(book["boundary"]["not_verified"]))
     for err in book["errors"]:
         print("ERROR", err)
     return 0 if book["state"] == "REGISTERED" else 1
@@ -169,6 +216,7 @@ def catalog(book=None) -> int:
 def spec(key: str, book=None) -> int:
     book = book or build()
     hits = [row for row in book["indicators"] if key in row["stable_id"] or key == row.get("code_key")]
+    hits += [row for row in book["official_charts"] if key in (row.get("code"), row.get("id"))]
     hits += [row for row in book["charts"] if key in row["id"] or key == row["code"]]
     if not hits:
         print("NONE", key)
@@ -195,11 +243,20 @@ def selftest() -> int:
     if not any(row["id"] == "VAP_ENG010" for row in book["engines"]):
         print("[FAIL] chart library engine")
         return 1
+    if len(book["official_charts"]) != 28 or book["boundary"]["flow"] != ["VDF", "PARQUET", "VQG", "VAP"]:
+        print("[FAIL] roles", book["boundary"]["flow"])
+        return 1
+    if "read_parquet" not in book["boundary"]["roles"]["VAP"]["does_not"]:
+        print("[FAIL] VAP must not read the parquet store")
+        return 1
+    if book["boundary"]["roles"]["VQG"]["does"][0] != "read_parquet":
+        print("[FAIL] VQG must read parquet")
+        return 1
     if len(book["engines"]) + len(book["gaps"]) != 16:
         print("[FAIL] roster", len(book["engines"]), book["gaps"])
         return 1
-    print("[OK] VQG indicators=%d VAP engines=%d gaps=%d charts=%d" % (
-        len(book["indicators"]), len(book["engines"]), len(book["gaps"]), len(book["charts"])))
+    print("[OK] VDF > PARQUET > VQG > VAP · charts=%d gallery=%d" % (
+        len(book["official_charts"]), len(book["charts"])))
     return 0
 
 

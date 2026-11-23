@@ -1,0 +1,15 @@
+{
+  "flow": ["VDF", "PARQUET", "VQG", "VAP"],
+  "store": {"format": "parquet", "reader": "duckdb"},
+  "roles": {
+    "VDF": {"does": ["fetch", "write_parquet", "manifest_hash"], "does_not": ["define_formula", "backtest", "render"]},
+    "PARQUET": {"does": ["store", "serve_vqg"], "does_not": ["compute", "render"]},
+    "VQG": {"does": ["read_parquet", "define", "compute", "backtest", "verify"], "does_not": ["fetch", "render"]},
+    "VAP": {"does": ["template", "chartlib", "render"], "does_not": ["fetch", "read_parquet", "compute", "skip_vqg"]}
+  },
+  "first_chart": "VAP-CH-01",
+  "quantguard_seat": "VQG",
+  "verified": ["official_ssot", "explicit_parameters", "source_hash", "protocol_double", "first_renderer_in_memory"],
+  "not_verified": ["indicator_core", "real_quantguard", "real_vdf_data", "first_chart_e2e", "windows_deploy"],
+  "test_only_provider_is_deliverable": false
+}
