@@ -342,7 +342,6 @@ def migrate_one(via: Path, job: dict, apply: bool, log=print) -> dict:
         return {"referrer": job["referrer"], "ok": False, "why": f"語法 / 編譯不過:{e}"}
     rel_dst = str(dst.relative_to(via))
     st = _has_selftest(text)
-    before = _run_check(via, job["referrer"], st)
     tmp = Path(tempfile.mkdtemp(prefix="via_migrate_"))
     try:
         top = Path(subprocess.run(["git", "-C", str(via), "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip())
@@ -351,6 +350,8 @@ def migrate_one(via: Path, job: dict, apply: bool, log=print) -> dict:
         subprocess.run(["git", "-C", str(top), "worktree", "add", "-q", "--detach", str(wt), "HEAD"], check=True, capture_output=True)
         try:
             wvia = wt / sub
+            before = _run_check(wvia, job["referrer"], st)          # 改前也在 worktree 跑(自測會重寫已追蹤檔,不碰主樹)
+            subprocess.run(["git", "-C", str(wt), "checkout", "-q", "--", "."], capture_output=True)
             (wvia / rel_dst).parent.mkdir(parents=True, exist_ok=True)
             (wvia / rel_dst).write_text(new_text, encoding="utf-8")
             after = _run_check(wvia, rel_dst, st)
