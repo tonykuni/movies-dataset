@@ -372,6 +372,30 @@ def prune_apply(via: Path, proven: list[dict]) -> dict:
     return {"dest": dest_root.as_posix(), "moved": len(moved), "mark": man["marks"]}
 
 
+_GLOB_RX = re.compile(r"\.glob\(")
+_PRIOR_RX = re.compile(r"_vnum|<\s*Path\(__file__\)\.name|p\.name\s*<")
+
+
+def live_versions(stem: str, vs: dict, link) -> set:
+    """v0102 的鏈判只看第一個標籤(exec / 釘名 / glob 擇一);VRN 管理器 v0279–v0280 同時 exec v0240 本體「又」glob 取前版
+    (容器實錄:拿掉 v0241–v0277 後 v0277 _owner('EM_CFG') 拿到 None)。本版三種連結各自判、全都走(只會更保守)。"""
+    live: set = set()
+    todo = [max(vs)]
+    while todo:
+        cur = todo.pop()
+        if cur in live or cur not in vs:
+            continue
+        live.add(cur)
+        text = vs[cur].read_text(encoding="utf-8", errors="replace")
+        todo += [int(x) for x in re.findall(re.escape(stem) + r"_v(\d{4})\.py", text) if int(x) != cur and int(x) in vs]
+        if (_GLOB_RX.search(text) and _PRIOR_RX.search(text)) or (link(text, stem, vs[cur].name) or "").startswith("glob"):
+            older = [v for v in vs if v < cur]
+            if older:
+                todo.append(max(older))
+    return live
+
+
+PRIOR.live_versions = live_versions
 PRIOR.prune_prove = prune_prove
 PRIOR.prune_apply = prune_apply
 PRIOR.CMD["via-prune"]["help"] = ("預設乾跑:列出鏈上走不到、程式碼與鎖定帳都沒點名的舊版。--prove:在 TEMP worktree 先在編號冊標退役"
@@ -453,6 +477,17 @@ def selftest() -> int:
         with file_lock(T / "x.json"):
             got = True
         chk("⑤ 檔案鎖可取可放", got)
+    with tempfile.TemporaryDirectory(prefix="vcgc_chain_st_") as td2:
+        F = Path(td2)
+        g = ("from pathlib import Path\nimport re\ndef _vnum(p):\n    return int(re.search(r'_v(\\d{4})$',Path(p).stem).group(1))\n"
+             "PRIOR_PATH=max((p for p in Path(__file__).parent.glob('M_v*.py') if _vnum(p)<_vnum(__file__)),key=_vnum)\n")
+        (F / "M_v0100.py").write_text("x=1\n", encoding="utf-8")
+        (F / "M_v0101.py").write_text("y=1\n", encoding="utf-8")
+        (F / "M_v0102.py").write_text(g, encoding="utf-8")
+        (F / "M_v0103.py").write_text("exec(open('M_v0100.py').read())\n" + g, encoding="utf-8")   # exec 本體又 glob 取前版
+        vs2 = {_vnum(p): p for p in F.glob("M_v*.py")}
+        lv = live_versions("M", vs2, lambda t, s_, n: "exec 本體 v0100" if "exec(" in t else ("glob 取前版" if ".glob(" in t else "本體"))
+        chk("⑩ 鏈判:exec 本體又 glob 取前版的,兩條都走(v0102 漏的情形)", lv == {100, 101, 102, 103}, f"(live {sorted(lv)})")
     chk("⑥ 時間格式 = MDL237 編號冊格式", re.fullmatch(r"\d{4}-\d\d-\d\d \d\d:\d\d:\d\d \+0000", _stamp()) is not None)
     chk("⑦ 主控台尾版在(元件冊同步引擎)", find_tail("CGC_MDL149_VeritasCentralGovernanceConsole", [CODE_ROOT]) is not None)
     chk("⑧ 加速器橋執行時生效", VIA_ACCEL is not None)
