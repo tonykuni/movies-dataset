@@ -73,3 +73,37 @@ if ($env:VIA_ROOT -and (Test-Path $ViaLoader)) { . $ViaLoader }
 - **AST 注入先沙盒**:一律 `ast.parse` + `compile()` 過才落檔,並留 `.astbak`;`via-ast -Rollback` 可還原。
 - **不寫死本機路徑**:路徑全由 `$PSScriptRoot` / `$env:VIA_ROOT` 決定;狀態與備份寫在 `VIA_Reports/vcgc_hub/`(.gitignore 已排除,永不入庫)。
 - **PS 只一支**:只負責進環境與呼叫 Python;出新版時同一則回覆點名作廢舊版。
+
+## v0101 更新(2026-11-23)· **v0100 作廢**,改用 `VIA_ProfileLoader_v0101.ps1`
+
+新增兩個指令(選單第 5、6 項):
+
+| 指令 | 做什麼 | 安全設計 |
+|---|---|---|
+| `via-auth` | 看授權狀態;`via-auth -Fred` 以遮罩輸入 FRED key 存到 Windows **使用者層**環境變數;`via-auth -Clear` 移除 | 不寫任何檔、不進 git、只顯示末 4 碼;格式不符(非 32 位十六進位)不存 |
+| `via-run` | 全線:VDF `launch --run` → VRN `VRN_MDL260 run --source private\vrn_samples --via-db via_database`,各段計時 | 同意閘每次由你**當場輸入 YES**才開,只在本行程;`finally` 保證跑完或出錯都關閘;`-VdfOnly` / `-VrnOnly` 可分段 |
+
+入口以檔名找尾版(`VDF_SystemManager_v*.py`、`VRN_MDL260_SafeParallelLaunch_v*.py`),桌機與倉兩種目錄結構都能用。
+
+**`$PROFILE` 改成自動取最新版 loader**(以後出新版不用再改 profile):
+```powershell
+if (!(Test-Path $PROFILE)) { New-Item -ItemType File -Path $PROFILE -Force | Out-Null }
+Add-Content -Path $PROFILE -Encoding UTF8 -Value @'
+
+# --- VIA VCGC 現代化雙引擎預設啟動(自動取最新版 loader)---
+if ($env:VIA_ROOT) {
+    $ViaLoader = Get-ChildItem $env:VIA_ROOT -Filter 'VIA_ProfileLoader_v*.ps1' -ErrorAction SilentlyContinue |
+        Sort-Object Name | Select-Object -Last 1
+    if ($ViaLoader) { . $ViaLoader.FullName }
+}
+'@
+[Environment]::SetEnvironmentVariable('VIA_ROOT', '<你的 VIA 根目錄>', 'User')   # 只需設一次
+```
+
+**v0101 UAT 追加**(在 Phase 3 沙盒視窗內):
+1. `pwsh -NoProfile -Command "[scriptblock]::Create((Get-Content -Raw .\VIA_ProfileLoader_v0101.ps1)) | Out-Null; 'PS parse OK'"`
+2. `via-auth` → 只看狀態(不輸入 key),確認顯示「未設定 / 已設定(…末4碼)」。
+3. `via-auth -Fred` → 貼 key → 再跑 `via-auth`,使用者層與本視窗都顯示已設定。
+4. `via-run` → 看計畫列出 VDF/VRN 入口與路徑 → **輸入 NO**,確認「未擷取」且 `$env:VIA_NET_CONSENT` 為空。
+5. 真跑:`via-run` 輸入 YES;結束後 `$env:VIA_NET_CONSENT` 應為空(閘已關)。
+
