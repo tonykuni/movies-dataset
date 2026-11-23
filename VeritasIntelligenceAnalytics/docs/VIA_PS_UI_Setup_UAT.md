@@ -128,3 +128,15 @@ HTML 顏色 / 字體 / 燈只取 `VIA_UI_FormatLock` 尾版(執行時讀,不寫�
 python "$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VCGC_CommandHub_v0101.py" setup
 ```
 之後開 pwsh 自動進 VIA;`via-update` 出架構頁,`via-doctor` 查環境。
+
+## v0105 + 中樞 v0102(2026-11-23)· **v0100–v0104 全作廢**
+
+- **PS 只是啟動**:`VIA_ProfileLoader_v0105.ps1` 照中樞指令冊(`names --ps`,依中樞檔時間快取)生出全部 `via-*`,每個都轉回 Python;
+  舊的 `via-vdf / via-vrn / via-vcgc / via-view`(走 2,500 行 `Invoke-VIA-Launch`)與 Override 的 DEPRECATED 殘樁一律改導 Python。
+- **指令冊模組化**(中樞 `COMMANDS`):19 個短指令,每列 = 名稱 · 群 · 一句話 · 詳細說明 · 例子 · 正主外掛 · 取代的舊短令(20 個舊名併入)。
+  `via-help` 看全表、`via-help <名稱>` 看詳細;`via` = Python 選擇題主控台(h <編號> 看說明,要參數的逐項問)。
+- **省 Token 外掛**:`via-tok read|slice|digest|pack|chain|delta|tools|verbs`(鎖冊那一支 CGC_MDL158)。
+- **via-setup 瘦身**:舊鏈(Register-VIA-Commands / VIA-Commands-Override / Invoke-VIA-Launch)那幾行改註解停用,改前改後量錯誤數與載入毫秒,變差自動還原;`--unslim` 復原、`--keep-old` 不動。
+- **via-prune 舊版退役閘**(刪舊版先證明):鏈判(MDL158 chain 判法)→ 全倉檔名引用 → git worktree 拿掉前後實跑(家族尾版載入 · 五入口自測 · MDL276 lost · 註冊 stale · MDL237 遺失/改身分/重號 · SDD 每條規則)→ 不變差才 `git mv` 到 `functional modules/VIA_RetiredEngines/prune_<時戳>/`(RETIRE_MANIFEST,CGC_MDL276 restore 可找回)。程式點名 / 鎖定帳點名的永不搬。
+
+**工作站一行(貼進 PowerShell;自己找倉、檢查工作樹、切分支、設定)**:見回覆裡的 one-liner。
