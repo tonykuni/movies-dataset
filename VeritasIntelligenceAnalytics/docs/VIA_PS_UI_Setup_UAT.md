@@ -107,3 +107,24 @@ if ($env:VIA_ROOT) {
 4. `via-run` → 看計畫列出 VDF/VRN 入口與路徑 → **輸入 NO**,確認「未擷取」且 `$env:VIA_NET_CONSENT` 為空。
 5. 真跑:`via-run` 輸入 YES;結束後 `$env:VIA_NET_CONSENT` 應為空(閘已關)。
 
+
+## v0104 + 中樞 v0101(2026-11-23)· **v0100–v0103 全作廢**,PS 只剩 `VIA_ProfileLoader_v0104.ps1`
+
+全部指令改 Python(`VCGC_CommandHub_v0101.py`,帶加速器橋,執行時實測載入);PS 每個 `via-*` 只轉呼叫,不再有邏輯。
+
+| 指令 | 做什麼 | 正主(外掛,不另寫) |
+|---|---|---|
+| `via-update` | **被動**架構快照:只在你啟動時更新(子行程一律 `VIA_PANORAMA_AUTO=0`,不在背景起監控)→ 視覺鎖定 HTML:五系統卡 + 資料根卡 · SSOT 矩陣(正則 regex · 同義字 · 自動編號 · 命名 · 註冊 · 連結 × 層)· SDD · 編號 / 註冊完整性 · 環境外掛 · 加速器 / 網路橋 · 整合待辦 · 跟上一份快照比(綠變差 = 退步,紅標) | MDL149 `ssot panorama`(MDL247)· MDL245 SDD · MDL237 audit · MDL158 `pack`(省 Token,各系統夾)· doctor · MDL230 TOOLPROBE |
+| `via-doctor` | 7 支 VCGC 工具並行(3 道、30 秒心跳)→ 衝突 · 遺漏 · 互撞 · 安裝計畫 · 三數 | MDL240 · MDL056 ×2 · MDL273 · MDL156 · MDL186 · CGC_SystemManager connect |
+| `via-install` | 照 doctor 計畫走安裝閘;你輸入 YES 才開同意閘,且只放進安裝子行程 | MDL056 InstallGate |
+| `via-bak` | 增量:size+mtime 快取,只對變動檔算 SHA-256、只複製變動檔;Graphify 拓撲沿用未變節點;OmniRoute 帳本記本次真解析數;agency-mem 只增帳;再交 VIA_DailyBackup 打包。`--refresh` 先叫各系統自己的 graphify / omniroute | VIA_DailyBackup 尾版 · 各系統管理器 |
+| `via-run` / `via-auth` / `via-setup` | 同 v0103,改 Python:同意閘只在子行程;FRED key 只印長度 + 指紋;$PROFILE 由 Python 備份 + 標記區塊 + 3 次 pwsh 載入檢查,失敗自動還原 | — |
+
+HTML 顏色 / 字體 / 燈只取 `VIA_UI_FormatLock` 尾版(執行時讀,不寫死);讀不到 → 文字燈 + 頁首 `UI_TOKENS=灰`。
+輸出:資料根 `VIA_Reports/vcgc_hub/arch/ARCH_latest.{html,json,txt}` + `ARCH_history.jsonl`(只增)。
+
+**一次設定(工作站,git 倉已 pull 本分支)**:
+```powershell
+python "$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VCGC_CommandHub_v0101.py" setup
+```
+之後開 pwsh 自動進 VIA;`via-update` 出架構頁,`via-doctor` 查環境。
