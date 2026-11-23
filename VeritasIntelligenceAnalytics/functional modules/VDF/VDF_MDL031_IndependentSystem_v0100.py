@@ -3,8 +3,8 @@
 """Independent VDF system entry.
 
 Runs the isolated pieces as one system: startup, input matrix, key door,
-sentiment store, macro verdicts, system monitor, and the lesson ledger
-that feeds Graphify, OmniRoute and agent-mem. It does not load the old
+sentiment store, macro verdicts, system monitor, lesson ledger, and the
+read-only VQG indicator plus VAP engine bridge. It does not load the old
 manager chain and it does not set a consent flag.
 
   py -3 VDF_MDL031_IndependentSystem_v0100.py selftest
@@ -27,6 +27,7 @@ PARTS = (
     ("verdict", "VDF_MDL016_MacroCrossCheck_v0100.py", ("--selftest",)),
     ("monitor", "VDF_MDL029_SystemManager_v0101.py", ("selftest",)),
     ("ledger", "VDF_MDL030_LessonLedger_v0101.py", ("selftest",)),
+    ("vqg-vap", "VDF_MDL032_VqgVapBridge_v0100.py", ("selftest",)),
 )
 
 
