@@ -186,3 +186,5 @@
 | 2026-11-24T17:05:00Z | VCGC_StartupEngine_v0100.py | 0100 | VIA-VCGC-MDL1711 | 9fcbcf825d49 | 演練不算完成 · INCOMPLETE | 自測 65/65 |
 | 2026-11-24T17:15:00Z | VCGC_StartupEngine_v0100.py | 0100 | VIA-VCGC-MDL1711 | 4ebfedeadf31 | 典籍綁指紋 · 演練標記照留 | 自測 67/67 |
 | 2026-11-24T17:23:10Z | VCGC_StartupEngine_v0100.py | 0100 | VIA-VCGC-MDL1711 | b98a26696abb | 前置換了下游作廢 · 混單先拒絕 | 自測 69/69 |
+| 2026-11-24T17:55:00Z | VCGC_CommandHub_v0115.py | 0115 | VIA-CORE-MDL909 | 046c6507766e | via-graph · via-bak 子動詞 | 自測 6/6 |
+| 2026-11-24T17:55:00Z | VIA_DailyBackup_v0103.py | 0103 | VIA-CORE-MDL910 | 40c5c2e4f433 | 還原先驗證 · 備份卡 | 自測 10/10 |
