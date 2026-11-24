@@ -8470,14 +8470,15 @@
     "docs/handoff/ai/VIA_ReworkGuard_v0100.py",
     "docs/handoff/ai/VIA_ReworkGuard_v0101.py",
     "docs/handoff/ai/VIA_ReworkGuard_v0102.py",
-    ".github/workflows/pr-guards.yml"
+    ".github/workflows/pr-guards.yml",
+    "docs/handoff/ai/VIA_ReworkGuard_v0103.py"
    ],
    "evidence": "容器:自測 16/16;真倉 check 一上線就抓到開著的 PR #722 也新增 VRN_SystemManager_v0288.py · #730 也新增 VIA_ModuFuse_v0102.py(本批因此改發 VRN v0289、ModuFuse 交給 #730);report 教訓 89 條歸類後未歸類 1 條。v0101(v0100 已鎖 → 薄尾):真分支三個誤判修正(新冊版整本複製的舊代碼不算撞號 · 同號同實體不算撞號 · 已提交收據不算工作樹重寫 · 前版就有的本機路徑不算新加);修完後在本批分支上抓到真撞號:registry-sync 元件冊 VIA-FNC-22063 / 22067.. 跟 #730 指向不同函式 → 本批撤回註冊同步,由後併的那條重跑。v0102(PR 732 Codex P2):撞號比的是每筆紀錄的正式身分(key → identity → full → declared),不是附近任一個值;拿不到正式身分照報;自測先清 VIA_OPEN_PRS(LL-20261124-07)",
    "next": "本 PR 合併後 CI 的 rework-guard job 才從 base 生效;GitHub Settings → Branches 把 PR guards / Codex 審查設為必要檢查(操作員)",
    "hand": "AI + 操作員(必要檢查設定)",
    "why_homes": "VCGC 收尾的治理工具(CORE)",
    "ts": "2026-11-24T05:10:00Z",
-   "updated_at": "2026-11-24T05:15:00Z"
+   "updated_at": "2026-11-24T15:20:00Z"
   },
   {
    "code": "VCGC-REQ256",
@@ -8491,14 +8492,15 @@
    ],
    "modules": [
     "supportive modules/registry/CGC_MDL133_ProductGate_v0102.py",
-    "docs/handoff/ai/VIA_ReworkGuard_v0100.py"
+    "docs/handoff/ai/VIA_ReworkGuard_v0100.py",
+    "docs/handoff/ai/VIA_ReworkGuard_v0103.py"
    ],
-   "evidence": "容器:G6 g6_keys() 命中 0(48.9s);git grep 金鑰 0 處;遮罩 +15 −15 行;.py 遮罩後 ast.parse + compile 過 · .json json.loads 過",
+   "evidence": "容器:G6 g6_keys() 命中 0(48.9s);git grep 金鑰 0 處;遮罩 +15 −15 行;.py 遮罩後 ast.parse + compile 過 · .json json.loads 過;PR #734 R11 誤判:TOKEN_TOOL = VIA 版號檔名本體(CGC_MDL158_…_v0121)被當金鑰 → ReworkGuard v0103:值是「_v + 四位數」結尾的版號檔名本體不算金鑰;十六進位 / 混合英數 / ghp_ 照樣紅;自測 6/6 · 前版鏈全過",
    "next": "操作員到 FRED 作廢舊金鑰、重發;新鑰只放環境變數 FRED_API_KEY 或 VDF 資料家的 .fred_api_key(金鑰已在 git 歷史,倉內遮罩不能收回)",
    "hand": "操作員(作廢重發)",
    "why_homes": "安全 · 跨系統唯讀掃描、只遮罩不改邏輯",
    "ts": "2026-11-24T05:10:00Z",
-   "updated_at": "2026-11-24T05:10:00Z"
+   "updated_at": "2026-11-24T15:20:00Z"
   },
   {
    "code": "VRN-REQ030",
