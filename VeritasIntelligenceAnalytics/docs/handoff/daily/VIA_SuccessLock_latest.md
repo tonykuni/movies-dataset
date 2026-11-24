@@ -165,3 +165,20 @@
 | 2026-11-24T08:40:00Z | VRN_ENG397_P1Segment_v0130.py | 0130 | VIA-VRN-ENG341 | 8dd1d5ed4848 | VRN 擷取還原量測 fidelity(v0129 不動) | 自測 7/7 + 前版 35/35 |
 | 2026-11-24T09:00:00Z | VCGC_CommandHub_v0109.py | 0109 | VIA-CORE-MDL897 | dab7181eceba | 中樞:找工具與讀收據分開(v0101–v0108 不動) | 自測 4/4 + 前版 |
 | 2026-11-24T09:00:00Z | VRN_ENG397_P1Segment_v0131.py | 0131 | VIA-VRN-ENG342 | 70256c10656f | VRN fidelity 兩處量測修正(v0129 · v0130 不動) | 自測 5/5 + 前版 |
+| 2026-11-24T09:50:00Z | VCGC_CommandHub_v0110.py | 0110 | VIA-CORE-MDL898 | 4bfcdb627869 | 中樞:doctor 總表不再崩潰(v0101–v0109 不動)| 自測 4/4 + 前版 |
+| 2026-11-24T10:35:00Z | VIA_FastRun_v0102.py | 0102 | VIA-CORE-MDL899 | 36df686bd210 | 快跑器:env · fidelity · 動態進度條(v0100 · v0101 不動)| 自測 8/8 + 前版 9/9 |
+| 2026-11-24T11:00:00Z | VIA_HostBoot_v0100.py | 0100 | VIA-CORE-MDL900 | b246e6a9f911 | 桌機啟動器:git 同步改在 Python | 自測 6/6 |
+| 2026-11-24T11:30:00Z | VIA_FastRun_v0103.py | 0103 | VIA-CORE-MDL901 | bb103eb99975 | 心跳不溢位 · env 提速 | 自測 8/8 + 前版 8/8 |
+| 2026-11-24T11:30:00Z | VCGC_CommandHub_v0111.py | 0111 | VIA-CORE-MDL902 | e34f917bf5d8 | via-health 短令 | 自測 5/5 + 前版鏈 v0110~v0105 全過 |
+| 2026-11-24T13:30:00Z | CGC_MDL056_InstallGate_v0105.py | 0105 | VIA-VCGC-MDL1708 | 44b098423c1f | 三鏡像查衝突 · 依計畫安裝 | 自測 11/11 |
+| 2026-11-24T13:30:00Z | VCGC_CommandHub_v0112.py | 0112 | VIA-CORE-MDL903 | 2759245f8bda | via-install 先查再裝 | 自測 6/6 + 前版鏈全過 |
+| 2026-11-24T13:30:00Z | VIA_FastRun_v0104.py | 0104 | VIA-CORE-MDL904 | f9ed53db78d0 | env 組照規範 | 自測 6/6 + 前版 8/8 |
+| 2026-11-24T13:30:00Z | VRN_ENG397_P1Segment_v0132.py | 0132 | VIA-VRN-ENG343 | 7f3e0cc3bd1d | 橋 OCR 一頁一批 | 自測 5/5 + 前版 5/5 |
+| 2026-11-24T14:10:00Z | VCGC_CommandHub_v0113.py | 0113 | VIA-CORE-MDL905 | 991ceee73aef | 舊名照原意 | 自測 4/4 |
+| 2026-11-24T15:20:00Z | VDF_MDL020_DataPlane_v0104.py | 0104 | VIA-VDF-MDL318 | c04457beda85 | parquet 對齊 DataFrame | 自測 6/6 |
+| 2026-11-24T15:20:00Z | VDF_ENG053_ParamEngineMap_v0105.py | 0105 | VIA-VDF-ENG397 | f249cc3ad5be | 起始日 2018 自測 | 自測 5/5 |
+| 2026-11-24T16:10:00Z | VIA_FastRun_v0105.py | 0105 | VIA-CORE-MDL906 | 4732ba7dcff6 | 前置檢查要新鮮 | 自測 5/5 + 前版鏈 |
+| 2026-11-24T16:10:00Z | CGC_MDL056_InstallGate_v0106.py | 0106 | VIA-VCGC-MDL1709 | 9d6c97e1f3b5 | 計畫綁環境 | 自測 5/5 + 前版 11/11 |
+| 2026-11-24T16:40:00Z | VCGC_CommandHub_v0114.py | 0114 | VIA-CORE-MDL907 | d065f9471a11 | install 只用這一輪的計畫 | 自測 5/5 + 前版鏈 |
+| 2026-11-24T15:35:00Z | VIA_ReworkGuard_v0103.py | 0103 | VIA-CORE-MDL908 | c036e1f99084 | R11 不誤判工具檔名 | 自測 6/6 + 前版鏈 |
+| 2026-11-24T15:55:00Z | CGC_MDL056_InstallGate_v0107.py | 0107 | VIA-VCGC-MDL1710 | b3cbd60f99a9 | 照計畫目標裝 | 自測 5/5 + 前版鏈 |
