@@ -202,9 +202,17 @@ def do_restore(via: Path, out_root: Path, stamp: str = "latest", systems: list |
     if not ver["ok"]:
         rec.update(lamp="RED", meaning="還原前驗證沒過(%d 項)→ 這份備份不能拿來還原,零寫入" % len(ver["problems"]))
         return rec
+    unknown = [s for s in (systems or []) if s not in ver["manifest"]["systems"]]
+    if unknown:                                          # 指名的系統不在這份備份裡:不能當成「一模一樣」
+        rec.update(lamp="RED", meaning="這份備份沒有系統 %s(有:%s)→ 零寫入" % (unknown, ", ".join(sorted(ver["manifest"]["systems"]))))
+        return rec
     plan = restore_plan(via, ver["manifest"], systems, only)
     todo = [r for r in plan["rows"] if r["state"] in ("CHANGED", "MISSING")]
     rec["plan"] = {"count": plan["count"], "todo": [{k: r[k] for k in ("sys", "path", "state")} for r in todo][:200]}
+    if not plan["rows"]:                                 # 篩完一個檔都沒有:沒比對、沒還原,不是綠
+        rec.update(lamp="RED", meaning="這次選擇(--sys %s · --only %s)沒有對到任何備份檔 → 沒有比對也沒有還原,零寫入"
+                   % (",".join(systems or []) or "全部", only or "—"))
+        return rec
     if plan["count"]["REFUSED"]:
         rec.update(lamp="RED", meaning="MANIFEST 有 %d 個路徑跳出倉根 → 拒絕還原(零寫入)" % plan["count"]["REFUSED"])
         return rec
@@ -305,7 +313,7 @@ def main(argv=None) -> int:
     install()
     verb = argv[0] if argv else ""
     if verb not in ("restore", "card"):
-        rc = PRIOR.main(argv)
+        rc = BASE.main(argv)                             # 不經 PRIOR.main:它會重跑 v0102 install(),把本版的 GRAPHIFY_VCGC 範圍蓋掉
         if verb in ("backup", "check"):
             via, out_root, mdir = _paths(argv)
             write_card(via, out_root, mdir)
@@ -409,6 +417,24 @@ def selftest() -> int:
             tampered["lamp"] == "RED" and not tampered["verify"]["ok"]
             and (reg / "VIA_Requirements_SSOT_v0100.json").read_text(encoding="utf-8") == '{"a": 3}\n', tampered.get("verify"))
         chk("⑥ 跳出倉根的路徑一律拒絕", repo_target(via, "../../outside.txt") is None and repo_target(via, "../CLAUDE.md") is not None)
+        (reg / "VIA_Requirements_SSOT_v0100.json").write_text('{"a": 4}\n', encoding="utf-8")
+        good = Path(applied["backup_dir"]) / "VCGC.zip"
+        good.write_bytes(bytes(raw[:-5]) + bytes([raw[-5] ^ 0xFF]) + bytes(raw[-4:]))     # 把 ⑤ 動過的 zip 還原成原樣
+        typo = do_restore(via, out_root, systems=["VCGCC"], apply=True)
+        none = do_restore(via, out_root, only="no-such-path", apply=True)
+        chk("⑩ --sys 指了備份裡沒有的系統 · --only 一個都沒對到 → RED、零寫入(不是「一模一樣」)",
+            typo["lamp"] == "RED" and "VCGCC" in typo["meaning"] and none["lamp"] == "RED" and "沒有對到" in none["meaning"]
+            and (reg / "VIA_Requirements_SSOT_v0100.json").read_text(encoding="utf-8") == '{"a": 4}\n', (typo.get("meaning"), none.get("meaning")))
+        g = via / "VIA_Reports" / "vcgc" / "agentos" / "graphify" / "VCGC" / "graphify-out" / "graph.json"
+        g.parent.mkdir(parents=True)
+        g.write_text('{"nodes": []}\n', encoding="utf-8")
+        out2, mdir2 = Path(td) / "bak2", Path(td) / "man2"
+        with contextlib.redirect_stdout(io.StringIO()):
+            rc_main = main(["backup", "--via", str(via), "--out", str(out2), "--manifest-dir", str(mdir2)])
+        man2 = json.loads(next(out2.glob("*/MANIFEST.json")).read_text(encoding="utf-8")) if list(out2.glob("*/MANIFEST.json")) else {}
+        got = [e["path"] for e in (man2.get("systems", {}).get("GRAPHIFY_VCGC") or {}).get("files", [])]
+        chk("⑪ 真入口 main(['backup', …]):VCGC 的 Graphify 圖照樣進備份(範圍沒被前版 install 蓋掉)",
+            rc_main == 0 and "GRAPHIFY_VCGC" in BASE.SCOPE and any(p.endswith("VCGC/graphify-out/graph.json") for p in got), (rc_main, got))
         card = write_card(via, out_root, mdir)
         md = (mdir / "BACKUP_CARD_latest.md").read_text(encoding="utf-8")
         chk("⑦ 多 AI 共讀卡:≤ 40 行 · 有最新備份 / check / 還原 / 指令 · 沒有檔案內容",
