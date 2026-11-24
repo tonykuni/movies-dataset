@@ -3,8 +3,8 @@
  "version": "v0122",
  "subsystem": "VRN",
  "zh": "研報引擎工作流",
- "batch": "+VRN-WKF021(擷取還原量測)",
- "ts": "2026-11-24T08:30:00Z",
+ "batch": "+VRN-WKF021(擷取還原量測 · TST002 v0131)",
+ "ts": "2026-11-24T08:55:00Z",
  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
  "sdd": {
   "layers": [
@@ -1335,7 +1335,7 @@
    "name": "擷取還原量測(非 OCR → 輕 OCR → 重 OCR · 可驗證 · 輕能解不升重)",
    "kind": "procedure",
    "version": "v0100",
-   "updated_at": "2026-11-24T08:30:00Z",
+   "updated_at": "2026-11-24T08:55:00Z",
    "spec": {
     "goal": "每頁每種擷取方法還原到原樣的程度有可重算的證據;輕 / 重切換點由實測決定",
     "requirements": [
@@ -1350,7 +1350,8 @@
      "自測過 · 前版 v0129 自測過 · 擷取流程(run / p1view)行為不變",
      "輸出不含研報內文與檔名(只有雜湊 · 數字 · 耗時)",
      "主機 C:\\測試樣本報告 實跑、量測推回 intake 分支(未在主機實跑前不算收尾)",
-     "依量測定輕 / 重切換點後才接進正常流程(另一步)"
+     "依量測定輕 / 重切換點後才接進正常流程(另一步)",
+     "數字 F1 用原文切 token(相鄰格不黏)· 兩階 OCR 都讀不到字不算共識(PR #733 Codex P2 ×2)"
     ],
     "entry": "python \"functional modules/VRN/VRN_ENG397_P1Segment_v0130.py\" fidelity <輸入夾> --rep <報告夾> --calib 1",
     "evidence": "docs/handoff/evidence/C-vrn-eng397-v0130.json",
@@ -1380,6 +1381,13 @@
      "engine": "functional modules/VRN/VRN_ENG397_P1Segment_v0130.py",
      "verb": "--selftest",
      "expect": "rc 0 · 7/7 · 前版 35/35"
+    },
+    {
+     "code": "VRN-WKF021-TST002",
+     "case": "C-vrn-eng397-v0131",
+     "engine": "functional modules/VRN/VRN_ENG397_P1Segment_v0131.py",
+     "verb": "--selftest",
+     "expect": "rc 0 · 5/5 · 前版 7/7 · 35/35"
     }
    ]
   }

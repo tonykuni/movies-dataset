@@ -7997,6 +7997,38 @@
    "timeout_seconds": 1800,
    "updated_at": "2026-11-24T08:30:00Z",
    "registered_at": "2026-11-24T08:30:00Z"
+  },
+  "C-hub-v0109": {
+   "argv": [
+    "--family",
+    "core",
+    "VCGC_CommandHub_v0109.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VCGC_CommandHub v0109 自測 OK 4 · FAIL 0 · 前版 rc=0",
+   "scope": "VCGC_CommandHub_v0109.py(VCGC-REQ254 · PR #733 Codex P2:找工具的根不動,只把讀收據導到寫它的工具的根)",
+   "dependencies": [
+    "VCGC_CommandHub_v*.py"
+   ],
+   "version": "v0109",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-24T08:55:00Z",
+   "registered_at": "2026-11-24T08:55:00Z"
+  },
+  "C-vrn-eng397-v0131": {
+   "argv": [
+    "functional modules/VRN/VRN_ENG397_P1Segment_v0131.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VRN_ENG397_P1Segment v0131 自測 OK 5 · FAIL 0 · 前版 rc=0",
+   "scope": "VRN_ENG397_P1Segment_v0131.py(VRN-REQ031 · fidelity 數字 F1 用原文 · 空 OCR 不算共識)",
+   "dependencies": [
+    "functional modules/VRN/VRN_ENG397_P1Segment_v*.py"
+   ],
+   "version": "v0131",
+   "timeout_seconds": 1800,
+   "updated_at": "2026-11-24T08:55:00Z",
+   "registered_at": "2026-11-24T08:55:00Z"
   }
  },
  "work_items": [
@@ -15781,6 +15813,30 @@
    "updated_at": "2026-11-24T08:30:00Z",
    "registered_at": "2026-11-24T08:30:00Z",
    "receipt": "docs/handoff/evidence/C-vrn-eng397-v0130.json"
+  },
+  {
+   "id": "VCGC-REQ254:C-hub-v0109",
+   "requirement": "VCGC-REQ254",
+   "case": "C-hub-v0109",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "PR #733 Codex P2:v0108 在 boot 期間整個換 VIA_ROOT → boot --all 裡的 bak 用換過的根找 ApplyRun(兩根都有時選到程式樹那支);v0109 撤掉換根、只換 read_json(backup → ApplyRun 的根 · vcgc → 管理器的根)(自測 4/4 · 前版 5/5 · 6/6 · 6/6 · 11/11)",
+   "next": "主機 via-bak / via-pano 實跑(未在主機實跑)",
+   "updated_at": "2026-11-24T08:55:00Z",
+   "registered_at": "2026-11-24T08:55:00Z",
+   "receipt": "docs/handoff/evidence/C-hub-v0109.json"
+  },
+  {
+   "id": "VRN-REQ031:C-vrn-eng397-v0131",
+   "requirement": "VRN-REQ031",
+   "case": "C-vrn-eng397-v0131",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "PR #733 Codex P2 ×2:校準數字 F1 從正規化文字切 token(相鄰格黏成一個數)→ 改用原文;兩階 OCR 都讀到空字串 f1=1.0 被判 CONSENSUS → 要求兩階都 ≥10 字(自測 5/5 · 前版 7/7 · 35/35)",
+   "next": "主機 C:\\測試樣本報告 fidelity 實跑推回(未在主機實跑)→ 依數字接進正常流程",
+   "updated_at": "2026-11-24T08:55:00Z",
+   "registered_at": "2026-11-24T08:55:00Z",
+   "receipt": "docs/handoff/evidence/C-vrn-eng397-v0131.json"
   }
  ],
  "retired_files": {
