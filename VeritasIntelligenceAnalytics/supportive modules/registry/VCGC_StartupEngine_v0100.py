@@ -114,7 +114,7 @@ SUPPORT_SOURCES: tuple[tuple[str, str, str], ...] = (
     ("copilot", "Copilot", "對話只留最後一則摘要。沒有索引就是缺席。"),
 )
 SCHEMA = "vcgc.startup-engine/1"
-SELFTEST_TOTAL = 67
+SELFTEST_TOTAL = 69
 # 2026-11-24 已寫進盤點冊的站。這支引擎不另開站、不把本體塞進備份 zip。
 TODAY_STATIONS: tuple[tuple[str, str, str], ...] = (
     ("C-rework-guard-v0100", "v0100", "重工守衛"),
@@ -849,6 +849,7 @@ AST_FNC_FLOOR: tuple[str, ...] = (
     "launch_status",
     "launch_run",
     "job_fingerprint",
+    "chain_fingerprint",
 )
 
 
@@ -1356,6 +1357,15 @@ def job_fingerprint(job: Job) -> str:
     return hashlib.sha256(body.encode("utf-8")).hexdigest()[:16]
 
 
+def chain_fingerprint(job: Job, by_name: dict, memo: dict | None = None) -> str:
+    """任務連同所有前置的指紋:前置的定義一變,下游的完成也跟著不算(A → B → C 換了 A,B、C 都要重跑)。"""
+    memo = {} if memo is None else memo
+    if job.name not in memo:
+        ups = [chain_fingerprint(by_name[d], by_name, memo) if d in by_name else "missing:" + d for d in sorted(job.deps)]
+        memo[job.name] = hashlib.sha256((job_fingerprint(job) + "|" + "|".join(ups)).encode("utf-8")).hexdigest()[:16]
+    return memo[job.name]
+
+
 def load_journal(path: Path, jobs: list[Job]) -> tuple[list[str], list[str]]:
     """回 (已完成且指紋對得上的任務, 不採用的舊名)。不採用 = 冊上已沒有,或同名但定義變了,或典籍沒記指紋。
     檔不在 = 空典籍。不歸零、不改檔。"""
@@ -1366,7 +1376,8 @@ def load_journal(path: Path, jobs: list[Job]) -> tuple[list[str], list[str]]:
     by_name = {j.name: j for j in jobs}
     marks = data.get("fingerprints") or {}
     done = [n for n in data.get("journal", []) if isinstance(n, str)]
-    keep = [n for n in done if n in by_name and marks.get(n) == job_fingerprint(by_name[n])]
+    memo: dict = {}
+    keep = [n for n in done if n in by_name and marks.get(n) == chain_fingerprint(by_name[n], by_name, memo)]
     return keep, [n for n in done if n not in keep]
 
 
@@ -1374,7 +1385,8 @@ def save_journal(path: Path, result: dict, verb: str, jobs: list[Job] | None = N
     """只記完成的任務(失敗與跳過不算)與它們的定義指紋,先寫暫存檔再換名。"""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    marks = {j.name: job_fingerprint(j) for j in (jobs or []) if j.name in result["journal"]}
+    by_name, memo = {j.name: j for j in (jobs or [])}, {}
+    marks = {j.name: chain_fingerprint(j, by_name, memo) for j in (jobs or []) if j.name in result["journal"]}
     tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps({"engine": ENGINE_ID, "verb": verb, "journal": result["journal"], "fingerprints": marks,
                                "failed": result["failed"], "skipped": result["skipped"]}, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -1433,6 +1445,12 @@ def launch_run(verb: str, jobs: list[Job], hw: HardwareProfile, gated: list[str]
                fail_name: str | None = None, runner=None) -> tuple[dict, int]:
     """launch / resume 的本體(main 與自測共用)。演練清單不讀也不寫典籍;真清單每件完成就落典籍。"""
     rehearsal = any(job.rehearsal for job in jobs)
+    if rehearsal and not all(job.rehearsal for job in jobs):     # 演練與真任務混在一張清單:一件都不跑(不重複真擷取、不丟典籍)
+        mixed = sorted(job.name for job in jobs if job.rehearsal)
+        result = {"status": "MIXED_REJECTED", "runs": [], "journal": [], "failed": None, "skipped": [], "journal_file": None,
+                  "resumed_from": [], "stale_journal_names": [], "rehearsal": True, "rehearsal_jobs": mixed,
+                  "note": "清單裡還有演練占位任務 %s:先換成真指令(或全部拿掉)再跑;這輪一件都沒跑" % mixed}
+        return result, 2
     run = runner or (lambda job: run_job(job, hw))
     if rehearsal:
         prior, stale = [], []
@@ -2219,6 +2237,21 @@ def selftest() -> list[dict]:
         _check("同名但指令換了:resume 不拿舊的完成來抵,照樣重跑(典籍記指紋)",
                again["resumed_from"] == [] and "J_vcgc" in again["stale_journal_names"] and len(again["runs"]) == 1,
                f"抵掉 {again['resumed_from']} · 不採用 {again['stale_journal_names']} · 這輪跑 {len(again['runs'])}", rows)
+        abc = [Job("C_A", ["python", "-c", "a"], 100, "VCGC"), Job("C_B", ["python", "-c", "b"], 100, "VCGC", deps=["C_A"]),
+               Job("C_C", ["python", "-c", "c"], 100, "VCGC", deps=["C_B"])]
+        cj = Path(ldir) / "chain.json"
+        launch_run("launch", abc, detect_hardware(65536, 16), [], cj, runner=ok_run)
+        abc2 = [Job("C_A", ["python", "-c", "a2"], 100, "VCGC")] + abc[1:]
+        ch, ch_rc = launch_run("resume", abc2, detect_hardware(65536, 16), [], cj, runner=ok_run)
+        _check("前置換了定義:下游的完成跟著作廢(A → B → C 換 A,resume 三件都重跑)",
+               ch["resumed_from"] == [] and set(ch["stale_journal_names"]) == {"C_A", "C_B", "C_C"} and len(ch["runs"]) == 3 and ch_rc == 0,
+               f"抵掉 {ch['resumed_from']} · 不採用 {ch['stale_journal_names']} · 這輪跑 {len(ch['runs'])}", rows)
+        ran = []
+        mix = [Job("M_real", ["python", "-c", "real"], 100, "VCGC"), Job("M_stub", ["python", "-c", "stub"], 100, "VCGC", rehearsal=True)]
+        mj = Path(ldir) / "mixed.json"
+        mx, mx_rc = launch_run("launch", mix, detect_hardware(65536, 16), [], mj, runner=lambda job: ran.append(job.name) or ok_run(job))
+        _check("演練與真任務混在一張清單:先拒絕、一件都不跑、不碰典籍(rc 2)",
+               mx["status"] == "MIXED_REJECTED" and mx_rc == 2 and ran == [] and not mj.exists(), f"{mx['status']} rc {mx_rc} · 跑了 {ran}", rows)
         dumped = Path(ldir) / "plan_jobs.json"
         dumped.write_text(json.dumps({"jobs": [j.to_dict() for j in default_jobs()]}), encoding="utf-8")
         relo = load_jobs(dumped)
