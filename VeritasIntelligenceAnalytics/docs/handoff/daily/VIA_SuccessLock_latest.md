@@ -182,3 +182,10 @@
 | 2026-11-24T16:40:00Z | VCGC_CommandHub_v0114.py | 0114 | VIA-CORE-MDL907 | d065f9471a11 | install 只用這一輪的計畫 | 自測 5/5 + 前版鏈 |
 | 2026-11-24T15:35:00Z | VIA_ReworkGuard_v0103.py | 0103 | VIA-CORE-MDL908 | c036e1f99084 | R11 不誤判工具檔名 | 自測 6/6 + 前版鏈 |
 | 2026-11-24T15:55:00Z | CGC_MDL056_InstallGate_v0107.py | 0107 | VIA-VCGC-MDL1710 | b3cbd60f99a9 | 照計畫目標裝 | 自測 5/5 + 前版鏈 |
+| 2026-11-24T16:45:00Z | VCGC_StartupEngine_v0100.py | 0100 | VIA-VCGC-MDL1711 | 8f6ca058b2ee | 啟動引擎 9 項修正 | 自測 62/62 |
+| 2026-11-24T17:05:00Z | VCGC_StartupEngine_v0100.py | 0100 | VIA-VCGC-MDL1711 | 9fcbcf825d49 | 演練不算完成 · INCOMPLETE | 自測 65/65 |
+| 2026-11-24T17:15:00Z | VCGC_StartupEngine_v0100.py | 0100 | VIA-VCGC-MDL1711 | 4ebfedeadf31 | 典籍綁指紋 · 演練標記照留 | 自測 67/67 |
+| 2026-11-24T17:23:10Z | VCGC_StartupEngine_v0100.py | 0100 | VIA-VCGC-MDL1711 | b98a26696abb | 前置換了下游作廢 · 混單先拒絕 | 自測 69/69 |
+| 2026-11-24T17:55:00Z | VCGC_CommandHub_v0115.py | 0115 | VIA-CORE-MDL909 | 046c6507766e | via-graph · via-bak 子動詞 | 自測 6/6 |
+| 2026-11-24T17:55:00Z | VIA_DailyBackup_v0103.py | 0103 | VIA-CORE-MDL910 | 40c5c2e4f433 | 還原先驗證 · 備份卡 | 自測 10/10 |
+| 2026-11-24T18:05:00Z | VIA_DailyBackup_v0103.py | 0103 | VIA-CORE-MDL910 | 4f961277ce1d | 真入口保留範圍 · 空選擇回紅 | 自測 12/12 |
