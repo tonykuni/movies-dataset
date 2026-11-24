@@ -166,3 +166,4 @@
 | 2026-11-24T09:00:00Z | VCGC_CommandHub_v0109.py | 0109 | VIA-CORE-MDL897 | dab7181eceba | 中樞:找工具與讀收據分開(v0101–v0108 不動) | 自測 4/4 + 前版 |
 | 2026-11-24T09:00:00Z | VRN_ENG397_P1Segment_v0131.py | 0131 | VIA-VRN-ENG342 | 70256c10656f | VRN fidelity 兩處量測修正(v0129 · v0130 不動) | 自測 5/5 + 前版 |
 | 2026-11-24T09:50:00Z | VCGC_CommandHub_v0110.py | 0110 | VIA-CORE-MDL898 | 4bfcdb627869 | 中樞:doctor 總表不再崩潰(v0101–v0109 不動)| 自測 4/4 + 前版 |
+| 2026-11-24T10:35:00Z | VIA_FastRun_v0102.py | 0102 | VIA-CORE-MDL899 | 36df686bd210 | 快跑器:env · fidelity · 動態進度條(v0100 · v0101 不動)| 自測 8/8 + 前版 9/9 |
