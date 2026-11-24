@@ -73,8 +73,15 @@ jobs:
       - name: Load the rework guard from the base revision
         run: |
           mkdir -p "$RUNNER_TEMP/rework"
-          G="VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_ReworkGuard_v0100.py"
-          for f in "$G" .github/scripts/pr_guard.py; do
+          # 重工守門取 base 上的尾版(版號最大那支 + 它的前版鏈,薄尾要前版在同一夾);base 還沒有就用 PR 帶的。
+          D="VeritasIntelligenceAnalytics/docs/handoff/ai"
+          SRC="origin/${{ github.base_ref }}"
+          git ls-tree --name-only "$SRC" "$D/" | grep -q 'VIA_ReworkGuard_v' || SRC="HEAD"
+          for f in $(git ls-tree --name-only "$SRC" "$D/" | grep 'VIA_ReworkGuard_v[0-9]*\.py$'); do
+            git show "$SRC:$f" > "$RUNNER_TEMP/rework/$(basename "$f")"
+          done
+          ls "$RUNNER_TEMP/rework/" | sort | tail -1 > "$RUNNER_TEMP/rework/TAIL"
+          for f in .github/scripts/pr_guard.py; do
             if git cat-file -e "origin/${{ github.base_ref }}:$f" 2>/dev/null; then
               git show "origin/${{ github.base_ref }}:$f" > "$RUNNER_TEMP/rework/$(basename "$f")"
             else
@@ -89,11 +96,11 @@ jobs:
           git fetch -q origin '+refs/pull/*/head:refs/remotes/pr/*' || true
           echo "VIA_OPEN_PRS=$(gh pr list --repo '${{ github.repository }}' --state open --limit 200 --json number -q '.[].number' | grep -vx '${{ github.event.pull_request.number }}' | tr '\n' ' ')" >> "$GITHUB_ENV"
       - name: Rework guard selftest (base version)
-        run: python3 "$RUNNER_TEMP/rework/VIA_ReworkGuard_v0100.py" --selftest
+        run: python3 "$RUNNER_TEMP/rework/$(cat "$RUNNER_TEMP/rework/TAIL")" --selftest
       - name: Rework causes on this PR
         run: |
           set +e
-          python3 "$RUNNER_TEMP/rework/VIA_ReworkGuard_v0100.py" check --repo . --base "origin/${{ github.base_ref }}" --head HEAD
+          python3 "$RUNNER_TEMP/rework/$(cat "$RUNNER_TEMP/rework/TAIL")" check --repo . --base "origin/${{ github.base_ref }}" --head HEAD
           rc=$?
           if [ "$rc" -eq 1 ]; then exit 1; fi
           exit 0

@@ -4427,7 +4427,7 @@
    "name": "重工守門:推送 / 開 PR / 取號前跑 13 類偵測(每項附解法與指令)· PR 守門 CI 預設跑 · 週報",
    "kind": "procedure",
    "version": "v0100",
-   "updated_at": "2026-11-24T05:10:00Z",
+   "updated_at": "2026-11-24T06:20:00Z",
    "spec": {
     "goal": "這一週反覆重工的 13 類原因在推送前就被點名,紅擋黃提醒,不再靠事後 Codex / 人工發現",
     "requirements": [
@@ -4435,7 +4435,7 @@
      "VCGC-REQ256"
     ],
     "acceptance": "check:版號插到尾版底下 · 已鎖被改 · 開著的 PR 同號同檔名 · 新冊版少列 · 金鑰 → 紅;工作樹產物 · 換錯層 · 自測脆 · 橋 · 本機路徑 · 跨系統退路 · 字集 · 註冊鏈漏步 → 黃;每項印解法與指令;report 數字從 git 與教訓帳來;CI 守門程式從 base 取",
-    "entry": "python3 docs/handoff/ai/VIA_ReworkGuard_v0100.py check --fetch-prs · report · causes",
+    "entry": "python3 \"$(ls docs/handoff/ai/VIA_ReworkGuard_v*.py | sort | tail -1)\" check --fetch-prs · report · causes",
     "evidence": "docs/handoff/evidence/C-rework-guard-v0100.json",
     "books": []
    },
@@ -4467,7 +4467,7 @@
     }
    ],
    "tests": {
-    "self": "VIA_ReworkGuard_v0100 --selftest(站 C-rework-guard-v0100)",
+    "self": "VIA_ReworkGuard_v0101 --selftest(站 C-rework-guard-v0101;v0100 站 C-rework-guard-v0100 照留)",
     "cross": [
      "X-REQ-BACK",
      "X-ENGINE"

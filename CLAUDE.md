@@ -140,9 +140,9 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
 **2026-11-24 操作員令「重工因素寫成指令的預設偵測 · 解決方案內建」(待登需求 VCGC-REQ255;不是律)**
 
 - **重工守門預設跑**:出新版號、發號、推送、開 PR 之前一律先跑
-  `python3 VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_ReworkGuard_v0100.py check --fetch-prs`(看已提交 + 工作樹)。
+  `python3 "$(ls VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_ReworkGuard_v*.py | sort | tail -1)" check --fetch-prs`(尾版;看已提交 + 工作樹)。
   紅 = 不推(已鎖被改 · 版號插到尾版底下 · 開著的 PR 同號同檔名 · 新冊版少了 base 的列 · 明文金鑰);黃照它印的「解法 / 指令」修,不修就在收據寫理由。
-  13 類根因與解法:`… causes`;一週數字:`… report`。PR 守門 workflow 的 rework-guard job 跑同一支(從 base 取,PR 改不掉)。
+  13 類根因與解法:`… causes`;一週數字:`… report`。PR 守門 workflow 的 rework-guard job 跑 base 上的尾版(PR 改不掉)。
 - **發號接在開著的 PR 之上**:編號引擎從本機冊尾 +1;開著的 PR 已用的號(MDL · SSOT · ENV · 分類碼)要先避開,發完再跑一次 check(2026-11-24 實錄:#722 / #730)。
 
 **待操作員裁定(兩邊的話對不上,AI 不自己選邊;裁定前照較保守的一邊做)**
