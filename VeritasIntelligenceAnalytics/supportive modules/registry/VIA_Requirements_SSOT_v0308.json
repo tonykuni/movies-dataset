@@ -139,7 +139,7 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "COVERED": 141,
-  "PARTIAL": 167,
+  "PARTIAL": 168,
   "RECORDED": 28,
   "MISSING": 1
  },
@@ -8540,6 +8540,26 @@
    "why_homes": "VRN 自己的入口(VRN 自發號)",
    "ts": "2026-11-24T08:30:00Z",
    "updated_at": "2026-11-24T08:55:00Z"
+  },
+  {
+   "code": "VCGC-REQ257",
+   "subsystem": "VCGC",
+   "topic": "via-health:先期檢查 · 安裝 · 系統健康收成 VCGC 常態短令(FastRun v0103 · Hub v0111)",
+   "requirement": "操作員 2026-11-24 原文:「上面若有先期檢查安裝檢視指令及系統健康的功能都優化放入VCGC當常態使用工具」(附主機 HostBoot 實跑:doctor_before 889.2s · install 317.6s · doctor_after 650.3s,之後 FastRun v0102 心跳執行緒 OverflowError: timeout value is too large)。→ ① VIA_FastRun v0103:心跳間隔夾到 3600 秒(Windows Event.wait 上限);doctor 裝前只跑跟安裝有關的 6 項(不含 envmgr)、裝後只重驗 3 項,沒有要裝的就不重驗;環境總管 envmgr 改成並行段的一個工作;跑完後進度條寫「VCGC 收尾中」 ② VCGC_CommandHub v0111:新短令 via-health(target health → FastRun 尾版 --set env,vrn,vdf,參數原樣轉;子行程不帶 VCGC 旗標,交 FastRun 自己過閘),PS 載入器照 names --ps 自動生函式。",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "modules": [
+    "docs/handoff/ai/VIA_FastRun_v0103.py",
+    "VCGC_CommandHub_v0111.py"
+   ],
+   "evidence": "容器:FastRun v0103 自測 8/8(前版 v0102 8/8 · v0101 9/9);Hub v0111 自測 5/5(前版鏈 v0110~v0105 全過);經 VCGC 實跑 x via-health(env,vrn,vdf)9 項 174 秒(doctor 裝前 45.5s · 安裝閘 3.0s · 裝後 4.3s · envmgr 並行 117s;燈紅 = accel 9 支 VAP 收容檔缺橋 + envmgr LOCK_MISMATCH,兩項都是 #733 之前就有、不在本批範圍);--set vrn,vdf 5 項 5 秒全綠",
+   "next": "主機:via-health --push(未在主機實跑;本分支合併前用 HostBoot 一行)",
+   "hand": "AI + 操作員(主機實跑)",
+   "why_homes": "VCGC 自己的工具;只呼叫既有 doctor / 安裝閘 / 各系統 SystemManager,不另寫引擎、不改他系統的檔",
+   "ts": "2026-11-24T11:15:00Z",
+   "updated_at": "2026-11-24T11:15:00Z"
   }
  ],
  "non_requirements": [

@@ -8077,6 +8077,40 @@
    "timeout_seconds": 900,
    "updated_at": "2026-11-24T10:55:00Z",
    "registered_at": "2026-11-24T10:55:00Z"
+  },
+  "C-fastrun-v0103": {
+   "argv": [
+    "docs/handoff/ai/VIA_FastRun_v0103.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VIA_FastRun v0103 自測 OK 8 · FAIL 0 · 前版 rc=0",
+   "scope": "VIA_FastRun_v0103.py(VCGC-REQ257 · 心跳夾 3600 秒 · doctor 裝前 6 項 / 裝後 3 項 · envmgr 並行 · 收尾進度條)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_FastRun_v0100.py",
+    "docs/handoff/ai/VIA_FastRun_v0101.py",
+    "docs/handoff/ai/VIA_FastRun_v0102.py"
+   ],
+   "version": "v0103",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-24T11:15:00Z",
+   "registered_at": "2026-11-24T11:15:00Z"
+  },
+  "C-hub-v0111": {
+   "argv": [
+    "--family",
+    "core",
+    "VCGC_CommandHub_v0111.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VCGC_CommandHub v0111 自測 OK 5 · FAIL 0 · 前版 rc=0",
+   "scope": "VCGC_CommandHub_v0111.py(VCGC-REQ257 · 新短令 via-health)",
+   "dependencies": [
+    "VCGC_CommandHub_v*.py"
+   ],
+   "version": "v0111",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-24T11:15:00Z",
+   "registered_at": "2026-11-24T11:15:00Z"
   }
  },
  "work_items": [
@@ -15921,6 +15955,30 @@
    "updated_at": "2026-11-24T10:55:00Z",
    "registered_at": "2026-11-24T10:55:00Z",
    "receipt": "docs/handoff/evidence/C-hostboot-v0100.json"
+  },
+  {
+   "id": "VCGC-REQ257:C-fastrun-v0103",
+   "requirement": "VCGC-REQ257",
+   "case": "C-fastrun-v0103",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "主機 v0102 心跳 OverflowError + doctor 889/650 秒 → v0103:心跳夾 3600 · doctor 子集 · envmgr 並行(自測 8/8 · 前版 8/8 · 容器實跑 env,vrn,vdf 174 秒)",
+   "next": "主機 via-health --push(未在主機實跑)",
+   "updated_at": "2026-11-24T11:15:00Z",
+   "registered_at": "2026-11-24T11:15:00Z",
+   "receipt": "docs/handoff/evidence/C-fastrun-v0103.json"
+  },
+  {
+   "id": "VCGC-REQ257:C-hub-v0111",
+   "requirement": "VCGC-REQ257",
+   "case": "C-hub-v0111",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "先期檢查 · 安裝 · 系統健康收成 VCGC 短令 via-health(三條路都到 FastRun 尾版;自測 5/5 · 前版鏈全過 · 容器實跑 9 項 174 秒)",
+   "next": "主機 via-health --push(未在主機實跑)",
+   "updated_at": "2026-11-24T11:15:00Z",
+   "registered_at": "2026-11-24T11:15:00Z",
+   "receipt": "docs/handoff/evidence/C-hub-v0111.json"
   }
  ],
  "retired_files": {
