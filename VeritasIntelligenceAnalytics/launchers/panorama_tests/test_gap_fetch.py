@@ -35,8 +35,8 @@ def def_load(name, relative):
     return m
 
 
-HIST = def_load('panorama_hist_test', 'functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0111.py')
-ETF = def_load('panorama_etf_test', 'functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0108.py')
+HIST = def_load('panorama_hist_test', 'functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py')
+ETF = def_load('panorama_etf_test', 'functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0114.py')
 
 
 def def_row(day, ticker, close=100):

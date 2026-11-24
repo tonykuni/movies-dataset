@@ -67,7 +67,7 @@ padding:10px 16px;cursor:pointer;min-height:44px}
 background:#333;color:#fff;padding:10px 18px;border-radius:20px;display:none}
 </style></head><body><div class="wrap">
 <h1>🎛️ VIA 指揮台(零打字操作)</h1>
-<div class="mut">2026-09-19 23:41 · 點卡/下拉/勾選/拖曳 → 指令自動入剪貼簿 → 貼到
+<div class="mut">2026-11-24 06:43 · 點卡/下拉/勾選/拖曳 → 指令自動入剪貼簿 → 貼到
 PowerShell 按 Enter · 誠實界線:瀏覽器不能直接執行本機程式,本台=
 三動作極簡(複製→貼上→Enter);真零操作=每日開機自動鏈+桌面
 VIA-Start.bat 雙擊</div>
@@ -100,7 +100,7 @@ VIA-Start.bat 雙擊</div>
 <div id="toast">已複製!到 PowerShell 貼上按 Enter</div>
 </div><script>
 const ENGINES = [{"zh": "月營收分析", "path": "functional modules\\VDF\\engine\\VDF_ENG063_MonthlyRevenue_v*.py", "verbs": ["run", "--analyze", "--status"], "codes": true}, {"zh": "鉅亨共識", "path": "functional modules\\VRN\\VRN_ENG071_CnyesFusion_v*.py", "verbs": ["run", "--status"], "codes": true}, {"zh": "Yahoo 共識", "path": "functional modules\\VRN\\VRN_ENG070_YahooConsensus_v*.py", "verbs": ["run", "--status"], "codes": true}, {"zh": "歷史回補", "path": "functional modules\\VDF\\engine\\VDF_ENG064_HistoryBackfill_v*.py", "verbs": ["run", "--status", "--rebuild-ckpt"], "codes": false}, {"zh": "因子庫", "path": "functional modules\\VDF\\engine\\VDF_ENG061_FeatureStore_v*.py", "verbs": ["build", "--status"], "codes": false}];
-const DROPMAP = {"pdf": {"zh": "券商報告 PDF", "dest": "functional modules\\VRN\\input_reports", "after": "python \"{R}\\functional modules\\VRN\\vrn_report_digest_v0107.py\""}, "docx": {"zh": "Word 報告", "dest": "functional modules\\VRN\\input_reports", "after": "python \"{R}\\functional modules\\VRN\\vrn_report_digest_v0107.py\""}, "py": {"zh": "Python 引擎(候收容)", "dest": "supportive modules\\_inbox_to_classify", "after": "rem 收容後由治理批次分類"}, "csv": {"zh": "資料表", "dest": "functional modules\\VDF\\input_inbox", "after": "rem 入庫由 VDF 攝入引擎處理"}};
+const DROPMAP = {"pdf": {"zh": "券商報告 PDF", "dest": "functional modules\\VRN\\input_reports", "after": "python \"{R}\\functional modules\\VRN\\vrn_report_digest_v0117.py\""}, "docx": {"zh": "Word 報告", "dest": "functional modules\\VRN\\input_reports", "after": "python \"{R}\\functional modules\\VRN\\vrn_report_digest_v0117.py\""}, "py": {"zh": "Python 引擎(候收容)", "dest": "supportive modules\\_inbox_to_classify", "after": "rem 收容後由治理批次分類"}, "csv": {"zh": "資料表", "dest": "functional modules\\VDF\\input_inbox", "after": "rem 入庫由 VDF 攝入引擎處理"}};
 const $ = id => document.getElementById(id);
 const R = () => $("root").value.trim().replace(/\\+$/, "");
 let current = "";
@@ -183,6 +183,14 @@ $("root").oninput = combo;
 renderVerbs();
 /* 批209 個股全景:代號→①觸發共識擷取②等任務完③聚合④渲染=全自動 */
 const pc2 = (x, d = 1) => x == null ? "—" : (x * 100).toFixed(d) + "%";
+// 批733(Z157):共識 upside 用最新 ADJ CLOSE(c[9]);算不出給狀態;舊橋沒有 c[9] → 顯示 c[8] 並標原始價
+const upA = c => c.length > 9
+  ? (c[9] == null ? `<span class="mut" title="${c[10] || ""}">— ${String(c[10] || "").split("(")[0]}</span>` : pc2(c[9]))
+  : pc2(c[8]) + '<span class="mut">(原始價)</span>';
+// PR #115 審查:目標價跟 upside 同一個基準——c[9] 有數、橋帶了 ADJ 目標價(c[11..13])才顯示 ADJ;否則原始價並標「(原始)」
+const adjT = c => c.length > 14 && c[9] != null && c[13] != null;
+const tg = (c, i) => adjT(c) ? (c[9 + i] ?? "—") : (c[i] == null ? "—" : `${c[i]}<span class="mut">(原始)</span>`);
+const pxA = c => adjT(c) && c[14] != null ? `<span title="${c[15] || ""}">${c[14]}</span>` : "—";
 function svgLine(px) {
   if (!px || px.length < 2) return '<div class="mut">價格序列不足(誠實)</div>';
   const vs = px.map(p => p[1]), mn = Math.min(...vs), mx = Math.max(...vs);
@@ -204,8 +212,8 @@ function renderStock(d) {
       · 52週高點 ${pc2(hi)} · 量能Z ${vz == null ? "—" : vz.toFixed(2)}</div>`;
   }
   if (d.consensus && d.consensus.length)
-    h += '<div class="tablewrap"><table><tr><th>共識源</th><th>日期</th><th>高</th><th>低</th><th>中位</th><th>分析師</th><th>FY1 EPS</th><th>upside</th></tr>' +
-      d.consensus.map(c => `<tr><td>${c[0]}</td><td>${c[1]}</td><td>${c[2] ?? "—"}</td><td>${c[3] ?? "—"}</td><td><b>${c[4] ?? "—"}</b></td><td>${c[5] ?? "—"}</td><td>${c[6] ?? "—"}</td><td>${pc2(c[8])}</td></tr>`).join("") + "</table></div>";
+    h += '<div class="tablewrap"><table><tr><th>共識源</th><th>日期</th><th>目標高(ADJ)</th><th>目標低(ADJ)</th><th>目標中位(ADJ)</th><th>分析師</th><th>FY1 EPS</th><th>最新 ADJ 收盤</th><th>upside(最新 ADJ)</th></tr>' +
+      d.consensus.map(c => `<tr><td>${c[0]}</td><td>${c[1]}</td><td>${tg(c, 2)}</td><td>${tg(c, 3)}</td><td><b>${tg(c, 4)}</b></td><td>${c[5] ?? "—"}</td><td>${c[6] ?? "—"}</td><td>${pxA(c)}</td><td>${upA(c)}</td></tr>`).join("") + "</table></div>";
   else h += '<div class="mut">共識:尚無(擷取任務可能仍在跑,矩陣看燈)</div>';
   if (d.revenue && d.revenue.length)
     h += '<div class="tablewrap"><table><tr><th>月營收</th><th>金額(千元)</th><th>月增</th><th>年增</th><th>60月高</th></tr>' +

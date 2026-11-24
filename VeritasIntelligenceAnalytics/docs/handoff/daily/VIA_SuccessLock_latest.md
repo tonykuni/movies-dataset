@@ -158,3 +158,10 @@
 | 2026-11-24T05:40:00Z | VRN_SystemManager_v0289.py | 0289 | VIA-VRN-MDL374 | 32d7edf95e46 | 自測提速 · bridges 語法樹 | 自測 11/11 |
 | 2026-11-24T06:35:00Z | VIA_ReworkGuard_v0101.py | 0101 | VIA-CORE-MDL891 | ea9589b5c317 | 重工守門:真分支誤判修正(v0100 鎖定不動)| 自測 10/10 |
 | 2026-11-24T05:25:00Z | VIA_ReworkGuard_v0102.py | 0102 | VIA-CORE-MDL892 | 5b51476924f1 | 重工守門:撞號比正式身分(v0100 · v0101 鎖定不動)| 自測 9/9 |
+| 2026-11-24T08:10:00Z | VCGC_CommandHub_v0105.py | 0105 | VIA-CORE-MDL893 | 1fc5d88ff64a | 中樞:#730 照實燈改發(v0101–v0104 不動)| 自測 11/11 |
+| 2026-11-24T08:40:00Z | VCGC_CommandHub_v0106.py | 0106 | VIA-CORE-MDL894 | 90e7031e5a4b | 中樞:短指令與選單接到 v0105(v0101–v0105 不動)| 自測 6/6 + 前版 11/11 |
+| 2026-11-24T08:05:00Z | VCGC_CommandHub_v0107.py | 0107 | VIA-CORE-MDL895 | d66242bd6032 | 中樞:資料根 ≠ 程式樹時找得到工具(v0101–v0106 不動)| 自測 6/6 + 前版 6/6 · 11/11 |
+| 2026-11-24T08:40:00Z | VCGC_CommandHub_v0108.py | 0108 | VIA-CORE-MDL896 | 04b979eb2821 | 中樞:收據從工具所在的根讀(v0101–v0107 不動) | 自測 5/5 + 前版 |
+| 2026-11-24T08:40:00Z | VRN_ENG397_P1Segment_v0130.py | 0130 | VIA-VRN-ENG341 | 8dd1d5ed4848 | VRN 擷取還原量測 fidelity(v0129 不動) | 自測 7/7 + 前版 35/35 |
+| 2026-11-24T09:00:00Z | VCGC_CommandHub_v0109.py | 0109 | VIA-CORE-MDL897 | dab7181eceba | 中樞:找工具與讀收據分開(v0101–v0108 不動) | 自測 4/4 + 前版 |
+| 2026-11-24T09:00:00Z | VRN_ENG397_P1Segment_v0131.py | 0131 | VIA-VRN-ENG342 | 70256c10656f | VRN fidelity 兩處量測修正(v0129 · v0130 不動) | 自測 5/5 + 前版 |
