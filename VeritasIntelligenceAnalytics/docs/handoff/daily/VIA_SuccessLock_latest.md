@@ -170,3 +170,7 @@
 | 2026-11-24T11:00:00Z | VIA_HostBoot_v0100.py | 0100 | VIA-CORE-MDL900 | b246e6a9f911 | 桌機啟動器:git 同步改在 Python | 自測 6/6 |
 | 2026-11-24T11:30:00Z | VIA_FastRun_v0103.py | 0103 | VIA-CORE-MDL901 | bb103eb99975 | 心跳不溢位 · env 提速 | 自測 8/8 + 前版 8/8 |
 | 2026-11-24T11:30:00Z | VCGC_CommandHub_v0111.py | 0111 | VIA-CORE-MDL902 | e34f917bf5d8 | via-health 短令 | 自測 5/5 + 前版鏈 v0110~v0105 全過 |
+| 2026-11-24T13:30:00Z | CGC_MDL056_InstallGate_v0105.py | 0105 | VIA-VCGC-MDL1708 | 44b098423c1f | 三鏡像查衝突 · 依計畫安裝 | 自測 11/11 |
+| 2026-11-24T13:30:00Z | VCGC_CommandHub_v0112.py | 0112 | VIA-CORE-MDL903 | 2759245f8bda | via-install 先查再裝 | 自測 6/6 + 前版鏈全過 |
+| 2026-11-24T13:30:00Z | VIA_FastRun_v0104.py | 0104 | VIA-CORE-MDL904 | f9ed53db78d0 | env 組照規範 | 自測 6/6 + 前版 8/8 |
+| 2026-11-24T13:30:00Z | VRN_ENG397_P1Segment_v0132.py | 0132 | VIA-VRN-ENG343 | 7f3e0cc3bd1d | 橋 OCR 一頁一批 | 自測 5/5 + 前版 5/5 |
