@@ -49,6 +49,7 @@ import importlib.util
 import json
 import os
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from graphlib import CycleError, TopologicalSorter
@@ -110,7 +111,7 @@ SUPPORT_SOURCES: tuple[tuple[str, str, str], ...] = (
     ("copilot", "Copilot", "對話只留最後一則摘要。沒有索引就是缺席。"),
 )
 SCHEMA = "vcgc.startup-engine/1"
-SELFTEST_TOTAL = 54
+SELFTEST_TOTAL = 57
 # 2026-11-24 已寫進盤點冊的站。這支引擎不另開站、不把本體塞進備份 zip。
 TODAY_STATIONS: tuple[tuple[str, str, str], ...] = (
     ("C-rework-guard-v0100", "v0100", "重工守衛"),
@@ -319,6 +320,12 @@ def accel_env(job: Job, hw: HardwareProfile, base: dict[str, str] | None = None)
     env["VIA_JOB_MAX_RAM_MB"] = str(job.est_ram_mb)
     env["VIA_JOB_MAX_THREADS"] = cap
     env["VIA_ENGINE"] = ENGINE_ID
+    if VIA_ACCEL is not None:
+        # 子程序的轉接要 import 得到加速器；路徑取自本檔加速器橋已找到的那一份，不另找本體。
+        seat_dir = str(Path(VIA_ACCEL.__file__).resolve().parent)
+        parts = [part for part in env.get("PYTHONPATH", "").split(os.pathsep) if part]
+        if seat_dir not in parts:
+            env["PYTHONPATH"] = os.pathsep.join([seat_dir, *parts])
     return env
 
 
@@ -748,7 +755,11 @@ def accel_argv(args: list[str]) -> list[str]:
         "except Exception as exc:\n"
         " sys.stderr.write('ACCEL_ABSENT %s\\n' % exc)\n"
         " sys.exit(3)\n"
-        "os.execv(sys.executable, [sys.executable, *sys.argv[1:]])\n"
+        "import subprocess\n"
+        "argv = sys.argv[1:]\n"
+        "if os.path.basename(argv[0]).lower() in ('python', 'python3', 'python.exe', 'python3.exe'):\n"
+        " argv[0] = sys.executable\n"
+        "sys.exit(subprocess.call(argv))\n"
     )
     return [sys.executable, "-c", bootstrap, *args]
 
@@ -769,6 +780,7 @@ AST_LIB_FLOOR = (
     "re",
     "sys",
     "typing",
+    "subprocess",
 )
 AST_ABSENT = ("LibCST", "ruff", "tree-sitter", "PSScriptAnalyzer", "Pyre")
 AST_FNC_FLOOR: tuple[str, ...] = (
@@ -820,6 +832,7 @@ AST_FNC_FLOOR: tuple[str, ...] = (
     "vqg_analyze",
     "vap_view",
     "pipeline_rehearse",
+    "run_job",
 )
 
 
@@ -1106,6 +1119,7 @@ def simulate(
     fail_name: str | None = None,
     on_fault: str = "halt",
     gated: Iterable[str] | None = None,
+    runner=None,
 ) -> dict:
     """on_fault=halt：失敗即停，已完成的留在 journal。
     on_fault=skip：失敗的那一件記入典籍並跳過，沒有這條依賴的系統繼續。不自動重試，不歸零。"""
@@ -1125,6 +1139,7 @@ def simulate(
     failed: str | None = None
     steps = 0
     gated_names = set(gated or ())
+    runs: list[dict] = []
 
     def release_blocked() -> None:
         progressed = True
@@ -1179,6 +1194,24 @@ def simulate(
                     running.clear()
                     break
                 continue
+            if runner is not None:
+                # launch / resume：真的跑這件的指令，完成與否只看回傳碼。不重試。
+                outcome = runner(job)
+                runs.append(outcome)
+                if not outcome["ok"]:
+                    if failed is None:
+                        failed = job.name
+                    skipped.add(job.name)
+                    hit = fold_canon("此件中斷")
+                    hit["name"] = job.name
+                    hit["system"] = job.system
+                    hit["rc"] = outcome["rc"]
+                    canon.append(hit)
+                    events.append({"kind": "fail", "name": job.name, "system": job.system, "code": hit["code"], "rc": outcome["rc"]})
+                    if on_fault == "halt":
+                        running.clear()
+                        break
+                    continue
             done.add(job.name)
             events.append({"kind": "done", "name": job.name, "system": job.system})
             continue
@@ -1209,7 +1242,21 @@ def simulate(
         "canon": canon,
         "stopped": failed is not None and on_fault == "halt",
         "reset": False,
+        "executed": runner is not None,
+        "runs": runs,
     }
+
+
+def run_job(job: Job, hw: HardwareProfile, run=subprocess.run) -> dict:
+    """launch / resume 用：跑這件的指令（已先掛加速器），完成與否只看回傳碼。不重試、不改指令、不用 shell。"""
+    try:
+        proc = run(job.cmd, env=accel_env(job, hw), timeout=job.timeout_sec, capture_output=True, text=True)
+    except subprocess.TimeoutExpired:
+        return {"name": job.name, "ok": False, "rc": 124, "why": "逾時"}
+    except OSError as exc:
+        return {"name": job.name, "ok": False, "rc": 127, "why": type(exc).__name__}
+    tail = ((proc.stderr or "") + (proc.stdout or "")).strip().splitlines()
+    return {"name": job.name, "ok": proc.returncode == 0, "rc": proc.returncode, "why": tail[-1][:200] if tail else ""}
 
 
 def default_jobs() -> list[Job]:
@@ -1319,6 +1366,9 @@ def vqg_analyze(vdf_folder: str | Path, vqg_folder: str | Path) -> dict:
         ).fetchall()
         if not got or any(close is None or symbol is None or t is None for symbol, t, close in got):
             return {"ok": False, "lamp": "RED", "why": "欄位不完整"}
+        symbols = sorted({row[0] for row in got})
+        if len(symbols) != 1:
+            return {"ok": False, "lamp": "RED", "why": f"有 {len(symbols)} 檔標的。持有報酬一次只算一檔，不把不同標的接起來算。"}
         start = float(got[0][2])
         end = float(got[-1][2])
         if start == 0:
@@ -1644,8 +1694,11 @@ def selftest() -> list[dict]:
     wrapped = all("VIA_SuperAccel_Module" in " ".join(job.cmd) and job.cmd[0] == sys.executable for job in jobs)
     _check("每個任務的指令先掛加速器", wrapped and ACCEL_MODULE in argv[2], argv[1], rows)
 
-    seat = find_accel_seat()
-    net = find_net_seat()
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as off_tree:
+        seat = find_accel_seat(off_tree)
+        net = find_net_seat(off_tree)
     seat_ok = seat["lamp"] == "ABSENT" and net["lamp"] == "ABSENT" and seat["version"] == "v1141" and net["version"] == "v1652" and net["engine"] == "1.65.2"
     _check("沒有 VIA 樹就不把缺席說成已載入", seat_ok and seat["via"] == "lock" and net["via"] == "lock", seat["lamp"] + " " + net["lamp"], rows)
 
@@ -1853,23 +1906,58 @@ def selftest() -> list[dict]:
         str(len(book["fnc"])),
         rows,
     )
-    import tempfile
-
     with tempfile.TemporaryDirectory() as folder:
         rehearsed = pipeline_rehearse(folder)
+    if rehearsed.get("lamp") == "ABSENT":
+        _check("VDF 增量寫 parquet，VQG 只讀，VAP 只顯示", False, "ABSENT · " + rehearsed["why"] + " 這一條沒跑。", rows)
+        rows[-1]["lamp"] = "ABSENT"
+    else:
+        _check(
+            "VDF 增量寫 parquet，VQG 只讀，VAP 只顯示",
+            rehearsed["fusion"] is False and rehearsed["managers_added"] is False
+            and rehearsed["vdf_unchanged"] is True and rehearsed["replay"] is True
+            and rehearsed["inserted"] == [2, 0, 1]
+            and rehearsed["view"]["symbol"] == "DEMO"
+            and rehearsed["view"]["rows"] == 3
+            and rehearsed["view"]["template"] == "TPL-HOLD-0001"
+            and abs(rehearsed["view"]["ret"] - 0.02) < 1e-9
+            and "不是行情" in rehearsed["view"]["note"],
+            str(rehearsed["inserted"]),
+            rows,
+        )
+    if _duckdb() is None:
+        _check("多檔標的不接起來算持有報酬", False, "ABSENT · 沒有 duckdb。這一條沒跑。", rows)
+        rows[-1]["lamp"] = "ABSENT"
+    else:
+        with tempfile.TemporaryDirectory() as folder:
+            vdf_parquet_increment(Path(folder) / "vdf", 1, [("AAA", 1, 100.0), ("AAA", 2, 110.0), ("BBB", 1, 50.0), ("BBB", 2, 40.0)])
+            mixed = vqg_analyze(Path(folder) / "vdf", Path(folder) / "vqg")
+        _check("多檔標的不接起來算持有報酬", mixed["ok"] is False and mixed["lamp"] == "RED" and "2 檔" in mixed["why"], mixed.get("why", ""), rows)
+
+    calls: list[list[str]] = []
+
+    def fake_run(cmd, env=None, timeout=None, capture_output=None, text=None):
+        calls.append(list(cmd))
+        code = 7 if cmd[-1] == "fail" else 0
+        return type("Done", (), {"returncode": code, "stdout": "", "stderr": "boom" if code else ""})()
+
+    probe = [
+        Job("P_ok", ["python", "-c", "ok"], 100, "VCGC"),
+        Job("P_bad", ["python", "-c", "fail"], 100, "VCGC"),
+        Job("P_after", ["python", "-c", "after"], 100, "VCGC", deps=["P_bad"]),
+    ]
+    ran = simulate(probe, detect_hardware(16384, 4), on_fault="skip", runner=lambda job: run_job(job, hw, run=fake_run))
     _check(
-        "VDF 增量寫 parquet，VQG 只讀，VAP 只顯示",
-        rehearsed["fusion"] is False and rehearsed["managers_added"] is False
-        and rehearsed["vdf_unchanged"] is True and rehearsed["replay"] is True
-        and rehearsed["inserted"] == [2, 0, 1]
-        and rehearsed["view"]["symbol"] == "DEMO"
-        and rehearsed["view"]["rows"] == 3
-        and rehearsed["view"]["template"] == "TPL-HOLD-0001"
-        and abs(rehearsed["view"]["ret"] - 0.02) < 1e-9
-        and "不是行情" in rehearsed["view"]["note"],
-        str(rehearsed["inserted"]),
+        "launch 真的跑指令，完成只看回傳碼",
+        ran["executed"] is True and len(calls) == 2 and ran["journal"] == ["P_ok"]
+        and ran["failed"] == "P_bad" and "P_after" in ran["skipped"]
+        and sorted(r["rc"] for r in ran["runs"]) == [0, 7],
+        f"跑了 {len(calls)} 件 · 完成 {ran['journal']}",
         rows,
     )
+    real = run_job(default_jobs()[0], hw)
+    want = 0 if VIA_ACCEL is not None else 3
+    _check("預設任務的指令實跑：先掛加速器再執行原指令", real["rc"] == want, f"rc {real['rc']} · {real['why']}", rows)
     _check("自測條數與常數一致", len(rows) + 1 == SELFTEST_TOTAL, f"{len(rows) + 1}/{SELFTEST_TOTAL}", rows)
     return rows
 
@@ -1927,7 +2015,7 @@ def main(argv: list[str] | None = None) -> int:
             rows = selftest()
             failed = [r for r in rows if not r["ok"]]
             for row in rows:
-                flag = "PASS" if row["ok"] else "FAIL"
+                flag = "PASS" if row["ok"] else row.get("lamp", "FAIL")
                 print(f"[{flag}] {row['name']} — {row['detail']}")
             print(f"{len(rows) - len(failed)}/{len(rows)}")
             return 1 if failed else 0
@@ -1960,7 +2048,10 @@ def main(argv: list[str] | None = None) -> int:
             gated = [job.name for job in jobs if (job.mutex or "").startswith("net_")]
         else:
             gated = []
-        result = simulate(jobs, hw, journal=None, fail_name=args.fail or None, on_fault="skip", gated=gated)
+        result = simulate(
+            jobs, hw, journal=None, fail_name=args.fail or None, on_fault="skip", gated=gated,
+            runner=lambda job: run_job(job, hw),
+        )
         result["accel"] = hooked
         result["coverage"] = {"required": cov["required"], "covered": cov["covered"], "ratio": cov["ratio"], "ok": True}
         result["preflight"] = {"ok": True, "net_jobs": gate["net_jobs"], "repair": False, "install": False, "touched_existing": False}
