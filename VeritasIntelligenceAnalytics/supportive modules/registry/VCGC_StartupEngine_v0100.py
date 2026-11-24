@@ -114,7 +114,7 @@ SUPPORT_SOURCES: tuple[tuple[str, str, str], ...] = (
     ("copilot", "Copilot", "對話只留最後一則摘要。沒有索引就是缺席。"),
 )
 SCHEMA = "vcgc.startup-engine/1"
-SELFTEST_TOTAL = 61
+SELFTEST_TOTAL = 62
 # 2026-11-24 已寫進盤點冊的站。這支引擎不另開站、不把本體塞進備份 zip。
 TODAY_STATIONS: tuple[tuple[str, str, str], ...] = (
     ("C-rework-guard-v0100", "v0100", "重工守衛"),
@@ -1319,7 +1319,8 @@ def run_job(job: Job, hw: HardwareProfile, run=None) -> dict:
     else:
         group = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt" else {"start_new_session": True}
         try:
-            proc = subprocess.Popen(job.cmd, env=accel_env(job, hw), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, **group)
+            proc = subprocess.Popen(job.cmd, env=accel_env(job, hw), stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    encoding="utf-8", errors="replace", **group)   # 子程序被 PYTHONUTF8=1 → 一律 UTF-8 解,壞字元換掉不炸
         except OSError as exc:
             return {"name": job.name, "ok": False, "rc": 127, "why": type(exc).__name__}
         try:
@@ -2120,6 +2121,8 @@ def selftest() -> list[dict]:
         orphan = marker.exists()
     _check("逾時把整棵行程樹砍掉(外層轉接底下的指令不會事後再寫檔)", killed["rc"] == 124 and not orphan,
            f"rc {killed['rc']} · 事後寫檔 {orphan}", rows)
+    utf = run_job(Job("U_utf8", [sys.executable, "-c", "import sys; sys.stdout.buffer.write('\\u5b8c\\u6210 \\u2705\\n'.encode('utf-8')); sys.stdout.buffer.write(b'\\xff\\n')"], 100, "VCGC"), hw)
+    _check("子程序輸出一律用 UTF-8 解(父行程是 CP950 也不炸;壞位元組換掉)· 回傳碼照收", utf["ok"] is True and utf["rc"] == 0, str(utf), rows)
     real = run_job(default_jobs()[0], hw)
     want = 0 if VIA_ACCEL is not None else 3
     _check("預設任務的指令實跑：先掛加速器再執行原指令", real["rc"] == want, f"rc {real['rc']} · {real['why']}", rows)
