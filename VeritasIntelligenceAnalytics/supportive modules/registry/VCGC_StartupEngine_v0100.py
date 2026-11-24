@@ -51,6 +51,8 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
+from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass, field
 from graphlib import CycleError, TopologicalSorter
 from pathlib import Path
@@ -111,7 +113,7 @@ SUPPORT_SOURCES: tuple[tuple[str, str, str], ...] = (
     ("copilot", "Copilot", "對話只留最後一則摘要。沒有索引就是缺席。"),
 )
 SCHEMA = "vcgc.startup-engine/1"
-SELFTEST_TOTAL = 57
+SELFTEST_TOTAL = 59
 # 2026-11-24 已寫進盤點冊的站。這支引擎不另開站、不把本體塞進備份 zip。
 TODAY_STATIONS: tuple[tuple[str, str, str], ...] = (
     ("C-rework-guard-v0100", "v0100", "重工守衛"),
@@ -781,6 +783,8 @@ AST_LIB_FLOOR = (
     "sys",
     "typing",
     "subprocess",
+    "tempfile",
+    "concurrent",
 )
 AST_ABSENT = ("LibCST", "ruff", "tree-sitter", "PSScriptAnalyzer", "Pyre")
 AST_FNC_FLOOR: tuple[str, ...] = (
@@ -833,6 +837,9 @@ AST_FNC_FLOOR: tuple[str, ...] = (
     "vap_view",
     "pipeline_rehearse",
     "run_job",
+    "journal_path",
+    "load_journal",
+    "save_journal",
 )
 
 
@@ -1140,6 +1147,8 @@ def simulate(
     steps = 0
     gated_names = set(gated or ())
     runs: list[dict] = []
+    futures: dict = {}
+    pool = ThreadPoolExecutor(max_workers=max(1, len(jobs))) if runner is not None else None
 
     def release_blocked() -> None:
         progressed = True
@@ -1180,6 +1189,48 @@ def simulate(
             running.append(job)
             events.append({"kind": "start", "name": job.name, "system": job.system, "ram": job.est_ram_mb})
             started = True
+        if running and runner is not None:
+            # launch / resume：每件被放行的任務各自在工作緒裡真的跑（准入照舊看依賴、記憶體、互斥），誰先跑完先收。
+            for j in running:
+                if j.name not in futures:
+                    if fail_name and j.name == fail_name and failed is None:
+                        fut: Future = Future()
+                        fut.set_result({"name": j.name, "ok": False, "rc": None, "why": "指定中斷（--fail）"})
+                        futures[j.name] = fut
+                    else:
+                        futures[j.name] = pool.submit(runner, j)
+            finished, _ = wait([futures[j.name] for j in running], return_when=FIRST_COMPLETED)
+            first = next(iter(finished))
+            job = next(j for j in running if futures[j.name] is first)
+            running.remove(job)
+            outcome = futures.pop(job.name).result()
+            runs.append(outcome)
+            if not outcome["ok"]:
+                if failed is None:
+                    failed = job.name
+                skipped.add(job.name)
+                hit = fold_canon("此件中斷")
+                hit["name"] = job.name
+                hit["system"] = job.system
+                hit["rc"] = outcome["rc"]
+                canon.append(hit)
+                events.append({"kind": "fail", "name": job.name, "system": job.system, "code": hit["code"], "rc": outcome["rc"]})
+                if on_fault == "halt":
+                    for other in running:                      # 已在跑的等它跑完、照實記，不再放行新的
+                        late = futures.pop(other.name).result()
+                        runs.append(late)
+                        if late["ok"]:
+                            done.add(other.name)
+                            events.append({"kind": "done", "name": other.name, "system": other.system})
+                        else:
+                            skipped.add(other.name)
+                            events.append({"kind": "fail", "name": other.name, "system": other.system, "rc": late["rc"]})
+                    running.clear()
+                    break
+                continue
+            done.add(job.name)
+            events.append({"kind": "done", "name": job.name, "system": job.system})
+            continue
         if running:
             job = running.pop(0)
             if fail_name and job.name == fail_name and failed is None:
@@ -1194,24 +1245,6 @@ def simulate(
                     running.clear()
                     break
                 continue
-            if runner is not None:
-                # launch / resume：真的跑這件的指令，完成與否只看回傳碼。不重試。
-                outcome = runner(job)
-                runs.append(outcome)
-                if not outcome["ok"]:
-                    if failed is None:
-                        failed = job.name
-                    skipped.add(job.name)
-                    hit = fold_canon("此件中斷")
-                    hit["name"] = job.name
-                    hit["system"] = job.system
-                    hit["rc"] = outcome["rc"]
-                    canon.append(hit)
-                    events.append({"kind": "fail", "name": job.name, "system": job.system, "code": hit["code"], "rc": outcome["rc"]})
-                    if on_fault == "halt":
-                        running.clear()
-                        break
-                    continue
             done.add(job.name)
             events.append({"kind": "done", "name": job.name, "system": job.system})
             continue
@@ -1233,6 +1266,8 @@ def simulate(
             events.append({"kind": "wait", "name": smallest.name})
             break
 
+    if pool is not None:
+        pool.shutdown(wait=True)
     return {
         "events": events,
         "journal": sorted(done),
@@ -1257,6 +1292,37 @@ def run_job(job: Job, hw: HardwareProfile, run=subprocess.run) -> dict:
         return {"name": job.name, "ok": False, "rc": 127, "why": type(exc).__name__}
     tail = ((proc.stderr or "") + (proc.stdout or "")).strip().splitlines()
     return {"name": job.name, "ok": proc.returncode == 0, "rc": proc.returncode, "why": tail[-1][:200] if tail else ""}
+
+
+def journal_path(override: str = "") -> Path:
+    """完成典籍放哪:--journal 指定 > VIA 樹的 VIA_Reports/vcgc_startup/ > 系統暫存夾(單檔不在樹上時)。"""
+    if override:
+        return Path(override)
+    root = find_via_root()
+    base = (root.parent if root and root.name == "VeritasIntelligenceAnalytics" else root) if root else None
+    folder = (base / "VIA_Reports" / "vcgc_startup") if base else Path(tempfile.gettempdir()) / "vcgc_startup"
+    return folder / "JOURNAL_latest.json"
+
+
+def load_journal(path: Path, jobs: list[Job]) -> tuple[list[str], list[str]]:
+    """回 (已完成且仍在冊上的任務, 冊上已沒有的舊名)。檔不在 = 空典籍。不歸零、不改檔。"""
+    try:
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return [], []
+    names = {j.name for j in jobs}
+    done = [n for n in data.get("journal", []) if isinstance(n, str)]
+    return [n for n in done if n in names], [n for n in done if n not in names]
+
+
+def save_journal(path: Path, result: dict, verb: str) -> None:
+    """只記完成的任務(失敗與跳過不算),先寫暫存檔再換名。"""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps({"engine": ENGINE_ID, "verb": verb, "journal": result["journal"], "failed": result["failed"],
+                               "skipped": result["skipped"]}, ensure_ascii=False, indent=2), encoding="utf-8")
+    os.replace(tmp, path)
 
 
 def default_jobs() -> list[Job]:
@@ -1955,6 +2021,39 @@ def selftest() -> list[dict]:
         f"跑了 {len(calls)} 件 · 完成 {ran['journal']}",
         rows,
     )
+    import threading
+    import time as _time
+
+    live = {"now": 0, "peak": 0}
+    lock = threading.Lock()
+
+    def slow_run(cmd, env=None, timeout=None, capture_output=None, text=None):
+        with lock:
+            live["now"] += 1
+            live["peak"] = max(live["peak"], live["now"])
+        _time.sleep(0.4)
+        with lock:
+            live["now"] -= 1
+        return type("Done", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    trio = [Job("Q_%d" % i, ["python", "-c", "q%d" % i], 100, "VCGC") for i in range(3)]
+    big = detect_hardware(65536, 16)
+    t0 = _time.time()
+    par = simulate(trio, big, on_fault="skip", runner=lambda job: run_job(job, big, run=slow_run))
+    took = _time.time() - t0
+    _check("放行的任務真的同時跑(不是一件跑完才跑下一件)", par["journal"] == ["Q_0", "Q_1", "Q_2"] and live["peak"] >= 2
+           and took < 1.1, f"同時最多 {live['peak']} 件 · {took:.2f}s(逐件會是 1.2s 以上)", rows)
+    with tempfile.TemporaryDirectory() as jdir:
+        jp = Path(jdir) / "JOURNAL_latest.json"
+        calls.clear()
+        first = simulate(probe, detect_hardware(16384, 4), on_fault="skip", runner=lambda job: run_job(job, hw, run=fake_run))
+        save_journal(jp, first, "launch")
+        prior, stale = load_journal(jp, probe)
+        calls.clear()
+        again = simulate(probe, detect_hardware(16384, 4), journal=prior, on_fault="skip", runner=lambda job: run_job(job, hw, run=fake_run))
+    _check("resume 讀上一輪的完成典籍:已完成的不重跑,失敗的與其下游照實再試",
+           prior == ["P_ok"] and stale == [] and all(c[-1] != "ok" for c in calls) and "P_ok" in again["journal"],
+           f"典籍 {prior} · 這輪跑了 {[c[-1] for c in calls]}", rows)
     real = run_job(default_jobs()[0], hw)
     want = 0 if VIA_ACCEL is not None else 3
     _check("預設任務的指令實跑：先掛加速器再執行原指令", real["rc"] == want, f"rc {real['rc']} · {real['why']}", rows)
@@ -1969,6 +2068,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--fail", default="", help="模擬時指定失敗節點，不自動重跑")
     parser.add_argument("--ram-mb", type=int, default=0)
     parser.add_argument("--cores", type=int, default=0)
+    parser.add_argument("--journal", default="", help="launch / resume 的完成典籍檔(預設 VIA_Reports/vcgc_startup/JOURNAL_latest.json)")
     args = parser.parse_args(argv)
     verb = args.verb
     hw = detect_hardware(args.ram_mb or None, args.cores or None)
@@ -2048,10 +2148,16 @@ def main(argv: list[str] | None = None) -> int:
             gated = [job.name for job in jobs if (job.mutex or "").startswith("net_")]
         else:
             gated = []
+        jpath = journal_path(args.journal)
+        prior, stale = load_journal(jpath, jobs) if verb == "resume" else ([], [])
         result = simulate(
-            jobs, hw, journal=None, fail_name=args.fail or None, on_fault="skip", gated=gated,
+            jobs, hw, journal=prior, fail_name=args.fail or None, on_fault="skip", gated=gated,
             runner=lambda job: run_job(job, hw),
         )
+        save_journal(jpath, result, verb)
+        result["journal_file"] = str(jpath)
+        result["resumed_from"] = prior
+        result["stale_journal_names"] = stale
         result["accel"] = hooked
         result["coverage"] = {"required": cov["required"], "covered": cov["covered"], "ratio": cov["ratio"], "ok": True}
         result["preflight"] = {"ok": True, "net_jobs": gate["net_jobs"], "repair": False, "install": False, "touched_existing": False}
