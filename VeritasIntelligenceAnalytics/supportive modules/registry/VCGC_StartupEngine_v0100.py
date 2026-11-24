@@ -110,7 +110,7 @@ SUPPORT_SOURCES: tuple[tuple[str, str, str], ...] = (
     ("copilot", "Copilot", "對話只留最後一則摘要。沒有索引就是缺席。"),
 )
 SCHEMA = "vcgc.startup-engine/1"
-SELFTEST_TOTAL = 52
+SELFTEST_TOTAL = 54
 # 2026-11-24 已寫進盤點冊的站。這支引擎不另開站、不把本體塞進備份 zip。
 TODAY_STATIONS: tuple[tuple[str, str, str], ...] = (
     ("C-rework-guard-v0100", "v0100", "重工守衛"),
@@ -753,9 +753,142 @@ def accel_argv(args: list[str]) -> list[str]:
     return [sys.executable, "-c", bootstrap, *args]
 
 
-def ast_string_verbs(source: str) -> set[str]:
+# 編號只增。不跟行號。不在這三份裡的名字就是還沒登記。
+AST_CLS_FLOOR = ("Job", "HardwareProfile")
+AST_LIB_FLOOR = (
+    "__future__",
+    "argparse",
+    "ast",
+    "dataclasses",
+    "graphlib",
+    "hashlib",
+    "importlib",
+    "json",
+    "os",
+    "pathlib",
+    "re",
+    "sys",
+    "typing",
+)
+AST_ABSENT = ("LibCST", "ruff", "tree-sitter", "PSScriptAnalyzer", "Pyre")
+AST_FNC_FLOOR: tuple[str, ...] = (
+    "detect_hardware",
+    "accel_env",
+    "_tail_num",
+    "pick_newest_tail",
+    "_version_num",
+    "find_via_root",
+    "_file_sha256",
+    "_resolve_locked",
+    "read_lock_book",
+    "_tool_seat",
+    "find_accel_seat",
+    "find_net_seat",
+    "fold_canon",
+    "dock_ledger",
+    "clamp_wait",
+    "token_directive",
+    "platform_dock",
+    "support_review",
+    "complement_survey",
+    "dock_walk",
+    "through_accel",
+    "accel_argv",
+    "parse_source",
+    "ast_inventory",
+    "ast_string_verbs",
+    "coverage",
+    "engine_coverage",
+    "mount",
+    "assist_interface",
+    "validate_jobs",
+    "dependency_waves",
+    "_fits",
+    "simulate",
+    "default_jobs",
+    "_spec_found",
+    "source_activates_talib",
+    "preflight",
+    "plan_report",
+    "conform",
+    "_check",
+    "selftest",
+    "main",
+    "_duckdb",
+    "_parquet_target",
+    "vdf_parquet_increment",
+    "vqg_analyze",
+    "vap_view",
+    "pipeline_rehearse",
+)
+
+
+def parse_source(source: str) -> ast.AST:
+    """全檔只從這裡解析。呼叫端把樹傳下去，不各自再解析。"""
+    return ast.parse(source)
+
+
+def ast_inventory(source: str | None = None) -> dict:
+    """CLS / FNC / LIB 編號。缺的庫保持缺席。不寫檔，不融合。"""
+    src = source if source is not None else Path(__file__).read_text(encoding="utf-8")
+    tree = parse_source(src)
+    classes: list[str] = []
+    functions: list[str] = []
+    libs: list[str] = []
+    parse_owners: list[str] = []
+    assist_imports = 0
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef):
+            classes.append(node.name)
+        elif isinstance(node, ast.FunctionDef):
+            functions.append(node.name)
+            for inner in ast.walk(node):
+                called = (
+                    isinstance(inner, ast.Call)
+                    and isinstance(inner.func, ast.Attribute)
+                    and isinstance(inner.func.value, ast.Name)
+                    and inner.func.value.id == "ast"
+                    and inner.func.attr == "parse"
+                )
+                if called:
+                    parse_owners.append(node.name)
+                if node.name == "assist_interface" and isinstance(inner, (ast.Import, ast.ImportFrom)):
+                    assist_imports += 1
+        elif isinstance(node, ast.Import):
+            libs.extend(alias.name.split(".")[0] for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            libs.append(node.module.split(".")[0])
+
+    def rows(names: list[str], floor: tuple[str, ...], kind: str) -> list[dict]:
+        return [
+            {"id": f"AST-{kind}-CORE-{index:04d}", "name": name, "present": name in names}
+            for index, name in enumerate(floor, start=1)
+        ]
+
+    lib_set = sorted(set(libs))
+    return {
+        "writes": False,
+        "fusion": False,
+        "cls": rows(classes, AST_CLS_FLOOR, "CLS"),
+        "fnc": rows(functions, AST_FNC_FLOOR, "FNC"),
+        "lib": lib_set,
+        "lost_cls": [name for name in AST_CLS_FLOOR if name not in classes],
+        "lost_fnc": [name for name in AST_FNC_FLOOR if name not in functions],
+        "extra_fnc": [name for name in functions if name not in AST_FNC_FLOOR],
+        "lost_lib": [name for name in AST_LIB_FLOOR if name not in lib_set],
+        "extra_lib": [name for name in lib_set if name not in AST_LIB_FLOOR],
+        "hold": ["_tail_num", "_version_num"],
+        "composed": {"body": "_tool_seat", "names": ["find_accel_seat", "find_net_seat"]},
+        "absent": list(AST_ABSENT),
+        "parse_owners": parse_owners,
+        "assist_imports": assist_imports,
+    }
+
+
+def ast_string_verbs(source: str, tree: ast.AST | None = None) -> set[str]:
     """用 AST 收動詞，不靠關鍵字全文搜。只認賦值、choices、以及與字串常數的比較。"""
-    tree = ast.parse(source)
+    if tree is None:
+        tree = parse_source(source)
     found: set[str] = set()
 
     def take_seq(node: ast.AST) -> None:
@@ -785,10 +918,10 @@ def ast_string_verbs(source: str) -> set[str]:
     return found
 
 
-def coverage(source: str, required: Iterable[str] = VERBS) -> dict:
+def coverage(source: str, required: Iterable[str] = VERBS, tree: ast.AST | None = None) -> dict:
     text_has_accel = ACCEL_MARK in source
     try:
-        found = ast_string_verbs(source)
+        found = ast_string_verbs(source, tree)
         parsed = True
         error = ""
     except SyntaxError as exc:
@@ -810,15 +943,16 @@ def coverage(source: str, required: Iterable[str] = VERBS) -> dict:
     }
 
 
-def engine_coverage(source: str | None = None) -> dict:
+def engine_coverage(source: str | None = None, tree: ast.AST | None = None) -> dict:
     """啟動面：環境標記、橋、鎖冊版本、動詞派發、任務包裝、十五個動詞。未滿 1.0 不放行。"""
     src = source if source is not None else Path(__file__).read_text(encoding="utf-8")
-    try:
-        tree = ast.parse(src)
-        parsed = True
-    except SyntaxError:
-        tree = None
-        parsed = False
+    parsed = True
+    if tree is None:
+        try:
+            tree = parse_source(src)
+        except SyntaxError:
+            tree = None
+            parsed = False
     imported = False
     has_through = False
     has_wrap = False
@@ -830,7 +964,7 @@ def engine_coverage(source: str | None = None) -> dict:
                 has_through = True
             if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "accel_argv":
                 has_wrap = True
-    verb_gate = coverage(src) if parsed else {"found": [], "missing": list(VERBS), "ok": False}
+    verb_gate = coverage(src, tree=tree) if parsed else {"found": [], "missing": list(VERBS), "ok": False}
     found = set(verb_gate.get("found") or [])
     flags = [
         ("環境標記", ACCEL_MARK in src),
@@ -1094,6 +1228,165 @@ def default_jobs() -> list[Job]:
     ]
 
 
+def _duckdb():
+    """資料庫只在呼叫時載入。沒有就不假造 parquet。不在檔案頂層綁死。"""
+    try:
+        import duckdb
+    except ImportError:
+        return None
+    return duckdb
+
+
+def _parquet_target(folder: Path, batch: int) -> Path:
+    root = folder.resolve()
+    target = (root / f"batch_{batch:04d}.parquet").resolve()
+    if target.parent != root:
+        raise ValueError("parquet 路徑越界")
+    return target
+
+
+def vdf_parquet_increment(folder: str | Path, batch: int, rows: list[tuple[str, int, float]]) -> dict:
+    """VDF 的增量。DuckDB 持有本座的庫。寫出的 parquet 只含這次新進的列。重跑同一批不插入。"""
+    duckdb = _duckdb()
+    if duckdb is None:
+        return {"lamp": "ABSENT", "inserted": 0, "replay": False, "parquet": None}
+    root = Path(folder)
+    root.mkdir(parents=True, exist_ok=True)
+    con = duckdb.connect(str(root / "vdf.duckdb"))
+    try:
+        con.execute(
+            """
+            CREATE TABLE IF NOT EXISTS bars (
+                symbol VARCHAR, t INTEGER, close DOUBLE, batch INTEGER,
+                PRIMARY KEY (symbol, t)
+            )
+            """
+        )
+        con.execute("CREATE TABLE IF NOT EXISTS ingest_log (batch INTEGER PRIMARY KEY, inserted INTEGER)")
+        seen = con.execute("SELECT inserted FROM ingest_log WHERE batch = ?", [batch]).fetchone()
+        if seen is not None:
+            return {"lamp": "GREEN", "inserted": 0, "replay": True, "parquet": None}
+        fresh: list[tuple[str, int, float]] = []
+        taken: set[tuple[str, int]] = set()
+        for symbol, t, close in rows:
+            key = (symbol, t)
+            if key in taken:
+                continue
+            taken.add(key)
+            fresh.append((symbol, t, float(close)))
+        con.execute("CREATE TEMP TABLE incoming (symbol VARCHAR, t INTEGER, close DOUBLE)")
+        if fresh:
+            con.executemany("INSERT INTO incoming VALUES (?, ?, ?)", fresh)
+        con.execute(
+            """
+            INSERT INTO bars
+            SELECT i.symbol, i.t, i.close, ?
+            FROM incoming i
+            ANTI JOIN bars b ON i.symbol = b.symbol AND i.t = b.t
+            """,
+            [batch],
+        )
+        inserted = con.execute("SELECT count(*) FROM bars WHERE batch = ?", [batch]).fetchone()[0]
+        parquet_name = None
+        if inserted:
+            target = _parquet_target(root, batch)
+            safe = target.as_posix().replace("'", "''")
+            con.execute(
+                f"COPY (SELECT symbol, t, close, batch FROM bars WHERE batch = {int(batch)}) TO '{safe}' (FORMAT PARQUET)"
+            )
+            parquet_name = target.name
+        con.execute("INSERT INTO ingest_log VALUES (?, ?)", [batch, inserted])
+        return {"lamp": "GREEN", "inserted": int(inserted), "replay": False, "parquet": parquet_name}
+    finally:
+        con.close()
+
+
+def vqg_analyze(vdf_folder: str | Path, vqg_folder: str | Path) -> dict:
+    """VQG 只讀 VDF 的 parquet。結果寫在自己的庫。不開 vdf.duckdb。沒有管理器。"""
+    duckdb = _duckdb()
+    if duckdb is None:
+        return {"ok": False, "lamp": "ABSENT"}
+    files = sorted(Path(vdf_folder).glob("batch_*.parquet"))
+    if not files:
+        return {"ok": False, "lamp": "RED", "why": "沒有 parquet"}
+    root = Path(vqg_folder)
+    root.mkdir(parents=True, exist_ok=True)
+    glob = (Path(vdf_folder).resolve() / "batch_*.parquet").as_posix().replace("'", "''")
+    con = duckdb.connect(str(root / "vqg.duckdb"))
+    try:
+        got = con.execute(
+            f"SELECT symbol, t, close FROM read_parquet('{glob}') ORDER BY symbol, t"
+        ).fetchall()
+        if not got or any(close is None or symbol is None or t is None for symbol, t, close in got):
+            return {"ok": False, "lamp": "RED", "why": "欄位不完整"}
+        start = float(got[0][2])
+        end = float(got[-1][2])
+        if start == 0:
+            return {"ok": False, "lamp": "RED", "why": "起點是 0"}
+        ret = (end - start) / start
+        con.execute("CREATE TABLE IF NOT EXISTS result (symbol VARCHAR, rows INTEGER, ret DOUBLE, template VARCHAR)")
+        con.execute("DELETE FROM result")
+        con.execute(
+            "INSERT INTO result VALUES (?, ?, ?, 'TPL-HOLD-0001')",
+            [got[0][0], len(got), ret],
+        )
+        return {
+            "ok": True,
+            "lamp": "GREEN",
+            "symbol": got[0][0],
+            "rows": len(got),
+            "ret": ret,
+            "template": "TPL-HOLD-0001",
+        }
+    finally:
+        con.close()
+
+
+def vap_view(analysis: dict) -> dict:
+    """VAP 只顯示 VQG 的結果。不寫庫，不補管理器。"""
+    if not analysis.get("ok"):
+        return {"ok": False, "lamp": analysis.get("lamp", "RED"), "lines": [], "note": "沒有可顯示的結果。"}
+    pct = analysis["ret"] * 100
+    return {
+        "ok": True,
+        "lamp": "GREEN",
+        "symbol": analysis["symbol"],
+        "rows": analysis["rows"],
+        "template": analysis["template"],
+        "ret": analysis["ret"],
+        "lines": [
+            f"{analysis['symbol']} · {analysis['rows']} 列",
+            f"{analysis['template']} · 持有報酬 {pct:.2f}%",
+        ],
+        "note": "模板回測。不是行情。VQG 與 VAP 仍沒有管理器。",
+    }
+
+
+def pipeline_rehearse(work: str | Path) -> dict:
+    """VDF 寫、VQG 讀、VAP 顯示。不新增管理器，不融合。"""
+    if _duckdb() is None:
+        return {"lamp": "ABSENT", "fusion": False, "managers_added": False, "why": "沒有 duckdb。不假造 parquet。"}
+    root = Path(work)
+    vdf = root / "vdf"
+    vqg = root / "vqg"
+    first = vdf_parquet_increment(vdf, 1, [("DEMO", 1, 100.0), ("DEMO", 2, 101.0)])
+    replay = vdf_parquet_increment(vdf, 1, [("DEMO", 1, 100.0), ("DEMO", 2, 101.0)])
+    second = vdf_parquet_increment(vdf, 2, [("DEMO", 2, 999.0), ("DEMO", 3, 102.0)])
+    before = {path.name: _file_sha256(path) for path in vdf.iterdir() if path.is_file()}
+    analysis = vqg_analyze(vdf, vqg)
+    after = {path.name: _file_sha256(path) for path in vdf.iterdir() if path.is_file()}
+    view = vap_view(analysis)
+    return {
+        "lamp": view["lamp"] if view.get("ok") else "RED",
+        "fusion": False,
+        "managers_added": False,
+        "vdf_unchanged": before == after,
+        "inserted": [first["inserted"], replay["inserted"], second["inserted"]],
+        "replay": replay["replay"],
+        "view": view,
+    }
+
+
 def _spec_found(name: str) -> bool:
     try:
         return importlib.util.find_spec(name) is not None
@@ -1101,12 +1394,13 @@ def _spec_found(name: str) -> bool:
         return False
 
 
-def source_activates_talib(src: str) -> bool:
+def source_activates_talib(src: str, tree: ast.AST | None = None) -> bool:
     """L50 的尺是 import 與 _si('talib')，不是全文搜到 talib 這個字。"""
-    try:
-        tree = ast.parse(src)
-    except SyntaxError:
-        return True
+    if tree is None:
+        try:
+            tree = parse_source(src)
+        except SyntaxError:
+            return True
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             if any(alias.name == "talib" or alias.name.startswith("talib.") for alias in node.names):
@@ -1123,8 +1417,12 @@ def source_activates_talib(src: str) -> bool:
 def preflight(source: str | None = None) -> dict:
     """啟動前快閘。只讀本檔與 find_spec。不安裝、不修復、不寫他系統的檔。"""
     src = source if source is not None else Path(__file__).read_text(encoding="utf-8")
+    try:
+        shared = parse_source(src)
+    except SyntaxError:
+        shared = None
     rows: list[dict] = []
-    talib_import = source_activates_talib(src)
+    talib_import = True if shared is None else source_activates_talib(src, shared)
     rows.append({
         "id": "libs_source",
         "lamp": "RED" if talib_import else "GREEN",
@@ -1139,7 +1437,7 @@ def preflight(source: str | None = None) -> dict:
         "detail": "環境解析到 talib 就拒絕啟動。六個動作都不做：不安裝、不載入、不復活、不路由、不當活動基準，也不移除。",
     })
     try:
-        cov = engine_coverage(src)
+        cov = engine_coverage(src, shared)
         seat = cov["seat"]
         contract_ok = bool(cov["ok"])
     except Exception as exc:  # noqa: BLE001
@@ -1227,8 +1525,12 @@ def plan_report(jobs: list[Job] | None = None, hw: HardwareProfile | None = None
 
 def conform(source: str | None = None) -> dict:
     src = source if source is not None else Path(__file__).read_text(encoding="utf-8")
-    gate = coverage(src)
-    cov = engine_coverage(src)
+    try:
+        shared = parse_source(src)
+    except SyntaxError:
+        shared = None
+    gate = coverage(src, tree=shared)
+    cov = engine_coverage(src, shared)
     mounts = [mount(sid) for sid in ("VCGC", "VDF", "VRN", "VQG", "VAP")]
     present = [m for m in mounts if m["rc"] == 0]
     absent = [m for m in mounts if m["rc"] == 3]
@@ -1509,12 +1811,8 @@ def selftest() -> list[dict]:
     face = assist_interface()
     bumped = {row["id"]: row for row in assist_interface({"VDF": {"why": "只動 VDF"}})["seats"]}
     base = {row["id"]: row for row in face["seats"]}
-    imports: list[str] = []
-    for node in ast.parse(Path(__file__).read_text(encoding="utf-8")).body:
-        if isinstance(node, ast.FunctionDef) and node.name == "assist_interface":
-            for inner in ast.walk(node):
-                if isinstance(inner, (ast.Import, ast.ImportFrom)):
-                    imports.append("import")
+    book = ast_inventory()
+    imports_clear = book["assist_imports"] == 0
     floor = [
         "C-rework-guard-v0100",
         "C-vrn-manager-v0289",
@@ -1539,8 +1837,37 @@ def selftest() -> list[dict]:
         and bumped["VDF"]["why"] == "只動 VDF" and bumped["VRN"]["why"] == base["VRN"]["why"]
         and bumped["VCGC"]["manager"] == base["VCGC"]["manager"]
         and all(row["blast"] == row["id"] and row["fusion"] is False for row in face["seats"])
-        and imports == [],
+        and imports_clear,
         str(len(face["register"])),
+        rows,
+    )
+    _check(
+        "語法樹只解析一次且編號不丟",
+        book["writes"] is False and book["fusion"] is False
+        and book["lost_cls"] == [] and book["lost_fnc"] == [] and book["extra_fnc"] == []
+        and book["lost_lib"] == [] and book["extra_lib"] == []
+        and book["parse_owners"] == ["parse_source"]
+        and book["hold"] == ["_tail_num", "_version_num"]
+        and book["absent"] == list(AST_ABSENT)
+        and len(book["fnc"]) == len(AST_FNC_FLOOR) and len(book["cls"]) == len(AST_CLS_FLOOR),
+        str(len(book["fnc"])),
+        rows,
+    )
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as folder:
+        rehearsed = pipeline_rehearse(folder)
+    _check(
+        "VDF 增量寫 parquet，VQG 只讀，VAP 只顯示",
+        rehearsed["fusion"] is False and rehearsed["managers_added"] is False
+        and rehearsed["vdf_unchanged"] is True and rehearsed["replay"] is True
+        and rehearsed["inserted"] == [2, 0, 1]
+        and rehearsed["view"]["symbol"] == "DEMO"
+        and rehearsed["view"]["rows"] == 3
+        and rehearsed["view"]["template"] == "TPL-HOLD-0001"
+        and abs(rehearsed["view"]["ret"] - 0.02) < 1e-9
+        and "不是行情" in rehearsed["view"]["note"],
+        str(rehearsed["inserted"]),
         rows,
     )
     _check("自測條數與常數一致", len(rows) + 1 == SELFTEST_TOTAL, f"{len(rows) + 1}/{SELFTEST_TOTAL}", rows)
@@ -1569,6 +1896,7 @@ def main(argv: list[str] | None = None) -> int:
         print("省額度指引: 只貼一行。不另造尺。")
         print("現況對接: " + str(len(PLATFORM_IDS)) + " 列。不跑、不裝、不加 --apply。Agent OS 正式放行 BLOCKED。")
         print("協助接口: 五座各走各的。有管理器的先接口。REGISTER " + str(len(TODAY_STATIONS)) + " 站不丟。融合先不做。")
+        print("資料面: VDF 增量 parquet。VQG 只讀。VAP 只顯示。不補管理器。")
         print("展勘: 對接 GRAPHIFY OMNIROUTE PONYTAIL AGENCY-MEM · 今日站 " + str(len(TODAY_STATIONS)) + " 已在冊 · 不改備份尾")
         print("對接輪: 同義字 · 參數 · 管理器 · " + ACCEL_TOOL + " · 備份 · 四工具。走完不是已裝。")
         return 0
