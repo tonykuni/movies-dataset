@@ -114,7 +114,7 @@ SUPPORT_SOURCES: tuple[tuple[str, str, str], ...] = (
     ("copilot", "Copilot", "對話只留最後一則摘要。沒有索引就是缺席。"),
 )
 SCHEMA = "vcgc.startup-engine/1"
-SELFTEST_TOTAL = 62
+SELFTEST_TOTAL = 65
 # 2026-11-24 已寫進盤點冊的站。這支引擎不另開站、不把本體塞進備份 zip。
 TODAY_STATIONS: tuple[tuple[str, str, str], ...] = (
     ("C-rework-guard-v0100", "v0100", "重工守衛"),
@@ -247,6 +247,7 @@ class Job:
     deps: list[str] = field(default_factory=list)
     mutex: str | None = None
     timeout_sec: int = 3600
+    rehearsal: bool = False                                   # 演練用的占位指令:跑得動,但不算完成、不寫典籍
 
     def to_dict(self) -> dict:
         return {
@@ -257,6 +258,7 @@ class Job:
             "deps": list(self.deps),
             "mutex": self.mutex,
             "timeout_sec": self.timeout_sec,
+            "rehearsal": self.rehearsal,
         }
 
 
@@ -843,6 +845,9 @@ AST_FNC_FLOOR: tuple[str, ...] = (
     "load_journal",
     "save_journal",
     "_kill_tree",
+    "load_jobs",
+    "launch_status",
+    "launch_run",
 )
 
 
@@ -1368,7 +1373,7 @@ def default_jobs() -> list[Job]:
     """只排已裝外掛的系統。VQG / VAP 不在冊上。每道指令先掛加速器，不觸網。
     VCGC 的三件只依賴自己。VRN 抽取那條邊是資料依賴，不是 VDF 管轄 VRN。"""
     quiet = accel_argv(["python", "-c", "print('ok')"])
-    return [
+    jobs = [
         Job("VCGC_01_PolicySeat", quiet, 400, "VCGC"),
         Job("VCGC_02_PanoramaGuard", quiet, 800, "VCGC", deps=["VCGC_01_PolicySeat"]),
         Job("VCGC_03_TestLanes", quiet, 600, "VCGC", deps=["VCGC_02_PanoramaGuard"]),
@@ -1378,6 +1383,61 @@ def default_jobs() -> list[Job]:
         Job("VRN_01_PDF_Layout", quiet, 4200, "VRN", mutex="vrn_ocr"),
         Job("VRN_02_Extract", quiet, 2200, "VRN", deps=["VRN_01_PDF_Layout", "VDF_04_Lakehouse_Merge"], mutex="duckdb_write"),
     ]
+    for job in jobs:
+        job.rehearsal = True                                   # 還沒接各系統管理器的真指令(接口相位):只能演練
+    return jobs
+
+
+def load_jobs(path: str | Path) -> list[Job]:
+    """--jobs 指定的任務清單(JSON:{"jobs":[{name, cmd, est_ram_mb, system, deps, mutex, timeout_sec}]} 或直接是清單)。
+    每道 cmd 照樣先掛加速器(accel_argv);系統沒有管理器的照 validate_jobs 拒絕。"""
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    rows = data.get("jobs") if isinstance(data, dict) else data
+    if not isinstance(rows, list) or not rows:
+        raise ValueError("--jobs 檔裡沒有任務清單")
+    jobs = []
+    for row in rows:
+        jobs.append(Job(str(row["name"]), accel_argv(list(row["cmd"])), int(row["est_ram_mb"]), str(row["system"]),
+                        deps=list(row.get("deps") or []), mutex=row.get("mutex"), timeout_sec=int(row.get("timeout_sec") or 3600)))
+    validate_jobs(jobs)
+    return jobs
+
+
+def launch_status(result: dict, rehearsal: bool) -> tuple[str, int]:
+    """失敗 → FAILED rc 1;演練 → REHEARSAL rc 3;有跳過 / 未跑 → INCOMPLETE rc 3;全跑完 → COMPLETE rc 0。"""
+    if result.get("failed"):
+        return "FAILED", 1
+    if rehearsal:
+        return "REHEARSAL", 3
+    if result.get("skipped") or result.get("pending"):
+        return "INCOMPLETE", 3
+    return "COMPLETE", 0
+
+
+def launch_run(verb: str, jobs: list[Job], hw: HardwareProfile, gated: list[str], jpath: Path,
+               fail_name: str | None = None, runner=None) -> tuple[dict, int]:
+    """launch / resume 的本體(main 與自測共用)。演練清單不讀也不寫典籍;真清單每件完成就落典籍。"""
+    rehearsal = any(job.rehearsal for job in jobs)
+    run = runner or (lambda job: run_job(job, hw))
+    if rehearsal:
+        prior, stale = [], []
+        result = simulate(jobs, hw, journal=None, fail_name=fail_name, on_fault="skip", gated=gated, runner=run)
+        result["journal_file"] = None
+        result["note"] = "演練:任務是占位指令,還沒接各系統管理器的真指令 → 不寫典籍、不算完成(給 --jobs <清單.json> 才是真跑)"
+    else:
+        prior, stale = load_journal(jpath, jobs) if verb == "resume" else ([], [])
+        if verb == "launch":                                   # launch 是新的一輪:先把典籍歸到這一輪(空),不讀上一輪的
+            save_journal(jpath, {"journal": [], "failed": None, "skipped": []}, verb)
+        result = simulate(jobs, hw, journal=prior, fail_name=fail_name, on_fault="skip", gated=gated, runner=run,
+                          on_done=lambda names: save_journal(jpath, {"journal": names, "failed": None, "skipped": []}, verb))
+        save_journal(jpath, result, verb)
+        result["journal_file"] = str(jpath)
+    result["resumed_from"] = prior
+    result["stale_journal_names"] = stale
+    result["rehearsal"] = rehearsal
+    status, rc = launch_status(result, rehearsal)
+    result["status"] = status
+    return result, rc
 
 
 def _duckdb():
@@ -2121,6 +2181,27 @@ def selftest() -> list[dict]:
         orphan = marker.exists()
     _check("逾時把整棵行程樹砍掉(外層轉接底下的指令不會事後再寫檔)", killed["rc"] == 124 and not orphan,
            f"rc {killed['rc']} · 事後寫檔 {orphan}", rows)
+    ok_run = lambda job: {"name": job.name, "ok": True, "rc": 0, "why": ""}   # noqa: E731
+    with tempfile.TemporaryDirectory() as ldir:
+        lj = Path(ldir) / "JOURNAL_latest.json"
+        reh, reh_rc = launch_run("launch", default_jobs(), detect_hardware(65536, 16), [], lj, runner=ok_run)
+        _check("占位任務只算演練:REHEARSAL rc 3、不寫典籍(resume 不會因此跳過真工作)",
+               reh["status"] == "REHEARSAL" and reh_rc == 3 and not lj.exists(), f"{reh['status']} rc {reh_rc} · 典籍 {lj.exists()}", rows)
+        real_jobs = [Job("R_ok", ["python", "-c", "ok"], 100, "VCGC"), Job("R_net", ["python", "-c", "net"], 100, "VDF", mutex="net_x"),
+                     Job("R_after", ["python", "-c", "after"], 100, "VDF", deps=["R_net"])]
+        part, part_rc = launch_run("launch", real_jobs, detect_hardware(65536, 16), ["R_net"], lj, runner=ok_run)
+        _check("網路工具缺席、要連網的任務被擋:INCOMPLETE rc 3(不再回 0),獨立的照跑",
+               part["status"] == "INCOMPLETE" and part_rc == 3 and part["journal"] == ["R_ok"] and {"R_net", "R_after"} <= set(part["skipped"]),
+               f"{part['status']} rc {part_rc} · 完成 {part['journal']} · 跳過 {part['skipped']}", rows)
+        spec = Path(ldir) / "jobs.json"
+        spec.write_text(json.dumps({"jobs": [{"name": "J_vcgc", "cmd": ["python", "-c", "pass"], "est_ram_mb": 100, "system": "VCGC"}]}), encoding="utf-8")
+        loaded = load_jobs(spec)
+        full, full_rc = launch_run("launch", loaded, detect_hardware(65536, 16), [], lj, runner=ok_run)
+        kept_full, _ = load_journal(lj, loaded)
+        _check("--jobs 真清單:每道先掛加速器、不是演練;全跑完 COMPLETE rc 0 並寫典籍",
+               loaded[0].rehearsal is False and loaded[0].cmd[0] == sys.executable and ACCEL_MODULE in loaded[0].cmd[2]
+               and full["status"] == "COMPLETE" and full_rc == 0 and kept_full == ["J_vcgc"],
+               f"{full['status']} rc {full_rc} · 典籍 {kept_full}", rows)
     utf = run_job(Job("U_utf8", [sys.executable, "-c", "import sys; sys.stdout.buffer.write('\\u5b8c\\u6210 \\u2705\\n'.encode('utf-8')); sys.stdout.buffer.write(b'\\xff\\n')"], 100, "VCGC"), hw)
     _check("子程序輸出一律用 UTF-8 解(父行程是 CP950 也不炸;壞位元組換掉)· 回傳碼照收", utf["ok"] is True and utf["rc"] == 0, str(utf), rows)
     real = run_job(default_jobs()[0], hw)
@@ -2137,6 +2218,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--fail", default="", help="模擬時指定失敗節點，不自動重跑")
     parser.add_argument("--ram-mb", type=int, default=0)
     parser.add_argument("--cores", type=int, default=0)
+    parser.add_argument("--jobs", default="", help="launch / resume 的真任務清單 JSON(沒給 = 占位演練,不算完成)")
     parser.add_argument("--journal", default="", help="launch / resume 的完成典籍檔(預設 VIA_Reports/vcgc_startup/JOURNAL_latest.json)")
     args = parser.parse_args(argv)
     verb = args.verb
@@ -2212,29 +2294,17 @@ def main(argv: list[str] | None = None) -> int:
                 "install": False,
             }, ensure_ascii=False, indent=2))
             return 1
-        jobs = default_jobs()
+        jobs = load_jobs(args.jobs) if args.jobs else default_jobs()
         if gate["net_jobs"] != "OPEN":
             gated = [job.name for job in jobs if (job.mutex or "").startswith("net_")]
         else:
             gated = []
-        jpath = journal_path(args.journal)
-        prior, stale = load_journal(jpath, jobs) if verb == "resume" else ([], [])
-        if verb == "launch":                                   # launch 是新的一輪:先把典籍歸到這一輪(空),不讀上一輪的
-            save_journal(jpath, {"journal": [], "failed": None, "skipped": []}, verb)
-        result = simulate(
-            jobs, hw, journal=prior, fail_name=args.fail or None, on_fault="skip", gated=gated,
-            runner=lambda job: run_job(job, hw),
-            on_done=lambda names: save_journal(jpath, {"journal": names, "failed": None, "skipped": []}, verb),
-        )
-        save_journal(jpath, result, verb)
-        result["journal_file"] = str(jpath)
-        result["resumed_from"] = prior
-        result["stale_journal_names"] = stale
+        result, rc = launch_run(verb, jobs, hw, gated, journal_path(args.journal), fail_name=args.fail or None)
         result["accel"] = hooked
         result["coverage"] = {"required": cov["required"], "covered": cov["covered"], "ratio": cov["ratio"], "ok": True}
         result["preflight"] = {"ok": True, "net_jobs": gate["net_jobs"], "repair": False, "install": False, "touched_existing": False}
         print(json.dumps(result, ensure_ascii=False, indent=2))
-        return 1 if result["failed"] else 0
+        return rc
     print("未知動詞", file=sys.stderr)
     return 1
 
