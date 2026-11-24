@@ -125,7 +125,7 @@ class EightHubTests(unittest.TestCase):
             self.assertTrue((root / "via_existing").exists())
 
     def test_canonical_installer_bootstrap_only_allows_install(self):
-        source = MODULE.with_name("CGC_MDL135_EnvGovernance_v0114.py")
+        source = MODULE.with_name("CGC_MDL135_EnvGovernance_v0118.py")
         if not source.exists():
             self.skipTest("canonical MDL135 source is not in this isolated layout")
         spec = importlib.util.spec_from_file_location("via_envgov_test", source)

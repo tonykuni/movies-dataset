@@ -153,7 +153,7 @@ python src/vdf_core.py --category consensus --max-tickers 50
 
 | Key | Env Var | Default | Required? |
 |---|---|---|---|
-| FRED | `VDF_FRED_API_KEY` | `2d5ae8dfe834ffc409bf98d51f539c17` | Yes (for macro) |
+| FRED | `VDF_FRED_API_KEY` | `<REDACTED:VDF_FRED_API_KEY>` | Yes (for macro) |
 | BEA | `VDF_BEA_API_KEY` | none | Optional |
 
 ---
