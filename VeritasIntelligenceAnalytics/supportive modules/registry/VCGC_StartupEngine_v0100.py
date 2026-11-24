@@ -44,7 +44,6 @@ except Exception:  # noqa: BLE001
 
 import argparse
 import ast
-import contextlib
 import hashlib
 import importlib.util
 import json
@@ -54,7 +53,6 @@ import signal
 import subprocess
 import sys
 import tempfile
-import uuid
 from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass, field
 from graphlib import CycleError, TopologicalSorter
@@ -116,7 +114,7 @@ SUPPORT_SOURCES: tuple[tuple[str, str, str], ...] = (
     ("copilot", "Copilot", "對話只留最後一則摘要。沒有索引就是缺席。"),
 )
 SCHEMA = "vcgc.startup-engine/1"
-SELFTEST_TOTAL = 71
+SELFTEST_TOTAL = 69
 # 2026-11-24 已寫進盤點冊的站。這支引擎不另開站、不把本體塞進備份 zip。
 TODAY_STATIONS: tuple[tuple[str, str, str], ...] = (
     ("C-rework-guard-v0100", "v0100", "重工守衛"),
@@ -791,8 +789,6 @@ AST_LIB_FLOOR = (
     "tempfile",
     "concurrent",
     "signal",
-    "contextlib",
-    "uuid",
 )
 AST_ABSENT = ("LibCST", "ruff", "tree-sitter", "PSScriptAnalyzer", "Pyre")
 AST_FNC_FLOOR: tuple[str, ...] = (
@@ -854,7 +850,6 @@ AST_FNC_FLOOR: tuple[str, ...] = (
     "launch_run",
     "job_fingerprint",
     "chain_fingerprint",
-    "journal_lock",
 )
 
 
@@ -1392,41 +1387,10 @@ def save_journal(path: Path, result: dict, verb: str, jobs: list[Job] | None = N
     path.parent.mkdir(parents=True, exist_ok=True)
     by_name, memo = {j.name: j for j in (jobs or [])}, {}
     marks = {j.name: chain_fingerprint(j, by_name, memo) for j in (jobs or []) if j.name in result["journal"]}
-    tmp = path.with_name(f"{path.name}.{os.getpid()}.{uuid.uuid4().hex}.tmp")      # 每個寫手一個暫存檔,不互相搶
+    tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps({"engine": ENGINE_ID, "verb": verb, "journal": result["journal"], "fingerprints": marks,
                                "failed": result["failed"], "skipped": result["skipped"]}, ensure_ascii=False, indent=2), encoding="utf-8")
     os.replace(tmp, path)
-
-
-@contextlib.contextmanager
-def journal_lock(path: Path):
-    """同一份典籍同一時間只准一個 launch / resume(作業系統檔案鎖 · 不等待)。被占用 → BlockingIOError。"""
-    lock = Path(path).with_name(Path(path).name + ".lock")
-    lock.parent.mkdir(parents=True, exist_ok=True)
-    fh = open(lock, "a+b")
-    try:
-        try:
-            if os.name == "nt":
-                import msvcrt
-                fh.seek(0)
-                msvcrt.locking(fh.fileno(), msvcrt.LK_NBLCK, 1)
-            else:
-                import fcntl
-                fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except OSError as exc:
-            raise BlockingIOError(f"典籍 {path} 正被另一個 launch / resume 使用") from exc
-        try:
-            yield
-        finally:
-            if os.name == "nt":
-                import msvcrt
-                fh.seek(0)
-                msvcrt.locking(fh.fileno(), msvcrt.LK_UNLCK, 1)
-            else:
-                import fcntl
-                fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
-    finally:
-        fh.close()
 
 
 def default_jobs() -> list[Job]:
@@ -1494,17 +1458,12 @@ def launch_run(verb: str, jobs: list[Job], hw: HardwareProfile, gated: list[str]
         result["journal_file"] = None
         result["note"] = "演練:任務是占位指令,還沒接各系統管理器的真指令 → 不寫典籍、不算完成(給 --jobs <清單.json> 才是真跑)"
     else:
-        try:
-            with journal_lock(jpath):                          # 初始化 · 每件完成 · 收尾都在同一把鎖裡
-                prior, stale = load_journal(jpath, jobs) if verb == "resume" else ([], [])
-                if verb == "launch":                           # launch 是新的一輪:先把典籍歸到這一輪(空),不讀上一輪的
-                    save_journal(jpath, {"journal": [], "failed": None, "skipped": []}, verb, jobs)
-                result = simulate(jobs, hw, journal=prior, fail_name=fail_name, on_fault="skip", gated=gated, runner=run,
-                                  on_done=lambda names: save_journal(jpath, {"journal": names, "failed": None, "skipped": []}, verb, jobs))
-                save_journal(jpath, result, verb, jobs)
-        except BlockingIOError as exc:                         # 另一個行程正在用這份典籍:一件都不跑
-            return {"status": "BUSY", "runs": [], "journal": [], "failed": None, "skipped": [], "journal_file": str(jpath),
-                    "resumed_from": [], "stale_journal_names": [], "rehearsal": False, "note": str(exc) + ";這輪一件都沒跑"}, 2
+        prior, stale = load_journal(jpath, jobs) if verb == "resume" else ([], [])
+        if verb == "launch":                                   # launch 是新的一輪:先把典籍歸到這一輪(空),不讀上一輪的
+            save_journal(jpath, {"journal": [], "failed": None, "skipped": []}, verb, jobs)
+        result = simulate(jobs, hw, journal=prior, fail_name=fail_name, on_fault="skip", gated=gated, runner=run,
+                          on_done=lambda names: save_journal(jpath, {"journal": names, "failed": None, "skipped": []}, verb, jobs))
+        save_journal(jpath, result, verb, jobs)
         result["journal_file"] = str(jpath)
     result["resumed_from"] = prior
     result["stale_journal_names"] = stale
@@ -2293,26 +2252,6 @@ def selftest() -> list[dict]:
         mx, mx_rc = launch_run("launch", mix, detect_hardware(65536, 16), [], mj, runner=lambda job: ran.append(job.name) or ok_run(job))
         _check("演練與真任務混在一張清單:先拒絕、一件都不跑、不碰典籍(rc 2)",
                mx["status"] == "MIXED_REJECTED" and mx_rc == 2 and ran == [] and not mj.exists(), f"{mx['status']} rc {mx_rc} · 跑了 {ran}", rows)
-        import threading as _th
-        cj2, errs = Path(ldir) / "conc.json", []
-        def _writer(tag):
-            for k in range(40):
-                try:
-                    save_journal(cj2, {"journal": [f"{tag}{k}"], "failed": None, "skipped": []}, "launch", [])
-                except Exception as exc:                       # noqa: BLE001
-                    errs.append(repr(exc))
-        ts = [_th.Thread(target=_writer, args=(t,)) for t in "ab"]
-        [t.start() for t in ts]
-        [t.join() for t in ts]
-        leftovers = [p.name for p in Path(ldir).glob("conc.json.*.tmp")]
-        _check("兩個寫手同時寫典籍:暫存檔各自唯一 · 不丟例外 · 不留暫存檔", not errs and not leftovers and cj2.is_file(),
-               f"例外 {errs[:2]} · 殘留 {leftovers[:2]}", rows)
-        bj, ran2 = Path(ldir) / "busy.json", []
-        with journal_lock(bj):
-            busy, busy_rc = launch_run("launch", [Job("B_real", ["python", "-c", "b"], 100, "VCGC")], detect_hardware(65536, 16), [], bj,
-                                       runner=lambda job: ran2.append(job.name) or ok_run(job))
-        _check("同一份典籍已有人在跑:BUSY rc 2 · 一件都不跑 · 不碰典籍",
-               busy["status"] == "BUSY" and busy_rc == 2 and ran2 == [] and not bj.exists(), f"{busy['status']} rc {busy_rc} · 跑了 {ran2}", rows)
         dumped = Path(ldir) / "plan_jobs.json"
         dumped.write_text(json.dumps({"jobs": [j.to_dict() for j in default_jobs()]}), encoding="utf-8")
         relo = load_jobs(dumped)
