@@ -163,3 +163,5 @@
 | 2026-11-24T08:05:00Z | VCGC_CommandHub_v0107.py | 0107 | VIA-CORE-MDL895 | d66242bd6032 | 中樞:資料根 ≠ 程式樹時找得到工具(v0101–v0106 不動)| 自測 6/6 + 前版 6/6 · 11/11 |
 | 2026-11-24T08:40:00Z | VCGC_CommandHub_v0108.py | 0108 | VIA-CORE-MDL896 | 04b979eb2821 | 中樞:收據從工具所在的根讀(v0101–v0107 不動) | 自測 5/5 + 前版 |
 | 2026-11-24T08:40:00Z | VRN_ENG397_P1Segment_v0130.py | 0130 | VIA-VRN-ENG341 | 8dd1d5ed4848 | VRN 擷取還原量測 fidelity(v0129 不動) | 自測 7/7 + 前版 35/35 |
+| 2026-11-24T09:00:00Z | VCGC_CommandHub_v0109.py | 0109 | VIA-CORE-MDL897 | dab7181eceba | 中樞:找工具與讀收據分開(v0101–v0108 不動) | 自測 4/4 + 前版 |
+| 2026-11-24T09:00:00Z | VRN_ENG397_P1Segment_v0131.py | 0131 | VIA-VRN-ENG342 | 70256c10656f | VRN fidelity 兩處量測修正(v0129 · v0130 不動) | 自測 5/5 + 前版 |
