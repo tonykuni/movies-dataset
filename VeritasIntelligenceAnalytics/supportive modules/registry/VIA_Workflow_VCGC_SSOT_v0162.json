@@ -4,7 +4,7 @@
  "subsystem": "VCGC",
  "zh": "中央治理 · 中樞工作流",
  "batch": "+VCGC-WKF053(VCGC 啟動引擎 · 接口相位)",
- "ts": "2026-11-24T18:10:00Z",
+ "ts": "2026-11-24T18:35:00Z",
  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
  "sdd": {
   "layers": [
@@ -4481,15 +4481,15 @@
    "name": "VCGC 啟動引擎 v0100:三座有管理器的系統排程啟動(接口相位)· 真跑 · 典籍續跑 · 逾時收樹",
    "kind": "procedure",
    "version": "v0100",
-   "updated_at": "2026-11-24T18:10:00Z",
+   "updated_at": "2026-11-24T18:35:00Z",
    "spec": {
     "goal": "VCGC / VDF / VRN 各自管理器的工作照依賴與記憶體預算並行啟動;完成看回傳碼、每件落典籍、resume 不重跑成功的擷取",
     "requirements": [
      "VCGC-REQ260"
     ],
     "acceptance": "演練清單只回 REHEARSAL rc 3 不寫典籍;--jobs 真清單全完成 COMPLETE rc 0;被擋 / 跳過 INCOMPLETE rc 3;失敗 FAILED rc 1;演練與真任務混單 MIXED_REJECTED rc 2;同一份典籍已有人在跑 BUSY rc 2;前置換定義下游跟著重跑;逾時收整棵行程樹",
-    "entry": "python3 \"supportive modules/registry/VCGC_StartupEngine_v0100.py\" launch|resume --jobs <清單.json> [--journal <檔>]",
-    "evidence": "docs/handoff/evidence/C-vcgc-startup-engine-v0100.json",
+    "entry": "python3 \"$(ls \"supportive modules/registry/\"VCGC_StartupEngine_v*.py | sort | tail -1)\" launch|resume --jobs <清單.json> [--journal <檔>]",
+    "evidence": "docs/handoff/evidence/C-vcgc-startup-engine-v0101.json",
     "books": []
    },
    "plan": {
@@ -4505,7 +4505,7 @@
      "alias": "plan",
      "name": "排程計畫(依賴波次 · 記憶體預算 · 互斥)",
      "what": "只算不跑",
-     "engine": "supportive modules/registry/VCGC_StartupEngine_v0100.py",
+     "engine": "supportive modules/registry/VCGC_StartupEngine_v*.py",
      "verb": "selftest",
      "inside": "VCGC",
      "evidence": "self:VCGC_StartupEngine"
@@ -4515,7 +4515,7 @@
      "alias": "launch",
      "name": "真跑 · 每件落典籍 · 逾時收整棵行程樹",
      "what": "子行程跑 --jobs 的指令;同一份典籍一次只准一個",
-     "engine": "supportive modules/registry/VCGC_StartupEngine_v0100.py",
+     "engine": "supportive modules/registry/VCGC_StartupEngine_v*.py",
      "verb": "selftest",
      "inside": "VCGC",
      "evidence": "self:VCGC_StartupEngine"
@@ -4525,14 +4525,14 @@
      "alias": "resume",
      "name": "讀典籍續跑(指紋連同前置一起比)",
      "what": "只跑沒完成或定義變了的任務",
-     "engine": "supportive modules/registry/VCGC_StartupEngine_v0100.py",
+     "engine": "supportive modules/registry/VCGC_StartupEngine_v*.py",
      "verb": "selftest",
      "inside": "VCGC",
      "evidence": "self:VCGC_StartupEngine"
     }
    ],
    "tests": {
-    "self": "VCGC_StartupEngine_v0100 selftest(站 C-vcgc-startup-engine-v0100 · 71/71)",
+    "self": "VCGC_StartupEngine_v0101 selftest(站 C-vcgc-startup-engine-v0101 · 73/73 = 本版 4 + 前版 v0100 69;v0100 站照留)",
     "cross": [
      "X-REQ-BACK",
      "X-ENGINE"
@@ -4599,5 +4599,5 @@
  "why_v0159": "新增 VCGC-WKF049(回指 VCGC-REQ252 快跑器)· VCGC-WKF050(回指 VCGC-REQ251 NLP 收件四動詞;PR 723 漏登工作流冊,本版補上;PR 726 Codex P1)。前版 48 條一字不動。",
  "why_v0160": "新增 VCGC-WKF051(回指 VCGC-REQ253 備份 Graphify / OmniRoute)。前版 50 條一字不動。",
  "why_v0161": "新增 VCGC-WKF052(回指 VCGC-REQ255 重工守門 · VCGC-REQ256 金鑰偵測)。前版 51 條一字不動。",
- "why_v0162": "VIA_Workflow_VCGC_SSOT_v0161.json 已在 main → 出新版。只增:VCGC-WKF053(VCGC-REQ260 啟動引擎;PR #734 Codex P1)。前版一字不動。"
+ "why_v0162": "VIA_Workflow_VCGC_SSOT_v0161.json 已在 main → 出新版。只增:VCGC-WKF053(VCGC-REQ260 啟動引擎;PR #734 Codex P1;引擎取尾版 v0101)。前版一字不動。"
 }
