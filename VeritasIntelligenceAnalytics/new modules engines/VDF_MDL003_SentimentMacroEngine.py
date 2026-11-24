@@ -31,7 +31,7 @@ ROLE (高度整合的市場情緒 + 宏觀數據引擎)
 
     [API-3] FRED (Federal Reserve Economic Data) - 50+ key series
             - 利率/通膨/就業/GDP/信用/外匯/PMI 等聖經級宏觀指標
-            - API Key: 2d5ae8dfe834ffc409bf98d51f539c17 (內建)
+            - API Key: <REDACTED:VDF_FRED_API_KEY> (內建)
             - 用途: 宏觀基本面 + 利率/通膨/景氣循環判定
             - 來源: api.stlouisfed.org/fred/series/observations
 
@@ -89,7 +89,7 @@ BASE_DIR     = r"C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\VDF
 OUTPUT_DIR   = "1-4-SentimentMacro"
 
 # 🔑 [PARAM-2/10] API Keys (FRED 必填)
-FRED_API_KEY = "2d5ae8dfe834ffc409bf98d51f539c17"   # 使用者提供
+FRED_API_KEY = "<REDACTED:VDF_FRED_API_KEY>"   # 使用者提供
 # AAII 不需 key (公開頁面 scrape)
 # CNN 不需 key (公開 dataviz API)
 # AKShare 不需 key (Python lib 直連)

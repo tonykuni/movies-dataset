@@ -88,7 +88,7 @@ for _p in VERITAS_SUPPORT_PATHS:
     if _p.exists() and str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
 
-FRED_API_KEY = os.environ.get("VDF_FRED_API_KEY", "2d5ae8dfe834ffc409bf98d51f539c17")
+FRED_API_KEY = os.environ.get("VDF_FRED_API_KEY", "<REDACTED:VDF_FRED_API_KEY>")
 
 
 # =========================================================================
