@@ -145,6 +145,14 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
   13 類根因與解法:`… causes`;一週數字:`… report`。PR 守門 workflow 的 rework-guard job 跑 base 上的尾版(PR 改不掉)。
 - **發號接在開著的 PR 之上**:編號引擎從本機冊尾 +1;開著的 PR 已用的號(MDL · SSOT · ENV · 分類碼)要先避開,發完再跑一次 check(2026-11-24 實錄:#722 / #730)。
 
+**2026-11-24 操作員令「環境安裝規範」(待登需求 VCGC-REQ258;不是律。全文 `VeritasIntelligenceAnalytics/docs/VIA_Environment_EightHub_Policy_v0101.md`)**
+
+- **順序固定,前一步不過後一步不做**:① 全面檢視 base · `via_core` · 所有 `via_*` 境(八路衝突檢查 + pip check + 多層 site 互撞 + 工具冊缺件 + 加速器)→ ② 有衝突風險:不新增,把風險移開、該境立刻重建(`via-envgov plan` → `via-envgov apply --approve` 的 REBUILD 段),重建後回 ① → ③ 檢查無誤後,沒裝的工具列入新增 → ④ 特殊環境及分類一律單獨安裝(Baseline `package_env_overrides` / `families` 成員不進 base)→ ⑤ 清華 · 阿里 · 官方三鏡像同時解析新增(零安裝)、推算裝後新增衝突 → ⑥ 寫新增計畫(全部釘版)→ ⑦ 直接執行計畫,不再測。
+- **一行入口**:`via-health`(⑦ 之前全做);只查 `via-install --plan-check`;照計畫裝 `via-install --from-plan --yes`。不直接 pip;同意閘只在安裝閘子行程裡設。
+- **多版本共存**:numpy、pyarrow 這類常用件允許不同 Python 版本 / 不同境各用各的版本;同一境多版遮蔽或 ABI 錯配才是要重建的風險。
+- **不邊裝邊測**:不在安裝途中拆批重試、不在裝後整套重驗;要驗就是下一輪 `via-health` 的 ①。
+- 跟「待操作員裁定」第 1 項的關係:本令把「有風險就重建」寫成規範步驟;重建仍走 `via-envgov apply --approve`(保留舊境與 LKGC),AI 不自己刪境。
+
 **待操作員裁定(兩邊的話對不上,AI 不自己選邊;裁定前照較保守的一邊做)**
 
 1. **已裁定(操作員 2026-11-18)**:授權 AI 開兩道同意閘、經 VCGC 安裝閘(`CGC_MDL056_InstallGate` 尾版)安裝套件、推送到 GitHub 的工作分支,不用逐次再問。界線:安裝只走安裝閘(不直接 pip);開閘只在執行那一步的行程裡設、不寫進任何檔;重建或刪除環境、合併 PR、改 .ps1 既有檔不在這次授權內。每批回報寫明用到哪一項。

@@ -8111,6 +8111,75 @@
    "timeout_seconds": 900,
    "updated_at": "2026-11-24T11:15:00Z",
    "registered_at": "2026-11-24T11:15:00Z"
+  },
+  "C-installgate-v0105": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL056_InstallGate_v0105.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL056_InstallGate v0105 自測 11/11 · PASS",
+   "scope": "安裝閘 v0105:三鏡像 plan-check · 特殊境分流 · from-plan 照計畫一次裝不再測(VCGC-REQ258)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL056_InstallGate_v0104.py",
+    "supportive modules/registry/CGC_MDL056_InstallGate_v0105.py",
+    "supportive modules/registry/VIA_EnvGovernance_Baseline_v0100.json"
+   ],
+   "version": "v0105",
+   "timeout_seconds": 300,
+   "updated_at": "2026-11-24T13:05:00Z",
+   "registered_at": "2026-11-24T13:05:00Z"
+  },
+  "C-hub-v0112": {
+   "argv": [
+    "--family",
+    "core",
+    "VCGC_CommandHub_v0112.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VCGC_CommandHub v0112 自測 OK 6 · FAIL 0 · 前版 rc=0",
+   "scope": "VCGC_CommandHub_v0112.py(VCGC-REQ258 · via-install 先查再裝)",
+   "dependencies": [
+    "VCGC_CommandHub_v*.py"
+   ],
+   "version": "v0112",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-24T13:05:00Z",
+   "registered_at": "2026-11-24T13:05:00Z"
+  },
+  "C-fastrun-v0104": {
+   "argv": [
+    "docs/handoff/ai/VIA_FastRun_v0104.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VIA_FastRun v0104 自測 OK 6 · FAIL 0 · 前版 rc=0",
+   "scope": "VIA_FastRun_v0104.py(VCGC-REQ258 · env 組照環境安裝規範)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_FastRun_v0100.py",
+    "docs/handoff/ai/VIA_FastRun_v0101.py",
+    "docs/handoff/ai/VIA_FastRun_v0102.py",
+    "docs/handoff/ai/VIA_FastRun_v0103.py"
+   ],
+   "version": "v0104",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-24T13:05:00Z",
+   "registered_at": "2026-11-24T13:05:00Z"
+  },
+  "C-vrn-eng397-v0132": {
+   "argv": [
+    "functional modules/VRN/VRN_ENG397_P1Segment_v0132.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VRN_ENG397_P1Segment v0132 自測 OK 5 · FAIL 0 · 前版 rc=0",
+   "scope": "VRN_ENG397_P1Segment_v0132.py(VRN-REQ031 · 隔離橋 OCR 一頁一批)",
+   "dependencies": [
+    "functional modules/VRN/VRN_ENG397_P1Segment_v*.py"
+   ],
+   "version": "v0132",
+   "timeout_seconds": 1800,
+   "updated_at": "2026-11-24T13:05:00Z",
+   "registered_at": "2026-11-24T13:05:00Z"
   }
  },
  "work_items": [
@@ -15979,6 +16048,54 @@
    "updated_at": "2026-11-24T11:15:00Z",
    "registered_at": "2026-11-24T11:15:00Z",
    "receipt": "docs/handoff/evidence/C-hub-v0111.json"
+  },
+  {
+   "id": "VCGC-REQ258:C-installgate-v0105",
+   "requirement": "VCGC-REQ258",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "先查衝突再依計畫安裝(自測 11/11 · 真跑 plan-check 三鏡像 · from-plan 9 件 3.8 秒 · 衝突 0→0)",
+   "next": "主機 via-health --push(未在主機實跑)",
+   "updated_at": "2026-11-24T13:05:00Z",
+   "registered_at": "2026-11-24T13:05:00Z",
+   "case": "C-installgate-v0105",
+   "receipt": "docs/handoff/evidence/C-installgate-v0105.json"
+  },
+  {
+   "id": "VCGC-REQ258:C-hub-v0112",
+   "requirement": "VCGC-REQ258",
+   "case": "C-hub-v0112",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "via-install 一律 --plan-check → --from-plan;三條路都走本版(自測 6/6 · 前版鏈全過)",
+   "next": "主機 via-health --push(未在主機實跑)",
+   "updated_at": "2026-11-24T13:05:00Z",
+   "registered_at": "2026-11-24T13:05:00Z",
+   "receipt": "docs/handoff/evidence/C-hub-v0112.json"
+  },
+  {
+   "id": "VCGC-REQ258:C-fastrun-v0104",
+   "requirement": "VCGC-REQ258",
+   "case": "C-fastrun-v0104",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "env 組:全面檢視 → 衝突閘 → 三鏡像計畫 → 直接裝(自測 6/6 · 前版 8/8 · 容器 via-health --set env 109 秒)",
+   "next": "主機 via-health --push(未在主機實跑)",
+   "updated_at": "2026-11-24T13:05:00Z",
+   "registered_at": "2026-11-24T13:05:00Z",
+   "receipt": "docs/handoff/evidence/C-fastrun-v0104.json"
+  },
+  {
+   "id": "VRN-REQ031:C-vrn-eng397-v0132",
+   "requirement": "VRN-REQ031",
+   "case": "C-vrn-eng397-v0132",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "主機 fidelity 190 秒 / 份 → 橋模式一頁一批:橋行程 3 → 1 · 結果相同(自測 5/5 · 容器模擬橋 18 → 6 次)",
+   "next": "主機 via-health --push(未在主機實跑)",
+   "updated_at": "2026-11-24T13:05:00Z",
+   "registered_at": "2026-11-24T13:05:00Z",
+   "receipt": "docs/handoff/evidence/C-vrn-eng397-v0132.json"
   }
  ],
  "retired_files": {

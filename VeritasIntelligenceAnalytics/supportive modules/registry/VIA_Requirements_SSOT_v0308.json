@@ -139,7 +139,7 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "COVERED": 141,
-  "PARTIAL": 168,
+  "PARTIAL": 169,
   "RECORDED": 28,
   "MISSING": 1
  },
@@ -8532,14 +8532,15 @@
    ],
    "modules": [
     "functional modules/VRN/VRN_ENG397_P1Segment_v0130.py",
-    "functional modules/VRN/VRN_ENG397_P1Segment_v0131.py"
+    "functional modules/VRN/VRN_ENG397_P1Segment_v0131.py",
+    "functional modules/VRN/VRN_ENG397_P1Segment_v0132.py"
    ],
-   "evidence": "容器:自測 11/11 · 39.7s(整條前版鏈 38s;真的去掃 901 次 · 記憶命中 1705);bridges GREEN · accel 85/85 · net 1/1 · MDL002 不再被點名;version 鏈 20 版完整",
+   "evidence": "容器:自測 11/11 · 39.7s(整條前版鏈 38s;真的去掃 901 次 · 記憶命中 1705);bridges GREEN · accel 85/85 · net 1/1 · MDL002 不再被點名;version 鏈 20 版完整;v0132(2026-11-24 主機 190 秒 / 份):隔離橋模式一頁一批(一頁三階原本起三個橋行程、各載一次模型 → 起一次);容器模擬橋實跑 6 份:橋呼叫 18 → 6 · 結果逐份逐欄相同 · 105.2 → 100.9 秒(容器每起一次約 1.9 秒;主機每次較重,省得多,待主機量)。同時量過「整夾分段並行」:4 核容器 3 段並行 92 秒比一次跑 71 秒還慢(OCR 已吃滿核心)→ 不採用",
    "next": "主機重跑 VIA_FiveSystemConstitution run --apply(VRN 自測應在 900s 內)(未在主機實跑)",
    "hand": "AI + 操作員(主機實跑)",
    "why_homes": "VRN 自己的入口(VRN 自發號)",
    "ts": "2026-11-24T08:30:00Z",
-   "updated_at": "2026-11-24T08:55:00Z"
+   "updated_at": "2026-11-24T13:05:00Z"
   },
   {
    "code": "VCGC-REQ257",
@@ -8560,6 +8561,28 @@
    "why_homes": "VCGC 自己的工具;只呼叫既有 doctor / 安裝閘 / 各系統 SystemManager,不另寫引擎、不改他系統的檔",
    "ts": "2026-11-24T11:15:00Z",
    "updated_at": "2026-11-24T11:15:00Z"
+  },
+  {
+   "code": "VCGC-REQ258",
+   "subsystem": "VCGC",
+   "topic": "環境安裝規範:全面檢視 → 有風險先重建 → 沒裝的列新增 → 特殊境單獨裝 → 三鏡像查衝突 → 寫計畫 → 直接照計畫裝不再測(InstallGate v0105 · Hub v0112 · FastRun v0104 · 規範 v0101 · CLAUDE.md)",
+   "requirement": "操作員 2026-11-24 兩則原文:①「速度太慢 PY檔都有家入加速器嗎 加速器跟網路工具LIB環境都有透過VCGC安裝無衝突嗎 更快先檢查經過衝突檢測三鏡像共同檢查衝突後環境確認無誤進行安裝計畫 依計畫安裝不用編裝邊測 這個流程要寫入環境安裝規範」②「環境安裝規範為先檢查base / via_core / via_開頭的環境全面檢視用8個檢測衝突的工具及清華阿里官方鏡像組成衝突檢查機制加入加速器 先檢查現在環境有無衝突，有衝突風險將風險移開立刻重建 在檢查無誤後 風險因子即沒裝的工具列入新增 特殊環境及分類一律單獨安裝 numpy這種常用允許多版本搭配python多版本共存 規劃環境安裝新增檢測無誤新增計畫 直接執行計畫無須再測將此寫入Claude.md及環境管理工具」。主機量到:doctor 計畫 10 件整批丟進安裝閘 21.7 秒 rc 1(一件解不出整批不裝)。→ ① CGC_MDL056_InstallGate v0105:--plan-check(三鏡像同時 dry-run 解析 · 解不出逐件剔除 · 鏡像不同步以官方為準 · 疊到現況推算裝後新增衝突 · sdist 點名 · Baseline 家族 / 覆寫件分出去單獨安裝 · 慢鏡像最多再等 max(90 秒, 4 倍))· --from-plan(照計畫一次裝釘版 --no-deps,不再測)② VCGC_CommandHub v0112:via-install 一律先查再裝(--plan-check 只查 · --from-plan 照計畫裝)· via-health 說明照規範 ③ VIA_FastRun v0104:env 組 = 全面檢視 → 衝突閘(pip check 衝突或 envgov / gate_conflict / gate_doctor 紅 → 不新增、印重建指令)→ 三鏡像計畫 → 直接裝;沒有裝後重驗 ④ docs/VIA_Environment_EightHub_Policy_v0101.md 規範全文 ⑤ CLAUDE.md 規範段。",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "modules": [
+    "supportive modules/registry/CGC_MDL056_InstallGate_v0105.py",
+    "VCGC_CommandHub_v0112.py",
+    "docs/handoff/ai/VIA_FastRun_v0104.py",
+    "docs/VIA_Environment_EightHub_Policy_v0101.md"
+   ],
+   "evidence": "容器:InstallGate v0105 自測 11/11;Hub v0112 自測 6/6(前版鏈 v0111~v0105 全過);FastRun v0104 自測 6/6(前版 v0103 8/8 · v0102 8/8);真跑:主機那 10 件三鏡像 plan-check 90 秒(清華 90 秒沒答完算沒回應 · 阿里 11.1 秒 · 官方 3.0 秒 · 29 件釘版 · 推算新增衝突 0 · docopt 要建置);經中樞 x via-install --plan-check segtok sumy 15 秒三鏡像一致 → --from-plan 一次裝 9 件 3.8 秒 · 衝突 0→0;x via-health --set env 109 秒:現況無衝突 → opencv-contrib-python 分到 via_paddle_311(不再每輪重裝進 base)→ base 沒有要裝的。依新分流,主機那 10 件只有 docopt-ng · libcst 進 base,其餘 8 件分到 via_nlp / via_vrn_312 / via_iso_webui_M。加速器:現役尾版 .py 1896 支,缺橋 9 支全在 VAP intake 收容夾(VAP 範圍,只回報)",
+   "next": "主機 via-health --push(未在主機實跑);各特殊境單獨安裝 via-envgov plan → apply --approve(主機)",
+   "hand": "AI + 操作員(主機實跑)",
+   "why_homes": "VCGC 的安裝閘與中樞;各境單獨安裝沿用 MDL135 / MDL186,不另寫",
+   "ts": "2026-11-24T13:05:00Z",
+   "updated_at": "2026-11-24T13:05:00Z"
   }
  ],
  "non_requirements": [
