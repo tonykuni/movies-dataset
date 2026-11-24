@@ -1,0 +1,25 @@
+=== VQG_AllInOne v0112 薄尾自測(加速器橋以語法樹為準)===
+  [OK] ① 前版位元沒變(SHA-256 與釘的值相同) · VQG_AllInOne_v0111.py
+  [OK] ② 本檔語法樹裡真的匯入加速器;前版沒有(所以才出這一版)
+  [OK] ③ 加速器在這台載得到,或缺席時照舊能跑(VIA_ACCEL 是模組或 None) · 載入
+  [OK] ④ 前版公開名稱經本檔都拿得到 · 108 個
+  [OK] ⑤ 不含本機路徑 · 不碰 TA-Lib · 本檔零網路
+[VQG v0111 selftest]
+  [PASS] ① 前版 v0110 SHA-256 釘住(一字未改)
+  [PASS] ② 冊在同夾 · 讀得到 · 有列 · VQG_IndicatorRegister_SSOT_v0100.json · 66 列
+  [PASS] ③ 冊 ⇄ 程式對帳 GREEN(19 指標公式一字相同 · 每個輸出欄都有登記)
+  [PASS] ④ 刪掉一個指標列 → RED(程式有、冊沒登記)
+  [PASS] ⑤ 公式差一個字 → RED
+  [PASS] ⑥ 量化分析欄漏登 → RED
+  [PASS] ⑦ 重號 → RED
+  [PASS] ⑧ 替代指標指到不存在的代碼 → RED
+  [PASS] ⑨ 規劃中(implemented=false)的新列不算孤兒 · 照列出
+  [PASS] ⑩ 必填欄空(benchmark)→ RED
+  [PASS] ⑪ 匯出 CSV + MD · 欄位照操作員順序 · 列數 = 冊列數 · ['編號', '分類', '指標名稱', '公式']
+  [PASS] ⑫ 本檔:第 3 行加速器橋 · 零網路 import · 無 TA-Lib
+    前版 [PASS] ⑩ 入庫程式碼沒有刪除呼叫(unlink / rmtree / remove / rmdir / delete)
+    前版 [PASS] ⑪ 共用套件不在 → 入庫黃燈照實說 · 不建庫 · 匯出不受影響 · 找不到共用套件 supportive modules/VIA_ParquetLake_v9999_missing.py → 本輪沒入庫(匯出照常)
+    前版 [FAIL] VQG v0110 selftest · 本版 11/11 · 前版鏈 v0109 FAIL(rc 1)
+[FAIL] VQG v0111 selftest · 本版 12/12 · 前版鏈 v0110 FAIL
+  [FAIL] ⑥ 前版自測照過 · rc 1
+[計] VQG_AllInOne v0112 本版 5/6 · FAIL

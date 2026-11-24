@@ -1,0 +1,117 @@
+=== VDF SystemManager v0186 自測(薄尾 · synchronizer 一個動詞 + 其餘照前版;夾具 · 零網路 · 不碰真樹)===
+  [OK] ① 前版在且是本家族上一版
+  [OK] 核① 頁與收據同一輪(時間 · 燈 · 分項 · 版本都對)→ 綠;沒有收據的頁沒寫產生時間 → 黃
+  [OK] 核② 頁上的時間對不上收據 → 紅(只寫到分的時間、帶時區的時間、起訖區間都認得)
+  [OK] 核③ 頁上的燈或分項的燈不是收據的 → 紅
+  [OK] 核④ 不是本動詞產的頁:收據超過 24 小時、或是前一版入口跑的 → 黃;自己該產的頁不在 → 紅;別人的頁沒跑過 → 灰
+  [OK] 核⑤ 步驟兩盞燈分開:跑完且有更新 = 同步綠、內容照 rc 或它印的 lamp;沒更新 / rc 不認得 / 逾時 = 同步紅
+  [OK] 核⑥ 冊的步驟看它印的內容,不只看 rc:內容說待同步 → 黃(rc 0 也一樣);內容說好 → 綠(rc 2 也一樣)
+  [OK] 核⑦ 整輪:收據 · 連結頁 · 只增帳都寫出;冊黃 → rc 2;內容紅不染同步燈
+  [OK] 核⑧ 連結頁帶收據時間 · 入口版本 · 同一盞燈;連結都是相對路徑;不在的頁不給連結
+  [OK] 核⑨ 同儕:讀得到對方自報的燈 · 時間 · 下一步;對方沒有收據照實灰;對方的黃不算進自己的同步燈;對方的夾一個位元都沒動
+  [OK] 核⑩ 冊轉綠後只剩沒寫產生時間的頁 → 仍是黃(rc 2),不放水;只增帳 2 行
+  [OK] 核⑪ check / --last 零寫入(夾內每個檔的時間與大小不變),rc 照燈;事後被換掉的頁抓得到(紅);沒有收據 → rc 2
+  [OK] 核⑫ --steps 只跑部分 → 最高黃;不認得的步驟名或子動詞 → rc 2 不跑;另一輪在跑 → rc 2 一步都沒跑
+  [OK] 核⑬ manifest 列出步驟 · 頁 · 同儕 · 不做清單 · 收據欄位
+  [OK] 核⑭ 時間字樣:Z / 帶位移各一種解讀;沒寫時區三種都試;不是時間回空
+  [OK] ② 設定:步驟與頁的名稱不重複 · 每張頁指到的步驟都在 · 自己寫的檔都在自己的 VIA_Reports 夾 · 同儕只列別的系統、只讀
+  [OK] ③ 步驟只用唯讀動詞:沒有 --apply · 沒有 --run
+  [OK] ④ books 看 sync 自己印的內容:有漂移 → 有原因;全好 → 空;讀不到 → 有原因
+  [OK] ⑤ 連結頁樣式取自鎖定模板(讀冊;雜湊對得上;本檔沒有自訂色碼)
+  [OK] ⑥ 排隊鎖:本管理器自己的檔案鎖拿得到(前版鏈沒有就照實說沒排隊)
+  [OK] ⑦ 子行程環境:VIA_NO_OPEN=1 · 不多設任何他系統的旗標
+  [OK] ⑧ 只有 synchronizer 留在本版;其餘動詞原樣交給前版(參數不變)
+  [OK] ⑨ 前版公開名稱都在(TAILAPI)· collect 記本版(前版鏈沒有這個接口就照實回 ABSENT,不炸)· 入口契約照前版
+  [OK] ⑩ 兩個標準橋在 · 零網路 · 不用 TA-Lib · 不 import 他系統 · 不寫同意閘 · 寫檔只經 sy_write / sy_append
+  ── 前版 VDF_SystemManager_v0185.py 自測 ──
+[計] VDF SystemManager v0185 自測開始(本版 + 前版 VDF_SystemManager_v0184.py)
+  [OK] B1 加速器看語法樹:真的 import 才算 · 字串裡寫 import 不算(只有標記)· 標記版號讀得到
+  [OK] B2 網路橋看語法樹:指派 + 找檔呼叫才算 · 文件字串 / 空指派 / 字串 'requests' 不算橋也不算出網
+  [OK] B3 會出網的套件:函式內匯入 · __import__ 延遲匯入 · urllib.request 都抓到;urllib.parse 不算;只匯入 socket 來擋連線不算、真的開 socket 才算
+  [OK] B4 判讀:生效帶工具檔名與標記 · 只有標記 · 缺 · 載不到 · 會出網沒橋 = 缺 · 不出網不算缺 · 語法錯照實
+  [OK] B5 換裝在位:鏈上每個 em_register 都是本版 · 欄位表多 accel / net(path 仍在最後)
+  [OK] B6 實跑 engine-matrix(暫存夾):每列有 accel / net · 缺的點名 · 舊版號列照列但不計燈 · 三份檔都多兩欄
+  [OK] B7 總燈:加速器缺 = 紅;會出網沒網路橋 = 紅
+  [OK] B8 檔面:第 3 行加速器標記 · 自己的語法樹量得到加速器橋 · 零 TA-Lib · 不寫同意閘 · 沒有本機路徑
+  ── 前版 VDF_SystemManager_v0184.py 自測(本版換裝卸下)──
+=== VDF_SystemManager v0184 自測(v0183 全套 + datamatrix · MCP · OmniRoute · Graphify 資料血緣)===
+PRIOR ['boom']
+  [FAIL] ① v0183 全套自測照過 · 面 if(登在本版 SM_MAIN_IFS)· 本檔照樣是標準轉交者 · 三動詞不在原生表(不搶前版)
+  [OK] P2 沙盒真跑(VDF_MDL020_DataPlane_v0103.py · 呼叫端沒有入口旗標,同 CI):parquet sync 建 tw__ 檔 · 重跑沒新鍵不動檔 · status 列得出 · 模組不在 → ABSENT rc 3
+  [OK] P3 管理員頁導覽列有「VDF 管理範圍」· help 列出三動詞 · 不動態載入他檔(子行程叫資料平面)· 只帶 VDF 自己的旗標
+[計] VDF_SystemManager v0184 全原生 38/39 FAIL
+
+  [OK] ② datamatrix 是原生動詞 · 引擎尾版找得到
+  [OK] ③ MCP tools/list 有 vdf_datamatrix · tools/call 回燈號
+  [OK] ④ OmniRoute 五家用戶端都帶 vdf_datamatrix
+  [OK] ⑤ Graphify 併入資料血緣(節點 2 · 邊 1)
+  [OK] ⑥ 摘要:沒跑過 → NODATA 並提示
+=== VDF_ENG240_DataScopeMatrix v0100 自測(合成夾具 · 只讀量測)===
+  [OK] ① 量價:起始日前 1 · (鍵,日期) 重複 1 · 多餘 2 / 5(範圍起 = min(2022-07-01, 2022-01-01))
+  [OK] ② 財報名單 2330:名單外 2 列 → OVER_MEMBERS · 多餘 2
+  [OK] ③ VAKE 選單內序列量得到(1990 前 1 列 = 多餘)
+  [OK] ④ 選單有、store 沒有 → NODATA(不是多抓)
+  [OK] ⑤ 冊上沒有的表 / 序列 → UNMAPPED(tw_extra_junk · macro_china_bond)
+  [OK] ⑥ 湖內 fg_status = 控制表入湖 · 快照 3 次 · 多餘 4/6
+  [OK] ⑦ 副本:tw_daily_prices = csv + parquet + duckdb 3 份
+  [OK] ⑦b 冊上 parquet 的 DuckDB 同名表 = COPY(綠)· 同庫其他表 = UNMAPPED 附帶產出(點名族群)
+  [OK] ⑧ 引擎重疊:009 掛在 2 個族群
+  [OK] ⑨ 總燈 YELLOW(有多餘)· rc 2
+  [OK] ⑩ 輸出 json · csv · parquet · lineage · html 都在
+  [OK] ⑪ 血緣圖:大類 → 族群 → 引擎 → 表 都有邊
+  [OK] ⑫ HTML 用鎖站色票 · 大類彙總 + 逐表 + 副本 + 引擎重疊四段
+  [OK] ⑬ 只讀:再掃一次擷取夾檔案不變
+  [OK] ⑭ 無 TA-Lib · 不出網 · 不刪檔
+[計] VDF_ENG240_DataScopeMatrix v0100 自測 15/15 PASS
+  [OK] ⑦ datamatrix --selftest(子行程跑 ENG240 自測)rc 0
+[計] VDF_SystemManager v0184 自測 6/7 FAIL
+  [FAIL] B9 前版 VDF_SystemManager_v0184.py 自測照過 · 跑完本版又換上 · 1
+[計] VDF SystemManager v0185(VDF_SystemManager_v0185.py)自測 8/9 · FAIL
+  [FAIL] ⑪ 前版 VDF_SystemManager_v0185.py 自測照過 · rc 1
+[FAIL] VDF SystemManager v0186 selftest · 24/25
+=== VDF_SystemManager v0188 · 薄尾自測(monitor 只彙總既有唯讀動詞;零網路 · 假子行程)===
+  [FAIL] ⓪ 直接前版 VDF_SystemManager_v0186.py 自測過 · rc 1
+  [OK] ① 只叫前版已有的五個唯讀動詞(沒有 launch / sync --apply / db)
+  [OK] ② 道數照 --lanes(2 道同時最多 2 支)
+  [OK] ③ 沒有對應引擎的兩格 + 沒收據的輸出驗證 / 資料庫亮灰並寫原因
+  [OK] ④ bridges 讀 JSON:加速器 112/112 · 網路 9/9 · 缺橋 0 → 綠
+  [OK] ⑤ 總燈取最差(灰不算綠也不算紅)→ 黃;九格都在
+  [OK] ⑥ 收據 + 頁寫在指定夾(不入倉)· 頁只用鎖定模板的 class(沒有自訂色碼)
+  [OK] ⑥b 收據 → 輸出驗證 PASS 綠 · 資料庫取最差(db check 紅 → 紅)
+  [OK] ⑦ 缺橋 → 加速器格紅 · 總燈紅
+  [OK] ⑧ 加速器橋 · 網路橋在;本動詞不出網(沒有 _via_net() 呼叫)· 不碰 TA-Lib
+  [OK] ⑩ 系統獨立:不設他系統的入口旗標(本檔是 VDF 自己的入口;VCGC 只支援不干涉)
+  [OK] ⑨ 尾版保有前版公開名稱(TAILAPI)
+  [計] VDF_SystemManager v0188 本版 11/12 · FAIL
+=== VDF_SystemManager v0189 · 薄尾自測(每一格看自己的收據年齡;暫存夾 · 零網路)===
+  [FAIL] ⓪ 直接前版 VDF_SystemManager_v0188.py 自測過 · rc 1
+  [OK] ① 全部新鮮 → 輸出驗證綠 · 資料庫綠
+  [OK] ② 狀態矩陣剛更新 · db check 72h 前 → 資料庫降黃(不再被較新的那份蓋過)· 標最舊那份
+  [OK] ③ 只有 parquet 收據過期 → 資料庫也降黃(v0188 完全沒算 parquet 年齡)
+  [OK] ④ 輸出驗證只看 VERIFY 自己(別的收據過期不影響它)
+  [OK] ⑤ 紅照紅(過期只把綠降黃,不把紅洗成黃)
+  [OK] ⑥ 換裝:v0188 的 monitor 叫到的 from_receipts = 本版
+  [OK] ⑦ 系統獨立:不設他系統的入口旗標(本檔是 VDF 自己的入口;VCGC 只支援不干涉)
+  [OK] ⑧ 加速器橋 · 網路橋在;不出網 · 不碰 TA-Lib
+  [OK] ⑨ 尾版保有前版公開名稱(TAILAPI)
+  [計] VDF_SystemManager v0189 本版 9/10 · FAIL
+=== VDF_SystemManager v0190 · 薄尾自測(心跳 · 逐動詞回報 · 逾時;假子行程 · 零網路)===
+  [FAIL] ⓪ 直接前版 VDF_SystemManager_v0189.py 自測過 · rc 1
+  [OK] ① 慢的動詞跑的時候有 [心跳] 行(點名還在跑的動詞)
+  [OK] ② 每個動詞都有 [起] / [完] 各一行
+  [OK] ③ 逾時那支 → 那一格黃(標逾時),其餘格照常
+  [OK] ④ 九格都在 · 總燈取最差
+  [OK] ⑤ 系統獨立:不設他系統的入口旗標(本檔是 VDF 自己的入口;VCGC 只支援不干涉)
+  [OK] ⑥ 加速器橋 · 網路橋在;不出網 · 不碰 TA-Lib
+  [OK] ⑦ 尾版保有前版公開名稱(TAILAPI)
+  [計] VDF_SystemManager v0190 本版 7/8 · FAIL
+=== VDF_SystemManager v0191 · 薄尾自測(--json 時 stdout 只有 JSON;假子行程 · 零網路)===
+  [FAIL] ⓪ 直接前版 VDF_SystemManager_v0190.py 自測過 · rc 1
+  [OK] ① --json:stdout 整份就是 JSON(json.loads 讀得了 · Codex 重現情境)
+  [OK] ② --json:開始行 · [起] / [完] · [心跳] 都在 stderr(畫面照樣看得到)
+  [OK] ③ 回碼照總燈(有逾時 → 黃 2)
+  [OK] ④ 不帶 --json:進度與九格照 v0190 印在 stdout · stderr 沒東西
+  [OK] ⑤ 系統獨立:不設他系統的入口旗標(本檔是 VDF 自己的入口;VCGC 只支援不干涉)
+  [OK] ⑥ 加速器橋 · 網路橋在;不出網 · 不碰 TA-Lib
+  [OK] ⑦ 尾版保有前版公開名稱(TAILAPI)
+  [計] VDF_SystemManager v0191 本版 7/8 · FAIL
