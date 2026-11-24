@@ -1,0 +1,60 @@
+# env:envmgr
+# argv: ~\envs\via_core_312\Scripts\python.exe ~\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\supportive modules\registry\CGC_MDL240_EnvManager_v0101.py check
+# rc 1 · 1025.8s
+
+## stdout
+[進度] ENV 1/8 開始 CGC_MDL233_ToolActivate_v0108 status
+[進度] ENV 1/8 完成 CGC_MDL233_ToolActivate_v0108 status · rc 0 · 2.9s
+[進度] ENV 2/8 開始 SUP_MDL737_SuperAccelModule_v0110
+[進度] ENV 2/8 完成 SUP_MDL737_SuperAccelModule_v0110 · rc 0 · 69.7s
+[進度] ENV 3/8 開始 SUP_MDL740_NetUnified_v0120 --selftest
+[進度] ENV 3/8 完成 SUP_MDL740_NetUnified_v0120 --selftest · rc 0 · 26.2s
+[進度] ENV 4/8 開始 SUP_MDL743_GenericLayoutHub_v0110 --selftest
+[進度] ENV 4/8 完成 SUP_MDL743_GenericLayoutHub_v0110 --selftest · rc 1 · 110.9s
+[進度] ENV 5/8 開始 SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108 --selftest
+[進度] ENV 5/8 完成 SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108 --selftest · rc 1 · 15.5s
+[進度] ENV 6/8 開始 CGC_MDL230_ToolCoverageProbe_v0106 probe
+[進度] ENV 6/8 完成 CGC_MDL230_ToolCoverageProbe_v0106 probe · rc None · 300.1s
+[進度] ENV 7/8 開始 CGC_MDL137_RunGate_v0109 probe
+[進度] ENV 7/8 完成 CGC_MDL137_RunGate_v0109 probe · rc 1 · 197.7s
+[進度] ENV 8/8 開始 CGC_MDL135_EnvGovernance_v0118 tools
+[進度] ENV 8/8 完成 CGC_MDL135_EnvGovernance_v0118 tools · rc None · 300.2s
+  GREEN  │ Ⓐ 輔助工具     │ ① 鎖版號 · accelerator                          │ VeritasCeleritas_v1141.py · sha 對
+  GREEN  │ Ⓐ 輔助工具     │ ① 鎖版號 · network                              │ VeritasAegisNexus_v1652.py · sha 對
+  GREEN  │ Ⓐ 輔助工具     │ ① 鎖版號 · layout                               │ SUP_MDL743_GenericLayoutHub_v0110.py · sha 對
+  GREEN  │ Ⓐ 輔助工具     │ ① 鎖版號 · nlp                                  │ SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108.py · sha 對 · 新版待啟用 1
+  GREEN  │ Ⓐ 輔助工具     │ ① 鎖版號 · token                                │ CGC_MDL158_VIAPanoramaAuditRepair_v0121.py · sha 對
+  GREEN  │ Ⓐ 輔助工具     │ ① 鎖版號 · frame                                │ SUP_MDL755_VIAPolarsFrame_v0100.py · sha 對
+  GREEN  │ Ⓐ 輔助工具     │ ① 鎖版號 · praddle                              │ VRN_ENG398_PraddleExtractor_v0100.py · sha 對
+  GREEN  │ Ⓐ 輔助工具     │ ① 鎖版號 · pdfplumber                           │ SUP_MDL746_PDFPlumberPlusHub_v0102.py · sha 對
+  GREEN  │ Ⓐ 輔助工具     │ ① 鎖版號 · ocr                                  │ via_ocr_super_v0102.py · sha 對
+  GREEN  │ Ⓐ 輔助工具     │ ② 加速器載入(SUP_MDL737 尾版)                       │ [計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS
+  GREEN  │ Ⓐ 輔助工具     │ ③ 網路工具載入(SUP_MDL740 尾版)                      │ [計] SUP_MDL740_NetUnified v0120 自測 8/8 · PASS
+  RED    │ Ⓐ 輔助工具     │ ④ LAYOUT 載入(SUP_MDL743_GenericLayoutHub_v011 │ rc 1 · LOCK_MISMATCH " + " | ".join(real))
+RuntimeError: LOCK_MISMATCH
+         └ 補法:python "SUP_MDL743_GenericLayoutHub_v0110.py" --selftest
+  RED    │ Ⓐ 輔助工具     │ ⑤ NLP 載入(SUP_MDL866_VIAUnifiedNLPOrchestrato │ rc 1 · LOCK_MISMATCH " + " | ".join(real))
+RuntimeError: LOCK_MISMATCH
+         └ 補法:python "SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108.py" --selftest
+  NODATA │ Ⓐ 輔助工具     │ ⑥ 加速器 / 網路 註冊 · 覆蓋(CGC_MDL230)               │ rc None
+         └ 補法:看 VIA_Reports/toolprobe/TOOLPROBE_latest.json 的待辦
+  NODATA │ Ⓑ 環境與 LIB  │ ⑦ 家族境                                        │ RunGate 沒給結果(rc 1)
+         └ 補法:via-rungate probe
+  NODATA │ Ⓑ 環境與 LIB  │ ⑧ 各境工具冊(VIA_ToolRoster_SSOT)                 │ rc None · 讀不到工具冊結果
+         └ 補法:via-envgov tools
+  GREEN  │ Ⓑ 環境與 LIB  │ ⑨ 鏈上缺件                                       │ 最近一次鏈跑沒有缺件
+  GREEN  │ Ⓑ 環境與 LIB  │ ⑩ 執行檔 · git(必備)                              │ C:\Program Files\Git\cmd\git.EXE
+  GREEN  │ Ⓑ 環境與 LIB  │ ⑩ 執行檔 · pwsh(必備)                             │ C:\Program Files\PowerShell\7\pwsh.EXE
+  GREEN  │ Ⓑ 環境與 LIB  │ ⑩ 執行檔 · node                                 │ C:\Program Files\nodejs\node.EXE
+  GREEN  │ Ⓑ 環境與 LIB  │ ⑩ 執行檔 · npm                                  │ C:\Program Files\nodejs\npm.CMD
+  GREEN  │ Ⓑ 環境與 LIB  │ ⑩ 執行檔 · uv                                   │ ~\.local\bin\uv.EXE
+  GREEN  │ Ⓑ 環境與 LIB  │ ⑩ 執行檔 · tesseract                            │ C:\Program Files\Tesseract-OCR\tesseract.EXE
+  GREEN  │ Ⓑ 環境與 LIB  │ ⑩ 執行檔 · java                                 │ C:\Program Files (x86)\Common Files\Oracle\Java\java8path\java.EXE
+  GREEN  │ Ⓑ 環境與 LIB  │ ⑩ 執行檔 · pandoc                               │ C:\ProgramData\chocolatey\bin\pandoc.EXE
+  NODATA │ Ⓒ PowerShell 端 │ PS 端檢查                                       │ 沒有 PS_SIDE_latest.json(從操作台 PowerShell 跑才有)
+         └ 補法:.\VIA-OperatorConsole.ps1
+[ENV MANAGER] 總判 RED · GREEN 20 · NODATA 4 · RED 2 · JSON ~\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\env_manager\ENVMGR_latest.json
+
+
+## stderr
+
