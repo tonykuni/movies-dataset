@@ -168,3 +168,5 @@
 | 2026-11-24T09:50:00Z | VCGC_CommandHub_v0110.py | 0110 | VIA-CORE-MDL898 | 4bfcdb627869 | 中樞:doctor 總表不再崩潰(v0101–v0109 不動)| 自測 4/4 + 前版 |
 | 2026-11-24T10:35:00Z | VIA_FastRun_v0102.py | 0102 | VIA-CORE-MDL899 | 36df686bd210 | 快跑器:env · fidelity · 動態進度條(v0100 · v0101 不動)| 自測 8/8 + 前版 9/9 |
 | 2026-11-24T11:00:00Z | VIA_HostBoot_v0100.py | 0100 | VIA-CORE-MDL900 | b246e6a9f911 | 桌機啟動器:git 同步改在 Python | 自測 6/6 |
+| 2026-11-24T11:30:00Z | VIA_FastRun_v0103.py | 0103 | VIA-CORE-MDL901 | bb103eb99975 | 心跳不溢位 · env 提速 | 自測 8/8 + 前版 8/8 |
+| 2026-11-24T11:30:00Z | VCGC_CommandHub_v0111.py | 0111 | VIA-CORE-MDL902 | e34f917bf5d8 | via-health 短令 | 自測 5/5 + 前版鏈 v0110~v0105 全過 |
