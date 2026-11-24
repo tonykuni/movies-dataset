@@ -135,7 +135,7 @@ def fetch_macro_fred(spec, ctx):
         ctx.get("fred_api_key", "")
         or os.environ.get("VDF_FRED_API_KEY", "")
         or os.environ.get("FRED_API_KEY", "")
-        or "2d5ae8dfe834ffc409bf98d51f539c17"  # default (Tony's key)
+        or "<REDACTED:VDF_FRED_API_KEY>"  # default (Tony's key)
     )
     start = ctx["start"]
     end = ctx["end"]
@@ -216,7 +216,7 @@ def fetch_sentiment(spec, ctx):
         ctx.get("fred_api_key", "")
         or os.environ.get("VDF_FRED_API_KEY", "")
         or os.environ.get("FRED_API_KEY", "")
-        or "2d5ae8dfe834ffc409bf98d51f539c17"
+        or "<REDACTED:VDF_FRED_API_KEY>"
     )
     start = ctx["start"]
     end = ctx["end"]

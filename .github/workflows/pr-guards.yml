@@ -1,4 +1,4 @@
-name: PR guards (version tails · success locks · Codex review)
+name: PR guards (version tails · success locks · rework causes · Codex review)
 
 # 2026-11-22 一週重工回顧:最常見的兩種重工在合併前就攔下(說明在兩支腳本的檔頭)。
 #  · version-tails:PR 新增的程式版號插到 base 尾版底下(會悄悄改掉薄尾前版鏈)、或改 / 刪已鎖成功的檔 → 紅。
@@ -60,6 +60,43 @@ jobs:
         run: python3 "$RUNNER_TEMP/guard/pr_guard.py" --selftest
       - name: Version tails and success locks
         run: python3 "$RUNNER_TEMP/guard/pr_guard.py" --repo . --base "origin/${{ github.base_ref }}" --head HEAD
+
+  # 2026-11-24 一週重工回顧(13 類根因 · 本週 89 條教訓):VIA_ReworkGuard 把每一類寫成偵測器,每一項附解法與指令。
+  # 一樣從 base 取守門程式(連同它呼叫的 pr_guard.py),PR 的內容只當 git 物件與檔案讀,不執行。紅 = 擋;黃 = 只提醒(寫進摘要)。
+  rework-guard:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Load the rework guard from the base revision
+        run: |
+          mkdir -p "$RUNNER_TEMP/rework"
+          G="VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_ReworkGuard_v0100.py"
+          for f in "$G" .github/scripts/pr_guard.py; do
+            if git cat-file -e "origin/${{ github.base_ref }}:$f" 2>/dev/null; then
+              git show "origin/${{ github.base_ref }}:$f" > "$RUNNER_TEMP/rework/$(basename "$f")"
+            else
+              echo "base 上還沒有 $f:這次用 PR 帶的版本(只有引入它的那一支 PR 會走這裡)"
+              cp "$f" "$RUNNER_TEMP/rework/$(basename "$f")"
+            fi
+          done
+      - name: Fetch open PR heads (number and version collisions across lines)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch -q origin '+refs/pull/*/head:refs/remotes/pr/*' || true
+          echo "VIA_OPEN_PRS=$(gh pr list --repo '${{ github.repository }}' --state open --limit 200 --json number -q '.[].number' | grep -vx '${{ github.event.pull_request.number }}' | tr '\n' ' ')" >> "$GITHUB_ENV"
+      - name: Rework guard selftest (base version)
+        run: python3 "$RUNNER_TEMP/rework/VIA_ReworkGuard_v0100.py" --selftest
+      - name: Rework causes on this PR
+        run: |
+          set +e
+          python3 "$RUNNER_TEMP/rework/VIA_ReworkGuard_v0100.py" check --repo . --base "origin/${{ github.base_ref }}" --head HEAD
+          rc=$?
+          if [ "$rc" -eq 1 ]; then exit 1; fi
+          exit 0
 
   codex-status:
     if: github.event_name != 'issue_comment' || github.event.issue.pull_request
