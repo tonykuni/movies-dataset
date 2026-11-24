@@ -358,7 +358,7 @@ class Tower:
         rules = self.sm / "70_VRN_Rules"
         code = self.patched(cand, {
             r'\$BrokerHelper\s*=\s*".*?"':
-                f'$BrokerHelper = "{rules / "SUP_MDL015_VISVRNBrokerAliasFullList_v0100.py"}"',
+                f'$BrokerHelper = "{rules / "SUP_MDL015_VISVRNBrokerAliasFullList_v0102.py"}"',
             r'\$FallbackHelper\s*=\s*".*?"':
                 f'$FallbackHelper = "{rules / "VIS_VRN_PDFTextLayerFallbackPlan_v0222.py"}"',
         })
@@ -388,7 +388,7 @@ class Tower:
         add("MQ-NoOCR candidate (60_)",
             (self.sm / "60_PowerShell_Entry_Internal"
              / "Invoke-VRN-MQ-NoOCR-Staging-v222.ps1").is_file())
-        for helper in ("SUP_MDL015_VISVRNBrokerAliasFullList_v0100.py",
+        for helper in ("SUP_MDL015_VISVRNBrokerAliasFullList_v0102.py",
                        "VIS_VRN_PDFTextLayerFallbackPlan_v0222.py"):
             add(f"helper {helper}", (self.sm / "70_VRN_Rules" / helper).is_file())
         add("intake 標準槽", self.intake.is_dir(), str(self.intake))

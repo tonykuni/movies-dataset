@@ -73,3 +73,78 @@ if ($env:VIA_ROOT -and (Test-Path $ViaLoader)) { . $ViaLoader }
 - **AST 注入先沙盒**:一律 `ast.parse` + `compile()` 過才落檔,並留 `.astbak`;`via-ast -Rollback` 可還原。
 - **不寫死本機路徑**:路徑全由 `$PSScriptRoot` / `$env:VIA_ROOT` 決定;狀態與備份寫在 `VIA_Reports/vcgc_hub/`(.gitignore 已排除,永不入庫)。
 - **PS 只一支**:只負責進環境與呼叫 Python;出新版時同一則回覆點名作廢舊版。
+
+## v0101 更新(2026-11-23)· **v0100 作廢**,改用 `VIA_ProfileLoader_v0101.ps1`
+
+新增兩個指令(選單第 5、6 項):
+
+| 指令 | 做什麼 | 安全設計 |
+|---|---|---|
+| `via-auth` | 看授權狀態;`via-auth -Fred` 以遮罩輸入 FRED key 存到 Windows **使用者層**環境變數;`via-auth -Clear` 移除 | 不寫任何檔、不進 git、只顯示末 4 碼;格式不符(非 32 位十六進位)不存 |
+| `via-run` | 全線:VDF `launch --run` → VRN `VRN_MDL260 run --source private\vrn_samples --via-db via_database`,各段計時 | 同意閘每次由你**當場輸入 YES**才開,只在本行程;`finally` 保證跑完或出錯都關閘;`-VdfOnly` / `-VrnOnly` 可分段 |
+
+入口以檔名找尾版(`VDF_SystemManager_v*.py`、`VRN_MDL260_SafeParallelLaunch_v*.py`),桌機與倉兩種目錄結構都能用。
+
+**`$PROFILE` 改成自動取最新版 loader**(以後出新版不用再改 profile):
+```powershell
+if (!(Test-Path $PROFILE)) { New-Item -ItemType File -Path $PROFILE -Force | Out-Null }
+Add-Content -Path $PROFILE -Encoding UTF8 -Value @'
+
+# --- VIA VCGC 現代化雙引擎預設啟動(自動取最新版 loader)---
+if ($env:VIA_ROOT) {
+    $ViaLoader = Get-ChildItem $env:VIA_ROOT -Filter 'VIA_ProfileLoader_v*.ps1' -ErrorAction SilentlyContinue |
+        Sort-Object Name | Select-Object -Last 1
+    if ($ViaLoader) { . $ViaLoader.FullName }
+}
+'@
+[Environment]::SetEnvironmentVariable('VIA_ROOT', '<你的 VIA 根目錄>', 'User')   # 只需設一次
+```
+
+**v0101 UAT 追加**(在 Phase 3 沙盒視窗內):
+1. `pwsh -NoProfile -Command "[scriptblock]::Create((Get-Content -Raw .\VIA_ProfileLoader_v0101.ps1)) | Out-Null; 'PS parse OK'"`
+2. `via-auth` → 只看狀態(不輸入 key),確認顯示「未設定 / 已設定(…末4碼)」。
+3. `via-auth -Fred` → 貼 key → 再跑 `via-auth`,使用者層與本視窗都顯示已設定。
+4. `via-run` → 看計畫列出 VDF/VRN 入口與路徑 → **輸入 NO**,確認「未擷取」且 `$env:VIA_NET_CONSENT` 為空。
+5. 真跑:`via-run` 輸入 YES;結束後 `$env:VIA_NET_CONSENT` 應為空(閘已關)。
+
+
+## v0104 + 中樞 v0101(2026-11-23)· **v0100–v0103 全作廢**,PS 只剩 `VIA_ProfileLoader_v0104.ps1`
+
+全部指令改 Python(`VCGC_CommandHub_v0101.py`,帶加速器橋,執行時實測載入);PS 每個 `via-*` 只轉呼叫,不再有邏輯。
+
+| 指令 | 做什麼 | 正主(外掛,不另寫) |
+|---|---|---|
+| `via-update` | **被動**架構快照:只在你啟動時更新(子行程一律 `VIA_PANORAMA_AUTO=0`,不在背景起監控)→ 視覺鎖定 HTML:五系統卡 + 資料根卡 · SSOT 矩陣(正則 regex · 同義字 · 自動編號 · 命名 · 註冊 · 連結 × 層)· SDD · 編號 / 註冊完整性 · 環境外掛 · 加速器 / 網路橋 · 整合待辦 · 跟上一份快照比(綠變差 = 退步,紅標) | MDL149 `ssot panorama`(MDL247)· MDL245 SDD · MDL237 audit · MDL158 `pack`(省 Token,各系統夾)· doctor · MDL230 TOOLPROBE |
+| `via-doctor` | 7 支 VCGC 工具並行(3 道、30 秒心跳)→ 衝突 · 遺漏 · 互撞 · 安裝計畫 · 三數 | MDL240 · MDL056 ×2 · MDL273 · MDL156 · MDL186 · CGC_SystemManager connect |
+| `via-install` | 照 doctor 計畫走安裝閘;你輸入 YES 才開同意閘,且只放進安裝子行程 | MDL056 InstallGate |
+| `via-bak` | 增量:size+mtime 快取,只對變動檔算 SHA-256、只複製變動檔;Graphify 拓撲沿用未變節點;OmniRoute 帳本記本次真解析數;agency-mem 只增帳;再交 VIA_DailyBackup 打包。`--refresh` 先叫各系統自己的 graphify / omniroute | VIA_DailyBackup 尾版 · 各系統管理器 |
+| `via-run` / `via-auth` / `via-setup` | 同 v0103,改 Python:同意閘只在子行程;FRED key 只印長度 + 指紋;$PROFILE 由 Python 備份 + 標記區塊 + 3 次 pwsh 載入檢查,失敗自動還原 | — |
+
+HTML 顏色 / 字體 / 燈只取 `VIA_UI_FormatLock` 尾版(執行時讀,不寫死);讀不到 → 文字燈 + 頁首 `UI_TOKENS=灰`。
+輸出:資料根 `VIA_Reports/vcgc_hub/arch/ARCH_latest.{html,json,txt}` + `ARCH_history.jsonl`(只增)。
+
+**一次設定(工作站,git 倉已 pull 本分支)**:
+```powershell
+python "$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VCGC_CommandHub_v0101.py" setup
+```
+之後開 pwsh 自動進 VIA;`via-update` 出架構頁,`via-doctor` 查環境。
+
+## v0105 + 中樞 v0102(2026-11-23)· **v0100–v0104 全作廢**
+
+- **PS 只是啟動**:`VIA_ProfileLoader_v0105.ps1` 照中樞指令冊(`names --ps`,依中樞檔時間快取)生出全部 `via-*`,每個都轉回 Python;
+  舊的 `via-vdf / via-vrn / via-vcgc / via-view`(走 2,500 行 `Invoke-VIA-Launch`)與 Override 的 DEPRECATED 殘樁一律改導 Python。
+- **指令冊模組化**(中樞 `COMMANDS`):19 個短指令,每列 = 名稱 · 群 · 一句話 · 詳細說明 · 例子 · 正主外掛 · 取代的舊短令(20 個舊名併入)。
+  `via-help` 看全表、`via-help <名稱>` 看詳細;`via` = Python 選擇題主控台(h <編號> 看說明,要參數的逐項問)。
+- **省 Token 外掛**:`via-tok read|slice|digest|pack|chain|delta|tools|verbs`(鎖冊那一支 CGC_MDL158)。
+- **via-setup 瘦身**:舊鏈(Register-VIA-Commands / VIA-Commands-Override / Invoke-VIA-Launch)那幾行改註解停用,改前改後量錯誤數與載入毫秒,變差自動還原;`--unslim` 復原、`--keep-old` 不動。
+- **via-prune 舊版退役閘**(刪舊版先證明):鏈判(MDL158 chain 判法)→ 全倉檔名引用 → git worktree 拿掉前後實跑(家族尾版載入 · 五入口自測 · MDL276 lost · 註冊 stale · MDL237 遺失/改身分/重號 · SDD 每條規則)→ 不變差才 `git mv` 到 `functional modules/VIA_RetiredEngines/prune_<時戳>/`(RETIRE_MANIFEST,CGC_MDL276 restore 可找回)。程式點名 / 鎖定帳點名的永不搬。
+
+**工作站一行(貼進 PowerShell;自己找倉、檢查工作樹、切分支、設定)**:見回覆裡的 one-liner。
+
+## 工作站一行(v0105 + 中樞 v0104;倉裡有未提交改動時給選擇題,不丟任何檔)
+
+```powershell
+& { $r = @("$HOME\OneDrive\Documents\movies-dataset", "$HOME\Documents\movies-dataset") | Where-Object { Test-Path "$_\.git" } | Select-Object -First 1; if (-not $r) { Write-Host '[VIA] 找不到 movies-dataset 倉' -ForegroundColor Red; return }; $b = 'claude/sweet-hamilton-gei01h'; git -C $r fetch -q origin $b; if ($LASTEXITCODE) { Write-Host '[VIA] fetch 失敗' -ForegroundColor Red; return }; $d = git -C $r status --porcelain --untracked-files=no; if ($d) { $d; Write-Host '[VIA] 倉裡有上面這些未提交的改動。 1 = 存成本機提交(不推送,隨時可找回)再繼續   2 = 停止' -ForegroundColor Yellow; if ((Read-Host '請選 1 或 2') -ne '1') { Write-Host '[VIA] 已停止,沒動任何檔' -ForegroundColor Yellow; return }; $cur = git -C $r branch --show-current; if (-not $cur) { $cur = "via-local-$(Get-Date -Format yyyyMMddHHmm)"; git -C $r switch -q -c $cur }; git -C $r add -u; git -C $r commit -q -m "workstation local state before switching to $b"; if ($LASTEXITCODE) { Write-Host '[VIA] 本機提交失敗,已停止' -ForegroundColor Red; return }; Write-Host "[VIA] 已存成分支 $cur 上的本機提交(沒推送);要找回:git -C `"$r`" log $cur -1" -ForegroundColor Green }; git -C $r switch -q $b 2>$null; if ($LASTEXITCODE) { git -C $r switch -q -c $b --track "origin/$b" }; if ($LASTEXITCODE) { Write-Host '[VIA] 切換分支失敗' -ForegroundColor Red; return }; git -C $r pull -q --ff-only origin $b; $h = Get-ChildItem "$r\VeritasIntelligenceAnalytics" -Filter 'VCGC_CommandHub_v*.py' | Sort-Object Name | Select-Object -Last 1; Write-Host "[VIA] $($h.FullName)" -ForegroundColor Cyan; python $h.FullName setup }
+```
+
+選 1 = 把那些改動存成「目前分支上的本機提交」(不推送,隨時 git log 找回)再切分支;選 2 = 停止、什麼都不動。
