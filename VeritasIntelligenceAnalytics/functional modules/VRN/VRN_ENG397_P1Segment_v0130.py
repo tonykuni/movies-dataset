@@ -255,9 +255,12 @@ def fidelity(indir: Path, rep: Path, all_pages: bool = False, ladder: str = "", 
     import pdfplumber
     import pypdfium2 as pdfium
     try:
-        import fitz  # PyMuPDF(有裝才當第三方)
+        import pymupdf as fitz  # PyMuPDF(有裝才當第三方;新名稱,不觸發 fitz 舊名的棄用警告)
     except Exception:  # noqa: BLE001
-        fitz = None
+        try:
+            import fitz  # 舊版 PyMuPDF 只有 fitz 這個名字
+        except Exception:  # noqa: BLE001
+            fitz = None
     lad = rungs(ladder or os.environ.get("VIA_VRN2_OCR_LADDER_CALIB") or DEFAULT_LADDER)
     mode = ocr_mode()
     sp = PRIOR._spill()
