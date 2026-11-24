@@ -174,3 +174,4 @@
 | 2026-11-24T13:30:00Z | VCGC_CommandHub_v0112.py | 0112 | VIA-CORE-MDL903 | 2759245f8bda | via-install 先查再裝 | 自測 6/6 + 前版鏈全過 |
 | 2026-11-24T13:30:00Z | VIA_FastRun_v0104.py | 0104 | VIA-CORE-MDL904 | f9ed53db78d0 | env 組照規範 | 自測 6/6 + 前版 8/8 |
 | 2026-11-24T13:30:00Z | VRN_ENG397_P1Segment_v0132.py | 0132 | VIA-VRN-ENG343 | 7f3e0cc3bd1d | 橋 OCR 一頁一批 | 自測 5/5 + 前版 5/5 |
+| 2026-11-24T14:10:00Z | VCGC_CommandHub_v0113.py | 0113 | VIA-CORE-MDL905 | 991ceee73aef | 舊名照原意 | 自測 4/4 |
