@@ -78,6 +78,16 @@ QUANTGUARD = "VDF_ENG086_QuantGuardOneBridge_v0101"
 TOKEN_VERB = "token"
 TOKEN_STATION = "V-token"
 TOKEN_TOOL = "CGC_MDL158_VIAPanoramaAuditRepair_v0121"
+# 貼給任何 AI 的只有這一行。下面六條是這頁的尺，不跟著貼。
+TOKEN_CUE = "先呼叫工具再回答。只留路徑、sha或大小、一行錯誤、決定。十處無索引即缺席不拉取。24小時內不重讀。動詞token站V-token不另造尺。"
+TOKEN_RULES: tuple[tuple[str, str], ...] = (
+    ("tool-first", "要看就先呼叫工具。不要請人把全文貼進對話。"),
+    ("index-only", "先要索引。全文只取索引點到的那幾行。"),
+    ("reply-thin", "回覆只留路徑、sha 或大小、一行錯誤、決定。"),
+    ("absent", "十處沒有索引就是缺席。不拉取、不猜測。"),
+    ("reuse", "24 小時內已看過的索引不重讀。"),
+    ("owner", "動詞仍是 token，站仍是 V-token。不另造尺。"),
+)
 INVENTORY_BOOK = "VIA_VCGC_FunctionInventory_SSOT_v0299.json"
 INVENTORY_STATIONS = 551
 INVENTORY_REUSE_HOURS = 24
@@ -100,7 +110,7 @@ SUPPORT_SOURCES: tuple[tuple[str, str, str], ...] = (
     ("copilot", "Copilot", "對話只留最後一則摘要。沒有索引就是缺席。"),
 )
 SCHEMA = "vcgc.startup-engine/1"
-SELFTEST_TOTAL = 49
+SELFTEST_TOTAL = 52
 # 2026-11-24 已寫進盤點冊的站。這支引擎不另開站、不把本體塞進備份 zip。
 TODAY_STATIONS: tuple[tuple[str, str, str], ...] = (
     ("C-rework-guard-v0100", "v0100", "重工守衛"),
@@ -488,6 +498,58 @@ def clamp_wait(seconds: float | None) -> float | None:
     return value
 
 
+def token_directive() -> dict:
+    """任何 AI 主動取用工具的整份指引。貼出去的只有 cue 那一行。"""
+    return {
+        "cue": TOKEN_CUE,
+        "rules": [{"id": rule_id, "do": text} for rule_id, text in TOKEN_RULES],
+        "paste": "cue",
+        "verb": TOKEN_VERB,
+        "station": TOKEN_STATION,
+        "new_meter": False,
+    }
+
+
+# 現況對接的列號。全文在這頁，不在這支引擎裡重貼。兩份 Agent OS 壓縮包是同一份。
+PLATFORM_IDS = (
+    "status", "mdl283", "mdl282", "mcp", "connect", "diag", "align", "local",
+    "token6", "cue", "tokenconsole", "handoff", "sdd", "constitution", "vcgc", "vdf", "vrn",
+    "vdfdb", "t3017", "onedrive", "g01", "g02", "g03", "g05", "g06", "g08", "g09",
+    "c05", "c12", "c13", "quality", "req225", "regsync", "prstack", "startuppr", "overflow",
+    "fourtools", "psyntax", "feedback", "flare", "agentos", "connectors", "pyarrow",
+    "matrix", "fail20", "bench", "fiveentry",
+)
+PLATFORM_COMMANDS = (
+    "via-vcgc monitor status --last",
+    "Invoke-VIA-VCGC-Connect-v0100.ps1 -NoSwitch -NoFetch",
+    "Invoke-VIA-VCGC-LatestToolsDiag-v0100.ps1 -NoOpen",
+    "Invoke-VIA-PCAlign-HandleAll-v0100.ps1 -NoAlign -NoOpen",
+    "Invoke-VIA-LocalMonitor-v0100.ps1 -NoOpen",
+    "Invoke-VIA-WorkbenchLocal-v0104.ps1",
+    "py -3.12 CGC_MDL149_VeritasCentralGovernanceConsole_v0194.py matrix install",
+    "py VIA_SystemIntegrationEngine.py --doctor",
+)
+
+
+def platform_dock() -> dict:
+    """附件與壓縮包只對接。不跑、不裝、不寫倉、不加 --apply、不把 v0194 放進 registry。"""
+    joined = " | ".join(PLATFORM_COMMANDS)
+    return {
+        "runs": False,
+        "install": False,
+        "holds_apply": "--apply" in joined or " -Sync" in joined,
+        "writes_books": False,
+        "fusion": False,
+        "go_live": "BLOCKED",
+        "agentos_same": True,
+        "agentos_sha": "97ca853d253ea58194a2938762899624852f8651c9853fa3224d93d46855f304",
+        "v0194_in_registry": False,
+        "count": len(PLATFORM_IDS),
+        "ids": list(PLATFORM_IDS),
+        "commands": joined,
+    }
+
+
 def support_review(already: Iterable[str] | None = None) -> dict:
     """先走既有 token 動詞。十個來源只看索引。24 小時內不重讀。不拉全文，不代裝。"""
     seen = {item for item in (already or ())}
@@ -510,6 +572,7 @@ def support_review(already: Iterable[str] | None = None) -> dict:
         "sources": sources,
         "pulled_bodies": False,
         "install": False,
+        "directive": token_directive(),
         "receipt": {
             "tool": FASTRUN_TAIL,
             "argv": ["--set", "env,fidelity", "--push"],
@@ -821,6 +884,33 @@ def mount(system_id: str) -> dict:
         "verbs": list(VERBS),
         "accel": ACCEL_MARK,
         "why": spec["why"],
+    }
+
+
+def assist_interface(overlay: dict | None = None) -> dict:
+    """一座系統一塊接口。改一座不會改到另一座。融合先不做。REGISTER 不丟。"""
+    seats = []
+    for sid, spec in SYSTEMS.items():
+        local = dict(spec)
+        if overlay and sid in overlay:
+            local.update(overlay[sid])
+        has = bool(local.get("has_manager"))
+        seats.append({
+            "id": sid,
+            "manager": local.get("manager"),
+            "phase": "interface" if has else "absent",
+            "fusion": False,
+            "blast": sid,
+            "why": local.get("why"),
+        })
+    prior = [item[0] for item in TODAY_STATIONS]
+    return {
+        "phase": "interface",
+        "fusion": False,
+        "register": prior,
+        "lost": [],
+        "duplicates": [item for item in prior if prior.count(item) > 1],
+        "seats": seats,
     }
 
 
@@ -1344,6 +1434,34 @@ def selftest() -> list[dict]:
         INVENTORY_BOOK,
         rows,
     )
+    directive = token_directive()
+    rule_ids = [item["id"] for item in directive["rules"]]
+    _check(
+        "指引只是一行且不另造尺",
+        directive["paste"] == "cue"
+        and directive["new_meter"] is False
+        and directive["verb"] == TOKEN_VERB
+        and directive["station"] == TOKEN_STATION
+        and "\n" not in directive["cue"]
+        and "先呼叫工具" in directive["cue"]
+        and "不另造尺" in directive["cue"]
+        and rule_ids == ["tool-first", "index-only", "reply-thin", "absent", "reuse", "owner"]
+        and review["directive"]["cue"] == TOKEN_CUE,
+        TOKEN_STATION,
+        rows,
+    )
+    docked = platform_dock()
+    _check(
+        "現況包只對接且兩份 Agent OS 是同一份",
+        docked["runs"] is False and docked["install"] is False and docked["holds_apply"] is False
+        and docked["writes_books"] is False and docked["fusion"] is False
+        and docked["go_live"] == "BLOCKED" and docked["agentos_same"] is True
+        and docked["agentos_sha"].startswith("97ca853d") and docked["v0194_in_registry"] is False
+        and docked["count"] == 47 and "--apply" not in docked["commands"]
+        and "agentos" in docked["ids"] and "bench" in docked["ids"] and "fiveentry" in docked["ids"],
+        str(docked["count"]),
+        rows,
+    )
     survey = complement_survey()
     tool_ids = [item["id"] for item in survey["tools"]]
     _check(
@@ -1388,6 +1506,43 @@ def selftest() -> list[dict]:
         walk["accel"],
         rows,
     )
+    face = assist_interface()
+    bumped = {row["id"]: row for row in assist_interface({"VDF": {"why": "只動 VDF"}})["seats"]}
+    base = {row["id"]: row for row in face["seats"]}
+    imports: list[str] = []
+    for node in ast.parse(Path(__file__).read_text(encoding="utf-8")).body:
+        if isinstance(node, ast.FunctionDef) and node.name == "assist_interface":
+            for inner in ast.walk(node):
+                if isinstance(inner, (ast.Import, ast.ImportFrom)):
+                    imports.append("import")
+    floor = [
+        "C-rework-guard-v0100",
+        "C-vrn-manager-v0289",
+        "C-rework-guard-v0102",
+        "C-rework-guard-v0101",
+        "C-hub-v0101",
+        "C-hub-v0105",
+        "C-hub-v0106",
+        "C-hub-v0107",
+        "C-hub-v0108",
+        "C-hub-v0109",
+        "C-vrn-eng397-v0130",
+        "C-vrn-eng397-v0131",
+    ]
+    _check(
+        "協助接口各走各的且 REGISTER 不丟",
+        face["phase"] == "interface" and face["fusion"] is False and face["lost"] == [] and face["duplicates"] == []
+        and face["register"] == floor
+        and [row["id"] for row in face["seats"]] == ["VCGC", "VDF", "VRN", "VQG", "VAP"]
+        and base["VQG"]["phase"] == base["VAP"]["phase"] == "absent"
+        and base["VCGC"]["phase"] == base["VDF"]["phase"] == base["VRN"]["phase"] == "interface"
+        and bumped["VDF"]["why"] == "只動 VDF" and bumped["VRN"]["why"] == base["VRN"]["why"]
+        and bumped["VCGC"]["manager"] == base["VCGC"]["manager"]
+        and all(row["blast"] == row["id"] and row["fusion"] is False for row in face["seats"])
+        and imports == [],
+        str(len(face["register"])),
+        rows,
+    )
     _check("自測條數與常數一致", len(rows) + 1 == SELFTEST_TOTAL, f"{len(rows) + 1}/{SELFTEST_TOTAL}", rows)
     return rows
 
@@ -1411,6 +1566,9 @@ def main(argv: list[str] | None = None) -> int:
         print("加速器: " + ACCEL_TOOL + " " + ACCEL_LOCK_VERSION + " · 橋 " + ACCEL_MODULE)
         print("網路: " + NET_TOOL + " " + NET_LOCK_VERSION + " · " + NET_ENGINE_VERSION)
         print("省額度: 動詞 " + TOKEN_VERB + " 仍歸 " + TOKEN_STATION + " · 來源 " + " ".join(item[0] for item in SUPPORT_SOURCES))
+        print("省額度指引: 只貼一行。不另造尺。")
+        print("現況對接: " + str(len(PLATFORM_IDS)) + " 列。不跑、不裝、不加 --apply。Agent OS 正式放行 BLOCKED。")
+        print("協助接口: 五座各走各的。有管理器的先接口。REGISTER " + str(len(TODAY_STATIONS)) + " 站不丟。融合先不做。")
         print("展勘: 對接 GRAPHIFY OMNIROUTE PONYTAIL AGENCY-MEM · 今日站 " + str(len(TODAY_STATIONS)) + " 已在冊 · 不改備份尾")
         print("對接輪: 同義字 · 參數 · 管理器 · " + ACCEL_TOOL + " · 備份 · 四工具。走完不是已裝。")
         return 0
