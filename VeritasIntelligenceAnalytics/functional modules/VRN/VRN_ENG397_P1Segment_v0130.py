@@ -109,6 +109,11 @@ def nums(s: str) -> list:
     return [x.replace(",", "") for x in _NUMTOK.findall(unicodedata.normalize("NFKC", s or ""))]
 
 
+def digits(s: str) -> str:
+    """只留數字字元:跟 nums 對照可分出「OCR 讀錯數字」(digit F1 低)與「OCR 把相鄰欄的數字黏在一起」(只有 nums F1 低)。"""
+    return "".join(c for c in unicodedata.normalize("NFKC", s or "") if c.isdigit())
+
+
 # ---- ① 文字層三方 ----
 def layers(pl_page, pdoc, i: int, fz=None) -> dict:
     out = {}
@@ -152,7 +157,9 @@ def verdict(raw: dict) -> dict:
                 best, how = grp, "VERIFIED_SET"
     if len(best) >= 2:
         ref = clean["pdfplumber"] if "pdfplumber" in best else clean[best[0]]
-        return {"status": how, "tier": "T0" if "pdfplumber" in best else "T1", "agree": sorted(best), "ref": ref, "sha": sha16(ref), "pairs": pairs}
+        same = sorted(set(best) | {k for k in clean if k not in best and Counter(clean[k]) == Counter(ref)})
+        # 層 = 字元完全相同的最便宜那一家(順序是切割的事):pdfplumber 字一樣只是順序不同也算 T0
+        return {"status": how, "tier": "T0" if "pdfplumber" in same else "T1", "agree": same, "ref": ref, "sha": sha16(ref), "pairs": pairs}
     near = [p for p, v in pairs.items() if v >= F1_NEAR and all(k in clean for k in p.split("~"))]
     if near:
         a = near[0].split("~")[0]
@@ -300,7 +307,7 @@ def fidelity(indir: Path, rep: Path, all_pages: bool = False, ladder: str = "", 
                             r = ocr_rung(pdoc, i, dpi, prep, mode, sp)
                             t = r.pop("text", None)             # OCR 原文只在本行程比對,不寫出
                             if t is not None:
-                                r["char_f1"], r["num_f1"], r["use"] = f1(v["ref"], norm(t)), f1(rn, nums(t)), "calib"
+                                r["char_f1"], r["num_f1"], r["digit_f1"], r["use"] = f1(v["ref"], norm(t)), f1(rn, nums(t)), f1(digits(v["ref"]), digits(t)), "calib"
                             pg["ocr"].append(r)
                             calib_rows.append(dict(r, doc=did, pno=i + 1))
                     elif mode and v["status"] in ("NO_TEXT", "CONFLICT"):
@@ -327,7 +334,8 @@ def fidelity(indir: Path, rep: Path, all_pages: bool = False, ladder: str = "", 
                     fz.close()
                 pdoc.close()
         except Exception as exc:  # noqa: BLE001  單檔失敗照實記,不中斷
-            doc["error"] = "%s: %s" % (type(exc).__name__, str(exc)[:160])
+            msg = str(exc).replace(str(f), did).replace(f.name, did).replace(str(Path(indir)), "<輸入夾>")   # 錯誤訊息不帶檔名 / 路徑
+            doc["error"] = "%s: %s" % (type(exc).__name__, msg[:160])
             print("  %s 失敗 %s" % (did, doc["error"]), flush=True)
         doc["secs"] = round(time.time() - t0, 2)
         docs.append(doc)
@@ -353,16 +361,22 @@ def summarize(docs: list, rows: list, lad: list, mode: str) -> dict:
         if rs:
             per[k] = {"n": len(rs), "char_f1_median": round(statistics.median(r["char_f1"] for r in rs), 4),
                       "num_f1_median": round(statistics.median(r["num_f1"] for r in rs), 4),
+                      "digit_f1_median": round(statistics.median(r.get("digit_f1", 0) for r in rs), 4),
                       "num_exact_ratio": round(sum(1 for r in rs if r["num_f1"] >= 1.0) / len(rs), 3),
                       "secs_mean": round(statistics.mean(r["secs"] for r in rs), 2)}
     light = next((k for k in per if per[k]["num_f1_median"] >= F1_NEAR and per[k]["char_f1_median"] >= 0.98), None)
     arb = Counter(p["agree"][1].split("@", 1)[1] for p in pages if p["status"] == "VERIFIED_OCR")
+    pv = {}
+    for p in pages:
+        for k, x in p["pairs"].items():
+            pv.setdefault(k, []).append(x)
+    pair_med = {k: {"median": round(statistics.median(x), 4), "min": round(min(x), 4), "n": len(x)} for k, x in sorted(pv.items())}
     errs = sum(1 for d in docs if d.get("error"))
     lamp = "RED" if errs else ("YELLOW" if (not mode or st.get("CONFLICT") or tier.get("T4") or not pages) else "GREEN")
     return {"lamp": lamp, "docs": len(docs), "doc_errors": errs, "pages": len(pages), "status": dict(st), "tier": dict(tier),
             "verified_ratio": round((st.get("VERIFIED", 0) + st.get("VERIFIED_SET", 0)) / max(1, len(pages)), 4),
             "verified_any_ratio": round(sum(st.get(k, 0) for k in ("VERIFIED", "VERIFIED_SET", "VERIFIED_OCR", "CONSENSUS")) / max(1, len(pages)), 4),
-            "arbitration_won_at": dict(arb), "thresholds": {"near": F1_NEAR, "agree": F1_AGREE, "arb_min": ARB_MIN, "arb_margin": ARB_MARGIN,
+            "arbitration_won_at": dict(arb), "pair_f1": pair_med, "thresholds": {"near": F1_NEAR, "agree": F1_AGREE, "arb_min": ARB_MIN, "arb_margin": ARB_MARGIN,
                                                            "arb_single_char": ARB_SINGLE_CHAR, "arb_single_num": ARB_SINGLE_NUM},
             "ocr_per_rung": per, "light_enough": light, "ocr_mode": mode or "未就緒(SKIP ≠ 綠)"}
 
@@ -377,7 +391,9 @@ def report_lines(out: dict) -> list:
          "最低夠用的層:%s" % " · ".join("%s %d" % kv for kv in sorted(s["tier"].items())),
          "OCR:%s · 階梯 %s" % (s["ocr_mode"], ",".join(out["ladder"]))]
     for k, v in s["ocr_per_rung"].items():
-        L.append("  %s · %d 頁 · 字元 F1 中位 %.4f · 數字 F1 中位 %.4f · 數字全對 %.0f%% · 平均 %.2fs/頁" % (k, v["n"], v["char_f1_median"], v["num_f1_median"], 100 * v["num_exact_ratio"], v["secs_mean"]))
+        L.append("  %s · %d 頁 · 字元 F1 中位 %.4f · 數字 F1 中位 %.4f · 數字字元 F1 中位 %.4f · 數字全對 %.0f%% · 平均 %.2fs/頁" % (
+            k, v["n"], v["char_f1_median"], v["num_f1_median"], v["digit_f1_median"], 100 * v["num_exact_ratio"], v["secs_mean"]))
+    L.append("文字層兩兩字元 F1:%s" % " · ".join("%s 中位 %.4f 最低 %.4f" % (k, v["median"], v["min"]) for k, v in s["pair_f1"].items()))
     L.append("輕型夠用的最低一階:%s" % (s["light_enough"] or "沒有一階達標(數字 F1 ≥ 0.995 且字元 F1 ≥ 0.98)"))
     for d in out["docs"]:
         bad = [p for p in d["pages"] if p["status"] in ("CONFLICT", "NO_TEXT") and p.get("tier") == "T4"]
@@ -463,7 +479,19 @@ def selftest() -> int:
     n = sum(ok)
     print("[計] %s 自測 %d/%d · %s" % (TAG, n, len(ok), "PASS" if n == len(ok) else "FAIL"), flush=True)
     print("[前版] %s 自測" % PRIOR_PATH.name, flush=True)
-    rc_prior = selftest_prior()
+    cdir = HERE / "contract"                               # 前版自測會把契約檔寫進倉(write_contract)→ 跑完還原成跑之前的樣子
+    before = {p: p.read_bytes() for p in cdir.glob("*")} if cdir.is_dir() else None
+    try:
+        rc_prior = selftest_prior()
+    finally:
+        if cdir.is_dir():
+            for p in cdir.glob("*"):
+                if before is None or p not in before:
+                    p.unlink()
+                elif p.read_bytes() != before[p]:
+                    p.write_bytes(before[p])
+            if before is None and not any(cdir.iterdir()):
+                cdir.rmdir()
     print("[計] %s 自測 OK %d · FAIL %d · 前版 rc=%s" % (TAG, n, len(ok) - n, rc_prior), flush=True)
     return 0 if n == len(ok) and rc_prior == 0 else 1
 
