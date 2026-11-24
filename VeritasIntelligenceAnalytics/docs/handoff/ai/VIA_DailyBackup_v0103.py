@@ -310,7 +310,7 @@ def main(argv=None) -> int:
             via, out_root, mdir = _paths(argv)
             write_card(via, out_root, mdir)
         return rc
-    ap = argparse.ArgumentParser(prog="VIA_DailyBackup_v0103.py", description=__doc__.split("\n")[0])
+    ap = argparse.ArgumentParser(prog=Path(__file__).name, description=__doc__.split("\n")[0])
     ap.add_argument("verb", choices=["restore", "card"])
     ap.add_argument("--via", default=None)
     ap.add_argument("--out", default=None)

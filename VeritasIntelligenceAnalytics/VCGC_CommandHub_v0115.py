@@ -292,7 +292,7 @@ def selftest() -> int:
     print("[計] %s 自測開始(本版 6 項 · 前版 %s)" % (TAG, PRIOR_PATH.name), flush=True)
     chk("T1 via-graph 登記 · via-bak 範例多 restore / card / check · route 換在 v0102 那一層",
         "via-graph" in DISPATCH_OWNER.CMD and DISPATCH_OWNER.main is route
-        and "via-bak restore" in DISPATCH_OWNER.CMD["via-bak"]["examples"] and PRIOR_PATH.name == "VCGC_CommandHub_v0114.py")
+        and "via-bak restore" in DISPATCH_OWNER.CMD["via-bak"]["examples"] and 0 <= _vnum(PRIOR_PATH) < _vnum(__file__))
     calls = []
 
     def fake(argv, **kw):
