@@ -139,7 +139,7 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "COVERED": 141,
-  "PARTIAL": 170,
+  "PARTIAL": 172,
   "RECORDED": 28,
   "MISSING": 1
  },
@@ -8602,6 +8602,44 @@
    "why_homes": "VCGC 自己的中樞;不改他系統的檔",
    "ts": "2026-11-24T14:00:00Z",
    "updated_at": "2026-11-24T14:00:00Z"
+  },
+  {
+   "code": "VDF-REQ052",
+   "subsystem": "VDF",
+   "topic": "VDF 起始日 2018-01-01 一致化:實際傳參查證 · ENG053 自測跟上裁定(v0105)",
+   "requirement": "操作員 2026-11-24「2018起」(回應轉來的檢查意見:新版參數寫 2018、分組啟動器實際仍傳 2021、ENG053 自測還要求 2022)。查證(容器 · 本分支與 main 相同):範圍帳各大類 TW_MARKET · FIN · OTHER = 2018-01-01(11-22 那筆蓋掉 11-19 的 2021),MACRO = 1990-01-01;FetchGroups 實際組出的參數:收起始日的引擎 e054 · e056 · e075 · e232 · e066 都是 2018-01-01,財報 e082 --years 9(2018 起);沒帶起始日的 10 支,家族鏈裡沒有寫死 2021 / 2022(主動式 ETF 2025-05-01 · FRED 1990 · akshare 2015);程式裡找不到實際傳 2021 的地方。真的錯的:ENG053 v0104 自測寫死 2022(冊已是 2018)→ 紅;會誤會的:並行啟動器 MDL022 沒帶 --start 時預設 2022-01-01 只給資料範圍矩陣(ENG240 取大類起始日與 --start 較早者 = 2018,不會誤判)。",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "modules": [
+    "functional modules/VDF/engine/VDF_ENG053_ParamEngineMap_v0105.py"
+   ],
+   "evidence": "容器:ENG053 v0105 自測 5/5(冊① 冊② 起始日 = 裁定 2018-01-01 · 映射冊 START_DATE 裁定 '2018-01-01' · 前版 v0104 只有寫死 2022 的 ① ③ 兩行紅 · 它裡面的 v0103 照過)",
+   "next": "主機 VDF 擷取用 2018 起實跑(未在主機實跑);MDL022 預設 2022 只影響矩陣顯示,下一版改從範圍冊取",
+   "hand": "AI + 操作員(主機實跑)",
+   "why_homes": "VDF 自己的引擎",
+   "ts": "2026-11-24T15:00:00Z",
+   "updated_at": "2026-11-24T15:00:00Z"
+  },
+  {
+   "code": "VDF-REQ053",
+   "subsystem": "VDF",
+   "topic": "parquet align:資料家 parquet 對齊輸出 DataFrame(DataPlane v0104)",
+   "requirement": "操作員 2026-11-24 原文:「C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_database\\vdf_database 對齊PARQUET與輸出DATAFRAME」。讀碼:輸出 DataFrame 正本 = DataPlane 冊尾版 outputs(22 個);parquet status 只比列 · 鍵 · 重複 · 日期,不比欄位;parquet sync 在既有 parquet 上 UNION ALL BY NAME → 新欄接在最後、型別照舊 parquet、來源刪掉的欄留著;冊外 parquet 沒人點名。→ VDF_MDL020_DataPlane v0104 新動詞 parquet align(唯讀:冊上 ∪ 實有逐檔 缺欄 · 多欄(有沒有資料)· 型別 · 欄序 · 鍵欄 · 起始日前列數 · 冊外點名)與 --apply(入口旗標;只重寫欄位對不上的檔:欄序型別照 DataFrame · 缺欄補 NULL · 全空多欄去掉 · 有資料多欄留最後 · 驗列數與重複鍵 → 原子替換;不刪列、不刪檔、正典庫唯讀)。",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "modules": [
+    "functional modules/VDF/VDF_MDL020_DataPlane_v0104.py"
+   ],
+   "evidence": "容器:DataPlane v0104 自測 6/6(暫存資料家:缺 adj · 多 junk / legacy · close 型別 · 欄序 · 起始日前 1 列 → --apply 後欄序型別照 DataFrame · 列數與值不變 · 正典庫沒動;前版 v0103 自測紅 2 行皆為 v0101 寫死冊 v0101(21 個輸出 · 2022)· 已知);經 VDF_SystemManager parquet align 轉到本版(無資料家 → 灰)",
+   "next": "主機:via-vdf parquet align(先唯讀看)→ via-vdf parquet align --apply(未在主機實跑)",
+   "hand": "AI + 操作員(主機實跑)",
+   "why_homes": "VDF 自己的引擎",
+   "ts": "2026-11-24T15:00:00Z",
+   "updated_at": "2026-11-24T15:00:00Z"
   }
  ],
  "non_requirements": [
