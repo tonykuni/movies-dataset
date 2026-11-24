@@ -139,7 +139,7 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "COVERED": 141,
-  "PARTIAL": 169,
+  "PARTIAL": 170,
   "RECORDED": 28,
   "MISSING": 1
  },
@@ -8583,6 +8583,25 @@
    "why_homes": "VCGC 的安裝閘與中樞;各境單獨安裝沿用 MDL135 / MDL186,不另寫",
    "ts": "2026-11-24T13:05:00Z",
    "updated_at": "2026-11-24T13:05:00Z"
+  },
+  {
+   "code": "VCGC-REQ259",
+   "subsystem": "VCGC",
+   "topic": "短指令全面檢視:全部 PY 化 · 加速器 · 擷取接網路工具 · 可用的沿用 · 舊名 via-vdffetch / via-vrnrun 照原意(Hub v0113)",
+   "requirement": "操作員 2026-11-24 原文:「所有的指令全部PY化導入加速器 向外擷取的指令導入網路工具 短指令檢視可用就可用 PS指令絕對是錯應重寫 其他依你建議」(附主機舊一行仍在跑 fidelity 6832 秒 25/97 份「還是好慢」)。檢視結果:PS 載入器 v0105(60 行)沒有指令邏輯,每個 via-* 都轉回 VCGC 中樞 Python;中樞新指令 21 條 help 全過、舊名 21 條都指得到新名;背後 20 支程式語法樹都匯入加速器;對外擷取入口(VDF_SystemManager v0191 · VDF_MDL022 v0109)有網路橋;VDF 現役尾版 115 支全有加速器、用到網路套件的 11 支全有網路橋。唯一錯的:v0102 把 via-vdffetch(VDF 擷取)與 via-vrnrun(VRN)都導到 via-run 全線 → Hub v0113 照原意補 --vdf-only / --vrn-only。給操作員的 PS 長一行改為併進 main 後一行 via-health(PS 只啟動)。",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "modules": [
+    "VCGC_CommandHub_v0113.py"
+   ],
+   "evidence": "容器:Hub v0113 自測 4/4(前版鏈 v0112~v0105 全過);x via-vdffetch --plan → run --vdf-only --plan · x via-vrnrun --plan → run --vrn-only --plan · via-fetch 照舊全線;中樞 21 條 help 0 失敗;語法樹檢:指令背後 20 支 accel 20/20 · 擷取入口 net 2/2 · VDF 115 支 accel 115/115 · 網路件 11 支 net 11/11",
+   "next": "開 PR 併進 main 後主機只打 via-health --push(未在主機實跑)",
+   "hand": "AI + 操作員",
+   "why_homes": "VCGC 自己的中樞;不改他系統的檔",
+   "ts": "2026-11-24T14:00:00Z",
+   "updated_at": "2026-11-24T14:00:00Z"
   }
  ],
  "non_requirements": [
