@@ -175,3 +175,5 @@
 | 2026-11-24T13:30:00Z | VIA_FastRun_v0104.py | 0104 | VIA-CORE-MDL904 | f9ed53db78d0 | env 組照規範 | 自測 6/6 + 前版 8/8 |
 | 2026-11-24T13:30:00Z | VRN_ENG397_P1Segment_v0132.py | 0132 | VIA-VRN-ENG343 | 7f3e0cc3bd1d | 橋 OCR 一頁一批 | 自測 5/5 + 前版 5/5 |
 | 2026-11-24T14:10:00Z | VCGC_CommandHub_v0113.py | 0113 | VIA-CORE-MDL905 | 991ceee73aef | 舊名照原意 | 自測 4/4 |
+| 2026-11-24T15:20:00Z | VDF_MDL020_DataPlane_v0104.py | 0104 | VIA-VDF-MDL318 | c04457beda85 | parquet 對齊 DataFrame | 自測 6/6 |
+| 2026-11-24T15:20:00Z | VDF_ENG053_ParamEngineMap_v0105.py | 0105 | VIA-VDF-ENG397 | f249cc3ad5be | 起始日 2018 自測 | 自測 5/5 |
