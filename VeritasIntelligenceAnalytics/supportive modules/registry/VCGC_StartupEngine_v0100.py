@@ -49,6 +49,7 @@ import importlib.util
 import json
 import os
 import re
+import signal
 import subprocess
 import sys
 import tempfile
@@ -113,7 +114,7 @@ SUPPORT_SOURCES: tuple[tuple[str, str, str], ...] = (
     ("copilot", "Copilot", "對話只留最後一則摘要。沒有索引就是缺席。"),
 )
 SCHEMA = "vcgc.startup-engine/1"
-SELFTEST_TOTAL = 59
+SELFTEST_TOTAL = 61
 # 2026-11-24 已寫進盤點冊的站。這支引擎不另開站、不把本體塞進備份 zip。
 TODAY_STATIONS: tuple[tuple[str, str, str], ...] = (
     ("C-rework-guard-v0100", "v0100", "重工守衛"),
@@ -785,6 +786,7 @@ AST_LIB_FLOOR = (
     "subprocess",
     "tempfile",
     "concurrent",
+    "signal",
 )
 AST_ABSENT = ("LibCST", "ruff", "tree-sitter", "PSScriptAnalyzer", "Pyre")
 AST_FNC_FLOOR: tuple[str, ...] = (
@@ -840,6 +842,7 @@ AST_FNC_FLOOR: tuple[str, ...] = (
     "journal_path",
     "load_journal",
     "save_journal",
+    "_kill_tree",
 )
 
 
@@ -1127,6 +1130,7 @@ def simulate(
     on_fault: str = "halt",
     gated: Iterable[str] | None = None,
     runner=None,
+    on_done=None,
 ) -> dict:
     """on_fault=halt：失敗即停，已完成的留在 journal。
     on_fault=skip：失敗的那一件記入典籍並跳過，沒有這條依賴的系統繼續。不自動重試，不歸零。"""
@@ -1222,6 +1226,8 @@ def simulate(
                         if late["ok"]:
                             done.add(other.name)
                             events.append({"kind": "done", "name": other.name, "system": other.system})
+                            if on_done is not None:
+                                on_done(sorted(done))
                         else:
                             skipped.add(other.name)
                             events.append({"kind": "fail", "name": other.name, "system": other.system, "rc": late["rc"]})
@@ -1230,6 +1236,8 @@ def simulate(
                 continue
             done.add(job.name)
             events.append({"kind": "done", "name": job.name, "system": job.system})
+            if on_done is not None:
+                on_done(sorted(done))                          # 每收一件就落典籍(中途被打斷也不丟已完成的)
             continue
         if running:
             job = running.pop(0)
@@ -1282,16 +1290,46 @@ def simulate(
     }
 
 
-def run_job(job: Job, hw: HardwareProfile, run=subprocess.run) -> dict:
-    """launch / resume 用：跑這件的指令（已先掛加速器），完成與否只看回傳碼。不重試、不改指令、不用 shell。"""
+def _kill_tree(proc) -> None:
+    """逾時:整棵行程樹一起收(轉接行程底下真正的指令也算),收完才回。"""
     try:
-        proc = run(job.cmd, env=accel_env(job, hw), timeout=job.timeout_sec, capture_output=True, text=True)
-    except subprocess.TimeoutExpired:
-        return {"name": job.name, "ok": False, "rc": 124, "why": "逾時"}
-    except OSError as exc:
-        return {"name": job.name, "ok": False, "rc": 127, "why": type(exc).__name__}
-    tail = ((proc.stderr or "") + (proc.stdout or "")).strip().splitlines()
-    return {"name": job.name, "ok": proc.returncode == 0, "rc": proc.returncode, "why": tail[-1][:200] if tail else ""}
+        if os.name == "nt":
+            subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True, timeout=60)
+        else:
+            os.killpg(proc.pid, signal.SIGKILL)
+    except (OSError, subprocess.SubprocessError):
+        proc.kill()
+    try:
+        proc.communicate(timeout=60)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        proc.wait()
+
+
+def run_job(job: Job, hw: HardwareProfile, run=None) -> dict:
+    """launch / resume 用：跑這件的指令（已先掛加速器），完成與否只看回傳碼。不重試、不改指令、不用 shell。
+    逾時 → 整棵行程樹砍掉並收屍後才回 rc 124(不留孤兒寫手占著記憶體與互斥)。run 只給自測注入假的執行器。"""
+    if run is not None:
+        try:
+            proc = run(job.cmd, env=accel_env(job, hw), timeout=job.timeout_sec, capture_output=True, text=True)
+        except subprocess.TimeoutExpired:
+            return {"name": job.name, "ok": False, "rc": 124, "why": "逾時"}
+        except OSError as exc:
+            return {"name": job.name, "ok": False, "rc": 127, "why": type(exc).__name__}
+        out, err, code = proc.stdout, proc.stderr, proc.returncode
+    else:
+        group = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt" else {"start_new_session": True}
+        try:
+            proc = subprocess.Popen(job.cmd, env=accel_env(job, hw), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, **group)
+        except OSError as exc:
+            return {"name": job.name, "ok": False, "rc": 127, "why": type(exc).__name__}
+        try:
+            out, err = proc.communicate(timeout=job.timeout_sec)
+        except subprocess.TimeoutExpired:
+            _kill_tree(proc)
+            return {"name": job.name, "ok": False, "rc": 124, "why": "逾時(整棵行程樹已收)"}
+        code = proc.returncode
+    tail = ((err or "") + (out or "")).strip().splitlines()
+    return {"name": job.name, "ok": code == 0, "rc": code, "why": tail[-1][:200] if tail else ""}
 
 
 def journal_path(override: str = "") -> Path:
@@ -2054,6 +2092,34 @@ def selftest() -> list[dict]:
     _check("resume 讀上一輪的完成典籍:已完成的不重跑,失敗的與其下游照實再試",
            prior == ["P_ok"] and stale == [] and all(c[-1] != "ok" for c in calls) and "P_ok" in again["journal"],
            f"典籍 {prior} · 這輪跑了 {[c[-1] for c in calls]}", rows)
+    with tempfile.TemporaryDirectory() as jdir:
+        jp2 = Path(jdir) / "JOURNAL_latest.json"
+
+        def dies_second(job):
+            if job.name == "P_after":
+                raise KeyboardInterrupt("中途被打斷")
+            return {"name": job.name, "ok": True, "rc": 0, "why": ""}
+
+        chain = [Job("P_ok", ["python", "-c", "ok"], 100, "VCGC"), Job("P_after", ["python", "-c", "after"], 100, "VCGC", deps=["P_ok"])]
+        try:
+            simulate(chain, detect_hardware(16384, 4), on_fault="skip", runner=dies_second,
+                     on_done=lambda names: save_journal(jp2, {"journal": names, "failed": None, "skipped": []}, "launch"))
+            interrupted = False
+        except KeyboardInterrupt:
+            interrupted = True
+        kept, _ = load_journal(jp2, chain)
+    _check("每完成一件就落典籍:中途被打斷,已完成的照樣在典籍裡(resume 不重跑)", interrupted and kept == ["P_ok"], str(kept), rows)
+    with tempfile.TemporaryDirectory() as kdir:
+        marker = Path(kdir) / "orphan_wrote.txt"
+        inner = "import time,pathlib,sys; time.sleep(2.5); pathlib.Path(sys.argv[1]).write_text('x')"
+        outer = "import subprocess,sys; sys.exit(subprocess.call([sys.executable,'-c',sys.argv[1],sys.argv[2]]))"
+        tree = Job("K_tree", [sys.executable, "-c", outer, inner, str(marker)], 100, "VCGC", timeout_sec=1)
+        killed = run_job(tree, hw)
+        import time as _t2
+        _t2.sleep(3.0)
+        orphan = marker.exists()
+    _check("逾時把整棵行程樹砍掉(外層轉接底下的指令不會事後再寫檔)", killed["rc"] == 124 and not orphan,
+           f"rc {killed['rc']} · 事後寫檔 {orphan}", rows)
     real = run_job(default_jobs()[0], hw)
     want = 0 if VIA_ACCEL is not None else 3
     _check("預設任務的指令實跑：先掛加速器再執行原指令", real["rc"] == want, f"rc {real['rc']} · {real['why']}", rows)
@@ -2150,9 +2216,12 @@ def main(argv: list[str] | None = None) -> int:
             gated = []
         jpath = journal_path(args.journal)
         prior, stale = load_journal(jpath, jobs) if verb == "resume" else ([], [])
+        if verb == "launch":                                   # launch 是新的一輪:先把典籍歸到這一輪(空),不讀上一輪的
+            save_journal(jpath, {"journal": [], "failed": None, "skipped": []}, verb)
         result = simulate(
             jobs, hw, journal=prior, fail_name=args.fail or None, on_fault="skip", gated=gated,
             runner=lambda job: run_job(job, hw),
+            on_done=lambda names: save_journal(jpath, {"journal": names, "failed": None, "skipped": []}, verb),
         )
         save_journal(jpath, result, verb)
         result["journal_file"] = str(jpath)
