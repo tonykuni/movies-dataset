@@ -114,7 +114,7 @@ SUPPORT_SOURCES: tuple[tuple[str, str, str], ...] = (
     ("copilot", "Copilot", "對話只留最後一則摘要。沒有索引就是缺席。"),
 )
 SCHEMA = "vcgc.startup-engine/1"
-SELFTEST_TOTAL = 65
+SELFTEST_TOTAL = 67
 # 2026-11-24 已寫進盤點冊的站。這支引擎不另開站、不把本體塞進備份 zip。
 TODAY_STATIONS: tuple[tuple[str, str, str], ...] = (
     ("C-rework-guard-v0100", "v0100", "重工守衛"),
@@ -848,6 +848,7 @@ AST_FNC_FLOOR: tuple[str, ...] = (
     "load_jobs",
     "launch_status",
     "launch_run",
+    "job_fingerprint",
 )
 
 
@@ -1348,24 +1349,35 @@ def journal_path(override: str = "") -> Path:
     return folder / "JOURNAL_latest.json"
 
 
+def job_fingerprint(job: Job) -> str:
+    """任務定義的指紋:名稱 · 指令 · 系統 · 依賴 · 互斥 · 演練。換了指令就是另一件事,典籍不能拿舊的完成來抵。"""
+    body = json.dumps({"name": job.name, "cmd": list(job.cmd), "system": job.system, "deps": sorted(job.deps),
+                       "mutex": job.mutex, "rehearsal": job.rehearsal}, ensure_ascii=False, sort_keys=True)
+    return hashlib.sha256(body.encode("utf-8")).hexdigest()[:16]
+
+
 def load_journal(path: Path, jobs: list[Job]) -> tuple[list[str], list[str]]:
-    """回 (已完成且仍在冊上的任務, 冊上已沒有的舊名)。檔不在 = 空典籍。不歸零、不改檔。"""
+    """回 (已完成且指紋對得上的任務, 不採用的舊名)。不採用 = 冊上已沒有,或同名但定義變了,或典籍沒記指紋。
+    檔不在 = 空典籍。不歸零、不改檔。"""
     try:
         data = json.loads(Path(path).read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return [], []
-    names = {j.name for j in jobs}
+    by_name = {j.name: j for j in jobs}
+    marks = data.get("fingerprints") or {}
     done = [n for n in data.get("journal", []) if isinstance(n, str)]
-    return [n for n in done if n in names], [n for n in done if n not in names]
+    keep = [n for n in done if n in by_name and marks.get(n) == job_fingerprint(by_name[n])]
+    return keep, [n for n in done if n not in keep]
 
 
-def save_journal(path: Path, result: dict, verb: str) -> None:
-    """只記完成的任務(失敗與跳過不算),先寫暫存檔再換名。"""
+def save_journal(path: Path, result: dict, verb: str, jobs: list[Job] | None = None) -> None:
+    """只記完成的任務(失敗與跳過不算)與它們的定義指紋,先寫暫存檔再換名。"""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    marks = {j.name: job_fingerprint(j) for j in (jobs or []) if j.name in result["journal"]}
     tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps({"engine": ENGINE_ID, "verb": verb, "journal": result["journal"], "failed": result["failed"],
-                               "skipped": result["skipped"]}, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.write_text(json.dumps({"engine": ENGINE_ID, "verb": verb, "journal": result["journal"], "fingerprints": marks,
+                               "failed": result["failed"], "skipped": result["skipped"]}, ensure_ascii=False, indent=2), encoding="utf-8")
     os.replace(tmp, path)
 
 
@@ -1397,8 +1409,11 @@ def load_jobs(path: str | Path) -> list[Job]:
         raise ValueError("--jobs 檔裡沒有任務清單")
     jobs = []
     for row in rows:
-        jobs.append(Job(str(row["name"]), accel_argv(list(row["cmd"])), int(row["est_ram_mb"]), str(row["system"]),
-                        deps=list(row.get("deps") or []), mutex=row.get("mutex"), timeout_sec=int(row.get("timeout_sec") or 3600)))
+        cmd = list(row["cmd"])
+        wrapped = len(cmd) >= 3 and cmd[0] == sys.executable and cmd[1] == "-c" and ACCEL_MODULE in cmd[2]
+        jobs.append(Job(str(row["name"]), cmd if wrapped else accel_argv(cmd), int(row["est_ram_mb"]), str(row["system"]),
+                        deps=list(row.get("deps") or []), mutex=row.get("mutex"), timeout_sec=int(row.get("timeout_sec") or 3600),
+                        rehearsal=bool(row.get("rehearsal", False))))       # 演練標記照留,不升格成正式任務
     validate_jobs(jobs)
     return jobs
 
@@ -1427,10 +1442,10 @@ def launch_run(verb: str, jobs: list[Job], hw: HardwareProfile, gated: list[str]
     else:
         prior, stale = load_journal(jpath, jobs) if verb == "resume" else ([], [])
         if verb == "launch":                                   # launch 是新的一輪:先把典籍歸到這一輪(空),不讀上一輪的
-            save_journal(jpath, {"journal": [], "failed": None, "skipped": []}, verb)
+            save_journal(jpath, {"journal": [], "failed": None, "skipped": []}, verb, jobs)
         result = simulate(jobs, hw, journal=prior, fail_name=fail_name, on_fault="skip", gated=gated, runner=run,
-                          on_done=lambda names: save_journal(jpath, {"journal": names, "failed": None, "skipped": []}, verb))
-        save_journal(jpath, result, verb)
+                          on_done=lambda names: save_journal(jpath, {"journal": names, "failed": None, "skipped": []}, verb, jobs))
+        save_journal(jpath, result, verb, jobs)
         result["journal_file"] = str(jpath)
     result["resumed_from"] = prior
     result["stale_journal_names"] = stale
@@ -2146,7 +2161,7 @@ def selftest() -> list[dict]:
         jp = Path(jdir) / "JOURNAL_latest.json"
         calls.clear()
         first = simulate(probe, detect_hardware(16384, 4), on_fault="skip", runner=lambda job: run_job(job, hw, run=fake_run))
-        save_journal(jp, first, "launch")
+        save_journal(jp, first, "launch", probe)
         prior, stale = load_journal(jp, probe)
         calls.clear()
         again = simulate(probe, detect_hardware(16384, 4), journal=prior, on_fault="skip", runner=lambda job: run_job(job, hw, run=fake_run))
@@ -2164,7 +2179,7 @@ def selftest() -> list[dict]:
         chain = [Job("P_ok", ["python", "-c", "ok"], 100, "VCGC"), Job("P_after", ["python", "-c", "after"], 100, "VCGC", deps=["P_ok"])]
         try:
             simulate(chain, detect_hardware(16384, 4), on_fault="skip", runner=dies_second,
-                     on_done=lambda names: save_journal(jp2, {"journal": names, "failed": None, "skipped": []}, "launch"))
+                     on_done=lambda names: save_journal(jp2, {"journal": names, "failed": None, "skipped": []}, "launch", chain))
             interrupted = False
         except KeyboardInterrupt:
             interrupted = True
@@ -2198,6 +2213,19 @@ def selftest() -> list[dict]:
         loaded = load_jobs(spec)
         full, full_rc = launch_run("launch", loaded, detect_hardware(65536, 16), [], lj, runner=ok_run)
         kept_full, _ = load_journal(lj, loaded)
+        changed = [Job("J_vcgc", ["python", "-c", "other"], 100, "VCGC")]
+        changed[0].cmd = accel_argv(changed[0].cmd)
+        again, again_rc = launch_run("resume", changed, detect_hardware(65536, 16), [], lj, runner=ok_run)
+        _check("同名但指令換了:resume 不拿舊的完成來抵,照樣重跑(典籍記指紋)",
+               again["resumed_from"] == [] and "J_vcgc" in again["stale_journal_names"] and len(again["runs"]) == 1,
+               f"抵掉 {again['resumed_from']} · 不採用 {again['stale_journal_names']} · 這輪跑 {len(again['runs'])}", rows)
+        dumped = Path(ldir) / "plan_jobs.json"
+        dumped.write_text(json.dumps({"jobs": [j.to_dict() for j in default_jobs()]}), encoding="utf-8")
+        relo = load_jobs(dumped)
+        rr, rr_rc = launch_run("launch", relo, detect_hardware(65536, 16), [], Path(ldir) / "J2.json", runner=ok_run)
+        _check("引擎自己輸出的清單再讀回來:演練標記照留(不升格)· 已掛加速器的指令不重包",
+               all(j.rehearsal for j in relo) and relo[0].cmd == default_jobs()[0].cmd and rr["status"] == "REHEARSAL" and rr_rc == 3
+               and not (Path(ldir) / "J2.json").exists(), f"{rr['status']} rc {rr_rc}", rows)
         _check("--jobs 真清單:每道先掛加速器、不是演練;全跑完 COMPLETE rc 0 並寫典籍",
                loaded[0].rehearsal is False and loaded[0].cmd[0] == sys.executable and ACCEL_MODULE in loaded[0].cmd[2]
                and full["status"] == "COMPLETE" and full_rc == 0 and kept_full == ["J_vcgc"],
