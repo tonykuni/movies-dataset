@@ -83,7 +83,7 @@
 [PASS] 同義字收成一碼且無管理器不擋有管理器 — RAM_RESERVE
 [PASS] 對接走完仍不把缺席工具說成已裝 — VeritasCeleritas v1141
 [PASS] 協助接口各走各的且 REGISTER 不丟 — 12
-[PASS] 語法樹只解析一次且編號不丟 — 53
+[PASS] 語法樹只解析一次且編號不丟 — 56
 [PASS] VDF 增量寫 parquet，VQG 只讀，VAP 只顯示 — [2, 0, 1]
 [PASS] 多檔標的不接起來算持有報酬 — 有 2 檔標的。持有報酬一次只算一檔，不把不同標的接起來算。
 [PASS] launch 真的跑指令，完成只看回傳碼 — 跑了 2 件 · 完成 ['P_ok']
@@ -91,24 +91,13 @@
 [PASS] resume 讀上一輪的完成典籍:已完成的不重跑,失敗的與其下游照實再試 — 典籍 ['P_ok'] · 這輪跑了 ['fail']
 [PASS] 每完成一件就落典籍:中途被打斷,已完成的照樣在典籍裡(resume 不重跑) — ['P_ok']
 [PASS] 逾時把整棵行程樹砍掉(外層轉接底下的指令不會事後再寫檔) — rc 124 · 事後寫檔 False
+[PASS] 占位任務只算演練:REHEARSAL rc 3、不寫典籍(resume 不會因此跳過真工作) — REHEARSAL rc 3 · 典籍 False
+[PASS] 網路工具缺席、要連網的任務被擋:INCOMPLETE rc 3(不再回 0),獨立的照跑 — INCOMPLETE rc 3 · 完成 ['R_ok'] · 跳過 ['R_after', 'R_net']
+[PASS] --jobs 真清單:每道先掛加速器、不是演練;全跑完 COMPLETE rc 0 並寫典籍 — COMPLETE rc 0 · 典籍 ['J_vcgc']
 [PASS] 子程序輸出一律用 UTF-8 解(父行程是 CP950 也不炸;壞位元組換掉)· 回傳碼照收 — {'name': 'U_utf8', 'ok': True, 'rc': 0, 'why': '�'}
 [PASS] 預設任務的指令實跑：先掛加速器再執行原指令 — rc 0 · ok
-[PASS] 自測條數與常數一致 — 62/62
-62/62
+[PASS] 自測條數與常數一致 — 65/65
+65/65
   [同步] SDD 驗證 RED:X-ACCEL 缺標準橋:VDF_MDL020_DataPlane_v0104.py(網路橋) | X-REG 未註冊 ['VDF_Engine_cnn_fear_greed_proxy.py', 'VDF_Engine_aaii_sentiment.py'] · 註冊冊 | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):55 個,例 ['VDF-WKF028', 'VDF-WKF029', | X-REQ 需求代碼不合 ['VDF-REQ 跳號'] · 歸屬指到不存在 [] · 工作流引用不存在的需求 [] → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 65, 'changed': 0, 'stale': 0, 'expected': 21675, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-/tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/wt734/VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL273_EnvToolAudit_v0102.py:6: SyntaxWarning: invalid escape sequence '\C'
-  exe(PATH + Windows 預設安裝路徑)· ps_word_com(登錄檔 ProgID Word.Application\CLSID;非 Windows = N/A)→ OK / MISSING + winget 計畫
-/tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/wt734/VeritasIntelligenceAnalytics/supportive modules/VIA_Central_Governance/CGC_MDL001_CentralGovernanceEngine_v0400.py:1940: SyntaxWarning: invalid escape sequence '\d'
-  <h2>台股代號登記簿(三種代號鎖死定義:^[1-9]\d{3}$ · .TW/.TWO · 「#### TT」;DELISTED 只標不刪)</h2>
-/tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/wt734/VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL148_EngineBus_v0106.py:12: SyntaxWarning: invalid escape sequence '\s'
-  (`需要\s*([A-Za-z0-9_\-]+)`),卻沒有把它帶回匯流排——
-/tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/wt734/VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0114.py:3: SyntaxWarning: invalid escape sequence '\*'
-  """CGC_MDL156_VIAAcceleratorControl v0114 — 薄尾:名冊補 /envs/(第三方虛擬環境;Windows venv 的 Scripts\*.py)
-/tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/wt734/VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL224_TestAuto_v0103.py:13: SyntaxWarning: invalid escape sequence '\('
-  暫存檔在本機暫存夾 VIA_progress\(VIA_PROGRESS_DIR / VIA_TEMP_ROOT 可指定;不在 OneDrive、不進 git);VIA_PROGRESS=0 = 不接續。
-/tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/wt734/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL011_AkshareFetcher_v0100.py:11: SyntaxWarning: invalid escape sequence '\V'
-  單獨手跑時照原件(env VAKE_ROOT,預設 C:\VIA\VAKE)。
-/tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/wt734/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL013_ActivateVDF_v0101.py:635: SyntaxWarning: invalid escape sequence '\]'
-  and not re.search(r"\[[\"']VIA_(NET|SCRAPE)_" + "CONSENT[\"']\]\s*=(?!=)", src))
-[監控] 已在背景起全景監控 pid 7016 · 閒置 1800 秒自停 · 交接閘 RED · 落後 828 提交 · 快照 1267.3h · 未登 2438 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/wt734/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [同步] 樹有變 · 註冊冊待同步 {'new': 3, 'changed': 63, 'stale': 0, 'expected': 21678, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 已在背景起全景監控 pid 1296 · 閒置 1800 秒自停 · 交接閘 RED · 落後 833 提交 · 快照 1267.5h · 未登 2438 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/wt734/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
