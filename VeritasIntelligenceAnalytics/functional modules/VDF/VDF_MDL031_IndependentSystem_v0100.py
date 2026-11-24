@@ -31,6 +31,7 @@ PARTS = (
     ("terms", "VDF_MDL033_TermGate_v0100.py", ("selftest",)),
     ("frames", "VDF_MDL034_FrameAlign_v0100.py", ("selftest",)),
     ("latest3", "VDF_MDL035_Latest3View_v0100.py", ("selftest",)),
+    ("price", "VDF_MDL036_PriceVolumePolicy_v0100.py", ("selftest",)),
 )
 
 
