@@ -89,6 +89,9 @@ jobs:
               cp "$f" "$RUNNER_TEMP/rework/$(basename "$f")"
             fi
           done
+          # v0100 的自測往上找 .github/scripts/pr_guard.py(在倉裡跑時就是倉根);CI 的暫存夾上面沒有 .github → 放一份在同一棵樹裡
+          mkdir -p "$RUNNER_TEMP/rework/.github/scripts"
+          cp "$RUNNER_TEMP/rework/pr_guard.py" "$RUNNER_TEMP/rework/.github/scripts/pr_guard.py"
       - name: Fetch open PR heads (number and version collisions across lines)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
