@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-24T07:30:00Z",
+ "updated_at": "2026-11-24T17:45:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -8332,6 +8332,38 @@
    "timeout_seconds": 900,
    "updated_at": "2026-11-24T17:10:00Z",
    "registered_at": "2026-11-24T16:40:00Z"
+  },
+  "C-hub-v0115": {
+   "argv": [
+    "--family",
+    "core",
+    "VCGC_CommandHub_v0115.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VCGC_CommandHub v0115 自測 OK 6 · FAIL 0 · 前版 rc=0",
+   "scope": "VCGC_CommandHub_v0115.py(VCGC-REQ261 · via-graph · via-bak restore/card/check)",
+   "dependencies": [
+    "VCGC_CommandHub_v*.py"
+   ],
+   "version": "v0115",
+   "timeout_seconds": 1200,
+   "updated_at": "2026-11-24T17:45:00Z",
+   "registered_at": "2026-11-24T17:45:00Z"
+  },
+  "C-daily-backup-v0103": {
+   "argv": [
+    "docs/handoff/ai/VIA_DailyBackup_v0103.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_DailyBackup v0103 selftest · 10/10",
+   "scope": "VIA_DailyBackup_v0103.py(VCGC-REQ261 · 一鍵還原 + 還原前驗證 · 多 AI 備份卡)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_DailyBackup_v*.py"
+   ],
+   "version": "v0103",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-24T17:45:00Z",
+   "registered_at": "2026-11-24T17:45:00Z"
   }
  },
  "work_items": [
@@ -16356,6 +16388,30 @@
    "updated_at": "2026-11-24T17:10:00Z",
    "registered_at": "2026-11-24T16:40:00Z",
    "receipt": "docs/handoff/evidence/C-vcgc-startup-engine-v0100.json"
+  },
+  {
+   "id": "VCGC-REQ261:C-hub-v0115",
+   "requirement": "VCGC-REQ261",
+   "case": "C-hub-v0115",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "via-graph 短令 + via-bak 子動詞(自測 6/6 · 前版鏈全綠)",
+   "next": "主機 via-graph status / build --sys VCGC · via-bak card(未在主機實跑)",
+   "updated_at": "2026-11-24T17:45:00Z",
+   "registered_at": "2026-11-24T17:45:00Z",
+   "receipt": "docs/handoff/evidence/C-hub-v0115.json"
+  },
+  {
+   "id": "VCGC-REQ261:C-daily-backup-v0103",
+   "requirement": "VCGC-REQ261",
+   "case": "C-daily-backup-v0103",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "restore 先驗證 · 乾跑 · 另存 · 原子寫 · card(自測 10/10)",
+   "next": "主機 via-graph status / build --sys VCGC · via-bak card(未在主機實跑)",
+   "updated_at": "2026-11-24T17:45:00Z",
+   "registered_at": "2026-11-24T17:45:00Z",
+   "receipt": "docs/handoff/evidence/C-daily-backup-v0103.json"
   }
  ],
  "retired_files": {
