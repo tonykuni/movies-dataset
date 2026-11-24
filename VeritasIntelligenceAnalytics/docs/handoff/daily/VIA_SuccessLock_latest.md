@@ -179,3 +179,4 @@
 | 2026-11-24T15:20:00Z | VDF_ENG053_ParamEngineMap_v0105.py | 0105 | VIA-VDF-ENG397 | f249cc3ad5be | 起始日 2018 自測 | 自測 5/5 |
 | 2026-11-24T16:10:00Z | VIA_FastRun_v0105.py | 0105 | VIA-CORE-MDL906 | 4732ba7dcff6 | 前置檢查要新鮮 | 自測 5/5 + 前版鏈 |
 | 2026-11-24T16:10:00Z | CGC_MDL056_InstallGate_v0106.py | 0106 | VIA-VCGC-MDL1709 | 9d6c97e1f3b5 | 計畫綁環境 | 自測 5/5 + 前版 11/11 |
+| 2026-11-24T16:40:00Z | VCGC_CommandHub_v0114.py | 0114 | VIA-CORE-MDL907 | d065f9471a11 | install 只用這一輪的計畫 | 自測 5/5 + 前版鏈 |
