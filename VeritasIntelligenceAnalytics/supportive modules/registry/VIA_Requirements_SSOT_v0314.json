@@ -1,7 +1,7 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0314",
- "batch": "+VCGC-REQ265 獨立系統架構 SDD 規劃稿 · AI 優先選 VCGC 動作(v0313 / REQ264 由開著的 PR #741 佔用,跳過)",
+ "batch": "+VCGC-REQ265 獨立系統架構 SDD 規劃稿 · AI 優先選 VCGC 動作(接 main v0313 · 含 v0311 / v0312 的列)",
  "ts": "2026-11-25T10:20:00Z",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
@@ -140,7 +140,7 @@
  "tally": {
   "RECORDED": 31,
   "COVERED": 141,
-  "PARTIAL": 175,
+  "PARTIAL": 176,
   "MISSING": 1
  },
  "requirements": [
@@ -8722,6 +8722,25 @@
    "updated_at": "2026-11-25T04:05:00Z"
   },
   {
+   "code": "VCGC-REQ264",
+   "subsystem": "VCGC",
+   "topic": "VCGC 串測紅收尾:MDL127 自測不吃本機 NODE_PATH · 盤點冊補 WKF053 / WKF054 六步",
+   "requirement": "操作員 2026-11-25 12:58 原文:「在檢查更新狀況完善一切上傳」。main 29dc2804a 上 VCGC test --quick:紅 1 = upd:CGC_MDL127_SixStreams_v0103 自測 ⑧ FAIL(機器本來就設了 NODE_PATH → 子行程繼承 → 判錯;拿掉上層 NODE_PATH 即 10/10);workflow 199/205 = WKF053(開機引擎)/ WKF054(via-graph · via-bak)六步沒登盤點冊。→ ① CGC_MDL127 v0104 薄尾:自測先拿掉上層 NODE_PATH 跑前版十檢 + 補 ⑪⑫ ② 盤點冊 v0306 補 6 步覆蓋(指到已綠的 C-vcgc-startup-engine-v0101 / C-hub-v0116)。",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "modules": [
+    "supportive modules/registry/CGC_MDL127_SixStreams_v0104.py"
+   ],
+   "evidence": "容器:v0104 自測 3/3 ×3(有 / 沒有上層 NODE_PATH 都過)",
+   "next": "主機跑 via test --quick 複驗",
+   "hand": "AI + 操作員",
+   "why_homes": "VCGC 自己的引擎與冊;不改 VDF / VRN",
+   "ts": "2026-11-25T05:20:00Z",
+   "updated_at": "2026-11-25T05:20:00Z"
+  },
+  {
    "code": "VCGC-REQ265",
    "subsystem": "VCGC",
    "topic": "從頭規劃 VCGC / VDF SystemManager / VRN SystemManager 的獨立系統架構(SDD 規劃稿)· 現有功能重組對照 · AI 優先選 VCGC 動作寫入 CLAUDE.md",
@@ -8847,7 +8866,7 @@
    "reason": "提問;本批答覆:不用外部庫(純 CSS + 頁內小段 JS,離線 · 不裝套件);清單裡 Textual 是終端機 UI、Faiss / scikit-learn 是機器學習、Layout-Parser 是文件影像版面分析,都不是 HTML 排版庫;真要拖放式儀表板再評估 Gridstack.js(MIT,需經 VCGC 工具啟用 + 操作員許可)"
   }
  ],
- "prior": "VIA_Requirements_SSOT_v0312.json",
+ "prior": "VIA_Requirements_SSOT_v0313.json",
  "why_v0104": "側線 i:操作員三則令(全部檢測 · SSOT 六族強化 · 全景上下單向;函式庫建議;盤點缺漏 · 省 Token 再升級 · AI 必用功能)入冊 VCGC-REQ077–083;舊 102 條一字不動",
  "why_v0105": "Codex #377 P1:v0104 已由 PR #376 併入 main,不得就地改;收尾追加的 VCGC-REQ078 範圍令(原話「註冊編號SSOT化更新全部SYNC ALL TO GITHUB」「既有範圍內註冊 不要擴張範圍」· 需求句補「只登本批範圍」· 證據改記範圍外列掛交接待辦)與 reviewed 144 → 149 改以本新版號發布;v0104 與其餘 108 條一字不動",
  "why_v0106": "側線 2026-09-30 a:操作員令重整編號 · 註冊 · SSOT 治理架構與風險 → VCGC-REQ084(PARTIAL:防線落地,對帳與對照表待辦);舊 109 條一字不動",
@@ -9190,5 +9209,5 @@
  "why_v0310": "VIA_Requirements_SSOT_v0309.json 在開著的 PR #734;本分支疊在其上 → 出 v0310。只增:VCGC-REQ261(via-graph · via-bak restore/card/check)。前版一字不動。",
  "why_v0311": "只增:VCGC-REQ262(系統架構與工程規範補充條文七節;CLAUDE.md 新段 + 待裁定 2 部分裁定 + 待裁定 7 · 8)。前版一字不動。",
  "why_v0312": "只增:VCGC-REQ263(AGENTS.md 跨 AI 版同步)。前版一字不動。",
- "why_v0314": "只增:VCGC-REQ265(架構規劃稿 · VCGC 優先)。前版 v0312 一字不動;v0313 與 REQ264 已由開著的 PR #741 使用,本冊跳過。"
+ "why_v0314": "只增:VCGC-REQ265(架構規劃稿 · VCGC 優先)。合併 main 後接在 v0313(VCGC-REQ264)之上;v0311 / v0312(REQ262 · REQ263)的列也在本冊。前版一字不動。"
 }
