@@ -189,3 +189,4 @@
 | 2026-11-24T17:55:00Z | VCGC_CommandHub_v0115.py | 0115 | VIA-CORE-MDL909 | 046c6507766e | via-graph · via-bak 子動詞 | 自測 6/6 |
 | 2026-11-24T17:55:00Z | VIA_DailyBackup_v0103.py | 0103 | VIA-CORE-MDL910 | 40c5c2e4f433 | 還原先驗證 · 備份卡 | 自測 10/10 |
 | 2026-11-24T18:05:00Z | VIA_DailyBackup_v0103.py | 0103 | VIA-CORE-MDL910 | 4f961277ce1d | 真入口保留範圍 · 空選擇回紅 | 自測 12/12 |
+| 2026-11-24T18:45:00Z | VCGC_StartupEngine_v0101.py | 0101 | VIA-VCGC-MDL1712 | 2189da877a6c | 典籍鎖 · 唯一暫存檔 | 自測 73/73 |
