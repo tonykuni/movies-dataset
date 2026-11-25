@@ -18,7 +18,8 @@
   寫入   預設只檢查(SYNCED / OUT_OF_SYNC)。--apply 才寫:新版號 = max(本機 ∪ origin/main)+1(避開已發布的號)→ 暫存檔原子換名;
          前版一字不動、只增不減(冊上原有的列一列不少);寫前寫後各跑一次 VCGC ssot panorama(主控台不在 = 黃,照寫)。
   運作帳 每次每引擎一列只增到 RUN_LEDGER.jsonl(UTC · 引擎 · 秒 · 列數 · 差異數 · 燈 · 寫了哪個新版 · start_date)。
-  網路   三引擎都不對外擷取 → 不接網路工具(CLAUDE.md REQ266:沒有對外擷取的不加)。
+  網路   操作員 2026-11-25 令「網路工具也要強制加入」→ 接 [VIA:NET-BRIDGE](via_net_unified 尾版,惰性載入;三引擎本身不出網,
+         真的連線才看同意閘 VIA_NET_CONSENT)。此令蓋過 REQ266「沒有對外擷取的不加」,已在收據列為衝突。
 用法:python VIA_BooksSync_v0100.py check|apply [--via <VIA 根>] [--params <參數冊>] [--start-date YYYY-MM-DD] [--only a,b] [--out <夾>]
       python VIA_BooksSync_v0100.py --selftest
 rc:0 全 SYNCED(或 apply 寫完)· 2 有 OUT_OF_SYNC / 黃 · 1 紅
@@ -49,6 +50,42 @@ try:
 except Exception:  # noqa: BLE001
     VIA_ACCEL = None  # graceful:加速器缺席零影響(自測會把它記成黃)
 # ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(操作員 2026-11-25「網路工具也要強制加入」;從 TEMP 跑時改由工作目錄 / VIA_REPO 找倉;graceful) =====
+VIA_NET_TOOL_PATH = None
+try:
+    import os as _nb_os
+    from pathlib import Path as _nb_Path
+    _nb_roots = [_nb_Path(__file__).resolve(), _nb_Path.cwd().resolve()]
+    if _nb_os.environ.get("VIA_REPO"):
+        _nb_roots.append(_nb_Path(_nb_os.environ["VIA_REPO"]).resolve())
+    for _nb_r in _nb_roots:
+        for _nb_q in (_nb_r, *_nb_r.parents):
+            for _nb_dir in (_nb_q / "supportive modules" / "network", _nb_q / "VeritasIntelligenceAnalytics" / "supportive modules" / "network"):
+                _nb_hits = sorted(_nb_dir.glob("via_net_unified_v*.py")) if _nb_dir.is_dir() else []
+                if _nb_hits:
+                    VIA_NET_TOOL_PATH = str(_nb_hits[-1])
+                    break
+            if VIA_NET_TOOL_PATH:
+                break
+        if VIA_NET_TOOL_PATH:
+            break
+except Exception:  # noqa: BLE001
+    VIA_NET_TOOL_PATH = None
+
+
+def _via_net():
+    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT:載入不出網,真的連線才看閘);缺席回 None(誠實)"""
+    if VIA_NET_TOOL_PATH is None:
+        return None
+    try:
+        import importlib.util as _nb_ilu
+        _nb_spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
+        _nb_mod = _nb_ilu.module_from_spec(_nb_spec)
+        _nb_spec.loader.exec_module(_nb_mod)
+        return _nb_mod
+    except Exception:  # noqa: BLE001
+        return None
+# ===== [VIA:NET-BRIDGE:END] =====
 
 import argparse
 import ast
@@ -482,6 +519,7 @@ def selftest() -> int:
         print(("  [OK] " if cond else "  [NG] ") + name + (f" · {note}" if note else ""), flush=True)
 
     chk("加速器載入(VIA_ACCEL is not None)", VIA_ACCEL is not None)
+    chk("網路工具載入(_via_net() is not None · 載入不出網)", _via_net() is not None, str(VIA_NET_TOOL_PATH))
     with tempfile.TemporaryDirectory() as td:
         via = Path(td) / "repo" / "VeritasIntelligenceAnalytics"
         reg = via / "supportive modules" / "registry"

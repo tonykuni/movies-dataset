@@ -42,6 +42,42 @@ try:
 except Exception:  # noqa: BLE001
     VIA_ACCEL = None  # graceful:加速器缺席零影響(自測會把它記成黃)
 # ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(操作員 2026-11-25「網路工具也要強制加入」;從 TEMP 跑時改由工作目錄 / VIA_REPO 找倉;graceful) =====
+VIA_NET_TOOL_PATH = None
+try:
+    import os as _nb_os
+    from pathlib import Path as _nb_Path
+    _nb_roots = [_nb_Path(__file__).resolve(), _nb_Path.cwd().resolve()]
+    if _nb_os.environ.get("VIA_REPO"):
+        _nb_roots.append(_nb_Path(_nb_os.environ["VIA_REPO"]).resolve())
+    for _nb_r in _nb_roots:
+        for _nb_q in (_nb_r, *_nb_r.parents):
+            for _nb_dir in (_nb_q / "supportive modules" / "network", _nb_q / "VeritasIntelligenceAnalytics" / "supportive modules" / "network"):
+                _nb_hits = sorted(_nb_dir.glob("via_net_unified_v*.py")) if _nb_dir.is_dir() else []
+                if _nb_hits:
+                    VIA_NET_TOOL_PATH = str(_nb_hits[-1])
+                    break
+            if VIA_NET_TOOL_PATH:
+                break
+        if VIA_NET_TOOL_PATH:
+            break
+except Exception:  # noqa: BLE001
+    VIA_NET_TOOL_PATH = None
+
+
+def _via_net():
+    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT:載入不出網,真的連線才看閘);缺席回 None(誠實)"""
+    if VIA_NET_TOOL_PATH is None:
+        return None
+    try:
+        import importlib.util as _nb_ilu
+        _nb_spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
+        _nb_mod = _nb_ilu.module_from_spec(_nb_spec)
+        _nb_spec.loader.exec_module(_nb_mod)
+        return _nb_mod
+    except Exception:  # noqa: BLE001
+        return None
+# ===== [VIA:NET-BRIDGE:END] =====
 
 import importlib.util
 import json
@@ -203,6 +239,7 @@ def selftest() -> int:
         print(("  [OK] " if cond else "  [NG] ") + name + (f" · {note}" if note else ""), flush=True)
 
     chk("加速器載入(VIA_ACCEL is not None)", VIA_ACCEL is not None)
+    chk("網路工具載入(_via_net() is not None · 載入不出網)", _via_net() is not None, str(VIA_NET_TOOL_PATH))
     chk("前版經 glob 載入(v0100)", PRIOR_PATH.name == STEM + "_v0100.py" and callable(getattr(PRIOR, "step_a", None)))
     chk("TAILAPI 轉接前版公開名稱", __getattr__("build_task") is PRIOR.build_task)
     keep = {k: os.environ.get(k) for k in ("VIA_PY_VDF", "VIA_ENV_ROOT", "VIA_ENV_ROOTS", "PATH")}
