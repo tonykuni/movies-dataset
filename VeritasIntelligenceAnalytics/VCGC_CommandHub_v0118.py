@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VCGC_CommandHub_v0117.py — 薄尾(v0116 以前一字不動;原分支 v0105 撞 main 的 v0105,照「同名不同內容以 main 為準、分支改發新版號」改發本號):合併指令 via-nlp(NLP · layout · markdown 唯一入口)
+"""VCGC_CommandHub_v0118.py — 薄尾(前版一字不動;原分支 v0105 撞 main 的 v0105、v0117 又撞開著的 PR #740,照「號取 本機 ∪ origin/main ∪ 開著的 PR 最大值之上」改發本號):合併指令 via-nlp(NLP · layout · markdown 唯一入口)
 
 操作員 2026-11-25:「NLP layout markdown 在倉內整合成一支 · 合併指令 · 只增不減 · 用 VCGC 工具完成」。
   via-nlp [動詞 …] → SUP_MDL866_VIAUnifiedNLPOrchestrator 尾版(v0110 起是三者唯一入口);不給動詞 = hub-status。
@@ -32,7 +32,7 @@ import re
 import sys
 from pathlib import Path
 
-VERSION = "v0117"
+VERSION = "v0118"
 FAMILY = "VCGC_CommandHub"
 HERE = Path(__file__).resolve().parent
 
@@ -115,7 +115,7 @@ def selftest() -> int:
     with contextlib.redirect_stdout(io.StringIO()) as pb:
         rc = PRIOR.selftest()
     tl = [l for l in pb.getvalue().splitlines() if "[計]" in l]
-    chk("⑥ 前版 v0116 自測", rc == 0, f"({tl[-1].strip() if tl else rc})")
+    chk("⑥ 前版自測", rc == 0, f"({tl[-1].strip() if tl else rc})")
     print(f"  [計] {FAMILY} {VERSION} 自測 OK {ok} · FAIL {bad}")
     return 1 if bad else 0
 
