@@ -12,6 +12,8 @@
                     (沒給 = host:Windows 在地驗收)。封包自己驗 SHA、建專用環境、寫 receipts/<執行碼>/;本檔只叫它、收收據。
   bak [參數…]       VIA_DailyBackup 尾版 full --via <倉>/VeritasIntelligenceAnalytics(三閘並行 → 補裝 → Fail-Closed → 備份)
   vdf [參數…]       VDF_LocalIntegrateLaunch 尾版 --repo <倉>(VCGC 健康 → via_vdf 境 → 三步盤點 → 本機 claude)
+  vdfp [--branch B] VDF 參數正本 / 衍生冊 / 引擎合併計畫的桌機實測:TEMP 另開 git worktree 指 origin/<B>(你的工作夾不動),
+                    在裡面依序跑 VDF_ENG053 尾版 --selftest · unify · derive · consolidate(全唯讀),收 SUMMARY,拆 worktree
   沒動詞            前版 v0100(同步 → 快跑器)
   --sync            先跑前版的同步(--dry:fetch · 擋路檔 · main 快轉)
   --push            收尾把收據推 intake/fastrun-<時間>(經 VIA_FastRun 尾版 push;工作夾不動)
@@ -101,7 +103,7 @@ _T0 = time.time()
 VIA_REL = "VeritasIntelligenceAnalytics"
 AI_REL = Path(VIA_REL) / "docs" / "handoff" / "ai"
 VDF_REL = Path(VIA_REL) / "functional modules" / "VDF"
-VERBS = ("fnc", "bak", "vdf")
+VERBS = ("fnc", "bak", "vdf", "vdfp")
 MAX_RECEIPT = 2 * 1024 * 1024
 
 
@@ -225,6 +227,38 @@ def push_receipts(repo: Path, out: Path, stamp: str) -> str:
         return f"[推送失敗] {type(e).__name__}: {e}"
 
 
+def run_vdfp(rest: list, repo: Path, out: Path, env: dict) -> int:
+    br = "claude/eloquent-rubin-q01657"
+    if "--branch" in rest:
+        j = rest.index("--branch")
+        br = rest[j + 1]
+        del rest[j:j + 2]
+    wt = Path(tempfile.gettempdir()) / f"via_vdfp_{out.name}"
+    git = lambda *a: subprocess.run(["git", "-C", str(repo), *a], capture_output=True, text=True, encoding="utf-8", errors="replace")  # noqa: E731
+    if git("fetch", "-q", "origin", br).returncode != 0:
+        say(f"[RED] git fetch origin {br} 失敗")
+        return 5
+    r = git("worktree", "add", "--detach", str(wt), "FETCH_HEAD")
+    if r.returncode != 0:
+        say("[RED] worktree:" + r.stderr.strip()[:200])
+        return 5
+    rc = 0
+    try:
+        eng = newest(wt / VDF_REL / "engine", "VDF_ENG053_ParamEngineMap_v*.py")
+        if eng is None:
+            say("[RED] 分支上沒有 VDF_ENG053 尾版")
+            return 1
+        for i, v in enumerate(rest or ["--selftest", "unify", "derive", "consolidate"]):
+            say(f"vdfp · {eng.name} {v}")
+            r1 = stream([sys.executable, str(eng), v], wt, dict(env, VIA_REPO=str(wt)), out / f"vdfp_{i}_{v.strip('-')}_console.txt")
+            rc = max(rc, r1 if r1 in (0, 1, 2) else 1)
+        for p in sorted((wt / VIA_REL / "VIA_Reports" / "vdf_params").glob("2*/SUMMARY.json")):
+            shutil.copyfile(p, out / f"vdfp_{p.parent.name}_SUMMARY.json")
+    finally:
+        git("worktree", "remove", "--force", str(wt))
+    return rc
+
+
 def run_verb(verb: str, rest: list, repo: Path, fnc_dir=None) -> int:
     env = dict(os.environ, VIA_REPO=str(repo))
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -236,6 +270,12 @@ def run_verb(verb: str, rest: list, repo: Path, fnc_dir=None) -> int:
             say(f"[RED] {d} 沒有 VIA_VCGC_FNC_v*.zip(--fnc-dir 指定)")
             return 1, None, None
         argv, cwd = fnc_python() + [str(z), *(rest or ["host"])], z.parent
+    elif verb == "vdfp":
+        rc = run_vdfp(list(rest), repo, out, env)
+        (out / "vdfp_RUN.json").write_text(json.dumps({"tool": TAG, "verb": verb, "rc": rc, "secs": round(time.time() - _T0, 1), "args": rest,
+                                                        "accel": VIA_ACCEL is not None, "net": VIA_NET_TOOL_PATH is not None}, ensure_ascii=False, indent=1), encoding="utf-8")
+        say(f"vdfp · rc {rc} · 收據 → {out}")
+        return rc, out, stamp
     elif verb == "bak":
         t = find_tail(repo, AI_REL, "VIA_DailyBackup_v*.py")
         if t is None:
@@ -348,6 +388,22 @@ def selftest() -> int:
             chk("fnc:沒有封包 = 紅", run_verb("fnc", [], repo, fnc_dir=td / "none")[0] == 1)
             chk("不是 VIA 倉 = 紅", main(["--repo", str(td), "bak"]) == 1)
             chk("沒有 FastRun = 推送略過(只印)", push_receipts(repo, out, "x").startswith("[推送略過]"))
+            src = td / "origin"
+            eng = src / VDF_REL / "engine"
+            eng.mkdir(parents=True)
+            (eng / "VDF_ENG053_ParamEngineMap_v0106.py").write_text(
+                "import sys, os, pathlib\nprint('ENG053', sys.argv[1:], pathlib.Path.cwd().name.startswith('via_vdfp_'))\nsys.exit(0)\n", encoding="utf-8")
+            g = lambda *a: subprocess.run(["git", *a], capture_output=True, text=True)  # noqa: E731
+            g("init", "-q", "-b", "main", str(src))
+            g("-C", str(src), "-c", "user.email=t@t", "-c", "user.name=t", "add", "-A")
+            g("-C", str(src), "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "t")
+            g("-C", str(src), "branch", "feat")
+            g("clone", "-q", str(src), str(td / "clone"))
+            (td / "clone" / VIA_REL).mkdir(parents=True, exist_ok=True)
+            rc, out, _ = run_verb("vdfp", ["--branch", "feat", "unify"], td / "clone")
+            log = (out / "vdfp_0_unify_console.txt").read_text(encoding="utf-8") if out else ""
+            wts = g("-C", str(td / "clone"), "worktree", "list").stdout.strip().splitlines()
+            chk("vdfp:分支另開 worktree 跑 ENG053 尾版 · 跑完拆掉 · 工作夾不動", rc == 0 and "ENG053 ['unify'] True" in log and len(wts) == 1, log[-160:] + str(wts))
     finally:
         for k, v in keep.items():
             if v is None:
