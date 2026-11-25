@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-25T13:40:00Z",
+ "updated_at": "2026-11-25T13:20:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -8442,6 +8442,32 @@
    "timeout_seconds": 900,
    "updated_at": "2026-11-25T13:40:00Z",
    "registered_at": "2026-11-25T13:40:00Z"
+  },
+  "C-mdl124-v0112": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0112.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL124_BridgeSweeper v0112 自測 10/10 · PASS",
+   "scope": "加速器生效覆蓋:五態分類 · 子行程實測 import · 前版 inject 補後轉生效 · 三數貼回包 · 鎖定色票頁 · 工具本體豁免 · 前版鏈",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0103.py",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0107.py",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0108.py",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0109.py",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0110.py",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0111.py",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0112.py",
+    "supportive modules/VIA_SuperAccel_Module.py",
+    "supportive modules/registry/VIA_UI_FormatLock_v0101.json",
+    "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+   ],
+   "version": "0112",
+   "timeout_seconds": 1200,
+   "updated_at": "2026-11-25T13:20:00Z",
+   "registered_at": "2026-11-25T13:20:00Z"
   }
  },
  "work_items": [
@@ -16551,6 +16577,53 @@
    "next": "操作員看過 PR 內的 CLAUDE.md 段落;要升為律另登政策冊",
    "updated_at": "2026-11-25T13:40:00Z",
    "registered_at": "2026-11-25T13:40:00Z"
+  },
+  {
+   "id": "VCGC-REQ267:C-mdl124-v0112",
+   "requirement": "VCGC-REQ267",
+   "case": "C-mdl124-v0112",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "容器自測 10/10 ×3 · handoff test C-mdl124-v0112 rc 0 · 標記見到",
+   "next": "主機跑 PS 啟動器",
+   "receipt": "docs/handoff/evidence/C-mdl124-v0112.json",
+   "updated_at": "2026-11-25T13:30:00Z",
+   "registered_at": "2026-11-25T13:20:00Z",
+   "verified_at": "2026-11-25T13:30:00Z",
+   "verified_why": "handoff test C-mdl124-v0112 rc 0 · 標記見到"
+  },
+  {
+   "id": "VCGC-REQ267:host-accel-cover",
+   "requirement": "VCGC-REQ267",
+   "case": null,
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "容器沒有 pwsh,PS 點源實測沒量;主機另有本機才有的檔",
+   "next": "主機跑 Invoke-VIA-AccelCover-v0100.ps1,把剪貼簿貼回包貼回",
+   "updated_at": "2026-11-25T13:20:00Z",
+   "registered_at": "2026-11-25T13:20:00Z"
+  },
+  {
+   "id": "VCGC-REQ267:vrn-net-bridge",
+   "requirement": "VCGC-REQ267",
+   "case": null,
+   "state": "PENDING",
+   "owner": "操作員 / VRN",
+   "reason": "VRN 兩支出網檔沒有網路橋:functional modules/VRN/20260804/VRN_MDL007_APIDataFetcher.py · functional modules/VRN/_vdf_fetch/VDF_TW_AllInOne_v039.py;VCGC 只量不補(四系統互不干涉)",
+   "next": "操作員一句話:VRN 管理器自己補,或 PS 帶 -All(= --scope all)由 VCGC 代補",
+   "updated_at": "2026-11-25T13:20:00Z",
+   "registered_at": "2026-11-25T13:20:00Z"
+  },
+  {
+   "id": "VCGC-REQ267:profileloader-ps-accel",
+   "requirement": "VCGC-REQ267",
+   "case": null,
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "VIA_ProfileLoader_v0105.ps1(每開一個 shell 都載入)沒有 PS 加速器橋;加了會拖慢開 shell,且改既有 .ps1 不在授權內",
+   "next": "操作員裁定:A 出 v0106 帶橋 · B 列豁免(啟動殼本身只轉 Python,Python 端已 100% 生效)",
+   "updated_at": "2026-11-25T13:20:00Z",
+   "registered_at": "2026-11-25T13:20:00Z"
   }
  ],
  "retired_files": {
