@@ -137,6 +137,22 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
 
 - **舊短指令改走 Python**(操作員 2026-11-18):短指令背後的動作改成呼叫 Python 入口,帶加速器橋,並行時照「先降壓 → 3~6 道 → 監工」的安全機制;PS 只留進環境與轉呼叫。逐批改,每批先列清單再動。
 
+**2026-11-24 操作員令「重工因素寫成指令的預設偵測 · 解決方案內建」(待登需求 VCGC-REQ255;不是律)**
+
+- **重工守門預設跑**:出新版號、發號、推送、開 PR 之前一律先跑
+  `python3 "$(ls VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_ReworkGuard_v*.py | sort | tail -1)" check --fetch-prs`(尾版;看已提交 + 工作樹)。
+  紅 = 不推(已鎖被改 · 版號插到尾版底下 · 開著的 PR 同號同檔名 · 新冊版少了 base 的列 · 明文金鑰);黃照它印的「解法 / 指令」修,不修就在收據寫理由。
+  13 類根因與解法:`… causes`;一週數字:`… report`。PR 守門 workflow 的 rework-guard job 跑 base 上的尾版(PR 改不掉)。
+- **發號接在開著的 PR 之上**:編號引擎從本機冊尾 +1;開著的 PR 已用的號(MDL · SSOT · ENV · 分類碼)要先避開,發完再跑一次 check(2026-11-24 實錄:#722 / #730)。
+
+**2026-11-24 操作員令「環境安裝規範」(待登需求 VCGC-REQ258;不是律。全文 `VeritasIntelligenceAnalytics/docs/VIA_Environment_EightHub_Policy_v0101.md`)**
+
+- **順序固定,前一步不過後一步不做**:① 全面檢視 base · `via_core` · 所有 `via_*` 境(八路衝突檢查 + pip check + 多層 site 互撞 + 工具冊缺件 + 加速器)→ ② 有衝突風險:不新增,把風險移開、該境立刻重建(`via-envgov plan` → `via-envgov apply --approve` 的 REBUILD 段),重建後回 ① → ③ 檢查無誤後,沒裝的工具列入新增 → ④ 特殊環境及分類一律單獨安裝(Baseline `package_env_overrides` / `families` 成員不進 base)→ ⑤ 清華 · 阿里 · 官方三鏡像同時解析新增(零安裝)、推算裝後新增衝突 → ⑥ 寫新增計畫(全部釘版)→ ⑦ 直接執行計畫,不再測。
+- **一行入口**:`via-health`(⑦ 之前全做);只查 `via-install --plan-check`;照計畫裝 `via-install --from-plan --yes`。不直接 pip;同意閘只在安裝閘子行程裡設。
+- **多版本共存**:numpy、pyarrow 這類常用件允許不同 Python 版本 / 不同境各用各的版本;同一境多版遮蔽或 ABI 錯配才是要重建的風險。
+- **不邊裝邊測**:不在安裝途中拆批重試、不在裝後整套重驗;要驗就是下一輪 `via-health` 的 ①。
+- 跟「待操作員裁定」第 1 項的關係:本令把「有風險就重建」寫成規範步驟;重建仍走 `via-envgov apply --approve`(保留舊境與 LKGC),AI 不自己刪境。
+
 **待操作員裁定(兩邊的話對不上,AI 不自己選邊;裁定前照較保守的一邊做)**
 
 1. **已裁定(操作員 2026-11-18)**:授權 AI 開兩道同意閘、經 VCGC 安裝閘(`CGC_MDL056_InstallGate` 尾版)安裝套件、推送到 GitHub 的工作分支,不用逐次再問。界線:安裝只走安裝閘(不直接 pip);開閘只在執行那一步的行程裡設、不寫進任何檔;重建或刪除環境、合併 PR、改 .ps1 既有檔不在這次授權內。每批回報寫明用到哪一項。
@@ -158,3 +174,56 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
 - **加速器覆蓋以語法樹為準、全系統算**:VCGC、VDF、VRN、VQG、VAP 的現役尾版都要真的匯入;只有標記那一行 = 黃。
 - **註冊同步與編號前工作樹要全乾淨**(未追蹤的容器產物先清);背景有 git 動作時,提交後看 `git log -1` 與 `git status`。
 - **慢要先量再說**:回報耗時要分開寫「空庫從頭抓」與「平常增量」,並點名最慢的那一支與原因。
+
+<!-- VIA:CLAUDE-CH5-6:BEGIN -->
+
+**2026-11-24 操作員令(第五 · 六章原文照錄;待登需求,不是律;與上文衝突時以上文與政策冊為準並回報)**
+
+---
+
+## 5. 備份與 Graphify 快照協議（Backup & Snapshot Gate）
+
+當使用者要求「進行備份」、「建立快照」或「執行 Graphify 備份」時，**嚴禁未經確認直接覆蓋既有檔案或掃描 `via_database` 實體大檔**。若使用者未在指令中指定參數，AI 必須先拋出以下 **6 題高密度選擇題組合**（單次互動鎖定邊界，等待使用者以快捷口令回覆後再執行）：
+
+### 5.1 進場必問 6 大問題組合（Compact Clarification Matrix）
+| 編號 | 確認維度 | AI 進場必問具體問題 | 選項與預設安全護欄（Guardrails） |
+| :--- | :--- | :--- | :--- |
+| **Q1** | **備份範圍（Scope）** | 本次備份的納管範圍為何？ | • **A（預設）**：僅引擎倉 `movies-dataset`（程式碼 + 三本尾版冊）<br>• **B**：引擎倉 + 隔離區 `sapphire-prism-baker-amber` 差異快照<br>• **C**：含 `VIA_Database_Topology_Index.md`（※嚴格排除 `via_database` 實體大檔） |
+| **Q2** | **Graphify 備份層級** | Graphify 圖譜要採用哪一種備份模式？ | • **Mode A**：僅複製 `graphify-out/graph.json` 與 `GRAPH_REPORT.md` 快照<br>• **Mode B**：先執行 `graphify update .` 與 `--wiki`，再打包整個 `graphify-out/`<br>• **Mode C（最推薦）**：先跑 `Sync-ViaWikiAndBooks.ps1` 刷齊三冊與圖譜，綠燈後再打包 |
+| **Q3** | **備份存放位置** | 備份壓縮檔要放在哪個路徑？ | • **本地隔離區（預設）**：本機非 OneDrive 磁碟或專案外的 `_via_backups/`（避免 OneDrive 同步鎖死）<br>• **倉內暫存**：專案根目錄 `.sdd_bak/`（已列入 `.gitignore` 與 `.graphifyignore`） |
+| **Q4** | **版本輪替上限** | 舊有備份快照如何清理？ | • **5 份輪替（預設）**：同一類型最多保留最新 5 份，超出自動刪除最舊快照<br>• **單次覆蓋**：僅保留最新 1 份基準快照 |
+| **Q5** | **前置門禁檢查** | 備份前是否強制執行唯讀健康檢查？ | • **Fail-Closed（預設）**：先跑 `Invoke-VcgcMasterGate.ps1` 與 AST 簽章檢查，紅燈即中止備份<br>• **強制快照**：忽略警告，直接對現狀進行原樣封存 |
+| **Q6** | **Git 狀態連動** | 本地備份完成後，是否需要操作 Git？ | • **純本地歸檔（預設）**：不執行 `git commit`，避免備份動作干擾版本紀錄<br>• **建立安全檢查點**：同步建立一筆本地 `git commit -m "chore(backup): ..."` |
+
+- **快捷回覆口令範例**：使用者回覆「`Q1選C、Q2選Mode C、Q3放本機隔離區、Q4保留5份輪替、Q5走Fail-Closed、Q6純本地歸檔，直接執行`」即可直接啟動。
+
+### 5.2 備份執行與安全鐵律
+- **原子備份與輪替上限**：所有本地備份檔必須先寫入暫存檔（`.sdd_tmp`）驗證非空後再移動至備份區，同一目標最多保留 **5 份**歷史快照。
+- **禁區隔離**：嚴禁將 `graphify-out/` 或 `.sdd_bak` 備份檔當作新的 SSOT 冊註冊進 `VIA_VRN_LogicArchitecture_SSOT_v0100.json`。
+
+---
+
+## 6. 每日收工自我檢查與蟲攻擊盤點協議（4-Gate Audit Protocol）
+
+當使用者要求「自我檢查今日成果」、「盤點錯誤與蟲攻擊」或進入每日收工覆盤時，AI 必須遵循 **Evidence-First（證據優先）、Zero-Token（指紋與狀態卡導向）、Fail-Closed（紅燈阻斷）** 三大原則，禁止空泛回答「已完成」，每項結論必須綁定 `Commit SHA`、`檔案路徑`、`AST 節點` 或 `Exit Code`：
+
+### 6.1 四層防禦稽核問題組（跨 AI 通用標準）
+1. **第一組：今日實質成果與架構對齊盤點（Deliverables & SSOT Alignment）**
+   - 列出今日在引擎倉（`movies-dataset`）與隔離區（`sapphire-prism-baker-amber`）實際寫入/修改的檔案、對應 `Commit SHA` 與解決的問題。
+   - 逐一標註三本尾版冊（`LogicArchitecture`、`Policy_Laws`、`ToolRoster`）與衍生產物（`graphify-out/graph.json`、`graphify-out/wiki/index.md`、`VIA_Database_Topology_Index.md`）為 `SYNCED` 或 `OUT_OF_SYNC`。
+   - 確認今日是否遵守 `CLAUDE.md` 省 Token 規範，有無違規全倉掃描或誤觸 `via_database` 實體路徑。
+2. **第二組：今日已發生錯誤與修補軌跡（Errors & Incident Log）**
+   - 列出今日遭遇的所有報錯（`SyntaxError`、BOM 編碼異常、DB 檔案鎖定 Lock、權限拒絕或路徑錯誤），說明根因（RCA）、修復手段，以及**如何透過自動化守衛/門禁防止再次發生**。
+3. **第三組：蟲攻擊與九頭龍回歸偵測（Bug Attacks & Hydra Regressions）**
+   - **公開介面保全（`VF_FUNCTIONS_KEPT`）**：確認修改或升級尾版的 `.py` 模組未遺失或破壞既有的公開方法（如 `VDF_SystemManager.collect()`）。
+   - **雙橋接與路由繞道**：確認最新尾版 `.py` 完整掛載 `CGC_MDL158` 加速器橋（且位於 `from __future__` 下方），且無任何模組繞過 `via-vcgc` / `SystemManager` 直連 `via_database`。
+   - **靜默失敗與快取毒化**：確認無遇到缺值自動補 0 或回傳 `NODATA` 掩蓋異常的情況（嚴守 `FAIL_CLOSED`）。
+4. **第四組：未解決技術債與跨 AI 交接狀態卡（Unresolved Issues & Handoff Card）**
+   - 依風險排序（`P0 阻斷` / `P1 高風險` / `P2 優化`）列出遺留紅燈、警告與待合併隔離區差異。
+   - 最後必須輸出 **250 字以內的標準跨 AI 交接狀態卡**：
+     - `[整體健康度]`：`GREEN` / `YELLOW` / `RED`
+     - `[最新基準點]`：分支名稱 @ Commit SHA
+     - `[今日已閉環]`：（限 3 點以內，附證據）
+     - `[明日第一動]`：（明確指出下一個要執行的單一指令或檔案座標）
+
+<!-- VIA:CLAUDE-CH5-6:END -->

@@ -8,7 +8,7 @@ _Build date: 2026-05-26_
 |---|---|
 | `default_start_date` | `2010-01-01` |
 | `default_end_date` | `TODAY` |
-| `fred_api_key_default` | `2d5ae8dfe834ffc409bf98d51f539c17` |
+| `fred_api_key_default` | `<REDACTED:VDF_FRED_API_KEY>` |
 | `fred_api_key_env` | `VDF_FRED_API_KEY` |
 | `yfinance_auto_adjust` | `False` |
 | `throttle_ms` | `{'yfinance': 150, 'twse': 300, 'tpex': 400, 'mops': 500, 'fred': 300, 'akshare': 500}` |
