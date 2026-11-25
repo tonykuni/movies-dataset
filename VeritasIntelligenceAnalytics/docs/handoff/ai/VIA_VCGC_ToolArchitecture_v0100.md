@@ -104,12 +104,12 @@ L5  工具                 鎖冊 9 支:accelerator · network · token · nlp �
 - 不跨系統改檔:VDF / VRN 的 `verbs --json` · `handoff` 由它們自己的管理器補。
 - 不改 `.ps1` 既有檔,不新增引擎種類;新能力掛既有家族的新動詞。
 
-## 5 待操作員裁定
+## 5 操作員裁定(2026-11-25,原文「A 照建議 B 用 backup C 標轉接」)
 
-| # | 題目 | 裁定前怎麼做 |
+| # | 題目 | 裁定 |
 |---|---|---|
-| A | VCGC 唯一入口是 `CGC_SystemManager`(照 REQ234),還是主控台 MDL149(現在實際在用的)? | 照 REQ234,主控台當服務群;兩邊都能叫 |
-| B | 六組重疊動詞的正名用哪個字(例:`bak` 還是 `backup`) | 取管理器已有的字,短令名照舊 |
-| C | runner 群(FastRun · ApplyRun · SettleAll · HostBoot)收成 `boot` 的道之後,舊 runner 何時停用 | 標「轉接」,不停用 |
+| A | VCGC 唯一入口 | **`CGC_SystemManager` 尾版**(照 REQ234)。主控台 MDL149 降為服務群本體(G1 讀取 · G3 驗收),原有動詞照舊能叫。CLAUDE.md 開頭「VCGC = `CGC_MDL149` 主控台」那句要跟著改,改時另登需求 |
+| B | 重疊動詞的正名 | **用完整英文字**:`backup`(不用 `bak`),其餘照同一原則:`health` · `graph` · `boot` · `handoff` · `overview`。短令 `via-bak` 等舊名照舊能打,轉接到正名 |
+| C | runner 群(FastRun · ApplyRun · SettleAll · HostBoot) | **標「轉接」**:收成 `boot` 的道之後,舊 runner 不停用、不刪,呼叫時印一行「舊 → 新」後照跑 |
 
-NEXT: 操作員裁 A / B / C → #745 那條線照第 3 節第 1 步開始(管理器 `verbs --json`)。
+NEXT: #745 那條線照第 3 節第 1 步開始(管理器 `verbs --json` · `help` · `version`),入口與正名照上表。
