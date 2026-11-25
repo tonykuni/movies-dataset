@@ -31,6 +31,7 @@ try:
 except Exception:  # noqa: BLE001
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
+import contextlib
 import importlib.util
 import os
 import re
@@ -156,13 +157,35 @@ class Progress:
             self.lines.append(text)
             self.last_print, self.last_decile = now, max(decile, self.last_decile)
 
-    def done(self) -> None:
+    def done(self, ok: bool = True, note: str = "") -> None:
+        """收尾:只有成功(ok)且走到 ④ 才補成 100%;失敗 / 中斷照實留在當下的百分比並寫原因(PR #740 Codex P2)。"""
         with self.lock:
-            if self.stage:
-                self.inner = (self.inner[0] if self.inner else "完成", 100.0, None, None) if self.stage == 4 else self.inner
+            if ok and self.stage == 4:
+                self.inner = (self.inner[0] if self.inner else "完成", 100.0, None, None)
+            text = self._text() + ("" if ok else " · 沒完成" + ((":" + note) if note else ""))
             if self.tty:
-                self.out.write("\r" + self._text()[:160].ljust(120) + "\n")
-                self.out.flush()
+                self.out.write("\r" + text[:180].ljust(120) + "\n")
+            else:
+                self.out.write(text + "\n")
+                self.lines.append(text)
+            self.out.flush()
+
+
+@contextlib.contextmanager
+def ticking(ui, every: float = 0.25):
+    """長步驟(單一大檔複製 · 夾複製 · 比對)期間背景定時 tick:終端機轉圈、非終端機每 ≤30 秒心跳(PR #740 Codex P2)。"""
+    stop = threading.Event()
+
+    def loop():
+        while not stop.wait(every):
+            ui.tick()
+    t = threading.Thread(target=loop, daemon=True)
+    t.start()
+    try:
+        yield
+    finally:
+        stop.set()
+        t.join(timeout=2)
 
 
 UI = None                                                 # 目前這一輪的進度(main 建;自測可換)
@@ -215,7 +238,7 @@ def _git(repo, *a, check=False):
     sub, at = _sub(args)
     ui = _ui()
     stage = STAGE_OF.get(sub, 2)
-    if stage == 2 and ui.stage < 1:                       # fetch 之前的準備查詢歸在 ①(不讓 fetch 的百分比算進 ②)
+    if stage == 2 and not getattr(ui, "fetched", False):  # fetch 做完之前的準備查詢全歸 ①(v0100 plan 先跑兩次 rev-parse;PR #740 Codex P2)
         stage = 1
     if sub in ("fetch", "merge") and "--progress" not in args and at >= 0:
         args.insert(at + 1, "--progress")
@@ -252,6 +275,8 @@ def _git(repo, *a, check=False):
         sys.stdout.write("\n[同步] 收到 Ctrl+C · git %s 已停 · 還沒到 ④ 還原並快轉 的話工作樹零改動;重跑同一行即可\n" % sub)
         sys.stdout.flush()
         raise
+    if sub == "fetch":
+        ui.fetched = True                                 # 從這裡起,不報進度的查詢才算 ② 比對
     out = (out_b[0] if out_b else b"").decode("utf-8", "surrogateescape")
     err = _strip_progress(b"".join(err_parts).decode("utf-8", "replace"))
     res = subprocess.CompletedProcess(["git", "-C", str(repo), *args], proc.returncode, out, err)
@@ -292,7 +317,8 @@ def _backup_all(root, p, bk):
     keep = V0103.shutil
     V0103.shutil = _CountingShutil(total)
     try:
-        return _BACKUP_V0105(root, p, bk)
+        with ticking(ui):                                 # 單一大檔 / 整夾複製與逐項比對期間也有心跳
+            return _BACKUP_V0105(root, p, bk)
     finally:
         V0103.shutil = keep
 
@@ -325,8 +351,13 @@ def main(argv=None) -> int:
     print(f"[{TAG}] 開始 · 四階段:①抓 GitHub ②比對本機與 main ③備份擋路檔 ④還原並快轉(畫面在動就是在跑,不用按 Ctrl+C)", flush=True)
     try:
         rc = PRIOR.main(a)                                 # v0105:畫面不炸 · TAG · 收據
-    finally:
-        UI.done()
+    except KeyboardInterrupt:
+        UI.done(ok=False, note="Ctrl+C 中斷")
+        raise
+    except BaseException as exc:                           # noqa: BLE001 — 照實寫沒完成,再原樣丟出
+        UI.done(ok=False, note=type(exc).__name__)
+        raise
+    UI.done(ok=rc == 0, note="" if rc == 0 else "rc %s" % rc)
     return rc
 
 
@@ -351,6 +382,7 @@ def selftest() -> int:
     sink = io.StringIO()
     UI = Progress(out=sink, tty=False, every=1)
     UI.set_stage(1, "git fetch")                           # 已抓完遠端之後的比對步驟
+    UI.fetched = True
     with tempfile.TemporaryDirectory(prefix="repo_sync106_") as td:
         subprocess.run(["git", "init", "-q", td], check=True)
         r = _git(td, "-c", "alias.slow=!sleep 2.6", "slow")
@@ -392,6 +424,39 @@ def selftest() -> int:
         fetch_total = UI.total()
     chk("④b fetch 之前的準備查詢歸在 ①:fetch 100% → 總 40%(不被算成 ② 的 60%)", before == 1 and abs(fetch_total - 40) < 0.01, (before, fetch_total))
     chk("⑤ 備份按檔數推百分比(4 檔 → 100% · 4/4)", inner5 == ("已備份", 100.0, 4, 4), inner5)
+    with tempfile.TemporaryDirectory(prefix="repo_sync106d_") as td:
+        t = Path(td)
+        subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(t / "up.git")], check=True)
+        subprocess.run(["git", "clone", "-q", str(t / "up.git"), str(t / "dev")], check=True, capture_output=True)
+        for k, v in (("user.email", "t@t"), ("user.name", "t")):
+            subprocess.run(["git", "-C", str(t / "dev"), "config", k, v], check=True)
+        (t / "dev" / "a").write_text("a\n", encoding="utf-8")
+        subprocess.run(["git", "-C", str(t / "dev"), "add", "-A"], check=True)
+        subprocess.run(["git", "-C", str(t / "dev"), "commit", "-qm", "c"], check=True)
+        subprocess.run(["git", "-C", str(t / "dev"), "push", "-q", "origin", "main"], check=True, capture_output=True)
+        UI = Progress(out=io.StringIO(), tty=False, every=30)
+        seen = []
+        _git(t / "dev", "rev-parse", "--show-toplevel"); seen.append(UI.stage)
+        _git(t / "dev", "rev-parse", "--abbrev-ref", "HEAD"); seen.append(UI.stage)
+        _git(t / "dev", "fetch", "origin", "main"); seen.append(UI.stage)
+        _git(t / "dev", "diff", "--name-only", "HEAD"); seen.append(UI.stage)
+    chk("⑦ v0100 plan 的真實順序(兩次 rev-parse → fetch → diff):fetch 前都在 ①,fetch 做完才進 ②", seen == [1, 1, 1, 2], seen)
+    UI = Progress(out=io.StringIO(), tty=False, every=30)
+    UI.set_stage(4, "git merge")
+    UI.done(ok=False, note="rc 2")
+    bad_line = UI.lines[-1]
+    UI = Progress(out=io.StringIO(), tty=False, every=30)
+    UI.set_stage(4, "git merge")
+    UI.done(ok=True)
+    good_line = UI.lines[-1]
+    chk("⑧ 收尾照實:失敗 / 中斷不補成 100%、寫「沒完成」與原因;成功走到 ④ 才 100%",
+        "100%" not in bad_line and "沒完成:rc 2" in bad_line and "100%" in good_line and "沒完成" not in good_line, (bad_line, good_line))
+    UI = Progress(out=io.StringIO(), tty=False, every=1)
+    UI.set_stage(3, "備份 1 項")
+    n0 = len(UI.lines)
+    with ticking(UI):
+        time.sleep(2.6)                                    # 模擬單一大檔複製卡在 copy2 裡
+    chk("⑨ 備份單一大檔期間也有心跳(背景定時 tick · 非終端機每 ≤1 秒測試間隔一行)", len(UI.lines) - n0 >= 2, UI.lines[n0:])
     src = HERE.read_text(encoding="utf-8")
     body = src.split("def selftest", 1)[0]
     chk("⑥ 檔面:加速器橋 · 零 TA-Lib · 不 import 他系統 · 整條前版鏈的 _git 都換成本版 · 前版一字不動",
