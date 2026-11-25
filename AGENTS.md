@@ -19,7 +19,7 @@ VIA_FROM_VCGC=YES python3 "$V" functions        # AI 必用功能卡,照卡上�
 ```
 - 開工第一則回覆先列前一日教訓(`VeritasIntelligenceAnalytics/docs/handoff/daily/VIA_DailyChecklist_latest.md`,只列條目)。
 
-## 1.5 選動作的順序(VCGC-REQ264)
+## 1.5 選動作的順序(VCGC-REQ265)
 - 先用 VCGC 現成的動作(token 工具 · `tools` / `verbs` · VCGC 動詞 · `via-*` 短指令)→ 再用該系統自己 SystemManager 的動詞 → 都沒有才自己寫,先回報缺口。VCGC 是工具不是閘門;VDF / VRN 的業務動作走它們自己的管理器。
 - 架構規劃稿:`VeritasIntelligenceAnalytics/docs/VIA_SystemArchitecture_SDD_v0100.md`(核准前只做唯讀盤點;SystemManager 動詞照它 §3 的契約)。
 
