@@ -167,6 +167,12 @@ def append_line(path: Path, line: str) -> None:
         f.write(pre + line + "\n")
 
 
+def entry_source() -> str:
+    """入口契約(VCGC 席位探針 CGC_MDL222 看的就是這個):經 VCGC 進來(VIA_FROM_VCGC=YES)記 VCGC,否則記 VDF 自己的入口。
+    只讀旗標、不設旗標;VDF 不靠它也照常跑(系統獨立)。"""
+    return "VCGC" if os.environ.get("VIA_FROM_VCGC") == "YES" else "VDF"
+
+
 def run_job(job: dict, vdf: Path = HERE, ledger: Path = LEDGER, py: str | None = None) -> int:
     cmd = list(job.get("cmd") or [])
     f = resolve(cmd[0], vdf) if cmd else None
@@ -178,7 +184,7 @@ def run_job(job: dict, vdf: Path = HERE, ledger: Path = LEDGER, py: str | None =
         env = dict(os.environ, PYTHONUTF8="1", **{k: os.environ.get(k, v) for k, v in ENTRY_ENV.items()})
         rc = subprocess.run([py or vdf_python(), str(f), *cmd[1:]], cwd=str(f.parent), env=env).returncode
     append_line(ledger, json.dumps({"utc": datetime.now(timezone.utc).isoformat(timespec="seconds"), "job": job.get("id"), "rc": rc,
-                                    "secs": round(time.time() - t0, 2), "file": f.name if f else None}, ensure_ascii=False))
+                                    "secs": round(time.time() - t0, 2), "file": f.name if f else None, "entry": entry_source()}, ensure_ascii=False))
     return rc
 
 
@@ -274,6 +280,19 @@ def selftest() -> int:
         chk("run:工作立刻跑一次 · 帶 VDF 入口標記 · 參數照傳 · 寫運作帳", rc == 0 and (v / "hit.txt").read_text() == f"{STEM}_{VERSION} --x"
             and json.loads((v / "LEDGER.jsonl").read_text(encoding="utf-8").splitlines()[-1])["job"] == "probe")
         chk("找不到尾版 = rc 127(照實記)", run_job({"id": "x", "cmd": ["VDF_NOPE"]}, v, v / "LEDGER.jsonl") == 127)
+        keep = os.environ.get("VIA_FROM_VCGC")
+        try:
+            os.environ["VIA_FROM_VCGC"] = "YES"
+            via_vcgc = entry_source()
+            os.environ.pop("VIA_FROM_VCGC")
+            own = entry_source()
+        finally:
+            if keep is None:
+                os.environ.pop("VIA_FROM_VCGC", None)
+            else:
+                os.environ["VIA_FROM_VCGC"] = keep
+        chk("入口契約:經 VCGC 記 VCGC · 自己入口記 VDF · 運作帳有 entry", via_vcgc == "VCGC" and own == "VDF"
+            and "entry" in json.loads((v / "LEDGER.jsonl").read_text(encoding="utf-8").splitlines()[-1]))
         try:
             s = scheduler(cfg, background=True)
             s.start(paused=True)
