@@ -19,6 +19,10 @@ VIA_FROM_VCGC=YES python3 "$V" functions        # AI 必用功能卡,照卡上�
 ```
 - 開工第一則回覆先列前一日教訓(`VeritasIntelligenceAnalytics/docs/handoff/daily/VIA_DailyChecklist_latest.md`,只列條目)。
 
+## 1.5 選動作的順序(VCGC-REQ264)
+- 先用 VCGC 現成的動作(token 工具 · `tools` / `verbs` · VCGC 動詞 · `via-*` 短指令)→ 再用該系統自己 SystemManager 的動詞 → 都沒有才自己寫,先回報缺口。VCGC 是工具不是閘門;VDF / VRN 的業務動作走它們自己的管理器。
+- 架構規劃稿:`VeritasIntelligenceAnalytics/docs/VIA_SystemArchitecture_SDD_v0100.md`(核准前只做唯讀盤點;SystemManager 動詞照它 §3 的契約)。
+
 ## 2 讀檔(省 Token)
 - 約 >200 行的檔、整個資料夾、日誌:`python3 "$E" read` → `slice <檔> <定義名>` → `digest <日誌>` · `pack <夾>` · 重讀加 `--if-etag`。長文用 NLP `--brief`(token 卡上有指令)。不整檔讀、不把原文貼回對話。
 - 清單上有現成功能就用,不自己另寫;不夠用時先寫一行「缺口:要做什麼 · 最接近的動詞 · 差在哪」,再用通用方法,記黃。
