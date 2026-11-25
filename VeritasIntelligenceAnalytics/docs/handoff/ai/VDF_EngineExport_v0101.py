@@ -213,7 +213,7 @@ def main(argv=None) -> int:
           + (f":{c['skipped']}" if c["skipped"] else ""))
     by = {}
     for r in rep["rows"]:
-        by.setdefault(r["category"], []).append(r["name"] if r["role"] in ("tail", "config") else None)
+        by.setdefault(r["category"], []).append(r["name"] if r["role"] in ("tail", "config", "tool") else None)
     for k, v in by.items():
         print(f"  {k:<14} " + " · ".join(n for n in v if n))
     vr = {"ok": True}
