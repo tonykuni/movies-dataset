@@ -11,7 +11,8 @@ full [--via <VIA 根>] [--out <備份根>] [--keep 5] [--no-install] [--sys VCGC
   ① 三道並行(互不相依;每 20 秒一行心跳):
      G1 Graphify + 三冊  VCGC 中樞 graph build --sys <每個系統>(本機 code-only;一次一個系統)
                          三本尾版冊(Policy_Laws · ToolRoster · VRN LogicArchitecture)JSON 可解析 + 雜湊。
-                         缺口:倉裡沒有 Sync-ViaWikiAndBooks 的 py 版 → 三冊只驗不重產(收據記黃)。
+                         三冊先刷齊:VIA_BooksSync 尾版 apply(Mode C;出新版號冊 · 前版不動 · 寫前寫後 ssot panorama;
+                         --books-check-only 只查不寫)。三冊 DataFrame(book · current · diff)另收 extras/BOOKS_FRAMES.zip。
      G2 環境衝突          VCGC 中樞 doctor(7 支 VCGC 環境工具:envmgr 管 base · via_core · via_* · 安裝閘 pip check / 多層互撞 · 加速器 · 八樞)
                          讀 DOCTOR_latest.json 的總燈 · 安裝計畫 · 衝突 · 互撞。
      G3 工具安裝來源      鎖冊每一家(加速器 · 網路 · 省 Token · NLP …)+ 加速器本體 + VCGC / VDF / VRN 入口尾版:
@@ -154,8 +155,31 @@ def hub_run(via: Path, args: list, timeout: int = 3600, capture: bool = True):
 
 
 # ---------------------------------------------------------------- G1 Graphify + 三冊
-def gate_graphify(via: Path, systems: list) -> dict:
-    out = {"gate": "G1_graphify", "systems": {}, "books": {}, "notes": ["缺口:三冊重產器(Sync-ViaWikiAndBooks)沒有 py 版 → 只驗不重產"]}
+def books_sync_tail(via: Path):
+    return newest(HERE.parent, "VIA_BooksSync_v*.py") or newest(via / "docs" / "handoff" / "ai", "VIA_BooksSync_v*.py")
+
+
+def run_books(via: Path, apply: bool) -> dict:
+    """三冊重產器(VIA_BooksSync 尾版;Mode C 先刷齊):apply = 出新版號冊(前版不動 · 寫前寫後 ssot panorama);check = 只出 SYNCED / OUT_OF_SYNC。"""
+    t = books_sync_tail(via)
+    if t is None:
+        return {"lamp": "YELLOW", "note": "找不到 VIA_BooksSync 尾版 → 三冊只驗不重產"}
+    args = [sys.executable, str(t), "apply" if apply else "check", "--via", str(via)]
+    prm = newest(t.parent, "VIA_BooksSync_Params_v*.json")
+    if prm and newest(via / "docs" / "handoff" / "ai", "VIA_BooksSync_Params_v*.json") is None:
+        args += ["--params", str(prm)]                                   # 從 TEMP 跑:參數冊跟著本檔一起取出
+    try:
+        r = subprocess.run(args, cwd=str(via), capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=1800,
+                           env=dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8", VIA_REPO=str(via.parent)))
+    except subprocess.TimeoutExpired:
+        return {"lamp": "RED", "note": "三冊重產器逾時 1800s"}
+    return {"rc": r.returncode, "mode": "apply" if apply else "check", "lamp": {0: "GREEN", 2: "YELLOW"}.get(r.returncode, "RED"),
+            "tool": t.name, "tail": (r.stdout or "")[-1500:] + (r.stderr or "")[-500:]}
+
+
+def gate_graphify(via: Path, systems: list, books_apply: bool = True) -> dict:
+    out = {"gate": "G1_graphify", "systems": {}, "books": {}, "notes": []}
+    out["books_sync"] = run_books(via, books_apply)
     for s in systems:                                                    # 一次一個系統(大夾吃記憶體)
         rc, tail = hub_run(via, ["graph", "build", "--sys", s], timeout=3600)
         absent = "ABSENT" in tail or "沒有隔離環境" in tail
@@ -170,9 +194,9 @@ def gate_graphify(via: Path, systems: list) -> dict:
             out["books"][pat] = {"lamp": "GREEN", "tail": p.name, "sha12": sha256(p)[:12]}
         except Exception as e:  # noqa: BLE001
             out["books"][pat] = {"lamp": "RED", "tail": p.name, "note": f"{type(e).__name__}: {e}"}
-    reds = [k for k, v in {**out["systems"], **out["books"]}.items() if v["lamp"] == "RED"]
+    reds = [k for k, v in {**out["systems"], **out["books"], "books_sync": out["books_sync"]}.items() if v["lamp"] == "RED"]
     out["red"] = reds
-    out["lamp"] = "RED" if reds else "YELLOW"                             # 三冊只驗不重產 = 黃
+    out["lamp"] = "RED" if reds else ("YELLOW" if out["books_sync"]["lamp"] == "YELLOW" else "GREEN")
     if any(v.get("absent_env") for v in out["systems"].values()):
         out["fix"] = "桌機先建 Graphify 隔離境(via-graph status 印的那一行;建境由操作員下)"
     return out
@@ -434,6 +458,10 @@ def write_extras(bdir: Path, via: Path, gates: dict, systems: list) -> dict:
     books = [b for b in (newest(via / d, pat) for d, pat in BOOKS) if b]
     if books:
         rows.append(_atomic_zip(ex / "BOOKS.zip", _zip_files(books, via)))
+    fr = sorted((via / "VIA_Reports" / "books_sync").glob("2*"))
+    ffiles = [p for p in fr[-1].iterdir() if p.is_file()] if fr else []
+    if ffiles:
+        rows.append(_atomic_zip(ex / "BOOKS_FRAMES.zip", _zip_files(ffiles, via)))
     gfiles = [p for s in systems for p in (via / GRAPH_REL / s / "graphify-out").rglob("*") if p.is_file()]
     if gfiles:
         rows.append(_atomic_zip(ex / "GRAPHIFY.zip", _zip_files(gfiles, via)))
@@ -457,7 +485,7 @@ def rotate(out: Path, keep: int) -> list:
 
 
 # ---------------------------------------------------------------- full
-def do_full(via: Path, out: Path, keep: int = 5, install: bool = True, systems=None) -> int:
+def do_full(via: Path, out: Path, keep: int = 5, install: bool = True, systems=None, books_apply: bool = True) -> int:
     systems = systems or ["VCGC", "VDF", "VRN"]
     repo = via.parent
     why = bad_out(out, repo)
@@ -466,7 +494,7 @@ def do_full(via: Path, out: Path, keep: int = 5, install: bool = True, systems=N
         return 1
     say(f"{TAG} full · VIA {via} · 備份根 {out} · 加速器 {'載入' if VIA_ACCEL is not None else '沒載到(黃)'}")
     say("① 三閘並行:G1 Graphify + 三冊 · G2 環境衝突(doctor)· G3 工具安裝來源")
-    gates = run_parallel({"G1_graphify": lambda: gate_graphify(via, systems), "G2_doctor": lambda: gate_doctor(via),
+    gates = run_parallel({"G1_graphify": lambda: gate_graphify(via, systems, books_apply), "G2_doctor": lambda: gate_doctor(via),
                           "G3_tools": lambda: gate_tools(via)})
     need = gates["G2_doctor"].get("plan_pip") or gates["G3_tools"].get("missing") or gates["G3_tools"].get("optional_missing")
     if install and need:
@@ -517,9 +545,10 @@ def main(argv=None) -> int:
     ap.add_argument("--keep", type=int, default=5)
     ap.add_argument("--no-install", action="store_true")
     ap.add_argument("--sys", default="VCGC,VDF,VRN")
+    ap.add_argument("--books-check-only", action="store_true", help="三冊只查不寫(預設 Mode C 先刷齊)")
     a = ap.parse_args(argv)
     via = Path(a.via).resolve() if a.via else PRIOR.BASE.VIA
-    return do_full(via, Path(a.out) if a.out else default_out(), a.keep, not a.no_install, [s for s in a.sys.split(",") if s])
+    return do_full(via, Path(a.out) if a.out else default_out(), a.keep, not a.no_install, [s for s in a.sys.split(",") if s], not a.books_check_only)
 
 
 # ---------------------------------------------------------------- 自測(全在暫存夾造資料)
@@ -591,7 +620,9 @@ def selftest() -> int:
             chk("G3 入口尾版不在 = 簽章紅", any("VDF_SystemManager" in r for r in g3["red"]))
             chk("G3 三數(應 = 已掃)", g3["counts"]["should"] == g3["counts"]["scanned"])
             g1 = gate_graphify(via, ["VCGC", "VDF"])
-            chk("G1 圖建好 + 三冊可解析 = 黃(三冊只驗不重產)", g1["lamp"] == "YELLOW" and len(g1["books"]) == 3, str(g1.get("red")))
+            chk("G1 圖建好 + 三冊重產器跑過 + 三冊可解析", g1["lamp"] in ("GREEN", "YELLOW") and len(g1["books"]) == 3
+                and g1["books_sync"].get("mode") == "apply", str((g1.get("red"), g1["books_sync"].get("tail", "")[-200:])))
+            chk("--books-check-only = 只查", gate_graphify(via, ["VCGC"], books_apply=False)["books_sync"].get("mode") == "check")
             os.environ["FAKE_GRAPH_RC"] = "1"
             chk("G1 建圖失敗 = 紅", gate_graphify(via, ["VDF"])["lamp"] == "RED")
             os.environ.pop("FAKE_GRAPH_RC")
@@ -622,7 +653,7 @@ def selftest() -> int:
             snaps = sorted(p for p in out.iterdir() if re.fullmatch(r"\d{8}_\d{6}Z", p.name))
             ex = snaps[-1] / "extras" if snaps else td
             chk("extras:CODE · BOOKS · GRAPHIFY · GATES + SHA256SUMS", all((ex / f).exists() for f in
-                ("CODE.zip", "BOOKS.zip", "GRAPHIFY.zip", "GATES.json", "SHA256SUMS.txt")))
+                ("CODE.zip", "BOOKS.zip", "BOOKS_FRAMES.zip", "GRAPHIFY.zip", "GATES.json", "SHA256SUMS.txt")))
             chk("沒有殘留 .sdd_tmp", not list(out.rglob("*.sdd_tmp")))
             sums = (ex / "SHA256SUMS.txt").read_text(encoding="utf-8").split()
             chk("SHA256SUMS = 實檔", sums[0] == sha256(ex / sums[1]))
