@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-25T03:00:00Z",
+ "updated_at": "2026-11-25T04:30:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -8398,6 +8398,40 @@
    "timeout_seconds": 1500,
    "updated_at": "2026-11-25T03:00:00Z",
    "registered_at": "2026-11-25T03:00:00Z"
+  },
+  "C-reposafesync-v0106": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_RepoSafeSync_v0106.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VIA_RepoSafeSync v0106 本版 8/8 · PASS",
+   "scope": "VIA_RepoSafeSync_v0106.py(VCGC-REQ245 · 動態進度條 · 動態百分比 · 心跳)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_RepoSafeSync_v*.py"
+   ],
+   "version": "v0106",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-25T04:30:00Z",
+   "registered_at": "2026-11-25T04:30:00Z"
+  },
+  "C-hub-v0117": {
+   "argv": [
+    "--family",
+    "core",
+    "VCGC_CommandHub_v0117.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VCGC_CommandHub v0117 自測 OK 6 · FAIL 0 · 前版 rc=0",
+   "scope": "VCGC_CommandHub_v0117.py(VCGC-REQ261 · via-graph build 動態進度條 · 依檔數估百分比)",
+   "dependencies": [
+    "VCGC_CommandHub_v*.py"
+   ],
+   "version": "v0117",
+   "timeout_seconds": 2000,
+   "updated_at": "2026-11-25T04:30:00Z",
+   "registered_at": "2026-11-25T04:30:00Z"
   }
  },
  "work_items": [
@@ -16470,6 +16504,30 @@
    "updated_at": "2026-11-25T03:00:00Z",
    "registered_at": "2026-11-25T03:00:00Z",
    "receipt": "docs/handoff/evidence/C-hub-v0116.json"
+  },
+  {
+   "id": "VCGC-REQ245:C-reposafesync-v0106",
+   "requirement": "VCGC-REQ245",
+   "case": "C-reposafesync-v0106",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "主機:同步好幾分鐘沒字被 Ctrl+C → 四階段動態進度條 · fetch/merge 真實百分比 · 備份按檔數 · 心跳(自測 8/8 · 前版鏈全綠)",
+   "next": "主機:安全同步 --apply → 新視窗 via-graph build --sys VCGC → via-bak(未在主機實跑)",
+   "updated_at": "2026-11-25T04:30:00Z",
+   "registered_at": "2026-11-25T04:30:00Z",
+   "receipt": "docs/handoff/evidence/C-reposafesync-v0106.json"
+  },
+  {
+   "id": "VCGC-REQ261:C-hub-v0117",
+   "requirement": "VCGC-REQ261",
+   "case": "C-hub-v0117",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "主機要求動態進度條與百分比 → 建圖依檔數估百分比 · 本機計時校正(自測 6/6 · 前版鏈全綠)",
+   "next": "主機:安全同步 --apply → 新視窗 via-graph build --sys VCGC → via-bak(未在主機實跑)",
+   "updated_at": "2026-11-25T04:30:00Z",
+   "registered_at": "2026-11-25T04:30:00Z",
+   "receipt": "docs/handoff/evidence/C-hub-v0117.json"
   }
  ],
  "retired_files": {
