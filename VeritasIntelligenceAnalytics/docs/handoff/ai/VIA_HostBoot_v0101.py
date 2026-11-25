@@ -13,7 +13,8 @@
   bak [參數…]       VIA_DailyBackup 尾版 full --via <倉>/VeritasIntelligenceAnalytics(三閘並行 → 補裝 → Fail-Closed → 備份)
   vdf [參數…]       VDF_LocalIntegrateLaunch 尾版 --repo <倉>(VCGC 健康 → via_vdf 境 → 三步盤點 → 本機 claude)
   vdfp [--branch B] VDF 參數正本 / 衍生冊 / 引擎合併計畫的桌機實測:TEMP 另開 git worktree 指 origin/<B>(你的工作夾不動),
-                    在裡面依序跑 VDF_ENG053 尾版 --selftest · unify · derive · consolidate(全唯讀),收 SUMMARY,拆 worktree
+                    在裡面依序跑 VDF_ENG053 尾版 --selftest · unify · derive · consolidate,再跑 VCGC via_params_central 尾版
+                    --selftest · vdf-master(只讀匯總 VDF 正本;全唯讀),收 SUMMARY,拆 worktree
   沒動詞            前版 v0100(同步 → 快跑器)
   --sync            先跑前版的同步(--dry:fetch · 擋路檔 · main 快轉)
   --push            收尾把收據推 intake/fastrun-<時間>(經 VIA_FastRun 尾版 push;工作夾不動)
@@ -252,8 +253,16 @@ def run_vdfp(rest: list, repo: Path, out: Path, env: dict) -> int:
             say(f"vdfp · {eng.name} {v}")
             r1 = stream([sys.executable, str(eng), v], wt, dict(env, VIA_REPO=str(wt)), out / f"vdfp_{i}_{v.strip('-')}_console.txt")
             rc = max(rc, r1 if r1 in (0, 1, 2) else 1)
+        hub = newest(wt / VIA_REL / "supportive modules" / "registry", "via_params_central_v*.py")
+        if hub is not None and not rest:                                  # VDF 自報之後,VCGC 只讀匯總(讀得到 VDF 的 unify 收據)
+            for i, v in enumerate(["--selftest", "vdf-master"]):
+                say(f"vdfp · {hub.name} {v}")
+                r1 = stream([sys.executable, str(hub), v], wt, dict(env, VIA_REPO=str(wt)), out / f"vdfp_vcgc_{i}_{v.strip('-')}_console.txt")
+                rc = max(rc, r1 if r1 in (0, 1, 2) else 1)
         for p in sorted((wt / VIA_REL / "VIA_Reports" / "vdf_params").glob("2*/SUMMARY.json")):
             shutil.copyfile(p, out / f"vdfp_{p.parent.name}_SUMMARY.json")
+        for p in sorted((wt / VIA_REL / "VIA_Reports" / "vcgc" / "central_params").glob("2*/SUMMARY.json")):
+            shutil.copyfile(p, out / f"vdfp_vcgc_{p.parent.name}_SUMMARY.json")
     finally:
         git("worktree", "remove", "--force", str(wt))
     return rc
