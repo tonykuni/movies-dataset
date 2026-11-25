@@ -548,11 +548,23 @@ def save(verb: str, res: dict, out_root: Path) -> Path:
     return od
 
 
+def fresh_map() -> dict:
+    """Engine_Map 一律在新行程重算:同一行程裡 derive 剛寫出的冊新版,前版 build_map 看不到(它在載入時就定了尾版)。"""
+    r = subprocess.run([sys.executable, str(Path(__file__).resolve()), "_map-json"], capture_output=True, text=True, encoding="utf-8",
+                       env=dict(os.environ, PYTHONUTF8="1"), timeout=600)
+    if r.returncode != 0:
+        raise RuntimeError(f"_map-json rc {r.returncode}: {r.stderr[-200:]}")
+    return json.loads(r.stdout[r.stdout.index("{"):])
+
+
 def main() -> int:
     a = sys.argv[1:]
     if a[:1] == ["--selftest"]:
         return selftest()
     verb = a[0] if a else ""
+    if verb == "_map-json":                                               # 子行程用:新行程重新解析各冊尾版後重算(前版在載入時就定了尾版)
+        sys.stdout.write(json.dumps(P.build_map(), ensure_ascii=False, default=str))
+        return 0
     if verb not in ("unify", "derive", "consolidate"):
         return P.main()
     apply = "--apply" in a
@@ -563,7 +575,7 @@ def main() -> int:
     if verb == "unify":
         res = unify(VDF, apply)
     elif verb == "derive":
-        res = derive(VDF, apply, map_builder=P.build_map)
+        res = derive(VDF, apply, map_builder=fresh_map)
     else:
         et = tail_of(VDF, EMAP)
         res = consolidate(VDF, load(et) if et else None)

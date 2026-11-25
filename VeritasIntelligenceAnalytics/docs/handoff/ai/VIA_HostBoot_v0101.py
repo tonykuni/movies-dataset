@@ -16,6 +16,11 @@
                     在裡面依序跑 VDF_ENG053 尾版 --selftest · unify · derive · consolidate,再跑 VCGC via_params_central 尾版
                     --selftest · vdf-master(只讀匯總 VDF 正本;全唯讀),收 SUMMARY,拆 worktree
   沒動詞            前版 v0100(同步 → 快跑器)
+  vdf3 [--branch B] [--live]
+                    三期蒸餾 + 排程的桌機實測(在你的真倉跑,因為資料庫與湖在倉的 VIA_Reports 底下):照前版規則暫時切到 origin/<B>
+                    (已追蹤檔有改動 = 停不碰 · 擋路的未追蹤檔一樣就移除、不一樣搬倉外備份)→ 經 VDF_SystemManager three
+                    --selftest · ready · inventory · plan · names · [run --live] · distill · reconcile · bench → 兩邊 schedule list →
+                    VCGC schedule run vcgc_vdf_master → 一定切回原分支。沒 --live = 不出網(run 只列指令)。
   --sync            先跑前版的同步(--dry:fetch · 擋路檔 · main 快轉)
   --push            收尾把收據推 intake/fastrun-<時間>(經 VIA_FastRun 尾版 push;工作夾不動)
 找檔順序:本檔旁(PS 從分支取到 TEMP 的那一份)→ 倉裡。子行程輸出逐塊直通(安裝閘的 YES 提示照樣看得到、打得進)。
@@ -104,7 +109,7 @@ _T0 = time.time()
 VIA_REL = "VeritasIntelligenceAnalytics"
 AI_REL = Path(VIA_REL) / "docs" / "handoff" / "ai"
 VDF_REL = Path(VIA_REL) / "functional modules" / "VDF"
-VERBS = ("fnc", "bak", "vdf", "vdfp")
+VERBS = ("fnc", "bak", "vdf", "vdfp", "vdf3")
 MAX_RECEIPT = 2 * 1024 * 1024
 
 
@@ -268,6 +273,64 @@ def run_vdfp(rest: list, repo: Path, out: Path, env: dict) -> int:
     return rc
 
 
+def run_vdf3(rest: list, repo: Path, out: Path, env: dict) -> int:
+    br = "claude/eloquent-rubin-q01657"
+    if "--branch" in rest:
+        j = rest.index("--branch")
+        br = rest[j + 1]
+        del rest[j:j + 2]
+    live = "--live" in rest
+    G = PRIOR.git
+    if G(repo, "fetch", "-q", "origin", br)[0] != 0:
+        say(f"[RED] git fetch origin {br} 失敗")
+        return 5
+    ch = PRIOR.tracked_changes(repo)
+    if ch:
+        say("[停] 倉裡有已追蹤檔的改動,沒有動它們;先提交或還原再跑:")
+        for ln in ch[:20]:
+            say("   " + ln)
+        return 4
+    stamp = out.name
+    for verb_, rel, bk in PRIOR.clear_blockers(repo, PRIOR.blockers(repo, ["origin/" + br]), stamp):
+        say(f"[YELLOW] {verb_} · {rel}" + (f" → {bk}" if bk else ""))
+    cur = G(repo, "rev-parse", "--abbrev-ref", "HEAD")[1].strip()
+    if G(repo, "switch", "-q", "--detach", "origin/" + br, live=True)[0] != 0:
+        say(f"[RED] 切不到 origin/{br}")
+        return 5
+    say(f"暫時切到 origin/{br}(跑完切回 {cur})")
+    t0 = time.time()
+    rc = 0
+    try:
+        via = repo / VIA_REL
+        vm = newest(via / "functional modules" / "VDF", "VDF_SystemManager_v*.py")
+        cm = newest(via / "supportive modules" / "registry", "CGC_SystemManager_v*.py")
+        steps = [[str(vm), "three", v] for v in ("--selftest", "ready", "inventory", "plan", "names")]
+        if live:
+            steps.append([str(vm), "three", "run", "--live"])
+        steps += [[str(vm), "three", v] for v in ("distill", "reconcile", "bench")]
+        steps += [[str(vm), "schedule", "list"], [str(cm), "schedule", "list"], [str(cm), "schedule", "run", "vcgc_vdf_master"]]
+        for i, st in enumerate(steps):
+            name = "_".join(x.strip("-") for x in st[1:])
+            say(f"vdf3 · {Path(st[0]).name} {' '.join(st[1:])}")
+            r1 = stream([sys.executable, *st], repo, dict(env, VIA_REPO=str(repo)), out / f"vdf3_{i:02d}_{name}_console.txt")
+            rc = max(rc, r1 if r1 in (0, 1, 2) else 1)
+        for p in sorted((via / "VIA_Reports" / "vdf_three").glob("2*/SUMMARY.json")):
+            if p.stat().st_mtime >= t0 - 2:
+                shutil.copyfile(p, out / f"vdf3_{p.parent.name}_SUMMARY.json")
+        for p in sorted((via / "VIA_Reports" / "vcgc" / "central_params").glob("2*/SUMMARY.json")):
+            if p.stat().st_mtime >= t0 - 2:
+                shutil.copyfile(p, out / f"vdf3_vcgc_{p.parent.name}_SUMMARY.json")
+        for lg in (via / "VIA_Reports" / "vdf_schedule" / "RUN_LEDGER.jsonl", via / "VIA_Reports" / "vcgc_schedule" / "RUN_LEDGER.jsonl",
+                   via / "VIA_Reports" / "vdf_three" / "run" / "RUN_LEDGER.jsonl"):
+            if lg.is_file():
+                (out / f"vdf3_{lg.parent.name}_ledger_tail.txt").write_text("\n".join(lg.read_text(encoding="utf-8").splitlines()[-30:]), encoding="utf-8")
+    finally:
+        back = "main" if cur in ("HEAD", "") else cur
+        G(repo, "switch", "-q", back, live=True)
+        say(f"切回 {back}")
+    return rc
+
+
 def run_verb(verb: str, rest: list, repo: Path, fnc_dir=None) -> int:
     env = dict(os.environ, VIA_REPO=str(repo))
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -279,11 +342,11 @@ def run_verb(verb: str, rest: list, repo: Path, fnc_dir=None) -> int:
             say(f"[RED] {d} 沒有 VIA_VCGC_FNC_v*.zip(--fnc-dir 指定)")
             return 1, None, None
         argv, cwd = fnc_python() + [str(z), *(rest or ["host"])], z.parent
-    elif verb == "vdfp":
-        rc = run_vdfp(list(rest), repo, out, env)
-        (out / "vdfp_RUN.json").write_text(json.dumps({"tool": TAG, "verb": verb, "rc": rc, "secs": round(time.time() - _T0, 1), "args": rest,
+    elif verb in ("vdfp", "vdf3"):
+        rc = (run_vdfp if verb == "vdfp" else run_vdf3)(list(rest), repo, out, env)
+        (out / f"{verb}_RUN.json").write_text(json.dumps({"tool": TAG, "verb": verb, "rc": rc, "secs": round(time.time() - _T0, 1), "args": rest,
                                                         "accel": VIA_ACCEL is not None, "net": VIA_NET_TOOL_PATH is not None}, ensure_ascii=False, indent=1), encoding="utf-8")
-        say(f"vdfp · rc {rc} · 收據 → {out}")
+        say(f"{verb} · rc {rc} · 收據 → {out}")
         return rc, out, stamp
     elif verb == "bak":
         t = find_tail(repo, AI_REL, "VIA_DailyBackup_v*.py")
@@ -412,6 +475,21 @@ def selftest() -> int:
             rc, out, _ = run_verb("vdfp", ["--branch", "feat", "unify"], td / "clone")
             log = (out / "vdfp_0_unify_console.txt").read_text(encoding="utf-8") if out else ""
             wts = g("-C", str(td / "clone"), "worktree", "list").stdout.strip().splitlines()
+            vm = src / VIA_REL / "functional modules" / "VDF"
+            vm.mkdir(parents=True, exist_ok=True)
+            (vm / "VDF_SystemManager_v0192.py").write_text("import sys, subprocess\nprint('VDFM', sys.argv[1:], subprocess.run(['git','rev-parse','--abbrev-ref','HEAD'],capture_output=True,text=True).stdout.strip())\n", encoding="utf-8")
+            reg = src / VIA_REL / "supportive modules" / "registry"
+            reg.mkdir(parents=True, exist_ok=True)
+            (reg / "CGC_SystemManager_v0121.py").write_text("import sys\nprint('CGCM', sys.argv[1:])\n", encoding="utf-8")
+            g("-C", str(src), "-c", "user.email=t@t", "-c", "user.name=t", "add", "-A")
+            g("-C", str(src), "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "m")
+            g("-C", str(src), "branch", "-f", "feat2")
+            g("-C", str(td / "clone"), "fetch", "-q", "origin")
+            rc3, out3, _ = run_verb("vdf3", ["--branch", "feat2"], td / "clone")
+            logs = " ".join(p.read_text(encoding="utf-8") for p in sorted(out3.glob("vdf3_*_console.txt"))) if out3 else ""
+            head = g("-C", str(td / "clone"), "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
+            chk("vdf3:暫切分支在真倉跑(detached)· 經兩個管理器 · 沒 --live 不跑 run · 跑完切回", rc3 == 0 and "VDFM ['three', 'ready'] HEAD" in logs
+                and "'run', '--live'" not in logs and "CGCM ['schedule', 'run', 'vcgc_vdf_master']" in logs and head == "main", logs[-200:] + " head=" + head)
             chk("vdfp:分支另開 worktree 跑 ENG053 尾版 · 跑完拆掉 · 工作夾不動", rc == 0 and "ENG053 ['unify'] True" in log and len(wts) == 1, log[-160:] + str(wts))
     finally:
         for k, v in keep.items():
