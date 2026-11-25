@@ -191,3 +191,5 @@
 | 2026-11-24T18:05:00Z | VIA_DailyBackup_v0103.py | 0103 | VIA-CORE-MDL910 | 4f961277ce1d | 真入口保留範圍 · 空選擇回紅 | 自測 12/12 |
 | 2026-11-24T18:45:00Z | VCGC_StartupEngine_v0101.py | 0101 | VIA-VCGC-MDL1712 | 2189da877a6c | 典籍鎖 · 唯一暫存檔 | 自測 73/73 |
 | 2026-11-25T03:10:00Z | VCGC_CommandHub_v0116.py | 0116 | VIA-CORE-MDL911 | 838a506ab22b | 長跑心跳 · Ctrl+C 收樹 | 自測 6/6 |
+| 2026-11-25T04:45:00Z | VIA_RepoSafeSync_v0106.py | 0106 | VIA-CORE-MDL912 | fcc4ce307770 | 四階段進度 · 真實 % | 自測 8/8 |
+| 2026-11-25T04:45:00Z | VCGC_CommandHub_v0117.py | 0117 | VIA-CORE-MDL913 | 22511ba7af7b | 建圖進度條 · 估 % | 自測 6/6 |
