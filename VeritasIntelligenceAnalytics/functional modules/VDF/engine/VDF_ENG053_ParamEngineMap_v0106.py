@@ -110,6 +110,7 @@ EMAP = "VDF_Param_Engine_Map"
 CLASS_OF = {"time": "時間範圍", "fetch": "輸入參數", "markets": "輸入參數", "output": "輸出參數", "honesty": "規則"}
 SKIP_TOP = {"schema", "note", "version", "prior", "ts", "derived_from"}
 _MISSING = object()
+INVENTORY_BOOKS = {EMAP, REGISTRY}                                        # consolidate 的引用面排除這兩本(它們本身就是全引擎清冊)
 
 
 def _vnum(p) -> int:
@@ -450,6 +451,8 @@ def consolidate(vdf: Path, emap: dict | None = None) -> dict:
         if "_sha" in j.name.lower() or j.stat().st_size > 5_000_000:
             continue
         k = family(j.name) if _vnum(j) >= 0 else j.stem
+        if k in INVENTORY_BOOKS:                                          # 掃全部引擎產生的清冊:列出每一支 ≠ 有人用它(自證循環)
+            continue
         if k not in jf or _vnum(j) > _vnum(jf[k]):
             jf[k] = j
     for k, j in jf.items():
@@ -651,10 +654,11 @@ def selftest() -> int:
         (vdf / "engine" / "VDF_ENG901_B_v0100.py").write_text("'''同功能另一支'''\n" + body.replace("def run(x):", "def go(x):\n    '''doc'''"), encoding="utf-8")
         (vdf / "engine" / "VDF_ENG902_C_v0100.py").write_text("X = 'VDF_ENG900_A'\n", encoding="utf-8")
         (vdf / "engine" / "VDF_ENG903_D_v0100.py").write_text("def f():\n    return 1\n", encoding="utf-8")
+        (vdf / "VDF_Param_Engine_Map_v0005.json").write_text(json.dumps({"by_engine": {"VDF_ENG903_D_v0100.py": {}}}), encoding="utf-8")
         c = consolidate(vdf)
         act = {r["family"]: r["action"] for r in c["rows"]}
         chk("consolidate:同 AST 異名 → 合併候選指向被引用的本體", act.get("VDF_ENG901_B") == "MERGE_CANDIDATE → VDF_ENG900_A" and act.get("VDF_ENG900_A") == "KEEP", str(act))
-        chk("consolidate:沒人引用 → 休眠候選 · 不改任何檔", act.get("VDF_ENG903_D") == "DORMANT_CANDIDATE" and (vdf / "engine" / "VDF_ENG903_D_v0100.py").exists())
+        chk("consolidate:全引擎清冊(Engine_Map)列到不算引用 · 沒人引用 → 休眠候選 · 不改任何檔", act.get("VDF_ENG903_D") == "DORMANT_CANDIDATE" and (vdf / "engine" / "VDF_ENG903_D_v0100.py").exists())
         df = frame(c["rows"])
         chk("輸出 DataFrame", df is not None and len(df) == len(c["rows"]))
     print(f"{TAG} selftest {len(ok)}/{len(ok) + len(bad)}" + (" · 不過:" + " · ".join(bad) if bad else ""), flush=True)
