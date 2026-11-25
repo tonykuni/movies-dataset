@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-25T05:20:00Z",
+ "updated_at": "2026-11-25T13:40:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -8416,6 +8416,32 @@
    "timeout_seconds": 600,
    "updated_at": "2026-11-25T05:20:00Z",
    "registered_at": "2026-11-25T05:20:00Z"
+  },
+  "C-mdl279-v0107": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0107.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL279_MCPServer v0107 自測 8/8 · PASS",
+   "scope": "MCP 加 vcgc_read_card:只回骨架卡 · 允許 / 拒絕清單 · stdio 握手 · 前版鏈子行程 · 加速器載入生效",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0100.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0101.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0102.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0103.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0104.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0105.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0106.py",
+    "supportive modules/registry/CGC_MDL279_MCPServer_v0107.py",
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0121.py",
+    "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+   ],
+   "version": "0107",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-25T13:40:00Z",
+   "registered_at": "2026-11-25T13:40:00Z"
   }
  },
  "work_items": [
@@ -8456,11 +8482,11 @@
    "id": "VCGC-REQ220:V-vrn-nonstock-bridge-v0100",
    "requirement": "VCGC-REQ220",
    "case": "V-vrn-nonstock-bridge-v0100",
-   "state": "PENDING",
+   "state": "BLOCKED",
    "owner": "operator",
-   "reason": "nonstock_v0310 summarizer 凍結操作員原件;本次只加 graceful 加速器橋(AST 過 · 位置合規 · 與全樹同一塊);--selftest 硬閘要桌機 bundled internal/NON_STOCK_CORE_v0200.py,容器跑不了,照實列 PENDING 不冒充",
-   "next": "桌機 bundled NON_STOCK_CORE_v0200.py 在時跑 --selftest 驗證(含加速器橋)",
-   "updated_at": "2026-11-22T09:52:28Z"
+   "reason": "nonstock_v0310 summarizer 凍結操作員原件;本次只加 graceful 加速器橋(AST 過 · 位置合規 · 與全樹同一塊);--selftest 硬閘要桌機 bundled internal/NON_STOCK_CORE_v0200.py,容器跑不了,照實列 PENDING 不冒充 ‖ 2026-11-25:注橋版與凍結原件都卡在 REUSE_HARD_GATE_FAIL(nonstock_v0310/internal/ 只有 README_MISSING.md,打包核心 NON_STOCK_CORE_v0200.py 不在倉;同 VRN-REQ019)。#742 合併後檔案回到原件、不再有橋,本案的「補橋」範圍也一併失效",
+   "next": "操作員上傳打包核心(VRN-REQ019)後,改用原件重登案;#742 合併後本項轉 SUPERSEDED",
+   "updated_at": "2026-11-25T13:40:00Z"
   },
   {
    "id": "VCGC-REQ075:handoff",
@@ -16114,11 +16140,11 @@
   {
    "id": "VCGC-REQ254:frozen-vrn-restore",
    "requirement": "VCGC-REQ254",
-   "state": "PENDING",
+   "state": "REVIEW",
    "owner": "操作員",
-   "reason": "#728(11-22)在兩支凍結的 VRN 原件上直接注加速器橋:VRN_ENG112_FinancialRead_v0100.py(凍結 4f0965ad99c4 → 現 ef6f9f86ffbc)· VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310.py(凍結 86903811ad13 → 現 2b3688c521f6;MDL156 v0115 本來就列為操作員原件豁免)→ 交接冊 frozen_sources 2/13 破 · VIA_Layout_Reuse_SSOT_v0100 鎖不符 → LAYOUT(SUP_MDL743)與 NLP(SUP_MDL866)載入 LOCK_MISMATCH 紅。本線(VCGC)從容器還原 VRN 檔被安全閘擋下,照 CLAUDE.md 待裁第 3 項不繞過",
-   "next": "操作員一句話:A 還原兩支凍結位元組 + ENG112 進加速器豁免名冊(MDL156 v0116;照 v0115 前例)· 或 B 接受新雜湊(新版鎖冊 + 交接冊凍結值改寫,破凍結要你裁)",
-   "updated_at": "2026-11-23T20:40:00Z",
+   "reason": "#728(11-22)在兩支凍結的 VRN 原件上直接注加速器橋:VRN_ENG112_FinancialRead_v0100.py(凍結 4f0965ad99c4 → 現 ef6f9f86ffbc)· VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310.py(凍結 86903811ad13 → 現 2b3688c521f6;MDL156 v0115 本來就列為操作員原件豁免)→ 交接冊 frozen_sources 2/13 破 · VIA_Layout_Reuse_SSOT_v0100 鎖不符 → LAYOUT(SUP_MDL743)與 NLP(SUP_MDL866)載入 LOCK_MISMATCH 紅。本線(VCGC)從容器還原 VRN 檔被安全閘擋下,照 CLAUDE.md 待裁第 3 項不繞過 ‖ 2026-11-25 20:32 操作員裁定 A → VRN 線 PR #742 只含這兩支檔,還原成凍結位元組(4f0965ad99c4 · 86903811ad13);容器:frozen 13/13 · LAYOUT 7/7 · NLP 5/5 · 橋掃 VRN/accel 180/180(凍結原件本來就排除,MDL156 不需另加豁免)",
+   "next": "合併 #742 後 handoff check 看 frozen_sources 13/13,再轉 VERIFIED",
+   "updated_at": "2026-11-25T13:40:00Z",
    "registered_at": "2026-11-23T20:40:00Z"
   },
   {
@@ -16500,6 +16526,31 @@
    "registered_at": "2026-11-25T05:20:00Z",
    "case": "C-mdl127-v0104",
    "receipt": "docs/handoff/evidence/C-mdl127-v0104.json"
+  },
+  {
+   "id": "VCGC-REQ266:C-mdl279-v0107",
+   "requirement": "VCGC-REQ266",
+   "case": "C-mdl279-v0107",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "容器自測 8/8 ×3 · handoff test C-mdl279-v0107 rc 0 · 標記見到",
+   "next": "主機 MCP 用戶端重連看 tools/list",
+   "receipt": "docs/handoff/evidence/C-mdl279-v0107.json",
+   "updated_at": "2026-11-25T13:55:00Z",
+   "registered_at": "2026-11-25T13:40:00Z",
+   "verified_at": "2026-11-25T13:55:00Z",
+   "verified_why": "handoff test C-mdl279-v0107 rc 0 · 標記見到"
+  },
+  {
+   "id": "VCGC-REQ266:claude-md-python-accel",
+   "requirement": "VCGC-REQ266",
+   "case": null,
+   "state": "REVIEW",
+   "owner": "操作員",
+   "reason": "CLAUDE.md 加「指令一律 Python · 加速器經 AST 導入且真的生效」與裁定 ⑬ ⑭ 兩段;規則文字待操作員看過(律號待登)",
+   "next": "操作員看過 PR 內的 CLAUDE.md 段落;要升為律另登政策冊",
+   "updated_at": "2026-11-25T13:40:00Z",
+   "registered_at": "2026-11-25T13:40:00Z"
   }
  ],
  "retired_files": {
