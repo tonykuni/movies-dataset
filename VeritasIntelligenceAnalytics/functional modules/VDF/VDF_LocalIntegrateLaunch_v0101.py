@@ -171,8 +171,8 @@ def main(argv=None) -> int:
         lamps.append(s.split("(")[0])
     if "--skip-health" not in flags:
         rc = run_health(code_root)
-        lamp = {0: "GREEN", 2: "YELLOW"}.get(rc, "RED")
-        say(f"1 VCGC 健康 · rc {rc} · {lamp}")
+        lamp = {0: "GREEN", 2: "YELLOW", 3: "YELLOW"}.get(rc, "RED")     # 3 = VCGC 中樞不在 → 退路:跳過健康檢查,VDF 照常(系統獨立)
+        say(f"1 VCGC 健康 · rc {rc} · {lamp}" + (" · VCGC 不在:跳過(退路),VDF 照常" if rc == 3 else ""))
         if lamp == "RED":
             say("[停] 環境健康沒過,不進整合。照上面 doctor 列的處理(衝突境重建:via-envgov plan → 你下 via-envgov apply --approve)")
             return 1
@@ -227,6 +227,9 @@ def selftest() -> int:
             p2, tried = find_vdf_python(code)
             chk("找不到 = None 且列出找過的根", p2 is None and "conda env list" in tried)
             chk("沒有中樞 = rc 3", run_health(code) == 3)
+            os.environ["VIA_PY_VDF"] = sys.executable
+            chk("沒有 VCGC 中樞 → 退路(黃)照常往下", main(["--repo", str(code.parent), "--no-sync", "--env-only"]) == 2)
+            os.environ.pop("VIA_PY_VDF")
             (code / "VCGC_CommandHub_v0100.py").write_text("import sys\nsys.exit(9)\n", encoding="utf-8")
             (code / "VCGC_CommandHub_v0116.py").write_text(
                 "import os, sys\nassert sys.argv[1:] == ['health'] and 'VIA_FROM_VCGC' not in os.environ\n"
