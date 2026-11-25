@@ -131,7 +131,7 @@ def export(repo: Path, ref: str, root: Path, man: dict, dry: bool = False, log=p
             atomic_write(target, data)
         wrote += 1
         rows.append({**e, "status": "WROTE" if not dry else "WOULD_WRITE", "target": str(target)})
-    now = {str(root / e["to"]) for e in man["entries"]}
+    now = {os.path.normcase(os.path.normpath(str(root / e["to"]))) for e in man["entries"]}
     moved_old = []
     for rc in [RECEIPT] + OLD_RECEIPTS:
         rp = root / rc
@@ -141,10 +141,11 @@ def export(repo: Path, ref: str, root: Path, man: dict, dry: bool = False, log=p
             prev_t = {r.get("target") for r in json.loads(rp.read_text(encoding="utf-8")).get("rows", []) if r.get("status") in ("WROTE", "SAME")}
         except (OSError, ValueError):
             continue
-        for t in sorted(x for x in prev_t - now if x):
+        stale = {os.path.normpath(x) for x in prev_t if x and os.path.normcase(os.path.normpath(x)) not in now}
+        for t in sorted(stale):
             tp = Path(t)
             if tp.is_file():
-                rel = tp.relative_to(root) if root in tp.parents else Path(tp.name)
+                rel = tp.relative_to(root) if Path(os.path.normpath(root)) in tp.parents else Path(tp.name)
                 if not dry:
                     dst = root / "_prev" / stamp / rel
                     dst.parent.mkdir(parents=True, exist_ok=True)
@@ -291,13 +292,16 @@ def selftest() -> int:
         (root / "VDF" / "engine" / "old_flat.py").write_text("x\n", encoding="utf-8")
         (root / "VDF" / "engine" / "mine.txt").write_text("user\n", encoding="utf-8")
         atomic_write(root / "VDF/engine/VDF_ENGINE_EXPORT_RECEIPT.json",
-                     json.dumps({"rows": [{"target": str(root / "VDF/engine/old_flat.py"), "status": "WROTE"}]}).encode())
+                     json.dumps({"rows": [{"target": str(root / "VDF/engine/old_flat.py"), "status": "WROTE"},
+                                          {"target": str(root / "VDF/engine/../../VCGC/CGC_X_v0100.py"), "status": "WROTE"}]}).encode())
         r = export(repo, "HEAD", root, man, log=lambda *a: None)
         chk("① 相對位置:VRN/… · VCGC/…;取分支內容不取工作樹", (root / "VRN/a_v0100.py").read_bytes() == b"a=1\r\n" and (root / "VCGC/CGC_X_v0100.py").is_file())
         lc = json.loads((root / "supportive modules/registry/L.json").read_text(encoding="utf-8"))
         chk("② 鎖冊複本路徑改指測試夾", lc["accelerator"]["path"] == "測試/supportive modules/A.py")
         chk("③ 上一版 VDF 平放的舊匯出搬 _prev、使用者自己的檔不動", not (root / "VDF/engine/old_flat.py").exists()
             and any((root / "_prev").rglob("old_flat.py")) and (root / "VDF/engine/mine.txt").is_file())
+        chk("③b 舊收據寫成 ../ 形式、但就是這次要的檔 → 不搬(路徑正規化後比)", (root / "VCGC/CGC_X_v0100.py").is_file()
+            and not any((root / "_prev").rglob("CGC_X_v0100.py")))
         chk("④ 分支上沒有的照實列缺", r["counts"]["skipped"] == ["VRN/nope.py"])
         r2 = export(repo, "HEAD", root, man, log=lambda *a: None)
         chk("⑤ 再跑一次相同內容全略過(冪等)", r2["counts"]["wrote"] == 0 and r2["counts"]["same"] == 3, f"({r2['counts']})")

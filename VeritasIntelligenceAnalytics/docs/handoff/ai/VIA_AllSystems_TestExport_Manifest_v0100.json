@@ -1,8 +1,8 @@
 {
  "schema": "VIA.AllSystems.TestExport.v1",
  "version": "v0100",
- "built_at": "2026-11-25T09:55:48+00:00",
- "git_head": "69c5457413f7",
+ "built_at": "2026-11-25T09:58:26+00:00",
+ "git_head": "274778e3f7a0",
  "repo_prefix": "VeritasIntelligenceAnalytics/",
  "rule": "各系統引擎一種一支(現役尾版)+ 靜態鏈 + 實測載入補齊;支援工具只帶鎖冊現役、一種一支 NLP/layout/markdown 與引擎實際載入的;相對位置:functional modules/<系統>/ → <系統>/;supportive modules/registry/CGC_* → VCGC/;supportive modules/ → supportive modules/",
  "expect": {
@@ -16,26 +16,29 @@
     "fail": 0
    },
    "VDF": {
-    "ok": 115,
-    "fail": 0
+    "ok": 114,
+    "fail": 1
    },
    "VQG": {
     "ok": 1,
     "fail": 1
    },
    "VRN": {
-    "ok": 99,
-    "fail": 0
+    "ok": 97,
+    "fail": 2
    },
    "VCGC": {
-    "ok": 286,
-    "fail": 0
+    "ok": 285,
+    "fail": 1
    }
   },
   "fail_reasons": {
-   "其他": 1
+   "缺套件": 2,
+   "其他": 3
   },
-  "missing_packages": {}
+  "missing_packages": {
+   "duckdb": 2
+  }
  },
  "tails": [
   "VAP/VAP_SystemManager_v0100.py",
@@ -4806,12 +4809,28 @@
    "bytes": 32750
   },
   {
+   "path": "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py",
+   "to": "VCGC/CGC_MDL248_FullCheck_v0100.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "00bb5b4cba5c772137f14579c248633616c78785c904688aee779d374a37dc87",
+   "bytes": 35021
+  },
+  {
    "path": "supportive modules/registry/CGC_MDL248_FullCheck_v0101.py",
    "to": "VCGC/CGC_MDL248_FullCheck_v0101.py",
    "role": "tail",
    "why": "尾版",
    "sha256_lf": "af72d33148adee3583cbdc0528ee46efe161b83bcc69e3f1bdbecc4d5b2f9f5b",
    "bytes": 13695
+  },
+  {
+   "path": "supportive modules/registry/CGC_MDL249_DataFrameLock_v0100.py",
+   "to": "VCGC/CGC_MDL249_DataFrameLock_v0100.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "954147fcfa4766aa8abae512fe8a19b43e4edbf7c2598e7c3ea41d31e989a08f",
+   "bytes": 21016
   },
   {
    "path": "supportive modules/registry/CGC_MDL249_DataFrameLock_v0101.py",
@@ -5006,6 +5025,22 @@
    "bytes": 15614
   },
   {
+   "path": "supportive modules/registry/CGC_MDL261_UIEngine_v0100.py",
+   "to": "VCGC/CGC_MDL261_UIEngine_v0100.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "343a2c408ef1cb00f567d0466a6de27b2aea26f0c61eaba03bd239ea6edda9e2",
+   "bytes": 47448
+  },
+  {
+   "path": "supportive modules/registry/CGC_MDL261_UIEngine_v0101.py",
+   "to": "VCGC/CGC_MDL261_UIEngine_v0101.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "b1641467feeeee142281cdda2d1e9e0706caa3132a066a2af759efaf9d882a19",
+   "bytes": 50365
+  },
+  {
    "path": "supportive modules/registry/CGC_MDL261_UIEngine_v0102.py",
    "to": "VCGC/CGC_MDL261_UIEngine_v0102.py",
    "role": "chain",
@@ -5092,6 +5127,14 @@
    "why": "尾版",
    "sha256_lf": "add6ecda37b019f6c400f5180a0da63cf3c972946b21db07286c518a877b5505",
    "bytes": 10257
+  },
+  {
+   "path": "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0100.py",
+   "to": "VCGC/CGC_MDL265_VdfVrnReadiness_v0100.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "1c6c411f02a34b33edebddec5a6b46251b677b655b266f1aa48c45bc5f686c47",
+   "bytes": 23816
   },
   {
    "path": "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0101.py",
@@ -5750,6 +5793,14 @@
    "bytes": 16081
   },
   {
+   "path": "supportive modules/registry/VIA_SubsystemBundle_SSOT_v0104.json",
+   "to": "VCGC/VIA_SubsystemBundle_SSOT_v0104.json",
+   "role": "chain",
+   "why": "CGC_MDL256 讀同夾的子系統包冊尾版",
+   "sha256_lf": "603c81da7f7bded27a41052655e6f145481c37e2e96c41c88a58d1a227f0dd20",
+   "bytes": 550187
+  },
+  {
    "path": "functional modules/VDF/ActivateVDF.py",
    "to": "VDF/ActivateVDF.py",
    "role": "chain",
@@ -6326,6 +6377,38 @@
    "bytes": 10527
   },
   {
+   "path": "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
+   "to": "VDF/VDF_MDL012_FetchGroups_v0100.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "ad649256b19461fc811b5599bee160a468483fe73631cd775557cd2550546d01",
+   "bytes": 61241
+  },
+  {
+   "path": "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
+   "to": "VDF/VDF_MDL012_FetchGroups_v0101.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "7bd3aa3aadefe8c07489fde8f347a498815268e477bbd32c99917d4785c980de",
+   "bytes": 45361
+  },
+  {
+   "path": "functional modules/VDF/VDF_MDL012_FetchGroups_v0102.py",
+   "to": "VDF/VDF_MDL012_FetchGroups_v0102.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "b02f1cbe19d1f2d42ac31be2e729a2d2ab01103735829e0292731b755c437279",
+   "bytes": 17806
+  },
+  {
+   "path": "functional modules/VDF/VDF_MDL012_FetchGroups_v0103.py",
+   "to": "VDF/VDF_MDL012_FetchGroups_v0103.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "8dc663160df43e887990cef1441c131205c74be05b38d79844841352c0ba3147",
+   "bytes": 23381
+  },
+  {
    "path": "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
    "to": "VDF/VDF_MDL012_FetchGroups_v0106.py",
    "role": "chain",
@@ -6662,6 +6745,22 @@
    "bytes": 51219
   },
   {
+   "path": "functional modules/VDF/VDF_MDL020_DataPlane_v0100.py",
+   "to": "VDF/VDF_MDL020_DataPlane_v0100.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "7e989fe1774691264bc4d719819f3b13c3104b78da6e4c2a74460e9132cd0273",
+   "bytes": 76437
+  },
+  {
+   "path": "functional modules/VDF/VDF_MDL020_DataPlane_v0101.py",
+   "to": "VDF/VDF_MDL020_DataPlane_v0101.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "37742455f07cf80815ee0e48794659e85a8d017f0b9757364d5a90a5a238c9ba",
+   "bytes": 41679
+  },
+  {
    "path": "functional modules/VDF/VDF_MDL020_DataPlane_v0103.py",
    "to": "VDF/VDF_MDL020_DataPlane_v0103.py",
    "role": "tail",
@@ -6684,6 +6783,38 @@
    "why": "尾版",
    "sha256_lf": "cd3dd95374e9ee2470ae2853df82b6fa0452ce5d0b6744a19629e92ce2c89fca",
    "bytes": 33307
+  },
+  {
+   "path": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v0100.py",
+   "to": "VDF/VDF_MDL022_SafeParallelLaunch_v0100.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "29298f89f52b06ff16b93467744de5ca84bdddbe4f191c648424701e3601f10b",
+   "bytes": 38869
+  },
+  {
+   "path": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v0101.py",
+   "to": "VDF/VDF_MDL022_SafeParallelLaunch_v0101.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "4b01b0e770ca682e6d80b31693b30e958913ba07553447e173d1e16c2d227ea1",
+   "bytes": 54661
+  },
+  {
+   "path": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v0102.py",
+   "to": "VDF/VDF_MDL022_SafeParallelLaunch_v0102.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "ce102efe928e3f12b6b118b4c72b7e9810c8d600b22772ac270e117bd44b6485",
+   "bytes": 11681
+  },
+  {
+   "path": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v0103.py",
+   "to": "VDF/VDF_MDL022_SafeParallelLaunch_v0103.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "11c5676d9035332724577738d36eb767648ac471fe2a52d509d2d93e7c452492",
+   "bytes": 5432
   },
   {
    "path": "functional modules/VDF/VDF_MDL022_SafeParallelLaunch_v0104.py",
@@ -8014,6 +8145,14 @@
    "bytes": 14008
   },
   {
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py",
+   "to": "VDF/engine/VDF_ENG055_OmniFetch_v0118.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "d520bc21b1d93c59aa6afb1f0061050922f81f62bd5dfe5f8ccc48f8f37838fa",
+   "bytes": 94688
+  },
+  {
    "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0124.py",
    "to": "VDF/engine/VDF_ENG055_OmniFetch_v0124.py",
    "role": "tail",
@@ -8470,6 +8609,30 @@
    "bytes": 24076
   },
   {
+   "path": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0101.py",
+   "to": "VDF/engine/VDF_ENG077_ActiveETFUniverse_v0101.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "89600ebf87aaffe153c6fb92247b92930dae6f6d1e825b4fa3b4b8642e98a221",
+   "bytes": 20988
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0105.py",
+   "to": "VDF/engine/VDF_ENG077_ActiveETFUniverse_v0105.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "68b647404c92e5cdf80dcb1179f6ab4527f762c4c9a8bacab1b5bba4b4223e15",
+   "bytes": 6559
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0106.py",
+   "to": "VDF/engine/VDF_ENG077_ActiveETFUniverse_v0106.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "aed545575b18adb864d3a6f670306782d4c4485a080916b76737558f77618621",
+   "bytes": 16913
+  },
+  {
    "path": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0107.py",
    "to": "VDF/engine/VDF_ENG077_ActiveETFUniverse_v0107.py",
    "role": "tail",
@@ -8588,6 +8751,14 @@
    "why": "鏈上前版(靜態)",
    "sha256_lf": "058570195e0befa5826b3adc4733ecf7b954d7e24858b07c7c802dd0aaa9b92b",
    "bytes": 19406
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG082_FinStatements_v0101.py",
+   "to": "VDF/engine/VDF_ENG082_FinStatements_v0101.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "49cb8b8bfecc2a532b9830d29f8adfb9fc1bfb4e3c0662120233ddca51a9d29d",
+   "bytes": 30095
   },
   {
    "path": "functional modules/VDF/engine/VDF_ENG082_FinStatements_v0105.py",
@@ -8974,6 +9145,38 @@
    "bytes": 2986
   },
   {
+   "path": "functional modules/VDF/engine/VDF_ENG113_MacroMethod_v0100.py",
+   "to": "VDF/engine/VDF_ENG113_MacroMethod_v0100.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "c6e82dbebab2b5374aa06700fce1d181a0fb335e8562870e4dfa44bb668372b0",
+   "bytes": 4977
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG113_MacroMethod_v0101.py",
+   "to": "VDF/engine/VDF_ENG113_MacroMethod_v0101.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "2e13d9a055339e3a2252c8ac72d2ee447e120239eb44c6c9ad26f2e88908e5ad",
+   "bytes": 5770
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG113_MacroMethod_v0102.py",
+   "to": "VDF/engine/VDF_ENG113_MacroMethod_v0102.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "a4cbbf74c7fc88b8774a79e76b94570d9b2246b72f166920deaaa307ed8d600e",
+   "bytes": 8884
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG113_MacroMethod_v0103.py",
+   "to": "VDF/engine/VDF_ENG113_MacroMethod_v0103.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "01a3d2cca7a20d9e7d793e38a65f2b7ae2a97be0dd639039dd39648d913aaf6f",
+   "bytes": 10979
+  },
+  {
    "path": "functional modules/VDF/engine/VDF_ENG113_MacroMethod_v0104.py",
    "to": "VDF/engine/VDF_ENG113_MacroMethod_v0104.py",
    "role": "tail",
@@ -8990,12 +9193,76 @@
    "bytes": 6477
   },
   {
+   "path": "functional modules/VDF/engine/VDF_ENG115_SentimentFetch_v0100.py",
+   "to": "VDF/engine/VDF_ENG115_SentimentFetch_v0100.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "b54ad04a9b605ae744cb1e1a413acf2a3a754d8e650c2e20e6f62d59d5537fd3",
+   "bytes": 5087
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG115_SentimentFetch_v0101.py",
+   "to": "VDF/engine/VDF_ENG115_SentimentFetch_v0101.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "217f052219d596a0a06d648ce8a46059b4e6eb5d29bc96fd25140940dd042801",
+   "bytes": 5589
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG115_SentimentFetch_v0102.py",
+   "to": "VDF/engine/VDF_ENG115_SentimentFetch_v0102.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "80e23626d03fdaa9852c526a7eba170e56f2597f27cf1bcf2593009fc3ca09fa",
+   "bytes": 8881
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG115_SentimentFetch_v0103.py",
+   "to": "VDF/engine/VDF_ENG115_SentimentFetch_v0103.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "48767cfbceab3b2d9e90a9dcb076f13effae2e8dd2f7e75a4977d24ee52acabc",
+   "bytes": 10221
+  },
+  {
    "path": "functional modules/VDF/engine/VDF_ENG115_SentimentFetch_v0104.py",
    "to": "VDF/engine/VDF_ENG115_SentimentFetch_v0104.py",
    "role": "tail",
    "why": "尾版",
    "sha256_lf": "52e9fc14932c8d9c72a92ae18cd26c98bf58b10ce19f80b61442ff39f7c8f2eb",
    "bytes": 7616
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG116_AAIIWorkbook_v0100.py",
+   "to": "VDF/engine/VDF_ENG116_AAIIWorkbook_v0100.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "d448810d152d5fdefcdf2baef8fad1d8b37808c0155eaca38418cef2a73edd21",
+   "bytes": 6145
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG116_AAIIWorkbook_v0101.py",
+   "to": "VDF/engine/VDF_ENG116_AAIIWorkbook_v0101.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "3ee2ad63e6f324c3b5888396c103dc5dcda57875a8af007a8cddeedf94e14a65",
+   "bytes": 7780
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG116_AAIIWorkbook_v0102.py",
+   "to": "VDF/engine/VDF_ENG116_AAIIWorkbook_v0102.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "d3a024a76c3b5684e909140d9ca47b47cc1a306c9062e82c71c58b310485eba3",
+   "bytes": 8885
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG116_AAIIWorkbook_v0103.py",
+   "to": "VDF/engine/VDF_ENG116_AAIIWorkbook_v0103.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "cdf48c3f4e7b8557551f50e9537bb16ebc46640241097657c39cdfbe8ed608b8",
+   "bytes": 10031
   },
   {
    "path": "functional modules/VDF/engine/VDF_ENG116_AAIIWorkbook_v0104.py",
@@ -9012,6 +9279,14 @@
    "why": "尾版",
    "sha256_lf": "153f0c47d4d98554870f913593b051c65c472bb646724a08970572ffe5ad1c1d",
    "bytes": 3777
+  },
+  {
+   "path": "functional modules/VDF/engine/VDF_ENG117_ForwardVintage_v0100.py",
+   "to": "VDF/engine/VDF_ENG117_ForwardVintage_v0100.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "1df8e2ef5fcf6685d169fc47efb93b079d4b38ac9903df6f8281d8dd241ed498",
+   "bytes": 59689
   },
   {
    "path": "functional modules/VDF/engine/VDF_ENG117_ForwardVintage_v0101.py",
@@ -9340,6 +9615,22 @@
    "why": "無版號、被尾版或系統冊點名",
    "sha256_lf": "8a9b771b82bf0b477802ece7b44b3a8f9186b37c4d300928bbd16f29ee0a3332",
    "bytes": 13973
+  },
+  {
+   "path": "functional modules/VDF/references/intake/VIA_ForwardValuation_b20260928/forward_valuation_vintage_v2_2.py",
+   "to": "VDF/references/intake/VIA_ForwardValuation_b20260928/forward_valuation_vintage_v2_2.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "12540f67fbb1aa57fad0f04834ef2b33330245eff528ba829adcdb6ff3903d21",
+   "bytes": 100557
+  },
+  {
+   "path": "functional modules/VDF/references/intake/VIA_ForwardValuation_b20260928/via_fwdper_free4_fetch.py",
+   "to": "VDF/references/intake/VIA_ForwardValuation_b20260928/via_fwdper_free4_fetch.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "4666bd7c61bac68f1374f73e84bbaed6a6d5eeaded2c611e7b56e75699bf451e",
+   "bytes": 37457
   },
   {
    "path": "functional modules/VDF/registry/VDF_FunctionMatrix_v0100.json",
@@ -11350,6 +11641,22 @@
    "bytes": 35467
   },
   {
+   "path": "functional modules/VRN/VRN_MDL260_SafeParallelLaunch_v0100.py",
+   "to": "VRN/VRN_MDL260_SafeParallelLaunch_v0100.py",
+   "role": "chain",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "bd742d549ff380dfaaab2d4327311abc1b6604ffc0b7661b0177cacd83db9e3f",
+   "bytes": 38165
+  },
+  {
+   "path": "functional modules/VRN/VRN_MDL260_SafeParallelLaunch_v0101.py",
+   "to": "VRN/VRN_MDL260_SafeParallelLaunch_v0101.py",
+   "role": "chain",
+   "why": "載入時找不到 → 補",
+   "sha256_lf": "a2fc6e59dd806a25f7ad842bf4983dfacb692d0300e343025638062df49ae61c",
+   "bytes": 49607
+  },
+  {
    "path": "functional modules/VRN/VRN_MDL260_SafeParallelLaunch_v0102.py",
    "to": "VRN/VRN_MDL260_SafeParallelLaunch_v0102.py",
    "role": "chain",
@@ -12470,12 +12777,28 @@
    "bytes": 705
   },
   {
+   "path": "functional modules/VRN/nonstock_v0310/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310_SHA256.txt",
+   "to": "VRN/nonstock_v0310/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310_SHA256.txt",
+   "role": "chain",
+   "why": "nonstock 摘要引擎同包模組(REUSE 閘要)",
+   "sha256_lf": "943085c492a36392edfe9c9a68dfbb53c0a58e074ee94748d8fb504cdeb59678",
+   "bytes": 108
+  },
+  {
    "path": "functional modules/VRN/nonstock_v0310/engine/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310.py",
    "to": "VRN/nonstock_v0310/engine/VIA_NON_STOCK_SUMMARIZER_ENGINE_v0310.py",
    "role": "tail",
    "why": "尾版",
    "sha256_lf": "2b3688c521f622cd350d447ddae6bca455bc1aced137a7fa9c57c7496a7a0010",
    "bytes": 39529
+  },
+  {
+   "path": "functional modules/VRN/nonstock_v0310/internal/README_MISSING.md",
+   "to": "VRN/nonstock_v0310/internal/README_MISSING.md",
+   "role": "chain",
+   "why": "nonstock 摘要引擎同包模組(REUSE 閘要)",
+   "sha256_lf": "aac4e021c44ee3cafe7fe590514315d1119aca0fa73e8212b7786f328ff8cd87",
+   "bytes": 908
   },
   {
    "path": "functional modules/VRN/nonstock_v0310/reuse/vrn2/VRN_M03_PDF_Layout_JSON_v3.py",
@@ -12774,6 +13097,22 @@
    "bytes": 9156
   },
   {
+   "path": "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0100.py",
+   "to": "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0100.py",
+   "role": "support",
+   "why": "SUP_MDL744 鏈上前版(載入實測)",
+   "sha256_lf": "438a9d62f9c036d287c91dc51d0ab67086b109aade4032bb4d2e99e78cdc6ff2",
+   "bytes": 21224
+  },
+  {
+   "path": "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py",
+   "to": "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py",
+   "role": "support",
+   "why": "SUP_MDL744 鏈上前版(載入實測)",
+   "sha256_lf": "8f6dfeaeb3e6ec8e5f59c971716e6486fb3d7221059e091eea364e2dd0798a30",
+   "bytes": 26669
+  },
+  {
    "path": "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0103.py",
    "to": "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0103.py",
    "role": "support",
@@ -12793,7 +13132,7 @@
    "path": "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v0101.py",
    "to": "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v0101.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "4e75ce94bba2995383292d341d5c7e9b2877007dbec499e34fc84889d701355b",
    "bytes": 27903
   },
@@ -12809,7 +13148,7 @@
    "path": "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0107.py",
    "to": "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0107.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "dad847a927f4a89605c6c97c5fd7af783a48daaddc86926e425755276eea0715",
    "bytes": 37728
   },
@@ -12825,7 +13164,7 @@
    "path": "supportive modules/SUP_MDL737_SuperAccelModule_v0108.py",
    "to": "supportive modules/SUP_MDL737_SuperAccelModule_v0108.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "d539fddfabba811df534fc91a32d2dafa094d5eef6583726c75afcf9154c6c67",
    "bytes": 24065
   },
@@ -12833,7 +13172,7 @@
    "path": "supportive modules/SUP_MDL737_SuperAccelModule_v0109.py",
    "to": "supportive modules/SUP_MDL737_SuperAccelModule_v0109.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "86b75a37c62dd425b8fc6d387494476391724b41e02a3c9819e1a89bac2a0c4a",
    "bytes": 5279
   },
@@ -12862,10 +13201,18 @@
    "bytes": 19282
   },
   {
+   "path": "supportive modules/SUP_MDL753_VIACommonUtils_v0100.py",
+   "to": "supportive modules/SUP_MDL753_VIACommonUtils_v0100.py",
+   "role": "support",
+   "why": "載入時缺前版 → 補",
+   "sha256_lf": "b040584c69322b92668447018b0e6aee7df72cc9e70efd3cf6fddd0d17a8f078",
+   "bytes": 20153
+  },
+  {
    "path": "supportive modules/SUP_MDL753_VIACommonUtils_v0112.py",
    "to": "supportive modules/SUP_MDL753_VIACommonUtils_v0112.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "載入時缺前版 → 補",
    "sha256_lf": "ed59110774ade5a305a1c52184be20ed4844f08c38cac7408701e0941a4eebcc",
    "bytes": 127560
   },
@@ -12913,7 +13260,7 @@
    "path": "supportive modules/network/SUP_MDL740_NetUnified_v0115.py",
    "to": "supportive modules/network/SUP_MDL740_NetUnified_v0115.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "e7ef1c1df3027c78e6eda60d464e6cb30080c34b6c9863221a3cf1ee2484e34e",
    "bytes": 50299
   },
@@ -12921,7 +13268,7 @@
    "path": "supportive modules/network/SUP_MDL740_NetUnified_v0116.py",
    "to": "supportive modules/network/SUP_MDL740_NetUnified_v0116.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "1a3ca4dbf066f550d55dc0f88455fd729ea17d4ac338dad30b8cdf0bb09fd38a",
    "bytes": 3271
   },
@@ -12929,7 +13276,7 @@
    "path": "supportive modules/network/SUP_MDL740_NetUnified_v0117.py",
    "to": "supportive modules/network/SUP_MDL740_NetUnified_v0117.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "ec1db1fe8eca302c8c6f99c95d75270e6e4d9e89258f3192c1a5adfac3055c37",
    "bytes": 1820
   },
@@ -12937,7 +13284,7 @@
    "path": "supportive modules/network/SUP_MDL740_NetUnified_v0118.py",
    "to": "supportive modules/network/SUP_MDL740_NetUnified_v0118.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "ca9798f7a8d46f067b634d966d34eff7957bd1fd5cd678330d7b17f523b0d8d7",
    "bytes": 4685
   },
@@ -12945,7 +13292,7 @@
    "path": "supportive modules/network/SUP_MDL740_NetUnified_v0119.py",
    "to": "supportive modules/network/SUP_MDL740_NetUnified_v0119.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "1cb9c5652508598522cb1077e4bb061d988ee458d93f78dd65ace3dace83c4ba",
    "bytes": 10066
   },
@@ -12961,7 +13308,7 @@
    "path": "supportive modules/network/VeritasAegisNexus_v1651.py",
    "to": "supportive modules/network/VeritasAegisNexus_v1651.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "b983c642e111bfdba775f684f486ca4dbb05868a595f61af4359aee0be1d4976",
    "bytes": 350167
   },
@@ -12985,7 +13332,7 @@
    "path": "supportive modules/registry/CGC_MDL224_ScrapeGate_v0100.py",
    "to": "supportive modules/registry/CGC_MDL224_ScrapeGate_v0100.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "a810969538c94e98329463d74610e276f7b5b261c0d5263267763fa8314e8f29",
    "bytes": 2228
   },
@@ -13001,7 +13348,7 @@
    "path": "supportive modules/registry/via_ocr_super_v0101.py",
    "to": "supportive modules/registry/via_ocr_super_v0101.py",
    "role": "support",
-   "why": "支援工具載入一定要(先前容器閉包實測:前版 / 本體 / 網路工具的擷取同意尺)",
+   "why": "支援工具載入一定要(容器閉包實測)",
    "sha256_lf": "a3772712d5019be8317633e25b876221875f8ee763134b52fac86ca26b0b418d",
    "bytes": 22757
   },
