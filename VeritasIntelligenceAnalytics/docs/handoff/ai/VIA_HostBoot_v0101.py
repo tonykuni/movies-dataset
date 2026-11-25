@@ -21,6 +21,9 @@
                     (已追蹤檔有改動 = 停不碰 · 擋路的未追蹤檔一樣就移除、不一樣搬倉外備份)→ 經 VDF_SystemManager three
                     --selftest · ready · inventory · plan · names · [run --live] · distill · reconcile · bench → 兩邊 schedule list →
                     VCGC schedule run vcgc_vdf_master → 一定切回原分支。沒 --live = 不出網(run 只列指令)。
+  fin5y [--branch B] [--live] [--only 代碼,..] [--max N]
+                    全部台股近 5 年度財報 → 8 指標(VDF_ENG243):同 vdf3 暫切分支在真倉跑 → --selftest · plan → [--live:probe · fetch] → compute。
+                    第一次建議 --live --only 2330,3017,3324 --max 30 先驗;全市場約 1,800 家 × 9 請求 × fin5y.rate_s 秒(預設 3 秒 ≈ 13.5 小時,可斷點續跑)
   --sync            先跑前版的同步(--dry:fetch · 擋路檔 · main 快轉)
   --push            收尾把收據推 intake/fastrun-<時間>(經 VIA_FastRun 尾版 push;工作夾不動)
 找檔順序:本檔旁(PS 從分支取到 TEMP 的那一份)→ 倉裡。子行程輸出逐塊直通(安裝閘的 YES 提示照樣看得到、打得進)。
@@ -109,7 +112,7 @@ _T0 = time.time()
 VIA_REL = "VeritasIntelligenceAnalytics"
 AI_REL = Path(VIA_REL) / "docs" / "handoff" / "ai"
 VDF_REL = Path(VIA_REL) / "functional modules" / "VDF"
-VERBS = ("fnc", "bak", "vdf", "vdfp", "vdf3")
+VERBS = ("fnc", "bak", "vdf", "vdfp", "vdf3", "fin5y")
 MAX_RECEIPT = 2 * 1024 * 1024
 
 
@@ -274,12 +277,37 @@ def run_vdfp(rest: list, repo: Path, out: Path, env: dict) -> int:
 
 
 def run_vdf3(rest: list, repo: Path, out: Path, env: dict) -> int:
+    def steps(via: Path, live: bool, extra: list) -> list:
+        vm = newest(via / "functional modules" / "VDF", "VDF_SystemManager_v*.py")
+        cm = newest(via / "supportive modules" / "registry", "CGC_SystemManager_v*.py")
+        st = [[str(vm), "three", v] for v in ("--selftest", "ready", "inventory", "plan", "names")]
+        if live:
+            st.append([str(vm), "three", "run", "--live"])
+        st += [[str(vm), "three", v] for v in ("distill", "reconcile", "bench")]
+        return st + [[str(vm), "schedule", "list"], [str(cm), "schedule", "list"], [str(cm), "schedule", "run", "vcgc_vdf_master"]]
+    return on_branch(rest, repo, out, env, "vdf3", steps, ("vdf_three", "vcgc/central_params"))
+
+
+def run_fin5y(rest: list, repo: Path, out: Path, env: dict) -> int:
+    def steps(via: Path, live: bool, extra: list) -> list:
+        f = newest(via / "functional modules" / "VDF" / "engine", "VDF_ENG243_TWFin5Y_v*.py")
+        st = [[str(f), "--selftest"], [str(f), "plan", *extra]]
+        if live:
+            st += [[str(f), "probe", "--live"], [str(f), "fetch", "--live", *extra]]
+        return st + [[str(f), "compute"]]
+    return on_branch(rest, repo, out, env, "fin5y", steps, ("vdf_fin5y",))
+
+
+def on_branch(rest: list, repo: Path, out: Path, env: dict, tag: str, steps_fn, report_dirs: tuple) -> int:
+    """暫切 origin/<分支> 在真倉跑(資料在 VIA_Reports / output_hub,不受 git 追蹤),一定切回;已追蹤檔有改動 = 停不碰。"""
+    rest = list(rest)
     br = "claude/eloquent-rubin-q01657"
     if "--branch" in rest:
         j = rest.index("--branch")
         br = rest[j + 1]
         del rest[j:j + 2]
     live = "--live" in rest
+    extra = [x for x in rest if x != "--live"]
     G = PRIOR.git
     if G(repo, "fetch", "-q", "origin", br)[0] != 0:
         say(f"[RED] git fetch origin {br} 失敗")
@@ -302,28 +330,19 @@ def run_vdf3(rest: list, repo: Path, out: Path, env: dict) -> int:
     rc = 0
     try:
         via = repo / VIA_REL
-        vm = newest(via / "functional modules" / "VDF", "VDF_SystemManager_v*.py")
-        cm = newest(via / "supportive modules" / "registry", "CGC_SystemManager_v*.py")
-        steps = [[str(vm), "three", v] for v in ("--selftest", "ready", "inventory", "plan", "names")]
-        if live:
-            steps.append([str(vm), "three", "run", "--live"])
-        steps += [[str(vm), "three", v] for v in ("distill", "reconcile", "bench")]
-        steps += [[str(vm), "schedule", "list"], [str(cm), "schedule", "list"], [str(cm), "schedule", "run", "vcgc_vdf_master"]]
-        for i, st in enumerate(steps):
-            name = "_".join(x.strip("-") for x in st[1:])
-            say(f"vdf3 · {Path(st[0]).name} {' '.join(st[1:])}")
-            r1 = stream([sys.executable, *st], repo, dict(env, VIA_REPO=str(repo)), out / f"vdf3_{i:02d}_{name}_console.txt")
+        for i, st in enumerate(steps_fn(via, live, extra)):
+            name = re.sub(r"[^\w]+", "_", "_".join(x.strip("-") for x in st[1:3]))
+            say(f"{tag} · {Path(st[0]).name} {' '.join(st[1:])}")
+            r1 = stream([sys.executable, *st], repo, dict(env, VIA_REPO=str(repo)), out / f"{tag}_{i:02d}_{name}_console.txt")
             rc = max(rc, r1 if r1 in (0, 1, 2) else 1)
-        for p in sorted((via / "VIA_Reports" / "vdf_three").glob("2*/SUMMARY.json")):
-            if p.stat().st_mtime >= t0 - 2:
-                shutil.copyfile(p, out / f"vdf3_{p.parent.name}_SUMMARY.json")
-        for p in sorted((via / "VIA_Reports" / "vcgc" / "central_params").glob("2*/SUMMARY.json")):
-            if p.stat().st_mtime >= t0 - 2:
-                shutil.copyfile(p, out / f"vdf3_vcgc_{p.parent.name}_SUMMARY.json")
+        for d in report_dirs:
+            for p in sorted((via / "VIA_Reports" / d).glob("2*/SUMMARY.json")):
+                if p.stat().st_mtime >= t0 - 2:
+                    shutil.copyfile(p, out / f"{tag}_{d.replace('/', '_')}_{p.parent.name}_SUMMARY.json")
         for lg in (via / "VIA_Reports" / "vdf_schedule" / "RUN_LEDGER.jsonl", via / "VIA_Reports" / "vcgc_schedule" / "RUN_LEDGER.jsonl",
                    via / "VIA_Reports" / "vdf_three" / "run" / "RUN_LEDGER.jsonl"):
             if lg.is_file():
-                (out / f"vdf3_{lg.parent.name}_ledger_tail.txt").write_text("\n".join(lg.read_text(encoding="utf-8").splitlines()[-30:]), encoding="utf-8")
+                (out / f"{tag}_{lg.parent.name}_ledger_tail.txt").write_text("\n".join(lg.read_text(encoding="utf-8").splitlines()[-30:]), encoding="utf-8")
     finally:
         back = "main" if cur in ("HEAD", "") else cur
         G(repo, "switch", "-q", back, live=True)
@@ -342,8 +361,8 @@ def run_verb(verb: str, rest: list, repo: Path, fnc_dir=None) -> int:
             say(f"[RED] {d} 沒有 VIA_VCGC_FNC_v*.zip(--fnc-dir 指定)")
             return 1, None, None
         argv, cwd = fnc_python() + [str(z), *(rest or ["host"])], z.parent
-    elif verb in ("vdfp", "vdf3"):
-        rc = (run_vdfp if verb == "vdfp" else run_vdf3)(list(rest), repo, out, env)
+    elif verb in ("vdfp", "vdf3", "fin5y"):
+        rc = {"vdfp": run_vdfp, "vdf3": run_vdf3, "fin5y": run_fin5y}[verb](list(rest), repo, out, env)
         (out / f"{verb}_RUN.json").write_text(json.dumps({"tool": TAG, "verb": verb, "rc": rc, "secs": round(time.time() - _T0, 1), "args": rest,
                                                         "accel": VIA_ACCEL is not None, "net": VIA_NET_TOOL_PATH is not None}, ensure_ascii=False, indent=1), encoding="utf-8")
         say(f"{verb} · rc {rc} · 收據 → {out}")
