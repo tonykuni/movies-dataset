@@ -15,7 +15,10 @@ r"""VIA_HostBoot v0105 — 薄尾(v0100–v0104 一字不動):新動詞 lakeall(
   沒開 = RED rc 1、一步都不跑(不冒充已抓;只要湖用現有資料請用 lake)。
 收據(資料邊界:只推結構):DB_CHECK · VERIFY · MONITOR 照 v0104 的投影;湖狀態只推每個 view 的布林
   (有沒有日期欄 · 是否從 2018 年初起 · 是否 7 天內新)與分片數,不推列數與日期;每步主控台只留本機 <夾>_local。
-用法:python VIA_HostBoot_v0105.py --repo <倉> lakeall [--branch B] [--jobs 3] [--push]
+用法:python VIA_HostBoot_v0105.py --repo <倉> lakeall [--branch B] [--jobs 3] [--start S] [--end E|latest] [--align-apply] [--push]
+  --start / --end:輸出 DataFrame 前後可調(交給 ENG239 v0104+;沒給 = DataPlane 冊 2018-01-01 → latest);覆蓋判定照同一個視窗。
+  ⑤ VDF 管理器 parquet align(唯讀:資料家 parquet 對 DuckDB 輸出 DataFrame 的欄位 · 型別 · 欄序 · 鍵);
+     --align-apply = 對不上的檔照 DataFrame 原子重寫(VDF 自己的動詞;不刪列、不刪檔、不碰正典庫)。
 其餘動詞(fnc · bak · vdf · vdfp · vdf3 · fin5y · hydra · lake · vdfcheck)全部照前版。不用 TA-Lib · 不設同意閘 · 本檔零外呼。
 """
 from __future__ import annotations
@@ -89,28 +92,59 @@ def say(msg: str) -> None:
     BASE.say(msg)
 
 
+def _opt(extra: list, k: str):
+    return extra[extra.index(k) + 1] if k in extra and extra.index(k) + 1 < len(extra) else None
+
+
+def window_args(extra: list) -> list:
+    out = []
+    for k in ("--start", "--end"):
+        v = _opt(extra, k)
+        if v:
+            out += [k, v]
+    return out
+
+
 def lakeall_steps(via: Path, live: bool, extra: list) -> list:
     eng = via / "functional modules" / "VDF" / "engine"
     lb = BASE.newest(eng, "VDF_ENG239_ParquetLakeBuild_v*.py")
     vm = BASE.newest(via / "functional modules" / "VDF", "VDF_SystemManager_v*.py")
-    jobs = extra[extra.index("--jobs") + 1] if "--jobs" in extra and extra.index("--jobs") + 1 < len(extra) else "3"
-    return ([[str(lb), "--selftest"], [str(lb), "run", "--all", "--jobs", str(jobs)]]
+    jobs = _opt(extra, "--jobs") or "3"
+    win = window_args(extra)
+    align = [str(vm), "parquet", "align"] + (["--apply"] if "--align-apply" in extra else []) + (["--start", _opt(extra, "--start")] if _opt(extra, "--start") else [])
+    return ([[str(lb), "--selftest"], [str(lb), "run", "--all", "--jobs", str(jobs), *win]]
             + [[str(vm), "three", v] for v in ("inventory", "distill", "reconcile")]
-            + [[str(vm), "db", "check"], [str(vm), "db", "verify"], [str(vm), "monitor", "--lanes", "3", "--timeout", "400", "--json"]])
+            + [[str(vm), "db", "check"], [str(vm), "db", "verify"], align,
+               [str(vm), "monitor", "--lanes", "3", "--timeout", "400", "--json"]])
+
+
+def _start_by(start) -> str:
+    """「從起日起」的判準:視窗起日 + 9 天(頭幾天可能是假日);沒有視窗 = 2018-01-10。"""
+    from datetime import date, timedelta
+    try:
+        return (date.fromisoformat(str(start)[:10]) + timedelta(days=9)).isoformat()
+    except ValueError:
+        return START_BY
 
 
 def project_lake(d: dict) -> dict:
-    """湖狀態只留結構:view 名 · 有沒有日期欄 · 是否從 2018 年初起 · 是否 7 天內新 · 分片數(不留列數與日期)。"""
+    """湖狀態只留結構:view 名 · 有沒有日期欄 · 是否從視窗起日起 · 是否對視窗迄日 7 天內 · 分片數(不留列數與日期)。
+    收據有 window(ENG239 v0104+)就照它判;沒有 = 2018-01-01 起 · 對今天 7 天內(前版行為)。"""
+    win = d.get("window") if isinstance(d.get("window"), dict) else {}
+    by = _start_by(win.get("start")) if win.get("start") else START_BY
     views = []
     for t in d.get("tables") or []:
         if not isinstance(t, dict):
             continue
-        lo, lag = t.get("min_date"), t.get("lag_days")
+        lo = t.get("min_date")
+        lag = t.get("lag_to_end_days") if "lag_to_end_days" in t else t.get("lag_days")
+        ok_start = bool(lo) and str(lo) <= by
         views.append({"view": t.get("view"), "has_date": bool(t.get("date_col")),
-                      "covers_2018": bool(lo) and str(lo) <= START_BY,
+                      "covers_2018": ok_start, "covers_start": ok_start,
                       "fresh_7d": isinstance(lag, int) and lag <= FRESH_DAYS, "parts": t.get("parts")})
     dated = [v for v in views if v["has_date"]]
     return {"engine": d.get("engine"), "at": d.get("at"), "views_n": len(views), "dated_n": len(dated),
+            "window": {"start": win.get("start"), "end": win.get("end"), "end_setting": win.get("end_setting")} if win else None,
             "covers_2018_n": sum(v["covers_2018"] for v in dated), "fresh_7d_n": sum(v["fresh_7d"] for v in dated), "views": views}
 
 
@@ -147,9 +181,11 @@ def run_lakeall(rest: list, repo: Path, out: Path, env: dict) -> int:
             pj = project_lake(json.loads(st.read_text(encoding="utf-8")))
             (out / "lakeall_LAKE_STATUS_projection.json").write_text(json.dumps(pj, ensure_ascii=False, indent=1), encoding="utf-8")
             got.append("lakeall_LAKE_STATUS_projection.json")
-            say(f"湖 · view {pj['views_n']} · 有日期 {pj['dated_n']} · 從 2018 年初起 {pj['covers_2018_n']} · 7 天內新 {pj['fresh_7d_n']}")
+            w = pj.get("window") or {}
+            ws = f"{w.get('start')} → {w.get('end')}" if w else "2018-01-01 → 今天"
+            say(f"湖 · 視窗 {ws} · view {pj['views_n']} · 有日期 {pj['dated_n']} · 從起日起 {pj['covers_2018_n']} · 對迄日 7 天內 {pj['fresh_7d_n']}")
             crc, short, stale = coverage_rc(pj)
-            for name, lst in (("沒從 2018 年初起", short), ("不是 7 天內新", stale)):
+            for name, lst in (("沒從視窗起日起", short), ("對迄日不是 7 天內", stale)):
                 if lst:
                     say(f"  [黃] {name} {len(lst)} 張:" + " · ".join(lst[:12]) + (" …" if len(lst) > 12 else ""))
             rc = PRIOR.worse(rc, crc)               # 範圍沒達成 = 至少黃(PR #762 Codex P1);已經紅就留紅
@@ -213,11 +249,14 @@ def selftest() -> int:
     chk("② 動詞表 = 前版 + lakeall", VERBS[:-1] == tuple(PRIOR.VERBS) and VERBS[-1] == "lakeall" and "vdfcheck" in VERBS)
     via = HERE.parents[3]
     st = lakeall_steps(via, False, ["--jobs", "4"])
-    chk("③ 步驟:ENG239 尾版 --selftest → run --all --jobs 4(不帶 --start:起日讀 DataPlane 冊)→ three inventory/distill/reconcile → db check/verify → monitor",
+    chk("③ 步驟:ENG239 尾版 --selftest → run --all --jobs 4(沒給視窗:讀 DataPlane 冊)→ three ×3 → db check/verify → parquet align(唯讀)→ monitor",
         Path(st[0][0]).name.startswith("VDF_ENG239_ParquetLakeBuild_v") and st[1][1:] == ["run", "--all", "--jobs", "4"]
         and [s[1:] for s in st[2:5]] == [["three", "inventory"], ["three", "distill"], ["three", "reconcile"]]
-        and [s[1:3] for s in st[5:7]] == [["db", "check"], ["db", "verify"]] and st[7][1] == "monitor", st)
+        and [s[1:3] for s in st[5:7]] == [["db", "check"], ["db", "verify"]] and st[7][1:] == ["parquet", "align"] and st[8][1] == "monitor", st)
     chk("③b 沒給 --jobs = 3 道", lakeall_steps(via, False, [])[1][-1] == "3")
+    sw = lakeall_steps(via, False, ["--start", "2020-01-01", "--end", "2024-12-31", "--align-apply"])
+    chk("③c 前後可調:--start/--end 原樣交給 ENG239 run · parquet align 帶 --apply 與起日",
+        sw[1][-4:] == ["--start", "2020-01-01", "--end", "2024-12-31"] and sw[7][1:] == ["parquet", "align", "--apply", "--start", "2020-01-01"], (sw[1], sw[7]))
     with tempfile.TemporaryDirectory() as td:
         tdp = Path(td)
         (tdp / BASE.VIA_REL).mkdir(parents=True)
@@ -253,6 +292,10 @@ def selftest() -> int:
     chk("⑦b 覆蓋算進總燈:2018 起且 7 天內新 = 0 · 2022 起又落後 500 天 = 黃 2 並點名(Codex P1)· 一張日期表都沒有 = 黃",
         rc_full == 0 and rc_late[0] == 2 and rc_late[1] == ["v_x__t"] and rc_late[2] == ["v_x__t"]
         and coverage_rc({"views": []})[0] == 2, (rc_full, rc_late))
+    wv = project_lake({"window": {"start": "2020-01-01", "end": "2024-12-31", "end_setting": "2024-12-31"}, "tables": [
+        {"view": "v_w__t", "date_col": "date", "min_date": "2020-01-02", "lag_days": 700, "lag_to_end_days": 3, "parts": 1}]})
+    chk("⑦c 收據帶視窗 → 照視窗判:2020 起 · 對迄日落後 3 天 = 綠(不拿今天比)· 投影留視窗、不留列數",
+        coverage_rc(wv)[0] == 0 and wv["window"]["start"] == "2020-01-01" and "rows" not in json.dumps(wv), wv)
     rc_p = PRIOR.selftest()
     chk("⑧ 前版 v0104 自測照過(rc 0)", rc_p == 0, rc_p)
     src = HERE.read_text(encoding="utf-8")
