@@ -19,6 +19,8 @@ r"""VDF_ENG242_ThreePeriodDistill v0105 — 薄尾(v0100–v0104 一字不動):�
      兩邊都有列卻一筆都對不上 → NO_OVERLAP(黃,不冒充 OK)。
   ④ SUMMARY.json 加 tables:逐表的 group · view · state · rows(列數)· pk · pk_conflicts · key/date 推斷 · 衝突欄名;
      只有結構與計數,不含任何資料值(資料邊界)。
+PR #754 Codex(兩筆,本檔未發布 · 未鎖,就地修):合成鍵改「長度:值」串接(值裡有 | 也不撞);補鍵候選先寫旁邊的試寫檔,
+驗過 OK 才換上,失敗不留候選結果;SUMMARY 的 tool 寫實際跑的尾版(BASE.TAG)。
 不動來源冊(FetchGroups_SSOT 是 VDF 的冊);唯讀開湖;不出網;不用 TA-Lib;不設同意閘。
 """
 from __future__ import annotations
@@ -161,6 +163,12 @@ def conflict_cols(con, rel: str, keys: list, cols: list) -> list:
     return [c for c, v in zip(others, row or ()) if v and v > 1]
 
 
+def key_expr(parts: list) -> str:
+    """多欄合成鍵:每欄寫成「長度:值」(NULL 寫 ~)再串起來 → 不同欄值組合不會撞成同一個字串(不用分隔字元)。"""
+    seg = [f"CASE WHEN {_q(x)} IS NULL THEN '~' ELSE length({_q(x)}::VARCHAR)::VARCHAR || ':' || {_q(x)}::VARCHAR END" for x in parts]
+    return "concat(" + ", ".join(seg) + ")"
+
+
 _ORIG = BASE.distill_one                            # = v0104 的 distill_one(標的鍵推斷 · NO_KEY)
 
 
@@ -182,27 +190,34 @@ def distill_one(con, rel: str, date_col, key_col, nb: dict, n: int, out_path: Pa
         if _dup_groups(con, rel, base_keys + [ext]):
             continue
         parts = [x for x in (key, ext) if x]
-        if len(parts) == 1:
-            r2 = _ORIG(con, rel, date_col, parts[0], nb, n, out_path)
-        else:
-            sub = f"(SELECT *, concat_ws('|', {', '.join(_q(x) + '::VARCHAR' for x in parts)}) AS {_KCOL} FROM {rel})"
-            r2 = _ORIG(con, sub, date_col, _KCOL, nb, n, out_path)
-            if out_path.exists():
-                tmp = out_path.with_name(out_path.name + f".{os.getpid()}.sdd_tmp")
-                con.execute(f"COPY (SELECT * EXCLUDE ({_KCOL}) FROM read_parquet('{out_path.as_posix()}') ORDER BY ALL) "
-                            f"TO '{tmp.as_posix()}' (FORMAT PARQUET, COMPRESSION ZSTD)")
-                os.replace(tmp, out_path)
-            ren = BASE._canon_cols(names, nb)
-            r2["pk"] = [ren.get(x, x) for x in parts + [date_col]]
-            r2.pop("renamed", None)
-            r2["renamed"] = {k: v for k, v in ren.items() if k != v}
-        if r2.get("state") == "OK":
-            r2["key_extended"] = ext
-            if res.get("key_inferred"):
-                r2["key_inferred"] = res["key_inferred"]
-            if d_inf:
-                r2["date_inferred"] = d_inf
-            return r2
+        probe = out_path.with_name(out_path.name + f".{os.getpid()}.ext.probe.parquet")   # 先寫旁邊,驗過才換上
+        try:
+            if len(parts) == 1:
+                r2 = _ORIG(con, rel, date_col, parts[0], nb, n, probe)
+            else:
+                sub = f"(SELECT *, {key_expr(parts)} AS {_KCOL} FROM {rel})"
+                r2 = _ORIG(con, sub, date_col, _KCOL, nb, n, probe)
+                if r2.get("state") == "OK" and probe.exists():
+                    tmp = probe.with_name(probe.name + ".sdd_tmp")
+                    con.execute(f"COPY (SELECT * EXCLUDE ({_KCOL}) FROM read_parquet('{probe.as_posix()}') ORDER BY ALL) "
+                                f"TO '{tmp.as_posix()}' (FORMAT PARQUET, COMPRESSION ZSTD)")
+                    os.replace(tmp, probe)
+                ren = BASE._canon_cols(names, nb)
+                r2["pk"] = [ren.get(x, x) for x in parts + [date_col]]
+                r2.pop("renamed", None)
+                r2["renamed"] = {k: v for k, v in ren.items() if k != v}
+            if r2.get("state") == "OK":
+                if probe.exists():
+                    os.replace(probe, out_path)
+                r2["key_extended"] = ext
+                if res.get("key_inferred"):
+                    r2["key_inferred"] = res["key_inferred"]
+                if d_inf:
+                    r2["date_inferred"] = d_inf
+                return r2
+        finally:
+            if probe.exists():
+                probe.unlink()
     res["conflict_cols"] = conflict_cols(con, rel, base_keys, cols)
     return res
 
@@ -263,7 +278,7 @@ def save(verb: str, res: dict, root: Path = None) -> Path:
         try:
             s = json.loads(p.read_text(encoding="utf-8"))
             s["tables"] = summary_tables(res.get("rows"))
-            s["tool"] = TAG
+            s["tool"] = BASE.TAG                      # 實際跑的尾版(v0106 以後換裝時是它的 TAG)
             tmp = p.with_name(p.name + f".{os.getpid()}.sdd_tmp")
             tmp.write_text(json.dumps(s, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
             os.replace(tmp, p)
@@ -336,6 +351,15 @@ def selftest() -> int:
         r2b = distill_one(con, "macro2", "date", "series", nb, 3, td / "macro2.parquet")
         chk("② 找不到能分開的欄 → 照舊 PK_CONFLICT(紅)· 點名衝突欄 value(只寫欄名)",
             r2b["state"] == "PK_CONFLICT" and r2b.get("conflict_cols") == ["value"] and "key_extended" not in r2b, r2b)
+        con.execute("CREATE TABLE pipe AS SELECT * FROM (VALUES ('2026-10-01','a|b','c',1.0),('2026-10-01','a','b|c',2.0),"
+                    "('2026-11-01','X','s1',1.0),('2026-11-01','X','s2',2.0)) t(date, series, source, value)")
+        r2c = distill_one(con, "pipe", "date", "series", nb, 3, td / "pipe.parquet")
+        n2c = con.execute(f"SELECT count(*) FROM read_parquet('{(td / 'pipe.parquet').as_posix()}')").fetchone()[0]
+        chk("② 值裡有 | 也不撞鍵:('a|b','c') 與 ('a','b|c') 各自一列 · 補 source 後 4 列全留 · 不留試寫檔",
+            r2c["state"] == "OK" and r2c["rows"] == 4 and n2c == 4 and r2c.get("key_extended") == "source"
+            and not list(td.glob("*.probe.parquet")), (r2c, n2c))
+        n2b = con.execute(f"SELECT count(*) FROM read_parquet('{(td / 'macro2.parquet').as_posix()}')").fetchone()[0]
+        chk("② 補鍵失敗時輸出檔 = 回報的那份(列數一致,不被候選結果蓋掉)", n2b == r2b["rows"], (n2b, r2b["rows"]))
         # ③ reconcile 鍵對齊
         con.execute("CREATE TABLE pa AS SELECT * FROM (VALUES ('2330.TW', TIMESTAMP '2026-11-25 00:00:00', 100.0),"
                     "('2317.TW', TIMESTAMP '2026-11-25 00:00:00', 50.0)) t(code, date, close)")
