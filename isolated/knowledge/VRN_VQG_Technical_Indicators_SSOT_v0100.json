@@ -1,0 +1,31 @@
+{
+  "schema_id": "VRN_VQG_Technical_Indicators_SSOT",
+  "version": "v0100",
+  "generated": "2026-11-26",
+  "source": "VQG Part 1 Definitions (TMP-B series)",
+  "description": "技術指標定義（RSI, MACD, KD, Bollinger, ATR, Sharpe 等）",
+  "indicators": {
+    "TMP-B01": {"name": "描述統計 SUMMARY", "formula": "mean, min, max, std(ddof=0), count", "params": "expanding"},
+    "TMP-B02": {"name": "單期報酬 RETURNS", "formula": "r_t = P_t / P_prev - 1", "params": "ADJ price"},
+    "TMP-B03": {"name": "簡單移動平均 SMA", "formula": "SMA_n = sum(P) / n", "params": "n=5,10,20,30,60,120,240"},
+    "TMP-B04": {"name": "指數移動平均 EMA", "formula": "EMA_t = α*P_t + (1-α)*EMA_prev", "params": "α=2/(n+1), SMA seed"},
+    "TMP-B05": {"name": "歷史波動 VOLATILITY", "formula": "sample_std of returns", "params": "n=5,10,20,60,120,240; ddof=1"},
+    "TMP-B06": {"name": "價格偏離標準分 ZSCORE", "formula": "(P - SMA) / std", "params": "n=20"},
+    "TMP-B07": {"name": "漲跌力道 RSI", "formula": "Wilder smoothed gains/losses", "params": "n=14"},
+    "TMP-B08": {"name": "趨勢快慢差 MACD", "formula": "DIF=EMA12-EMA26; DEA=EMA9(DIF); Hist=DIF-DEA", "params": "12/26/9"},
+    "TMP-B09": {"name": "布林通道 BOLLINGER", "formula": "mid ± k * std", "params": "n=20, k=2, ddof=1"},
+    "TMP-B10": {"name": "區間漲跌幅 ROC", "formula": "P_t / P_t-n - 1", "params": "n=20"},
+    "TMP-B11": {"name": "價格趨勢斜率 SLOPE", "formula": "linear regression slope", "params": "n=20"},
+    "TMP-B12": {"name": "距前高回落 DRAWDOWN", "formula": "P_t / max_so_far - 1", "params": "cumulative"},
+    "TMP-B13": {"name": "扣當沖量異常 VOLUME_ZSCORE", "formula": "(Q* - mean) / std", "params": "n=20"},
+    "TMP-B14": {"name": "大盤敏感度 BETA", "formula": "cov(ri, rb) / var(rb)", "params": "n=60"},
+    "TMP-B15": {"name": "區間位置 KD", "formula": "RSV then smoothed K/D", "params": "9/3/3, seed=50"},
+    "TMP-B16": {"name": "平均真實波幅 ATR", "formula": "Wilder of True Range", "params": "n=14"},
+    "TMP-B17": {"name": "風險調整表現 SHARPE", "formula": "mean(excess) / std * sqrt(252)", "params": "W=60"}
+  },
+  "notes": [
+    "與財務公式 SSOT 分開管理",
+    "參數與暖機規則依原文件保留",
+    "ready_for_part2 = false"
+  ]
+}

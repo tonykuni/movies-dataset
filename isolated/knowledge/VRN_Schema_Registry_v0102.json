@@ -1,0 +1,38 @@
+{
+  "schema_id": "VRN_Schema_Registry",
+  "version": "v0102",
+  "generated": "2026-11-26",
+  "description": "SSOT Schema Registry（優化版）— 相容性模式與註冊規則",
+  "compatibility_modes": {
+    "backward": "新版可讀舊資料；允許新增可選欄位",
+    "forward": "舊版可讀新資料；允許刪除欄位",
+    "full": "雙向相容；最嚴格",
+    "none": "不相容；需人工核准與遷移說明"
+  },
+  "default_mode": "backward",
+  "entries": [
+    {
+      "schema_id": "VRN_VCGC_VDF_IO_SSOT",
+      "version": "v0100",
+      "path": "isolated/knowledge/VRN_VCGC_VDF_IO_SSOT_v0100.json",
+      "compatibility": "backward",
+      "status": "registered",
+      "registered_at": "2026-11-26"
+    },
+    {
+      "schema_id": "VRN_DuckDB_Management_SSOT",
+      "version": "v0100",
+      "path": "isolated/knowledge/VRN_DuckDB_Management_SSOT_v0100.json",
+      "compatibility": "backward",
+      "status": "registered",
+      "registered_at": "2026-11-26"
+    }
+  ],
+  "rules": [
+    "新 SSOT 必須先註冊再使用",
+    "預設相容性為 backward",
+    "Major 變更或 none 模式需附遷移說明",
+    "規格層只引用 schema_id@version",
+    "引擎不內嵌相容性邏輯，只讀 Registry"
+  ]
+}

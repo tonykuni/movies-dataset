@@ -1,0 +1,39 @@
+{
+  "schema_id": "VRN_Management_Failures_Optimized_SSOT",
+  "version": "v0101",
+  "generated": "2026-11-26",
+  "description": "管理失敗情況 SSOT（優化版）— 解決方案外置，引擎只讀取執行",
+  "design_principle": "引擎不內建解決方案；失敗情況與修復步驟皆由 SSOT 定義，引擎依 ID 執行對應檢查與提示",
+  "failures": [
+    {"id": "F01", "check": "cross_system_import", "severity": "red", "remediation_ref": "ext:cross_import_policy"},
+    {"id": "F02", "check": "generated_modified", "severity": "red", "remediation_ref": "ext:ssot_regenerate"},
+    {"id": "F03", "check": "spec_duplicates_schema", "severity": "yellow", "remediation_ref": "ext:spec_behavior_only"},
+    {"id": "F04", "check": "accel_not_effective", "severity": "yellow", "remediation_ref": "ext:accel_ast_check"},
+    {"id": "F05", "check": "frozen_modified", "severity": "red", "remediation_ref": "ext:restore_frozen"},
+    {"id": "F06", "check": "numbering_conflict", "severity": "yellow", "remediation_ref": "ext:delay_numbering"},
+    {"id": "F07", "check": "handoff_not_transitioned", "severity": "yellow", "remediation_ref": "ext:handoff_check"},
+    {"id": "F08", "check": "sm_too_long", "severity": "yellow", "remediation_ref": "ext:line_count_body"},
+    {"id": "F09", "check": "data_path_exposed", "severity": "red", "remediation_ref": "ext:mcp_allowlist"},
+    {"id": "F10", "check": "zero_denominator", "severity": "yellow", "remediation_ref": "ext:safe_division"},
+    {"id": "F11", "check": "price_basis_mismatch", "severity": "yellow", "remediation_ref": "ext:adj_close_consistent"},
+    {"id": "F12", "check": "warmup_insufficient", "severity": "yellow", "remediation_ref": "ext:warmup_gate"},
+    {"id": "F13", "check": "cross_system_write", "severity": "yellow", "remediation_ref": "ext:own_output_only"},
+    {"id": "F14", "check": "receipt_expired", "severity": "yellow", "remediation_ref": "ext:retest_x3"},
+    {"id": "F15", "check": "ps_has_logic", "severity": "yellow", "remediation_ref": "ext:ps_thin"},
+    {"id": "F16", "check": "synonym_regex_mixed", "severity": "yellow", "remediation_ref": "ext:view_books"},
+    {"id": "F17", "check": "wrong_handoff_book", "severity": "yellow", "remediation_ref": "ext:move_to_own_book"},
+    {"id": "F18", "check": "direct_request", "severity": "red", "remediation_ref": "ext:network_tool"},
+    {"id": "F19", "check": "success_lock_conflict", "severity": "yellow", "remediation_ref": "ext:merge_both"},
+    {"id": "F20", "check": "container_as_host", "severity": "yellow", "remediation_ref": "ext:require_host_receipt"}
+  ],
+  "engine_contract": {
+    "input": "failure_id",
+    "output": "severity + remediation_ref",
+    "rule": "引擎不解釋解決方案，只回傳引用；實際修復由操作員或上層流程依 ref 執行"
+  },
+  "notes": [
+    "解決方案完全外置，避免寫死在引擎",
+    "可獨立更新 remediation 而不改引擎",
+    "測試時驗證引擎只回傳正確 ref，不內嵌邏輯"
+  ]
+}

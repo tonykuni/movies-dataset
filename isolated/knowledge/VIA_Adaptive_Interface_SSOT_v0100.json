@@ -1,0 +1,21 @@
+{
+  "schema_id": "VIA_Adaptive_Interface_SSOT",
+  "version": "v0100",
+  "generated": "2026-11-26",
+  "description": "VIA 自適應介面 SSOT — 各系統共享 SSOT 的消費方式，由 VCGC 檢查，保持獨立運作",
+  "principles": [
+    "共享契約，不共享實作",
+    "只引用 schema_id@version 與結構卡",
+    "VCGC 僅做檢查與閘門，不代跑業務",
+    "各系統可獨立升級，只要符合相容性模式",
+    "自適應：透過指紋、列數、結構卡自動對齊，無需人工重寫"
+  ],
+  "consumption_pattern": {
+    "read": "從 Registry 取得 path 與 version，載入契約",
+    "validate": "以 schema_check 或指紋比對輸出",
+    "fail": "回傳結構卡與失敗收據，不內嵌對方邏輯"
+  },
+  "vcgc_role": "檢查註冊、相容性與結構卡完整性；不執行查詢或業務計算",
+  "independent_operation": true,
+  "shared_use": true
+}
