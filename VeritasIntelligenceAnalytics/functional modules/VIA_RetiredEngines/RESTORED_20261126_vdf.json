@@ -1,0 +1,54 @@
+{
+ "schema": "VIA.retire.restore.v1",
+ "ts": "2026-11-26T10:20:57Z",
+ "why": "VDF 輸出驗證(操作員 2026-11-26「所有VDF過關輸出驗證」):VDF test 裡 ENG059 rc 1(FileNotFoundError v0103)。11-23 prune 把三個家族的前版鏈搬走,但現役尾版用 CHAIN_VERSIONS 版號元組 + '%s_v%s' 拼檔名載入,11-24 那次只掃「寫死完整檔名」所以漏掉。依 CLAUDE.md「刪舊版先證明 · 名字釘死前版的都算用到」搬回原位(git mv,內容零改);號冊 gone_since 由 CGC_MDL237 發號工具在檔重現時清掉並留 gone_history。",
+ "count": 9,
+ "proof": "搬回後自測(各連三次 rc 0):ENG059 v0105 8/8 · ENG075 v0108 7/7 · ENG075 v0107 8/8 · ENG100 v0102 5/5;VDF test:失敗 2 → 0(ENG066 另由 v0105 薄尾修自測量法)",
+ "files": [
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG059_EstimateBands_v0101.py",
+   "from": "functional modules/VIA_RetiredEngines/prune_20261123_162109/functional modules/VDF/engine/VDF_ENG059_EstimateBands_v0101.py",
+   "why": "VDF_ENG059 v0105 CHAIN_VERSIONS=('0103','0102','0101') 以 %s_v%s 拼檔名載入(直接執行 runpy v0103;自測讀前版鏈 AST)"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG059_EstimateBands_v0102.py",
+   "from": "functional modules/VIA_RetiredEngines/prune_20261123_162109/functional modules/VDF/engine/VDF_ENG059_EstimateBands_v0102.py",
+   "why": "同上(ENG059 v0105 前版鏈)"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG059_EstimateBands_v0103.py",
+   "from": "functional modules/VIA_RetiredEngines/prune_20261123_144317/functional modules/VDF/engine/VDF_ENG059_EstimateBands_v0103.py",
+   "why": "同上(ENG059 v0105 PRIOR_PATH = CHAIN[0])"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0100.py",
+   "from": "functional modules/VIA_RetiredEngines/prune_20261123_162109/functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0100.py",
+   "why": "VDF_ENG075 v0107 CHAIN_VERSIONS=('0105','0104','0103','0100')(v0108 自測另起行程跑 v0107)"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0103.py",
+   "from": "functional modules/VIA_RetiredEngines/prune_20261123_162109/functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0103.py",
+   "why": "同上(ENG075 v0107 前版鏈)"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0104.py",
+   "from": "functional modules/VIA_RetiredEngines/prune_20261123_162109/functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0104.py",
+   "why": "同上(ENG075 v0107 前版鏈)"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0105.py",
+   "from": "functional modules/VIA_RetiredEngines/prune_20261123_144317/functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0105.py",
+   "why": "同上(ENG075 v0107 PRIOR_PATH = CHAIN[0])"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG100_FinStatementQuery_v0100.py",
+   "from": "functional modules/VIA_RetiredEngines/prune_20261123_162109/functional modules/VDF/engine/VDF_ENG100_FinStatementQuery_v0100.py",
+   "why": "VDF_ENG100 v0102 CHAIN_VERSIONS=('0101','0100')"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG100_FinStatementQuery_v0101.py",
+   "from": "functional modules/VIA_RetiredEngines/prune_20261123_144317/functional modules/VDF/engine/VDF_ENG100_FinStatementQuery_v0101.py",
+   "why": "同上(ENG100 v0102 PRIOR_PATH = CHAIN[0])"
+  }
+ ]
+}
