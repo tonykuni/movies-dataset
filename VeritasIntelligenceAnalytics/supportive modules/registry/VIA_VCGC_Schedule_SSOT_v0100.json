@@ -1,0 +1,48 @@
+{
+ "schema": "VIA.VCGC.Schedule.v1",
+ "version": "v0100",
+ "owner": "VCGC",
+ "ts": "2026-11-25T18:00:00Z",
+ "policy": "VCGC 自己的排程冊(只放 VCGC 的工作;VDF 的排程在 VDF 參數正本 schedule.jobs)。可編輯:改這本出新版號;CGC_SystemManager schedule 讀尾版。",
+ "timezone": "Asia/Taipei",
+ "lanes": 3,
+ "jobs": [
+  {
+   "id": "vcgc_ssot_panorama",
+   "cron": "5 19 * * 1-5",
+   "cmd": [
+    "CGC_MDL149_VeritasCentralGovernanceConsole",
+    "ssot",
+    "panorama"
+   ],
+   "env": {
+    "VIA_FROM_VCGC": "YES"
+   },
+   "why": "每日全景(VDF 18:35 擷取 · 18:55 蒸餾之後)"
+  },
+  {
+   "id": "vcgc_vdf_master",
+   "cron": "10 19 * * 1-5",
+   "cmd": [
+    "via_params_central",
+    "vdf-master"
+   ],
+   "env": {},
+   "why": "只讀匯總 VDF 參數正本 + 跨系統同名比對(讀 VDF 自報收據)"
+  },
+  {
+   "id": "vcgc_handoff_check",
+   "cron": "15 19 * * 1-5",
+   "cmd": [
+    "CGC_MDL149_VeritasCentralGovernanceConsole",
+    "handoff",
+    "check"
+   ],
+   "env": {
+    "VIA_FROM_VCGC": "YES"
+   },
+   "why": "收工前交接完整性檢查"
+  }
+ ],
+ "why_v0100": "操作員 2026-11-25「最快排程器從 GitHub 加進來掛到 system manager · VCGC 也是一樣」:APScheduler(經 VCGC 安裝閘 3.11.3)"
+}

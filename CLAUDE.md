@@ -69,6 +69,23 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
 站表正本 `VIA_VCGC_FunctionInventory_SSOT_v*.json`;新增 / 換版任何 VCGC 指令或模組後跑 `test`(整輪,沒變的站沿用),
 新指令沒登盤點冊 = 黃;改過的尾版會自動跑它的 `--selftest`,版本與 UTC 時間只增寫進 `VIA_VCGC_FunctionLedger_v0100.jsonl`(要一起提交)。
 
+**指令一律 Python · 加速器經 AST 導入而且真的生效(操作員 2026-11-25 20:32 令 · VCGC-REQ266;待登律號,不是律;細化 L117)**
+原文:「所有指令都用 py 撰寫,注入 AST 導入加速器,強力執行」。
+- AI 交付的每個動作(檢查、登記、編號、報告、啟動)都寫成 `.py`:新檔,或既有管理器的動詞。PS / 短令只做三件事:落檔、叫一個 python 動詞、開它產的頁。對話裡的多步 shell 只是 AI 自己的操作,不算交付。
+- 每支新檔或新版號 `.py`:第 3 行 `# [VIA:ACCEL-BRIDGE:v0111]`,下接加速器橋區塊。
+- 「導入」以語法樹為準:`python3 "$E" read <檔>` 的匯入欄要有 `VIA_SuperAccel_Module`。
+- 「強力執行」= 執行時真的載到:載入後 `VIA_ACCEL is not None`。自測要有這一項;只有標記、載不到 = 假加速 = 黃。
+- 有對外擷取的引擎,另經語法樹導入鎖冊上的網路工具;沒有對外擷取的不加。
+- 交付前三檢:`ast.parse` + `compile` 過 · 自測連過三次 · 上面的載入檢查過。
+- 例外(不注橋):交接冊 `frozen_sources` 的凍結原件。#728 在兩支 VRN 凍結原件上注橋,破了凍結,LAYOUT / NLP 因此轉紅;已依裁定 ⑮ A 在 #742 還原。
+
+**同一則裁定的另兩項(架構規劃 v0101 待裁 ⑬ ⑭)**
+- ⑬ 路由:不新設 AI 路由冊。AI 要知道某系統有哪些動作,讀那個系統 SystemManager 自報的 `verbs --json`;沒有這個動詞的系統 = 灰,VCGC 不代補。
+- ⑭ VCGC MCP 加唯讀工具 `vcgc_read_card`(`CGC_MDL279_MCPServer` v0107 起,`.mcp.json` 已指到它)。
+  - 它只回省 Token `read` 的骨架卡,不回全文、不給 slice。
+  - 只收 VIA 根之下的 `.py .ps1 .psm1 .json .jsonl .md`。
+  - VIA_Reports、資料 / 研報 / 收件類夾,以及 `.parquet .duckdb .csv .pdf` 等資料檔一律拒絕:能離開本機的只有程式碼結構與 schema。
+
 ---
 
 **2026-11-16 操作員令(逐題定案;REQ 號與律號待 VCGC 登錄後補。登錄前是「待登需求」,不是律;與上文衝突時以上文與政策冊為準並回報)**
