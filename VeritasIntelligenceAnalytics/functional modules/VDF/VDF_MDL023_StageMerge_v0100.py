@@ -208,6 +208,23 @@ def choose_key(con, dst_cat: str, table: str, common: list, db_name: str = "") -
     return list(common), "整列"
 
 
+def create_like(con, table: str, target: str) -> str:
+    """照來源表的建表語句(duckdb_tables().sql:主鍵 · 唯一 · NOT NULL · 預設值)在目前庫建表,再把列搬進來;
+    語句建不起來(例如用到來源的序列 / 自訂型別)→ 退回 CREATE TABLE AS 並回 'NO_CONSTRAINTS'(照實黃)。PR #763 Codex P1。"""
+    row = con.execute("select sql from duckdb_tables() where database_name = 's' and schema_name = 'main' and table_name = ?",
+                      [table]).fetchone()
+    try:
+        if not row or not row[0]:
+            raise RuntimeError("沒有建表語句")
+        con.execute(row[0])
+        con.execute(f"insert into {target} select * from s.main.{_qi(table)}")
+        return "DDL"
+    except Exception:  # noqa: BLE001 — 退路:至少列要搬到,約束沒帶到照實標
+        con.execute(f"drop table if exists {target}")
+        con.execute(f"create table {target} as select * from s.main.{_qi(table)}")
+        return "NO_CONSTRAINTS"
+
+
 def merge_table(con, table: str, apply: bool, db_name: str = "") -> dict:
     row = {"table": table}
     s_cols = _cols(con, "s", table)
@@ -217,9 +234,9 @@ def merge_table(con, table: str, apply: bool, db_name: str = "") -> dict:
         if apply and n:
             con.execute("begin")
             try:
-                con.execute(f"create table t.main.{_qi(table)} as select * from s.main.{_qi(table)}")
+                how = create_like(con, table, f"t.main.{_qi(table)}")
                 con.execute("commit")
-                row.update(merged=n, state="CREATED")
+                row.update(merged=n, state="CREATED" if how == "DDL" else "CREATED_NO_CONSTRAINTS")
             except Exception as exc:  # noqa: BLE001
                 con.execute("rollback")
                 row.update(state="FAIL", why=str(exc)[:160])
@@ -291,8 +308,10 @@ def new_db_snapshot(s: Path, t: Path) -> dict:
     rows = {}
     try:
         con.execute(f"attach {_ql(str(s))} as s (read_only)")
+        lost = []
         for tb in _tables(con, "s"):
-            con.execute(f"create table {_qi(tb)} as select * from s.main.{_qi(tb)}")
+            if create_like(con, tb, _qi(tb)) != "DDL":
+                lost.append(tb)
             a = con.execute(f"select count(*) from s.main.{_qi(tb)}").fetchone()[0]
             b = con.execute(f"select count(*) from {_qi(tb)}").fetchone()[0]
             if a != b:
@@ -307,7 +326,10 @@ def new_db_snapshot(s: Path, t: Path) -> dict:
         return {"state": "FAIL", "why": str(exc)[:160]}
     con.close()
     os.replace(tmp, t)
-    return {"state": "COPIED", "tables_copied": len(rows), "rows_copied": sum(rows.values())}
+    out = {"state": "COPIED" if not lost else "COPIED_NO_CONSTRAINTS", "tables_copied": len(rows), "rows_copied": sum(rows.values())}
+    if lost:
+        out["why"] = "約束沒帶到:" + ",".join(lost)
+    return out
 
 
 def _merge_aliased(con, cat: str, table: str, apply: bool, db_name: str = "") -> dict:
@@ -335,7 +357,8 @@ def lamp_of(dbs: list, apply: bool, home_ok: bool) -> tuple:
     tabs = [t for d in dbs for t in d["tables"]]
     if any(t.get("state") == "FAIL" for t in tabs) or any(d.get("state") == "FAIL" for d in dbs):
         return "RED", 1
-    pending = any(t.get("state") in ("PENDING", "NEW_TABLE") for t in tabs) or any(d.get("state") == "NEW_DB" for d in dbs)
+    pending = (any(t.get("state") in ("PENDING", "NEW_TABLE", "CREATED_NO_CONSTRAINTS") for t in tabs)
+               or any(d.get("state") in ("NEW_DB", "COPIED_NO_CONSTRAINTS") for d in dbs))
     extra = any(t.get("extra_cols") for t in tabs)
     if pending or extra:
         return "YELLOW", 2
@@ -402,13 +425,13 @@ def selftest() -> int:
         c.execute("insert into tw_daily_prices values ('2018-01-02','2330.TW',1,9),('2018-01-02','2330.TW',1,9),('2026-11-20','2330.TW',2,9),('2026-11-20','2317.TW',3,9)")
         c.execute("create table us_macro(date varchar, series varchar, value double)")
         c.execute("insert into us_macro values ('2026-10-01','CPI',1)")
-        c.execute("create table only_in_stage(a int)")
+        c.execute("create table only_in_stage(a int primary key)")
         c.execute("insert into only_in_stage values (1),(2)")
         c.execute("create table tw_financial(Date varchar, Ticker varchar, Source varchar, Period_Type varchar, v double)")
         c.execute("insert into tw_financial values ('2025-12-31','2330.TW','yfinance','annual',1),('2025-12-31','2330.TW','yfinance','quarterly',2)")
         c.close()
         c = duckdb.connect(str(src / "mega" / "aaii_sentiment.duckdb"))
-        c.execute("create table aaii(date varchar, bullish double)")
+        c.execute("create table aaii(date varchar primary key, bullish double)")
         c.execute("checkpoint")
         c.execute("PRAGMA disable_checkpoint_on_shutdown")
         c.execute("set checkpoint_threshold='10GB'")
@@ -449,7 +472,13 @@ def selftest() -> int:
         q.close()
         aq = duckdb.connect(str(home / "output_hub" / "mega" / "aaii_sentiment.duckdb"), read_only=True)
         aaii_n = aq.execute("select count(*) from aaii").fetchone()[0]
+        aaii_pk = aq.execute("select count(*) from duckdb_constraints() where database_name = current_database() and table_name = 'aaii' "
+                             "and constraint_type = 'PRIMARY KEY'").fetchone()[0]
         aq.close()
+        q2 = duckdb.connect(str(home / "output_hub" / "mega" / "vdf_tw_market.duckdb"), read_only=True)
+        oi_pk = q2.execute("select count(*) from duckdb_constraints() where database_name = current_database() and table_name = 'only_in_stage' "
+                           "and constraint_type = 'PRIMARY KEY'").fetchone()[0]
+        q2.close()
         tabs = {t["table"]: t for d in plan.get("dbs", []) for t in d["tables"]}
         chk("③ 沒入口旗標 apply → RED rc 1 零寫入", rc_gate == 1)
         chk("④ plan 唯讀:價表鍵 = 目標主鍵 · 待併 2(同鍵兩列只算一列 · 目標已有的 2330@11-20 不算)· 多欄 extra_x 點名 · 總經已有 = 0 · 新表 / 新庫列待併 · 黃 rc 2",
@@ -465,6 +494,8 @@ def selftest() -> int:
         chk("⑦b 沒主鍵、冊上也沒鍵的財報表 → 整列當鍵:同日同代號的年 / 季兩列都保留(季報補進來,不被年報吃掉;Codex P1)",
             fin == [("annual",), ("quarterly",)] and tabs["tw_financial"]["key_kind"] == "整列" and tabs["tw_financial"]["new"] == 1, (fin, tabs.get("tw_financial")))
         chk("⑦c 新庫:來源只在 .wal 裡的已提交列也搬到(唯讀 ATTACH 套用 WAL,不整檔複製;Codex P1)", wal_left and aaii_n == 1, (wal_left, aaii_n))
+        chk("⑦e 新庫 / 新表照來源建表語句建:主鍵帶過來(aaii · only_in_stage;不是 CREATE TABLE AS 丟約束;Codex P1)",
+            aaii_pk == 1 and oi_pk == 1, (aaii_pk, oi_pk))
         chk("⑦d 冊上業務鍵:us_macro 用 DataPlane 冊的 date + series", tabs["us_macro"]["key_kind"] == "冊上業務鍵"
             and tabs["us_macro"]["key"] == ["date", "series"], tabs["us_macro"])
         same = pairs(home / "output_hub", home)

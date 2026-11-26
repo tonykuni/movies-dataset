@@ -113,9 +113,22 @@ def norm_args(args: list) -> list:
     return a
 
 
+def effective_home(args: list) -> str | None:
+    """用主流程同一個解析器(前版 resolve_data_home:--data-home > env > 使用者文件夾 via_database\\vdf_database)
+    先定一次資料家,⓪ 的兩步都用它(PR #763 Codex P2)。"""
+    dh = PRIOR._opt(args, "--data-home")
+    try:
+        home, _why = PRIOR.resolve_data_home(dh)
+    except Exception:  # noqa: BLE001 — 解析器不在照舊用參數
+        home = Path(dh) if dh else None
+    if home is None and dh:
+        return str(Path(dh))                        # 給了卻解析不到(不在)→ 照給的交下去,由前版 / 併入自己拒並點名
+    return str(home) if home else None
+
+
 def stage_steps(args: list) -> list:
     """⓪ 的子行程(不跑,只組):擷取家 → 暫存併入。"""
-    dh = PRIOR._opt(args, "--data-home")
+    dh = effective_home(args)
     fg, sm = _tail("VDF_MDL012_FetchGroups_v*.py"), _tail("VDF_MDL023_StageMerge_v*.py")
     steps = []
     if fg:
@@ -129,7 +142,7 @@ def stage_steps(args: list) -> list:
 def run_stage(args: list, runner=None) -> int:
     runner = runner or (lambda cmd, env: subprocess.run(cmd, env=env, cwd=str(HERE)).returncode)
     env = dict(os.environ, VIA_FROM_VDFSM="YES", PYTHONUTF8="1")
-    dh = PRIOR._opt(args, "--data-home")
+    dh = effective_home(args)
     if dh:
         env["VIA_VDF_DB_HOME"] = str(dh)               # 跟前版 run 帶給子行程的同一個資料家
     rc = 0
@@ -275,6 +288,16 @@ def selftest() -> int:
     seen = []
     rc = run_stage(["run", "--data-home", "D"], runner=lambda cmd, env: seen.append((cmd[4], env.get("VIA_FROM_VDFSM"), env.get("VIA_VDF_DB_HOME"))) or 1)
     chk("⑤ 子行程帶 VDF 入口旗標與資料家 · 併入紅 → ⓪ 紅(擷取家查不到只算黃)", rc == 1 and seen == [("home", "YES", "D"), ("apply", "YES", "D")], (rc, seen))
+    keep_res = getattr(PRIOR, "resolve_data_home", None)
+    try:
+        PRIOR.resolve_data_home = lambda arg=None, env=None: (Path("/auto/via_database/vdf_database"), "使用者文件夾")
+        st3, seen3 = stage_steps(["run"]), []
+        run_stage(["run"], runner=lambda cmd, env: seen3.append(env.get("VIA_VDF_DB_HOME")) or 0)
+    finally:
+        if keep_res is not None:
+            PRIOR.resolve_data_home = keep_res
+    chk("⑤b 沒帶參數 → 先用主流程解析器定資料家,⓪ 併入帶 --home、兩步子行程都帶同一個 VIA_VDF_DB_HOME(Codex P2)",
+        st3[1][1][-2:] == ["--home", "/auto/via_database/vdf_database"] and seen3 == ["/auto/via_database/vdf_database"] * 2, (st3, seen3))
     chk("⑥ 總燈 worse:紅留紅 · 黃不蓋紅", worse(0, 2) == 2 and worse(1, 2) == 1 and worse(2, 0) == 2)
     import tempfile
     with tempfile.TemporaryDirectory() as td:
