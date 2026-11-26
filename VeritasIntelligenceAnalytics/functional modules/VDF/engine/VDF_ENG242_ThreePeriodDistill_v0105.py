@@ -20,7 +20,8 @@ r"""VDF_ENG242_ThreePeriodDistill v0105 — 薄尾(v0100–v0104 一字不動):�
   ④ SUMMARY.json 加 tables:逐表的 group · view · state · rows(列數)· pk · pk_conflicts · key/date 推斷 · 衝突欄名;
      只有結構與計數,不含任何資料值(資料邊界)。
 PR #754 Codex(兩筆,本檔未發布 · 未鎖,就地修):合成鍵改「長度:值」串接(值裡有 | 也不撞);補鍵候選先寫旁邊的試寫檔,
-驗過 OK 才換上,失敗不留候選結果;SUMMARY 的 tool 寫實際跑的尾版(BASE.TAG)。
+驗過 OK 才換上,失敗不留候選結果;SUMMARY 的 tool 寫實際跑的尾版(BASE.TAG);對核的期間鍵能轉日期才轉,
+月份鍵(ym 202607)保留原值去分隔字元,不再變 NULL。
 不動來源冊(FetchGroups_SSOT 是 VDF 的冊);唯讀開湖;不出網;不用 TA-Lib;不設同意閘。
 """
 from __future__ import annotations
@@ -232,7 +233,9 @@ def _norm_rel(con, rel: str, pk: list) -> tuple:
         if k not in cols:
             continue
         if BASE.norm_name(k) in {BASE.norm_name(x) for x in DATE_NAMES} or cols[k].startswith(("DATE", "TIMESTAMP")):
-            rep.append(f"TRY_CAST({_q(k)} AS DATE) AS {_q(k)}")
+            d = f"TRY_CAST({_q(k)} AS DATE)"                 # 能轉日期 → YYYY-MM-DD;不能(例 ym 202607)→ 原值去分隔字元,不變 NULL
+            rep.append(f"CASE WHEN {d} IS NOT NULL THEN strftime({d}, '%Y-%m-%d') "
+                       f"ELSE regexp_replace(trim(CAST({_q(k)} AS VARCHAR)), '[^0-9A-Za-z]', '', 'g') END AS {_q(k)}")
         else:
             rep.append(f"regexp_replace(upper(trim(CAST({_q(k)} AS VARCHAR))), '\\.(TWO|TW)$', '') AS {_q(k)}")
     sub = f"(SELECT * REPLACE ({', '.join(rep)}) FROM {rel})" if rep else rel
@@ -372,6 +375,11 @@ def selftest() -> int:
         r3 = reconcile_pair(con, "pa", "pb", ["code", "date"], 0.001, td / "rec.parquet")
         chk("③ 重現桌機:v0100 代號帶 .TW / 日期型別不同 → compared 0;本版對齊後 compared 2 · mismatch 1",
             r0.get("compared") == 0 and r3["state"] == "OK" and r3["compared"] == 2 and r3["mismatch"] == 1 and r3.get("key_normalized"), (r0, r3))
+        con.execute("CREATE TABLE ma AS SELECT * FROM (VALUES ('2330','202607',10.0),('2330','202608',11.0)) t(code, ym, revenue)")
+        con.execute("CREATE TABLE mb AS SELECT * FROM (VALUES ('2330','2026-07',10.0),('2330','202608',12.0)) t(code, ym, revenue)")
+        r3m = reconcile_pair(con, "ma", "mb", ["code", "ym"], 0.001, td / "recm.parquet")
+        chk("③ 月份鍵 ym(202607 / 2026-07)不被轉成 NULL:兩列都對上 · compared 2 · mismatch 1(不報 NO_OVERLAP)",
+            r3m["state"] == "OK" and r3m["compared"] == 2 and r3m["mismatch"] == 1, r3m)
         con.execute("CREATE TABLE pc AS SELECT * FROM (VALUES ('9999', DATE '2020-01-01', 1.0)) t(code, date, close)")
         r3b = reconcile_pair(con, "pa", "pc", ["code", "date"], 0.001, td / "rec2.parquet")
         chk("③ 兩邊都有列卻一筆對不上 → NO_OVERLAP(不冒充 OK)", r3b["state"] == "NO_OVERLAP" and r3b["a_rows"] == 2, r3b)
