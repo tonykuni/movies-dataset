@@ -11,7 +11,8 @@ r"""VDF_MDL022_SafeParallelLaunch v0113 — 薄尾(v0100–v0112 一字不動):�
   ① start 記開跑時間;跑完看 VDF_Launch_latest.json 是不是這一輪寫的(檔時間 ≥ 開跑):
      不是(中斷 / 子行程沒寫完)→ 先印黃框「本輪沒有跑完」+ 本輪各流程停在哪(完成 / 跑中 / 未開始 · 秒),
      再印上一輪矩陣並標明時間;中斷回 rc 130。
-  ② 預估剩餘:用上一輪每支流程的實測秒數(VDF_Launch_latest.json)算「還沒完成的流程合計 − 本輪已耗超出的部分」;
+  ② 預估剩餘:用上一輪每支流程的實測秒數(VDF_Launch_latest.json)。輪詢時記每支流程第一次「跑中」的時間,
+     跑中的剩 = 上一輪秒數 − 本輪已跑;剩餘 ≈ max(跑中最久還剩的那支, 全部剩餘工作 ÷ 同時在跑的道數)(並行不重算)。
      沒有上一輪就照 v0111 的估法。
   ③ summary:紅 / 黃流程,從它自己的日誌抓前 3 條錯誤行(Traceback · Error · RED · FAIL · rc≠0 · 失敗 · 錯)直接列出,
      不用再自己開日誌找。只在本機印,不寫檔、不送出。
@@ -112,32 +113,49 @@ def last_durations(rep: dict | None) -> dict:
     return out
 
 
-def eta_from_history(j: dict | None, hist: dict) -> float | None:
-    """還沒完成的流程 · 上一輪秒數合計 − 本輪已耗超出已完成流程的部分(不小於 0)。沒有歷史 → None(照 v0111)。"""
+def mark_started(j: dict | None, started: dict, now: float) -> dict:
+    """輪詢時第一次看到某流程變「跑中」就記下時間(進度檔本身沒有每支的開跑時間)。"""
+    for k, v in ((j or {}).get("jobs") or {}).items():
+        if v.get("state") == "RUN" and k not in started:
+            started[k] = now
+    return started
+
+
+def eta_from_history(j: dict | None, hist: dict, started: dict | None = None, now: float | None = None) -> float | None:
+    """並行下的剩餘時間(PR #767 Codex P2):
+    跑中的每一支 剩 = max(0, 上一輪秒數 − 本輪已跑);還沒開始的照上一輪秒數;
+    剩餘 ≈ max(跑中最久還剩的那支, 全部剩餘工作 ÷ 同時在跑的道數)。缺歷史 → None(照 v0111)。"""
     jobs = (j or {}).get("jobs") or {}
     if not jobs or not hist:
         return None
-    done_k = [k for k, v in jobs.items() if v.get("state") in ("DONE", "FAILED", "SKIP")]
-    left_k = [k for k in jobs if k not in done_k]
-    if any(k not in hist for k in left_k):
+    now = time.time() if now is None else now
+    started = started or {}
+    run_k = [k for k, v in jobs.items() if v.get("state") == "RUN"]
+    wait_k = [k for k, v in jobs.items() if v.get("state") not in ("DONE", "FAILED", "SKIP", "RUN")]
+    if any(k not in hist for k in run_k + wait_k):
         return None
-    spent_on_left = max(0.0, float(j.get("elapsed_s") or 0) - sum(float(jobs[k].get("sec") or hist.get(k, 0)) for k in done_k))
-    return max(0.0, sum(hist[k] for k in left_k) - spent_on_left)
+    rem_run = [max(0.0, hist[k] - (now - started.get(k, now))) for k in run_k]
+    work = sum(rem_run) + sum(hist[k] for k in wait_k)
+    lanes = max(1, len(run_k))
+    return max(max(rem_run, default=0.0), work / lanes)
 
 
-def view(j: dict | None, hist: dict) -> dict | None:
+def view(j: dict | None, hist: dict, started: dict | None = None) -> dict | None:
     if not j:
         return j
-    e = eta_from_history(j, hist)
+    now = time.time()
+    if started is not None:
+        mark_started(j, started, now)
+    e = eta_from_history(j, hist, started, now)
     return dict(j, eta_s=round(e, 1)) if e is not None else j
 
 
 def _render_ansi(proc, path: Path, poll: float, out, hist: dict) -> None:
-    f = 0
+    f, started = 0, {}
     out.write("\x1b[?25l")
     try:
         while proc.poll() is None:
-            out.write(PRIOR.bar_line(view(PRIOR._read(path), hist), f))
+            out.write(PRIOR.bar_line(view(PRIOR._read(path), hist, started), f))
             out.flush()
             f += 1
             time.sleep(poll)
@@ -155,8 +173,9 @@ def _render_rich(proc, path: Path, poll: float, hist: dict) -> bool:
     with Progress(SpinnerColumn(), TextColumn("[bold]{task.description}"), BarColumn(), TextColumn("{task.percentage:>5.1f}%"),
                   TimeElapsedColumn(), TextColumn("ETA {task.fields[eta]}")) as bar:
         t = bar.add_task("VDF 啟動", total=100, eta="--:--")
+        started = {}
         while proc.poll() is None:
-            j = view(PRIOR._read(path), hist)
+            j = view(PRIOR._read(path), hist, started)
             if j:
                 bar.update(t, completed=float(j.get("pct") or 0), eta=PRIOR._mmss(j.get("eta_s")),
                            description=f"VDF {j.get('done', 0)}/{j.get('total', 0)} · {j.get('current') or ''}"[:80])
@@ -292,11 +311,16 @@ def selftest() -> int:
 
     chk("加速器載入(VIA_ACCEL is not None)", VIA_ACCEL is not None)
     chk("網路工具載入(_via_net() is not None · 載入不出網)", _via_net() is not None, VIA_NET_TOOL_PATH)
-    hist = last_durations({"run": {"jobs": [{"id": "gate", "sec": 12}, {"id": "fetch", "sec": 300}, {"id": "sync", "sec": 200}]}})
-    j = {"elapsed_s": 112, "jobs": {"gate": {"state": "DONE", "sec": 12}, "fetch": {"state": "RUN"}, "sync": {"state": "WAIT"}}}
-    e = eta_from_history(j, hist)
-    chk("① 預估剩餘用上一輪實測:gate 完 · fetch 已跑 100 秒 → 剩 300+200−100 = 400 秒;缺歷史 → None(照 v0111)",
-        e == 400 and eta_from_history({"elapsed_s": 5, "jobs": {"new": {"state": "RUN"}}}, hist) is None, e)
+    hist = last_durations({"run": {"jobs": [{"id": "gate", "sec": 12}, {"id": "fetch", "sec": 300}, {"id": "sync", "sec": 200},
+                                            {"id": "a", "sec": 100}, {"id": "b", "sec": 100}, {"id": "c", "sec": 150}]}})
+    j = {"jobs": {"gate": {"state": "DONE", "sec": 12}, "fetch": {"state": "RUN"}, "sync": {"state": "WAIT"}}}
+    e = eta_from_history(j, hist, {"fetch": 1000.0}, 1100.0)
+    jc = {"jobs": {"a": {"state": "DONE", "sec": 100}, "b": {"state": "DONE", "sec": 100}, "c": {"state": "RUN"}}}
+    ec = eta_from_history(jc, hist, {"c": 0.0}, 100.0)
+    st = mark_started({"jobs": {"x": {"state": "RUN"}, "y": {"state": "WAIT"}}}, {}, 5.0)
+    chk("① 剩餘時間(並行):fetch 已跑 100 秒 → max(200, (200+200)/1) = 400;Codex 例 a b c 同時開跑、a b 100 秒完、c 上輪 150 → 剩 50;"
+        "第一次看到跑中才記開跑時間;缺歷史 → None",
+        e == 400 and ec == 50 and st == {"x": 5.0} and eta_from_history({"jobs": {"new": {"state": "RUN"}}}, hist) is None, (e, ec, st))
     with tempfile.TemporaryDirectory() as td:
         td = Path(td)
         prog, latest = td / "P.json", td / "L.json"
