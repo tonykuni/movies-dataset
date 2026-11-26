@@ -138,9 +138,9 @@
  "status_rule": "COVERED = 有正主執行(律 / 引擎 / 工作流步);RECORDED = 常設令已入冊有代碼,由 AI 程序遵守;PARTIAL / MISSING = 附 next 與 hand(誰的手)",
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
-  "RECORDED": 28,
+  "RECORDED": 31,
   "COVERED": 141,
-  "PARTIAL": 179,
+  "PARTIAL": 180,
   "MISSING": 1
  },
  "requirements": [
@@ -8973,6 +8973,76 @@
    "registered_at": "2026-11-26T06:11:06Z"
   },
   {
+   "code": "VCGC-REQ262",
+   "subsystem": "VCGC",
+   "topic": "系統架構與工程規範補充條文七節(系統邊界 · SDD/AST 節點手術 · PS/PY 分工與 100% 覆蓋 · VCGC 全景巡檢與環境衝突 · 工具去重清理 · 省 Token 與 Graphify · 每日復盤重工歸因)寫入 CLAUDE.md",
+   "requirement": "操作員 2026-11-25 11:34 原文:「補充不足 優化 部丟失品質前提下優先使用vcgc token saving tools」,附件全文照錄:\n## 系統架構與工程規範補充條文（Architecture & Engineering Addenda）\n\n### 1. 系統邊界與 SSOT 隔離原則（System Isolation & SSOT）\n* **完全獨立運作**：所有子系統（VDF、VRN、VAP、VQG、VPNS 等）採完全獨立架構，彼此互不依賴、耦合度降至最低，確保單一系統變更對其他子系統影響趨近於零。\n* **唯一共享規範**：各系統間僅共享 **SSOT（單一事實來源）** 與 **標準 Regex 定義**（如台股四碼非零開頭代碼、Bloomberg `TT` 後綴、動態滾動參數規範等）。\n* **功能檔案名稱為主（Functional Filename as SSOT）**：所有模組與程式碼同步均以功能檔案名稱為最高準則。\n\n---\n\n### 2. SDD 開發模式與 AST 精準手術（Spec-Driven Development & AST Surgery）\n* **SDD 規範驅動開發**：所有新功能或重構皆須先確立規格（Spec），再執行實作與測試。\n* **模組化與 AST 節點級修改**：\n  * Python 腳本必須高度模組化。\n  * 修改程式碼時，嚴禁整份覆寫；須透過 **AST 精準定位目標節點（函數／類別）→ 取出重整修正 → 放回原位 → 執行單元與整合測試驗證無誤**。\n\n---\n\n### 3. 腳本分工與全覆蓋率硬性指標（PS1 vs. PY & 100% Coverage）\n* **PowerShell（`.ps1`）極簡化**：PS1 腳本僅負責「環境啟動與短指令觸發」，嚴禁在 `.ps1` 中撰寫複雜商業邏輯；僅保留核心短指令（如系統啟動、備份、讀取備份）。\n* **Python（`.py`）核心化**：所有複雜運算、流程控制與自動化動作一律轉寫為 `.py` 模組，便於維護與 AST 追蹤。\n* **100% 元件覆蓋率**：\n  1. **計算加速器（Accelerator）覆蓋率 100%**：所有 `.py` 檔案皆須強制導入最新計算加速器（如 Polars、DuckDB、Numba、NumExpr、Orjson 等），並透過 AST 掃描確認覆蓋到每一個執行動作。\n  2. **網路工具（Network Tool）覆蓋率 100%**：所有具備外部資料擷取（爬蟲、API 請求）功能的 `.py` 檔案，皆須 100% 掛載標準網路請求與容錯工具。\n\n---\n\n### 4. VCGC 全景控制與環境衝突偵測引擎（VCGC Governance & Conflict Engine）\n* **持續演化與低干擾**：VCGC（理｜Veritas Central Governance）將持續擴充能力，專注於「跨系統無干擾開發」與「極致節省 Token 消耗」。\n* **每日首末全景巡檢（Daily Panoramic Health Check）**：\n  * 每天系統啟動的**第一個動作**與結束前的**最後一個動作**，必須由 VCGC 環境控制引擎執行全景式巡檢，驗證所有系統、子系統、Library 與短指令是否處於健康可運作狀態，避免發生「未掛載加速器卻誤以為已加速」的假性執行。\n* **8 套件衝突偵測與三鏡像引擎**：\n  * 結合 **8 個核心相依性偵測套件** 與 **三源鏡像（阿里雲 Aliyun、清華 TUNA、官方 PyPI）** 組成環境衝突檢查引擎。\n* **衝突隔離與自動重建機制**：\n  1. 優先掃描現有 `base` 環境及所有 `VIA` 開頭的虛擬環境。\n  2. **零容忍重建**：一旦偵測到依賴衝突，立即萃取「衝突因子」，將整個受損環境銷毀重建，並把衝突因子轉列為「新增隔離因子」，確保重建後的環境 100% 無衝突並進行二次驗證。\n  3. **獨立環境隔離政策**：凡具備「中高衝突風險」或極難編譯安裝的特殊套件（如 `ripple` 等特定底層依賴），一律強制建立**專屬獨立虛擬環境**隔離安裝，嚴禁混入主環境。\n  4. **多版本共存白名單**：允許核心基礎科學計算套件（如 `numpy`）及 Python 直譯器（3.10–3.13）以多版本形式並存，以適配不同隔離環境的需求。\n\n---\n\n### 5. 工具鏈去重、版控與空間清理（Deduplication & Lifecycle Hygiene）\n* **NLP / Layout / 加速器 / 網路工具汰弱留強**：定期盤點現有工具箱，針對功能重疊或版本雜亂的套件進行驗證；一旦確認「最強／最穩定版本」運作無誤，立即清理並刪除舊版與冗餘工具以釋放空間。\n* **嚴格版本控管**：保持專案目錄結構整潔，嚴禁散落未納管之測試腳本或備份殘檔。\n\n---\n\n### 6. Token 節省協議與全景讀取（Token Optimization & Graphify Protocol）\n* **VCGC 優先讀取原則**：所有檔案讀取、備份檢索、GitHub 倉庫掃描及外部 AI 知識讀取，必須優先調用 **VCGC 節省 Token 工具** 與 **全景式讀取工具**，最大限度壓低 Context Token 消耗。\n* **Graphify 知識圖譜連動**：每次執行完整備份時，須同步更新 **Graphify** 結構圖譜；協作時優先讀取 Graphify 摘要，讓其他 AI 代理能以最低 Token 成本快速掌握全專案脈絡。\n* **工具缺口回報機制**：若現有 VCGC 動詞／工具不足以完成特定低 Token 讀取或操作任務，**必須主動向使用者回報缺口**，隨後再採用通用標準方法（如標準 AST/腳本擴充）完成任務。\n\n---\n\n### 7. 每日復盤與重工歸因（Daily Lesson Learned & Rework Audit）\n* **每日復盤報告**：每天開發作業啟動或總結時，必須明確列出**前一日的 Lesson Learned（經驗教訓）**。\n* **重工（Rework）根因分析**：凡前一日發生重複修改、環境報錯或退回重做之項目，必須逐一剖析「發生原因」與「防呆對策」，並寫入每日紀錄以避免重蹈覆轍。",
+   "status": "RECORDED",
+   "homes": [
+    "CLAUDE.md",
+    "docs/VIA_Environment_EightHub_Policy_v0101.md"
+   ],
+   "modules": [],
+   "evidence": "只登錄;CLAUDE.md 新段 VIA:CLAUDE-ADDENDA-20261125(七節只寫本檔原本沒有的部分,已有的指出段落)· 待裁定 2 加部分裁定(第 5 節:三條都過才實體刪除)· 新增待裁定 7(運算庫強制導入 vs 加速器橋)與 8(AI 自行銷毀環境 vs 授權界線)。讀檔走 token 卡 / tools / verbs / read / NLP --brief。",
+   "next": "操作員裁定待裁定 7 · 8;確認原文「ripple」實際套件名;VPNS 要不要登席位",
+   "hand": "操作員(裁定)",
+   "why_homes": "常設令,由 AI 程序遵守;八路與三鏡像的正主是環境安裝規範(REQ258)",
+   "ts": "2026-11-25T03:50:00Z",
+   "updated_at": "2026-11-25T03:50:00Z"
+  },
+  {
+   "code": "VCGC-REQ263",
+   "subsystem": "VCGC",
+   "topic": "跨 AI 接手必讀(ChatGPT · Codex 讀的 AGENTS.md)與 CLAUDE.md 同步:精簡版 · 以 CLAUDE.md 與政策冊為準",
+   "requirement": "操作員 2026-11-25 11:53 原文:「ChatGPT.md」(接在「advise new CLAUDE.md」之後)。ChatGPT Codex 與多數代理讀倉根 AGENTS.md,不讀 ChatGPT.md;另立一份 = 同一功能多份,所以更新既有 AGENTS.md(停在 2026-11-07 的四系統說法)為 CLAUDE.md 的跨 AI 精簡版,舊 AGENTS.md 八條全部保留,並加「不能跑指令時(ChatGPT 網頁版)」一節。",
+   "status": "RECORDED",
+   "homes": [
+    "CLAUDE.md"
+   ],
+   "modules": [],
+   "evidence": "AGENTS.md 58 行:系統身分 · 接手順序 · 省 Token 讀檔 · 改程式 · 編號推送 · 環境安全資料邊界 · 收尾 · 不能跑指令時;舊版八條逐條對過都在。",
+   "next": "操作員確認要不要另外一份 ChatGPT.md(預設不另立,ChatGPT Projects 可直接貼 AGENTS.md)",
+   "hand": "操作員(確認)",
+   "why_homes": "常設令,由 AI 程序遵守;正本仍是 CLAUDE.md 與政策冊",
+   "ts": "2026-11-25T04:05:00Z",
+   "updated_at": "2026-11-25T04:05:00Z"
+  },
+  {
+   "code": "VCGC-REQ265",
+   "subsystem": "VCGC",
+   "topic": "從頭規劃 VCGC / VDF SystemManager / VRN SystemManager 的獨立系統架構(SDD 規劃稿)· 現有功能重組對照 · AI 優先選 VCGC 動作寫入 CLAUDE.md",
+   "requirement": "操作員 2026-11-25 17:53 原文:「系統亂掉了 根據現在CLAUDE.md SDD規範從頭規劃VCGC / VDF SYSTEM MANAGER / VRN SYSTEM MANAGER的架構 先忽略現在有甚麼功能  然後善用VCGC讀取所有相關聯的檔案分類整合補上新架構的功能  還有空的再補  獨立系統架構 不可用TA-LIB 用PY寫指令包含短指令等全部按照既有CLAUDE.md   接下來所有動作ai都要優先選擇vcgc的動作去完成寫入CLAUDE.md 先寫規劃 再享目前功能如何模塊化重組 來完成vcgc」;附件:Phase 1–3 全景盤點與遷移提示(N-2 留存)· VCGC 工具說明書 v0102 · Graphify Phase0 v0102 · 11-22 VCGC 清點。18:01 再附同一份提示。",
+   "status": "RECORDED",
+   "homes": [
+    "CLAUDE.md",
+    "docs/VIA_SystemArchitecture_SDD_v0100.md"
+   ],
+   "modules": [],
+   "evidence": "規劃稿 docs/VIA_SystemArchitecture_SDD_v0100.md:現況數字 · 十條原則 · 五系統六層 · SystemManager 標準契約(A–F 群動詞 · rc · 收據)· VCGC 九服務群 · VDF / VRN 服務群 · 三條系統間介面 · 本體合併 · P0–P6 階段與驗收 · 25 群 / VDF / VRN 動詞對照 · 12 項缺口 · 附件提示逐項核對。CLAUDE.md 新段 VIA:CLAUDE-VCGC-FIRST-20261125 + 待裁定 9 · 10;AGENTS.md §1.5。全程 VCGC 工具:token · delta · read · slice · chain · 管理器 help。",
+   "next": "操作員核准規劃稿(含待裁定 9–12)→ P0 基線 → VCGC 第一批(CGC_SystemManager 補標準動詞 · 轉接表 · conform --contract)",
+   "hand": "操作員(核准)",
+   "why_homes": "規劃稿是本需求的正本;CLAUDE.md / AGENTS.md 是給 AI 的常設令",
+   "ts": "2026-11-25T10:20:00Z",
+   "updated_at": "2026-11-25T10:20:00Z"
+  },
+  {
+   "code": "VDF-REQ054",
+   "subsystem": "VDF",
+   "topic": "VDF 檔案最少化與指令模塊化:VCGC 省 Token 工具全檢 · 封存批與舊啟動器以搬代刪 · 133 家族對位 12 目標模組 · 舊短指令對照",
+   "requirement": "操作員 2026-11-25 19:39 原文:「用vcgc節省token工具檢視所有vdf檔案審視檔案最少  指令模塊化  數量最小化進行整合」",
+   "status": "PARTIAL",
+   "homes": [
+    "docs/vdf/VDF_Integration_Report_v0100.md",
+    "functional modules/VDF/registry/VDF_IntegrationMap_v0100.json"
+   ],
+   "modules": [],
+   "evidence": "VDF 夾已追蹤檔 1389 → 982:批 A 397(_integration_* 封裝 · nostall 啟動器 · 根目錄 v0113/v0114 舊 .ps1)→ VIA_RetiredEngines/prune_20261125_120933;批 D 11(Invoke-VDF-Activate v0100–0105 · Start-VIA-VDF v0101–0104 · VDF_Consolidator)→ prune_20261125_123256。三條件:沒人載入 · VDF 管理器 40 動詞基準 / 拿掉後 rc 全同 · 成功鎖定帳 0 列;VCGC prune_apply 搬前搬後不變差。批 B 26(VDF 冊仍登記)與批 C 19(全在 RESTORED_20261124 搬回清單)不動。",
+   "next": "VDF 出新版 FunctionMatrix / Param_Registry / FetchSystem_SSOT 再退批 B;VCGC 退役閘補讀 RESTORED 清單;VDF 管理器補 run <引擎> · verbs --json;本體合併從 MDL013 / MDL008 / MDL012 起;舊 via-*.cmd 改道等待裁定 10;主機實跑",
+   "hand": "AI(VDF)· 操作員(裁定 10 · 主機實跑)",
+   "ts": "2026-11-25T12:45:00Z",
+   "updated_at": "2026-11-25T12:45:00Z"
+  },
+  {
    "code": "VDF-REQ062",
    "subsystem": "VDF",
    "topic": "桌機 lake 後 distill / reconcile RED 的三個成因:日期欄推斷 · 主鍵衝突補第三鍵 · reconcile 鍵對齊 · 收據逐表(ENG242 v0105)",
@@ -9096,7 +9166,7 @@
    "reason": "提問;本批答覆:不用外部庫(純 CSS + 頁內小段 JS,離線 · 不裝套件);清單裡 Textual 是終端機 UI、Faiss / scikit-learn 是機器學習、Layout-Parser 是文件影像版面分析,都不是 HTML 排版庫;真要拖放式儀表板再評估 Gridstack.js(MIT,需經 VCGC 工具啟用 + 操作員許可)"
   }
  ],
- "prior": "VIA_Requirements_SSOT_v0327.json",
+ "prior": "VIA_Requirements_SSOT_v0329.json",
  "why_v0104": "側線 i:操作員三則令(全部檢測 · SSOT 六族強化 · 全景上下單向;函式庫建議;盤點缺漏 · 省 Token 再升級 · AI 必用功能)入冊 VCGC-REQ077–083;舊 102 條一字不動",
  "why_v0105": "Codex #377 P1:v0104 已由 PR #376 併入 main,不得就地改;收尾追加的 VCGC-REQ078 範圍令(原話「註冊編號SSOT化更新全部SYNC ALL TO GITHUB」「既有範圍內註冊 不要擴張範圍」· 需求句補「只登本批範圍」· 證據改記範圍外列掛交接待辦)與 reviewed 144 → 149 改以本新版號發布;v0104 與其餘 108 條一字不動",
  "why_v0106": "側線 2026-09-30 a:操作員令重整編號 · 註冊 · SSOT 治理架構與風險 → VCGC-REQ084(PARTIAL:防線落地,對帳與對照表待辦);舊 109 條一字不動",
@@ -9450,5 +9520,7 @@
  "why_v0325": "登 VDF-REQ059(PR #749 CI 修正);前版一字不動",
  "why_v0326": "登 VCGC-REQ274 · VDF-REQ060;前版一字不動",
  "why_v0327": "登 VDF-REQ061(PR #749 Codex 二輪);前版一字不動",
- "why_v0330": "登 VDF-REQ062。版號跳過開著的 PR #743 已用的 v0328 / v0329(避撞號);#743 的列不帶過來(各 PR 只登自己的號,ReworkGuard R2)。兩邊誰後合,後合的那支要在合併 main 後把自己的列疊到當時尾版之上再出一版。"
+ "why_v0330": "登 VDF-REQ062。#743(含 #739)合併後 main 尾版是 v0329 → 本版 = v0329 全文 + VDF-REQ062 一列,只增不減(本檔未發布,就地重疊)。",
+ "why_v0328": "PR #749 合併後 main 的需求冊尾版是 v0327,本 PR 的 v0314(登 VCGC-REQ262 · 263 · 265)落在尾版底下、讀尾版的工具看不到 → 本版 = v0327 全文 + 那三列(逐字照抄 v0314),只增不減;tally 照新增列的狀態加。",
+ "why_v0329": "本 PR 的 v0315(登 VDF-REQ054)落在 main 尾版 v0327 / #739 疊上的 v0328 底下 → 本版 = v0328 全文 + VDF-REQ054 一列(逐字照抄 v0315),只增不減;tally 照新增列的狀態加。"
 }
