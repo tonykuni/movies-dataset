@@ -277,7 +277,7 @@ def selftest() -> int:
         cfg = jobs(v)
         chk("排程工作取自 VDF 正本(可編輯可管理)", cfg["master"] == "VDF_ParamControl_SSOT_v0105.json" and cfg["jobs"][0]["id"] == "probe" and cfg["lanes"] == 3)
         rc = run_job(cfg["jobs"][0], v, v / "LEDGER.jsonl", py=sys.executable)
-        chk("run:工作立刻跑一次 · 帶 VDF 入口標記 · 參數照傳 · 寫運作帳", rc == 0 and (v / "hit.txt").read_text() == f"{STEM}_{VERSION} --x"
+        chk("run:工作立刻跑一次 · 帶 VDF 入口標記 · 參數照傳 · 寫運作帳", rc == 0 and (v / "hit.txt").read_text(encoding="utf-8-sig") == f"{STEM}_{VERSION} --x"
             and json.loads((v / "LEDGER.jsonl").read_text(encoding="utf-8").splitlines()[-1])["job"] == "probe")
         chk("找不到尾版 = rc 127(照實記)", run_job({"id": "x", "cmd": ["VDF_NOPE"]}, v, v / "LEDGER.jsonl") == 127)
         keep = os.environ.get("VIA_FROM_VCGC")
