@@ -9,7 +9,7 @@ r"""VDF_ENG074_FredMacroSSOT v0108 — 薄尾(v0100–v0107 一字不動):退役
   · run 前把冊上的 fred_id 從序列清單拿掉(零請求),印「[退役] N 條」;
   · run 跑完(閘開才會跑到)把這些序列在序列冊記 RETIRED(不再是 PARKED → status 紅冊不再列它們);
   · 新動詞 retired:列退役冊(唯讀)。
-要恢復:出退役冊新版把 id 拿掉。母冊 VIA_VDF_SSOT_b360(intake)不動;本體走法同 v0106 _impl(含 v0104 換上的 CGC_MDL224 掃描閘)。
+要恢復:出退役冊新版把 id 拿掉。母冊 VIA_VDF_SSOT_b360(intake)不動;本體走法同 v0106 _impl(含 v0104 換上的 VCGC 掃描閘(MDL224))。
 自測零網路(假本體);不設同意閘;不用 TA-Lib。
 """
 from __future__ import annotations
@@ -89,7 +89,7 @@ def __getattr__(name):  # 尾版律 TAILAPI:前版公開名稱經本檔轉接
 
 
 def body_module(impl=None):
-    """本體:先走 v0106 _impl(含 v0104 換上的 CGC_MDL224 掃描閘);那條路載不起來(例如拿掉 VCGC 的副本)→ 退路:
+    """本體:先走 v0106 _impl(含 v0104 換上的 VCGC 掃描閘(MDL224));那條路載不起來(例如拿掉 VCGC 的副本)→ 退路:
     直接載本家族最新的本體檔(有 load_series · ssot_path 的那一版),用本體自己的閘(同判法:兩道都要 YES,沒同意照樣關)。"""
     try:
         return (impl or PRIOR._impl)(), "v0106 _impl"
@@ -210,7 +210,7 @@ def selftest() -> int:
     except Exception as exc:  # noqa: BLE001
         chk("⑧ 走得到本體", False, f"{type(exc).__name__}: {exc}")
     def boom():
-        raise ImportError("CGC_MDL224 不在")
+        raise ImportError("VCGC 掃描閘不在")
     fb, how = body_module(boom)
     chk("⑧b 跨系統退路:_impl 載不起來(拿掉 VCGC)→ 改載本體、用本體自己的閘(沒同意 = 關)",
         how.startswith("退路") and callable(getattr(fb, "load_series", None)) and fb.gate_open({}) is False, how)
