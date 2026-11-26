@@ -1,0 +1,39 @@
+{
+  "schema_id": "VRN_Accounting_Regex_Validation_SSOT",
+  "version": "v0100",
+  "source": "InvestmentRegexPattern_VALIDATED.py v3.0",
+  "integrated": "2026-11-26",
+  "description": "Full integration of accounting accounts, regex patterns, and verification methods (加減法 + 除法) without omission",
+  "validation_methods": {
+    "ADD_SUBTRACT": {
+      "BS_EQUATION": "total_assets == total_liabilities_equity (tolerance 0.1%)",
+      "CURRENT_ASSETS_SUM": "sum(cash + AR + inventory + ...) ≈ total_current_assets",
+      "GROSS_PROFIT": "revenue - cost_of_sales ≈ gross_profit",
+      "OPERATING_INCOME": "gross_profit - total_operating_expenses ≈ operating_income",
+      "CASH_FLOW_SUM": "operating_cf + investing_cf + financing_cf ≈ net_change_in_cash",
+      "EQUITY_ROLLFORWARD": "equity_end ≈ equity_begin + net_income - dividend"
+    },
+    "DIVISION": {
+      "GROSS_MARGIN": "(revenue - cogs) / revenue",
+      "OPERATING_MARGIN": "operating_income / revenue",
+      "NET_MARGIN": "net_income / revenue",
+      "ROE": "net_income / equity",
+      "ROA": "net_income / total_assets",
+      "CURRENT_RATIO": "current_assets / current_liabilities",
+      "DEBT_RATIO": "total_liabilities / total_assets"
+    }
+  },
+  "pattern_sections": [
+    "BALANCE_SHEET_PATTERNS",
+    "INCOME_STATEMENT_PATTERNS",
+    "CASH_FLOW_PATTERNS",
+    "EQUITY_CHANGE_PATTERNS",
+    "RATIO_PATTERNS",
+    "PER_SHARE_PATTERNS"
+  ],
+  "notes": [
+    "Patterns cover BS / IS / CF / Equity / Ratios / Per-share",
+    "Validation includes balance equation, roll-forward, margin and ratio checks",
+    "Ready for SSOT alignment with existing VRN knowledge files"
+  ]
+}

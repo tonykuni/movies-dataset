@@ -1,0 +1,56 @@
+{
+  "schema_id": "VRN_Master_SSOT_Registry_Engine",
+  "version": "v0100",
+  "generated": "2026-11-26",
+  "description": "全面整合註冊管理引擎 — 分類、去重、版本與狀態追蹤",
+  "governance": {
+    "append_only": true,
+    "no_silent_overwrite": true,
+    "version_required": true,
+    "status_tracking": ["draft", "reviewed", "approved", "deprecated"]
+  },
+  "categories": {
+    "01_accounting_formulas": {
+      "name": "會計科目與公式",
+      "files": [
+        "VRN_Financial_Accounts_Formulas_SSOT_v0100.json",
+        "VRN_Accounting_Regex_Validation_SSOT_v0100.json"
+      ],
+      "covers": ["資產負債表", "損益表", "現金流量表", "比率", "每股指標", "加減法/除法驗證"]
+    },
+    "02_dupont_fcf_ev": {
+      "name": "杜邦、自由現金流與企業價值",
+      "files": ["VRN_DuPont_Analysis_SSOT_v0100.json"],
+      "covers": ["杜邦三因子/五因子", "FCFF/FCFE", "EV倍數"]
+    },
+    "03_vqg_tmpk": {
+      "name": "VQG TMP-K 營收估值信用",
+      "files": ["VRN_VQG_TMPK_Integration_SSOT_v0100.json"],
+      "covers": ["月營收成長", "目標價", "估值帶", "信用水位", "指數權重"]
+    },
+    "04_regex_ticker_date": {
+      "name": "Regex / Ticker / Date / ETF",
+      "files": [
+        "VRN_TickerRegexSSOT_v0100.json",
+        "VRN_Date_Regex_SSOT_v0100.json"
+      ],
+      "covers": ["三個台灣股票 Regex", "基金/ETF 識別", "日期 Regex（含閏年）"]
+    },
+    "05_listing_standards": {
+      "name": "上市櫃標準與分類器",
+      "files": [],
+      "covers": ["TWSE vs TPEx 比較", "Python 分類函式"]
+    }
+  },
+  "registry_index": [
+    {"id": "ACCT-001", "category": "01_accounting_formulas", "status": "integrated", "source": "InvestmentRegexPattern_VALIDATED.py"},
+    {"id": "DUPONT-001", "category": "02_dupont_fcf_ev", "status": "integrated", "source": "conversation"},
+    {"id": "VQG-K-001", "category": "03_vqg_tmpk", "status": "integrated", "source": "VQG Part 1 Definitions"},
+    {"id": "REGEX-001", "category": "04_regex_ticker_date", "status": "integrated", "source": "prior work"}
+  ],
+  "next_actions": [
+    "技術指標（RSI/MACD/KD 等）可另開獨立分類",
+    "完整 VQG 定義包可依需求分批匯入",
+    "所有項目皆標記 ready_for_part2 = false（依原文件）"
+  ]
+}

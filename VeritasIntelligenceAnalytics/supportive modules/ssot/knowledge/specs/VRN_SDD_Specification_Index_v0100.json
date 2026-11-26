@@ -1,0 +1,39 @@
+{
+  "schema_id": "VRN_SDD_Specification_Index",
+  "version": "v0100",
+  "generated": "2026-11-26",
+  "description": "SDD 規格層索引 — 指向 SSOT 契約，不重複定義結構",
+  "layers": {
+    "specification": "openspec/specs/ — 行為與驗收標準",
+    "contract": "isolated/knowledge/ — 唯一結構來源 (SSOT)",
+    "gate": "VRN_Master_SSOT_Registry_Engine — 狀態與版本閘門"
+  },
+  "specs": {
+    "accounting": {
+      "behavior": "三大報表公式可互相驗證，除法處理零分母",
+      "acceptance": "資產 = 負債 + 權益；比率計算不產生 NaN",
+      "ssot_ref": "isolated/knowledge/VRN_Financial_Accounts_Formulas_SSOT_v0100.json"
+    },
+    "dupont_fcf": {
+      "behavior": "杜邦三因子可重組成 ROE；FCF 扣除 Capex",
+      "acceptance": "ROE = PM × AT × EM；FCFF = OCF - Capex",
+      "ssot_ref": "isolated/knowledge/VRN_DuPont_Analysis_SSOT_v0100.json"
+    },
+    "vqg_tmpk": {
+      "behavior": "目標價與價格使用相同調整基礎",
+      "acceptance": "EPS > 0 時才計算 PE；分母為零回 null",
+      "ssot_ref": "isolated/knowledge/VRN_VQG_TMPK_Integration_SSOT_v0100.json"
+    },
+    "technical": {
+      "behavior": "技術指標使用調整後價格；暖機與種子依定義",
+      "acceptance": "RSI 範圍 0-100；MACD hist = DIF - DEA",
+      "ssot_ref": "isolated/knowledge/VRN_VQG_Technical_Indicators_SSOT_v0100.json"
+    }
+  },
+  "rules": [
+    "規格書只寫行為與驗收，結構指向 SSOT",
+    "結構變更必須先改 SSOT，再更新規格引用",
+    "generated/ 目錄嚴禁手動修改",
+    "每次變更透過 Registry 記錄狀態"
+  ]
+}
