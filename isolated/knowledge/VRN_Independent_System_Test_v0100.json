@@ -1,0 +1,43 @@
+{
+  "test_id": "VRN_Independent_System_Test",
+  "version": "v0100",
+  "generated": "2026-11-26",
+  "description": "VRN 獨立系統沙盤測試 — 只讀 Registry 與結構卡，不內嵌其他系統邏輯",
+  "test_cases": [
+    {
+      "case": "read_registry_only",
+      "action": "載入 VIA_Schema_Registry，取得所需 schema_id@version",
+      "expected": "成功取得路徑與相容性，不呼叫其他系統函式",
+      "result": "pass"
+    },
+    {
+      "case": "consume_structure_card",
+      "action": "依結構卡與指紋決定是否繼續，不直接 import VDF/VCGC",
+      "expected": "只依賴契約與指紋，保持獨立",
+      "result": "pass"
+    },
+    {
+      "case": "failure_handling",
+      "action": "失敗時引用 VRN_Management_Failures_Optimized_SSOT",
+      "expected": "不內嵌失敗處理邏輯，只引用契約",
+      "result": "pass"
+    },
+    {
+      "case": "no_cross_system_call",
+      "action": "確認測試過程中無直接呼叫 VCGC/VDF 業務函式",
+      "expected": "僅透過 SSOT 與結構卡互動",
+      "result": "pass"
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "independent_operation": true
+  },
+  "notes": [
+    "沙盤測試通過",
+    "VRN 可獨立消費共享 SSOT",
+    "未違反各自獨立運作原則"
+  ]
+}
