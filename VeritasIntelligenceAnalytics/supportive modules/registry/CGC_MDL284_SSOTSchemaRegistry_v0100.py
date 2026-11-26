@@ -133,17 +133,24 @@ def check(via: Path = VIA, with_cards: bool = True) -> dict:
         rc = worse(rc, {"GREEN": 0, "YELLOW": 2}.get(row["lamp"], 1))
         rows.append(row)
     unreg, history = [], []
-    reg_ids = {e.get("schema_id") for e in book.get("entries") or []}
+    reg_ver = {}                                      # schema_id → 冊上登的最大版號(數字)
+    for e in book.get("entries") or []:
+        m = re.match(r"v(\d{4})$", str(e.get("version") or ""))
+        if m:
+            reg_ver[e.get("schema_id")] = max(reg_ver.get(e.get("schema_id"), -1), int(m.group(1)))
     for p in sorted((via / KNOW_REL).rglob("*.json")):
         if p.resolve() in seen or p.resolve() == reg.resolve():
             continue
         try:
             d = json.loads(p.read_text(encoding="utf-8"))
             sid = d.get("schema_id") if isinstance(d, dict) else None
+            fv = d.get("version") if isinstance(d, dict) else None
         except ValueError:
-            sid = None
-        item = {"path": str(p.relative_to(via)), "schema_id": sid}
-        (history if sid in reg_ids else unreg).append(item)        # 同 schema_id 已登較新版 = 歷史版,不算未登
+            sid, fv = None, None
+        m = re.match(r"v(\d{4})$", str(fv or ""))
+        item = {"path": str(p.relative_to(via)), "schema_id": sid, "version": fv}
+        older = sid in reg_ver and m is not None and int(m.group(1)) < reg_ver[sid]
+        (history if older else unreg).append(item)   # 只有「比冊上登的版號舊」才算歷史版;同號 / 更新 / 讀不到版號都算未登(PR #762 Codex P2)
     if unreg:
         rc = worse(rc, 2)
     lamp = {0: "GREEN", 2: "YELLOW", 1: "RED"}[rc]
@@ -221,6 +228,7 @@ def selftest() -> int:
         (kn / "C_SSOT_v0100.json").write_text("{bad json", encoding="utf-8")
         (kn / "D_SSOT_v0100.json").write_text(json.dumps({"schema_id": "D_SSOT", "version": "v0100"}), encoding="utf-8")
         (kn / "A_SSOT_v0099.json").write_text(json.dumps({"schema_id": "A_SSOT", "version": "v0099"}), encoding="utf-8")
+        (kn / "A_SSOT_v0101.json").write_text(json.dumps({"schema_id": "A_SSOT", "version": "v0101"}), encoding="utf-8")
         reg = {"schema_id": "VIA_SSOT_Schema_Registry", "version": "v0100", "compatibility_modes": {"backward": "", "full": ""},
                "entries": [{"schema_id": "A_SSOT", "version": "v0100", "path": str(KNOW_REL / "A_SSOT_v0100.json"), "compatibility": "backward"},
                            {"schema_id": "B_SSOT", "version": "v0100", "path": str(KNOW_REL / "B_SSOT_v0101.json"), "compatibility": "backward"},
@@ -231,9 +239,9 @@ def selftest() -> int:
         lamps = {r["schema_id"]: r["lamp"] for r in res["rows"]}
         chk("③ 實測燈:A 綠 · B 檔內版號不同 = 黃 · C 解析不過 = 紅 · E 檔不在 = 紅 · 總燈紅 rc 1",
             lamps == {"A_SSOT": "GREEN", "B_SSOT": "YELLOW", "C_SSOT": "RED", "E_SSOT": "RED"} and res["rc"] == 1, lamps)
-        chk("④ 未登冊的 SSOT 被列出(D)· 已登 schema_id 的舊版(A v0099)列歷史、不算未登",
-            [u["schema_id"] for u in res["unregistered"]] == ["D_SSOT"] and [h["schema_id"] for h in res["history"]] == ["A_SSOT"],
-            (res["unregistered"], res["history"]))
+        chk("④ 未登冊:D 與 A 的新版 v0101(升版沒登冊照樣黃)· 只有比冊上舊的 A v0099 列歷史(Codex P2)",
+            sorted((u["schema_id"], u["version"]) for u in res["unregistered"]) == [("A_SSOT", "v0101"), ("D_SSOT", "v0100")]
+            and [(h["schema_id"], h["version"]) for h in res["history"]] == [("A_SSOT", "v0099")], (res["unregistered"], res["history"]))
         c = card(kn / "A_SSOT_v0100.json")
         chk("⑤ 結構卡經省 Token 工具 read:有 etag 指紋 · 卡上是結構不是全文", c["ok"] and c["etag"] and "schema_id" in c["card"], c)
         rp = write_receipt(check(via, with_cards=True), via)

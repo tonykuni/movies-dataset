@@ -114,6 +114,16 @@ def project_lake(d: dict) -> dict:
             "covers_2018_n": sum(v["covers_2018"] for v in dated), "fresh_7d_n": sum(v["fresh_7d"] for v in dated), "views": views}
 
 
+def coverage_rc(pj: dict) -> tuple:
+    """要求範圍(2018-01-01 起 · 到最新):有日期的 view 任一不是從 2018 年初起或不是 7 天內新 → 至少黃,逐項點名(不只看收據在不在)。"""
+    dated = [v for v in pj.get("views") or [] if v.get("has_date")]
+    short = [v["view"] for v in dated if not v.get("covers_2018")]
+    stale = [v["view"] for v in dated if not v.get("fresh_7d")]
+    if not dated:
+        return 2, short, stale                        # 一張帶日期的表都沒有 = 沒交出要的資料
+    return (2 if (short or stale) else 0), short, stale
+
+
 def run_lakeall(rest: list, repo: Path, out: Path, env: dict) -> int:
     missing = [k for k in CONSENT if env.get(k) != "YES"]
     if missing:
@@ -138,6 +148,11 @@ def run_lakeall(rest: list, repo: Path, out: Path, env: dict) -> int:
             (out / "lakeall_LAKE_STATUS_projection.json").write_text(json.dumps(pj, ensure_ascii=False, indent=1), encoding="utf-8")
             got.append("lakeall_LAKE_STATUS_projection.json")
             say(f"湖 · view {pj['views_n']} · 有日期 {pj['dated_n']} · 從 2018 年初起 {pj['covers_2018_n']} · 7 天內新 {pj['fresh_7d_n']}")
+            crc, short, stale = coverage_rc(pj)
+            for name, lst in (("沒從 2018 年初起", short), ("不是 7 天內新", stale)):
+                if lst:
+                    say(f"  [黃] {name} {len(lst)} 張:" + " · ".join(lst[:12]) + (" …" if len(lst) > 12 else ""))
+            rc = PRIOR.worse(rc, crc)               # 範圍沒達成 = 至少黃(PR #762 Codex P1);已經紅就留紅
         except ValueError:
             say("[黃] LAKE_STATUS_latest.json 讀不懂")
     else:
@@ -232,6 +247,12 @@ def selftest() -> int:
     txt = json.dumps(pj, ensure_ascii=False)
     chk("⑦ 湖投影:只留布林與分片數(不含列數 2341815 / 日期 2026-11-25)· 從 2018 起 2 · 7 天內新 1 · 有日期 2",
         "2341815" not in txt and "2026-11-25" not in txt and pj["covers_2018_n"] == 2 and pj["fresh_7d_n"] == 1 and pj["dated_n"] == 2, txt[:300])
+    full = project_lake({"tables": [{"view": "v_x__t", "date_col": "date", "min_date": "2018-01-02", "lag_days": 1, "parts": 1}]})
+    late = project_lake({"tables": [{"view": "v_x__t", "date_col": "date", "min_date": "2022-01-03", "lag_days": 500, "parts": 1}]})
+    rc_full, rc_late = coverage_rc(full)[0], coverage_rc(late)
+    chk("⑦b 覆蓋算進總燈:2018 起且 7 天內新 = 0 · 2022 起又落後 500 天 = 黃 2 並點名(Codex P1)· 一張日期表都沒有 = 黃",
+        rc_full == 0 and rc_late[0] == 2 and rc_late[1] == ["v_x__t"] and rc_late[2] == ["v_x__t"]
+        and coverage_rc({"views": []})[0] == 2, (rc_full, rc_late))
     rc_p = PRIOR.selftest()
     chk("⑧ 前版 v0104 自測照過(rc 0)", rc_p == 0, rc_p)
     src = HERE.read_text(encoding="utf-8")
