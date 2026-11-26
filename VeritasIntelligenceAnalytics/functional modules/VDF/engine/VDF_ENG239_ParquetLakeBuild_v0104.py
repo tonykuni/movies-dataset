@@ -22,7 +22,9 @@ r"""VDF_ENG239_ParquetLakeBuild v0104 — 薄尾(v0100–v0103 一字不動):輸
      (FetchGroups start --category X --set … --apply;本支不代寫帳本)。
 零網路(擷取由 ENG064 / FetchGroups 經網路工具與雙同意閘負責);不設同意閘;不用 TA-Lib。
 用法:py VDF_ENG239_ParquetLakeBuild_v0104.py window [--start S] [--end E|latest] [--json]
-      py VDF_ENG239_ParquetLakeBuild_v0104.py run --all [--start S] [--end E|latest] [--jobs 3] · status · --selftest
+      py VDF_ENG239_ParquetLakeBuild_v0104.py run --all [--start S] [--end E|latest] [--jobs 3] · --selftest
+      py VDF_ENG239_ParquetLakeBuild_v0104.py status [--lake 夾]                    沿用建 VIEW 時存的視窗(LAKE_WINDOW_latest.json)
+      py VDF_ENG239_ParquetLakeBuild_v0104.py status --start S --end E [--lake 夾]  換視窗:VIEW 重建 + 收據一起換
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -86,6 +88,7 @@ STEM = "VDF_ENG239_ParquetLakeBuild"
 VERSION = "v0104"
 TAG = f"{STEM} {VERSION}"
 DEFAULT_START, DEFAULT_END = "2018-01-01", "latest"
+WINDOW_FILE = "LAKE_WINDOW_latest.json"            # 建 VIEW 當下的實際視窗(status 沿用它,不重解析冊)
 _ISO = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
@@ -230,7 +233,47 @@ def catalog(lake: Path) -> Path:
                 con.execute(f'create or replace view "v_{dbdir.name}__{tdir.name}" as select * from read_parquet({src}, union_by_name=true){where}')
     finally:
         con.close()
+    if s and e:                                     # VIEW 的 SQL 用哪個視窗,收據就記哪個(PR #762 Codex P2)
+        (lake / WINDOW_FILE).write_text(json.dumps({k: W.get(k) for k in ("start", "end", "end_setting", "start_why", "end_why")},
+                                                   ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     return cat
+
+
+def saved_window(lake: Path) -> dict:
+    try:
+        w = json.loads((lake / WINDOW_FILE).read_text(encoding="utf-8"))
+        return w if isinstance(w, dict) and w.get("start") and w.get("end") else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def status_cmd(args: list) -> int:
+    """status:沒給 --start/--end → 沿用建 VIEW 時存下的視窗(VIEW 跟收據同一個);
+    給了 → 先用新視窗重建 VIEW(湖分片不動)再出收據,查詢範圍與標示一起換。"""
+    lake = Path(_opt(args, "--lake") or P0.DEFAULT_LAKE)
+    if "--start" in args or "--end" in args:
+        w = resolve_window(args)
+        if not w["ok"]:
+            print(f"[拒絕] {w['why']}(零寫入)", flush=True)
+            return 2
+        _install(w)
+        try:
+            if (lake / "VDF_catalog.duckdb").is_file():
+                P0.catalog(lake)
+                print(f"[視窗] VIEW 改用 {w['start']} → {w['end']}(湖分片不動)", flush=True)
+            st = P0.status(lake)
+        finally:
+            _uninstall()
+    else:
+        w = saved_window(lake)
+        if w:
+            print(f"[視窗] 沿用建 VIEW 時的 {w['start']} → {w['end']}({WINDOW_FILE})", flush=True)
+        _install(w)
+        try:
+            st = P0.status(lake)
+        finally:
+            _uninstall()
+    return 0 if st.get("tables") else 2
 
 
 def status(lake: Path, write: bool = True) -> dict:
@@ -341,12 +384,7 @@ def main() -> int:
     if a and a[0] == "run":
         return run(a[1:])
     if a and a[0] == "status":
-        w = resolve_window(a[1:])
-        _install(w if w["ok"] else {})
-        try:
-            return PRIOR.main()
-        finally:
-            _uninstall()
+        return status_cmd(a[1:])
     return PRIOR.main()
 
 
@@ -426,6 +464,24 @@ def selftest() -> int:
         finally:
             _uninstall()
         chk("⑩ 迄日放寬再建 VIEW → 列回來(湖只增不刪;不用重抓)", n2 == 3, n2)
+        _install({"start": "2020-01-01", "end": "2024-12-31", "end_setting": "2024-12-31", "start_why": "--start", "end_why": "--end"})
+        try:
+            P0.catalog(lake)
+        finally:
+            _uninstall()
+        rc_s = status_cmd(["--lake", str(lake)])
+        s1 = json.loads((lake / "LAKE_STATUS_latest.json").read_text(encoding="utf-8"))
+        r1 = [r for r in s1["tables"] if r["view"].endswith("tw_daily_prices")][0]
+        chk("⑩b status 不帶日期 → 沿用建 VIEW 的 2020–2024 視窗(不被冊預設蓋掉)· lag_to_end_days 對 2024-12-31 算(Codex P2)",
+            rc_s == 0 and s1["window"]["end"] == "2024-12-31" and s1["window"]["start"] == "2020-01-01" and r1["lag_to_end_days"] == 211
+            and r1["rows"] == 1, (s1.get("window"), r1))
+        rc_s2 = status_cmd(["--lake", str(lake), "--start", "2018-01-01", "--end", "2026-11-27"])
+        s2 = json.loads((lake / "LAKE_STATUS_latest.json").read_text(encoding="utf-8"))
+        r2 = [r for r in s2["tables"] if r["view"].endswith("tw_daily_prices")][0]
+        chk("⑩c status 帶新視窗 → VIEW 一起重建(列數跟著變)· 收據與存檔視窗都換成新的",
+            rc_s2 == 0 and r2["rows"] == 3 and s2["window"]["end"] == "2026-11-27" and saved_window(lake)["end"] == "2026-11-27", (s2.get("window"), r2))
+        chk("⑩d status 視窗錯 → rc 2 零寫入", status_cmd(["--lake", str(lake), "--start", "2030-01-01", "--end", "2020-01-01"]) == 2
+            and saved_window(lake)["end"] == "2026-11-27")
         lake_files = sorted(p.name for p in (lake / "vdf_tw_market" / "tw_daily_prices").glob("*.parquet"))
         chk("⑪ 改視窗不動湖分片(分片數不變)", len(lake_files) == 1, lake_files)
         seen = {}
