@@ -12,6 +12,9 @@ r"""VIA_GovernanceApply v0106 — 薄尾(v0100–v0105 一字不動):PR #747 Cod
   ③ (P2)參數解耦橋範本 `_VDF_VIA_ROOT_REL`:有設 VIA_ROOT(資料根)但該子夾還沒建時,會掉回程式根。
      → 範本改成:有設 VIA_ROOT 就以它為準(子夾不在也回它底下);沒設才找程式根。之後用 param 車道注入的新版都用新範本。
      已注入的 7 支引擎(#745 鎖定)不改:現行所有入口都把 VIA_ROOT 設成 VIA 樹本身(= 程式根),兩條路回同一個路徑。
+  ④ (P2 · 二輪)④ 加速器生效:掃描器逾時 / 當掉時,v0105 照讀上一輪留下的 ACCEL_COVER_latest.json → 舊的綠燈被當成這次的結果。
+     → 本版只收「這次真的跑完」的報告:掃描 rc 要是 0 / 1 / 2(綠 / 紅 / 黃),而且報告檔是這次呼叫寫的(修改時間在呼叫之後、
+       與呼叫前不同);任一條不成立 → RED「報告不是這次寫的」,不沿用舊燈。
 零網路 · 零 TA-Lib · 不 import 他系統 · 不讀寫同意閘。用法同前:plan · apply [--lanes …] · verify · --fresh · selftest。
 """
 from __future__ import annotations
@@ -32,12 +35,14 @@ except Exception:  # noqa: BLE001
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import hashlib
+import json
 import importlib.util
 import os
 import re
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -146,8 +151,36 @@ _NEW_TAIL = ("    if _gp_os.environ.get(\"VIA_ROOT\"):\n        return str(roots
 PARAM_BLOCK_FIXED = P.PARAM_BLOCK.replace(_OLD_TAIL, _NEW_TAIL) if _OLD_TAIL in P.PARAM_BLOCK else None
 
 
+# ── ④ 加速器生效:只收這次寫的報告 ─────────────────────────────────
+_PREV_COVER = V5.job_cover
+SWEEP_OK_RC = (0, 1, 2)
+
+
+def _mtime_ns(p: Path):
+    try:
+        return p.stat().st_mtime_ns
+    except OSError:
+        return None
+
+
+def job_cover(via: Path) -> dict:
+    rp = via / V5.COVER_JSON
+    before, t0 = _mtime_ns(rp), time.time_ns()
+    res = _PREV_COVER(via)
+    if res.get("lamp") == "GRAY" and res.get("rc") is None:
+        return res                                  # 沒有 --effective 版掃描器:照前版灰
+    after = _mtime_ns(rp)
+    fresh = after is not None and after != before and after >= t0 - 2_000_000_000
+    if res.get("rc") not in SWEEP_OK_RC or not fresh:
+        return {**res, "lamp": "RED", "not_green": res.get("not_green") or [],
+                "line": "掃描 rc %s · 報告%s(不沿用上一輪的燈)· 原判讀:%s" % (
+                    res.get("rc"), "是這次寫的" if fresh else "不是這次寫的", str(res.get("line", ""))[:120])}
+    return res
+
+
 def _install():
     P.verify, P.report, V2.state_key = verify, report, state_key
+    V5.job_cover = job_cover                             # v0105 的 verify / start_initial 依模組全域名叫它
     if PARAM_BLOCK_FIXED:
         P.PARAM_BLOCK = PARAM_BLOCK_FIXED
     P.TAG = TAG
@@ -164,7 +197,7 @@ def selftest() -> int:
         ok.append(bool(cond))
         print(("  [OK] " if cond else "  [FAIL] ") + name + ((" · " + str(note)[:240]) if note and not cond else ""), flush=True)
 
-    print("[計] %s 自測開始(本版 7 項 · 前版 %s 在子行程)" % (TAG, PRIOR_PATH.name), flush=True)
+    print("[計] %s 自測開始(本版 8 項 · 前版 %s 在子行程)" % (TAG, PRIOR_PATH.name), flush=True)
     good = {"新版自測": "a.py rc 0", "ReworkGuard": "[VIA_ReworkGuard v0103] check YELLOW · 掃 3 檔",
             "編號稽核": "[編號只增稽核] YELLOW · 遺失 0 · 改身分 0 · 重號 0 | GREEN  DUPREG         0 | GREEN  XCODE          0",
             "加速器生效": "🟢 PY 生效 3/3"}
@@ -231,6 +264,36 @@ def selftest() -> int:
         chk("T5 範本:設了 VIA_ROOT 但子夾還不在 → 仍回 VIA_ROOT 底下;沒設 → 回程式根底下(範本已換進 P.PARAM_BLOCK)",
             PARAM_BLOCK_FIXED is not None and P.PARAM_BLOCK is PARAM_BLOCK_FIXED
             and got == str(root / "module/VDF/dict") and got2 == str(code / "module/VDF/dict"), (got, got2))
+    with tempfile.TemporaryDirectory(prefix="gov106c_") as tc:
+        via = Path(tc)
+        (via / "supportive modules" / "registry").mkdir(parents=True)
+        (via / "supportive modules" / "registry" / "CGC_MDL124_BridgeSweeper_v0112.py").write_text("# fx\n", encoding="utf-8")
+        rp = via / V5.COVER_JSON
+        rp.parent.mkdir(parents=True, exist_ok=True)
+        rep = {"lamp": "GREEN", "total": {"effective": 1, "py": 1, "pct": 100.0}, "should_scan": 1, "scanned": 1, "skipped": 0,
+               "systems": {}, "ps_runtime": "-", "not_green": []}
+        rp.write_text(json.dumps(rep), encoding="utf-8")
+        os.utime(rp, ns=(time.time_ns() - 60_000_000_000, time.time_ns() - 60_000_000_000))
+        keep_run = V5.G.run
+
+        def fake(rc, write):
+            def _r(cmd, cwd, timeout=900, env_extra=None):
+                if write:
+                    rp.write_text(json.dumps(rep), encoding="utf-8")
+                return subprocess.CompletedProcess(cmd, rc, "", "[逾時]" if rc == 124 else "")
+            return _r
+        try:
+            V5.G.run = fake(124, False)
+            stale = V5.job_cover(via)
+            V5.G.run = fake(0, True)
+            good = V5.job_cover(via)
+            V5.G.run = fake(124, True)
+            crash = V5.job_cover(via)
+        finally:
+            V5.G.run = keep_run
+    chk("T8 加速器生效:掃描逾時(rc 124)沒寫新報告 → 舊綠報告不算 · RED;rc 0 且這次寫的 → 照報告綠;rc 124 即使寫了也 RED",
+        V5.job_cover is job_cover and stale["lamp"] == "RED" and "不是這次寫的" in stale["line"]
+        and good["lamp"] == "GREEN" and crash["lamp"] == "RED", (stale.get("line"), good.get("lamp"), crash.get("lamp")))
     cp = subprocess.run([sys.executable, "-B", str(PRIOR_PATH), "selftest"], capture_output=True, text=True, encoding="utf-8",
                         errors="replace", timeout=1800)
     chk("T6 前版 %s 自測照過(子行程)" % PRIOR_PATH.name, cp.returncode == 0, [x for x in cp.stdout.splitlines() if "FAIL" in x][:3])
