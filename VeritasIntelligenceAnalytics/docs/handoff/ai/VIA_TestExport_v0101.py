@@ -8,6 +8,9 @@ PR #747 Codex(P2):`--root testroot` 這類相對路徑時,v0100 的 verify 每�
 工具探測也是先 cd 進 supportive modules 再傳相對的同一路徑。
 本版:main 收到的 --root 一律先 Path(...).resolve() 成絕對路徑,export / verify / 收據全用它;
 直接呼叫 verify(root, man) 的也包一層同樣處理。清單照 v0100 取同夾 VIA_AllSystems_TestExport_Manifest_v*.json 尾版。
+PR #747 Codex 二輪(P2):v0100 的回傳碼只看 tools_ok,引擎載入失敗(收據 verify.fails)照樣 rc 0。本版在驗證有跑時讀收據判:
+  · 沒有失敗 → 0;只有「缺第三方套件」(ModuleNotFoundError 且模組名不是 VIA 自己的)→ 2(黃:缺依賴不是綠);
+  · 缺 VIA 自己的模組(VDF_ / VRN_ / CGC_ … 或帶 _vNNNN)或其他錯誤 → 1(紅:匯出的測試樹不能用)。
 零網路 · 零 TA-Lib · 不 import 他系統 · 不設同意閘。用法同 v0100:--repo <倉> --root <夾> [--ref …] [--dry] [--no-verify] · --selftest
 """
 from __future__ import annotations
@@ -28,6 +31,7 @@ except Exception:  # noqa: BLE001
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import importlib.util
+import json
 import os
 import re
 import subprocess
@@ -75,6 +79,27 @@ def abs_root_args(a: list) -> list:
     return out
 
 
+VIA_MOD = re.compile(r"^(VDF|VRN2?|CGC|VCGC|VAP|VQG|VTK|SUP|VIA|via)_|_v\d{4}$")
+_MISSING = re.compile(r"ModuleNotFoundError: No module named '([^']+)'")
+
+
+def classify(fails: list) -> tuple:
+    """→ (rc, 說明)。0 沒失敗;2 只缺第三方套件;1 其他(含缺 VIA 自己的模組)。"""
+    if not fails:
+        return 0, "引擎載入全過"
+    pkgs, hard = set(), []
+    for f in fails:
+        m = _MISSING.search(str(f.get("why") or ""))
+        top = m.group(1).split(".")[0] if m else None
+        if top and not VIA_MOD.search(top):
+            pkgs.add(top)
+        else:
+            hard.append(f.get("tail"))
+    if hard:
+        return 1, "引擎載入不過 %d 支(非缺套件):%s" % (len(hard), hard[:5])
+    return 2, "只缺第三方套件 %s(%d 支;黃)" % (sorted(pkgs), len(fails))
+
+
 _PREV_VERIFY = PRIOR.verify
 
 
@@ -89,7 +114,19 @@ def main(argv=None) -> int:
     a = list(sys.argv[1:] if argv is None else argv)
     if "--selftest" in a:
         return selftest()
-    return PRIOR.main(abs_root_args(a))
+    b = abs_root_args(a)
+    rc = PRIOR.main(b)
+    if rc != 0 or "--dry" in b or "--no-verify" in b or "--root" not in b:
+        return rc
+    rec = Path(b[b.index("--root") + 1]) / PRIOR.RECEIPT
+    try:
+        fails = (json.loads(rec.read_text(encoding="utf-8")).get("verify") or {}).get("fails") or []
+    except (OSError, ValueError) as exc:
+        print(f"[RED] 讀不到收據的驗證結果:{exc}", flush=True)
+        return 1
+    rc2, why = classify(fails)
+    print(f"[{'OK' if rc2 == 0 else ('YELLOW' if rc2 == 2 else 'RED')}] {why}", flush=True)
+    return rc2
 
 
 def selftest() -> int:
@@ -99,7 +136,7 @@ def selftest() -> int:
         ok.append(bool(cond))
         print(("  [OK] " if cond else "  [FAIL] ") + name + ((" · " + str(note)[:240]) if note and not cond else ""), flush=True)
 
-    print(f"[計] {TAG} 自測開始(本版 5 項 · 前版 {PRIOR_PATH.name} 在子行程)", flush=True)
+    print(f"[計] {TAG} 自測開始(本版 7 項 · 前版 {PRIOR_PATH.name} 在子行程)", flush=True)
     chk("T1 加速器真的載到(VIA_ACCEL is not None)", VIA_ACCEL is not None)
     got = abs_root_args(["--repo", ".", "--root", "testroot", "--dry"])
     got2 = abs_root_args(["--root=sub/dir"])
@@ -122,6 +159,35 @@ def selftest() -> int:
     ok_new = (new.get("systems") or {}).get("VDF", {})
     chk("T3 重現:v0100 相對 root 的載入探測誤報失敗;本版同一夾 → 載入成功",
         str(ok_old).count("fail") >= 1 and ok_new and (ok_new.get("ok") == 1 or ok_new.get("fail") == 0), (old.get("systems"), new.get("systems")))
+    tp = "ModuleNotFoundError: No module named "
+    c0, c2, c1, c1b = (classify([]), classify([{"tail": "VDF/a.py", "why": tp + "'duckdb'"}]),
+                       classify([{"tail": "VDF/b.py", "why": tp + "'VDF_MDL020_DataPlane_v0104'"}]),
+                       classify([{"tail": "VRN/c.py", "why": "SyntaxError: bad"}]))
+    chk("T6 引擎載入判法:沒失敗 0 · 只缺第三方套件 2(黃)· 缺 VIA 自己的模組 1 · 其他錯誤 1",
+        (c0[0], c2[0], c1[0], c1b[0]) == (0, 2, 1, 1), (c0, c2, c1, c1b))
+    with tempfile.TemporaryDirectory(prefix="texp101m_") as tm:
+        keep_main = PRIOR.main
+        outs = {}
+        for name, fl in (("ok", []), ("pkg", [{"tail": "VDF/a.py", "why": tp + "'duckdb'"}]),
+                         ("hard", [{"tail": "VDF/b.py", "why": tp + "'VDF_X_v0101'"}])):
+            def fake(argv, fl=fl):
+                r = Path(argv[argv.index("--root") + 1])
+                r.mkdir(parents=True, exist_ok=True)
+                (r / PRIOR.RECEIPT).write_text(json.dumps({"verify": {"tools_ok": True, "fails": fl}}), encoding="utf-8")
+                return 0
+            PRIOR.main = fake
+            try:
+                outs[name] = main(["--repo", ".", "--root", str(Path(tm) / name)])
+            finally:
+                PRIOR.main = keep_main
+        dry = None
+        PRIOR.main = lambda argv: 0
+        try:
+            dry = main(["--repo", ".", "--root", str(Path(tm) / "d"), "--dry"])
+        finally:
+            PRIOR.main = keep_main
+    chk("T7 重現 Codex:工具都過、一支 VDF 引擎缺 VIA 模組 → v0100 rc 0,本版 rc 1;只缺套件 rc 2;全過 0;--dry 不讀收據",
+        outs == {"ok": 0, "pkg": 2, "hard": 1} and dry == 0, (outs, dry))
     cp = subprocess.run([sys.executable, "-B", str(PRIOR_PATH), "--selftest"], capture_output=True, text=True, encoding="utf-8",
                         errors="replace", timeout=1800)
     chk(f"T4 前版 {PRIOR_PATH.name} 自測照過(子行程)", cp.returncode == 0, cp.stdout[-300:])
