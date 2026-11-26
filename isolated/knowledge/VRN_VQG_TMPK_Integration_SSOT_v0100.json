@@ -1,0 +1,32 @@
+{
+  "schema_id": "VRN_VQG_TMPK_Integration_SSOT",
+  "version": "v0100",
+  "generated": "2026-11-26",
+  "source": "VQG Part 1 Definitions (TMP-K series)",
+  "description": "營收、目標價、估值帶、信用水位指標整合（與財務公式 SSOT 對齊）",
+  "indicators": {
+    "TMP-K01": {"name": "月營收年增", "formula": "Rev_m / Rev_m-12 - 1", "note": "相同公司／群母體；原幣別與合併口徑；分母正數"},
+    "TMP-K02": {"name": "月營收月增", "formula": "Rev_m / Rev_m-1 - 1", "note": "分母正數；不當作季調結果"},
+    "TMP-K03": {"name": "一二月合併年增", "formula": "(Rev_Jan + Rev_Feb) / (Rev_prevJan + Rev_prevFeb) - 1", "note": "兩個月都已公布才更新"},
+    "TMP-K04": {"name": "各來源目標價中心", "formula": "median(valid_targets)", "note": "FactSet／Yahoo 分列；as_of、樣本數、幣別一致"},
+    "TMP-K05": {"name": "目標價平均中位差", "formula": "abs(TP_mean - TP_median) / abs(TP_median)", "note": "median 非零"},
+    "TMP-K06": {"name": "兩來源目標價差距", "formula": "abs(M_FS - M_YF) / ((abs(M_FS) + abs(M_YF)) / 2)", "note": "同幣別、同股票與可比快照"},
+    "TMP-K07": {"name": "兩來源目標價平均", "formula": "(M_FS + M_YF) / 2", "note": "兩來源都通過時點、口徑及差距檢查才計"},
+    "TMP-K08": {"name": "距目標價空間", "formula": "TP_comparable / P_comparable - 1", "note": "同一基準與幣別；P > 0"},
+    "TMP-K09": {"name": "預估年度本益比", "formula": "P_comparable / EPS_FY_comparable", "note": "EPS > 0；forecast_as_of 與 EPS 口徑明示"},
+    "TMP-K10": {"name": "來源公布的指數預估本益比", "formula": "PE12F_index (來源公布)", "note": "不取個股 PE 算術平均"},
+    "TMP-K11": {"name": "股價淨值比 PB", "formula": "P_comparable / BVPS_comparable", "note": "BVPS > 0；effective_at 規則待確認"},
+    "TMP-K12": {"name": "預估盈餘估值帶 PEB", "formula": "Band_q = EPS_forward × 過去可比 PE 的 Q_q", "note": "q 候選 10/25/50/75/90"},
+    "TMP-K13": {"name": "帳面淨值估值帶 PBB", "formula": "Band_q = BVPS × 過去可比 PB 的 Q_q", "note": "沿用 BVPS 延遲政策"},
+    "TMP-K14": {"name": "指數科技業占比", "formula": "Σ(科技分類成員的指數權重)", "note": "指數官方權重優先"},
+    "TMP-K15": {"name": "信用融資對市場規模", "formula": "可比融資餘額金額 / 同範圍市值", "note": "同幣別；普通股範圍對齊"},
+    "TMP-K16": {"name": "信用融資歷史水位", "formula": "midrank_pct(CreditIntensity_t, past_W)", "note": "W 候選 60 月；至少 80% 有效樣本"},
+    "TMP-K17": {"name": "信用額度使用率", "formula": "已用信用額度 / 可用信用總額", "note": "分母 > 0"}
+  },
+  "integration_notes": [
+    "與 VRN_Financial_Accounts_Formulas_SSOT 中的 per_share / ratios 可互相參照",
+    "目標價與估值帶需與 Adj Close 及股本基礎一致",
+    "所有除法公式需處理分母為零",
+    "ready_for_part2 = false（依原文件狀態）"
+  ]
+}
