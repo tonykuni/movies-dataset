@@ -16,7 +16,12 @@ r"""VIA_HostBoot v0104 — 薄尾(v0100–v0103 一字不動):新動詞 vdfcheck
 收據(只帶結構與計數,不帶任何資料值):DB_CHECK_latest.json · VERIFY_latest.json · VDF_MONITOR_latest.json
   + 每步主控台尾巴。DB_STATUS_MATRIX 含「最新幾列」的實際資料 → 不收、不推(資料邊界)。
 用法:python VIA_HostBoot_v0104.py --repo <倉> vdfcheck [--branch B] [--push]
-其餘動詞(fnc · bak · vdf · vdfp · vdf3 · fin5y · hydra · lake)全部照前版。不用 TA-Lib · 不設同意閘 · 本檔零外呼。
+另修 bak(桌機 2026-11-26 19:02 實錄:前版 bak 取「工作夾 ∪ TEMP 取出的 HostBoot 旁」的 VIA_DailyBackup 尾版,
+  工作夾落後 → 拿到 v0103(沒有 full 動詞)→ argparse 拒絕 rc 2,沒有備份):
+  bak 改成跟 lake / vdfcheck 一樣暫切 origin/<分支>,用分支上的 VIA_DailyBackup 尾版跑 full(第五章六題已定案);
+  分支上的尾版不到 v0104(沒有 full)= RED rc 1、不跑。收據照前版 collect("bak")。
+  用法:python VIA_HostBoot_v0104.py --repo <倉> bak [--branch B] [--keep 5 …] [--push]
+其餘動詞(fnc · vdf · vdfp · vdf3 · fin5y · hydra · lake)全部照前版。不用 TA-Lib · 不設同意閘 · 本檔零外呼。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -126,6 +131,33 @@ def lamps(out: Path) -> dict:
     return res
 
 
+AI_REL = Path("VeritasIntelligenceAnalytics") / "docs" / "handoff" / "ai"
+BAK_MIN = 104                                       # VIA_DailyBackup v0104 起才有 full
+
+
+def run_bak(rest: list, repo: Path, out: Path, env: dict) -> int:
+    """暫切 origin/<分支>,用分支上的 VIA_DailyBackup 尾版跑 full;尾版不到 v0104 = RED。"""
+    seen = {}
+
+    def steps(via: Path, live: bool, extra: list) -> list:
+        t = BASE.newest(via / "docs" / "handoff" / "ai", "VIA_DailyBackup_v*.py")
+        seen["tail"] = t
+        if t is None or _vnum(t) < BAK_MIN:
+            return []
+        return [[str(t), "full", "--via", str(via), *extra]]
+
+    rc = BASE.on_branch(rest, repo, out, env, "bak", steps, ())
+    t = seen.get("tail")
+    if t is None or _vnum(t) < BAK_MIN:
+        say(f"[RED] 分支上的 VIA_DailyBackup 尾版是 {Path(t).name if t else '無'},要 v{BAK_MIN:04d} 以上才有 full;沒有備份")
+        return 1
+    got = BASE.collect("bak", repo, out)
+    say(f"備份收據 → {' · '.join(got) if got else '[黃] 沒有新的 BACKUP_latest / GATES(看主控台尾巴)'}")
+    if not got:
+        rc = max(rc, 2)
+    return rc
+
+
 def run_vdfcheck(rest: list, repo: Path, out: Path, env: dict) -> int:
     if "--live" in rest:
         say("[RED] vdfcheck 不出網:不收 --live(要抓新資料走 vdf3 --live)")
@@ -147,9 +179,10 @@ def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv[:1] in (["--selftest"], ["selftest"]):
         return selftest()
-    if "vdfcheck" not in argv:
+    verb = "vdfcheck" if "vdfcheck" in argv else ("bak" if "bak" in argv else None)
+    if verb is None:
         return PRIOR.main(argv)
-    i = argv.index("vdfcheck")
+    i = argv.index(verb)
     head, rest = argv[:i], argv[i + 1:]
     push = "--push" in head + rest
     head = [x for x in head if x != "--push"]
@@ -165,13 +198,14 @@ def main(argv=None) -> int:
     from datetime import datetime
     env = dict(os.environ, VIA_REPO=str(repo))
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out = Path(tempfile.gettempdir()) / f"via_hostboot_vdfcheck_{stamp}"
+    out = Path(tempfile.gettempdir()) / f"via_hostboot_{verb}_{stamp}"
     out.mkdir(parents=True, exist_ok=True)
-    rc = run_vdfcheck(rest, repo, out, env)
-    (out / "vdfcheck_RUN.json").write_text(json.dumps({"tool": TAG, "verb": "vdfcheck", "rc": rc, "secs": round(time.time() - _T0, 1),
-                                                       "args": rest, "accel": VIA_ACCEL is not None, "net": VIA_NET_TOOL_PATH is not None,
-                                                       "lamps": lamps(out)}, ensure_ascii=False, indent=1), encoding="utf-8")
-    say(f"vdfcheck · rc {rc} · 收據 → {out}")
+    rc = (run_vdfcheck if verb == "vdfcheck" else run_bak)(rest, repo, out, env)
+    (out / f"{verb}_RUN.json").write_text(json.dumps({"tool": TAG, "verb": verb, "rc": rc, "secs": round(time.time() - _T0, 1),
+                                                     "args": rest, "accel": VIA_ACCEL is not None, "net": VIA_NET_TOOL_PATH is not None,
+                                                     "lamps": lamps(out) if verb == "vdfcheck" else None}, ensure_ascii=False, indent=1),
+                                          encoding="utf-8")
+    say(f"{verb} · rc {rc} · 收據 → {out}")
     if push:
         say(BASE.push_receipts(repo, out, stamp))
     say(f"完成 · rc {rc} · 總計 {time.time() - _T0:.0f}s")
@@ -224,8 +258,30 @@ def selftest() -> int:
         out2 = tdp / "out2"
         out2.mkdir()
         chk("⑧ 舊收據(開跑前寫的)不收", "vdfcheck_VERIFY_latest.json" not in collect_receipts(tdp / "via", out2, t0))
+    with tempfile.TemporaryDirectory() as td:
+        tdp = Path(td)
+        ai = tdp / "via" / "docs" / "handoff" / "ai"
+        ai.mkdir(parents=True)
+        keep_ob, keep_col = BASE.on_branch, BASE.collect
+        calls = {}
+
+        def fake_on_branch(rest, repo, out, env, tag, fn, rd):
+            calls["tag"], calls["steps"] = tag, fn(tdp / "via", False, ["--keep", "5"])
+            return 0
+        try:
+            BASE.on_branch, BASE.collect = fake_on_branch, (lambda verb, repo, out, fnc_dir=None: ["bak_00_BACKUP_latest.json"])
+            (ai / "VIA_DailyBackup_v0103.py").write_text("x = 1\n", encoding="utf-8")
+            rc_old = run_bak([], tdp, tdp, {})
+            (ai / "VIA_DailyBackup_v0105.py").write_text("x = 1\n", encoding="utf-8")
+            rc_new = run_bak(["--keep", "5"], tdp, tdp, {})
+        finally:
+            BASE.on_branch, BASE.collect = keep_ob, keep_col
+        chk("⑨ bak 走 on_branch;分支尾版只有 v0103(沒有 full)= RED rc 1 · v0105 → full --via <分支 VIA> --keep 5",
+            rc_old == 1 and rc_new == 0 and calls.get("tag") == "bak" and calls.get("steps")
+            and Path(calls["steps"][0][0]).name == "VIA_DailyBackup_v0105.py" and calls["steps"][0][1:4] == ["full", "--via", str(tdp / "via")]
+            and calls["steps"][0][-2:] == ["--keep", "5"], calls)
     rc_p = PRIOR.selftest()
-    chk("⑨ 前版 v0103 自測照過(rc 0)", rc_p == 0, rc_p)
+    chk("⑨b 前版 v0103 自測照過(rc 0)", rc_p == 0, rc_p)
     src = HERE.read_text(encoding="utf-8")
     chk("⑩ 檔面:第 3 行加速器標記 · glob 取前版 · 零 TA-Lib · 不設同意閘 · 不寫入口標記到 os.environ · 不含本機路徑",
         src.splitlines()[2].startswith("# [VIA:ACCEL-BRIDGE") and "HERE.parent.glob(FAMILY" in src
