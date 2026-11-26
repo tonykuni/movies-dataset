@@ -113,12 +113,15 @@ def norm_args(args: list) -> list:
     return a
 
 
+RESOLVER = None                                         # 自測換假解析器用(本檔的全域,不動前版鏈)
+
+
 def effective_home(args: list) -> str | None:
     """用主流程同一個解析器(前版 resolve_data_home:--data-home > env > 使用者文件夾 via_database\\vdf_database)
     先定一次資料家,⓪ 的兩步都用它(PR #763 Codex P2)。"""
     dh = PRIOR._opt(args, "--data-home")
     try:
-        home, _why = PRIOR.resolve_data_home(dh)
+        home, _why = (RESOLVER or PRIOR.resolve_data_home)(dh)
     except Exception:  # noqa: BLE001 — 解析器不在照舊用參數
         home = Path(dh) if dh else None
     if home is None and dh:
@@ -288,14 +291,13 @@ def selftest() -> int:
     seen = []
     rc = run_stage(["run", "--data-home", "D"], runner=lambda cmd, env: seen.append((cmd[4], env.get("VIA_FROM_VDFSM"), env.get("VIA_VDF_DB_HOME"))) or 1)
     chk("⑤ 子行程帶 VDF 入口旗標與資料家 · 併入紅 → ⓪ 紅(擷取家查不到只算黃)", rc == 1 and seen == [("home", "YES", "D"), ("apply", "YES", "D")], (rc, seen))
-    keep_res = getattr(PRIOR, "resolve_data_home", None)
+    global RESOLVER
     try:
-        PRIOR.resolve_data_home = lambda arg=None, env=None: (Path("/auto/via_database/vdf_database"), "使用者文件夾")
+        RESOLVER = lambda arg=None, env=None: (Path("/auto/via_database/vdf_database"), "使用者文件夾")  # noqa: E731
         st3, seen3 = stage_steps(["run"]), []
         run_stage(["run"], runner=lambda cmd, env: seen3.append(env.get("VIA_VDF_DB_HOME")) or 0)
     finally:
-        if keep_res is not None:
-            PRIOR.resolve_data_home = keep_res
+        RESOLVER = None
     chk("⑤b 沒帶參數 → 先用主流程解析器定資料家,⓪ 併入帶 --home、兩步子行程都帶同一個 VIA_VDF_DB_HOME(Codex P2)",
         st3[1][1][-2:] == ["--home", "/auto/via_database/vdf_database"] and seen3 == ["/auto/via_database/vdf_database"] * 2, (st3, seen3))
     chk("⑥ 總燈 worse:紅留紅 · 黃不蓋紅", worse(0, 2) == 2 and worse(1, 2) == 1 and worse(2, 0) == 2)
