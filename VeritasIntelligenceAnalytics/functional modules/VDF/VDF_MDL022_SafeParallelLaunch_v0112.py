@@ -11,6 +11,10 @@ r"""VDF_MDL022_SafeParallelLaunch v0112 — 薄尾(v0100–v0111 一字不動):�
      → 印一行「共用快取 命中 X / 請求 Y」→ 刪掉本輪快取夾。summary 動詞也印這一行。
   ③ --no-shared-cache:這一輪不接快取(照 v0111)。找不到 MDL024 → 照 v0111 跑並印黃字,不擋。
   ④ 子行程預設 PYTHONWARNINGS=ignore::SyntaxWarning(只藏舊檔字串跳脫的語法警告,不改任何行為;已設就不動)。
+  ⑤ start 動詞(PR #764 Codex P1 · AGENTS.md §3「PS 只進環境與呼叫 Python 入口」):原本 Start-VIA-VDF PS 裡的
+     開跑前檢查 → 背景跑 → 輪詢進度檔 → 畫進度條 → Ctrl+C 收行程樹 → 摘要,全部搬進這裡。
+     畫面:方案一 Rich 進度條(有裝 Rich);方案二 原生 ANSI 八階平滑進度條(零依賴)。--ui rich|ansi|plain 可指定;
+     --plain / --check / 非互動主控台 → 前景照 launch 跑。PS 只剩:找尾版 · 看主控台能不能畫 · 叫 start。
 其他一律照 v0111(降壓一次後 3 道同步跑、不中途減道;Rich 詳細摘要矩陣;進度檔)。不代設同意閘;不碰 TA-Lib。
 """
 from __future__ import annotations
@@ -76,6 +80,10 @@ CACHE_STEM = "VDF_MDL024_RunFetchCache"
 CACHE_RECEIPT = VIA / "VIA_Reports" / "vdf" / "launch" / "RUN_CACHE_latest.json"
 NO_CACHE = "--no-shared-cache"
 RUNNER = None                                           # 自測換掉主流程用(本檔自己的鉤子,不改前版模組)
+CHILD_CMD = None                                        # 自測換掉背景子行程用(同上)
+PROGRESS_FILE = VIA / "VIA_Reports" / "vdf" / "launch" / "LAUNCH_PROGRESS.json"   # v0111 寫的進度檔
+BLOCKS = (" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉")
+SPIN = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 
 
 def _vnum(p) -> int:
@@ -154,11 +162,145 @@ def run_with_cache(args: list, runner, env=None, receipt: Path = CACHE_RECEIPT, 
         print(f"[{TAG}] {cache_line(st)}", flush=True)
 
 
+# ───────── start:PS 只叫這一個動詞(檢查 → 背景跑 → 進度條 → Ctrl+C 收樹 → 摘要)─────────
+def _mmss(sec) -> str:
+    if sec is None:
+        return "--:--"
+    sec = max(0, int(float(sec)))
+    return f"{sec // 60:02d}:{sec % 60:02d}"
+
+
+def bar_line(j: dict | None, frame: int = 0, width: int = 30, done: bool = False) -> str:
+    """方案二:原生 ANSI 八階平滑進度條的一行(數字全由 v0111 進度檔來;本函式只排版)。"""
+    j = j or {}
+    pct = 100.0 if done else max(0.0, min(100.0, float(j.get("pct") or 0)))
+    x = pct / 100 * width
+    full = int(x)
+    bar = "█" * full + ((BLOCKS[min(7, int((x - full) * 8))] + " " * (width - full - 1)) if full < width else "")
+    cnt = f"{j.get('done', 0)}/{j.get('total', 0)}" if j else "…"
+    head = "\x1b[32m✔\x1b[0m" if done else f"\x1b[36m{SPIN[frame % len(SPIN)]}\x1b[0m"
+    return (f"\r{head} [\x1b[38;5;73m{bar}\x1b[0m] \x1b[1m{pct:5.1f}%\x1b[0m ({cnt}) | "
+            f"{_mmss(j.get('elapsed_s') or 0)} / ETA {_mmss(j.get('eta_s'))} | {j.get('current') or ('完成' if done else '開始')}\x1b[K")
+
+
+def _read(path: Path) -> dict | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def kill_tree(proc) -> None:
+    """收掉背景子行程整棵樹(psutil 有就逐個收;Windows 沒 psutil 用 taskkill /T)。"""
+    try:
+        import psutil
+        try:
+            parent = psutil.Process(proc.pid)
+            kids = parent.children(recursive=True)
+        except psutil.Error:
+            kids = []
+        for k in kids:
+            try:
+                k.kill()
+            except psutil.Error:
+                pass
+    except ImportError:
+        if os.name == "nt":
+            import subprocess
+            subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"], capture_output=True)
+    try:
+        proc.kill()
+    except OSError:
+        pass
+
+
+def _render_rich(proc, path: Path, poll: float) -> bool:
+    """方案一:Rich 進度條(高質感)。沒裝 Rich 回 False 改走方案二。"""
+    try:
+        from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
+    except ImportError:
+        return False
+    import time
+    with Progress(SpinnerColumn(), TextColumn("[bold]{task.description}"), BarColumn(), TextColumn("{task.percentage:>5.1f}%"),
+                  TimeElapsedColumn(), TextColumn("ETA {task.fields[eta]}")) as bar:
+        t = bar.add_task("VDF 啟動", total=100, eta="--:--")
+        while proc.poll() is None:
+            j = _read(path)
+            if j:
+                bar.update(t, completed=float(j.get("pct") or 0), eta=_mmss(j.get("eta_s")),
+                           description=f"VDF {j.get('done', 0)}/{j.get('total', 0)} · {j.get('current') or ''}"[:80])
+            time.sleep(poll)
+        bar.update(t, completed=100, eta="00:00")
+    return True
+
+
+def _render_ansi(proc, path: Path, poll: float, out) -> None:
+    import time
+    f = 0
+    out.write("\x1b[?25l")
+    try:
+        while proc.poll() is None:
+            out.write(bar_line(_read(path), f))
+            out.flush()
+            f += 1
+            time.sleep(poll)
+        out.write(bar_line(_read(path), f, done=True) + "\n")
+    finally:
+        out.write("\x1b[?25h")
+        out.flush()
+
+
+def start_cmd(rest: list, out=None, tty=None, progress_path: Path = None, poll: float = 0.12, log_dir=None) -> int:
+    """PS 啟動器唯一要叫的動詞。--plain / --check / 非互動主控台 → 前景照 launch 跑(輸出照常)。
+    --ui rich|ansi:指定畫面(預設 auto:有 Rich 用 Rich,沒有用原生 ANSI)。"""
+    import subprocess
+    import tempfile
+    import time
+    out = out or sys.stdout
+    rest = list(rest)
+    ui = "auto"
+    if "--ui" in rest:
+        i = rest.index("--ui")
+        ui = (rest[i + 1:i + 2] or ["auto"])[0]
+        del rest[i:i + 2]
+    is_tty = out.isatty() if tty is None else tty
+    run = RUNNER or main
+    if "--plain" in rest or "--check" in rest or ui == "plain" or not is_tty:
+        return run(["launch", *[a for a in rest if a != "--plain"]])
+    rc = run(["launch", "--check", *rest])
+    if rc == 1:
+        return 1
+    path = Path(progress_path or PROGRESS_FILE)
+    try:
+        path.unlink()
+    except OSError:
+        pass
+    log = Path(log_dir or tempfile.gettempdir()) / f"VIA_VDF_launch_{time.strftime('%Y%m%d_%H%M%S')}.log"
+    cmd = list(CHILD_CMD) if CHILD_CMD else [sys.executable, "-X", "utf8", str(Path(__file__).resolve()), "launch", "--skip-preflight", *rest]
+    with open(log, "w", encoding="utf-8", errors="replace") as fh:
+        proc = subprocess.Popen(cmd, stdout=fh, stderr=subprocess.STDOUT)
+        print(f"  背景執行中 · 完整輸出 → {log}", file=out, flush=True)
+        try:
+            if ui == "ansi" or not (ui in ("auto", "rich") and _render_rich(proc, path, poll)):
+                _render_ansi(proc, path, poll, out)
+        except KeyboardInterrupt:
+            print("\n  中斷:收掉背景 Python 行程樹", file=out, flush=True)
+        finally:
+            if proc.poll() is None:
+                kill_tree(proc)
+        rc = proc.wait()
+    run(["summary"])
+    print(f"  完整輸出 → {log}", file=out, flush=True)
+    return rc
+
+
 def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if args[:1] in (["--selftest"], ["selftest"]):
         return selftest()
     os.environ.setdefault("PYTHONWARNINGS", "ignore::SyntaxWarning")
+    if args[:1] == ["start"]:
+        return start_cmd(args[1:])
     runner = RUNNER or PRIOR.main
     if args[:1] == ["summary"]:
         rc = runner(args)
@@ -176,6 +318,7 @@ def main(argv=None) -> int:
 def selftest() -> int:
     import subprocess
     import tempfile
+    import time
     ok, bad = [], []
 
     def chk(name, cond, note=""):
@@ -235,6 +378,55 @@ def selftest() -> int:
         globals()["RUNNER"] = None
     chk("⑥ 其他動詞照轉 v0111(拿掉 --no-shared-cache)· --check 不建快取",
         calls == [["status"], ["launch", "--check"]] and unchanged, calls)
+    import io
+    ln = bar_line({"pct": 50, "done": 3, "total": 6, "elapsed_s": 65, "eta_s": 65, "current": "e054"}, 0, width=10)
+    chk("⑦ 方案二進度條排版:50% → 五格滿 · (3/6) · 01:05 / ETA 01:05 · 目前流程;完成那一行 100%",
+        "█████" in ln and "50.0%" in ln and "(3/6)" in ln and "01:05 / ETA 01:05" in ln and "e054" in ln
+        and "100.0%" in bar_line({}, done=True, width=10), ln)
+    with tempfile.TemporaryDirectory() as td:
+        td = Path(td)
+        prog = td / "LAUNCH_PROGRESS.json"
+        writer = ("import json,sys,time\n"
+                  "p=sys.argv[1]\n"
+                  "for i in range(1,4):\n"
+                  " open(p,'w').write(json.dumps({'pct':i*33.3,'done':i,'total':3,'elapsed_s':i,'eta_s':3-i,'current':'f%d'%i}))\n"
+                  " time.sleep(0.15)\n"
+                  "sys.exit(3)\n")
+        calls = []
+        globals()["RUNNER"] = lambda a: calls.append(list(a)) or 0
+        globals()["CHILD_CMD"] = [sys.executable, "-c", writer, str(prog)]
+        buf = io.StringIO()
+        try:
+            rc = start_cmd(["--dry", "--ui", "ansi"], out=buf, tty=True, progress_path=prog, poll=0.05, log_dir=td)
+            calls_ok = calls == [["launch", "--check", "--dry"], ["summary"]]
+            calls.clear()
+            globals()["RUNNER"] = lambda a: calls.append(list(a)) or (1 if "--check" in a else 0)
+            rc_red = start_cmd(["--dry"], out=io.StringIO(), tty=True, progress_path=prog, log_dir=td)
+            red_ok = calls == [["launch", "--check", "--dry"]]
+            calls.clear()
+            globals()["RUNNER"] = lambda a: calls.append(list(a)) or 0
+            start_cmd(["--dry", "--plain"], out=io.StringIO(), tty=True, log_dir=td)
+            plain_ok = calls == [["launch", "--dry"]]
+        finally:
+            globals()["RUNNER"] = None
+            globals()["CHILD_CMD"] = None
+        chk("⑧ start:先 launch --check → 背景跑(rc 照子行程 3)→ 進度條畫到 100% → summary;日誌在指定夾",
+            rc == 3 and calls_ok and "100.0%" in buf.getvalue() and "(3/3)" in buf.getvalue() and any(td.glob("VIA_VDF_launch_*.log")),
+            (rc, buf.getvalue()[-200:]))
+        chk("⑨ start:開跑前檢查紅(rc 1)→ 不開背景、不印摘要;--plain → 前景 launch", rc_red == 1 and red_ok and plain_ok)
+        sleeper = subprocess.Popen([sys.executable, "-c", "import subprocess,sys,time;"
+                                    "subprocess.Popen([sys.executable,'-c','import time;time.sleep(60)']);time.sleep(60)"])
+        time.sleep(0.8)
+        try:
+            import psutil
+            kids = psutil.Process(sleeper.pid).children(recursive=True)
+        except ImportError:
+            kids = []
+        kill_tree(sleeper)
+        sleeper.wait(timeout=10)
+        time.sleep(0.3)
+        gone = all(not k.is_running() or k.status() == "zombie" for k in kids)
+        chk("⑩ Ctrl+C 收樹:背景子行程與它的孫行程都收掉", sleeper.poll() is not None and gone, len(kids))
     alone = subprocess.run([sys.executable, str(PRIOR_PATH), "--selftest"], capture_output=True, text=True, timeout=1800)
     tail = (alone.stdout.strip().splitlines() or [""])[-1]
     chk("⑦ 前版 v0111 自測單獨跑:綠,或它自己照實回黃(rc 2,例:容器缺 rich)· 本版不換裝前版任何名稱",

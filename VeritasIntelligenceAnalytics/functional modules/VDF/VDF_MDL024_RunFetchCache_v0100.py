@@ -82,6 +82,8 @@ ENV_MAX = "VIA_VDF_RUN_CACHE_MAX_MB"
 SKIP_HEADERS = {"user-agent", "cookie"}
 STATS = "_stats.jsonl"
 KEEP_HEADERS = ("content-type", "content-encoding", "last-modified", "date")
+LOCK_WAIT_S = 120                                   # 別道正在抓同一個鍵:最多等這麼久
+LOCK_STALE_S = 600                                  # 鎖檔比這舊 = 持鎖的行程已死,拆掉
 
 
 def max_bytes() -> int:
@@ -137,6 +139,72 @@ def store(root: Path, key: str, content: bytes, meta: dict) -> bool:
         return False
 
 
+def _acquire(root: Path, key: str):
+    """同鍵跨行程鎖(O_CREAT | O_EXCL):拿到回鎖檔路徑;別道持有回 None。過舊的鎖視為死鎖拆掉再試一次。"""
+    lk = root / f"{key}.lock"
+    for _ in range(2):
+        try:
+            fd = os.open(str(lk), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.write(fd, str(os.getpid()).encode())
+            os.close(fd)
+            return lk
+        except FileExistsError:
+            try:
+                if time.time() - lk.stat().st_mtime <= LOCK_STALE_S:
+                    return None
+                lk.unlink()
+            except OSError:
+                return None
+        except OSError:
+            return None
+    return None
+
+
+def _wait(root: Path, key: str, limit: float = None):
+    """等持鎖的那一道存好:有內容就回;鎖放掉了還沒內容(它抓失敗 / 不能收)→ None。"""
+    end = time.time() + (LOCK_WAIT_S if limit is None else limit)
+    lk = root / f"{key}.lock"
+    while time.time() < end:
+        hit = load(root, key)
+        if hit or not lk.exists():
+            return hit or load(root, key)
+        time.sleep(0.05)
+    return None
+
+
+def fetch_once(root: Path, key: str, url: str, fetch, make_hit):
+    """同一個鍵整輪只真的送一次:先查 → 拿鎖(拿不到就等別道存好)→ 拿到鎖後再查一次 → 送 → 存 → 放鎖。
+    fetch() 回 (給呼叫端的物件, 可快取的內容 bytes 或 None, meta)。"""
+    hit = load(root, key)
+    if hit:
+        _stat(root, "hit", url, len(hit[0]))
+        return make_hit(*hit)
+    lk = _acquire(root, key)
+    if lk is None:
+        hit = _wait(root, key)
+        if hit:
+            _stat(root, "hit", url, len(hit[0]))
+            return make_hit(*hit)
+        lk = _acquire(root, key)
+    try:
+        if lk is not None:
+            hit = load(root, key)
+            if hit:
+                _stat(root, "hit", url, len(hit[0]))
+                return make_hit(*hit)
+        obj, body, meta = fetch()
+        if body is not None:
+            saved = store(root, key, body, meta)
+            _stat(root, "miss_stored" if saved else "miss_big", url, len(body))
+        return obj
+    finally:
+        if lk is not None:
+            try:
+                lk.unlink()
+            except OSError:
+                pass
+
+
 def install(root=None) -> bool:
     """在本行程裝上快取(requests.Session.request · urllib.request.urlopen)。沒設 env 或夾不在 → 什麼都不做。"""
     raw = root or os.environ.get(ENV_DIR) or ""
@@ -164,22 +232,23 @@ def _install_urllib(root: Path) -> None:
         if method != "GET" or data is not None or (req is not None and req.data is not None):
             return orig(url, data, *a, **kw)
         key = cache_key(full, dict(req.header_items()) if req else {})
-        hit = load(root, key)
-        if hit:
-            body, meta = hit
-            _stat(root, "hit", full, len(body))
+
+        def make_hit(body, meta):
             msg = email.message_from_string("".join(f"{k}: {v}\n" for k, v in (meta.get("headers") or {}).items()),
                                             _class=http.client.HTTPMessage)
             return urllib.response.addinfourl(io.BytesIO(body), msg, meta.get("url") or full, 200)
-        resp = orig(url, data, *a, **kw)
-        code = getattr(resp, "status", None) or resp.getcode()
-        if code != 200:
-            return resp
-        body = resp.read()
-        hdrs = {k: v for k, v in resp.headers.items() if k.lower() in KEEP_HEADERS}
-        saved = store(root, key, body, {"headers": hdrs, "url": resp.geturl()})
-        _stat(root, "miss_stored" if saved else "miss_big", full, len(body))
-        return urllib.response.addinfourl(io.BytesIO(body), resp.headers, resp.geturl(), 200)
+
+        def fetch():
+            resp = orig(url, data, *a, **kw)
+            code = getattr(resp, "status", None) or resp.getcode()
+            if code != 200:
+                return resp, None, None
+            body = resp.read()
+            hdrs = {k: v for k, v in resp.headers.items() if k.lower() in KEEP_HEADERS}
+            return (urllib.response.addinfourl(io.BytesIO(body), resp.headers, resp.geturl(), 200), body,
+                    {"headers": hdrs, "url": resp.geturl()})
+
+        return fetch_once(root, key, full, fetch, make_hit)
 
     urlopen._vdf_run_cache = True
     urllib.request.urlopen = urlopen
@@ -211,24 +280,22 @@ def _install_requests(root: Path) -> None:
             key = cache_key(prep.url, merged)
         except Exception:
             return call()
-        hit = load(root, key)
-        if hit:
-            body, meta = hit
-            _stat(root, "hit", prep.url, len(body))
+        def make_hit(body, meta):
             r = requests.models.Response()
             r.status_code, r._content, r.url, r.reason = 200, body, meta.get("url") or prep.url, "OK"
             r.headers = CaseInsensitiveDict(meta.get("headers") or {})
             r.encoding = meta.get("encoding")
             r.request = prep
             return r
-        r = call()
-        if r.status_code != 200:
-            return r
-        content = r.content
-        hdrs = {k: v for k, v in r.headers.items() if k.lower() in ("content-type", "last-modified", "date")}
-        saved = store(root, key, content, {"headers": hdrs, "url": r.url, "encoding": r.encoding})
-        _stat(root, "miss_stored" if saved else "miss_big", prep.url, len(content))
-        return r
+
+        def fetch():
+            r = call()
+            if r.status_code != 200:
+                return r, None, None
+            hdrs = {k: v for k, v in r.headers.items() if k.lower() in ("content-type", "last-modified", "date")}
+            return r, r.content, {"headers": hdrs, "url": r.url, "encoding": r.encoding}
+
+        return fetch_once(root, key, prep.url, fetch, make_hit)
 
     request._vdf_run_cache = True
     S.request = request
@@ -330,6 +397,9 @@ def selftest() -> int:
     class H(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
             served["n"] += 1
+            served[self.path] = served.get(self.path, 0) + 1
+            if self.path.startswith("/slow"):
+                time.sleep(0.6)
             code = 404 if self.path.startswith("/missing") else 200
             body = json.dumps({"path": self.path, "n": served["n"]}).encode()
             self.send_response(code)
@@ -388,6 +458,23 @@ def selftest() -> int:
         chk("⑥ 檔名只有雜湊(網址不落檔)· 鍵不含 User-Agent / Cookie",
             all(len(f.stem) == 64 for f in Path(root).glob("*.body"))
             and cache_key("u", {"User-Agent": "a", "Cookie": "x"}) == cache_key("u", {"User-Agent": "b"}))
+        racer = ("import sys,urllib.request\n"
+                 "u=sys.argv[1]\n"
+                 "try:\n import requests\n requests.get(u+'/slow-r',timeout=30).content\nexcept ImportError:\n pass\n"
+                 "urllib.request.urlopen(u+'/slow-u',timeout=30).read()\n")
+        procs = [subprocess.Popen([sys.executable, "-c", racer, base], env=env, stdout=subprocess.DEVNULL,
+                                  stderr=subprocess.PIPE, text=True) for _ in range(4)]
+        errs = [p.communicate(timeout=120)[1] for p in procs]
+        rcs = [p.returncode for p in procs]
+        chk("⑨ 4 道同時抓同一個還沒快取的 GET(伺服器慢 0.6 秒):伺服器各只收到 1 次 · 其他道等鎖後讀快取 · 鎖檔不留",
+            rcs == [0, 0, 0, 0] and served.get("/slow-u") == 1 and served.get("/slow-r", 1 if not have_req else 0) == 1
+            and not any(Path(root).glob("*.lock")), (rcs, {k: v for k, v in served.items() if k.startswith("/slow")}, errs[-1][-300:]))
+        lk = _acquire(Path(root), "k" * 64)
+        os.utime(lk, (time.time() - LOCK_STALE_S - 5,) * 2)
+        lk2 = _acquire(Path(root), "k" * 64)
+        held = _acquire(Path(root), "k" * 64)
+        chk("⑩ 過舊的鎖(持鎖行程已死)會被拆掉重拿;新鮮的鎖拿不到", lk2 is not None and held is None, (lk2, held))
+        lk2.unlink()
         env2 = dict(env)
         env2.pop(ENV_DIR)
         p = subprocess.run([sys.executable, "-c", "import urllib.request;print(getattr(urllib.request.urlopen,'_vdf_run_cache',False))"],

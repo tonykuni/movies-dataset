@@ -61,6 +61,7 @@ def _via_net():
 # ===== [VIA:NET-BRIDGE:END] =====
 
 import importlib.util
+import json
 import re
 import sys
 import tempfile
@@ -122,9 +123,10 @@ def reconcile_pair(con, a_rel: str, b_rel: str, pk: list, tol: float, out_path: 
     return normalize_units(_V0106_REC(con, a_rel, b_rel, pk, tol, out_path))
 
 
+_SERIALIZER = PRIOR.summary_tables.__globals__        # 序列化器 summary_tables 的主人(v0105 模組)· 白名單要寫在它那裡
 for _k in ("unit_normalized", "mismatch_raw"):
-    if _k not in PRIOR.SUMMARY_KEYS:
-        PRIOR.SUMMARY_KEYS = tuple(PRIOR.SUMMARY_KEYS) + (_k,)
+    if _k not in _SERIALIZER["SUMMARY_KEYS"]:
+        _SERIALIZER["SUMMARY_KEYS"] = tuple(_SERIALIZER["SUMMARY_KEYS"]) + (_k,)
 
 
 def _install():
@@ -177,9 +179,15 @@ def selftest() -> int:
         con.execute("CREATE TABLE rb AS SELECT * FROM (VALUES ('2330', DATE '2026-11-25', 100.0, 5000.0)) t(code, date, close, volume)")
         r3 = BASE.reconcile_pair(con, "ra", "rb", ["code", "date"], 0.001, td / "rec3.parquet")
         chk("③ 價差 1%(不是 10 的次方)→ 照原數 1 · 不換算", r3["mismatch"] == 1 and "unit_normalized" not in r3, r3)
+        res = {"rows": [{"group": "G", "view": "v", "state": "OK", "mismatch": 0, "mismatch_raw": 3,
+                         "unit_normalized": {"volume": "×1000"}}], "reconcile": [r], "lamp": "GREEN", "counts": {}}
+        od = Path(BASE.save("reconcile", res, td))
+        summ = json.loads((od / "SUMMARY.json").read_text(encoding="utf-8"))
+        t0, r0 = (summ.get("tables") or [{}])[0], (summ.get("reconcile") or [{}])[0]
+        chk("④ 實寫出來的 SUMMARY.json:tables 與 reconcile 都留著 mismatch_raw · unit_normalized(只倍數標籤與計數)",
+            t0.get("mismatch_raw") == 3 and t0.get("unit_normalized") == {"volume": "×1000"}
+            and r0.get("mismatch_raw") == 3 and r0.get("unit_normalized") == {"volume": "×1000"}, (t0, r0))
     con.close()
-    chk("④ SUMMARY 白名單含 unit_normalized · mismatch_raw(只倍數標籤與計數)",
-        "unit_normalized" in PRIOR.SUMMARY_KEYS and "mismatch_raw" in PRIOR.SUMMARY_KEYS)
     _uninstall()
     try:
         rc = PRIOR.selftest()
