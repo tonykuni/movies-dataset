@@ -1,0 +1,41 @@
+{
+  "schema_id": "VIA_Scheduler_SSOT",
+  "version": "v0100",
+  "generated": "2026-11-26",
+  "description": "VIA 排程引擎契約 — 沙盤測試版，外置任務定義，不內嵌業務邏輯",
+  "principles": [
+    "排程只負責時序與重試，不執行業務計算",
+    "只引用 schema_id@version 與結構卡",
+    "VCGC 檢查註冊與相容性",
+    "失敗處理引用現有 Management Failures SSOT",
+    "各系統獨立運作"
+  ],
+  "task_template": {
+    "task_id": "string",
+    "required_schema": "schema_id@version",
+    "trigger": "cron or event",
+    "max_retries": 3,
+    "on_failure": "VRN_Management_Failures_Optimized_SSOT@v0101",
+    "output": "structure_card + receipt"
+  },
+  "example_tasks": [
+    {
+      "task_id": "daily_schema_check",
+      "required_schema": "VRN_DuckDB_Management_SSOT@v0100",
+      "trigger": "0 8 * * *",
+      "description": "每日指紋與列數檢查"
+    },
+    {
+      "task_id": "io_contract_validate",
+      "required_schema": "VRN_VCGC_VDF_IO_SSOT@v0100",
+      "trigger": "on_deploy",
+      "description": "部署前輸入輸出契約驗證"
+    }
+  ],
+  "sandbox_notes": [
+    "此版本僅供沙盤測試",
+    "未綁定真實排程器",
+    "可透過 Registry 註冊後由 System Manager 讀取"
+  ],
+  "ready_for_production": false
+}
