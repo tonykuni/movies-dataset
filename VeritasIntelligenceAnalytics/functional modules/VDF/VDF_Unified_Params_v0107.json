@@ -1,0 +1,898 @@
+{
+ "schema": "VIA.VDF.UnifiedParams.v1",
+ "note": "VDF 全引擎統一參數 SSOT——參數集中此檔,引擎讀此不各自散置 ‖ v0101(2026-11-15T19:00:16Z):操作員 2026-11-15 裁定 PC-001「起始日用 2022-01-01」+「獨立性」—— time.start_date 2018-01-01 → 2022-01-01,與 VDF_DataPlane_SSOT_v0102 群組起始日一致;只動這一個值,其餘一字不動;v0100 不動(已發布)。 ‖ v0102(2026-11-22T12:00:00Z):操作員 2026-11-22 令「VDF資料取自2018-01-01為起始」→ 覆蓋 PC-001(2026-11-15 的 2022-01-01),回到原始 2018-01-01(與 Unified_Params v0100、引擎寫死值 ENG044/ENG055 FRED 一致)。只在 VDF 自己的冊改。 time.start_date 2022-01-01→2018-01-01。v0100/v0101 不動。",
+ "time": {
+  "start_date": "2018-01-01",
+  "end_date": "TODAY",
+  "use_current_as_end": true
+ },
+ "fetch": {
+  "batch_size": 5,
+  "max_retries": 3,
+  "retry_delay_s": 2,
+  "timeout_s": 30,
+  "http_headers": {
+   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+   "Accept": "application/json, text/plain, */*"
+  }
+ },
+ "markets": {
+  "US_INDICES": [
+   "^GSPC",
+   "^DJI",
+   "^IXIC",
+   "^VIX"
+  ],
+  "TAIWAN_INDICES": [
+   "^TWII",
+   "^TWOII"
+  ],
+  "INTERNATIONAL": [
+   "^HSI",
+   "^N225"
+  ],
+  "CURRENCIES": [
+   "EURUSD=X",
+   "JPYUSD=X"
+  ]
+ },
+ "output": {
+  "formats": [
+   "parquet",
+   "csv",
+   "duckdb",
+   "sqlite",
+   "sql"
+  ],
+  "csv_encoding": "utf-8-sig",
+  "root": "functional modules/VDF/output_hub",
+  "gsheet": "REGISTERED(真 API=雲端道:VIA_NET_CONSENT+OAuth 憑證到位才實連;先出相容 csv)"
+ },
+ "honesty": {
+  "simulation_data": "禁——模擬值必須欄名帶 _SIM 後綴且摘要標註,絕不冒充真值"
+ },
+ "three": {
+  "periods": 3,
+  "lanes": 3,
+  "tolerance_rel": 0.001,
+  "engine_timeout_s": 1800,
+  "buffer": {
+   "daily": 10,
+   "monthly": 4,
+   "quarterly": 4,
+   "macro": 400,
+   "event": 30
+  }
+ },
+ "schedule": {
+  "timezone": "Asia/Taipei",
+  "jobs": [
+   {
+    "id": "vdf_three_run",
+    "cron": "35 18 * * 1-5",
+    "cmd": [
+     "VDF_ENG242_ThreePeriodDistill",
+     "run",
+     "--live"
+    ]
+   },
+   {
+    "id": "vdf_three_distill",
+    "cron": "55 18 * * 1-5",
+    "cmd": [
+     "VDF_ENG242_ThreePeriodDistill",
+     "distill"
+    ]
+   }
+  ]
+ },
+ "prior": "VDF_Unified_Params_v0105.json",
+ "ts": "2026-11-25T18:51:06Z",
+ "why_v0104": "VDF_ENG053_ParamEngineMap v0106 derive:正本 VDF_ParamControl_SSOT_v0106.json 的 7 條參數寫回(其餘一字不動)",
+ "derived_from": "VDF_Unified_Params_v0106.json + VDF_Unified_Params_v0103.json(engine_params · engine_params_note · harmonize_proposals)",
+ "fin5y": {
+  "years": 5,
+  "universe_regex": "^[1-9]\\d{3}$",
+  "rate_s": 3.0,
+  "amount_scale": 1000,
+  "face_value": 10,
+  "face_value_overrides": {},
+  "bases": [
+   "https://mopsov.twse.com.tw/mops/web",
+   "https://mops.twse.com.tw/mops/web"
+  ],
+  "endpoints": {
+   "income": "ajax_t164sb04",
+   "balance": "ajax_t164sb03",
+   "cashflow": "ajax_t164sb05",
+   "dividend": "ajax_t05st09_2"
+  },
+  "items": {
+   "diluted_eps": [
+    "稀釋每股盈餘",
+    "稀釋每股盈餘(元)",
+    "稀釋每股盈餘合計"
+   ],
+   "basic_eps": [
+    "基本每股盈餘",
+    "基本每股盈餘(元)",
+    "基本每股盈餘合計"
+   ],
+   "ni_parent": [
+    "本期淨利(淨損)歸屬於母公司業主",
+    "母公司業主(淨利/損)",
+    "淨利(淨損)歸屬於母公司業主",
+    "歸屬於母公司業主之本期淨利(淨損)"
+   ],
+   "equity_parent": [
+    "歸屬於母公司業主之權益合計",
+    "歸屬於母公司業主之權益"
+   ],
+   "share_capital": [
+    "普通股股本",
+    "普通股"
+   ],
+   "operating_income": [
+    "營業利益(損失)",
+    "營業利益",
+    "營業淨利(淨損)"
+   ],
+   "depreciation": [
+    "折舊費用",
+    "折舊費用合計"
+   ],
+   "amortization": [
+    "攤銷費用",
+    "攤銷費用合計"
+   ],
+   "dividends_paid": [
+    "發放現金股利",
+    "發放現金股利合計"
+   ],
+   "cash_dps": [
+    "盈餘分配之現金股利(元/股)",
+    "現金股利",
+    "股東配發-盈餘分配之現金股利(元/股)",
+    "盈餘分配之股東現金股利(元/股)"
+   ],
+   "cash_dps_reserve": [
+    "法定盈餘公積、資本公積發放之現金(元/股)",
+    "法定盈餘公積發放之現金(元/股)",
+    "資本公積發放之現金(元/股)"
+   ],
+   "dividend_period": [
+    "股利所屬年(季)度",
+    "股利所屬期間",
+    "股利所屬年度"
+   ]
+  }
+ },
+ "why_v0105": "VDF_ENG053_ParamEngineMap v0106 derive:正本 VDF_ParamControl_SSOT_v0108.json 的 9 條參數寫回(其餘一字不動)",
+ "why_v0106": "VDF_ENG053_ParamEngineMap v0106 derive:正本 VDF_ParamControl_SSOT_v0110.json 的 1 條參數寫回(其餘一字不動)",
+ "engine_params": {
+  "VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher": {
+   "PROJECT_NAME": {
+    "value": "1-2TWFinancialData",
+    "line": 65
+   },
+   "BASE_DIR": {
+    "via_root_rel": "module/VDF/dict",
+    "was": "本機絕對路徑(已改為自 VIA 根解析;原文不入冊)",
+    "line": 66
+   },
+   "OUTPUT_DIR": {
+    "value": "1-3-GlobalIndexIndicator",
+    "line": 67
+   },
+   "START_DATE": {
+    "value": "2018-01-01",
+    "line": 71
+   },
+   "END_DATE": {
+    "value": "2025-06-18",
+    "line": 72
+   },
+   "BATCH_SIZE": {
+    "value": 5,
+    "line": 76
+   },
+   "RETRY_DELAY": {
+    "value": 2,
+    "line": 78
+   },
+   "MAX_BACKUP_FILES": {
+    "value": 5,
+    "line": 86
+   },
+   "MARKETS": {
+    "value": {
+     "US_INDICES": {
+      "^GSPC": "S&P 500",
+      "^DJI": "Dow Jones",
+      "^IXIC": "NASDAQ",
+      "^VIX": "VIX"
+     },
+     "TAIWAN_INDICES": {
+      "^TWII": "TAIEX",
+      "^TWOII": "OTC"
+     },
+     "INTERNATIONAL": {
+      "^HSI": "Hang Seng",
+      "^N225": "Nikkei 225"
+     },
+     "CURRENCIES": {
+      "EURUSD=X": "EUR/USD",
+      "JPYUSD=X": "JPY/USD"
+     }
+    },
+    "line": 95
+   }
+  },
+  "VDF_MDL001_TWEquityEngine": {
+   "OUTPUT_DIR": {
+    "via_root_rel": "dict/1-2-TWStockData",
+    "was": "本機絕對路徑(已改為自 VIA 根解析;原文不入冊)",
+    "line": 164
+   },
+   "TICKER_FILE": {
+    "via_root_rel": "dict/1-1_TickerList.csv",
+    "was": "本機絕對路徑(已改為自 VIA 根解析;原文不入冊)",
+    "line": 165
+   },
+   "INDEX_OUTPUT_DIR": {
+    "via_root_rel": "dict/1-3-TWIndexUniverse",
+    "was": "本機絕對路徑(已改為自 VIA 根解析;原文不入冊)",
+    "line": 166
+   },
+   "EQUITY_OUTPUT_DIR": {
+    "via_root_rel": "dict/1-4-TWEquityUniverse",
+    "was": "本機絕對路徑(已改為自 VIA 根解析;原文不入冊)",
+    "line": 167
+   },
+   "VERITAS_MODULE_PATH": {
+    "via_root_rel": "module/supportive_module",
+    "was": "本機絕對路徑(已改為自 VIA 根解析;原文不入冊)",
+    "line": 170
+   },
+   "RETRY_DELAY": {
+    "value": 2,
+    "line": 186
+   },
+   "MAX_BACKUP_FILES": {
+    "value": 5,
+    "line": 243
+   }
+  },
+  "VDF_MDL002_YFinanceFetchingEngine": {
+   "PROJECT_NAME": {
+    "value": "1-2YFinanceData",
+    "line": 129
+   },
+   "_PROD_BASE": {
+    "via_root_rel": "module/VDF/dict",
+    "was": "本機絕對路徑(已改為自 VIA 根解析;原文不入冊)",
+    "line": 133
+   },
+   "OUTPUT_DIR": {
+    "value": "1-3-YFinanceUniverse",
+    "line": 135
+   },
+   "START_DATE": {
+    "value": "2018-01-01",
+    "line": 139
+   },
+   "END_DATE": {
+    "value": "2025-06-18",
+    "line": 140
+   },
+   "BATCH_SIZE": {
+    "value": 5,
+    "line": 144
+   },
+   "RETRY_DELAY": {
+    "value": 2,
+    "line": 146
+   },
+   "YF_BATCH_SIZE": {
+    "value": 20,
+    "line": 151
+   },
+   "THREADPOOL_WORKERS": {
+    "value": 4,
+    "line": 153
+   },
+   "MAX_BACKUP_FILES": {
+    "value": 5,
+    "line": 160
+   },
+   "MARKETS": {
+    "value": {
+     "INDICES_US": {
+      "^GSPC": "S&P 500",
+      "^NDX": "Nasdaq 100",
+      "^DJI": "Dow Jones",
+      "^RUT": "Russell 2000",
+      "^VIX": "VIX",
+      "^SOX": "Philadelphia Semiconductor"
+     },
+     "INDICES_ASIA": {
+      "^N225": "Nikkei 225",
+      "^TOPX": "Topix",
+      "^HSI": "Hang Seng",
+      "^HSCE": "HSCEI 國企指數",
+      "000001.SS": "上證綜指",
+      "399001.SZ": "深證成指",
+      "^KS11": "KOSPI",
+      "^STI": "STI 新加坡",
+      "^NSEI": "Nifty 50",
+      "^AXJO": "ASX 200"
+     },
+     "INDICES_EUROPE": {
+      "^GDAXI": "DAX 30",
+      "^FTSE": "FTSE 100",
+      "^FCHI": "CAC 40"
+     },
+     "EQUITY_US": {
+      "AAPL": "Apple",
+      "MSFT": "Microsoft",
+      "NVDA": "NVIDIA",
+      "GOOGL": "Alphabet",
+      "AMZN": "Amazon",
+      "META": "Meta",
+      "TSLA": "Tesla",
+      "TSM": "TSMC ADR",
+      "AVGO": "Broadcom",
+      "AMD": "AMD"
+     },
+     "EQUITY_TW_LISTED": {
+      "2330.TW": "台積電",
+      "2317.TW": "鴻海",
+      "2454.TW": "聯發科",
+      "2308.TW": "台達電",
+      "2382.TW": "廣達",
+      "2891.TW": "中信金",
+      "2412.TW": "中華電",
+      "1301.TW": "台塑",
+      "2603.TW": "長榮",
+      "3008.TW": "大立光",
+      "6415.TW": "矽力-KY"
+     },
+     "EQUITY_TW_OTC": {
+      "3324.TWO": "雙鴻",
+      "5483.TWO": "中美晶",
+      "6488.TWO": "環球晶",
+      "8069.TWO": "元太"
+     },
+     "EQUITY_ASIA": {
+      "0700.HK": "騰訊控股",
+      "9988.HK": "阿里巴巴",
+      "7203.T": "Toyota",
+      "6758.T": "Sony",
+      "005930.KS": "Samsung Electronics",
+      "600519.SS": "貴州茅台"
+     },
+     "EQUITY_EUROPE": {
+      "SAP.DE": "SAP",
+      "BMW.DE": "BMW",
+      "BP.L": "BP",
+      "HSBA.L": "HSBC"
+     },
+     "ETF_REGION_GLOBAL": {
+      "SPY": "S&P 500 (美國大盤基準)",
+      "QQQ": "Nasdaq 100 (科技板塊代理)",
+      "IWM": "Russell 2000 (美小型股風險偏好)",
+      "EFA": "已開發市場非美 (歐日韓資金輪動)",
+      "EEM": "新興市場 (EM vs DM 輪動)",
+      "VWO": "新興市場 Vanguard (EM 資金另一代理)",
+      "FXI": "中國大型股 (中國資金進出)",
+      "MCHI": "MSCI China (A+H+ADR 合計)",
+      "EWJ": "日本 (日圓避險參考)",
+      "EWY": "韓國 (台韓半導體輪動)",
+      "EWT": "台灣 (外資台股持倉代理)",
+      "EWZ": "巴西 (原物料新興市場)",
+      "INDA": "印度 (亞洲資金分流)",
+      "EWG": "德國 (歐洲工業代理)",
+      "EZU": "歐元區 (ECB 政策資金反應)"
+     },
+     "ETF_SECTOR_US": {
+      "XLK": "科技 (AAPL MSFT NVDA 主導)",
+      "XLF": "金融 (升息受益/銀行風險)",
+      "XLV": "醫療保健 (防禦性避風港)",
+      "XLE": "能源 (油價連動/通膨預期)",
+      "XLI": "工業 (景氣循環領先)",
+      "XLY": "非必需消費 (消費信心)",
+      "XLP": "必需消費 (防禦/避險訊號)",
+      "XLU": "公用事業 (長債替代/降息受益)",
+      "XLRE": "房地產 (利率敏感/REITs)",
+      "XLB": "材料 (商品周期連動)",
+      "XLC": "通訊服務 (GOOG META 主導)",
+      "SOXX": "半導體 (台股最相關)",
+      "SMH": "半導體 VanEck (NVDA TSM 權重高)",
+      "IBB": "生技 (風險偏好生技指標)",
+      "KRE": "區域銀行 (銀行危機早期警報)",
+      "ARKK": "創新科技主動 (高風險偏好溫度計)"
+     },
+     "ETF_BONDS": {
+      "SHY": "美國短債 1-3Y (Fed 短端利率代理)",
+      "IEF": "美國中債 7-10Y (殖利率曲線中段)",
+      "TLT": "美國長債 20Y+ (股債翹翹板核心)",
+      "IEI": "美國中短債 3-7Y (曲線形狀輔助)",
+      "LQD": "投資級公司債 (IG 信用利差)",
+      "HYG": "高收益 (垃圾債) (HY 利差)",
+      "JNK": "高收益 SPDR (HYG 配對驗證)",
+      "TIP": "TIPS 通膨連結債 (Break-even 通膨率)",
+      "BND": "全債市 Vanguard (整體債市基準)",
+      "EMB": "新興市場主權債 (EM 信用風險溢價)",
+      "MUB": "市政債免稅 (美國地方財政壓力)"
+     },
+     "ETF_THEMATIC": {
+      "GLD": "黃金 (避險/實質利率反向)",
+      "IAU": "黃金 iShares (GLD 配對驗證)",
+      "SLV": "白銀 (工業+避險雙屬性)",
+      "USO": "WTI 原油 (通膨/地緣衝突代理)",
+      "DJP": "商品指數 (大宗商品整體輪動)",
+      "VTV": "價值股因子 (價值 vs 成長輪動)",
+      "VUG": "成長股因子 (利率敏感成長)",
+      "QUAL": "品質因子 (資金品質偏好)",
+      "MTUM": "動能因子 (趨勢動能強弱)",
+      "SQQQ": "Nasdaq 3X 放空 (反轉信號)",
+      "TQQQ": "Nasdaq 3X 做多 (資金過度集中警示)",
+      "SH": "S&P 500 反向 1X (機構避險倉位估算)"
+     },
+     "ETF_HELPER": {
+      "UUP": "美元指數多頭 (美元強弱→EM 資金方向)",
+      "UDN": "美元指數空頭 (UUP 配對)",
+      "VIXY": "VIX 期貨多頭 (避險需求量化)",
+      "BIL": "T-Bill 短債 (現金等價物流量)",
+      "SGOV": "0-3M 公債 (資金停泊規模)"
+     },
+     "ETF_TW_PASSIVE": {
+      "0050.TW": "元大台灣 50 (最大台股 ETF, 外資持倉代理)",
+      "0056.TW": "元大高股息 (配息型資金, 散戶資金偏好)",
+      "00632R.TW": "元大台灣 50 反 1 (本土避險量化)",
+      "006208.TW": "富邦台 50 (低費用競爭, 0050 分流監控)",
+      "00878.TW": "國泰永續高股息 (ESG 主題)",
+      "00713.TW": "元大台灣高息低波",
+      "00919.TW": "群益台灣精選高息",
+      "00929.TW": "復華台灣科技優息 (月配息高股息)",
+      "00946.TW": "群益台灣科技高息"
+     },
+     "ETF_TW_ACTIVE": {
+      "00400A.TW": "主動國泰動能高息",
+      "00401A.TW": "主動摩根台灣鑫收",
+      "00404A.TW": "主動國泰臺灣價值優選",
+      "00405A.TW": "主動國泰臺灣科技領袖",
+      "00406A.TW": "主動中信臺灣半導體精選",
+      "00407A.TW": "主動中信臺灣高息動能",
+      "00408A.TW": "主動永豐臺灣均衡成長",
+      "00409A.TW": "主動第一金臺灣優選息收",
+      "00410A.TW": "主動凱基臺灣價值動能",
+      "00420A.TW": "主動安聯臺灣科技創新",
+      "00423A.TW": "主動復華臺灣半導體優選",
+      "00980A.TW": "主動野村臺灣優選 (台灣首檔, 2025/05/05)",
+      "00981A.TW": "主動統一台股增長",
+      "00982A.TW": "主動群益台灣強棒",
+      "00984A.TW": "主動安聯台灣高息",
+      "00985A.TW": "主動野村台灣 50",
+      "00987A.TW": "主動台新優勢成長",
+      "00991A.TW": "主動復華未來 50",
+      "00992A.TW": "主動群益科技創新",
+      "00993A.TW": "主動安聯台灣",
+      "00994A.TW": "主動第一金台股優",
+      "00995A.TW": "主動中信台灣卓越",
+      "00996A.TW": "主動兆豐台灣豐收",
+      "00997A.TW": "主動富邦臺灣 AI 成長",
+      "00999A.TW": "主動野村高息成長"
+     },
+     "CURRENCIES": {
+      "TWD=X": "USD/TWD",
+      "EURUSD=X": "EUR/USD",
+      "JPY=X": "USD/JPY",
+      "GBPUSD=X": "GBP/USD",
+      "CNY=X": "USD/CNY",
+      "KRW=X": "USD/KRW",
+      "AUDUSD=X": "AUD/USD",
+      "DX-Y.NYB": "DXY 美元指數"
+     },
+     "COMMODITIES": {
+      "GC=F": "黃金 Gold",
+      "SI=F": "白銀 Silver",
+      "CL=F": "WTI 原油",
+      "BZ=F": "布蘭特原油",
+      "NG=F": "天然氣",
+      "HG=F": "銅 Copper",
+      "ZS=F": "大豆 Soybean",
+      "ZW=F": "小麥 Wheat",
+      "ES=F": "S&P 500 Futures",
+      "NQ=F": "Nasdaq 100 Futures",
+      "YM=F": "Dow Jones Futures"
+     },
+     "BONDS_YIELDS": {
+      "^IRX": "美國 13週 T-Bill",
+      "^FVX": "美國 5Y 殖利率",
+      "^TNX": "美國 10Y 殖利率",
+      "^TYX": "美國 30Y 殖利率"
+     },
+     "CRYPTO": {
+      "BTC-USD": "Bitcoin",
+      "ETH-USD": "Ethereum",
+      "SOL-USD": "Solana",
+      "BNB-USD": "BNB",
+      "XRP-USD": "XRP"
+     }
+    },
+    "line": 181
+   },
+   "TW_TICKER_REGEX": {
+    "regex": "^(?!202[1-9])(?!2030)[1-9]\\d{3}$",
+    "line": 508
+   },
+   "TW_BLOOMBERG_REGEX": {
+    "regex": "\\b[1-9]\\d{3} TT\\b",
+    "line": 509
+   },
+   "TW_YFINANCE_REGEX": {
+    "regex": "\\b[1-9]\\d{3}\\.(TW|TWO)\\b",
+    "line": 510
+   }
+  },
+  "VDF_MDL003_SentimentMacroEngine": {
+   "PROJECT_NAME": {
+    "value": "1-4-SentimentMacro",
+    "line": 219
+   },
+   "_PROD_BASE": {
+    "via_root_rel": "module/VDF/dict",
+    "was": "本機絕對路徑(已改為自 VIA 根解析;原文不入冊)",
+    "line": 223
+   },
+   "OUTPUT_DIR": {
+    "value": "1-4-SentimentMacro",
+    "line": 226
+   },
+   "START_DATE": {
+    "value": "2018-01-01",
+    "line": 249
+   },
+   "END_DATE": {
+    "value": "",
+    "line": 250
+   },
+   "HTTP_TIMEOUT": {
+    "value": 30,
+    "line": 256
+   },
+   "RETRY_DELAY": {
+    "value": 2,
+    "line": 258
+   },
+   "THREADPOOL_WORKERS": {
+    "value": 4,
+    "line": 260
+   },
+   "OUTPUT_JSON": {
+    "value": true,
+    "line": 273
+   },
+   "DUCKDB_FILENAME": {
+    "value": "VDF_MDL003_SentimentMacro.duckdb",
+    "line": 278
+   },
+   "MAX_BACKUP_FILES": {
+    "value": 5,
+    "line": 284
+   }
+  },
+  "VDF_MDL004_TWFullMarketEngine": {
+   "PROJECT_NAME": {
+    "value": "1-4-TWFullMarket",
+    "line": 69
+   },
+   "BASE_DIR": {
+    "via_root_rel": "module/VDF/dict",
+    "was": "本機絕對路徑(已改為自 VIA 根解析;原文不入冊)",
+    "line": 70
+   },
+   "OUTPUT_DIR": {
+    "value": "1-4-TWFullMarket",
+    "line": 71
+   },
+   "UNIVERSE_SOURCE": {
+    "value": "1-0-TWUniverse",
+    "line": 74
+   },
+   "TW_TICKER_REGEX": {
+    "value": "(?!0)(?!202[1-9])(?!2030)([1-9]\\d{3})",
+    "line": 79
+   },
+   "TW_BLOOMBERG_REGEX": {
+    "value": "([1-9]\\d{3}) TT",
+    "line": 80
+   },
+   "TW_YFINANCE_REGEX": {
+    "value": "([1-9]\\d{3})\\.(TW|TWO)",
+    "line": 81
+   },
+   "TWSE_LISTING_URL": {
+    "value": "https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL",
+    "line": 85
+   },
+   "HTTP_USER_AGENT": {
+    "value": "Mozilla/5.0 VeritasDataForge/VDF-MDL004",
+    "line": 90
+   },
+   "HTTP_TIMEOUT": {
+    "value": 20,
+    "line": 91
+   },
+   "YF_HISTORY_PERIOD": {
+    "value": "1y",
+    "line": 96
+   },
+   "YF_TIMEOUT": {
+    "value": 15,
+    "line": 99
+   },
+   "RETRY_DELAY": {
+    "value": 2,
+    "line": 113
+   },
+   "OUTPUT_JSON": {
+    "value": false,
+    "line": 119
+   },
+   "DUCKDB_FILENAME": {
+    "value": "VDF_MDL004_TWFullMarket.duckdb",
+    "line": 123
+   },
+   "MAX_BACKUP_FILES": {
+    "value": 5,
+    "line": 125
+   }
+  },
+  "VDF_MDL006_FinancialModel": {
+   "PROJECT_NAME": {
+    "value": "1-6-FinancialModel",
+    "line": 200
+   },
+   "_PROD_BASE": {
+    "via_root_rel": "module/VDF/dict",
+    "was": "本機絕對路徑(已改為自 VIA 根解析;原文不入冊)",
+    "line": 204
+   },
+   "OUTPUT_DIR": {
+    "value": "1-6-FinancialModel",
+    "line": 207
+   },
+   "UNIVERSE_SOURCE": {
+    "via_root_rel": "module/VDF/dict/1-0-TWUniverse",
+    "was": "本機絕對路徑(已改為自 VIA 根解析;原文不入冊)",
+    "line": 210
+   },
+   "YF_HISTORY_PERIOD": {
+    "value": "5y",
+    "line": 215
+   },
+   "YF_TIMEOUT": {
+    "value": 20,
+    "line": 217
+   },
+   "THREADPOOL_WORKERS": {
+    "value": 6,
+    "line": 237
+   },
+   "RETRY_DELAY": {
+    "value": 2,
+    "line": 239
+   },
+   "OUTPUT_JSON": {
+    "value": false,
+    "line": 245
+   },
+   "DUCKDB_FILENAME": {
+    "value": "VDF_MDL006_FinancialModel.duckdb",
+    "line": 249
+   },
+   "MAX_BACKUP_FILES": {
+    "value": 5,
+    "line": 252
+   }
+  },
+  "VDF_ENG114_PmiPair": {
+   "HTTP_TIMEOUT": {
+    "value": 30,
+    "line": 56
+   }
+  }
+ },
+ "engine_params_note": "各引擎模組層參數的正本(VIA_GovernanceApply v0100 解耦;引擎新版以 _VDF_PARAM(名, 原值) 讀這裡,缺冊 / 缺鍵 = 原值)。via_root_rel = 自 VIA 根解析的相對路徑;regex = 正規式字串。",
+ "harmonize_proposals": {
+  "BASE_DIR": {
+   "values_seen": {
+    "<本機路徑>": 13,
+    "<DYNAMIC:自引擎位置向上解析 VIA 根>": 1
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "BATCH_SIZE": {
+   "values_seen": {
+    "5": 3,
+    "20": 2
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "DUCKDB_FILENAME": {
+   "values_seen": {
+    "'VDF_MDL006_FinancialModel.duckdb'": 2,
+    "'VDF_MDL103_MasterRegistry.duckdb'": 2,
+    "'VDF_MDL004_TWFullMarket.duckdb'": 2,
+    "'VDF_MDL005_TWStockFilter.duckdb'": 2,
+    "'VDF_MDL007_SSOTResolver.duckdb'": 2,
+    "'VDF_MDL003_SentimentMacro.duckdb'": 2,
+    "SCOPED(per-engine)": 1
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "END_DATE": {
+   "values_seen": {
+    "'2025-06-18'": 3,
+    "'2025-10-13'": 1,
+    "''": 2,
+    "<TODAY;可覆寫 YYYY-MM-DD>": 1
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "HTTP_TIMEOUT": {
+   "values_seen": {
+    "20": 4,
+    "30": 5
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "HTTP_USER_AGENT": {
+   "values_seen": {
+    "'Mozilla/5.0 VeritasDataForge/VDF-MDL004'": 2,
+    "'Mozilla/5.0 VeritasDataForge/VDF-MDL007'": 2,
+    "'Mozilla/5.0 VeritasDataForge/VDF'": 1
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "MARKETS": {
+   "values_seen": {
+    "{'US_INDICES': {'^GSPC': 'S&P 500', '^DJI': 'Dow Jones', '^IXIC': 'NASDAQ', '^VI": 2,
+    "{'INDICES_US': {'^GSPC': 'S&P 500', '^NDX': 'Nasdaq 100', '^DJI': 'Dow Jones', '": 2,
+    "<UNION:US_INDICES 鍵名體系+成員聯集>": 1
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "MAX_BACKUP_FILES": {
+   "values_seen": {
+    "5": 13,
+    "3": 1
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "OUTPUT_DIR": {
+   "values_seen": {
+    "'1-6-FinancialModel'": 2,
+    "'1-3-GlobalIndexIndicator'": 1,
+    "'0-0-MasterRegistry'": 2,
+    "'1-4-TWFullMarket'": 2,
+    "<本機路徑>": 1,
+    "'1-0-TWUniverse'": 2,
+    "'1-3-YFinanceUniverse'": 2,
+    "'1-5-TWStockFilter'": 2,
+    "'FinancialData'": 1,
+    "'1-7-SSOTResolver'": 2,
+    "'1-4-SentimentMacro'": 2,
+    "<DYNAMIC:自引擎位置向上解析 VIA 根>": 1
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "OUTPUT_JSON": {
+   "values_seen": {
+    "False": 4,
+    "True": 12,
+    "<DYNAMIC:自引擎位置向上解析 VIA 根>": 1
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "PROJECT_NAME": {
+   "values_seen": {
+    "'1-6-FinancialModel'": 2,
+    "'1-2TWFinancialData'": 1,
+    "'0-0-MasterRegistry'": 2,
+    "'1-4-TWFullMarket'": 2,
+    "'FINAL_ACTIVATION_TEST'": 2,
+    "'MDL001-TWUniverseVerify'": 3,
+    "'1-2YFinanceData'": 2,
+    "'1-5-TWStockFilter'": 2,
+    "'UltraFinancialData'": 1,
+    "'1-7-SSOTResolver'": 2,
+    "'1-4-SentimentMacro'": 2
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "RETRY_DELAY": {
+   "values_seen": {
+    "2": 13,
+    "1.5": 2,
+    "1": 1
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "START_DATE": {
+   "values_seen": {
+    "'2018-01-01'": 5,
+    "'1998-01-01'": 2
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "THREADPOOL_WORKERS": {
+   "values_seen": {
+    "6": 2,
+    "4": 4,
+    "8": 3
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "TWSE_LISTING_URL": {
+   "values_seen": {
+    "'https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL'": 2,
+    "'https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL'": 3
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "TW_BLOOMBERG_REGEX": {
+   "values_seen": {
+    "'([1-9]\\\\d{3}) TT'": 4,
+    "'^([1-9]\\\\d{3})\\\\s+TT$'": 3
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "TW_TICKER_REGEX": {
+   "values_seen": {
+    "'(?!0)(?!202[1-9])(?!2030)([1-9]\\\\d{3})'": 7,
+    "(?!0)(?!202[1-9])(?!2030)([1-9]\\d{3})": 1
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "TW_YFINANCE_REGEX": {
+   "values_seen": {
+    "'([1-9]\\\\d{3})\\\\.(TW|TWO)'": 4,
+    "'^([1-9]\\\\d{3})\\\\.(TW|TWO)$'": 3
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "UNIVERSE_SOURCE": {
+   "values_seen": {
+    "<本機路徑>": 4,
+    "'1-0-TWUniverse'": 4,
+    "<DYNAMIC:自引擎位置向上解析 VIA 根;相對件 module/VDF/dict/1-0-TWUniverse*(舊絕對路徑入 variants 存證)": 1
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "YF_BATCH_SIZE": {
+   "values_seen": {
+    "20": 2,
+    "50": 3
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "YF_HISTORY_PERIOD": {
+   "values_seen": {
+    "'5y'": 2,
+    "'1y'": 3
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  },
+  "YF_TIMEOUT": {
+   "values_seen": {
+    "20": 3,
+    "15": 6
+   },
+   "state": "proposed(未套用:同名不同值不自動統一,操作員裁定後由 VDF 出新版)"
+  }
+ },
+ "why_v0107": "PR #749 合併後 main 的尾版是 v0106(三期 · 排程 · fin5y),PR #745 的 v0103(參數解耦 engine_params)落在尾版底下、引擎讀尾版會讀不到 → 本版 = v0106 全文 + v0103 新增的三個頂層鍵(兩邊鍵不重疊,值逐字照抄);缺鍵照舊回原值,零行為變更。"
+}

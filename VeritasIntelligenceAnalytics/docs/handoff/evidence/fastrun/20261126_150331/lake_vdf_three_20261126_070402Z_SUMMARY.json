@@ -1,0 +1,262 @@
+{
+ "reconcile": [
+  {
+   "group": "TW_PRICE_VOL",
+   "pair": "TW_PRICE_VOL__tw_daily_prices.parquet × TW_PRICE_VOL__tw_trading_daily.parquet",
+   "state": "OK",
+   "compared": 7110,
+   "mismatch": 1366,
+   "columns": [
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume"
+   ],
+   "pk": [
+    "code",
+    "date"
+   ],
+   "key_normalized": true,
+   "a_rows": 6063,
+   "b_rows": 7105
+  },
+  {
+   "group": "TW_CHIP",
+   "pair": "TW_CHIP__tw_chip_margin.parquet × TW_CHIP__tw_chip_derived.parquet",
+   "state": "NO_COMMON_NUMERIC",
+   "pk": [
+    "code",
+    "date"
+   ],
+   "key_normalized": true,
+   "a_rows": 5709,
+   "b_rows": 5709
+  },
+  {
+   "group": "SENTIMENT",
+   "pair": "SENTIMENT__sentiment_daily.parquet × SENTIMENT__aaii_sentiment.parquet",
+   "state": "NO_COMMON_NUMERIC",
+   "pk": [
+    "date"
+   ],
+   "key_normalized": true,
+   "a_rows": 3,
+   "b_rows": 3
+  }
+ ],
+ "lamp": "RED",
+ "counts": {
+  "tables": 13,
+  "ok": 11,
+  "pk_conflict": 1,
+  "pairs": 3,
+  "mismatch": 1366,
+  "reconcile_not_ok": 2
+ },
+ "tool": "VDF_ENG242_ThreePeriodDistill v0105",
+ "verb": "distill",
+ "utc": "2026-11-26T07:04:03+00:00",
+ "format": "parquet",
+ "accel": true,
+ "net": true,
+ "three": {
+  "should": 13,
+  "done": 13,
+  "skipped": []
+ },
+ "tables": [
+  {
+   "group": "TW_PRICE_VOL",
+   "view": "v_vdf_tw_market__tw_daily_prices",
+   "state": "OK",
+   "rows": 6063,
+   "pk": [
+    "code",
+    "date"
+   ],
+   "pk_conflicts": 0,
+   "renamed": {
+    "ticker": "code"
+   },
+   "key_inferred": "ticker",
+   "file": "TW_PRICE_VOL__tw_daily_prices.parquet"
+  },
+  {
+   "group": "TW_PRICE_VOL",
+   "view": "v_vdf_tw_market__tw_trading_daily",
+   "state": "OK",
+   "rows": 7105,
+   "pk": [
+    "code",
+    "date"
+   ],
+   "pk_conflicts": 0,
+   "renamed": {},
+   "key_inferred": "code",
+   "file": "TW_PRICE_VOL__tw_trading_daily.parquet"
+  },
+  {
+   "group": "TW_CHIP",
+   "view": "v_vdf_tw_market__tw_chip_margin",
+   "state": "OK",
+   "rows": 5709,
+   "pk": [
+    "code",
+    "date"
+   ],
+   "pk_conflicts": 0,
+   "renamed": {},
+   "key_inferred": "code",
+   "date_inferred": "date",
+   "file": "TW_CHIP__tw_chip_margin.parquet"
+  },
+  {
+   "group": "TW_CHIP",
+   "view": "v_vdf_tw_market__tw_chip_derived",
+   "state": "OK",
+   "rows": 5709,
+   "pk": [
+    "code",
+    "date"
+   ],
+   "pk_conflicts": 0,
+   "renamed": {},
+   "key_inferred": "code",
+   "date_inferred": "date",
+   "file": "TW_CHIP__tw_chip_derived.parquet"
+  },
+  {
+   "group": "TW_MONTHLY_REV",
+   "view": "v_vdf_tw_market__tw_monthly_revenue",
+   "state": "OK",
+   "rows": 6809,
+   "pk": [
+    "code",
+    "ym"
+   ],
+   "pk_conflicts": 0,
+   "renamed": {},
+   "key_inferred": "code",
+   "date_inferred": "ym",
+   "file": "TW_MONTHLY_REV__tw_monthly_revenue.parquet"
+  },
+  {
+   "group": "TW_INDEX",
+   "view": "v_VDF_TWIndex_Daily__tw_index_daily",
+   "state": "OK",
+   "rows": 3,
+   "pk": [
+    "index_code",
+    "date"
+   ],
+   "pk_conflicts": 0,
+   "renamed": {
+    "turnover": "amount"
+   },
+   "file": "TW_INDEX__tw_index_daily.parquet"
+  },
+  {
+   "group": "TW_ACTIVE_ETF",
+   "view": "v_ActiveTWETF__active_tw_etf_universe",
+   "state": "OK",
+   "rows": 78,
+   "pk": [
+    "etf_ticker",
+    "snapshot_at"
+   ],
+   "pk_conflicts": 0,
+   "renamed": {},
+   "key_inferred": "etf_ticker",
+   "date_inferred": "snapshot_at",
+   "file": "TW_ACTIVE_ETF__active_tw_etf_universe.parquet"
+  },
+  {
+   "group": "TW_ACTIVE_ETF",
+   "view": "v_ActiveTWETF__holdings_daily",
+   "state": "NO_DATE_COL",
+   "rows": 0,
+   "key_inferred": "etf_ticker",
+   "file": "TW_ACTIVE_ETF__holdings_daily.parquet"
+  },
+  {
+   "group": "TW_FIN",
+   "view": "v_vdf_tw_market__tw_financial",
+   "state": "OK",
+   "rows": 24,
+   "pk": [
+    "code",
+    "Period_Type",
+    "date"
+   ],
+   "pk_conflicts": 0,
+   "renamed": {
+    "Date": "date",
+    "Ticker": "code",
+    "Revenue": "revenue"
+   },
+   "key_inferred": "Ticker",
+   "key_extended": "Period_Type",
+   "date_inferred": "Date",
+   "file": "TW_FIN__tw_financial.parquet"
+  },
+  {
+   "group": "INTL_DAILY",
+   "view": "v_vdf_global_market__global_daily",
+   "state": "OK",
+   "rows": 357,
+   "pk": [
+    "code",
+    "date"
+   ],
+   "pk_conflicts": 0,
+   "renamed": {
+    "ticker": "code"
+   },
+   "file": "INTL_DAILY__global_daily.parquet"
+  },
+  {
+   "group": "US_MACRO",
+   "view": "v_vdf_global_market__us_macro",
+   "state": "PK_CONFLICT",
+   "rows": 502,
+   "pk": [
+    "series",
+    "date"
+   ],
+   "pk_conflicts": 2,
+   "renamed": {
+    "value": "amount"
+   },
+   "conflict_cols": [
+    "value"
+   ],
+   "file": "US_MACRO__us_macro.parquet"
+  },
+  {
+   "group": "SENTIMENT",
+   "view": "v_vdf_global_market__sentiment_daily",
+   "state": "OK",
+   "rows": 3,
+   "pk": [
+    "date"
+   ],
+   "pk_conflicts": 0,
+   "renamed": {},
+   "file": "SENTIMENT__sentiment_daily.parquet"
+  },
+  {
+   "group": "SENTIMENT",
+   "view": "v_aaii_sentiment__aaii_sentiment",
+   "state": "OK",
+   "rows": 3,
+   "pk": [
+    "date"
+   ],
+   "pk_conflicts": 0,
+   "renamed": {},
+   "date_inferred": "date",
+   "file": "SENTIMENT__aaii_sentiment.parquet"
+  }
+ ]
+}

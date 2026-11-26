@@ -1,0 +1,23 @@
+{
+ "schema": "VIA.RetireRestore.v1",
+ "batch": "prune_20261125_123256",
+ "at": "2026-11-26T08:10:00Z",
+ "restored": [
+  {
+   "file": "functional modules/VDF/Start-VIA-VDF-v0104.ps1",
+   "from": "functional modules/VIA_RetiredEngines/prune_20261125_123256/functional modules/VDF/Start-VIA-VDF-v0104.ps1",
+   "sha256": "f2bdc1b266062d93",
+   "content_changed": false
+  },
+  {
+   "file": "functional modules/VDF/Start-VIA-VDF-v0103.ps1",
+   "from": "functional modules/VIA_RetiredEngines/prune_20261125_123256/functional modules/VDF/Start-VIA-VDF-v0103.ps1",
+   "sha256": "f8a5cb958ecd4bbd",
+   "content_changed": false,
+   "why": "PR #743 Codex 二輪(P1):Start-VIA-VDF-v0104.ps1 第 305–308 行明寫 Join-Path $VdfRoot 'Start-VIA-VDF-v0103.ps1',不在就 throw(預設走工作台時)。v0103 只再引用 supportive modules 下的 v0160C 啟動器(在倉),不再點名其他啟動器。"
+  }
+ ],
+ "why": "PR #743 Codex P1:bin/via-vdf.cmd(第 9 行 dir /b /o:n …Start-VIA-VDF-v0*.ps1)與 Invoke-VIA-TrinityClosure-v0100 / v0101.ps1(第 131 行)用萬用字元取「名字排序最後一支」啟動器;整批搬走後這兩個入口找不到檔。RETIRE_PROOF cond1 只查了點名,沒查萬用字元的使用者。",
+ "action": "只把被選中的那一支(v0104,排序最後)以 git mv 搬回原位,內容一字不改;v0101–v0103 沒有任何呼叫者會選到,照舊留在本批。",
+ "after": "via-vdf.cmd / TrinityClosure 解析到 Start-VIA-VDF-v0104.ps1,v0104 預設交棒的 v0103 也在原位;v0101 / v0102 沒有任何呼叫者(萬用字元取最後一支 = v0104;v0104 / v0103 都不點名它們),照舊留在本批。本批由 11 支變 9 支。"
+}
