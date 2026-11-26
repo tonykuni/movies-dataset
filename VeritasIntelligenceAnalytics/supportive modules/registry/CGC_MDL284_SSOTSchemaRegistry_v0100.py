@@ -94,6 +94,25 @@ def worse(*rcs) -> int:
     return max((r if r in _RANK else 1 for r in rcs), key=lambda r: _RANK[r], default=0)
 
 
+def broken_refs(d, here: Path, via: Path) -> list:
+    """冊內 *_ref 欄指到的 .json 要找得到(相對 VIA 根 · 相對本檔 · 相對知識夾任一個在就算);找不到的回清單(PR #762 Codex P2)。"""
+    out = []
+
+    def walk(x, path=""):
+        if isinstance(x, dict):
+            for k, v in x.items():
+                if isinstance(v, str) and str(k).endswith("_ref") and v.lower().endswith(".json"):
+                    if not any((b / v).is_file() for b in (via, here.parent, via / KNOW_REL)):
+                        out.append(f"{path}{k}={v}")
+                else:
+                    walk(v, f"{path}{k}.")
+        elif isinstance(x, list):
+            for i, v in enumerate(x):
+                walk(v, f"{path}[{i}].")
+    walk(d)
+    return out
+
+
 def check(via: Path = VIA, with_cards: bool = True) -> dict:
     reg = registry_path(via)
     if reg is None:
@@ -124,6 +143,10 @@ def check(via: Path = VIA, with_cards: bool = True) -> dict:
                     issues.append(f"檔內是 {own[0]}@{own[1]}")
                 if e.get("compatibility") not in modes:
                     issues.append(f"相容模式 {e.get('compatibility')!r} 不在 {sorted(modes)}")
+                br = broken_refs(d, p, via)
+                if br:
+                    row["broken_refs"] = br
+                    issues.append(f"引用斷鏈 {len(br)} 個:" + " · ".join(br[:4]))
                 if with_cards:
                     c = card(p, via)
                     row["etag"] = c["etag"]
@@ -234,11 +257,23 @@ def selftest() -> int:
                            {"schema_id": "B_SSOT", "version": "v0100", "path": str(KNOW_REL / "B_SSOT_v0101.json"), "compatibility": "backward"},
                            {"schema_id": "C_SSOT", "version": "v0100", "path": str(KNOW_REL / "C_SSOT_v0100.json"), "compatibility": "full"},
                            {"schema_id": "E_SSOT", "version": "v0100", "path": str(KNOW_REL / "E_SSOT_v0100.json"), "compatibility": "backward"}]}
+        (kn / "specs").mkdir()
+        (kn / "specs" / "F_SSOT_v0100.json").write_text(json.dumps({"schema_id": "F_SSOT", "version": "v0100", "specs": {
+            "a": {"ssot_ref": str(KNOW_REL / "A_SSOT_v0100.json")}, "b": {"ssot_ref": "isolated/knowledge/A_SSOT_v0100.json"}}}), encoding="utf-8")
+        (kn / "specs" / "G_SSOT_v0100.json").write_text(json.dumps({"schema_id": "G_SSOT", "version": "v0100", "s": [{"ssot_ref": "../A_SSOT_v0100.json"}]}),
+                                                     encoding="utf-8")
+        reg["entries"] += [{"schema_id": "F_SSOT", "version": "v0100", "path": str(KNOW_REL / "specs" / "F_SSOT_v0100.json"), "compatibility": "full"},
+                           {"schema_id": "G_SSOT", "version": "v0100", "path": str(KNOW_REL / "specs" / "G_SSOT_v0100.json"), "compatibility": "full"}]
         (kn / "VIA_SSOT_Schema_Registry_v0100.json").write_text(json.dumps(reg), encoding="utf-8")
         res = check(via, with_cards=False)
         lamps = {r["schema_id"]: r["lamp"] for r in res["rows"]}
         chk("③ 實測燈:A 綠 · B 檔內版號不同 = 黃 · C 解析不過 = 紅 · E 檔不在 = 紅 · 總燈紅 rc 1",
-            lamps == {"A_SSOT": "GREEN", "B_SSOT": "YELLOW", "C_SSOT": "RED", "E_SSOT": "RED"} and res["rc"] == 1, lamps)
+            {k: v for k, v in lamps.items() if k in "A_SSOT B_SSOT C_SSOT E_SSOT"} == {"A_SSOT": "GREEN", "B_SSOT": "YELLOW", "C_SSOT": "RED", "E_SSOT": "RED"}
+            and res["rc"] == 1, lamps)
+        fr = [r for r in res["rows"] if r["schema_id"] == "F_SSOT"][0]
+        chk("③b 引用斷鏈:F 的 ssot_ref 指舊 isolated/ 路徑 = 黃並點名(相對 VIA 根的那個不算)· G 用相對本檔的 ../ 找得到 = 綠(Codex P2)",
+            fr["lamp"] == "YELLOW" and fr.get("broken_refs") == ["specs.b.ssot_ref=isolated/knowledge/A_SSOT_v0100.json"]
+            and lamps.get("G_SSOT") == "GREEN", (fr, lamps.get("G_SSOT")))
         chk("④ 未登冊:D 與 A 的新版 v0101(升版沒登冊照樣黃)· 只有比冊上舊的 A v0099 列歷史(Codex P2)",
             sorted((u["schema_id"], u["version"]) for u in res["unregistered"]) == [("A_SSOT", "v0101"), ("D_SSOT", "v0100")]
             and [(h["schema_id"], h["version"]) for h in res["history"]] == [("A_SSOT", "v0099")], (res["unregistered"], res["history"]))
