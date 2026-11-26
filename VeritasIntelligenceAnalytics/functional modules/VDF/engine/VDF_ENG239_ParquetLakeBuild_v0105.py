@@ -93,8 +93,32 @@ def skipped_fetch(start, end, limit=None) -> dict:
     return {"state": "SKIPPED", "note": DUP_NOTE}
 
 
+DAILY_ENGINES = {"e054", "e066"}                     # ⓪ 裡分別寫 tw_daily_prices · global_daily 的擷取列
+
+
+def selected_engines(argv: list, book_dir: Path = HERE.parent) -> set | None:
+    """--groups(預設 ALL)在族群冊尾版選到的擷取列;ALL / 冊讀不到 → None(交給呼叫端判斷)。"""
+    g = argv[argv.index("--groups") + 1] if "--groups" in argv and argv.index("--groups") + 1 < len(argv) else "ALL"
+    wanted = {x.strip() for x in str(g).split(",") if x.strip()}
+    if not wanted or "ALL" in {w.upper() for w in wanted}:
+        return None
+    import json
+    books = sorted(Path(book_dir).glob("VDF_FetchGroups_SSOT_v*.json"), key=_vnum)
+    try:
+        groups = json.loads(books[-1].read_text(encoding="utf-8")).get("groups") or [] if books else []
+    except (OSError, ValueError):
+        return set()
+    return {e for gr in groups if gr.get("id") in wanted for e in gr.get("engines") or []}
+
+
+def covers_daily(argv: list, book_dir: Path = HERE.parent) -> bool:
+    """⓪ 這次選到的族群真的含台股 + 全球日價(e054 · e066)才跳過 ①;只選 US_MACRO 之類 → 不跳(PR #763 Codex P2)。"""
+    sel = selected_engines(argv, book_dir)
+    return True if sel is None else DAILY_ENGINES <= sel
+
+
 def run(argv: list) -> int:
-    if "--all" not in argv:
+    if "--all" not in argv or not covers_daily(argv):
         return PRIOR.run(argv)
     keep = P0.fetch
     P0.fetch = skipped_fetch
@@ -138,6 +162,24 @@ def selftest() -> int:
         rc1 == 0 and seen["calls"][0] == (["--all", "--start", "2018-01-01"], "SKIPPED"), seen.get("calls"))
     chk("④ 不帶 --all → 照前版(① 照跑)", rc2 == 0 and seen["calls"][1][1] == "PRIOR_FETCH", seen.get("calls"))
     chk("⑤ 跑完 v0100 fetch 換回原函式", P0.fetch is not skipped_fetch)
+    import json
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        td = Path(td)
+        (td / "VDF_FetchGroups_SSOT_v0105.json").write_text(json.dumps({"groups": [
+            {"id": "TW_PRICE_VOL", "engines": ["e054", "e057"]}, {"id": "INTL_DAILY", "engines": ["e066"]},
+            {"id": "US_MACRO", "engines": ["e074", "e113"]}]}), encoding="utf-8")
+        c = [covers_daily(a, td) for a in (["--all"], ["--all", "--groups", "ALL"], ["--all", "--groups", "US_MACRO"],
+                                            ["--all", "--groups", "TW_PRICE_VOL"], ["--all", "--groups", "TW_PRICE_VOL,INTL_DAILY"])]
+    chk("⑤b 只在選到的族群含 e054 + e066 才跳過 ①:ALL → 跳 · US_MACRO → 不跳 · 只有台股 → 不跳 · 台股 + 全球 → 跳(Codex P2)",
+        c == [True, True, False, False, True], c)
+    seen2 = []
+    try:
+        PRIOR.run = lambda argv: seen2.append(P0.fetch.__name__) or 0
+        run(["--all", "--groups", "US_MACRO"])
+    finally:
+        PRIOR.run = keep_run
+    chk("⑤c 真的族群冊:--groups US_MACRO → ① ENG064 照跑(fetch 沒被換掉)", seen2 == ["fetch"], seen2)
     rc_p = PRIOR.selftest()
     chk("⑥ 前版 v0104 自測照過(rc 0)", rc_p == 0, rc_p)
     src = Path(__file__).read_text(encoding="utf-8")
