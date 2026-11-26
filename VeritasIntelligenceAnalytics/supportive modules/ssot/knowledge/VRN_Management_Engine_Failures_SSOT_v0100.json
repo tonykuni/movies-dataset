@@ -1,0 +1,34 @@
+{
+  "schema_id": "VRN_Management_Engine_Failures_SSOT",
+  "version": "v0100",
+  "generated": "2026-11-26",
+  "description": "管理引擎 20 個常見失敗情況與解決方案",
+  "failures": [
+    {"id": "F01", "situation": "跨系統直接 import", "symptom": "獨立性檢查紅燈", "solution": "改走 SystemManager 調度或共用 Tool；禁止直接 import 他系統模組"},
+    {"id": "F02", "situation": "generated/ 被手動修改", "symptom": "契約與產物不一致", "solution": "Pre-commit 或測試阻攔；強制從 SSOT 重新生成"},
+    {"id": "F03", "situation": "規格書重複貼上完整欄位", "symptom": "文件與程式雙頭馬車", "solution": "規格只寫行為與驗收，結構以路徑指向 contracts/"},
+    {"id": "F04", "situation": "加速器只有標記未實際生效", "symptom": "VIA_ACCEL 為空或假加速黃燈", "solution": "第 3 行標記 + AST 導入 + 執行時非空檢查"},
+    {"id": "F05", "situation": "凍結原件被改動", "symptom": "LOCK_MISMATCH，NLP/LAYOUT 載不起來", "solution": "還原凍結位元組（裁定 15 A）或明確豁免"},
+    {"id": "F06", "situation": "編號引擎撞號", "symptom": "開著的 PR 與 main 編號衝突", "solution": "不帶編號結果；等相關 PR 合併後在 main 重跑編號"},
+    {"id": "F07", "situation": "交接冊案未轉態", "symptom": "已合併 PR 仍顯示進行中", "solution": "handoff check 後依證據轉 VERIFIED 或 SUPERSEDED"},
+    {"id": "F08", "situation": "SystemManager 過長", "symptom": "單檔超過 400 行", "solution": "量測本體合併後行數；動詞過多時拆成服務群"},
+    {"id": "F09", "situation": "資料類路徑被 MCP 讀取", "symptom": "研報/Parquet/PDF 被讀出", "solution": "vcgc_read_card 只允許程式與冊；資料路徑一律拒絕"},
+    {"id": "F10", "situation": "零分母未處理", "symptom": "比率計算產生 NaN 或例外", "solution": "除法前檢查分母；回 null 或明確標記"},
+    {"id": "F11", "situation": "目標價與價格基礎不一致", "symptom": "PE/PB 失真", "solution": "強制使用相同調整基礎（Adj Close）與股本"},
+    {"id": "F12", "situation": "技術指標暖機不足", "symptom": "RSI/MACD 初期值不可靠", "solution": "依定義保留暖機期；未達樣本數不輸出"},
+    {"id": "F13", "situation": "跨系統寫檔", "symptom": "寫他系統夾黃燈", "solution": "只允許寫自己系統的輸出區；跨系統走正式契約"},
+    {"id": "F14", "situation": "測試收據過期", "symptom": "handoff check 紅燈", "solution": "變更後重跑自測 ×3，更新收據"},
+    {"id": "F15", "situation": "PS 指令帶判斷", "symptom": "啟動器邏輯分散", "solution": "PS 只負責找倉與呼叫 Python；判斷放在 Python"},
+    {"id": "F16", "situation": "同義字與正則混在同一本", "symptom": "維護困難", "solution": "由中央冊產生兩本視圖冊（同源，不重寫）"},
+    {"id": "F17", "situation": "VDF/VRN 案掛在 VCGC 交接冊", "symptom": "責任不清", "solution": "各系統補 handoff 動詞後搬回各自冊"},
+    {"id": "F18", "situation": "網路請求未走工具", "symptom": "引擎直接 requests", "solution": "一律經網路工具；引擎不自己發請求"},
+    {"id": "F19", "situation": "成功鎖衝突", "symptom": "多線同時修改鎖帳本", "solution": "合併時保留兩邊列；衝突在隔離分支先解"},
+    {"id": "F20", "situation": "容器結果當主機結果", "symptom": "未在 Windows 實跑就宣稱綠燈", "solution": "容器只作初步驗證；主機實跑收據才算正式綠"}
+  ],
+  "optimization_notes": [
+    "優先處理紅燈（跨系統 import、凍結原件、資料外洩）",
+    "閘門盡量自動化（Pre-commit、測試、行數檢查）",
+    "規格與契約分離，避免雙頭馬車",
+    "每次變更走完整 handoff 流程"
+  ]
+}

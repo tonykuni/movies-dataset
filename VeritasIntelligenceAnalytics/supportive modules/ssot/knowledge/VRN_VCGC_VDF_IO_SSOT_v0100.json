@@ -1,0 +1,51 @@
+{
+  "schema_id": "VRN_VCGC_VDF_IO_SSOT",
+  "version": "v0100",
+  "generated": "2026-11-26",
+  "description": "VCGC 與 VDF 輸入輸出契約 — 外部化、可驗證",
+  "systems": {
+    "VCGC": {
+      "role": "治理與省 Token 工具",
+      "inputs": [
+        {"name": "file_path", "type": "string", "desc": "倉內程式或冊路徑（.py .ps1 .json .md）"},
+        {"name": "verb", "type": "string", "desc": "read / slice / digest / pack / chain / scan 等"},
+        {"name": "options", "type": "object", "desc": "--if-etag、行號範圍等"}
+      ],
+      "outputs": [
+        {"name": "card", "type": "object", "desc": "結構卡（骨架、行號、摘要），不回全文"},
+        {"name": "status", "type": "string", "desc": "green / yellow / red"},
+        {"name": "receipt", "type": "object", "desc": "執行收據（rc、時間、雜湊）"}
+      ],
+      "constraints": [
+        "資料類路徑（研報、Parquet、PDF）一律拒絕",
+        "只回結構卡，不回原文",
+        "跨系統直接 import 視為紅"
+      ]
+    },
+    "VDF": {
+      "role": "資料平面與擷取",
+      "inputs": [
+        {"name": "ticker", "type": "string", "desc": "台股 4 碼或正規化後 TT"},
+        {"name": "date_range", "type": "object", "desc": "起迄日"},
+        {"name": "source", "type": "string", "desc": "資料來源識別"}
+      ],
+      "outputs": [
+        {"name": "parquet_path", "type": "string", "desc": "落盤 Parquet 絕對路徑"},
+        {"name": "schema_fingerprint", "type": "string", "desc": "64 位小寫十六進位指紋"},
+        {"name": "row_count", "type": "integer", "desc": "列數"},
+        {"name": "receipt", "type": "object", "desc": "擷取與落盤收據"}
+      ],
+      "constraints": [
+        "不經 VCGC 代跑業務邏輯",
+        "輸出需可被 VRN / VQG 依契約讀取",
+        "失敗時附原因，不產空檔"
+      ]
+    }
+  },
+  "dataflow": "操作員 / AI → VCGC（結構卡）→ VDF（資料落盤）→ VRN / VQG（分析）",
+  "notes": [
+    "輸入輸出皆外置於 SSOT，引擎不硬編碼欄位",
+    "VCGC 不代跑 VDF 業務",
+    "ready_for_part2 = false"
+  ]
+}

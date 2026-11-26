@@ -1,0 +1,50 @@
+{
+  "schema_id": "VRN_Governance_Management_Tools_SSOT",
+  "version": "v0100",
+  "generated": "2026-11-26",
+  "source": ["VIA_Cowork_Handoff_20261125_Night.md", "VIA_SystemArchitecture_SDD_v0101.md", "VIA_SDD_Rulings_13-15_20261125.md", "VCGC_Rebuild_Plan_v0100.md"],
+  "description": "治理與管理工具 SSOT — 四層分工、三冊資料流、閘門與交接",
+  "layers": {
+    "L0_L1": "短指令 + Python 啟動器（不帶判斷）",
+    "L2": "SystemManager（動詞表、調度、收據；本體合併後 ≤400 行）",
+    "L3": "Action / 服務群（單檔 ≤500 行）",
+    "L4": "Engine（單獨啟動、--selftest）",
+    "L5": "Tool（加速器、網路工具、token 工具；共用件）"
+  },
+  "governance_books": {
+    "synonyms": "別名 → 正名（系統 / 指令 / 工具 / 欄位）",
+    "regex": "格式驗證（編號、日期、代號、路徑）",
+    "ssot": "正名的正式定義、主人、路由",
+    "dataflow": "輸入 → 同義字冊 → 正則冊 → SSOT 冊 → SystemManager.dispatch"
+  },
+  "token_tools": {
+    "existing": ["read", "slice", "digest", "pack", "chain", "delta", "scan", "report", "fix", "tests", "cache", "tools", "verbs"],
+    "planned": ["imports", "calltree", "dead", "deps", "hotspot"],
+    "rule": "只回結構卡，不回全文；資料類路徑一律拒絕"
+  },
+  "rulings": {
+    "13_routing": "不新設 AI 路由冊；路由讀各 SM 的 verbs --json",
+    "14_mcp_card": "vcgc_read_card 只回骨架卡，拒資料路徑",
+    "15_frozen": "凍結原件還原（A）；NLP/LAYOUT 修復後再使用"
+  },
+  "gates": [
+    "本體合併後行數限制",
+    "跨系統直接 import = 紅",
+    "generated/ 嚴禁手動修改",
+    "結構變更先改 SSOT",
+    "每次變更透過 Registry 記錄狀態"
+  ],
+  "handoff_flow": [
+    "handoff check",
+    "登記需求冊 / 盤點冊 / 交接冊",
+    "轉態（VERIFIED / SUPERSEDED）",
+    "test --quick",
+    "開 PR（疊在相關分支上）"
+  ],
+  "notes": [
+    "VCGC 不代跑 VDF / VRN 業務",
+    "加速器經 AST 導入且需實際生效",
+    "所有指令優先使用 Python",
+    "ready_for_part2 = false"
+  ]
+}
