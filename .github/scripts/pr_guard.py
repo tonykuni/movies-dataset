@@ -6,6 +6,8 @@
      薄尾版用 glob 取「比自己小的最大版」當前版 → 舊號一插進來,上面那版的前版鏈就悄悄換掉(例:#690 的 VDF_SystemManager_v0187
      插在 main v0191 底下、v0188 的前版會從 v0186 變成 v0187)。程式檔 = 紅(擋);冊 / 文件(.json · .jsonl · .md …)= 黃(只提醒,
      冊的前版寫在 prior 欄,不靠 glob)。修法:改發 base 尾版之上的新版號。
+     例外(只降成黃,不放過內容改動):退役夾 VIA_RetiredEngines/<批>/<同一相對路徑> 的檔在同一個 PR 被「原樣搬回」原位
+     (刪了退役副本、位元 LF 正規化後相同)—— 退役後才發現現役薄尾仍載入它,搬回是恢復前版鏈,不是新插舊號(2026-11-26 VDF ENG059)。
   ② 已鎖成功被改或刪:docs/handoff/daily/VIA_SuccessLock_Ledger_v0100.jsonl(只增帳)每個路徑最新那一列的 sha256(LF 正規化)
      就是鎖定位元;PR 修改後位元不同、或刪掉 = 紅。規則「修改開新版」:要改就出新版號。
 
@@ -44,6 +46,8 @@ VIA = "VeritasIntelligenceAnalytics/"
 LEDGER = VIA + "docs/handoff/daily/VIA_SuccessLock_Ledger_v0100.jsonl"
 CODE_EXT = {".py", ".ps1", ".psm1"}
 VER = re.compile(r"^(?P<fam>.+)_v(?P<n>\d{4})(?P<ext>\.[A-Za-z0-9]+)$")
+RETIRED = VIA + "functional modules/VIA_RetiredEngines/"     # 「以搬代刪」的退役夾:<批>/<原相對路徑>
+
 
 
 def git(repo, *a, binary=False):
@@ -94,6 +98,26 @@ def locked(repo, ref) -> dict:
     return rows
 
 
+def moved_back_from(repo, base, head, path, deleted) -> str | None:
+    """`path` 是不是把 base 上退役夾(VIA_RetiredEngines/<批>/ + 同一相對路徑)的檔「原樣搬回」:
+    同一個 PR 刪了那支退役副本,而且兩邊位元(LF 正規化)相同。是 → 回退役副本的路徑。"""
+    if not path.startswith(VIA):
+        return None
+    rel = path[len(VIA):]
+    for d in deleted:
+        if not (d.startswith(RETIRED) and d.endswith("/" + rel)):
+            continue
+        batch = d[len(RETIRED):len(d) - len(rel) - 1]
+        if not batch or "/" in batch:
+            continue
+        try:
+            if lf_sha(git(repo, "show", f"{base}:{d}", binary=True)) == lf_sha(git(repo, "show", f"{head}:{path}", binary=True)):
+                return d
+        except RuntimeError:
+            continue
+    return None
+
+
 def check(repo, base, head) -> dict:
     ch = changes(repo, base, head)
     tails = family_tails(repo, base)
@@ -104,6 +128,10 @@ def check(repo, base, head) -> dict:
             continue
         top = tails.get((m["fam"], m["ext"].lower()), 0)
         if top > int(m["n"]):
+            src = moved_back_from(repo, base, head, p, ch["D"])
+            if src:                                     # 退役後發現仍被現役程式載入 → 原樣搬回原位(前版鏈恢復,不是新插的舊號)
+                yellow.append(f"① `{p}` 是 v{m['n']}(base 尾版 v{top:04d}),由退役夾原樣搬回(`{src}` · 位元相同)")
+                continue
             msg = f"`{p}` 是 v{m['n']},base 上同家族已到 v{top:04d}(插到尾版底下)"
             (red if m["ext"].lower() in CODE_EXT else yellow).append("① " + msg)
     locks = locked(repo, base)
@@ -209,6 +237,32 @@ def selftest() -> int:
         chk("⑦ 刪掉已鎖成功的檔 → 紅", any("刪了" in x for x in check(d, "main", "pr")["red"]))
         chk("⑧ 回碼:有紅 = 1", main(["--repo", str(d), "--base", "main", "--head", "pr", "--summary", str(d / "s.md")]) == 1
             and "PR 守門 · 紅" in (d / "s.md").read_text(encoding="utf-8"))
+    with tempfile.TemporaryDirectory() as td:                               # 退役夾原樣搬回(2026-11-26 VDF ENG059 實錄)
+        d = Path(td)
+        sh(d, "init", "-q", "-b", "main")
+        sh(d, "config", "user.email", "t@t")
+        sh(d, "config", "user.name", "t")
+        eng = d / VIA / "functional modules" / "VDF" / "engine"
+        eng.mkdir(parents=True)
+        (eng / "VDF_ENG059_X_v0105.py").write_text("CHAIN = ('0103',)\n")
+        ret = d / RETIRED / "prune_20261123_144317" / "functional modules" / "VDF" / "engine"
+        ret.mkdir(parents=True)
+        (ret / "VDF_ENG059_X_v0103.py").write_text("body = 3\r\n")
+        (ret / "VDF_ENG059_X_v0102.py").write_text("body = 2\n")
+        sh(d, "add", "-A")
+        sh(d, "commit", "-qm", "base")
+        sh(d, "checkout", "-qb", "pr")
+        sh(d, "mv", str(ret / "VDF_ENG059_X_v0103.py"), str(eng / "VDF_ENG059_X_v0103.py"))     # 原樣搬回
+        (eng / "VDF_ENG059_X_v0102.py").write_text("body = 2 changed\n")                          # 同名但內容變了
+        sh(d, "rm", "-q", str(ret / "VDF_ENG059_X_v0102.py"))
+        (eng / "VDF_ENG059_X_v0101.py").write_text("body = 1\n")                                  # 退役夾沒有它 = 新插
+        sh(d, "add", "-A")
+        sh(d, "commit", "-qm", "restore")
+        r = check(d, "main", "pr")
+        chk("⑩ 退役夾原樣搬回(位元同,含 CRLF→LF)→ 黃、不擋", any("v0103.py" in x and "原樣搬回" in x for x in r["yellow"])
+            and not any("v0103.py" in x for x in r["red"]), r)
+        chk("⑪ 搬回但內容改過 → 照舊紅 · 退役夾沒有的舊號 → 照舊紅",
+            any("v0102.py" in x for x in r["red"]) and any("v0101.py" in x for x in r["red"]), r)
     chk("⑨ 加速器橋在(AGENTS.md:每支新 Python 帶既有加速器橋)", "[VIA:ACCEL-BRIDGE:v0100]" in Path(__file__).read_text(encoding="utf-8"))
     print(f"  [計] pr_guard 自測 {sum(ok)}/{len(ok)} · {'PASS' if all(ok) else 'FAIL'}")
     return 0 if all(ok) else 1
