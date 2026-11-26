@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# [VIA:ACCEL-BRIDGE:v0111]
 """CGC_MDL233_ToolActivate v0109 — 薄尾(v0108 以前一字不動):系統庫 syscat 掛進工具鎖冊(第十家)
 
 操作員 2026-11-26:附件「DuckDB 管系統文件 · 引擎版本 · 檔案資產 · 系統庫呢」+「token-saving +」。

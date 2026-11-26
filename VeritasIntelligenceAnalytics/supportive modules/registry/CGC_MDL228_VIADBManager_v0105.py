@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# [VIA:ACCEL-BRIDGE:v0111]
 """CGC_MDL228_VIADBManager v0105 — 薄尾(v0104 以前一字不動):系統庫 syscat(VIA 自己的檔 · 引擎版本 · 冊 · 號,建成一個 DuckDB)
 
 操作員 2026-11-26:附件「以 DuckDB 作為核心資料庫,搭配本機 UI 介面來管理系統文件、引擎版本與檔案資產 · 系統庫呢」+「token-saving +」。
