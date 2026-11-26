@@ -1,0 +1,107 @@
+{
+ "schema": "VIA.VTK.Params.v1",
+ "version": "v0102",
+ "owner": "VTK",
+ "updated_at": "2026-11-26T06:45:00Z",
+ "why": "SDD v0101 L4:VTK 管理器的參數全在這裡,程式不寫死;改行為 = 出這本冊的新版號。",
+ "params": {
+  "lock_book": "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+  "extra_sources": {
+   "syscat": "supportive modules/registry/CGC_MDL228_VIADBManager_v0106.py"
+  },
+  "tools_dir": "",
+  "out_dir": "VIA_Reports/vtk",
+  "drill_timeout_s": 120,
+  "code_prefix": "VTK-TOOL-",
+  "commands_glob": "Register-VIA-Commands-v[0-9][0-9][0-9][0-9].ps1",
+  "gated_vcgc": [],
+  "extra_files": {
+   "layout": [
+    "supportive modules/70_VRN_Rules/layout_repair_v0100",
+    "supportive modules/70_VRN_Rules/tests"
+   ],
+   "syscat": [
+    "supportive modules/registry/VIA_VCGC_SysCat_Params_v0100.json",
+    "supportive modules/registry/VIA_DB_Table_SSOT_v0100.json",
+    "supportive modules/registry/VIA_DB_Table_SSOT_v0101.json",
+    "supportive modules/registry/VIA_DB_Table_SSOT_v0102.json"
+   ]
+  },
+  "adapt": {
+   "layout": [
+    {
+     "id": "GATE-VTK",
+     "files": "*.py",
+     "find": "os.environ.get(\"VIA_FROM_VCGC\") != \"YES\"",
+     "replace": "(os.environ.get(\"VIA_FROM_VCGC\") != \"YES\" and os.environ.get(\"VIA_FROM_VTK\") != \"YES\")",
+     "why": "閘也收 VTK 自己的入口(11-18:閘不得只認別的系統的入口)"
+    },
+    {
+     "id": "POP-VTK",
+     "files": "*.py",
+     "find": "os.environ.pop(\"VIA_FROM_VCGC\", None)",
+     "replace": "os.environ.pop(\"VIA_FROM_VCGC\", None); os.environ.pop(\"VIA_FROM_VTK\", None)",
+     "why": "工具自測驗「沒入口就擋」時,VTK 的入口標記也要一起拿掉,否則測不到擋"
+    }
+   ],
+   "nlp": [
+    {
+     "id": "GATE-VTK",
+     "files": "*.py",
+     "find": "os.environ.get(\"VIA_FROM_VCGC\") != \"YES\"",
+     "replace": "(os.environ.get(\"VIA_FROM_VCGC\") != \"YES\" and os.environ.get(\"VIA_FROM_VTK\") != \"YES\")",
+     "why": "閘也收 VTK 自己的入口(11-18:閘不得只認別的系統的入口)"
+    },
+    {
+     "id": "POP-VTK",
+     "files": "*.py",
+     "find": "os.environ.pop(\"VIA_FROM_VCGC\", None)",
+     "replace": "os.environ.pop(\"VIA_FROM_VCGC\", None); os.environ.pop(\"VIA_FROM_VTK\", None)",
+     "why": "工具自測驗「沒入口就擋」時,VTK 的入口標記也要一起拿掉,否則測不到擋"
+    }
+   ],
+   "praddle": [
+    {
+     "id": "GATE-VTK",
+     "files": "*.py",
+     "find": "os.environ.get(\"VIA_FROM_VCGC\") != \"YES\"",
+     "replace": "(os.environ.get(\"VIA_FROM_VCGC\") != \"YES\" and os.environ.get(\"VIA_FROM_VTK\") != \"YES\")",
+     "why": "閘也收 VTK 自己的入口(11-18:閘不得只認別的系統的入口)"
+    }
+   ],
+   "syscat": [
+    {
+     "id": "OUT-VTK",
+     "files": "VIA_VCGC_SysCat_Params_v*.json",
+     "find": "\"VIA_Reports/vcgc/syscat\"",
+     "replace": "\"VIA_Reports/vtk/syscat\"",
+     "why": "VTK 的系統庫寫自己的輸出夾,不寫進 VCGC 的夾"
+    }
+   ],
+   "token": [
+    {
+     "id": "ROSTER-READ",
+     "files": "CGC_MDL158_*.py",
+     "find": "HERE.glob(\"CGC_MDL156_VIAAcceleratorControl_v*.py\")",
+     "replace": "(HERE.parents[1] / \"supportive modules\" / \"registry\").glob(\"CGC_MDL156_VIAAcceleratorControl_v*.py\")",
+     "why": "免修名冊只有一份在 VCGC 的 CGC_MDL156(L30 不抄第二份):VTK 副本到原位唯讀,不複製;原位不在時照工具內建底線退路"
+    },
+    {
+     "id": "BOOKS-READ",
+     "files": "CGC_MDL158_*.py",
+     "find": "here = Path(here or HERE)",
+     "replace": "here = Path(here or (HERE.parents[1] / \"supportive modules\" / \"registry\"))",
+     "why": "註冊清單只讀 VCGC 那三本冊(鎖冊 · 引擎版本冊 · 功能卡),在原位唯讀,不抄"
+    }
+   ]
+  },
+  "known_deps": {
+   "ocr": "CGC_MDL050_EnvRebuild(VCGC 的環境重建引擎):只用來盤點環境;不在時 OCR 照跑,自測少一檢(12 → 11),不複製(環境只由 VCGC 管)",
+   "layout": "praddle 路由會讀 VRN 的 VRN_ENG398 原位(跨系統只讀)",
+   "token": "讀 VCGC 的 CGC_MDL156 免修名冊(L30 只有一份,跨系統唯讀);拿掉 VCGC 時退到工具內建底線"
+  }
+ },
+ "prior": "VTK_Params_v0101.json",
+ "why_v0101": "操作員 2026-11-26 14:31「解除限制成為獨立新系統工具」:VTK 搬到 VIA 根下 VTK/,每家在 VTK/<家>/(副本用 HERE.parents[1] 推 VIA 根,深度對齊後一字不改);三家閘改成也收 VTK 入口(只改 VTK 副本,改法登號冊);syscat 帶自己的參數冊副本,輸出改到 VIA_Reports/vtk/syscat。",
+ "why_v0102": "PR #751 Codex 二輪(P2 ×2):syscat 的號照來源檔對、系統欄讀 sys / sub —— 修在 CGC_MDL228_VIADBManager v0106(v0105 照「修改開新版」不就地改);syscat 來源改指 v0106,VTK sync 照新版號複製。"
+}

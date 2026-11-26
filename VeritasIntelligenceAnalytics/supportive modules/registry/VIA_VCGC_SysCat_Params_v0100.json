@@ -1,0 +1,92 @@
+{
+ "schema": "VIA.VCGC.SysCat.Params.v1",
+ "version": "v0100",
+ "owner": "VCGC",
+ "engine": "CGC_MDL228_VIADBManager(v0105 起 syscat)",
+ "updated_at": "2026-11-26T06:00:00Z",
+ "why": "SDD v0101 L4:引擎參數從參數冊讀、不寫死。系統庫 syscat 的掃描範圍、輸出位置、卡片大小與預設查詢都在這裡;改這本冊(出新版號)就改行為,不必改程式。",
+ "data_boundary": "只收程式結構、冊的中繼資料與號;不收 VIA_Reports、資料湖、研報、.parquet / .duckdb / .csv / .pdf(CLAUDE.md 資料邊界)",
+ "params": {
+  "extensions": [
+   ".py",
+   ".ps1",
+   ".psm1",
+   ".json",
+   ".jsonl",
+   ".md",
+   ".yaml",
+   ".yml",
+   ".toml",
+   ".sh",
+   ".txt"
+  ],
+  "skip_prefixes": [
+   "VIA_Reports/",
+   "__pycache__/",
+   ".git/"
+  ],
+  "out_dir": "VIA_Reports/vcgc/syscat",
+  "db_name": "VIA_SystemCatalog",
+  "default_limit": 40,
+  "max_limit": 500,
+  "cell_chars": 80
+ },
+ "presets": {
+  "fam": {
+   "sql": "SELECT family, system, folder, versions, first_version, tail_version, tail_code, tail_doc FROM families WHERE lower(family) LIKE lower(?) ORDER BY family, folder",
+   "what": "家族:版數 · 首尾版 · 尾版號 · 首行說明",
+   "sources": [
+    "files"
+   ]
+  },
+  "code": {
+   "sql": "SELECT book, code, name, system FROM numbers WHERE code = ? OR lower(name) LIKE lower(?) ORDER BY book, code",
+   "what": "號 ↔ 名(全部編號冊)",
+   "sources": [
+    "numbers"
+   ]
+  },
+  "req": {
+   "sql": "SELECT code, subsystem, status, topic, next FROM requirements WHERE code = ? OR lower(topic) LIKE lower(?) ORDER BY code",
+   "what": "需求冊尾版",
+   "sources": [
+    "requirements"
+   ]
+  },
+  "wkf": {
+   "sql": "SELECT book, code, name, kind, version, steps FROM workflows WHERE code = ? OR lower(name) LIKE lower(?) ORDER BY book, code",
+   "what": "各系統工作流冊尾版",
+   "sources": [
+    "workflows"
+   ]
+  },
+  "file": {
+   "sql": "SELECT path, system, version, bytes, lines FROM files WHERE lower(path) LIKE lower(?) ORDER BY path",
+   "what": "檔案(只含程式與冊)",
+   "sources": [
+    "files"
+   ]
+  },
+  "tool": {
+   "sql": "SELECT family, version, code, activated_at, path FROM tools ORDER BY family",
+   "what": "鎖版工具",
+   "sources": [
+    "tools"
+   ]
+  },
+  "lamp": {
+   "sql": "SELECT kind, id, event, lamp, file, ts FROM ledger WHERE lower(id) LIKE lower(?) ORDER BY ts DESC",
+   "what": "串測紀錄冊(最新在前)",
+   "sources": [
+    "ledger"
+   ]
+  },
+  "changed": {
+   "sql": "SELECT change, path, prev_sha, sha FROM changes ORDER BY change, path",
+   "what": "跟上一次 build 比:新增 · 改了 · 不見",
+   "sources": [
+    "changes"
+   ]
+  }
+ }
+}
