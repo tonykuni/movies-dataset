@@ -39,6 +39,8 @@
   [OK] ① 真的沒有日期欄的快照表 → 照舊 NO_DATE_COL(照實黃,不硬猜)
   [OK] ② (series, date) 同鍵不同值 → 試到 source 當第三鍵 → OK · 4 列全留 · 主鍵寫三欄 · 輸出不帶內部鍵欄
   [OK] ② 找不到能分開的欄 → 照舊 PK_CONFLICT(紅)· 點名衝突欄 value(只寫欄名)
+  [OK] ② 值裡有 | 也不撞鍵:('a|b','c') 與 ('a','b|c') 各自一列 · 補 source 後 4 列全留 · 不留試寫檔
+  [OK] ② 補鍵失敗時輸出檔 = 回報的那份(列數一致,不被候選結果蓋掉)
   [OK] ③ 重現桌機:v0100 代號帶 .TW / 日期型別不同 → compared 0;本版對齊後 compared 2 · mismatch 1
   [OK] ③ 兩邊都有列卻一筆對不上 → NO_OVERLAP(不冒充 OK)
   [OK] ④ SUMMARY.json 帶 tables 逐表(state · pk · 衝突欄名)· 不帶白名單外欄位 · 不留暫存檔
@@ -54,9 +56,9 @@
   [OK] 加速器載入(VIA_ACCEL is not None)
   [OK] 網路工具載入(_via_net() is not None · 載入不出網)
   [OK] 前版 = 同家族比自己小的最大版 · inventory 換裝在 v0100 本體 · 橫幅寫本版
-[   0.7s]   盤 vake CN_MACRO ← /tmp/tmppyezx5ph/via_database/vdf_database(資料家 · env VIA_VDF_DB_HOME)· 有資料 1/1 · 最新 ['2026-10-01'] · 過期 1
-[   0.7s]   盤 parquet INTL_FIN ← /tmp/tmppyezx5ph/via_database/vdf_database(資料家 · env VIA_VDF_DB_HOME)· 有資料 1/1 · 最新 ['2026-09-30']
-[   0.7s]   盤 parquet SHIPPING ← 找不到(所有根都沒有)
+[   0.8s]   盤 vake CN_MACRO ← /tmp/tmp5i2bzuo1/via_database/vdf_database(資料家 · env VIA_VDF_DB_HOME)· 有資料 1/1 · 最新 ['2026-10-01'] · 過期 1
+[   0.9s]   盤 parquet INTL_FIN ← /tmp/tmp5i2bzuo1/via_database/vdf_database(資料家 · env VIA_VDF_DB_HOME)· 有資料 1/1 · 最新 ['2026-09-30']
+[   0.9s]   盤 parquet SHIPPING ← 找不到(所有根都沒有)
   [OK] parquet 來源:在資料家找到 glob → OK · 列數 2 · 最新日期 · 家 = 資料家
   [OK] vake 來源:讀資料家 vake\store 的僅增分片 → 有資料 1/1 = OK(不再記 NOT_DUCKDB);資料舊 → 另記 stale,不當缺
   [OK] 哪個家都沒有的 glob → NODATA 照實 · 寫「所有根都沒有」(不假綠)
@@ -66,12 +68,12 @@
   [OK] 網路工具載入(_via_net() is not None · 載入不出網)
   [OK] 前版 = 同家族比自己小的最大版 · 已裝進 v0100 本體(m012 · inventory · names · 橫幅)
   [OK] 資料家照 DataPlane resolve_home:env VIA_VDF_DB_HOME 指的夾
-[   0.9s]   找庫的根 1:/tmp/tmptkk7w_wk/via_database/vdf_database(資料家 · env VIA_VDF_DB_HOME)
-[   0.9s]   找庫的根 2:/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub(倉內 output_hub(工作站接點 → 資料家))
-[   0.9s]   找庫的根 3:/tmp/tmptkk7w_wk/vdf_fetch/dict(MDL012 擷取暫存家(v0100 原本唯一的根))
-[   0.9s]   讀庫 vdf_tw_market.duckdb ← /tmp/tmptkk7w_wk/via_database/vdf_database/output_hub/vdf_tw_market.duckdb(資料家 · env VIA_VDF_DB_HOME)
-[   0.9s]   讀庫 only_stage.duckdb ← /tmp/tmptkk7w_wk/vdf_fetch/dict/only_stage.duckdb(MDL012 擷取暫存家(v0100 原本唯一的根))
-[   0.9s]   讀庫 nowhere.duckdb ← 找不到(所有根都沒有)
+[   1.0s]   找庫的根 1:/tmp/tmpmh6ga08t/via_database/vdf_database(資料家 · env VIA_VDF_DB_HOME)
+[   1.0s]   找庫的根 2:/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub(倉內 output_hub(工作站接點 → 資料家))
+[   1.0s]   找庫的根 3:/tmp/tmpmh6ga08t/vdf_fetch/dict(MDL012 擷取暫存家(v0100 原本唯一的根))
+[   1.0s]   讀庫 vdf_tw_market.duckdb ← /tmp/tmpmh6ga08t/via_database/vdf_database/output_hub/vdf_tw_market.duckdb(資料家 · env VIA_VDF_DB_HOME)
+[   1.1s]   讀庫 only_stage.duckdb ← /tmp/tmpmh6ga08t/vdf_fetch/dict/only_stage.duckdb(MDL012 擷取暫存家(v0100 原本唯一的根))
+[   1.1s]   讀庫 nowhere.duckdb ← 找不到(所有根都沒有)
   [OK] 同名庫兩處都有 → 讀資料家的那份(5 列),不是暫存家的副本(2 列)
   [OK] 資料家沒有的庫 → 退到暫存家照讀(前版行為保留)
   [OK] 哪裡都沒有 → DB_MISSING 照實 · 收據寫「所有根都沒有」
@@ -98,8 +100,8 @@
   [OK] 跨來源核對:同鍵同期比數值 · 超出容差 = MISMATCH · {'state': 'OK', 'compared': 6, 'mismatch': 1, 'columns': ['close'], 'pk': ['code', 'date']}
   [OK] 最快排程:最長優先(LPT)· 沒量過的先跑
   [OK] 沒 --live = 只列指令不執行
-[   1.2s]   B · e1 · rc 0 · 0.0s[   1.2s]   A · e2 · rc 0 · 0.0s
-
+[   1.4s]   B · e1 · rc 0 · 0.0s
+[   1.4s]   A · e2 · rc 0 · 0.0s
   [OK] --live:每支個別啟動 · 同意閘只在子行程 · 帶入口標記 · 寫運作帳
   [OK] 準備檢查:單獨啟動 · 加速器生效 · 網路橋 · 不匯入他系統 · {'standalone': '1/2', 'accel': '1/2', 'net': '1/2', 'in_param_map': '0/2'}
   [OK] 輸出 DataFrame
@@ -121,7 +123,7 @@ VDF_ENG242_ThreePeriodDistill v0103 selftest 9/9
 VDF_ENG242_ThreePeriodDistill v0104 selftest 11/11
   [OK] 前版 v0104 鏈自測(本版換裝卸下)照過
   [OK] 檔面:第 3 行加速器標記 · 雙橋在 · 零 TA-Lib · 不設同意閘 · 不含本機路徑
-VDF_ENG242_ThreePeriodDistill v0105 selftest 12/12
-  [同步] SDD 驗證 RED:X-ACCEL 缺標準橋:VDF_MDL020_DataPlane_v0104.py(網路橋) | X-REG 未註冊 ['VDF_Engine_cnn_fear_greed_proxy.py', 'VDF_Engine_aaii_sentiment.py'] · 註冊冊 | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL158_VIAPanoramaAuditRepair_v0125.py', 'CGC_ | X-NUM 編號冊號碼 ≠ 冊上代碼:['VDF-REQ052', 'VDF-REQ053', 'VCGC-REQ264'] → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 356, 'changed': 112, 'stale': 39, 'expected': 21972, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 23938 · 觸碰 run --family · 交接閘 RED · 落後 382 提交 · 快照 1305.9h · 未推 1 · 未登 2435 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+VDF_ENG242_ThreePeriodDistill v0105 selftest 14/14
+  [同步] SDD 驗證 RED:X-ACCEL 缺標準橋:VDF_MDL020_DataPlane_v0104.py(網路橋) | X-REG 未註冊 ['VDF_Engine_aaii_sentiment.py', 'VDF_Engine_cnn_fear_greed_proxy.py'] · 註冊冊 | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VDF_SystemManager_v0193.py', 'CGC_MDL158_VIAPanora | X-NUM 編號冊號碼 ≠ 冊上代碼:['VDF-REQ052', 'VDF-REQ053', 'VCGC-REQ264'] → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 357, 'changed': 112, 'stale': 39, 'expected': 21973, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 23938 · 觸碰 run --family · 交接閘 RED · 落後 384 提交 · 快照 1306.3h · 未推 1 · 未登 2435 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
