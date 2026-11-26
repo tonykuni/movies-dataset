@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VCGC_CommandHub_v0118.py — 薄尾(前版一字不動;原分支 v0105 撞 main 的 v0105、v0117 又撞開著的 PR #740,照「號取 本機 ∪ origin/main ∪ 開著的 PR 最大值之上」改發本號):合併指令 via-nlp(NLP · layout · markdown 唯一入口)
+# [VIA:ACCEL-BRIDGE:v0111]
+"""VCGC_CommandHub_v0120.py — 薄尾(前版一字不動;2026-11-26 再改號:原 v0118 在 #740 合併後落在 main 尾版 v0119 底下 → 改發 v0120,內容不改;原分支 v0105 撞 main 的 v0105、v0117 又撞開著的 PR #740,照「號取 本機 ∪ origin/main ∪ 開著的 PR 最大值之上」改發本號):合併指令 via-nlp(NLP · layout · markdown 唯一入口)
 
 操作員 2026-11-25:「NLP layout markdown 在倉內整合成一支 · 合併指令 · 只增不減 · 用 VCGC 工具完成」。
   via-nlp [動詞 …] → SUP_MDL866_VIAUnifiedNLPOrchestrator 尾版(v0110 起是三者唯一入口);不給動詞 = hub-status。
@@ -32,7 +33,7 @@ import re
 import sys
 from pathlib import Path
 
-VERSION = "v0118"
+VERSION = "v0120"
 FAMILY = "VCGC_CommandHub"
 HERE = Path(__file__).resolve().parent
 
