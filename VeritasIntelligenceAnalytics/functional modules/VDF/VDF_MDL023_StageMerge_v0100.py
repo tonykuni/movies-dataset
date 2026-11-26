@@ -10,9 +10,11 @@ r"""VDF_MDL023_StageMerge v0100 — 倉內擷取暫存庫併入資料家正典�
   來源:倉內暫存 <VIA>\VIA_Reports\vdf_fetch\dict\output_hub\**\*.duckdb(--src 可改;略過 _backup · quarantine · selftest · _sha 副本 · .wal)
   目標:資料家 output_hub(VDF_MDL020_DataPlane 尾版 resolve_home:--home > env VIA_VDF_DB_HOME > 資料家冊)同一相對路徑的同名庫;
         同一個實體檔(接點 / 捷徑)= 已是同一份,跳過。
-  逐表:目標表在 → 鍵 = 目標表主鍵 / 唯一鍵;沒有 → 日期欄 + 識別欄(ticker · code · series …);都沒有 → 整列(共同欄)。
+  逐表:目標表在 → 鍵 = 目標表主鍵 / 唯一鍵 > DataPlane 冊 outputs 的 key > 整列(共同欄)。不從欄名猜部分鍵
+        (財報同一天有年 / 季兩列,猜成 date+ticker+source 會把不同列併掉;PR #763 Codex P1)。
         只插「目標沒有的鍵」(來源同鍵多列只取一列)· 只寫共同欄 · 來源多出的欄點名不加(黃)· 既有列零觸碰。
-        目標表不在 → 照來源建表(整表複製)。目標庫不在 → 先複製到暫存檔再原子換名(來源不動)。
+        目標表不在 → 照來源建表(整表複製)。目標庫不在 → 開新暫存庫、唯讀 ATTACH 來源(會套用來源的 .wal,中斷留下的已提交交易
+        不會掉;整檔複製會掉 —— PR #763 Codex P1)逐表 CREATE TABLE AS、核列數,再原子換名(來源不動)。
   每張表一個交易(BEGIN / COMMIT;錯 = ROLLBACK,該表紅、其他表照做)。
 動詞:plan(預設,唯讀:每表 待併列數 · 鍵 · 狀態)· apply(要 VDF / VCGC 入口旗標 VIA_FROM_VDFSM 或 VIA_FROM_VCGC = YES)· --selftest
 收據:<VIA>\VIA_Reports\vdf\stage_merge\STAGE_MERGE_latest.json(庫 · 表 · 鍵欄名 · 待併 / 已併列數 · 燈;不含資料值)。
@@ -68,7 +70,6 @@ def _via_net():
 import json
 import os
 import re
-import shutil
 import sys
 import tempfile
 import time
@@ -82,9 +83,6 @@ DEFAULT_SRC = VIA / "VIA_Reports" / "vdf_fetch" / "dict" / "output_hub"
 RECEIPT = VIA / "VIA_Reports" / "vdf" / "stage_merge" / "STAGE_MERGE_latest.json"
 SKIP_PARTS = ("_backup", "quarantine", "_quarantine", "selftest")
 _SHA = re.compile(r"_sha[0-9a-f]{6,}$")
-DATE_COLS = ("date", "trade_date", "dt", "obs_date", "as_of", "period_end", "snapshot_date", "_vake_date", "日期")
-ID_COLS = ("ticker", "code", "symbol", "stock_id", "etf_code", "series", "series_id", "indicator", "market", "source", "kind",
-           "country", "item", "holding_code", "name_en", "fn", "params")
 ENTRY = ("VIA_FROM_VDFSM", "VIA_FROM_VCGC")
 
 
@@ -180,21 +178,37 @@ def _pk(con, catalog: str, table: str) -> list:
     return list(rows[0][0]) if rows else []
 
 
-def choose_key(con, dst_cat: str, table: str, common: list) -> tuple:
+def book_keys(book_dir: Path = HERE) -> dict:
+    """DataPlane 冊尾版 outputs:(庫檔名, 表名) → 鍵欄(冊上寫的業務鍵)。"""
+    hits = sorted(Path(book_dir).glob("VDF_DataPlane_SSOT_v*.json"), key=_vnum)
+    if not hits:
+        return {}
+    try:
+        outs = json.loads(hits[-1].read_text(encoding="utf-8")).get("outputs") or []
+    except (OSError, ValueError):
+        return {}
+    return {(str(o.get("db") or ""), str(o.get("table") or "")): list(o["key"]) for o in outs if o.get("key")}
+
+
+BOOK_KEYS = {}
+
+
+def choose_key(con, dst_cat: str, table: str, common: list, db_name: str = "") -> tuple:
+    """主鍵 / 唯一鍵 > DataPlane 冊上的業務鍵 > 整列。不猜部分鍵(會把不同列併掉)。"""
     pk = _pk(con, dst_cat, table)
     if pk and all(c in common for c in pk):
         return pk, "主鍵"
     low = {c.lower(): c for c in common}
-    d = next((low[c] for c in DATE_COLS if c in low), None)
-    ids = [low[c] for c in ID_COLS if c in low]
-    if d and ids:
-        return [d] + ids, "日期 + 識別欄"
-    if d:
-        return [d], "日期"
+    bk = BOOK_KEYS.get((db_name, table))
+    if not bk:                                       # 庫名對不上:表名在冊上只出現一次 → 同一個業務表
+        same = [v for (d, t), v in BOOK_KEYS.items() if t == table]
+        bk = same[0] if len(same) == 1 else None
+    if bk and all(k.lower() in low for k in bk):
+        return [low[k.lower()] for k in bk], "冊上業務鍵"
     return list(common), "整列"
 
 
-def merge_table(con, table: str, apply: bool) -> dict:
+def merge_table(con, table: str, apply: bool, db_name: str = "") -> dict:
     row = {"table": table}
     s_cols = _cols(con, "s", table)
     if table not in _tables(con, "t"):
@@ -213,7 +227,7 @@ def merge_table(con, table: str, apply: bool) -> dict:
     t_cols = _cols(con, "t", table)
     common = [c for c in s_cols if c in t_cols]
     extra = [c for c in s_cols if c not in t_cols]
-    key, kind = choose_key(con, "t", table, common)
+    key, kind = choose_key(con, "t", table, common, db_name)
     row.update(key=key, key_kind=kind, extra_cols=extra)
     if not common:
         row.update(new=0, state="NO_COMMON_COLS")
@@ -221,7 +235,9 @@ def merge_table(con, table: str, apply: bool) -> dict:
     cl = ", ".join(_qi(c) for c in common)
     kl = ", ".join(_qi(c) for c in key)
     cond = " and ".join(f"y.{_qi(c)} is not distinct from x.{_qi(c)}" for c in key)
-    src = f"(select distinct on ({kl}) {cl} from s.main.{_qi(table)}) x"
+    whole = len(key) == len(common)
+    src = (f"(select distinct {cl} from s.main.{_qi(table)}) x" if whole
+           else f"(select distinct on ({kl}) {cl} from s.main.{_qi(table)}) x")
     where = f"where not exists (select 1 from t.main.{_qi(table)} y where {cond})"
     n = con.execute(f"select count(*) from {src} {where}").fetchone()[0]
     row.update(new=n, state="UPTODATE" if n == 0 else "PENDING")
@@ -246,16 +262,7 @@ def merge_db(p: dict, apply: bool) -> dict:
     if not t.exists():
         out["state"] = "NEW_DB"
         if apply:
-            t.parent.mkdir(parents=True, exist_ok=True)
-            tmp = t.with_name(t.name + f".mdl023_{os.getpid()}.tmp")
-            shutil.copy2(s, tmp)
-            if tmp.stat().st_size == s.stat().st_size:
-                os.replace(tmp, t)
-                out["state"] = "COPIED"
-            else:
-                tmp.unlink(missing_ok=True)
-                out["state"] = "FAIL"
-                out["why"] = "暫存檔大小不符,沒換名"
+            out.update(new_db_snapshot(s, t))
         return out
     con = _connect(t)
     try:
@@ -265,7 +272,7 @@ def merge_db(p: dict, apply: bool) -> dict:
             con.execute(f"use {_qi(cat)}")
         for tb in _tables(con, "s"):
             try:
-                out["tables"].append(_merge_aliased(con, cat, tb, apply))
+                out["tables"].append(_merge_aliased(con, cat, tb, apply, t.name))
             except Exception as exc:  # noqa: BLE001 — 單表錯照實紅,其他表照做
                 out["tables"].append({"table": tb, "state": "FAIL", "why": str(exc)[:160]})
         con.execute("detach s")
@@ -274,9 +281,38 @@ def merge_db(p: dict, apply: bool) -> dict:
     return out
 
 
-def _merge_aliased(con, cat: str, table: str, apply: bool) -> dict:
+def new_db_snapshot(s: Path, t: Path) -> dict:
+    """目標庫不在:新暫存庫 + 唯讀 ATTACH 來源(套用來源 .wal)→ 逐表 CREATE TABLE AS → 核列數 → 原子換名。不整檔複製。"""
+    t.parent.mkdir(parents=True, exist_ok=True)
+    tmp = t.with_name(f".{t.stem}.mdl023_{os.getpid()}.duckdb")
+    for q in (tmp, tmp.with_name(tmp.name + ".wal")):
+        q.unlink(missing_ok=True)
+    con = _connect(tmp)
+    rows = {}
+    try:
+        con.execute(f"attach {_ql(str(s))} as s (read_only)")
+        for tb in _tables(con, "s"):
+            con.execute(f"create table {_qi(tb)} as select * from s.main.{_qi(tb)}")
+            a = con.execute(f"select count(*) from s.main.{_qi(tb)}").fetchone()[0]
+            b = con.execute(f"select count(*) from {_qi(tb)}").fetchone()[0]
+            if a != b:
+                raise RuntimeError(f"{tb} 列數不符 {a} → {b}")
+            rows[tb] = b
+        con.execute("detach s")
+        con.execute("checkpoint")
+    except Exception as exc:  # noqa: BLE001 — 新庫建不成:刪暫存、照實紅
+        con.close()
+        for q in (tmp, tmp.with_name(tmp.name + ".wal")):
+            q.unlink(missing_ok=True)
+        return {"state": "FAIL", "why": str(exc)[:160]}
+    con.close()
+    os.replace(tmp, t)
+    return {"state": "COPIED", "tables_copied": len(rows), "rows_copied": sum(rows.values())}
+
+
+def _merge_aliased(con, cat: str, table: str, apply: bool, db_name: str = "") -> dict:
     """目標庫的 catalog 名是檔名 stem;merge_table 寫死 t → 用 VIEW 別名太繞,這裡把 t 換成實際 catalog。"""
-    return merge_table(_Alias(con, cat), table, apply)
+    return merge_table(_Alias(con, cat), table, apply, db_name)
 
 
 class _Alias:
@@ -314,6 +350,8 @@ def run(argv: list, apply: bool) -> int:
         return 1
     src = Path(opt("--src") or DEFAULT_SRC)
     home, why = data_home(opt("--home"))
+    BOOK_KEYS.clear()
+    BOOK_KEYS.update(book_keys())
     res = {"tool": TAG, "at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "apply": apply, "src": str(src),
            "home": str(home) if home else None, "home_why": why, "dbs": []}
     if home is None:
@@ -366,16 +404,24 @@ def selftest() -> int:
         c.execute("insert into us_macro values ('2026-10-01','CPI',1)")
         c.execute("create table only_in_stage(a int)")
         c.execute("insert into only_in_stage values (1),(2)")
+        c.execute("create table tw_financial(Date varchar, Ticker varchar, Source varchar, Period_Type varchar, v double)")
+        c.execute("insert into tw_financial values ('2025-12-31','2330.TW','yfinance','annual',1),('2025-12-31','2330.TW','yfinance','quarterly',2)")
         c.close()
         c = duckdb.connect(str(src / "mega" / "aaii_sentiment.duckdb"))
         c.execute("create table aaii(date varchar, bullish double)")
-        c.execute("insert into aaii values ('2026-11-19', 33.3)")
+        c.execute("checkpoint")
+        c.execute("PRAGMA disable_checkpoint_on_shutdown")
+        c.execute("set checkpoint_threshold='10GB'")
+        c.execute("insert into aaii values ('2026-11-19', 33.3)")   # 已提交、只在 .wal(模擬中斷的暫存庫)
         c.close()
+        wal_left = (src / "mega" / "aaii_sentiment.duckdb.wal").is_file()
         t = duckdb.connect(str(home / "output_hub" / "mega" / "vdf_tw_market.duckdb"))
         t.execute("create table tw_daily_prices(date varchar, ticker varchar, close double, primary key(date, ticker))")
         t.execute("insert into tw_daily_prices values ('2026-11-20','2330.TW',2.5)")
         t.execute("create table us_macro(date varchar, series varchar, value double)")
         t.execute("insert into us_macro values ('2026-10-01','CPI',1)")
+        t.execute("create table tw_financial(Date varchar, Ticker varchar, Source varchar, Period_Type varchar, v double)")
+        t.execute("insert into tw_financial values ('2025-12-31','2330.TW','yfinance','annual',1)")
         t.close()
         before = (src / "mega" / "vdf_tw_market.duckdb").stat().st_size
         keep = {k: os.environ.get(k) for k in ENTRY}
@@ -399,7 +445,11 @@ def selftest() -> int:
         px = q.execute("select date, ticker, close from tw_daily_prices order by 1, 2").fetchall()
         um = q.execute("select count(*) from us_macro").fetchone()[0]
         oi = q.execute("select count(*) from only_in_stage").fetchone()[0]
+        fin = q.execute("select Period_Type from tw_financial order by 1").fetchall()
         q.close()
+        aq = duckdb.connect(str(home / "output_hub" / "mega" / "aaii_sentiment.duckdb"), read_only=True)
+        aaii_n = aq.execute("select count(*) from aaii").fetchone()[0]
+        aq.close()
         tabs = {t["table"]: t for d in plan.get("dbs", []) for t in d["tables"]}
         chk("③ 沒入口旗標 apply → RED rc 1 零寫入", rc_gate == 1)
         chk("④ plan 唯讀:價表鍵 = 目標主鍵 · 待併 2(同鍵兩列只算一列 · 目標已有的 2330@11-20 不算)· 多欄 extra_x 點名 · 總經已有 = 0 · 新表 / 新庫列待併 · 黃 rc 2",
@@ -412,6 +462,11 @@ def selftest() -> int:
         chk("⑥ 再跑一次冪等:待併 0 · 只剩多欄黃(不寫第二次)",
             a2 == 2 and all(t.get("new", 0) == 0 for d in again["dbs"] for t in d["tables"]) and not any(d["state"] == "NEW_DB" for d in again["dbs"]), again)
         chk("⑦ 來源庫零觸碰(大小不變)", (src / "mega" / "vdf_tw_market.duckdb").stat().st_size == before)
+        chk("⑦b 沒主鍵、冊上也沒鍵的財報表 → 整列當鍵:同日同代號的年 / 季兩列都保留(季報補進來,不被年報吃掉;Codex P1)",
+            fin == [("annual",), ("quarterly",)] and tabs["tw_financial"]["key_kind"] == "整列" and tabs["tw_financial"]["new"] == 1, (fin, tabs.get("tw_financial")))
+        chk("⑦c 新庫:來源只在 .wal 裡的已提交列也搬到(唯讀 ATTACH 套用 WAL,不整檔複製;Codex P1)", wal_left and aaii_n == 1, (wal_left, aaii_n))
+        chk("⑦d 冊上業務鍵:us_macro 用 DataPlane 冊的 date + series", tabs["us_macro"]["key_kind"] == "冊上業務鍵"
+            and tabs["us_macro"]["key"] == ["date", "series"], tabs["us_macro"])
         same = pairs(home / "output_hub", home)
         chk("⑧ 來源就是資料家同一實體檔 → SAME_FILE 跳過", all(p["same"] for p in same) and same, [p["rel"] for p in same])
         chk("⑨ 收據只有庫 · 表 · 鍵欄名 · 列數 · 燈(不含資料值 2330 / 33.3)",
