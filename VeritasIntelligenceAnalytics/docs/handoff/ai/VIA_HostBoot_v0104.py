@@ -8,7 +8,8 @@ r"""VIA_HostBoot v0104 — 薄尾(v0100–v0103 一字不動):新動詞 vdfcheck
   ① test                    各引擎自測(UNIT)
   ② db check                冊 VIA_DB_Table_SSOT 每張表對真庫清點(缺庫 · 缺表 · 空表 · 列數 · 落後天)
   ③ db verify               獨立重核 ② 的每一列(檔 · 列數 · 最新日 · 狀態 · 燈)
-  ④ monitor --json          九格總燈(UNIT · SYSTEM · 參數 · 加速器/網路 · HTML U/I · 輸出驗證 · 資料庫 …)
+  ④ synchronizer run --no-open   HTML U/I 頁對收據(VDF 自己的唯讀 / 乾跑動詞;不開瀏覽器)
+  ⑤ monitor --json          九格總燈(UNIT · SYSTEM · 參數 · 加速器/網路 · HTML U/I · 輸出驗證 · 資料庫 …)
 暫切 origin/<分支>(同 lake / vdf3,一定切回;已追蹤檔有改動 = 停不碰)。不出網(不收 --live)· 不擷取 · 不寫庫。
 入口標記:VDF 管理器的 db 動詞只收 VIA_FROM_VCGC=YES(VDF 啟動器也是設這個);本動詞只在子行程環境帶入口標記,
           不寫進任何檔;同意閘(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT)一律不碰。
@@ -92,6 +93,7 @@ def say(msg: str) -> None:
 def vdfcheck_steps(via: Path, live: bool, extra: list) -> list:
     vm = BASE.newest(via / "functional modules" / "VDF", "VDF_SystemManager_v*.py")
     return [[str(vm), "test"], [str(vm), "db", "check"], [str(vm), "db", "verify"],
+            [str(vm), "synchronizer", "run", "--no-open"],
             [str(vm), "monitor", "--lanes", "3", "--timeout", "400", "--json"]]
 
 
@@ -187,9 +189,10 @@ def selftest() -> int:
     chk("② 動詞表 = 前版八個 + vdfcheck", VERBS[:-1] == tuple(PRIOR.VERBS) and VERBS[-1] == "vdfcheck" and "lake" in VERBS)
     via = HERE.parents[3]
     st = vdfcheck_steps(via, False, [])
-    chk("③ 步驟:VDF 管理器尾版 test → db check → db verify → monitor --json(全唯讀;不擷取不寫庫)",
+    chk("③ 步驟:VDF 管理器尾版 test → db check → db verify → synchronizer run --no-open → monitor --json(全唯讀;不擷取不寫庫)",
         all(Path(s[0]).name.startswith("VDF_SystemManager_v") for s in st)
-        and [s[1:] for s in st] == [["test"], ["db", "check"], ["db", "verify"], ["monitor", "--lanes", "3", "--timeout", "400", "--json"]], st)
+        and [s[1:] for s in st] == [["test"], ["db", "check"], ["db", "verify"], ["synchronizer", "run", "--no-open"],
+                                    ["monitor", "--lanes", "3", "--timeout", "400", "--json"]], st)
     with tempfile.TemporaryDirectory() as td:
         tdp = Path(td)
         chk("④ 不收 --live(不出網)→ RED rc 1、不跑", run_vdfcheck(["--live"], tdp, tdp, {}) == 1)
