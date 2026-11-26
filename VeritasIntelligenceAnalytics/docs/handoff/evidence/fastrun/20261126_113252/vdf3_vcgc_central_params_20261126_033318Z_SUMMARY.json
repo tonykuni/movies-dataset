@@ -1,0 +1,85 @@
+{
+ "tool": "via_params_central v0112",
+ "verb": "vdf-master",
+ "utc": "2026-11-26T03:33:19+00:00",
+ "lamp": "YELLOW",
+ "counts": {
+  "books": 74,
+  "ok": 73,
+  "missing": 1,
+  "fail": 0,
+  "cross_checked": 2,
+  "different": 2,
+  "repointed": 4,
+  "conflicts": 0
+ },
+ "written": null,
+ "format": "parquet",
+ "accel": true,
+ "net": true,
+ "vdf_master": {
+  "book": "functional modules/VDF/VDF_ParamControl_SSOT_v0111.json",
+  "params": 60,
+  "by_class": {
+   "時間範圍": 11,
+   "規則": 8,
+   "輸入參數": 14,
+   "輸出參數": 11
+  },
+  "open_conflicts": [],
+  "vdf_self_report": {
+   "lamp": "GRAY",
+   "note": "VDF 未自報(桌機跑 vdfp 或 ENG053 unify 後才有)",
+   "unreadable": []
+  },
+  "cross_system": {
+   "checked": 2,
+   "aligned": 0,
+   "different": [
+    {
+     "param_id": "VDF-PAR-035",
+     "name": "金額單位換算",
+     "key": "unit_scale",
+     "master_value": "{\"(yfinance)\": 1e-06, \"(空白)\": 1e-06, \"仟元\": 0.001, \"元\": 1e-06, \"千元\": 0.001, \"百萬元\": 1.0}",
+     "other_book": "VRN_FIELDRULES_SSOT_V0100",
+     "other_key": "rules.financial.verify.official.states.UNIT_SCALE",
+     "other_value": "比值落 千/百/百萬 倍附近=單位差非錯",
+     "state": "DIFFERENT"
+    },
+    {
+     "param_id": "VDF-PAR-035",
+     "name": "金額單位換算",
+     "key": "unit_scale",
+     "master_value": "{\"(yfinance)\": 1e-06, \"(空白)\": 1e-06, \"仟元\": 0.001, \"元\": 1e-06, \"千元\": 0.001, \"百萬元\": 1.0}",
+     "other_book": "VRN_FIELDRULES_SSOT_V0100",
+     "other_key": "rules.financial.verify.identity_states.UNIT_SCALE",
+     "other_value": "比率以小數呈現(0.40 vs 40)",
+     "state": "DIFFERENT"
+    }
+   ]
+  },
+  "repointed_books": [
+   {
+    "id": "VDF_UNIFIED",
+    "from": "functional modules/VDF/VDF_Unified_Params_v0100.json",
+    "to": "functional modules/VDF/VDF_Unified_Params_v0105.json"
+   },
+   {
+    "id": "VDF_PARAM_REG",
+    "from": "functional modules/VDF/VDF_Param_Registry_v0100.json",
+    "to": "functional modules/VDF/VDF_Param_Registry_v0102.json"
+   },
+   {
+    "id": "VDF_USMACRO_DETAIL_FETCH_ROSTER_V0",
+    "from": "functional modules/VDF/VDF_USMacro_Detail_Fetch_Roster_v0100.json",
+    "to": "functional modules/VDF/VDF_USMacro_Detail_Fetch_Roster_v0102.json"
+   },
+   {
+    "id": "VDF_STORYGROUP_REGISTRY_V0100",
+    "from": "supportive modules/registry/VDF_StoryGroup_Registry_v0100.json",
+    "to": "supportive modules/registry/VDF_StoryGroup_Registry_v0101.json"
+   }
+  ],
+  "policy": "VCGC 只讀匯總;VDF 正本由 VDF 自己寫;DIFFERENT = 建議燈候操作員裁決"
+ }
+}
