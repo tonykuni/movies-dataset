@@ -1,0 +1,96 @@
+  [OK] 加速器載入(VIA_ACCEL is not None)
+
+  [OK] 網路工具載入(_via_net() is not None · 載入不出網)
+
+  [OK] 已裝進 v0100 本體:run 找庫走本版 · 起日取 DataPlane 冊
+
+[入湖讀的庫] 資料家 ~\AppData\Local\Temp\tmp6iuufx_w\via_database\vdf_database\output_hub · 從資料家 1 個 · 共 2 個(同實體只算一次)
+
+   ~\AppData\Local\Temp\tmp6iuufx_w\via_database\vdf_database\output_hub\mega\vdf_tw_market.duckdb
+
+   ~\AppData\Local\Temp\tmp6iuufx_w\vdf_fetch\stage_only.duckdb
+
+  [OK] 資料家 output_hub 先讀 · 暫存家照讀 · _backup / _sha 副本略過
+
+  [OK] 倉內 output_hub 是接點(指到同一實體)→ 同一個庫只收一次(這台建不了接點,略)
+
+[入湖讀的庫] 資料家 沒判到(env VIA_VDF_DB_HOME=~\AppData\Local\Temp\tmp6iuufx_w\not_here 不在) · 從資料家 0 個 · 共 1 個(同實體只算一次)
+
+   ~\AppData\Local\Temp\tmp6iuufx_w\vdf_fetch\stage_only.duckdb
+
+  [OK] 資料家不在 → 照前版兩個根讀,不丟例外
+
+  [OK] 起日:DataPlane 冊讀得到 → 2018-01-01(操作員裁定);讀不到 → 退回 ENG239 預設並寫來源
+
+  [OK] ① 首輪照 v0100 全收(2 + 1)
+
+  [OK] ② 新成員 3017 的舊日期(≤ 水位)補進湖 3 列 · 總經單序列補舊日期 1 列
+
+  [OK] ③ 重跑零新列(鍵差只補一次)
+
+  [OK] ④ 湖內 5 列 · 2330 值修正不重寫(不製造同鍵兩版)
+
+  [OK] ⑤ late 分片各追一行 manifest(帶鍵欄)
+
+  [OK] ⑥ 不代設同意閘 · 不用 TA-Lib · 不刪分片
+
+  前版鏈 VDF_ENG239_ParquetLakeBuild_v0101.py selftest ↓
+
+  [OK] ① 不加 --all = 直接走 v0100 run(不跑 ⓪) · [('prior', ['--start', '2022-01-01'])]
+
+[⓪全族群] OK 
+
+  [OK] ② --all → ⓪ FetchGroups(ALL · 3 流)再交 v0100(--all / --jobs 不往下傳) · [('fetch_all', 'ALL', 3), ('prior', ['--start', '2022-01-01'])]
+
+[⓪全族群] GATED 閘
+
+[VDF 湖] YELLOW · 全族群擷取 GATED(湖內是庫內現有資料)
+
+  [OK] ③ ⓪ 被閘擋 → 照實 YELLOW rc 2(不冒充綠) · 2
+
+[⓪全族群] SKIPPED 
+
+  [OK] ④ --all --skip-fetch → ⓪ 不跑、--skip-fetch 照傳給 v0100 · [('prior', ['--skip-fetch'])]
+
+  [OK] ⑤ VDF 自己的 FetchGroups 尾版在位 · VDF_MDL012_FetchGroups_v0112.py
+
+  [OK] ⑥ 不代設同意閘 · 不用 TA-Lib
+
+  前版鏈 VDF_ENG239_ParquetLakeBuild_v0100.py selftest ↓
+
+  [OK] ① 日期表只收 >= 2022-01-01(2021-12-30 不收)· 快照表整張收 · [{'db': 'vdf_tw_market.duckdb', 'table': 'tw_daily_prices', 'state': 'APPEND', 'rows_new': 2, 'date_col': 'date', 'from': '2022-01-01'}, {'db': 'vdf_tw_market.duckdb', 'table': 'tw_stock_list', 'state': 'SNAPSHOT', 'rows_new': 1}]
+
+  [OK] ② 重跑零新分片(日期只增 · 快照指紋相同) · ['UPTODATE', 'UPTODATE']
+
+  [OK] ③ 新日期只寫新列(1 列)· 快照內容變了才寫新分片 · [{'db': 'vdf_tw_market.duckdb', 'table': 'tw_daily_prices', 'state': 'APPEND', 'rows_new': 1, 'date_col': 'date', 'from': '2026-11-13'}, {'db': 'vdf_tw_market.duckdb', 'table': 'tw_stock_list', 'state': 'SNAPSHOT', 'rows_new': 1}]
+
+  [OK] ④ 管家 VIEW 讀 Parquet:日期表三分片合計 3 列 · 快照表只取最新分片 · (3, '台灣積體電路')
+
+[VDF 湖] ~\AppData\Local\Temp\tmph1awbs_c\lake · 目錄 VDF_catalog.duckdb · 2 張表
+
+  v_vdf_tw_market__tw_daily_prices                           列          3 · 2022-01-03 → 2026-11-13 · 分片 2 · 落後 13 天
+
+  v_vdf_tw_market__tw_stock_list                             列          1 · — → — · 分片 2
+
+  [OK] ⑤ status:最早 2022-01-03 · 最晚 2026-11-13 · 分片 2 · {'view': 'v_vdf_tw_market__tw_daily_prices', 'rows': 3, 'date_col': 'date', 'min_date': '2022-01-03', 'max_date': '2026-11-13', 'lag_days': 13, 'parts': 2}
+
+  [OK] ⑥ 每個新分片追一行 _manifest.jsonl(只增) · 4
+
+  [OK] ⑦ 不代設同意閘 · 不用 TA-Lib · 不讀 VCGC 支援工具路徑 · 不刪分片
+
+[selftest] VDF_ENG239_ParquetLakeBuild v0100 7/7
+
+  [OK] ⑦ 前版 v0100 自測照過
+
+[selftest] VDF_ENG239_ParquetLakeBuild v0101 7/7
+
+  [OK] ⑦ 前版鏈 v0101 → v0100 自測照過
+
+[selftest] VDF_ENG239_ParquetLakeBuild v0102 7/7
+
+  [OK] 前版 v0102 自測(本版換裝卸下)照過
+
+  [OK] 檔面:雙橋在 · 零 TA-Lib · 不設同意閘
+
+VDF_ENG239_ParquetLakeBuild v0103 selftest 9/9
+
