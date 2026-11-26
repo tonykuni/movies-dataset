@@ -81,6 +81,13 @@ try {
     $r1 = Invoke-Step '找倉(VIA 根)' { [pscustomobject]@{ Ok = (Test-Path (Join-Path $Via 'functional modules\VDF')); Note = $Via } }
     if (-not $r1.Ok) { throw "這支 .ps1 要放在 VeritasIntelligenceAnalytics 根目錄(找不到 functional modules\VDF)" }
 
+    $null = Invoke-Step '倉狀態(分支)' {
+        $br = (& git -C $Via rev-parse --abbrev-ref HEAD 2>$null)
+        $det = ($br -eq 'HEAD')
+        [pscustomobject]@{ Ok = ($br -and -not $det); Warn = $true
+            Note = $(if (-not $br) { '不是 git 倉(照跑)' } elseif ($det) { '沒在分支上(detached;上次中斷留下的)→ 先 git switch main 再 git pull' } else { "分支 $br" }) }
+    }
+
     $py = $null
     $r2 = Invoke-Step 'Python' {
         $cand = @(@('py', '-3'), @('python'))
