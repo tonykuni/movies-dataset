@@ -1,0 +1,161 @@
+{
+ "schema": "VIA.VDF.UnifiedParams.v1",
+ "note": "VDF 全引擎統一參數 SSOT——參數集中此檔,引擎讀此不各自散置 ‖ v0101(2026-11-15T19:00:16Z):操作員 2026-11-15 裁定 PC-001「起始日用 2022-01-01」+「獨立性」—— time.start_date 2018-01-01 → 2022-01-01,與 VDF_DataPlane_SSOT_v0102 群組起始日一致;只動這一個值,其餘一字不動;v0100 不動(已發布)。 ‖ v0102(2026-11-22T12:00:00Z):操作員 2026-11-22 令「VDF資料取自2018-01-01為起始」→ 覆蓋 PC-001(2026-11-15 的 2022-01-01),回到原始 2018-01-01(與 Unified_Params v0100、引擎寫死值 ENG044/ENG055 FRED 一致)。只在 VDF 自己的冊改。 time.start_date 2022-01-01→2018-01-01。v0100/v0101 不動。",
+ "time": {
+  "start_date": "2018-01-01",
+  "end_date": "TODAY",
+  "use_current_as_end": true
+ },
+ "fetch": {
+  "batch_size": 5,
+  "max_retries": 3,
+  "retry_delay_s": 2,
+  "timeout_s": 30,
+  "http_headers": {
+   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+   "Accept": "application/json, text/plain, */*"
+  }
+ },
+ "markets": {
+  "US_INDICES": [
+   "^GSPC",
+   "^DJI",
+   "^IXIC",
+   "^VIX"
+  ],
+  "TAIWAN_INDICES": [
+   "^TWII",
+   "^TWOII"
+  ],
+  "INTERNATIONAL": [
+   "^HSI",
+   "^N225"
+  ],
+  "CURRENCIES": [
+   "EURUSD=X",
+   "JPYUSD=X"
+  ]
+ },
+ "output": {
+  "formats": [
+   "parquet",
+   "csv",
+   "duckdb",
+   "sqlite",
+   "sql"
+  ],
+  "csv_encoding": "utf-8-sig",
+  "root": "functional modules/VDF/output_hub",
+  "gsheet": "REGISTERED(真 API=雲端道:VIA_NET_CONSENT+OAuth 憑證到位才實連;先出相容 csv)"
+ },
+ "honesty": {
+  "simulation_data": "禁——模擬值必須欄名帶 _SIM 後綴且摘要標註,絕不冒充真值"
+ },
+ "three": {
+  "periods": 3,
+  "lanes": 3,
+  "tolerance_rel": 0.001,
+  "engine_timeout_s": 1800,
+  "buffer": {
+   "daily": 10,
+   "monthly": 4,
+   "quarterly": 4,
+   "macro": 400,
+   "event": 30
+  }
+ },
+ "schedule": {
+  "timezone": "Asia/Taipei",
+  "jobs": [
+   {
+    "id": "vdf_three_run",
+    "cron": "35 18 * * 1-5",
+    "cmd": [
+     "VDF_ENG242_ThreePeriodDistill",
+     "run",
+     "--live"
+    ]
+   },
+   {
+    "id": "vdf_three_distill",
+    "cron": "55 18 * * 1-5",
+    "cmd": [
+     "VDF_ENG242_ThreePeriodDistill",
+     "distill"
+    ]
+   }
+  ]
+ },
+ "prior": "VDF_Unified_Params_v0104.json",
+ "ts": "2026-11-25T18:18:42Z",
+ "why_v0104": "VDF_ENG053_ParamEngineMap v0106 derive:正本 VDF_ParamControl_SSOT_v0106.json 的 7 條參數寫回(其餘一字不動)",
+ "derived_from": "VDF_ParamControl_SSOT_v0108.json",
+ "fin5y": {
+  "years": 5,
+  "universe_regex": "^[1-9]\\d{3}$",
+  "rate_s": 3.0,
+  "amount_scale": 1000,
+  "face_value": 10,
+  "face_value_overrides": {},
+  "bases": [
+   "https://mopsov.twse.com.tw/mops/web",
+   "https://mops.twse.com.tw/mops/web"
+  ],
+  "endpoints": {
+   "income": "ajax_t164sb04",
+   "balance": "ajax_t164sb03",
+   "cashflow": "ajax_t164sb05",
+   "dividend": "ajax_t05st09_2"
+  },
+  "items": {
+   "diluted_eps": [
+    "稀釋每股盈餘",
+    "稀釋每股盈餘(元)",
+    "稀釋每股盈餘合計"
+   ],
+   "basic_eps": [
+    "基本每股盈餘",
+    "基本每股盈餘(元)",
+    "基本每股盈餘合計"
+   ],
+   "ni_parent": [
+    "本期淨利(淨損)歸屬於母公司業主",
+    "母公司業主(淨利/損)",
+    "淨利(淨損)歸屬於母公司業主",
+    "歸屬於母公司業主之本期淨利(淨損)"
+   ],
+   "equity_parent": [
+    "歸屬於母公司業主之權益合計",
+    "歸屬於母公司業主之權益"
+   ],
+   "share_capital": [
+    "普通股股本",
+    "普通股"
+   ],
+   "operating_income": [
+    "營業利益(損失)",
+    "營業利益",
+    "營業淨利(淨損)"
+   ],
+   "depreciation": [
+    "折舊費用",
+    "折舊費用合計"
+   ],
+   "amortization": [
+    "攤銷費用",
+    "攤銷費用合計"
+   ],
+   "dividends_paid": [
+    "發放現金股利",
+    "發放現金股利合計"
+   ],
+   "cash_dps": [
+    "盈餘分配之現金股利(元/股)",
+    "現金股利",
+    "股東配發-盈餘分配之現金股利(元/股)",
+    "盈餘分配之股東現金股利(元/股)"
+   ]
+  }
+ },
+ "why_v0105": "VDF_ENG053_ParamEngineMap v0106 derive:正本 VDF_ParamControl_SSOT_v0108.json 的 9 條參數寫回(其餘一字不動)"
+}
