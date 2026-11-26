@@ -158,6 +158,38 @@ def sha_lf(b: bytes) -> str:
     return hashlib.sha256(b.replace(b"\r\n", b"\n")).hexdigest()
 
 
+_SUBS = {"VCGC": "VCGC", "VDF": "VDF", "VRN": "VRN", "VRN2": "VRN", "VRN-2": "VRN", "VQG": "VQG", "VAP": "VAP", "SUP": "SUP"}
+
+
+def norm_sys(d: dict) -> str:
+    """編號冊的系統欄:有 system 就用;否則照 sub(VCGC / VDF / VRN…)對回目錄的系統名;其他 sub 歸 VIA(有 sys 時)。"""
+    if d.get("system"):
+        return str(d["system"])
+    sub = str(d.get("sub") or "").upper()
+    if not sub:                                     # 函式級列只有 code(VIA-CORE-ENG001-CLS001-FNC001)→ 取第二段
+        m = re.match(r"VIA-([A-Z0-9]+)-", str(d.get("code") or ""))
+        sub = m.group(1) if m else ""
+    if sub in _SUBS:
+        return _SUBS[sub]
+    return "VIA" if (d.get("sys") or sub) else ""
+
+
+def num_maps(recs: list) -> tuple:
+    """→ (來源路徑→號, 名字→號)。來源是冊檔(.json 卡冊 · LGC)的不拿來當檔的號;名字對照只收來源就是那支檔(或沒寫來源)的列。"""
+    by_src, by_name = {}, {}
+    for d in recs:
+        code, name = str(d.get("code") or ""), str(d.get("name") or d.get("file") or "")
+        src = str(d.get("source") or "").replace("\\", "/")
+        if not code:
+            continue
+        own = bool(src) and not src.lower().endswith(".json")
+        if own:
+            by_src.setdefault(src, code)
+        if name and (not src or (own and src.rsplit("/", 1)[-1].rsplit(".", 1)[0] == name)):
+            by_name.setdefault(name, code)
+    return by_src, by_name
+
+
 def system_of(name: str, rel: str) -> str:
     for p, s in SYS_PREFIX:
         if name.startswith(p):
@@ -248,8 +280,8 @@ def collect(via: Path, prev_stat=None) -> tuple:
         m = VERS.match(name)
         rows["files"].append([rel2, rel2.rsplit("/", 1)[0] if "/" in rel2 else "", name, ("." + name.rsplit(".", 1)[-1].lower()) if "." in name else "",
                               system_of(name, rel2), m.group("fam") if m else "", ("v" + m.group("ver")) if m else "", size, lines, sha, mt])
-    # 編號冊
-    num_by_name = {}
+    # 編號冊(PR #751 Codex:號照「來源檔 + 種類」對,不只看名字;系統欄讀冊上實際的 sys / sub)
+    recs = []
     for nb in sorted((reg / "VIA_NumberBooks").glob("VIA_NumberBook_*.jsonl")):
         book = nb.stem
         for line in nb.read_text(encoding="utf-8", errors="replace").splitlines():
@@ -259,10 +291,10 @@ def collect(via: Path, prev_stat=None) -> tuple:
                 continue
             if not isinstance(d, dict):
                 continue
+            recs.append(d)
             code, name = str(d.get("code") or ""), str(d.get("name") or d.get("file") or "")
-            rows["numbers"].append([book, code, name, str(d.get("system") or ""), json.dumps(d, ensure_ascii=False)[:2000]])
-            if name and code:
-                num_by_name[name] = code
+            rows["numbers"].append([book, code, name, norm_sys(d), json.dumps(d, ensure_ascii=False)[:2000]])
+    num_by_src, num_by_name = num_maps(recs)
     # 家族(由檔算)
     fam = {}
     for f in rows["files"]:
@@ -280,7 +312,7 @@ def collect(via: Path, prev_stat=None) -> tuple:
             except OSError:
                 doc = ""
         rows["families"].append([family, tail[4], folder, ext, len(fs), fs[0][6], tail[6], tail[0],
-                                 num_by_name.get(tail[2].rsplit(".", 1)[0], ""), doc])
+                                 num_by_src.get(tail[0]) or num_by_name.get(tail[2].rsplit(".", 1)[0], ""), doc])
     sources = {}
 
     def src(p):
@@ -769,6 +801,16 @@ def selftest() -> int:
         chk("④ CRLF 檔的雜湊先統一成 LF", sh["CGC_MDL900_Demo_v0101.py"] == hashlib.sha256('"""CGC_MDL900_Demo v0101 — 薄尾"""\nY = 2\n'.encode("utf-8")).hexdigest())
         fam = con.execute("SELECT versions, tail_version, tail_code, system FROM families WHERE family = 'CGC_MDL900_Demo'").fetchone()
         chk("⑤ 家族:2 版 · 尾版 v0101 · 尾版號取自編號冊 · 系統 VCGC", tuple(fam) == (2, "v0101", "VIA-VCGC-MDL9001", "VCGC"), fam)
+        recs = [{"code": "VIA-VDF-ENG005", "name": "VDF_ENG092_X_v0100", "sys": "VIA", "sub": "VDF", "kind": "ENG",
+                 "source": "functional modules/VDF/VDF_ENG092_X_v0100.py"},
+                {"code": "VIA-VDF-LGC007", "name": "VDF_ENG092_X_v0100", "sys": "VIA", "sub": "VDF", "kind": "LGC",
+                 "source": "supportive modules/registry/VIA_Essentia_CardBook_CGC_v0100.json"},
+                {"code": "VIA-CORE-ENG001", "name": "Y", "sys": "VIA", "sub": "CORE"}]
+        bs, bn = num_maps(recs)
+        chk("⑤b 號照來源檔對:同名的 ENG 號與 LGC 卡號不互蓋(取 ENG005);系統欄讀 sub(VDF)· 其他 sub 歸 VIA",
+            bs.get("functional modules/VDF/VDF_ENG092_X_v0100.py") == "VIA-VDF-ENG005" and bn.get("VDF_ENG092_X_v0100") == "VIA-VDF-ENG005"
+            and norm_sys(recs[0]) == "VDF" and norm_sys(recs[2]) == "VIA" and norm_sys({"system": "VCGC"}) == "VCGC"
+            and norm_sys({"code": "VIA-VDF-ENG001-CLS001-FNC001"}) == "VDF" and norm_sys({"code": "VIA-CORE-ENG001-FNC002"}) == "VIA", (bs, bn))
         chk("⑥ 工具 · 需求 · 工作流 · 站 · 動詞 · 紀錄各有列", all(con.execute("SELECT count(*) FROM %s" % t).fetchone()[0] == 1 for t in ("tools", "requirements", "workflows", "stations", "verbs", "ledger")))
         con.close()
         chk("⑦ build 不改倉內任何檔(只寫 VIA_Reports)", before == sorted(p.relative_to(via).as_posix() for p in via.rglob("*") if ".git/" not in p.as_posix() + "/" and "VIA_Reports" not in p.as_posix()))
