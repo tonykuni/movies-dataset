@@ -10,7 +10,8 @@ r"""VDF_MDL024_RunFetchCache v0100 — 同一輪擷取共用回應快取(同一�
 (擷取引擎、它們再開的子行程)一啟動就裝上本檔的 install()。
 規則(只快取「重抓也一定一樣」的):
   · 只收 GET、沒有 body、不是 stream、回 200、內容 ≤ 上限(預設 64 MB);POST / 錯誤 / 超大一律不收、照常送。
-  · 鍵 = sha256(最終網址 + 排序後的請求標頭,不含 User-Agent / Cookie);網址不寫進檔(金鑰可能在網址裡)。
+  · 鍵 = sha256(最終網址 + 排序後的請求標頭,不含 User-Agent / Cookie);網址不寫進任何檔(檔名只有雜湊 · meta 只有
+    回應標頭 content-type 等與編碼;命中時網址用這一次請求自己的):金鑰可能在網址裡(例 FRED api_key · PR #764 Codex P1)。
   · 寫檔:暫存名 + os.replace 原子換檔;兩道同時抓同一個網址最多各送一次,不會讀到半個檔。
   · 快取只活這一輪:夾在本機 TEMP(不在 OneDrive、不離開這台電腦),MDL022 收尾時刪掉,只留計數收據。
   · 同意閘:本檔不設、不繞;命中的內容都是本輪閘開著時真的抓回來的。
@@ -236,7 +237,7 @@ def _install_urllib(root: Path) -> None:
         def make_hit(body, meta):
             msg = email.message_from_string("".join(f"{k}: {v}\n" for k, v in (meta.get("headers") or {}).items()),
                                             _class=http.client.HTTPMessage)
-            return urllib.response.addinfourl(io.BytesIO(body), msg, meta.get("url") or full, 200)
+            return urllib.response.addinfourl(io.BytesIO(body), msg, full, 200)
 
         def fetch():
             resp = orig(url, data, *a, **kw)
@@ -246,7 +247,7 @@ def _install_urllib(root: Path) -> None:
             body = resp.read()
             hdrs = {k: v for k, v in resp.headers.items() if k.lower() in KEEP_HEADERS}
             return (urllib.response.addinfourl(io.BytesIO(body), resp.headers, resp.geturl(), 200), body,
-                    {"headers": hdrs, "url": resp.geturl()})
+                    {"headers": hdrs})
 
         return fetch_once(root, key, full, fetch, make_hit)
 
@@ -282,7 +283,7 @@ def _install_requests(root: Path) -> None:
             return call()
         def make_hit(body, meta):
             r = requests.models.Response()
-            r.status_code, r._content, r.url, r.reason = 200, body, meta.get("url") or prep.url, "OK"
+            r.status_code, r._content, r.url, r.reason = 200, body, prep.url, "OK"
             r.headers = CaseInsensitiveDict(meta.get("headers") or {})
             r.encoding = meta.get("encoding")
             r.request = prep
@@ -293,7 +294,7 @@ def _install_requests(root: Path) -> None:
             if r.status_code != 200:
                 return r, None, None
             hdrs = {k: v for k, v in r.headers.items() if k.lower() in ("content-type", "last-modified", "date")}
-            return r, r.content, {"headers": hdrs, "url": r.url, "encoding": r.encoding}
+            return r, r.content, {"headers": hdrs, "encoding": r.encoding}
 
         return fetch_once(root, key, prep.url, fetch, make_hit)
 
@@ -401,7 +402,7 @@ def selftest() -> int:
             if self.path.startswith("/slow"):
                 time.sleep(0.6)
             code = 404 if self.path.startswith("/missing") else 200
-            body = json.dumps({"path": self.path, "n": served["n"]}).encode()
+            body = json.dumps({"path": self.path.split("?")[0], "n": served["n"]}).encode()   # 不回顯查詢字串
             self.send_response(code)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
@@ -475,6 +476,17 @@ def selftest() -> int:
         held = _acquire(Path(root), "k" * 64)
         chk("⑩ 過舊的鎖(持鎖行程已死)會被拆掉重拿;新鮮的鎖拿不到", lk2 is not None and held is None, (lk2, held))
         lk2.unlink()
+        secret = "SECRETKEY" + "123"
+        leak = ("import sys,urllib.request\n"
+                "u=sys.argv[1]+'/k?series_id=X&api_key=" + secret + "'\n"
+                "urllib.request.urlopen(u,timeout=5).read()\n"
+                "try:\n import requests\n requests.get(sys.argv[1]+'/k2',params={'api_key':'" + secret + "'},timeout=5).content\n"
+                "except ImportError:\n pass\n")
+        for _ in range(2):
+            subprocess.run([sys.executable, "-c", leak, base], env=env, capture_output=True, text=True, timeout=60)
+        leaked = [f.name for f in Path(root).rglob("*") if f.is_file() and secret.encode() in f.read_bytes()]
+        chk("⑪ 網址裡的金鑰(api_key)不落任何快取檔(body · meta · 計數 · 鎖)· 第二次照樣命中",
+            not leaked and stats(root)["hit"] >= 3, leaked)
         env2 = dict(env)
         env2.pop(ENV_DIR)
         p = subprocess.run([sys.executable, "-c", "import urllib.request;print(getattr(urllib.request.urlopen,'_vdf_run_cache',False))"],
