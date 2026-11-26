@@ -11,6 +11,7 @@ r"""VDF_MDL022_SafeParallelLaunch v0112 — 薄尾(v0100–v0111 一字不動):�
      → 印一行「共用快取 命中 X / 請求 Y」→ 刪掉本輪快取夾。summary 動詞也印這一行。
   ③ --no-shared-cache:這一輪不接快取(照 v0111)。找不到 MDL024 → 照 v0111 跑並印黃字,不擋。
   ④ 子行程預設 PYTHONWARNINGS=ignore::SyntaxWarning(只藏舊檔字串跳脫的語法警告,不改任何行為;已設就不動)。
+  ⑥ 收樹(PR #764 Codex P2):POSIX 的背景子行程開在自己的行程群組,Ctrl+C 時整組 SIGKILL,沒裝 psutil 也收得到孫行程。
   ⑤ start 動詞(PR #764 Codex P1 · AGENTS.md §3「PS 只進環境與呼叫 Python 入口」):原本 Start-VIA-VDF PS 裡的
      開跑前檢查 → 背景跑 → 輪詢進度檔 → 畫進度條 → Ctrl+C 收行程樹 → 摘要,全部搬進這裡。
      畫面:方案一 Rich 進度條(有裝 Rich);方案二 原生 ANSI 八階平滑進度條(零依賴)。--ui rich|ansi|plain 可指定;
@@ -190,28 +191,60 @@ def _read(path: Path) -> dict | None:
         return None
 
 
-def kill_tree(proc) -> None:
-    """收掉背景子行程整棵樹(psutil 有就逐個收;Windows 沒 psutil 用 taskkill /T)。"""
-    try:
-        import psutil
+def spawn(cmd: list, **kw):
+    """背景子行程:POSIX 開在自己的行程群組(收樹時整組收,不依賴 psutil);Windows 照常(收樹用 psutil 或 taskkill /T)。"""
+    import subprocess
+    if os.name != "nt":
+        kw["start_new_session"] = True
+    return subprocess.Popen(cmd, **kw)
+
+
+def kill_tree(proc, use_psutil: bool = True) -> None:
+    """收掉背景子行程整棵樹。psutil 有就逐個收子孫;另外 POSIX 一律整組收(spawn 開的子行程是自己那組的組長,
+    沒有 psutil 也收得到孫行程);Windows 沒 psutil 用 taskkill /T /F。"""
+    have = False
+    if use_psutil:
         try:
-            parent = psutil.Process(proc.pid)
-            kids = parent.children(recursive=True)
-        except psutil.Error:
-            kids = []
-        for k in kids:
+            import psutil
+            have = True
             try:
-                k.kill()
+                kids = psutil.Process(proc.pid).children(recursive=True)
             except psutil.Error:
-                pass
-    except ImportError:
-        if os.name == "nt":
+                kids = []
+            for k in kids:
+                try:
+                    k.kill()
+                except psutil.Error:
+                    pass
+        except ImportError:
+            have = False
+    if os.name == "nt":
+        if not have:
             import subprocess
             subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"], capture_output=True)
+    else:
+        import signal
+        try:
+            if os.getpgid(proc.pid) == proc.pid and os.getpgid(proc.pid) != os.getpgid(0):
+                os.killpg(proc.pid, signal.SIGKILL)
+        except OSError:
+            pass
     try:
         proc.kill()
     except OSError:
         pass
+
+
+def _alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    try:
+        with open(f"/proc/{pid}/stat", encoding="utf-8") as fh:
+            return fh.read().split(")")[-1].split()[0] != "Z"
+    except OSError:
+        return True
 
 
 def _render_rich(proc, path: Path, poll: float) -> bool:
@@ -278,7 +311,7 @@ def start_cmd(rest: list, out=None, tty=None, progress_path: Path = None, poll: 
     log = Path(log_dir or tempfile.gettempdir()) / f"VIA_VDF_launch_{time.strftime('%Y%m%d_%H%M%S')}.log"
     cmd = list(CHILD_CMD) if CHILD_CMD else [sys.executable, "-X", "utf8", str(Path(__file__).resolve()), "launch", "--skip-preflight", *rest]
     with open(log, "w", encoding="utf-8", errors="replace") as fh:
-        proc = subprocess.Popen(cmd, stdout=fh, stderr=subprocess.STDOUT)
+        proc = spawn(cmd, stdout=fh, stderr=subprocess.STDOUT)
         print(f"  背景執行中 · 完整輸出 → {log}", file=out, flush=True)
         try:
             if ui == "ansi" or not (ui in ("auto", "rich") and _render_rich(proc, path, poll)):
@@ -414,19 +447,21 @@ def selftest() -> int:
             rc == 3 and calls_ok and "100.0%" in buf.getvalue() and "(3/3)" in buf.getvalue() and any(td.glob("VIA_VDF_launch_*.log")),
             (rc, buf.getvalue()[-200:]))
         chk("⑨ start:開跑前檢查紅(rc 1)→ 不開背景、不印摘要;--plain → 前景 launch", rc_red == 1 and red_ok and plain_ok)
-        sleeper = subprocess.Popen([sys.executable, "-c", "import subprocess,sys,time;"
-                                    "subprocess.Popen([sys.executable,'-c','import time;time.sleep(60)']);time.sleep(60)"])
-        time.sleep(0.8)
-        try:
-            import psutil
-            kids = psutil.Process(sleeper.pid).children(recursive=True)
-        except ImportError:
-            kids = []
-        kill_tree(sleeper)
-        sleeper.wait(timeout=10)
-        time.sleep(0.3)
-        gone = all(not k.is_running() or k.status() == "zombie" for k in kids)
-        chk("⑩ Ctrl+C 收樹:背景子行程與它的孫行程都收掉", sleeper.poll() is not None and gone, len(kids))
+        tree = ("import subprocess,sys,time;"
+                "g=subprocess.Popen([sys.executable,'-c','import time;time.sleep(60)']);print(g.pid,flush=True);time.sleep(60)")
+        res = []
+        for use in (True, False):
+            sleeper = spawn([sys.executable, "-c", tree], stdout=subprocess.PIPE, text=True)
+            gpid = int(sleeper.stdout.readline().strip() or 0)
+            kill_tree(sleeper, use_psutil=use)
+            sleeper.wait(timeout=10)
+            end = time.time() + 5
+            while gpid and _alive(gpid) and time.time() < end:
+                time.sleep(0.1)
+            res.append((use, sleeper.poll() is not None, bool(gpid) and not _alive(gpid)))
+            sleeper.stdout.close()
+        chk("⑩ Ctrl+C 收樹:有 psutil 與強制不用 psutil 兩條路,背景子行程與孫行程(實際 pid)都收掉",
+            all(a and b for _, a, b in res) if os.name != "nt" else res[0][1], res)
     alone = subprocess.run([sys.executable, str(PRIOR_PATH), "--selftest"], capture_output=True, text=True, timeout=1800)
     tail = (alone.stdout.strip().splitlines() or [""])[-1]
     chk("⑦ 前版 v0111 自測單獨跑:綠,或它自己照實回黃(rc 2,例:容器缺 rich)· 本版不換裝前版任何名稱",
