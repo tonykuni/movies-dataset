@@ -1,0 +1,102 @@
+  [OK] 加速器載入(VIA_ACCEL is not None)
+
+  [OK] 網路工具載入(_via_net() is not None · 載入不出網)
+
+  [OK] 前版 = 同家族比自己小的最大版 · 已裝進 v0100 本體(m012 · inventory · names · 橫幅)
+
+  [OK] 資料家照 DataPlane resolve_home:env VIA_VDF_DB_HOME 指的夾
+
+[   0.6s]   找庫的根 1:~\AppData\Local\Temp\tmp7vz1c400\via_database\vdf_database(資料家 · env VIA_VDF_DB_HOME)
+
+[   0.6s]   找庫的根 2:~\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\functional modules\VDF\output_hub(倉內 output_hub(工作站接點 → 資料家))
+
+[   0.6s]   找庫的根 3:~\AppData\Local\Temp\tmp7vz1c400\vdf_fetch\dict(MDL012 擷取暫存家(v0100 原本唯一的根))
+
+[   0.6s]   讀庫 vdf_tw_market.duckdb ← ~\AppData\Local\Temp\tmp7vz1c400\via_database\vdf_database\output_hub\vdf_tw_market.duckdb(資料家 · env VIA_VDF_DB_HOME)
+
+[   0.6s]   讀庫 only_stage.duckdb ← ~\AppData\Local\Temp\tmp7vz1c400\vdf_fetch\dict\only_stage.duckdb(MDL012 擷取暫存家(v0100 原本唯一的根))
+
+[   0.7s]   讀庫 nowhere.duckdb ← 找不到(所有根都沒有)
+
+  [OK] 同名庫兩處都有 → 讀資料家的那份(5 列),不是暫存家的副本(2 列)
+
+  [OK] 資料家沒有的庫 → 退到暫存家照讀(前版行為保留)
+
+  [OK] 哪裡都沒有 → DB_MISSING 照實 · 收據寫「所有根都沒有」
+
+  [OK] 收據多 search_roots(依序:資料家 → 倉內 output_hub → 暫存家)與 db_paths
+
+  [OK] names:有表讀不到欄 / 有庫沒找到 → 黃並點名(不再 0 欄也綠)
+
+  [OK] 資料家不在 → (None, 原因),不丟例外;根只剩倉內 / 暫存家
+
+[前版] VDF_ENG242_ThreePeriodDistill_v0101.py 自測(本版換裝卸下)
+
+  [OK] 加速器載入(VIA_ACCEL is not None)
+
+  [OK] 網路工具載入(_via_net() is not None · 載入不出網)
+
+  [OK] 前版 = 同家族比自己小的最大版 · 動詞全轉給前版
+
+  [OK] VDF 境判定:Windows venv / conda / Linux 都認;一般 python 不認
+
+  [OK] 標示不誤報:本解譯器是 via_vdf_312 → 綠字樣;真的退回一般 python → 照舊黃
+
+[前版] VDF_ENG242_ThreePeriodDistill_v0100.py 自測(擦掉同意閘 / 入口標記的環境;跑完還原 · 本檔不設閘)
+
+  [OK] 加速器載入(VIA_ACCEL is not None)
+
+  [OK] 網路工具載入(_via_net() is not None · 載入不出網) · ~\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\supportive modules\network\via_net_unified_v0101.py
+
+  [OK] 三期窗:日 −10 天 · 月 −4 月 · 季 −4 季
+
+  [OK] 起日換成窗起({start} · --start · --since · {years})
+
+  [OK] 尾版律:冊上釘舊版 → 換成同家族尾版
+
+  [OK] 名稱同義:全形 / 空白 / 大小寫正規化 · 沒對到列 UNMAPPED
+
+  [OK] 先看資料庫:列數 · 鍵數 · 期數 · 最新三期
+
+  [OK] 蒸餾:每鍵最新三期 · 完全重複的去掉 · 欄名對齊 · {'state': 'OK', 'rows': 6, 'pk': ['code', 'date'], 'pk_conflicts': 0, 'renamed': {'stock_id': 'code'}}
+
+  [OK] 重跑 = 整份換新不重複(列數不變)
+
+  [OK] 同主鍵不同值 = PK_CONFLICT(不猜,那一鍵期不輸出)
+
+  [OK] 跨來源核對:同鍵同期比數值 · 超出容差 = MISMATCH · {'state': 'OK', 'compared': 6, 'mismatch': 1, 'columns': ['close'], 'pk': ['code', 'date']}
+
+  [OK] 最快排程:最長優先(LPT)· 沒量過的先跑
+
+  [OK] 沒 --live = 只列指令不執行
+
+[   3.7s]   B · e1 · rc 0 · 0.0s
+
+[   3.7s]   A · e2 · rc 0 · 0.0s
+
+  [OK] --live:每支個別啟動 · 同意閘只在子行程 · 帶入口標記 · 寫運作帳
+
+  [OK] 準備檢查:單獨啟動 · 加速器生效 · 網路橋 · 不匯入他系統 · {'standalone': '1/2', 'accel': '1/2', 'net': '1/2', 'in_param_map': '0/2'}
+
+  [OK] 輸出 DataFrame
+
+VDF_ENG242_ThreePeriodDistill v0100 selftest 16/16
+
+  [OK] 前版 v0100 自測在乾淨閘環境照過(rc 0)· 操作員視窗閘先開著也一樣(擦掉再跑)
+
+  [OK] 橫幅 / 收據寫本版(PRIOR.TAG = v0101)
+
+  [OK] 自測後環境原樣還原(同意閘 · 入口標記)
+
+  [OK] 檔面:雙橋在 · 不設同意閘到檔 · 零 TA-Lib
+
+VDF_ENG242_ThreePeriodDistill v0101 selftest 9/9
+
+  [OK] 前版 v0101 鏈自測照過(rc 0;它自己再擦同意閘跑 v0100)· 跑完本版又換上
+
+  [OK] 自測後 VIA_VDF_DB_HOME 原樣還原
+
+  [OK] 檔面:雙橋在 · 唯讀開庫(本檔不寫真庫)· 零 TA-Lib · 不設同意閘
+
+VDF_ENG242_ThreePeriodDistill v0102 selftest 13/13
+
