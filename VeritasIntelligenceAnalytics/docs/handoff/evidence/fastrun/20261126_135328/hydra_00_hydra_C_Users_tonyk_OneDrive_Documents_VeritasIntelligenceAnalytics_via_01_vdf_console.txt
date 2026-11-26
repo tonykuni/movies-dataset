@@ -1,0 +1,142 @@
+[CGC_MDL158_VIAPanoramaAuditRepair v0125 hydra] YELLOW · 應掃 1837 · 已掃 1837 · 略過 0  · 587.83s · 工人 8
+
+  ① 三回合:P1 語法匯入符號 99 · P2 介面契約 0 · P3 執行期邊界 2901 · 確認 3000(雙判 7)· UNDEF 來源:黃 · python -m ruff 也跑不起來(FileNotFoundError);UNDEF 略過
+
+     各類:{'ENCODING': 102, 'SWALLOW': 2497, 'BAREEXC': 24, 'BOM': 271, 'LEAK': 3, 'COMPILE': 3, 'NOTIMEOUT': 4, 'DUPDEF': 92, 'UNRESOLVED': 2, 'CYCLE': 2}
+
+     P2 SCHEMA:灰 · DataFrame ↔ Parquet / DuckDB 欄位交給各系統現成動詞(VDF_SystemManager parquet align,唯讀)
+
+  ② 依賴圖:靜態匯入邊 2428 · 循環 1 · A 組(並行)6 檔 · B 組(拓撲序)9 檔 · [黃] 動態載入 2176 處(spec_from_file_location / import_module / run_path)不入圖 → A 組的「零耦合」只對靜態匯入成立,修時照樣每檔重掃
+
+  ①b 區位(只修正本):檔 {'正本': 0, '倉副本': 534, '副本': 586, '凍結': 523, '收容': 139, '前版': 1140, '已鎖': 0, '已發布': 0} · 發現 {'正本': 161, '倉副本': 955, '副本': 531, '凍結': 553, '收容': 731, '前版': 69, '已鎖': 0, '已發布': 0} → 副本 / 凍結 / 收容 照列不寫
+
+     循環:VeritasIntelligenceAnalytics/supportive modules/VeritasAegisNexus.py ↔ VeritasIntelligenceAnalytics/supportive modules/VIA_SSOT_Unified.py
+
+  [錯誤編號] | [執行模式] | [檔:行] | [根因] | [修正動作] | [覆核]
+
+  ERR-001 | 並行批次 | VDF_InstallBundle_v0103/VDF_Manager_v0104/VDF_DataManager_v0104.py:61 | ENCODING open() 文字模式 'r' 沒給 encoding(Windows 會用 cp950) | 人工(列計畫) | 單判(規則)
+
+  ERR-002 | 並行批次 | VDF_InstallBundle_v0103/VDF_Manager_v0104/VDF_DataManager_v0104.py:338 | SWALLOW except psutil.NoSuchProcess 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-003 | 並行批次 | VDF_InstallBundle_v0103/VDF_Manager_v0104/VDF_DataManager_v0104.py:342 | SWALLOW except psutil.NoSuchProcess 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-004 | 並行批次 | VDF_InstallBundle_v0103/retained_legacy/VDF_TW_AllInOne_v039.py:1537 | SWALLOW except EOFError 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-005 | 不寫(倉副本) | VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v0123.py:2082 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-006 | 不寫(倉副本) | VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v0123.py:2102 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-007 | 不寫(倉副本) | VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v0148.py:2191 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-008 | 不寫(倉副本) | VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v0148.py:2211 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-009 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG019_MDL501FetchContractManager.py:71 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-010 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG019_MDL501FetchContractManager.py:232 | SWALLOW except (IndexError, TypeError) 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-011 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher.py:191 | BAREEXC except: 未指名例外型別 | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-012 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher.py:275 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-013 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher.py:354 | BAREEXC except: 未指名例外型別 | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-014 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher.py:360 | BAREEXC except: 未指名例外型別 | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-015 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG045_OutputHub_v0100.py:143 | BOM open() 寫出用 utf-8-sig(會帶 BOM) | 人工(列計畫) | 單判(規則)
+
+  ERR-016 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG045_OutputHub_v0101.py:145 | BOM open() 寫出用 utf-8-sig(會帶 BOM) | 人工(列計畫) | 單判(規則)
+
+  ERR-017 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG093_LaunchConsole_v0100.py:818 | ENCODING open() 文字模式 'r' 沒給 encoding(Windows 會用 cp950) | 人工(列計畫) | 單判(規則)
+
+  ERR-018 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG093_LaunchConsole_v0101.py:360 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-019 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG093_LaunchConsole_v0102.py:364 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-020 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_ENG093_LaunchConsole_v0103.py:373 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-021 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL001_TWEquityEngine_shaf89f2a53.py:425 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-022 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL001_TWEquityEngine_shaf89f2a53.py:746 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-023 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL001_TWEquityEngine_shaf89f2a53.py:863 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-024 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL001_TWEquityEngine_shaf89f2a53.py:998 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-025 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL001_TWEquityEngine_shaf89f2a53.py:2051 | BOM to_csv(utf-8-sig) 帶 BOM(常是為了 Excel,人工判) | 人工(列計畫) | 單判(規則)
+
+  ERR-026 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL001_TWEquityEngine_shaf89f2a53.py:2059 | BOM open() 寫出用 utf-8-sig(會帶 BOM) | 人工(列計畫) | 單判(規則)
+
+  ERR-027 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL001_TWEquityEngine_shaf89f2a53.py:2297 | SWALLOW except (EOFError, KeyboardInterrupt) 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-028 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL001_TWEquityEngine_shaf89f2a53.py:2306 | SWALLOW except (EOFError, KeyboardInterrupt) 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-029 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL001_TWUniverseVerify_sha67ef6fce.py:622 | SWALLOW except (EOFError, KeyboardInterrupt) 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-030 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL002_YFinanceFetchingEngine.py:789 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-031 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL002_YFinanceFetchingEngine.py:1908 | SWALLOW except (EOFError, KeyboardInterrupt) 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-032 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL002_YFinanceFetchingEngine_shae5dbb168.py:785 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-033 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL002_YFinanceFetchingEngine_shae5dbb168.py:1837 | SWALLOW except (EOFError, KeyboardInterrupt) 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-034 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL002_YFinanceFetchingEngine_v0100.py:802 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-035 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL002_YFinanceFetchingEngine_v0100.py:2123 | SWALLOW except (EOFError, KeyboardInterrupt) 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-036 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine.py:146 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-037 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine.py:170 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-038 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine.py:190 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-039 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine.py:227 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-040 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine.py:1145 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-041 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine.py:1146 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-042 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine.py:1681 | SWALLOW except (EOFError, KeyboardInterrupt) 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-043 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine_shacb9c413e.py:129 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-044 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine_shacb9c413e.py:1047 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-045 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine_shacb9c413e.py:1048 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-046 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine_shacb9c413e.py:1516 | SWALLOW except (EOFError, KeyboardInterrupt) 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-047 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine_v0100.py:159 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-048 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine_v0100.py:183 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-049 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine_v0100.py:203 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-050 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine_v0100.py:240 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-051 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine_v0100.py:1170 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-052 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine_v0100.py:1171 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-053 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL003_SentimentMacroEngine_v0100.py:1761 | SWALLOW except (EOFError, KeyboardInterrupt) 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-054 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0100.py:317 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-055 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0100.py:537 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-056 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0100.py:894 | BAREEXC except: 未指名例外型別 | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-057 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0100.py:894 | SWALLOW except (全部) 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-058 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0100.py:1170 | BAREEXC except: 未指名例外型別 | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-059 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL005_TWStockFilter_sha49861a44.py:315 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  ERR-060 | 不寫(倉副本) | VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL005_TWStockFilter_sha49861a44.py:319 | SWALLOW except Exception 被吞:本體只有 pass/continue | 人工(列計畫) | 單判(規則 · 前版 _read_checks_py)
+
+  …另 2940 筆(全表在戰報 JSON;--max 調整)
+
+  ③ 乾跑:沒寫任何檔 · 可自動修 5 筆(ENCODING · BOM)· 其餘列計畫 → 要修再加 --apply
+
+  戰報 → ~\AppData\Local\Temp\via_hostboot_hydra_20261126_135328\hydra_report.json
+
