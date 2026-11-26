@@ -16,6 +16,8 @@ VIA 版取捨(只增不減 · 已有同功能就掛動詞):
     連線是唯讀且關掉外部存取(DuckDB enable_external_access=false),關鍵字檢查被繞過也讀不到檔。
   · 資料邊界:只收程式結構、冊的中繼資料與號;不收 VIA_Reports、資料湖、研報、.parquet / .duckdb / .csv / .pdf。
   · 不採 Streamlit / DuckDB 內建 UI:要起伺服器(CM-90 · L118 靜態頁);要看頁面用既有卡片矩陣引擎。
+  · syscat page:後端讀庫(唯讀)→ 前端一個靜態 HTML(VIA_SystemCatalog.html,不起伺服器、資料內嵌、
+    左欄 關鍵字 · 系統 · 分頁,右側表格可點欄排序;色與字只取 VIA_UI_Template_SSOT 尾版 token,燈四色白字、紅燈慢閃)。
   · 參數(掃描範圍 · 輸出夾 · 卡片大小 · 八個預設查詢)在參數冊 VIA_VCGC_SysCat_Params 尾版(SDD v0101 L4:參數從參數冊讀);
     冊不在就用程式內建預設照跑,燈降黃並點名。
   · 沒有 duckdb 的機器:用 Python 內建 sqlite 代替(同表同欄),燈降黃並印安裝指令;不自己裝套件。
@@ -578,6 +580,115 @@ def diff(out: Path = OUT_DEFAULT) -> int:
     return query(["@changed", "--limit", "60"], out)
 
 
+PAGE_TABS = (  # (分頁, 表, 欄, 排序, 上限)
+    ("家族尾版", "families", "system, family, folder, versions, tail_version, tail_code, tail_doc", "system, family", 4000),
+    ("工具鎖", "tools", "family, version, code, activated_at, path", "family", 200),
+    ("需求", "requirements", "code, subsystem, status, topic, next, book", "code DESC", 2000),
+    ("工作流", "workflows", "code, name, kind, version, steps, book", "code DESC", 1000),
+    ("帳燈", "ledger", "lamp, kind, id, event, file, ts", "ts DESC", 1500),
+    ("鎖定", "locks", "path, version, vcgc_code, locked_at, what", "locked_at DESC", 1000),
+    ("變更", "changes", "change, path", "change, path", 2000),
+)
+
+
+def _ui_tokens(reg: Path = HERE) -> tuple:
+    """視覺值只取鎖定冊 VIA_UI_Template_SSOT 尾版的 tokens;本檔不帶色碼。"""
+    hits = sorted(reg.glob("VIA_UI_Template_SSOT_v[0-9][0-9][0-9][0-9].json"))
+    if not hits:
+        return "", "UI_TOKENS=灰(鎖定冊不在)"
+    tk = json.loads(hits[-1].read_text(encoding="utf-8")).get("tokens") or {}
+    root = ":root{" + ";".join("--%s:%s" % (k, v) for k, v in tk.items() if "<" not in str(v) and "}" not in str(v) and ";" not in str(v)) + "}"
+    return root, hits[-1].name
+
+
+PAGE_CSS = """*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:var(--fs)/var(--lh) var(--font)}
+.wrap{display:grid;grid-template-columns:var(--aside-w) 1fr;min-height:100vh}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:12px;position:sticky;top:0;height:100vh;overflow:auto}
+aside h1{font:var(--w-bold) var(--fs-h) var(--serif);margin:0 0 2px}aside .sub{color:var(--dim);font-size:var(--fs-note);margin-bottom:10px}
+aside label{display:block;color:var(--dim);font-size:var(--fs-note);margin:10px 0 3px}
+aside input,aside select{width:100%;padding:5px 6px;border:1px solid var(--line);border-radius:var(--radius);background:var(--chip);color:var(--txt);font:inherit}
+.tabs button{display:block;width:100%;text-align:left;margin:3px 0;padding:5px 8px;border:1px solid var(--line);border-radius:var(--radius);background:var(--chip);color:var(--txt);font:inherit;cursor:pointer}
+.tabs button.on{background:var(--acc);color:var(--head);border-color:var(--acc)}
+.tabs button span{float:right;color:inherit;opacity:.7}
+main{padding:14px;min-width:0}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:8px}.card b{display:block;font-size:var(--fs-title)}.card i{color:var(--dim);font-style:normal;font-size:var(--fs-note)}
+.note{color:var(--dim);font-size:var(--fs-note);margin:4px 0 8px}
+table{width:100%;border-collapse:collapse;table-layout:fixed;background:var(--panel);border:1px solid var(--line)}
+th{background:var(--head);color:var(--head-txt);text-align:left;padding:4px var(--pad);border-bottom:1px solid var(--line);cursor:pointer;position:sticky;top:0}
+td{padding:3px var(--pad);border-bottom:1px solid var(--hair);overflow-wrap:anywhere;vertical-align:top}tr:nth-child(even) td{background:var(--zebra)}
+td.m{font-family:var(--mono)}.lamp{display:inline-block;min-width:3.2em;text-align:center;border-radius:var(--radius);padding:0 6px;color:var(--head);font-weight:var(--w-bold)}
+.l-g{background:var(--lamp-green)}.l-y{background:var(--lamp-yellow)}.l-r{background:var(--lamp-red);animation:bl 2.4s ease-in-out infinite}.l-x{background:var(--lamp-gray)}
+@keyframes bl{50%{opacity:.45}}@media(max-width:760px){.wrap{grid-template-columns:1fr}aside{position:static;height:auto}}"""
+
+PAGE_JS = """const D=JSON.parse(document.getElementById('d').textContent);let cur=D.tabs[0].name,sortK=null,sortD=1;
+const q=document.getElementById('q'),sy=document.getElementById('sy'),T=document.getElementById('tabs'),M=document.getElementById('m');
+function lamp(v){const s=String(v||'').toUpperCase();const c=/GREEN|綠|PASS|OK/.test(s)?'g':/YELLOW|黃|WARN|REVIEW/.test(s)?'y':/RED|紅|FAIL/.test(s)?'r':'x';
+const w={g:'綠',y:'黃',r:'紅',x:'灰'}[c];return '<span class="lamp l-'+c+'">'+w+'</span>'}
+function esc(v){return String(v==null?'':v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function tabs(){T.innerHTML=D.tabs.map(t=>'<button class="'+(t.name==cur?'on':'')+'" data-n="'+esc(t.name)+'">'+esc(t.name)+'<span>'+t.rows.length+'</span></button>').join('');
+T.querySelectorAll('button').forEach(b=>b.onclick=()=>{cur=b.dataset.n;sortK=null;draw()})}
+function draw(){tabs();const t=D.tabs.find(x=>x.name==cur),k=q.value.trim().toLowerCase(),s=sy.value;
+let r=t.rows.filter(row=>(!s||t.cols.indexOf('system')<0||row[t.cols.indexOf('system')]==s||(t.cols.indexOf('subsystem')>=0&&row[t.cols.indexOf('subsystem')]==s))&&(!k||row.join(' ').toLowerCase().includes(k)));
+if(s&&t.cols.indexOf('system')<0&&t.cols.indexOf('subsystem')>=0)r=r.filter(row=>String(row[t.cols.indexOf('subsystem')]).toUpperCase().includes(s));
+if(sortK!=null)r=r.slice().sort((a,b)=>String(a[sortK]).localeCompare(String(b[sortK]),'zh',{numeric:true})*sortD);
+const shown=r.slice(0,500),li=t.cols.indexOf('lamp');
+M.innerHTML='<div class="note">'+esc(t.name)+' · 顯示 '+shown.length+' / 符合 '+r.length+' / 本頁收 '+t.rows.length+' / 庫內 '+t.total+(t.total>t.rows.length?' · 本頁只收前 '+t.rows.length+' 列,其餘用 syscat q 查':'')+'</div>'+
+'<table><thead><tr>'+t.cols.map((c,i)=>'<th data-i="'+i+'">'+esc(c)+(sortK==i?(sortD>0?' ▲':' ▼'):'')+'</th>').join('')+'</tr></thead><tbody>'+
+shown.map(row=>'<tr>'+row.map((v,i)=>'<td class="'+(/path|code|file|version|sha/.test(t.cols[i])?'m':'')+'">'+(i==li?lamp(v):esc(v))+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+M.querySelectorAll('th').forEach(h=>h.onclick=()=>{const i=+h.dataset.i;sortD=sortK==i?-sortD:1;sortK=i;draw()})}
+q.oninput=draw;sy.onchange=draw;draw();"""
+
+
+def page(out: Path) -> int:
+    """後端讀系統庫(唯讀) → 前端一個靜態 HTML(不起伺服器;資料內嵌;色與字只取鎖定 token)。"""
+    con, p, why = _open(out)
+    if con is None:
+        print("[syscat page] 灰 · " + why)
+        return 2
+    import html as _h
+    tabs, three = [], {"should": len(PAGE_TABS), "done": 0, "skipped": []}
+    try:
+        meta = dict(con.execute("SELECT key, value FROM meta").fetchall())
+        for name, tbl, cols, order, cap in PAGE_TABS:
+            try:
+                total = con.execute("SELECT count(*) FROM %s" % tbl).fetchone()[0]
+                rows = con.execute("SELECT %s FROM %s ORDER BY %s LIMIT %d" % (cols, tbl, order, cap)).fetchall()
+            except Exception as e:  # 表不在 = 這一頁略過並點名
+                three["skipped"].append("%s(%s)" % (tbl, type(e).__name__))
+                continue
+            tabs.append({"name": name, "cols": [c.strip() for c in cols.split(",")], "total": total,
+                         "rows": [[("" if v is None else (str(v)[:CELL * 2] if isinstance(v, str) else v)) for v in r] for r in rows]})
+            three["done"] += 1
+    finally:
+        con.close()
+    root, src = _ui_tokens()
+    counts = {t["name"]: t["total"] for t in tabs}
+    cards = "".join('<div class="card"><i>%s</i><b>%s</b></div>' % (_h.escape(k), v) for k, v in counts.items())
+    data = json.dumps({"tabs": tabs}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    systems = "".join('<option value="%s">%s</option>' % (s, s) for s in ("VCGC", "VDF", "VRN", "VQG", "VAP"))
+    doc = ("<!DOCTYPE html><html lang=\"zh-Hant\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+           "<title>VCGC 系統庫</title><style>%s\n%s</style></head><body><div class=\"wrap\"><aside><h1>VCGC 系統庫</h1>"
+           "<div class=\"sub\">建庫 %s · HEAD %s · %s</div><label>關鍵字</label><input id=\"q\" placeholder=\"家族 · 號 · 路徑 · 字\">"
+           "<label>系統</label><select id=\"sy\"><option value=\"\">全部</option>%s</select><label>分頁</label><div class=\"tabs\" id=\"tabs\"></div>"
+           "<div class=\"sub\" style=\"margin-top:12px\">只含程式結構與冊的中繼資料;不含市場資料、研報或庫內容。視覺 token:%s</div></aside>"
+           "<main><div class=\"cards\">%s</div><div id=\"m\"></div></main></div>"
+           "<script type=\"application/json\" id=\"d\">%s</script><script>%s</script></body></html>") % (
+        root, PAGE_CSS, _h.escape(str(meta.get("built_at", "?"))), _h.escape(str(meta.get("git_head", "?"))[:9]),
+        _h.escape(p.name), systems, _h.escape(src), cards, data, PAGE_JS)
+    out.mkdir(parents=True, exist_ok=True)
+    dst = out / (DB_NAME + ".html")
+    tmp = out / (".%s.%d.tmp.html" % (DB_NAME, os.getpid()))
+    tmp.write_text(doc, encoding="utf-8", newline="\n")
+    os.replace(str(tmp), str(dst))
+    ok = three["should"] == three["done"] + len(three["skipped"])
+    lamp = "RED" if not ok else ("YELLOW" if (three["skipped"] or not root) else "GREEN")
+    print("[syscat page] %s · 應收 %d · 已收 %d · 略過 %d%s" % (lamp, three["should"], three["done"], len(three["skipped"]),
+          (" " + "、".join(three["skipped"])) if three["skipped"] else ""))
+    print("  頁:%s(%d KB)· 視覺 token:%s" % (dst, dst.stat().st_size // 1024, src))
+    print("NEXT: 開這一頁;要的列不在頁上 → syscat q @<預設> <字>")
+    return {"GREEN": 0, "YELLOW": 2, "RED": 1}[lamp]
+
+
 def syscat(args: list) -> int:
     apply_params()
     out = OUT_DEFAULT
@@ -594,7 +705,9 @@ def syscat(args: list) -> int:
         return stats(out)
     if sub == "diff":
         return diff(out)
-    print("[syscat] 用法:syscat build [--sqlite] | q \"SELECT …\" | q @<%s> [字] [--limit N] [--json] | stats | diff  [--out <夾>]" % "|".join(PRESETS))
+    if sub == "page":
+        return page(out)
+    print("[syscat] 用法:syscat build [--sqlite] | page | q \"SELECT …\" | q @<%s> [字] [--limit N] [--json] | stats | diff  [--out <夾>]" % "|".join(PRESETS))
     return 2
 
 
@@ -719,6 +832,16 @@ def selftest() -> int:
         con.close()
         chk("⑮ 就算繞過關鍵字檢查,唯讀連線也關了外部存取(讀不到檔)", blocked)
         chk("⑯ 暫存檔都清掉了", not list(out.glob(".*tmp*")) and not list(out.glob("*.ndjson")))
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            r8 = page(out)
+        hp = out / (DB_NAME + ".html")
+        h = hp.read_text(encoding="utf-8") if hp.exists() else ""
+        body = h.split("</style>", 1)[-1]
+        chk("⑱ 前端一頁:靜態檔、資料內嵌、色只走 var(--token)(頁身沒有任何色碼)、燈四色白字", r8 in (0, 2) and "<script type=\"application/json\" id=\"d\">" in h
+            and not re.search(r"#[0-9a-fA-F]{6}\b", PAGE_CSS + body.split("<script>", 1)[-1]) and "var(--lamp-red)" in h and "http" not in body.split("id=\"d\">", 1)[0], buf.getvalue()[:200])
+        dj = json.loads(h.split('id="d">', 1)[1].split("</script>", 1)[0].replace("<\\/", "</"))
+        chk("⑲ 頁上七個分頁都在,家族頁真的有列,暫存頁檔清掉", len(dj["tabs"]) == 7 and dj["tabs"][0]["rows"] and not list(out.glob(".*tmp.html")))
         (reg / (PARAM_STEM + "_v0100.json")).unlink()
         apply_params(reg)
         buf = io.StringIO()
