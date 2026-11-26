@@ -8,7 +8,7 @@
 讓 `tools` 清單看得到、啟用照同一把尺:
   syscat = CGC_MDL228_VIADBManager(supportive modules/registry;必備 API build · query · syscat · guard · main · selftest)
 檢查照前版原樣(夾 · 四位版號 · AST · 零 TA-Lib · 加速器橋 · 匯入層不開子行程 · 必備 API · 公開名稱不少於現役 · 參數只增不減 ·
-冊上已登錄 · 席位恰一列);引擎版本冊席位列 VIA-TOOL-0265(syscat → CGC_MDL228 v0106;原寫 0264,已由 main 發給 CGC_MDL158 v0125)與本版同批登錄(role=engine,照 REQ187 / REQ188 前例取號)。
+冊上已登錄 · 席位恰一列);引擎版本冊席位列 VIA-TOOL-0265(syscat → CGC_MDL228 v0107;原寫 0264,已由 main 發給 CGC_MDL158 v0125)與本版同批登錄(role=engine,照 REQ187 / REQ188 前例取號)。
 只有 VCGC 能啟用;零網路;不碰 TA-Lib;不讀寫同意閘。
 """
 from __future__ import annotations
