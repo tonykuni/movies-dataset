@@ -1,0 +1,68 @@
+{
+ "lamp": "RED",
+ "counts": {
+  "tables": 13,
+  "ok": 11,
+  "pk_conflict": 1,
+  "pairs": 3,
+  "mismatch": 1366,
+  "reconcile_not_ok": 2
+ },
+ "tool": "VDF_ENG242_ThreePeriodDistill v0105",
+ "verb": "reconcile",
+ "utc": "2026-11-26T07:04:09+00:00",
+ "format": "parquet",
+ "accel": true,
+ "net": true,
+ "three": {
+  "should": 3,
+  "done": 3,
+  "skipped": []
+ },
+ "tables": [
+  {
+   "group": "TW_PRICE_VOL",
+   "state": "OK",
+   "pk": [
+    "code",
+    "date"
+   ],
+   "pair": "TW_PRICE_VOL__tw_daily_prices.parquet × TW_PRICE_VOL__tw_trading_daily.parquet",
+   "compared": 7110,
+   "mismatch": 1366,
+   "columns": [
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume"
+   ],
+   "key_normalized": true,
+   "a_rows": 6063,
+   "b_rows": 7105
+  },
+  {
+   "group": "TW_CHIP",
+   "state": "NO_COMMON_NUMERIC",
+   "pk": [
+    "code",
+    "date"
+   ],
+   "pair": "TW_CHIP__tw_chip_margin.parquet × TW_CHIP__tw_chip_derived.parquet",
+   "key_normalized": true,
+   "a_rows": 5709,
+   "b_rows": 5709
+  },
+  {
+   "group": "SENTIMENT",
+   "state": "NO_COMMON_NUMERIC",
+   "pk": [
+    "date"
+   ],
+   "pair": "SENTIMENT__sentiment_daily.parquet × SENTIMENT__aaii_sentiment.parquet",
+   "key_normalized": true,
+   "a_rows": 3,
+   "b_rows": 3
+  }
+ ]
+}
