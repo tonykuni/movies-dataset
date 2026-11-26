@@ -1,0 +1,36 @@
+{
+  "schema": "VIA-BOOKS-SYNC-PARAMS/1.0",
+  "version": "v0100",
+  "purpose": "三冊重產器(VIA_BooksSync)唯一參數冊:分類管理;引擎檔不寫死任何參數。改參數只改本冊(出新版號)。",
+  "run": {
+    "start_date": "2026-11-16",
+    "start_date_note": "統一起算日:所有引擎共用(Policy_Laws 只收這天以後的每日教訓;運作帳也記它)。改一處全部跟著改。",
+    "lanes": 3,
+    "apply": false,
+    "apply_note": "false = 只檢查(SYNCED / OUT_OF_SYNC + DataFrame);命令列 --apply 才出新版號的冊(前版一字不動)。"
+  },
+  "paths": {
+    "books_dir": "supportive modules/registry",
+    "lessons_ledger": "docs/handoff/daily/VIA_DailyLessons_Ledger_v0100.jsonl",
+    "tool_lock": "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+    "vrn_code_dir": "functional modules/VRN",
+    "out_dir": "VIA_Reports/books_sync",
+    "run_ledger": "VIA_Reports/books_sync/RUN_LEDGER.jsonl"
+  },
+  "engines": [
+    {"name": "policy_laws", "enabled": true, "book": "VIA_Policy_Laws_SSOT_v*.json", "module": "",
+     "note": "lessons ← 每日教訓帳(date >= run.start_date);只增"},
+    {"name": "tool_roster", "enabled": true, "book": "VIA_ToolRoster_SSOT_v*.json", "module": "",
+     "note": "envs.*.tools ← 網路工具(AegisNexus)匯入件補進每個家族境;加速器(Celeritas _LIB_MAP)本冊四境沒收的件列 accelerator_not_in_roster_envs(路由看 Baseline families,不猜境)"},
+    {"name": "logic_arch", "enabled": true, "book": "VIA_VRN_LogicArchitecture_SSOT_v*.json", "module": "",
+     "note": "placed_by_batch662 / off_book_pending 的 tail · state ← glob 尾版(檔頭第一句職責照讀)"}
+  ],
+  "engines_note": "可插入:加一列 {name, enabled, book, module: <.py 路徑(相對 VIA 根)>};外掛檔要定義 ENGINE(有 name · key · book_rows · current_rows · apply 五個成員),先過 ast.parse 才載入。",
+  "output": {
+    "frame": "polars",
+    "frame_fallback": "pandas",
+    "file_format": "parquet",
+    "compression": "zstd",
+    "tables": ["book", "current", "diff"]
+  }
+}
