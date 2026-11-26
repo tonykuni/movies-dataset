@@ -88,6 +88,26 @@ def __getattr__(name):  # 尾版律 TAILAPI:前版公開名稱經本檔轉接
     return getattr(PRIOR, name)
 
 
+def body_module(impl=None):
+    """本體:先走 v0106 _impl(含 v0104 換上的 CGC_MDL224 掃描閘);那條路載不起來(例如拿掉 VCGC 的副本)→ 退路:
+    直接載本家族最新的本體檔(有 load_series · ssot_path 的那一版),用本體自己的閘(同判法:兩道都要 YES,沒同意照樣關)。"""
+    try:
+        return (impl or PRIOR._impl)(), "v0106 _impl"
+    except Exception as exc:  # noqa: BLE001 — 跨系統退路(重工守門 R10)
+        why = f"{type(exc).__name__}"
+    for p in sorted(HERE.glob(STEM + "_v*.py"), key=_vnum, reverse=True):
+        if _vnum(p) >= _vnum(__file__):
+            continue
+        src = p.read_text(encoding="utf-8", errors="replace")
+        if "def load_series" in src and "def ssot_path" in src:
+            sp = importlib.util.spec_from_file_location(f"{STEM}_body_fallback_v0108", p)
+            m = importlib.util.module_from_spec(sp)
+            sys.modules[sp.name] = m
+            sp.loader.exec_module(m)
+            return m, f"退路 {p.name}(_impl 載不起來:{why})"
+    raise RuntimeError("找不到 FRED 本體")
+
+
 def retired_book(book_dir: Path = VDF) -> tuple:
     hits = sorted(Path(book_dir).glob("VDF_FredRetired_SSOT_v*.json"), key=_vnum)
     if not hits:
@@ -136,7 +156,9 @@ def main() -> int:
         r, book = retired_book()
         print(f"[{TAG}] 退役冊 {book or '(沒有)'} · {len(r)} 條:" + " · ".join(sorted(r)))
         return 0
-    body = PRIOR._impl()
+    body, how = body_module()
+    if not how.startswith("v0106"):
+        print(f"  [註] {how}", flush=True)
     retired, book = retired_book()
     seen = install(body, retired, book)
     try:
@@ -187,6 +209,11 @@ def selftest() -> int:
             all(callable(getattr(impl, n, None)) for n in ("load_series", "upsert_registry", "main", "gate_open")))
     except Exception as exc:  # noqa: BLE001
         chk("⑧ 走得到本體", False, f"{type(exc).__name__}: {exc}")
+    def boom():
+        raise ImportError("CGC_MDL224 不在")
+    fb, how = body_module(boom)
+    chk("⑧b 跨系統退路:_impl 載不起來(拿掉 VCGC)→ 改載本體、用本體自己的閘(沒同意 = 關)",
+        how.startswith("退路") and callable(getattr(fb, "load_series", None)) and fb.gate_open({}) is False, how)
     import contextlib
     import io
     try:
