@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 r"""
 CGC_MDL158_VIAPanoramaAuditRepair v0108 — PowerShell 代讀誤報修正(批734;原在 PR #104 的 v0105 上,main 已升 v0106,改號重套)
+v0114→v0115(側線 2026-09-28,Z234):⑭ 的 tail_contains 只讀尾版字面,薄尾/exec 本體尾版(VDF_ENG087 v0104 載 v0103、
+  VIA_SYSTEM_MANAGER_v0150 exec v0148)被判「修沒帶進尾版=回歸」,是假紅。現在沿尾版**實際載入/exec**(程式碼字串常數點名、且有載入手段;說明與註解不算)的同族較舊版號檔往回走到具體實作,
+  markers 在實際跑的那串裡找;markers_absent 整串都不得出現(嚴格不放鬆)。其餘一字不動(v0114 留作版史 L04)。
+v0113→v0114(側線 2026-09-28;操作員令「適度採用附件架構、不大幅修正」):read 骨架卡多兩類,只報位置不改 ——
+  COMPILE:ast.parse 過、compile 不過(Z226:加速橋注在 from __future__ 前);TAILAPI:尾版比前版少了公開名稱又沒轉接(Z229:VIA_SYSTEM_MANAGER_v0149)。其餘一字不動(v0113 留作版史 L04)。
 
 v0106→v0107:全樹首跑 14 件 PSDUPFN **全是誤報**——here-string(@' … '@)裡內嵌的 JavaScript(fmt/render/done…)、
   產生另一支腳本的模板(EnsureDir/def_Main)、以及不同父函式裡的同名區域函式(Test-Prot)。
@@ -153,7 +158,7 @@ except Exception:
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 ENGINE_ID = "CGC_MDL158_VIAPanoramaAuditRepair"
-VERSION = "v0113"
+VERSION = "v0115"
 HERE = Path(__file__).resolve().parent
 VIA = HERE.parent.parent
 OUT = VIA / "VIA_Reports" / "panorama_audit"      # 批535:自己的命名空間。`VIA_Reports/panorama` 是 CGC_MDL135/CGC_MDL149
@@ -179,7 +184,7 @@ def _load_exempt_roster() -> tuple:
     這一批的根因正是那個(三把掃描器有批647 豁免、第四把沒有)。"""
     base = list(_EXEMPT_TEMPLATE)
     seen = {k for k, _ in base}
-    cand = sorted(HERE.glob("CGC_MDL156_VIAAcceleratorControl_v*.py"))
+    cand = sorted((HERE.parents[1] / "supportive modules" / "registry").glob("CGC_MDL156_VIAAcceleratorControl_v*.py"))
     if not cand:
         return tuple(base), "內建底線(CGC_MDL156 不在樹上=ABSENT,不編)"
     try:
@@ -860,6 +865,52 @@ def _tail_file(rel_dir: str, glob: str):
     return hits[-1] if hits else None
 
 
+_LOADER_NAMES = {"spec_from_file_location", "run_path", "SourceFileLoader", "exec_module", "import_module"}
+
+
+def _sibling_loads(txt: str, stem: str) -> set:
+    """原始碼**真的載入**的同族版號(不是註解/說明字串裡順口提到的):檔內要有載入手段(exec、模組層 __getattr__、
+    importlib/runpy 系),而且那個檔名出現在程式碼的字串常數裡(docstring 與單獨成句的字串不算)。剖析不了就當沒載。"""
+    try:
+        tree = ast.parse(txt)
+    except (SyntaxError, ValueError):
+        return set()
+    loads = _forwards(tree) or any(
+        (isinstance(nd, ast.Attribute) and nd.attr in _LOADER_NAMES) or (isinstance(nd, ast.Name) and nd.id in _LOADER_NAMES)
+        for nd in ast.walk(tree))
+    if not loads:
+        return set()
+    prose = {id(st.value) for st in ast.walk(tree) if isinstance(st, ast.Expr) and isinstance(st.value, ast.Constant)}
+    pat = re.compile(re.escape(stem) + r"_v(\d{4})\.py")
+    out: set = set()
+    for nd in ast.walk(tree):
+        if isinstance(nd, ast.Constant) and isinstance(nd.value, str) and id(nd) not in prose:
+            out |= {int(x) for x in pat.findall(nd.value)}
+    return out
+
+
+def _loaded_chain(p: Path, limit: int = 12) -> list:
+    """v0115(Z234):尾版 + 它**實際載入/exec** 的同族較舊版號檔,一路往回到不再載入同族檔的具體實作。
+    只認同夾、同族、版號比自己小且檔案存在的;自己的版號(例如印出自身檔名)與註解/說明裡提到的舊版都不算。最多 12 層,防環。"""
+    chain = [p]
+    cur = p
+    for _ in range(limit):
+        m = _TAIL_RE.match(cur.name)
+        if not m:
+            break
+        try:
+            txt = cur.read_text(encoding="utf-8-sig", errors="replace")
+        except OSError:
+            break
+        ver = int(m.group("ver"))
+        named = _sibling_loads(txt, m.group("stem"))
+        older = sorted((n for n in named if n < ver and (cur.parent / f"{m.group('stem')}_v{n:04d}.py").is_file()), reverse=True)
+        if not older:
+            break
+        cur = cur.parent / f"{m.group('stem')}_v{older[0]:04d}.py"
+        chain.append(cur)
+    return chain
+
 def _verify_one(v: dict, scan_d: dict, cov: dict) -> tuple:
     """一條憑據 → (燈, 說明)。量不出來就說量不出來(ABSENT),不當綠。"""
     k = v.get("kind")
@@ -884,14 +935,16 @@ def _verify_one(v: dict, scan_d: dict, cov: dict) -> tuple:
         p = _tail_file(v.get("dir", "."), v.get("glob", ""))
         if p is None:
             return "ABSENT", f"尾版不在:{v.get('dir')}/{v.get('glob')}"
-        txt = p.read_text(encoding="utf-8", errors="replace")
-        miss = [m for m in (v.get("markers") or []) if m not in txt]
-        back = [m for m in (v.get("markers_absent") or []) if m in txt]
+        chain = _loaded_chain(p)
+        txts = [q.read_text(encoding="utf-8", errors="replace") for q in chain]
+        miss = [m for m in (v.get("markers") or []) if not any(m in t for t in txts)]
+        back = [m for m in (v.get("markers_absent") or []) if any(m in t for t in txts)]
+        via = "" if len(chain) == 1 else f"(薄尾,實際本體 {' → '.join(q.name for q in chain[1:])})"
         if miss:
-            return "RED", f"{p.name} 少了 {miss}(修沒帶進尾版=回歸)"
+            return "RED", f"{p.name}{via} 少了 {miss}(修沒帶進尾版=回歸)"
         if back:
-            return "RED", f"{p.name} 又出現 {back}(退役件復活=回歸)"
-        return "GREEN", f"{p.name} 憑據齊"
+            return "RED", f"{p.name}{via} 又出現 {back}(退役件復活=回歸)"
+        return "GREEN", f"{p.name}{via} 憑據齊"
     return "ABSENT", f"不認得的憑據類 {k}"
 
 
@@ -1301,6 +1354,79 @@ def _read_checks_py(tree) -> list[dict]:
     return out
 
 
+def _compile_checks_py(src: str, path: Path) -> list[dict]:
+    """v0114(側線 2026-09-28,Z226):ast.parse 過得了、compile 才報的錯 —— 最常見是加速橋被注在
+    `from __future__` 之前(b12e82ff 實錄:三支尾版一 import 就 SyntaxError,AST 檢一支都沒抓到)。只報位置,不改。"""
+    try:
+        compile(src, str(path), "exec", dont_inherit=True)
+    except SyntaxError as exc:
+        msg = str(exc.msg or exc)
+        kind = "from __future__ 不在檔頭(橋注錯位置?)" if "__future__" in msg else msg[:80]
+        return [{"cls": "COMPILE", "line": int(exc.lineno or 1), "how": "compile", "detail": f"compile 失敗:{kind}"}]
+    except (ValueError, TypeError):
+        return []
+    return []
+
+
+_TAIL_RE = re.compile(r"^(?P<stem>.+)_v(?P<ver>\d{4})\.py$")
+
+
+def _public_top_names(tree) -> set[str]:
+    out: set[str] = set()
+    for st in getattr(tree, "body", []):
+        if isinstance(st, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and not st.name.startswith("_"):
+            out.add(st.name)
+    return out
+
+
+def _forwards(tree) -> bool:
+    """尾版把舊版整面接過來的兩種寫法:模組層 __getattr__(PEP 562)或在自己的 namespace exec 前版本體。"""
+    for st in getattr(tree, "body", []):
+        if isinstance(st, (ast.FunctionDef, ast.AsyncFunctionDef)) and st.name == "__getattr__":
+            return True
+    for nd in ast.walk(tree):
+        if isinstance(nd, ast.Call) and isinstance(nd.func, ast.Name) and nd.func.id == "exec":
+            return True
+    return False
+
+
+def _tail_api_checks_py(tree, path: Path) -> list[dict]:
+    """v0114(側線 2026-09-28,Z229):尾版比同夾前一版少了公開頂層名稱、又沒有轉接 → 呼叫端(測試、總管)一叫就炸。
+    實錄:VIA_SYSTEM_MANAGER_v0149 只剩 selftest/main,CI 的 do_list 在 setUpClass 就 AttributeError。只報位置,不改。"""
+    m = _TAIL_RE.match(path.name)
+    if not m or _forwards(tree):
+        return []
+    ver = int(m.group("ver"))
+    prior = []
+    for q in path.parent.glob(m.group("stem") + "_v*.py"):
+        mq = _TAIL_RE.match(q.name)
+        if mq and mq.group("stem") == m.group("stem") and int(mq.group("ver")) < ver:
+            prior.append((int(mq.group("ver")), q))
+    if not prior:
+        return []
+    # Codex #328:前一版若只是薄尾(原始碼裡點名同族別的版號檔來載),它的公開面其實是更前面那一版的;
+    # 往回走到第一個不再點名同族版號檔的**具體實作**,沿途公開名稱取聯集再比(最多 12 版)。
+    sib = re.compile(re.escape(m.group("stem")) + r"_v\d{4}\.py")
+    surface: set[str] = set()
+    walked: list[int] = []
+    for pv_i, pq_i in sorted(prior, reverse=True)[:12]:
+        try:
+            ptxt = pq_i.read_text(encoding="utf-8-sig", errors="replace")
+            ptree = ast.parse(ptxt)
+        except (SyntaxError, ValueError, OSError):
+            break
+        surface |= _public_top_names(ptree)
+        walked.append(pv_i)
+        if not sib.search(ptxt):
+            break
+    dropped = sorted(surface - _public_top_names(tree))
+    if not dropped:
+        return []
+    span = f"v{walked[0]:04d}" + (f"…v{walked[-1]:04d}" if len(walked) > 1 else "")
+    return [{"cls": "TAILAPI", "line": 1, "how": "ast",
+             "detail": f"比前版 {span}(薄尾往回到具體實作)少了公開名稱且沒有轉接:{', '.join(dropped[:8])}{' …' if len(dropped) > 8 else ''}"}]
+
+
 def _outline_py(tree) -> list[dict]:
     """定義樹:類別與函式(含巢狀方法),每筆 行號範圍/簽章/首行說明;不含函式內部的區域定義細節以外的原始碼。"""
     rows: list[dict] = []
@@ -1647,6 +1773,8 @@ def read_file(path: Path) -> dict:
             card["imports"] = _imports_py(tree)
             card["defs"] = _outline_py(tree)
             card["issues"] += _read_checks_py(tree)
+            card["issues"] += _compile_checks_py(src, path)
+            card["issues"] += _tail_api_checks_py(tree, path)
             if card["in_via"]:
                 card["issues"] += [i for i in audit_source(path, src, rel) if i["cls"] != "SYNTAX"]
     elif ext == ".ps1" or ext == ".psm1":
@@ -1887,6 +2015,23 @@ def selftest() -> int:
         v_ok[0] == "GREEN" and v_re[0] == "RED" and v_cv[0] == "RED" and v_ab[0] == "ABSENT" and v_no[0] == "ABSENT"
         and v_tc[0] == "GREEN" and v_ab2[0] == "GREEN",
         f"({v_ok[0]} {v_re[0]} {v_cv[0]} {v_ab[0]} {v_no[0]} {v_tc[0]} 退役件未復活={v_ab2[0]})")
+    with tempfile.TemporaryDirectory() as td3:
+        _d = Path(td3)
+        (_d / "ZZ_Thin_v0001.py").write_text("MARK_OK = 1\n", encoding="utf-8")
+        (_d / "ZZ_Thin_v0002.py").write_text("import runpy\nB = runpy.run_path('ZZ_Thin_v0001.py')\nME = 'ZZ_Thin_v0002.py'\n", encoding="utf-8")
+        (_d / "ZZ_Thin_v0003.py").write_text("exec(open('ZZ_Thin_v0002.py').read())\nME = 'ZZ_Thin_v0003.py'\n", encoding="utf-8")
+        (_d / "ZZ_Bad_v0001.py").write_text("RETIRED_KEY = 1\n", encoding="utf-8")
+        (_d / "ZZ_Bad_v0002.py").write_text("exec(open('ZZ_Bad_v0001.py').read())\n", encoding="utf-8")
+        (_d / "ZZ_Own_v0001.py").write_text("OLD = 1\n", encoding="utf-8")
+        (_d / "ZZ_Own_v0002.py").write_text('"""v0001 to v0002: ZZ_Own_v0001.py stays on disk"""\nimport importlib\n# was ZZ_Own_v0001.py\nNEW = 1\n', encoding="utf-8")
+        _c3 = [q.name for q in _loaded_chain(_d / "ZZ_Thin_v0003.py")]
+        _c1 = [q.name for q in _loaded_chain(_d / "ZZ_Thin_v0001.py")]
+        _cb = [q.name for q in _loaded_chain(_d / "ZZ_Bad_v0002.py")]
+        _co = [q.name for q in _loaded_chain(_d / "ZZ_Own_v0002.py")]
+    chk("⑭b v0115(Z234)薄尾/exec 本體尾版的憑據沿點名的較舊同族檔往回找:v0003→v0002→v0001 · 具體實作只有自己 · 自己的版號不算 · 退役件在本體裡照樣算 · 說明/註解只提到舊版不算載入",
+        _c3 == ["ZZ_Thin_v0003.py", "ZZ_Thin_v0002.py", "ZZ_Thin_v0001.py"] and _c1 == ["ZZ_Thin_v0001.py"]
+        and _cb == ["ZZ_Bad_v0002.py", "ZZ_Bad_v0001.py"] and _co == ["ZZ_Own_v0002.py"],
+        f"({_c3} · {_c1} · {_cb} · 只在說明/註解提到舊版不算載入 {_co})")
     fl_live = fixed_ledger(_scan_ok, _cov_ok)
     tri = issue_triage({"issues": 129, "by_class": {"VERB": 6, "HARDIMP": 100, "PINVER": 23}})
     _dummy = {"triage": tri, "fixed": fl_live, "tests": {"tally": {"GREEN": 17}, "rows": [0] * 17}, "fix": {"applied_by_class": {}}}

@@ -76,7 +76,7 @@ def __getattr__(name: str):
 
 
 def def_run_batch(source, output_root, evidence=None):
-    if os.environ.get("VIA_FROM_VCGC") != "YES":
+    if (os.environ.get("VIA_FROM_VCGC") != "YES" and os.environ.get("VIA_FROM_VTK") != "YES"):
         raise RuntimeError("DENY")
     body = _body()
     bridge = body._previous
@@ -97,14 +97,14 @@ def def_run_batch(source, output_root, evidence=None):
 
 
 def main() -> int:
-    if os.environ.get("VIA_FROM_VCGC") != "YES":
+    if (os.environ.get("VIA_FROM_VCGC") != "YES" and os.environ.get("VIA_FROM_VTK") != "YES"):
         print(json.dumps({"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}, ensure_ascii=False))
         return 2
     return _prior().main()
 
 
 def selftest() -> int:
-    os.environ.pop("VIA_FROM_VCGC", None)
+    os.environ.pop("VIA_FROM_VCGC", None); os.environ.pop("VIA_FROM_VTK", None)
     denied = main() == 2
     via = HERE.parents[1]
     policy = json.loads((via / "supportive modules/registry/VIA_Layout_Reuse_SSOT_v0100.json").read_text(encoding="utf-8-sig"))

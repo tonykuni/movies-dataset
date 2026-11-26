@@ -494,7 +494,7 @@ def selftest() -> int:
 
     pdf = VIA / "functional modules" / "VRN" / "references" / "intake" / "PDFRegressionEvidence_v1.0.0_b245" / \
         "PDFRegressionEvidence_v1.0.0" / "synthetic_financial_report.pdf"
-    if pdf.is_file() and os.environ.get("VIA_FROM_VCGC") != "YES":
+    if pdf.is_file() and (os.environ.get("VIA_FROM_VCGC") != "YES" and os.environ.get("VIA_FROM_VTK") != "YES"):
         chk("⑥ 數位原生 PDF(LAYOUT 整批只收 VCGC 呼叫;直跑 --selftest 跳過,經 via-vcgc run 才量)", True, "SKIP")
     elif pdf.is_file():
         with tempfile.TemporaryDirectory() as td:
@@ -524,7 +524,7 @@ def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
         return selftest()
-    if os.environ.get("VIA_FROM_VCGC") != "YES":
+    if (os.environ.get("VIA_FROM_VCGC") != "YES" and os.environ.get("VIA_FROM_VTK") != "YES"):
         print(json.dumps({"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}, ensure_ascii=False))
         return 2
     if a[:1] == ["probe"]:

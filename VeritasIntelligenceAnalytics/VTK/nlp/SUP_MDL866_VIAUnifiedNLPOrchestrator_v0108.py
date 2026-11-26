@@ -83,7 +83,7 @@ def needs_v0108(args: list) -> list:
 
 def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
-    if os.environ.get("VIA_FROM_VCGC") != "YES":
+    if (os.environ.get("VIA_FROM_VCGC") != "YES" and os.environ.get("VIA_FROM_VTK") != "YES"):
         print("[DENY] only VCGC entry")
         return 2
     if args == ["--selftest"]:
@@ -140,7 +140,7 @@ def selftest() -> int:
     finally:
         importlib.util.find_spec = real_find
         if keep_env is None:
-            os.environ.pop("VIA_FROM_VCGC", None)
+            os.environ.pop("VIA_FROM_VCGC", None); os.environ.pop("VIA_FROM_VTK", None)
         else:
             os.environ["VIA_FROM_VCGC"] = keep_env
     chk("⑤ 缺套件 → l1-clean 回 3 · state ABSENT · 點名缺件(不崩、不冒充)", rc == 3 and out.get("state") == "ABSENT" and "polars" in out.get("missing", []), out)

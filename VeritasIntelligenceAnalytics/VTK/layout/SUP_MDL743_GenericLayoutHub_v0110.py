@@ -105,7 +105,7 @@ def def_praddle_lanes() -> dict:
 
 
 def def_run_praddle(pdf, output_root=None, ocr: str = "auto", pages: str | None = None) -> dict:
-    if os.environ.get("VIA_FROM_VCGC") != "YES":
+    if (os.environ.get("VIA_FROM_VCGC") != "YES" and os.environ.get("VIA_FROM_VTK") != "YES"):
         raise RuntimeError("DENY")
     mod = praddle_tool()
     if mod is None:
@@ -147,7 +147,7 @@ def selftest() -> int:
                   praddle_pinned({"praddle": {"path": rel, "sha256": good, "version": "v0100"}}, t)["state"])
     chk("② 只認鎖冊:沒啟用 / 檔不在 / sha 不對 照實回因由,對得上才 PINNED(不 glob 猜尾版)",
         states == ("NOT_ACTIVATED", "PINNED_FILE_MISSING", "SHA_DRIFT", "PINNED"), states)
-    os.environ.pop("VIA_FROM_VCGC", None)
+    os.environ.pop("VIA_FROM_VCGC", None); os.environ.pop("VIA_FROM_VTK", None)
     try:
         def_run_praddle("x.pdf")
         denied = False

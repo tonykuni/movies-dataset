@@ -36,7 +36,7 @@ def _load():
 
 
 def main() -> int:
-    if os.environ.get("VIA_FROM_VCGC") != "YES":
+    if (os.environ.get("VIA_FROM_VCGC") != "YES" and os.environ.get("VIA_FROM_VTK") != "YES"):
         print(json.dumps({"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}, ensure_ascii=False))
         return 2
     prior = _load()
@@ -46,7 +46,7 @@ def main() -> int:
 
 
 def selftest() -> int:
-    os.environ.pop("VIA_FROM_VCGC", None)
+    os.environ.pop("VIA_FROM_VCGC", None); os.environ.pop("VIA_FROM_VTK", None)
     denied = main() == 2
     os.environ["VIA_FROM_VCGC"] = "YES"
     ok = denied and PRIOR.is_file()

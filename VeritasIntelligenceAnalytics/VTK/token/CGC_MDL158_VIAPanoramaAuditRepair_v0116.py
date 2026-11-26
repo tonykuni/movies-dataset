@@ -89,7 +89,7 @@ _NAMES = ("_ACCEL_EXEMPT", "_TREE_EXEMPT")
 
 def _roster_owner() -> Path | None:
     """Newest CGC_MDL156 version that really defines the roster literals (a thin tail forwards to the one before it)."""
-    for p in sorted(HERE.glob("CGC_MDL156_VIAAcceleratorControl_v*.py"), key=_vnum, reverse=True):
+    for p in sorted((HERE.parents[1] / "supportive modules" / "registry").glob("CGC_MDL156_VIAAcceleratorControl_v*.py"), key=_vnum, reverse=True):
         try:
             tree = ast.parse(p.read_text(encoding="utf-8", errors="replace"))
         except Exception:
@@ -107,7 +107,7 @@ def _load_exempt_roster() -> tuple:
     owner = _roster_owner()
     if owner is None:
         return tuple(base), "內建底線(CGC_MDL156 沒有一版定義名冊)"
-    newest = max(HERE.glob("CGC_MDL156_VIAAcceleratorControl_v*.py"), key=_vnum)
+    newest = max((HERE.parents[1] / "supportive modules" / "registry").glob("CGC_MDL156_VIAAcceleratorControl_v*.py"), key=_vnum)
     for node in ast.parse(owner.read_text(encoding="utf-8", errors="replace")).body:
         if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id in _NAMES for t in node.targets):
             try:

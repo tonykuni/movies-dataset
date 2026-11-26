@@ -50,21 +50,21 @@ def __getattr__(name: str):
 
 
 def def_run_batch(source, output_root, evidence=None):
-    if os.environ.get("VIA_FROM_VCGC") != "YES":
+    if (os.environ.get("VIA_FROM_VCGC") != "YES" and os.environ.get("VIA_FROM_VTK") != "YES"):
         raise RuntimeError("DENY")
     _quiet()
     return _load(PRIOR, "layout_run_v0108").def_run_batch(source, output_root, evidence)
 
 
 def main() -> int:
-    if os.environ.get("VIA_FROM_VCGC") != "YES":
+    if (os.environ.get("VIA_FROM_VCGC") != "YES" and os.environ.get("VIA_FROM_VTK") != "YES"):
         print(json.dumps({"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}, ensure_ascii=False))
         return 2
     return _load(PRIOR, "layout_main_v0108").main()
 
 
 def selftest() -> int:
-    os.environ.pop("VIA_FROM_VCGC", None)
+    os.environ.pop("VIA_FROM_VCGC", None); os.environ.pop("VIA_FROM_VTK", None)
     denied = False
     try:
         def_run_batch(Path("."), Path("."))

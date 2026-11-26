@@ -145,7 +145,7 @@ def _newest_card(here: Path) -> Path | None:
 
 def registry(here: Path | None = None, repo: Path | None = None) -> dict:
     """鎖冊 × 引擎版本冊 × 功能卡 tool_registry → 一張註冊清單。只讀。"""
-    here = Path(here or HERE)
+    here = Path(here or (HERE.parents[1] / "supportive modules" / "registry"))
     repo = Path(repo or here.parents[2])
     lock = _json(here / LOCK_BOOK)
     reg = _json(here / REGISTER_BOOK)

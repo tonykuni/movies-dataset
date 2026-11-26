@@ -124,7 +124,7 @@ def run_pdf_text(pdf, points: int = 5, compact: bool = False, ocr: str = "auto")
 
 
 def main() -> int:
-    if os.environ.get("VIA_FROM_VCGC") != "YES":
+    if (os.environ.get("VIA_FROM_VCGC") != "YES" and os.environ.get("VIA_FROM_VTK") != "YES"):
         print(json.dumps({"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}, ensure_ascii=False))
         return 2
     args = sys.argv[1:]
@@ -158,7 +158,7 @@ def selftest() -> int:
         print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)) if note else ''}")
 
     chk("① 前版 v0105 自測過(只收 VCGC · --brief)", rc == 0)
-    os.environ.pop("VIA_FROM_VCGC", None)
+    os.environ.pop("VIA_FROM_VCGC", None); os.environ.pop("VIA_FROM_VTK", None)
     argv, sys.argv = sys.argv, [sys.argv[0], "pdf", "--file", "x.pdf"]
     try:
         denied = main() == 2

@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""NLP tail. It starts only from VCGC, then calls v0103. The older body is not rewritten."""
+"""NLP tail. --brief stays on the newest file and is parsed by v0103.
+
+v0104 still owns the VCGC gate. This file does not download a model.
+"""
 from __future__ import annotations
+
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
 try:
     import sys as _sa_sys
@@ -16,7 +20,6 @@ try:
 except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
-
 import importlib.util
 import json
 import os
@@ -24,29 +27,31 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-PRIOR = HERE / "SUP_MDL866_VIAUnifiedNLPOrchestrator_v0103.py"
+PRIOR = HERE / "SUP_MDL866_VIAUnifiedNLPOrchestrator_v0104.py"
 
 
 def _load():
-    spec = importlib.util.spec_from_file_location("nlp_v0103_for_v0104", PRIOR)
+    spec = importlib.util.spec_from_file_location("nlp_v0104_for_v0105", PRIOR)
     module = importlib.util.module_from_spec(spec)
-    sys.modules["nlp_v0103_for_v0104"] = module
+    sys.modules["nlp_v0104_for_v0105"] = module
     spec.loader.exec_module(module)
     return module
 
 
 def main() -> int:
-    if os.environ.get("VIA_FROM_VCGC") != "YES":
+    if (os.environ.get("VIA_FROM_VCGC") != "YES" and os.environ.get("VIA_FROM_VTK") != "YES"):
         print(json.dumps({"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}, ensure_ascii=False))
         return 2
+    argv = ["--brief" if item in {"-Brief", "--brief"} else item for item in sys.argv[1:]]
+    sys.argv = [sys.argv[0], *argv]
     return _load().main()
 
 
 def selftest() -> int:
-    os.environ.pop("VIA_FROM_VCGC", None)
+    os.environ.pop("VIA_FROM_VCGC", None); os.environ.pop("VIA_FROM_VTK", None)
     denied = main() == 2
-    os.environ["VIA_FROM_VCGC"] = "YES"
-    ok = denied and PRIOR.is_file() and "VIA_FROM_VCGC" in Path(__file__).read_text(encoding="utf-8")
+    text = Path(__file__).read_text(encoding="utf-8")
+    ok = denied and "--brief" in text and PRIOR.is_file()
     print("  [OK]" if ok else "  [FAIL]")
     return 0 if ok else 1
 
