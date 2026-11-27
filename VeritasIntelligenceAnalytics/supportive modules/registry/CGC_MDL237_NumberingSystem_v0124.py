@@ -10,6 +10,9 @@ VCGC-REQ262~264 三條互相錯開;VDF-REQ052~062 十一條都往前移 6 號(VD
   ① 第一次發號就用冊上代碼:WKF / STP / REQ 的新列,號 = "VIA-" + 冊上代碼(那個號沒被別的活列佔用時);不再靠順序碰運氣。
   ② 已發出的錯位列,只有對齊帳 VIA_Numbering_Realign_Ledger_v0100.jsonl 上有的才改(鍵 + 舊號都要對得上):
      號改成冊上代碼,列上留 realigned_from = 舊號;帳是只增的歷史(鍵 · 舊號 · 新號 · 裁定 · 時間)。帳上沒有的錯位照舊 RED,要裁定才動。
+     這一步只走專用動詞 realign --apply [--scope 檔…]:一般的 --apply --scope(只登本批)是照「號」合併的,
+     舊列換號在那條路上會變成「新號一列、舊號一列」兩列並存(2026-11-27 容器實錄,已還原)。所以一般發號只對齊新列。
+     realign --apply:先留底 → 直接改寫錯位列 → 再跑一次只登本批(補保留列等新列)→ 用 ③ 對留底比;遺失 / 改身分 / 重號任一不是 0 就整批還原。
   ③ audit 的「改身分」不計對齊帳上的那幾個號(另報 realigned 數);遺失 · 重號照舊,一個都不放。
 不改需求冊 / 工作流冊。零網路。不用 TA-Lib。
 """
@@ -107,6 +110,7 @@ def _chain():
 
 
 AUDIT_HOME = next(m for m in _chain() if "compare" in vars(m) and "inventory" in vars(m))   # 擁有 audit 比對的那一層(v0108)
+SCOPE_HOME = next(m for m in _chain() if "merge_scoped" in vars(m) and "_write_state" in vars(m))   # 只登本批那一層(v0109)
 _PRIOR_ASSIGN = BASE.assign
 _PRIOR_COMPARE = AUDIT_HOME.compare
 
@@ -169,7 +173,7 @@ def realign(state: dict, ledger: list, fresh: set) -> dict:
 def assign(items: list, state: dict) -> dict:
     before = set(state["rows"])
     state = _PRIOR_ASSIGN(items, state)
-    res = realign(state, load_ledger(), set(state["rows"]) - before)
+    res = realign(state, [], set(state["rows"]) - before)        # 一般發號只對齊新列;舊列換號只走 realign --apply
     state["_realign"] = res
     return state
 
@@ -189,6 +193,55 @@ def compare(before: dict, after: dict) -> dict:
 
 BASE.assign = assign
 AUDIT_HOME.compare = compare
+
+
+def realign_books(books: dict, ledger: list) -> dict:
+    """books = {冊檔名: 內容}。把對齊帳上的錯位列直接改寫(沒動的列逐位元不變 · 整本照號排序)。回 {"done": [...], "blocked": [...]};就地改 books。"""
+    done, blocked = [], []
+    for name in sorted(books):
+        m = AUDIT_HOME.BOOK_RX.match(name)
+        if not (m and m.group("kind") in DECLARED_KINDS):
+            continue
+        lines = [ln for ln in books[name].splitlines() if ln.strip()]
+        parsed = [json.loads(ln) for ln in lines]
+        state = {"rows": {(r.get("kind"), r.get("key")): r for r in parsed}}
+        before = {id(r): r.get("code") for r in parsed}
+        res = realign(state, ledger, set())
+        done += res["done"]
+        blocked += res["blocked"]
+        if not res["done"]:
+            continue
+        out = {}
+        for ln, r in zip(lines, parsed):
+            out[r["code"]] = ln if before[id(r)] == r["code"] else json.dumps(r, ensure_ascii=False, separators=(",", ":"))
+        if len(out) != len(lines):
+            raise ValueError("realign 會製造重號:" + name)
+        books[name] = "".join(out[c] + "\n" for c in sorted(out))
+    return {"done": done, "blocked": blocked}
+
+
+def realign_apply(files: list, out=sys.stdout) -> int:
+    """realign --apply [--scope 檔…]:留底 → 改寫錯位列 → 只登本批(補新列)→ 對留底稽核;不過就整批還原。"""
+    ledger = load_ledger()
+    snap = AUDIT_HOME.snapshot()
+    before = AUDIT_HOME._texts(snap)
+    books, ssot = dict(before[0]), json.loads(json.dumps(before[1], ensure_ascii=False))
+    res = realign_books(books, ledger)
+    if res["blocked"]:
+        print(f"[編號 · 對齊] RED · {len(res['blocked'])} 列的目標號被不動的活列佔著,一列不寫:{res['blocked'][:3]}", file=out)
+        return 2
+    SCOPE_HOME._remeta(ssot, books)
+    SCOPE_HOME._write_state(books, ssot, snap)
+    rc = PRIOR.main(["--apply", "--scope"] + list(files)) if files else 0
+    rep = AUDIT_HOME.audit("寫前(對齊)", before=before, after=AUDIT_HOME.current_state())
+    bad = bool(rep["missing"] or rep["changed_identity"] or rep["duplicate_codes"]) or rc != 0
+    print(f"[編號 · 對齊] {'RED' if bad else 'GREEN'} · 對齊帳 {len(ledger)} 列 · 改寫 {len(res['done'])} 列 · 只登本批 rc {rc}"
+          f" · 遺失 {len(rep['missing'])} · 改身分 {len(rep['changed_identity'])} · 重號 {rep['duplicate_codes']} · 已裁定對齊 {rep.get('realigned', 0)}", file=out)
+    if bad:
+        n = AUDIT_HOME.restore(snap)
+        print(f"[編號 · 對齊] 不過 → 已整批還原 {n} 個檔", file=out)
+        return 2
+    return 0
 
 
 def plan_ledger(numbook=None) -> list:
@@ -215,6 +268,11 @@ def main(argv=None) -> int:
             print(("  [帳上有] " if (r["key"], r["from"]) in have else "  [待裁定] ") + f"{r['declared']}:{r['from']} → {r['to']}")
         print(f"[{ENGINE}] realign-plan · 錯位 {len(rows)} 列 · 對齊帳 {len(load_ledger())} 列(只列不寫)")
         return 0
+    if a[:1] == ["realign"]:
+        if "--apply" not in a:
+            return main(["realign-plan"])
+        files = a[a.index("--scope") + 1:] if "--scope" in a else []
+        return realign_apply([f for f in files if not f.startswith("--")])
     return PRIOR.main(a)
 
 
@@ -284,6 +342,26 @@ def selftest() -> int:
         c3 = compare(inv_b, inv_a)
         chk("⑪ 沒有對齊帳時,同樣的改動照舊算改身分(不默默放行)", len(c3["changed_identity"]) >= 4 and c3["realigned"] == 0)
     LEDGER = keep
+    dumps = lambda r: json.dumps(r, ensure_ascii=False, separators=(",", ":"))
+    text0 = "".join(dumps(r) + "\n" for r in sorted(base, key=lambda r: r["code"]))
+    bk = {"VIA_NumberBook_REQ_v0100.jsonl": text0, "VIA_NumberBook_FNC_VCGC_v0100.jsonl": "x\n"}
+    rb = realign_books(bk, led)
+    new_rows = [json.loads(x) for x in bk["VIA_NumberBook_REQ_v0100.jsonl"].splitlines()]
+    same = dumps(base[5]) in bk["VIA_NumberBook_REQ_v0100.jsonl"].splitlines()
+    chk("⑪b realign_books:錯位列直接改寫 · 列數不變 · 無重號 · 照號排序 · 沒動的列逐位元不變 · 別種冊不碰",
+        len(rb["done"]) == 5 and len(new_rows) == 6 and len({r["code"] for r in new_rows}) == 6
+        and [r["code"] for r in new_rows] == sorted(r["code"] for r in new_rows) and all(r["code"] == "VIA-" + r["declared"] for r in new_rows)
+        and same and bk["VIA_NumberBook_FNC_VCGC_v0100.jsonl"] == "x\n", [r["code"] for r in new_rows])
+    bk2 = {"VIA_NumberBook_REQ_v0100.jsonl": text0}
+    chk("⑪c realign_books:沒有對齊帳 → 內容逐位元不變", not realign_books(bk2, [])["done"] and bk2["VIA_NumberBook_REQ_v0100.jsonl"] == text0)
+    s7 = st(*base)
+    keep_assign = globals()["_PRIOR_ASSIGN"]
+    globals()["_PRIOR_ASSIGN"] = lambda items, state: state
+    try:
+        a7 = assign([], s7)
+    finally:
+        globals()["_PRIOR_ASSIGN"] = keep_assign
+    chk("⑪d 一般發號(assign)不動舊的錯位列 —— 舊列換號只走 realign --apply", not a7["_realign"]["done"] and a7["rows"][("REQ", "req|VDF-REQ052@v0100")]["code"] == "VIA-VDF-REQ046")
     chk("⑫ 裝進本體:BASE.assign 與 audit 層的 compare 都是本版", BASE.assign is assign and AUDIT_HOME.compare is compare)
     chk("⑬ 加速器真的載到(VIA_ACCEL 非空)", VIA_ACCEL is not None)
     srcs = Path(__file__).read_text(encoding="utf-8")
