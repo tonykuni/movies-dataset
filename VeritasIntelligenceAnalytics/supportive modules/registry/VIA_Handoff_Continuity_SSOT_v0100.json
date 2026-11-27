@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-27T15:38:02Z",
+ "updated_at": "2026-11-27T16:49:33Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -9043,6 +9043,22 @@
    "timeout_seconds": 900,
    "updated_at": "2026-11-27T15:38:02Z",
    "registered_at": "2026-11-27T15:38:02Z"
+  },
+  "C-handoff-v0112": {
+   "argv": [
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0112.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL140_HandoverConsole_v0112 本版 12/12 · PASS",
+   "scope": "CGC_MDL140_HandoverConsole v0112(有退役清冊且雜湊相符的搬移不算 FILE_REMOVED)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0112.py",
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0111.py"
+   ],
+   "version": "v0112",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-27T16:49:33Z",
+   "registered_at": "2026-11-27T16:49:33Z"
   }
  },
  "work_items": [
@@ -17615,8 +17631,9 @@
    "owner": "AI",
    "reason": "主機快測 upd:CGC_MDL230_ToolCoverageProbe_v0107 TIMEOUT(1216 秒):自測把前版鏈在真樹上跑兩遍。v0108 改在暫存樹比對,13/13 ×3(容器 0.4 秒)",
    "next": "主機:via-vcgc test --quick 看 upd:CGC_MDL230_ToolCoverageProbe 不再 TIMEOUT(未在主機實跑)",
-   "updated_at": "2026-11-27T14:35:00Z",
-   "registered_at": "2026-11-27T14:35:00Z"
+   "updated_at": "2026-11-27T16:49:33Z",
+   "registered_at": "2026-11-27T14:35:00Z",
+   "receipt": "docs/handoff/evidence/C-toolprobe-v0108.json"
   },
   {
    "id": "VCGC-REQ279:C-console-v0203",
@@ -17626,8 +17643,9 @@
    "owner": "AI",
    "reason": "操作員 2026-11-27 裁定 A:同名兩份登正本,VTK 的工具副本不當來源。CGC_MDL149 主控台 v0203(元件掃描同名兩份登正本;VTK 的工具副本不當來源);自測連過三次(容器)",
    "next": "主機:via-vcgc registry-sync 看變更 0、via-vcgc sdd check 看 X-REG(未在主機實跑)",
-   "updated_at": "2026-11-27T15:00:40Z",
-   "registered_at": "2026-11-27T15:00:40Z"
+   "updated_at": "2026-11-27T16:49:33Z",
+   "registered_at": "2026-11-27T15:00:40Z",
+   "receipt": "docs/handoff/evidence/C-console-v0203.json"
   },
   {
    "id": "VCGC-REQ279:C-sdd-validator-v0111",
@@ -17637,8 +17655,9 @@
    "owner": "AI",
    "reason": "操作員 2026-11-27 裁定 A:同名兩份登正本,VTK 的工具副本不當來源。CGC_MDL245_SDDValidator v0111(X-REG 把步釘前版與註冊冊落後分開);自測連過三次(容器)",
    "next": "主機:via-vcgc registry-sync 看變更 0、via-vcgc sdd check 看 X-REG(未在主機實跑)",
-   "updated_at": "2026-11-27T15:00:40Z",
-   "registered_at": "2026-11-27T15:00:40Z"
+   "updated_at": "2026-11-27T16:49:33Z",
+   "registered_at": "2026-11-27T15:00:40Z",
+   "receipt": "docs/handoff/evidence/C-sdd-validator-v0111.json"
   },
   {
    "id": "VCGC-REQ280:C-sdd-validator-v0112",
@@ -17648,8 +17667,21 @@
    "owner": "AI",
    "reason": "VDF-WKF033 兩步已標 retired(2026-11-21 裁定不另開新版);驗證器改成退役步的正主不要求註冊。自測 11/11 ×3(容器)",
    "next": "操作員裁定那兩支要不要仍出版號檔;主機 via-vcgc sdd check(未在主機實跑)",
-   "updated_at": "2026-11-27T15:38:02Z",
-   "registered_at": "2026-11-27T15:38:02Z"
+   "updated_at": "2026-11-27T16:49:33Z",
+   "registered_at": "2026-11-27T15:38:02Z",
+   "receipt": "docs/handoff/evidence/C-sdd-validator-v0112.json"
+  },
+  {
+   "id": "VCGC-REQ281:C-handoff-v0112",
+   "requirement": "VCGC-REQ281",
+   "case": "C-handoff-v0112",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "交接閘 FILE_REMOVED 900 列全是有清冊的退役搬移;v0112 改成有清冊 + 新路徑有檔 + 雜湊相符就不算紅。自測 12/12 ×3(容器)",
+   "next": "重跑失效的案 → handoff checkpoint;主機未實跑",
+   "updated_at": "2026-11-27T16:49:33Z",
+   "registered_at": "2026-11-27T16:49:33Z",
+   "receipt": "docs/handoff/evidence/C-handoff-v0112.json"
   }
  ],
  "retired_files": {
