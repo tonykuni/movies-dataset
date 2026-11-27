@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-26T08:00:00Z",
+ "updated_at": "2026-11-27T08:10:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -8898,6 +8898,53 @@
    "timeout_seconds": 1800,
    "updated_at": "2026-11-26T07:30:00Z",
    "registered_at": "2026-11-26T07:30:00Z"
+  },
+  "C-hub-v0122": {
+   "argv": [
+    "--family",
+    "core",
+    "VCGC_CommandHub_v0122.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VCGC_CommandHub v0122 自測 OK 7 · FAIL 0 · 前版 rc=0",
+   "scope": "VCGC_CommandHub_v0122.py(VCGC-REQ261 · via-graph 路由 · 舊短令 via-graphify / via-omniroute 照原意)",
+   "dependencies": [
+    "VCGC_CommandHub_v*.py"
+   ],
+   "version": "v0122",
+   "timeout_seconds": 1200,
+   "updated_at": "2026-11-27T02:30:00Z",
+   "registered_at": "2026-11-27T02:30:00Z"
+  },
+  "C-hostboot-v0107": {
+   "argv": [
+    "docs/handoff/ai/VIA_HostBoot_v0107.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VIA_HostBoot v0107 自測 OK 7 · FAIL 0 · 前版 rc=0",
+   "scope": "VIA_HostBoot_v0107.py(up 三步同時跑:VCGC 啟動 · 備份 + Graphify · VDF 啟動;PS 照舊 Start-VIA-v0100.ps1)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_HostBoot_v*.py"
+   ],
+   "version": "v0107",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-27T07:30:00Z",
+   "registered_at": "2026-11-27T07:30:00Z"
+  },
+  "C-toolmodules-v0100": {
+   "argv": [
+    "supportive modules/toolmodules/VIA_VCGC_ToolModules_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VIA_VCGC_ToolModules v0100 自測 OK 2 · FAIL 0",
+   "scope": "supportive modules/toolmodules/(VCGC 補強工具模組:metrics · schema · module-check · registration-plan 新增;其餘與 MDL158 重疊,原生優先)",
+   "dependencies": [
+    "supportive modules/toolmodules/**"
+   ],
+   "version": "v0100",
+   "timeout_seconds": 600,
+   "updated_at": "2026-11-27T08:10:00Z",
+   "registered_at": "2026-11-27T08:10:00Z"
   }
  },
  "work_items": [
@@ -17401,6 +17448,42 @@
    "receipt": "docs/handoff/evidence/C-eng242-v0106.json",
    "verified_at": "2026-11-26T07:40:00Z",
    "verified_why": "handoff test rc 0 · 標記已見(容器)"
+  },
+  {
+   "id": "VCGC-REQ261:C-hub-v0122",
+   "requirement": "VCGC-REQ261",
+   "case": "C-hub-v0122",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "main v0120 實測 x via-graph status → invalid choice 'graph'(主機 11-25 同句);v0122 把 graph_route 掛到 v0102 那層的 main,並讓 via-graphify / via-omniroute 照原意;自測 7/7 ×3 · 疊在 #766 的 v0121 上也 7/7 · 容器 via-omniroute 三系統全綠",
+   "next": "主機:python VCGC_CommandHub_v0122.py x via-graph status · x via-omniroute(未在主機實跑)",
+   "updated_at": "2026-11-27T02:30:00Z",
+   "registered_at": "2026-11-27T02:30:00Z",
+   "receipt": "docs/handoff/evidence/C-hub-v0122.json"
+  },
+  {
+   "id": "VCGC-REQ261:C-hostboot-v0107",
+   "requirement": "VCGC-REQ261",
+   "case": "C-hostboot-v0107",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-27「one py with 加速器去啟動全部三步驟同行 · 一個 ps 啟動她」:HostBoot v0107 把 up 改成三道同時起(各寫 log · 心跳 · 最差燈為總燈 · 記憶體 < 4 GB 自動逐步);自測 7/7 ×3",
+   "next": "主機:pwsh -NoProfile -ExecutionPolicy Bypass -File .\\Start-VIA-v0100.ps1(未在主機實跑)",
+   "updated_at": "2026-11-27T07:30:00Z",
+   "registered_at": "2026-11-27T07:30:00Z",
+   "receipt": "docs/handoff/evidence/C-hostboot-v0107.json"
+  },
+  {
+   "id": "VCGC-REQ265:C-toolmodules-v0100",
+   "requirement": "VCGC-REQ265",
+   "case": "C-toolmodules-v0100",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "操作員 2026-11-27 上傳 VIA_VCGC_ToolModules_v0100.zip 並說「導入」:放 supportive modules/toolmodules/;每支 .py 補真的加速器橋(原包只有標記);重疊動詞對照寫在 README;自測 2/2 ×3(回歸 34 項)",
+   "next": "重疊的 6 個動詞是否併回 CGC_MDL158 家族(另批,待操作員);主機:python \"supportive modules\\toolmodules\\VIA_VCGC_ToolModules_v0100.py\" catalog(未在主機實跑)",
+   "updated_at": "2026-11-27T08:10:00Z",
+   "registered_at": "2026-11-27T08:10:00Z",
+   "receipt": "docs/handoff/evidence/C-toolmodules-v0100.json"
   }
  ],
  "retired_files": {
