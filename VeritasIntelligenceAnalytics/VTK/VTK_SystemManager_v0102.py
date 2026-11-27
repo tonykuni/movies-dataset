@@ -262,11 +262,22 @@ def selftest() -> int:
     tj = Path(tempfile.mkdtemp(prefix="vtk_junc_"))
     keep_sym, keep_name, keep_win = os.symlink, os.name, sys.modules.get("_winapi")
     made = []
+    lk3 = None
+    # 替身底下真的做連結的那一手不能靠符號連結權限:真 Windows 用真的 _winapi.CreateJunction(一般帳號可用),
+    # 別的平台用 os.symlink(本來就不需特權)。舊寫法在真 Windows 一般帳號上自己就吃 WinError 1314(PR #765 Codex P2 第二輪)。
+    real_cj = None
+    if keep_name == "nt":
+        try:
+            import _winapi as _real_win
+            real_cj = getattr(_real_win, "CreateJunction", None)
+        except ImportError:
+            real_cj = None
+    back = real_cj if real_cj is not None else (lambda a, b: keep_sym(a, b, target_is_directory=True))
     try:
         (tj / "real" / "d").mkdir(parents=True)
         (tj / "real" / "d" / "k.txt").write_text("k", encoding="utf-8")
         fake = types.ModuleType("_winapi")
-        fake.CreateJunction = lambda a, b: (made.append(b), keep_sym(a, b, target_is_directory=True))
+        fake.CreateJunction = lambda a, b: (made.append(b), back(a, b))
         sys.modules["_winapi"] = fake
         os.name = "nt"
 
@@ -284,10 +295,8 @@ def selftest() -> int:
             sys.modules.pop("_winapi", None)
         else:
             sys.modules["_winapi"] = keep_win
-    try:
-        os.unlink(str(tj / "out_d"))
-    except OSError:
-        pass
+    if lk3 is not None:
+        lk3.unlink_all()  # junction 用 rmdir、符號連結用 unlink,只拆連結本身
     shutil.rmtree(str(tj), ignore_errors=True)
     chk("⑨ Windows 一般帳號(os.symlink 全被拒):自測的 junction 替身走 _winapi.CreateJunction,不靠符號連結權限(PR #765 Codex P2)",
         got == (1, "k") and len(made) == 1, got)
