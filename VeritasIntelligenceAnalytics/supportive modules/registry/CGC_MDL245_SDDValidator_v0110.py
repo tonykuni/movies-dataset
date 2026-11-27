@@ -7,7 +7,8 @@ PR #769 審查(Codex P2,讀碼重現屬實):工作流步的 match 只比「目�
 操作員打 `run VCGC_CommandHub x via-prune --system VDF` → 事件帳的 act 是 `x`,不是 `via-prune`。
 寫 match [["VCGC_CommandHub", "via-prune"]] 永遠對不到(主機跑過仍 NOT_RUN);寫成 "x" 又太寬(任何 x 短令都算)。
 事件帳本來就存了 args(目標起算前 6 個),所以不改主控台、不改事件格式,只在驗證這一邊補一個欄:
-  步上寫 match_args: ["via-prune"] → 這一步只認「match 對得到、而且 args 裡每一個字都在」的那一筆;
+  步上寫 match_args: ["via-prune", "--system", "VDF"] → 這一步只認「match 對得到、而且 args 裡有這一段(照順序、連在一起)」的那一筆;
+  連在一起才算:別的系統的 prune(--system VRN)或 VDF 出現在別的旗標後面,都不能頂替(PR #769 Codex P2 第三輪);
   沒有這樣的事件 = NOT_RUN(主機沒跑過就不亮 OK);有 = 取最差的一次(同本體算法)。沒寫 match_args 的步一字不動。
 步改過之後,整條工作流的燈照本體同一條式子重算。不改任何冊。零網路。不用 TA-Lib。
 """
@@ -91,13 +92,19 @@ def __getattr__(name: str):
     return getattr(PRIOR, name)
 
 
+def has_run(args: list, need: list) -> bool:
+    """need 是不是 args 裡照順序、連在一起的一段。"""
+    n = len(need)
+    return n == 0 or any(args[i:i + n] == need for i in range(len(args) - n + 1))
+
+
 def args_hits(step: dict, events: list) -> list:
-    """這一步的 match 對得到、而且 match_args 每一個字都在事件 args 裡的事件。"""
+    """這一步的 match 對得到、而且事件 args 裡有 match_args 這一段(照順序、連在一起)的事件。"""
     need = [str(a) for a in step.get("match_args") or []]
     out = []
     for e in events:
         args = [str(a) for a in e.get("args") or []]
-        if not all(a in args for a in need):
+        if not has_run(args, need):
             continue
         if any((e.get("target") or BASE.CONSOLE) == tgt and (vb is None or vb in BASE._act(e)) for tgt, vb in step.get("match") or []):
             out.append(e)
@@ -194,9 +201,17 @@ def selftest() -> int:
     r4 = rep0("OK")
     c4 = apply_match_args(r4, books({}), [ev([hub, "x", "via-graph"])], [])
     chk("④ 沒寫 match_args 的步一字不動", r4 == rep0("OK") and c4 == [])
+    vdf = {"match_args": ["via-prune", "--system", "VDF"]}
     r5 = rep0("OK")
-    apply_match_args(r5, books({"match_args": ["via-prune", "VDF"]}), [ev([hub, "x", "via-prune", "--system", "VRN"])], [])
-    chk("⑤ match_args 要全部都在(少一個就不算)", r5["wkf"]["T-WKF001"]["steps"]["T-WKF001-STP003"]["state"] == "NOT_RUN")
+    apply_match_args(r5, books(vdf), [ev([hub, "x", "via-prune", "--system", "VRN"])], [])
+    chk("⑤ 別的系統的 prune(--system VRN)不能頂替 VDF 這一步", r5["wkf"]["T-WKF001"]["steps"]["T-WKF001-STP003"]["state"] == "NOT_RUN")
+    r5b = rep0("OK")
+    apply_match_args(r5b, books(vdf), [ev([hub, "x", "via-prune", "--system", "VRN", "--only", "VDF"]), ev([hub, "x", "via-prune", "VDF", "--system"])], [])
+    chk("⑤b 要照順序連在一起:VDF 出現在別的旗標後面、或順序不對,都不算", r5b["wkf"]["T-WKF001"]["steps"]["T-WKF001-STP003"]["state"] == "NOT_RUN")
+    r5c = rep0("NOT_RUN")
+    apply_match_args(r5c, books(vdf), [ev([hub, "x", "via-prune", "--system", "VRN"]), ev([hub, "x", "via-prune", "--system", "VDF"])], [])
+    chk("⑤c VRN 與 VDF 都跑過 → 只算 VDF 那一筆(runs 1)· OK", r5c["wkf"]["T-WKF001"]["steps"]["T-WKF001-STP003"]["state"] == "OK"
+        and r5c["wkf"]["T-WKF001"]["steps"]["T-WKF001-STP003"]["runs"] == 1)
     r6 = rep0("OK")
     apply_match_args(r6, books(need), [dict(ev([hub, "x", "via-prune"]), target="CGC_MDL237_NumberingSystem")], [])
     chk("⑥ 參數對但目標不是這一步的 match → 不算", r6["wkf"]["T-WKF001"]["steps"]["T-WKF001-STP003"]["state"] == "NOT_RUN")
