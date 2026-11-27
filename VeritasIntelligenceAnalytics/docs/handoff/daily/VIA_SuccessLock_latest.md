@@ -219,3 +219,4 @@
 | 2026-11-27T19:58:19Z | CGC_SystemManager_v0125.py | 0125 | VIA-VCGC-MDL1734 | d358611cb50b | launch 的 NEXT 也看 overview | 自測 11/11 |
 | 2026-11-27T20:31:36Z | CGC_MDL140_HandoverConsole_v0113.py | 0113 | VIA-VCGC-MDL1735 | f281d6124a00 | 舊案不計入現況燈 · 兩系統範圍 | 自測 19/19 |
 | 2026-11-27T21:54:32Z | VIA_HostBoot_v0108.py | 0108 | VIA-CORE-MDL928 | 25e159740b0c | 一支 PY 同時啟用 VCGC 與 VDF | 自測 12/12 |
+| 2026-11-27T22:07:42Z | VIA_HostBoot_v0109.py | 0109 | VIA-CORE-MDL929 | 54f07ee702d3 | 一鍵啟用也用網路模組 | 自測 11/11 |
