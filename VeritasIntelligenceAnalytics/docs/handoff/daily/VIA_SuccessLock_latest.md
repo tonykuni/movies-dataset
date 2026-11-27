@@ -211,3 +211,6 @@
 | 2026-11-27T15:13:50Z | CGC_MDL149_VeritasCentralGovernanceConsole_v0203.py | 0203 | VIA-VCGC-MDL1727 | a6f5337702e2 | 元件掃描同名兩份登正本 | 自測 16/16 |
 | 2026-11-27T15:13:50Z | CGC_MDL245_SDDValidator_v0111.py | 0111 | VIA-VCGC-MDL1728 | 2fae1238d0e3 | X-REG 分開步釘前版與註冊冊落後 | 自測 12/12 |
 | 2026-11-27T15:43:03Z | CGC_MDL245_SDDValidator_v0112.py | 0112 | VIA-VCGC-MDL1729 | 5835ae2e39f9 | X-REG:已退役的步不要求正主註冊 | 自測 11/11 |
+| 2026-11-27T16:52:36Z | CGC_MDL140_HandoverConsole_v0112.py | 0112 | VIA-VCGC-MDL1730 | 464fe45626a8 | 有退役清冊的搬移不算 FILE_REMOVED | 自測 12/12 |
+| 2026-11-27T18:15:27Z | CGC_SystemManager_v0122.py | 0122 | VIA-VCGC-MDL1731 | 3f8c1ed8379a | launch:VCGC 一鍵啟用 | 自測 19/19 |
+| 2026-11-27T18:15:27Z | Start-VCGC-v0101.ps1 | 0101 | VIA-CORE-MDL924 | e31eb06de447 | 一支 PS 啟用 VCGC(只認主工作倉) | 主機起跑 |
