@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-27T08:10:00Z",
+ "updated_at": "2026-11-27T12:30:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -8945,6 +8945,23 @@
    "timeout_seconds": 600,
    "updated_at": "2026-11-27T08:10:00Z",
    "registered_at": "2026-11-27T08:10:00Z"
+  },
+  "C-sdd-validator-v0110": {
+   "argv": [
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0110.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL245_SDDValidator_v0110 本版 12/12 · PASS",
+   "scope": "CGC_MDL245_SDDValidator v0110(match_args:主機實跑步對事件帳帶指定參數的那一筆)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0110.py",
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0109.py",
+    "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0166.json"
+   ],
+   "version": "v0110",
+   "timeout_seconds": 1500,
+   "updated_at": "2026-11-27T12:30:00Z",
+   "registered_at": "2026-11-27T12:30:00Z"
   }
  },
  "work_items": [
@@ -17484,6 +17501,18 @@
    "updated_at": "2026-11-27T08:10:00Z",
    "registered_at": "2026-11-27T08:10:00Z",
    "receipt": "docs/handoff/evidence/C-toolmodules-v0100.json"
+  },
+  {
+   "id": "VCGC-REQ276:C-sdd-validator-v0110",
+   "requirement": "VCGC-REQ276",
+   "case": "C-sdd-validator-v0110",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "PR #769 Codex P1 + P2:主機實跑步不能被自測代替,也要對得到主機真的打的那一行。SDD 驗證器 v0110 加 match_args;工作流冊 v0166 的 VCGC-WKF056-STP003 改用它。自測 12/12 ×3(容器)",
+   "next": "主機:via-vcgc run VCGC_CommandHub x via-prune --system VDF 後 sdd real,看 VCGC-WKF056-STP003 轉 OK(未在主機實跑)",
+   "updated_at": "2026-11-27T12:30:00Z",
+   "registered_at": "2026-11-27T12:30:00Z",
+   "receipt": "docs/handoff/evidence/C-sdd-validator-v0110.json"
   }
  ],
  "retired_files": {
