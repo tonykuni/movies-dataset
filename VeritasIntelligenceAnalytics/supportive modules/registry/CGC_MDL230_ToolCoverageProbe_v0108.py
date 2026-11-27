@@ -88,7 +88,7 @@ _PRIOR._can_pool = _can_pool          # v0107 的 warm() 從它自己的全域�
 
 def route(a: list) -> str:
     """參數 → 走哪一條:fast(本版快自測)· full(v0107 的整鏈自測)· prior(其餘原樣轉交)。"""
-    if "--selftest" in a or a[:1] in (["selftest"], ["test"]):
+    if "--selftest" in a:                       # 跟 v0107 一樣只認這個旗標;其餘(含位置參數)原樣轉交
         return "full" if "--full" in a else "fast"
     return "prior"
 
@@ -212,8 +212,9 @@ def selftest() -> int:
     finally:
         P.selftest = keep
     chk("S8 分流:--selftest 走本版 · --selftest --full 走 v0107 整鏈(rc 原樣帶回)· 其餘轉交",
-        route(["--selftest"]) == "fast" and route(["selftest"]) == "fast" and route(["--selftest", "--full"]) == "full"
-        and route(["matrix", "--no-pwsh"]) == "prior" and calls == ["full"] and rc_full == 7, (calls, rc_full))
+        route(["--selftest"]) == "fast" and route(["--selftest", "--full"]) == "full" and route(["matrix", "--selftest"]) == "fast"
+        and route(["matrix", "--no-pwsh"]) == "prior" and route(["selftest"]) == "prior" and route([]) == "prior"
+        and calls == ["full"] and rc_full == 7, (calls, rc_full))
     lost = [n for n in dir(P) if not n.startswith("_") and callable(getattr(P, n)) and not hasattr(sys.modules[__name__], n)]
     chk("S9 前版公開名稱都還拿得到(經本檔轉接)", not lost and callable(sys.modules[__name__].matrix), lost[:6])
     src = Path(__file__).read_text(encoding="utf-8")
