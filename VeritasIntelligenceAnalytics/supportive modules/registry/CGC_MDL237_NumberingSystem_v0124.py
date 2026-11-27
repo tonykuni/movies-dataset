@@ -109,8 +109,15 @@ def _chain():
         m = vars(m).get("PRIOR") or vars(m).get("_PRIOR")
 
 
-AUDIT_HOME = next(m for m in _chain() if "compare" in vars(m) and "inventory" in vars(m))   # 擁有 audit 比對的那一層(v0108)
-SCOPE_HOME = next(m for m in _chain() if "merge_scoped" in vars(m) and "_write_state" in vars(m))   # 只登本批那一層(v0109)
+def _defined_in(m, name: str) -> bool:
+    """name 是不是「定義」在 m 這一層(函式自己的全域就是 m 的全域)。後面的薄尾常把前版的名字重新綁進自己的命名空間,
+    只看名字在不在會找錯層:掛鉤掛在轉手的那一層,真正執行的那一層看不到(2026-11-27 容器實錄:稽核照舊報改身分 14,整批還原)。"""
+    fn = vars(m).get(name)
+    return getattr(fn, "__globals__", None) is vars(m)
+
+
+AUDIT_HOME = next(m for m in _chain() if _defined_in(m, "compare") and _defined_in(m, "audit"))      # 定義 audit 與它叫的 compare 的那一層(v0108)
+SCOPE_HOME = next(m for m in _chain() if _defined_in(m, "merge_scoped") and _defined_in(m, "_write_state"))   # 定義只登本批的那一層(v0109)
 _PRIOR_ASSIGN = BASE.assign
 _PRIOR_COMPARE = AUDIT_HOME.compare
 
@@ -352,6 +359,18 @@ def selftest() -> int:
         len(rb["done"]) == 5 and len(new_rows) == 6 and len({r["code"] for r in new_rows}) == 6
         and [r["code"] for r in new_rows] == sorted(r["code"] for r in new_rows) and all(r["code"] == "VIA-" + r["declared"] for r in new_rows)
         and same and bk["VIA_NumberBook_FNC_VCGC_v0100.jsonl"] == "x\n", [r["code"] for r in new_rows])
+    with tempfile.TemporaryDirectory(prefix="mdl237_v0124b_") as td:
+        LEDGER = Path(td) / LEDGER_NAME
+        LEDGER.write_text("".join(json.dumps(e, ensure_ascii=False) + "\n" for e in led), encoding="utf-8")
+        real_audit = AUDIT_HOME.audit("自測", before=({"VIA_NumberBook_REQ_v0100.jsonl": text0}, {}), after=({"VIA_NumberBook_REQ_v0100.jsonl": bk["VIA_NumberBook_REQ_v0100.jsonl"]}, {}))
+        LEDGER.unlink()
+        raw_audit = AUDIT_HOME.audit("自測", before=({"VIA_NumberBook_REQ_v0100.jsonl": text0}, {}), after=({"VIA_NumberBook_REQ_v0100.jsonl": bk["VIA_NumberBook_REQ_v0100.jsonl"]}, {}))
+    LEDGER = keep
+    chk("⑪e 走真正的稽核路徑(定義 audit 的那一層):有對齊帳 → 改身分 0 · 已裁定 > 0;沒有帳 → 照舊報改身分",
+        real_audit["changed_identity"] == [] and real_audit.get("realigned", 0) > 0 and real_audit["duplicate_codes"] == 0
+        and len(raw_audit["changed_identity"]) > 0, (real_audit.get("changed_identity"), real_audit.get("realigned"), raw_audit.get("changed_identity")))
+    chk("⑪f 掛鉤掛在定義的那一層(不是轉手的那一層)", _defined_in(AUDIT_HOME, "audit") and AUDIT_HOME.audit.__globals__["compare"] is compare
+        and _defined_in(SCOPE_HOME, "merge_scoped"))
     bk2 = {"VIA_NumberBook_REQ_v0100.jsonl": text0}
     chk("⑪c realign_books:沒有對齊帳 → 內容逐位元不變", not realign_books(bk2, [])["done"] and bk2["VIA_NumberBook_REQ_v0100.jsonl"] == text0)
     s7 = st(*base)
