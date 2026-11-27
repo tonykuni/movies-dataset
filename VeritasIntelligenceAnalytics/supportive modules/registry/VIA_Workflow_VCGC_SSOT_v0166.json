@@ -4724,9 +4724,13 @@
      "what": "操作員主機實跑(未在主機實跑)",
      "engine": "VCGC_CommandHub_v*.py",
      "verb": "x via-prune --system VDF",
-     "inside": "VCGC",
-     "evidence": "step:VCGC-WKF056-STP003",
-     "evidence_state": "host:pending(未在主機實跑)"
+     "match": [
+      [
+       "VCGC_CommandHub",
+       "via-prune"
+      ]
+     ],
+     "evidence_note": "host:pending(未在主機實跑)。主機經 VCGC 主控台 run VCGC_CommandHub x via-prune --system VDF 跑過、事件帳有這一筆才算;在那之前本步 NOT_RUN,整條工作流不亮 OK。"
     }
    ],
    "tests": {
@@ -4801,5 +4805,5 @@
  "why_v0163": "VIA_Workflow_VCGC_SSOT_v0162.json 已在 main(PR #737)→ 出新版。只增:VCGC-WKF054(VCGC-REQ261 原先沒登工作流冊)。前版一字不動。",
  "why_v0164": "VIA_Workflow_VCGC_SSOT_v0163.json 已在 main(PR #738)→ 出新版。只增:VCGC-WKF055(VCGC-REQ245 安全同步原先沒登工作流冊);WKF054 驗收與測法換尾版 v0117。前版一字不動。",
  "why_v0165": "PR #766 Codex P1:VCGC-REQ275 只登了需求冊 v0331、工作流冊沒有。只增:VCGC-WKF056(退役閘先讀搬回清單 · 驗收條件 · 還沒做的主機乾跑)。v0164 一字不動。",
- "why_v0166": "VIA_Workflow_VCGC_SSOT_v0165.json 已隨 PR #766 進 main → 出新版。SDD X-COL 紅:VCGC-WKF056 缺 tests(self / cross / real),STP003 的 evidence 不是 step: / self: / chain: 形式。只補這兩處:+tests;STP003.evidence 改 step:VCGC-WKF056-STP003(本步的中樞觀測鍵),原值 host:pending 留在 evidence_state(主機還沒實跑,照實)。代碼 · 步 · 正主 · 其餘工作流一字不動。"
+ "why_v0166": "VIA_Workflow_VCGC_SSOT_v0165.json 已隨 PR #766 進 main → 出新版。SDD X-COL 紅:VCGC-WKF056 缺 tests(self / cross / real),STP003 的 evidence 不是 step: / self: / chain: 形式。只補這兩處:+tests;STP003 是主機實跑步,改用 match(事件帳觀測:目標 VCGC_CommandHub · 動作含 via-prune),拿掉 inside 與 evidence —— 主機沒跑過就是 NOT_RUN,自測過不能代替(PR #769 Codex P1:先前寫成指回自己的 step: 會被驗證器當成 EVIDENCE、整條亮 OK)。原值 host:pending 留在 evidence_note。代碼 · 步 · 正主 · 其餘工作流一字不動。"
 }
