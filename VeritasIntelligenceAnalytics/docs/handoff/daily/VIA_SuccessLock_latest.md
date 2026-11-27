@@ -194,3 +194,4 @@
 | 2026-11-25T04:45:00Z | VIA_RepoSafeSync_v0106.py | 0106 | VIA-CORE-MDL912 | fcc4ce307770 | 四階段進度 · 真實 % | 自測 8/8 |
 | 2026-11-25T04:45:00Z | VCGC_CommandHub_v0117.py | 0117 | VIA-CORE-MDL913 | 22511ba7af7b | 建圖進度條 · 估 % | 自測 6/6 |
 | 2026-11-25T05:05:00Z | VIA_RepoSafeSync_v0106.py | 0106 | VIA-CORE-MDL912 | 16ce248d044c | 階段界線 · 照實收尾 · 備份心跳 | 自測 11/11 |
+| 2026-11-27T02:45:00Z | VCGC_CommandHub_v0122.py | 0122 | VIA-CORE-MDL917 | 532eaff904b3 | via-graph 路由 · 舊名照原意 | 自測 7/7 |
