@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-26T08:00:00Z",
+ "updated_at": "2026-11-27T02:30:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -8898,6 +8898,23 @@
    "timeout_seconds": 1800,
    "updated_at": "2026-11-26T07:30:00Z",
    "registered_at": "2026-11-26T07:30:00Z"
+  },
+  "C-hub-v0122": {
+   "argv": [
+    "--family",
+    "core",
+    "VCGC_CommandHub_v0122.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] VCGC_CommandHub v0122 自測 OK 7 · FAIL 0 · 前版 rc=0",
+   "scope": "VCGC_CommandHub_v0122.py(VCGC-REQ261 · via-graph 路由 · 舊短令 via-graphify / via-omniroute 照原意)",
+   "dependencies": [
+    "VCGC_CommandHub_v*.py"
+   ],
+   "version": "v0122",
+   "timeout_seconds": 1200,
+   "updated_at": "2026-11-27T02:30:00Z",
+   "registered_at": "2026-11-27T02:30:00Z"
   }
  },
  "work_items": [
@@ -17401,6 +17418,18 @@
    "receipt": "docs/handoff/evidence/C-eng242-v0106.json",
    "verified_at": "2026-11-26T07:40:00Z",
    "verified_why": "handoff test rc 0 · 標記已見(容器)"
+  },
+  {
+   "id": "VCGC-REQ261:C-hub-v0122",
+   "requirement": "VCGC-REQ261",
+   "case": "C-hub-v0122",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "main v0120 實測 x via-graph status → invalid choice 'graph'(主機 11-25 同句);v0122 把 graph_route 掛到 v0102 那層的 main,並讓 via-graphify / via-omniroute 照原意;自測 7/7 ×3 · 疊在 #766 的 v0121 上也 7/7 · 容器 via-omniroute 三系統全綠",
+   "next": "主機:python VCGC_CommandHub_v0122.py x via-graph status · x via-omniroute(未在主機實跑)",
+   "updated_at": "2026-11-27T02:30:00Z",
+   "registered_at": "2026-11-27T02:30:00Z",
+   "receipt": "docs/handoff/evidence/C-hub-v0122.json"
   }
  ],
  "retired_files": {
