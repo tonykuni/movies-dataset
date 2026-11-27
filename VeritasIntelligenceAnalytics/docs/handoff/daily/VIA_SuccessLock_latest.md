@@ -217,3 +217,4 @@
 | 2026-11-27T19:32:46Z | CGC_SystemManager_v0123.py | 0123 | VIA-VCGC-MDL1732 | a1fb3768d1f0 | launch 總燈與三數照實 | 自測 13/13 |
 | 2026-11-27T19:45:36Z | CGC_SystemManager_v0124.py | 0124 | VIA-VCGC-MDL1733 | 0514e62930e6 | 容器跑的 launch 最多黃 | 自測 10/10 |
 | 2026-11-27T19:58:19Z | CGC_SystemManager_v0125.py | 0125 | VIA-VCGC-MDL1734 | d358611cb50b | launch 的 NEXT 也看 overview | 自測 11/11 |
+| 2026-11-27T20:31:36Z | CGC_MDL140_HandoverConsole_v0113.py | 0113 | VIA-VCGC-MDL1735 | f281d6124a00 | 舊案不計入現況燈 · 兩系統範圍 | 自測 19/19 |
