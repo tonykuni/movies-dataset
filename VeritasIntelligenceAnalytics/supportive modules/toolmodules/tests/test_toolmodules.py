@@ -98,6 +98,13 @@ class ToolModuleTests(unittest.TestCase):
         self.assertEqual(self.snap()['quantity']['nodes'], 4)
         self.assertEqual(self.snap()['duplicate_node_ids'], [])
 
+    def test_nested_defs_under_duplicate_parents_have_distinct_ids(self):
+        self.put('a.py', 'def f():\n def inner():\n  return 1\n return inner\ndef f():\n def inner():\n  return 2\n return inner\n')
+        result = self.snap()
+        self.assertEqual(len({n['node_id'] for n in result['nodes']}), 4)
+        self.assertEqual(result['duplicate_node_ids'], [])
+        self.assertNotEqual(result['status'], 'RED')
+
     def test_conditional_definitions(self):
         self.put('a.py', 'if True:\n def f():\n  return 1\nelse:\n def f():\n  return 2\n')
         self.assertEqual(len({n['node_id'] for n in self.snap()['nodes']}), 2)

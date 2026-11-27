@@ -18,7 +18,7 @@ except Exception:  # noqa: BLE001
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
-PARSER_REVISION = "vtm-ast-1"
+PARSER_REVISION = "vtm-ast-2"
 SECRET_WORDS = ("password", "secret", "api_key", "private_key", "credential", "access_token")
 
 import ast
@@ -104,7 +104,7 @@ def analyze_python(raw, label, relative):
     tree = ast.parse(source, filename=relative)
     compile(tree, relative, "exec")
     nodes, issues = [], []
-    def visit_scope(body, scope=""):
+    def visit_scope(body, scope="", id_scope=""):
         counts = collections.Counter(n.name for n in body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)))
         for name, count in counts.items():
             if count > 1:
@@ -114,21 +114,24 @@ def analyze_python(raw, label, relative):
             if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 qualified = (scope + "." if scope else "") + n.name
                 occurrences[n.name] += 1
-                identity = qualified + ("@" + str(occurrences[n.name]) if counts[n.name] > 1 else "")
+                # id_scope carries the parent's occurrence tag, so f@1.inner and f@2.inner stay distinct.
+                identity = (id_scope + "." if id_scope else "") + n.name + ("@" + str(occurrences[n.name]) if counts[n.name] > 1 else "")
                 nodes.append({"node_id": node_id(label, relative, identity), "name": qualified,
                               "kind": type(n).__name__, "start": n.lineno, "end": n.end_lineno,
                               "parameters": parameter_names(n), "has_docstring": bool(ast.get_docstring(n)),
                               "ast_sha256": digest(ast.dump(n, include_attributes=False).encode()),
                               "category": "ENTRY" if n.name == "main" else ("CONTRACT" if n.name in ("describe", "execute") else "FUNCTION")})
-                visit_scope(n.body, qualified)
+                visit_scope(n.body, qualified, identity)
             else:
                 # Conditional definitions are indexed with explicit scope, not silently merged.
                 for field in ("body", "orelse", "finalbody"):
                     children = getattr(n, field, None)
                     if isinstance(children, list):
-                        visit_scope(children, scope + f".<{type(n).__name__}:{n.lineno}:{field}>")
+                        tag = f".<{type(n).__name__}:{n.lineno}:{field}>"
+                        visit_scope(children, scope + tag, id_scope + tag)
                 for index, handler in enumerate(getattr(n, "handlers", [])):
-                    visit_scope(handler.body, scope + f".<except:{n.lineno}:{index}>")
+                    tag = f".<except:{n.lineno}:{index}>"
+                    visit_scope(handler.body, scope + tag, id_scope + tag)
     visit_scope(tree.body)
     imports = sorted({n.module or "" for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)} | {a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names})
     for n in ast.walk(tree):
