@@ -160,7 +160,7 @@ def realign(state: dict, ledger: list, fresh: set) -> dict:
     # 想搬進去的列也要跟著擋(PR #770 Codex P2:只算一輪會讓另一列搬進被擋列的原號 → 重號)。
     blocked = []
     while True:
-        held = {r.get("code") for k, r in rows.items() if k not in move and not r.get("gone_since")}
+        held = {r.get("code") for k, r in rows.items() if k not in move}      # 不動的列全算,已退役的也算:它的號還在冊上,稽核算重號時也算它
         wants = {}
         for k, want in move.items():
             wants.setdefault(want, []).append(k)
@@ -437,6 +437,10 @@ def selftest() -> int:
     chk("⑪j audit:原主要真的在帳上寫的新號上 —— 原主那一列不見、或目的地上是別的列,它讓出來的號照舊算改身分;都在才放行",
         v_ok["changed_identity"] == [] and v_ok["realigned"] == 5
         and v_gone["changed_identity"] == ["VIA-VDF-REQ052"] and v_moved["changed_identity"] == ["VIA-VDF-REQ052"], (v_ok, v_gone, v_moved))
+    s10 = st(row("VCGC-REQ004", "VIA-VCGC-REQ003", gone_since="t"), row("VCGC-REQ003", "VIA-VCGC-REQ004"))
+    r10 = realign(s10, [], {("REQ", "req|VCGC-REQ003@v0100")})
+    c10 = [r["code"] for r in s10["rows"].values()]
+    chk("⑪k 已退役列的號照樣算有人佔著:新列不搬進去、列進 blocked、不製造重號(PR #770 Codex P2)", len(set(c10)) == 2 and not r10["done"] and len(r10["blocked"]) == 1, (c10, r10))
     chk("⑫ 裝進本體:BASE.assign 與 audit 層的 compare 都是本版", BASE.assign is assign and AUDIT_HOME.compare is compare)
     chk("⑬ 加速器真的載到(VIA_ACCEL 非空)", VIA_ACCEL is not None)
     srcs = Path(__file__).read_text(encoding="utf-8")
