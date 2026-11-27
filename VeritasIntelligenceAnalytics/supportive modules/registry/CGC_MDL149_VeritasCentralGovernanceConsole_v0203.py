@@ -14,8 +14,10 @@
      v0167 的活元件快取另用一個快取名(舊快取是照舊判法算的,不能拿來用)。
   ③ v0195 起每一層都用子行程把舊動詞往下轉交,掛鉤帶不過去。所以舊動詞(會落到 v0194 以下同一行程那一疊的)由本版在自己的行程裡
      載入那一疊、掛好再跑;分流照 v0195–v0202 各層 main 的寫法逐條對(那幾版已發布,不會再變)。
-     其餘動詞(overview · synchronizer · monitor status · agentos · graphify · help · 標準管理器動詞 · selftest)原樣轉交 v0202。
+     其餘動詞(overview · monitor status · agentos · graphify · help · 標準管理器動詞 · selftest)原樣轉交 v0202。
   ④ 經本檔取用前版公開名稱(registry_sync · live_components · _tail_files …)也先掛好再給。
+  ⑤ synchronizer:同步台(v0198 / v0200)的每一步原本交給 v0197 去跑,會走到沒掛新判法的那一疊,
+     books 步(sync-check)就會一直說註冊冊待同步。本版把「步驟交給誰跑」改成本檔,其餘照 v0200 的做法在同一行程叫同步台。
 不寫任何檔;不出網;不碰 TA-Lib;不 import 他系統(VTK 的冊只當 JSON 讀)。
 用法照舊:VIA_FROM_VCGC=YES python CGC_MDL149_VeritasCentralGovernanceConsole_v0203.py <動詞…> · --selftest
 """
@@ -280,6 +282,21 @@ def legacy_main(args: list) -> int:
     return 1
 
 
+def synchronizer(args: list) -> int:
+    """同步台照 v0200 的做法在本行程叫;只把步驟的執行檔從 v0197 換成本檔(步驟裡的舊動詞才會帶新判法)。找不到同步台就原樣轉交。"""
+    try:
+        P = _prior_module()
+        owner = P.sync_owner()
+        cfg = dict(P.sync_config(owner), prior=Path(__file__).resolve()) if owner is not None else None
+    except AttributeError:
+        owner = cfg = None
+    if owner is None or cfg is None:
+        return forward(["synchronizer", *args])
+    os.environ.setdefault(OWN_FLAG, "YES")
+    os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+    return owner.sy_command(cfg, args)
+
+
 def help_extra() -> None:
     print("  [%s] 元件掃描:同名兩份登正本(VTK 的工具副本不當來源;正本位置讀 VTK_Register 尾版)。" % VERSION)
 
@@ -408,12 +425,31 @@ def selftest() -> int:
     keep = (globals()["forward"], globals()["legacy_main"])
     globals()["forward"] = lambda a: seen.append(("forward", list(a))) or 11
     globals()["legacy_main"] = lambda a: seen.append(("legacy", list(a))) or 22
+    keep_sync = globals()["synchronizer"]
+    globals()["synchronizer"] = lambda a: seen.append(("sync", list(a))) or 33
     try:
-        r1, r2, r3 = main(["overview"]), main(["registry-sync"]), main(["health", "--legacy"])
+        r1, r2, r3, r4 = main(["overview"]), main(["registry-sync"]), main(["health", "--legacy"]), main(["synchronizer", "check"])
     finally:
         globals()["forward"], globals()["legacy_main"] = keep
-    chk("T12 main:overview 轉交 v0202 · registry-sync 與 health --legacy 走同一行程那一疊 · rc 原樣帶回",
-        (r1, r2, r3) == (11, 22, 22) and [k for k, _ in seen] == ["forward", "legacy", "legacy"], (seen, r1, r2, r3))
+        globals()["synchronizer"] = keep_sync
+    chk("T12 main:overview 轉交 v0202 · registry-sync 與 health --legacy 走同一行程那一疊 · synchronizer 由本檔接 · rc 原樣帶回",
+        (r1, r2, r3, r4) == (11, 22, 22, 33) and seen == [("forward", ["overview"]), ("legacy", ["registry-sync"]), ("legacy", ["health", "--legacy"]), ("sync", ["check"])],
+        (seen, r1, r2, r3, r4))
+    took = []
+    fake_owner = types.SimpleNamespace(sy_command=lambda cfg, a: took.append((dict(cfg), list(a))) or 5)
+    fake_p = types.SimpleNamespace(sync_owner=lambda: fake_owner, sync_config=lambda o: {"prior": Path("old_prior.py"), "steps": ["books"], "version": "v0203"})
+    keep_pm, keep_fw = globals()["_prior_module"], globals()["forward"]
+    globals()["_prior_module"] = lambda: fake_p
+    try:
+        rc_sync = synchronizer(["run", "--steps", "books"])
+        fake_p.sync_owner = lambda: None
+        globals()["forward"] = lambda a: took.append(("forward", list(a))) or 6
+        rc_none = synchronizer(["check"])
+    finally:
+        globals()["_prior_module"], globals()["forward"] = keep_pm, keep_fw
+    chk("T12b synchronizer:步驟的執行檔換成本檔(其餘設定照舊 · rc 帶回);找不到同步台就原樣轉交",
+        rc_sync == 5 and took[0][0]["prior"] == Path(__file__).resolve() and took[0][0]["steps"] == ["books"] and took[0][1] == ["run", "--steps", "books"]
+        and rc_none == 6 and took[1] == ("forward", ["synchronizer", "check"]), (took, rc_sync, rc_none))
     got = []
     stub = types.SimpleNamespace(main=lambda a: got.append((list(a), list(sys.argv[1:]))) or None, __file__="x")
     keep2, keep_argv = globals()["legacy_module"], list(sys.argv)
@@ -446,6 +482,8 @@ def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if args and args[0] in ("--selftest", "selftest") and "--legacy" not in args:
         return selftest()
+    if args[:1] == ["synchronizer"]:
+        return synchronizer(args[1:])
     if is_legacy(args):
         return legacy_main(args)
     rc = forward(args)
