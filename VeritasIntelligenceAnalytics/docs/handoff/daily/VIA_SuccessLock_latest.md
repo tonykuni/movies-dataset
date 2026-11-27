@@ -206,5 +206,5 @@
 | 2026-11-27T15:00:00Z | CGC_MDL237_NumberingSystem_v0124.py | 0124 | VIA-VCGC-MDL1725 | 06cfbb469845 | 同版修正後重鎖:audit 只放行帳上那一步 | 自測 23/23 |
 | 2026-11-27T15:30:00Z | CGC_MDL237_NumberingSystem_v0124.py | 0124 | VIA-VCGC-MDL1725 | d44a5de09b38 | 同版修正後重鎖:原主要在目的地 | 自測 24/24 |
 | 2026-11-27T15:50:00Z | CGC_MDL237_NumberingSystem_v0124.py | 0124 | VIA-VCGC-MDL1725 | 93fabd070903 | 同版修正後重鎖:退役列的號算佔用 | 自測 25/25 |
-| 2026-11-27T14:45:00Z | CGC_MDL230_ToolCoverageProbe_v0108.py | 0108 | VIA-VCGC-MDL1726 | 831ae7d2edf0 | 自測改在暫存樹上比對;真樹整鏈對照改 --selftest --full | 自測 13/13 |
-| 2026-11-27T15:10:00Z | CGC_MDL230_ToolCoverageProbe_v0108.py | 0108 | VIA-VCGC-MDL1726 | 3ba4ca34bb27 | 同版修正後重鎖:只認 --selftest 旗標 | 自測 13/13 |
+| 2026-11-27T14:34:00Z | CGC_MDL230_ToolCoverageProbe_v0108.py | 0108 | VIA-VCGC-MDL1726 | 831ae7d2edf0 | 自測改在暫存樹上比對;真樹整鏈對照改 --selftest --full | 自測 13/13 |
+| 2026-11-27T14:45:00Z | CGC_MDL230_ToolCoverageProbe_v0108.py | 0108 | VIA-VCGC-MDL1726 | 3ba4ca34bb27 | 同版修正後重鎖:只認 --selftest 旗標 | 自測 13/13 |
