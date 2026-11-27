@@ -27,7 +27,7 @@
 也可指定來源：
 
 ```powershell
-& "$HOME\Downloads\Start-VCGC-ToolModules-v0100.ps1" -SourceRoot 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+& "$HOME\Downloads\Start-VCGC-ToolModules-v0100.ps1" -SourceRoot "$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics"
 ```
 
 自動來源候選：OneDrive 下的 movies-dataset VIA、Github 下的 VIA-VDF-VRN、Downloads 下的 VIA。實際存在的候選全部列為唯讀輸入。各來源有不同 root_id，不因內容相同合併身分。輸出預設在 `%LOCALAPPDATA%\VIA\ToolModules\Runs`。
@@ -51,9 +51,9 @@
 
 ```powershell
 python .\VIA_VCGC_ToolModules_v0100.py catalog --out "$env:LOCALAPPDATA\VIA\ToolModules\Runs"
-python .\VIA_VCGC_ToolModules_v0100.py context --input 'C:\path\round_3\snapshot.json' --query 'mcp' --budget 4000 --out "$env:LOCALAPPDATA\VIA\ToolModules\ContextRuns"
+python .\VIA_VCGC_ToolModules_v0100.py context --input '<路徑>\round_3\snapshot.json' --query 'mcp' --budget 4000 --out "$env:LOCALAPPDATA\VIA\ToolModules\ContextRuns"
 python .\VIA_VCGC_ToolModules_v0100.py module-check --input .\examples\module.json --out "$env:LOCALAPPDATA\VIA\ToolModules\Runs"
-python .\VIA_VCGC_ToolModules_v0100.py metrics --input 'C:\path\usage.jsonl' --out "$env:LOCALAPPDATA\VIA\ToolModules\MetricRuns"
+python .\VIA_VCGC_ToolModules_v0100.py metrics --input '<路徑>\usage.jsonl' --out "$env:LOCALAPPDATA\VIA\ToolModules\MetricRuns"
 ```
 
 `--out` 必須在所有輸入根目錄之外。`--root` 可重複使用，建議固定 `名稱=路徑` 以保持節點身分。行數變化不影響一般函式 ID；條件分支內的定義帶分支定位資訊，移動分支時可能需對照舊 ID。完整來源不會匯入或執行；Python 檢查不能代表 PowerShell AST 或實機執行通過。
@@ -86,7 +86,7 @@ AutoHarness、claude-mem 的學習／壓縮可能另外消耗模型 Token；Pony
 JavaScript `node --check` 通過。Playwright 本機瀏覽器啟動被 socket 權限阻擋；cloud browser 不允許 file://，所以視覺與互動回歸仍未完成。可在具備既有 Playwright／Chromium 的主機執行：
 
 ```powershell
-python .\tests\browser_check.py --html 'C:\path\round_3\Matrix.html' --output 'C:\path\browser_receipt.json'
+python .\tests\browser_check.py --html '<路徑>\round_3\Matrix.html' --output '<路徑>\browser_receipt.json'
 ```
 
 Windows PowerShell AST／啟動、原生 Celeritas 全 15 加速器、DuckDB 實機、VCGC 中央註冊、外部工具連線均未實測。腳本在 Windows 啟動時做自身原生 PS Parser 檢查。核心用至多六個唯讀工作緒、內容雜湊快取、有界輸入、忽略依賴目錄、短卡與延遲依賴載入；不將這些冒稱既有 15 加速器全部啟用。
