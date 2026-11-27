@@ -156,15 +156,21 @@ def realign(state: dict, ledger: list, fresh: set) -> dict:
             continue
         if (kind, key) in fresh or (kind, key, r.get("code")) in allow:
             move[(kind, key)] = want
-    held = {r.get("code"): k for k, r in rows.items() if k not in move and not r.get("gone_since")}
-    wants = {}
-    for k, want in move.items():
-        wants.setdefault(want, []).append(k)
-    done, blocked = [], []
+    # 先把「誰真的能動」算到不再變,才動任何一列:被擋下的列留在原號,那個號就還有人佔著,
+    # 想搬進去的列也要跟著擋(PR #770 Codex P2:只算一輪會讓另一列搬進被擋列的原號 → 重號)。
+    blocked = []
+    while True:
+        held = {r.get("code") for k, r in rows.items() if k not in move and not r.get("gone_since")}
+        wants = {}
+        for k, want in move.items():
+            wants.setdefault(want, []).append(k)
+        stuck = sorted(k for k, want in move.items() if want in held or len(wants[want]) > 1)
+        if not stuck:
+            break
+        for k in stuck:
+            blocked.append((k[0], k[1], rows[k].get("code"), move.pop(k)))
+    done = []
     for k, want in sorted(move.items()):
-        if want in held or len(wants[want]) > 1:
-            blocked.append((k[0], k[1], rows[k].get("code"), want))
-            continue
         r = rows[k]
         old = r["code"]
         r["code"] = want
@@ -185,14 +191,21 @@ def assign(items: list, state: dict) -> dict:
     return state
 
 
+def _declared_of(key) -> str:
+    """鍵裡的冊上代碼:req|VDF-REQ052@v0100 → VDF-REQ052。"""
+    return str(key or "").split("|", 1)[-1].split("@", 1)[0]
+
+
 def compare(before: dict, after: dict) -> dict:
-    """前版的只增比對,再把對齊帳上的號從「改身分」拿掉(另列 realigned)。遺失 · 重號原樣。"""
+    """前版的只增比對,再把「對齊帳准許的那一步」從改身分拿掉(另列 realigned)。遺失 · 重號原樣。
+    准許的只有一種:這個號原本在帳上那一列(種類 · 鍵 · 舊號全對)手上,現在落在冊上代碼就是它的那一列手上。
+    號在帳上但換給別的列、或原主不是帳上那一列,都照舊算改身分(PR #770 Codex P1:原判法只看號與鍵有沒有出現在帳上,
+    合併後把已對齊的號改給不相干的需求也會被放行)。"""
     rep = _PRIOR_COMPARE(before, after)
-    ok = {e.get("from") for e in load_ledger()} | {e.get("to") for e in load_ledger()}
-    keys = {e.get("key") for e in load_ledger()}
+    left = {(e.get("kind"), e.get("key"), e.get("from")) for e in load_ledger()}     # 帳上准許的「這一列離開這個號」
     b, a = before["codes"], after["codes"]
     sanctioned = [c for c in rep["changed_identity"]
-                  if c in ok and (b[c][1] in keys or a[c][1] in keys)]
+                  if (b[c][0], b[c][1], c) in left and a[c][0] == b[c][0] and _declared_of(a[c][1]) == c[len("VIA-"):]]
     rep["changed_identity"] = [c for c in rep["changed_identity"] if c not in sanctioned]
     rep["realigned"] = len(sanctioned)
     return rep
@@ -381,6 +394,27 @@ def selftest() -> int:
     finally:
         globals()["_PRIOR_ASSIGN"] = keep_assign
     chk("⑪d 一般發號(assign)不動舊的錯位列 —— 舊列換號只走 realign --apply", not a7["_realign"]["done"] and a7["rows"][("REQ", "req|VDF-REQ052@v0100")]["code"] == "VIA-VDF-REQ046")
+    s8 = st(row("VCGC-REQ004", "VIA-VCGC-REQ003"), row("VCGC-REQ005", "VIA-VCGC-REQ004"), row("VCGC-REQ003", "VIA-VCGC-REQ005"))
+    r8 = realign(s8, [], {("REQ", "req|VCGC-REQ005@v0100"), ("REQ", "req|VCGC-REQ003@v0100")})
+    c8 = sorted(r["code"] for r in s8["rows"].values())
+    chk("⑪g 被擋的列留在原號 → 想搬進那個號的列也擋(算到不再變才動)· 不製造重號", len(set(c8)) == 3 and not r8["done"] and len(r8["blocked"]) == 2, (c8, r8))
+    s9 = st(row("VCGC-REQ004", "VIA-VCGC-REQ003"), row("VCGC-REQ009", "VIA-VCGC-REQ004"), row("VCGC-REQ003", "VIA-VCGC-REQ005"))
+    r9 = realign(s9, [], {("REQ", "req|VCGC-REQ009@v0100"), ("REQ", "req|VCGC-REQ003@v0100")})
+    chk("⑪h 同一批裡沒被牽連的新列照樣對齊(只擋有相依的)", s9["rows"][("REQ", "req|VCGC-REQ009@v0100")]["code"] == "VIA-VCGC-REQ009"
+        and s9["rows"][("REQ", "req|VCGC-REQ003@v0100")]["code"] == "VIA-VCGC-REQ005" and len(r9["blocked"]) == 1)
+    with tempfile.TemporaryDirectory(prefix="mdl237_v0124c_") as td:
+        LEDGER = Path(td) / LEDGER_NAME
+        LEDGER.write_text("".join(json.dumps(e, ensure_ascii=False) + "\n" for e in led), encoding="utf-8")
+        one = lambda key: {"codes": {"VIA-VCGC-REQ262": ("REQ", key)}, "dups": [], "rows": 1}
+        u1 = compare(one("req|VCGC-REQ262@v0100"), one("req|UNAUTHORIZED@v0100"))
+        u2 = compare(one("req|VCGC-REQ264@v0100"), one("req|VCGC-REQ999@v0100"))
+        u3 = compare(one("req|VCGC-REQ264@v0100"), one("req|VCGC-REQ262@v0100"))
+        u4 = compare({"codes": {"VIA-VCGC-REQ262": ("REQ", "req|VCGC-REQ264@v0100")}, "dups": [], "rows": 1},
+                     {"codes": {"VIA-VCGC-REQ262": ("WKF", "req|VCGC-REQ262@v0100")}, "dups": [], "rows": 1})
+    LEDGER = keep
+    chk("⑪i audit 只放行帳上那一步:已對齊的號再改給別的列 → 照抓;原主是帳上那列但落點不是正主 → 照抓;種類不同 → 照抓;正確那一步才放行",
+        u1["changed_identity"] == ["VIA-VCGC-REQ262"] and u1["realigned"] == 0 and u2["changed_identity"] == ["VIA-VCGC-REQ262"]
+        and u3["changed_identity"] == [] and u3["realigned"] == 1 and u4["changed_identity"] == ["VIA-VCGC-REQ262"], (u1, u2, u3, u4))
     chk("⑫ 裝進本體:BASE.assign 與 audit 層的 compare 都是本版", BASE.assign is assign and AUDIT_HOME.compare is compare)
     chk("⑬ 加速器真的載到(VIA_ACCEL 非空)", VIA_ACCEL is not None)
     srcs = Path(__file__).read_text(encoding="utf-8")
