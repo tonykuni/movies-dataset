@@ -201,3 +201,8 @@
 | 2026-11-27T12:45:00Z | VIA_Workflow_VCGC_SSOT_v0166.json | 0166 | — | 479f44b50d3b | WKF056 欄位 · 主機步用事件帳 | X-COL 綠 · STP003 NOT_RUN |
 | 2026-11-27T13:10:00Z | CGC_MDL245_SDDValidator_v0110.py | 0110 | VIA-VCGC-MDL1724 | b650660acd1f | 同版修正後重鎖:參數要連在一起 | 自測 14/14 |
 | 2026-11-27T13:10:00Z | VIA_Workflow_VCGC_SSOT_v0166.json | 0166 | — | fbe7f6ec0f3f | 同版修正後重鎖:STP003 要 --system VDF | X-COL 綠 |
+| 2026-11-27T14:30:00Z | CGC_MDL237_NumberingSystem_v0124.py | 0124 | VIA-VCGC-MDL1725 | b8de710e4d13 | 需求號對齊冊上代碼 | 自測 20/20 · 三個 0 |
+| 2026-11-27T14:30:00Z | VIA_Numbering_Realign_Ledger_v0100.jsonl | 0100 | — | 2fe326721192 | 對齊帳 14 列 | 已套用 14 / 14 |
+| 2026-11-27T15:00:00Z | CGC_MDL237_NumberingSystem_v0124.py | 0124 | VIA-VCGC-MDL1725 | 06cfbb469845 | 同版修正後重鎖:audit 只放行帳上那一步 | 自測 23/23 |
+| 2026-11-27T15:30:00Z | CGC_MDL237_NumberingSystem_v0124.py | 0124 | VIA-VCGC-MDL1725 | d44a5de09b38 | 同版修正後重鎖:原主要在目的地 | 自測 24/24 |
+| 2026-11-27T15:50:00Z | CGC_MDL237_NumberingSystem_v0124.py | 0124 | VIA-VCGC-MDL1725 | 93fabd070903 | 同版修正後重鎖:退役列的號算佔用 | 自測 25/25 |
