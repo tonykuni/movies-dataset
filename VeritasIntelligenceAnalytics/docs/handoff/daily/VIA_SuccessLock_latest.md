@@ -215,3 +215,4 @@
 | 2026-11-27T18:15:27Z | CGC_SystemManager_v0122.py | 0122 | VIA-VCGC-MDL1731 | 3f8c1ed8379a | launch:VCGC 一鍵啟用 | 自測 19/19 |
 | 2026-11-27T18:15:27Z | Start-VCGC-v0101.ps1 | 0101 | VIA-CORE-MDL924 | e31eb06de447 | 一支 PS 啟用 VCGC(只認主工作倉) | 主機起跑 |
 | 2026-11-27T19:32:46Z | CGC_SystemManager_v0123.py | 0123 | VIA-VCGC-MDL1732 | a1fb3768d1f0 | launch 總燈與三數照實 | 自測 13/13 |
+| 2026-11-27T19:45:36Z | CGC_SystemManager_v0124.py | 0124 | VIA-VCGC-MDL1733 | 0514e62930e6 | 容器跑的 launch 最多黃 | 自測 10/10 |
