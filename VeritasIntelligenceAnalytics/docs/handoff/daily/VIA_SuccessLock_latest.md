@@ -214,3 +214,4 @@
 | 2026-11-27T16:52:36Z | CGC_MDL140_HandoverConsole_v0112.py | 0112 | VIA-VCGC-MDL1730 | 464fe45626a8 | 有退役清冊的搬移不算 FILE_REMOVED | 自測 12/12 |
 | 2026-11-27T18:15:27Z | CGC_SystemManager_v0122.py | 0122 | VIA-VCGC-MDL1731 | 3f8c1ed8379a | launch:VCGC 一鍵啟用 | 自測 19/19 |
 | 2026-11-27T18:15:27Z | Start-VCGC-v0101.ps1 | 0101 | VIA-CORE-MDL924 | e31eb06de447 | 一支 PS 啟用 VCGC(只認主工作倉) | 主機起跑 |
+| 2026-11-27T19:32:46Z | CGC_SystemManager_v0123.py | 0123 | VIA-VCGC-MDL1732 | a1fb3768d1f0 | launch 總燈與三數照實 | 自測 13/13 |
