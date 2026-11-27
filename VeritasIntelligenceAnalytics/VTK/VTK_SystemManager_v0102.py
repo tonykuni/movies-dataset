@@ -56,6 +56,14 @@ def _try_junction(src: Path, dst: Path) -> None:
     _winapi.CreateJunction(str(src), str(dst))
 
 
+def _test_junction(src: Path, dst: Path) -> None:
+    """自測用的 junction 替身:Windows 走真的 junction(_winapi · 一般帳號不需特權);別的平台符號連結本來就不需特權。"""
+    if os.name == "nt":
+        _try_junction(src, dst)
+    else:
+        os.symlink(str(src), str(dst), target_is_directory=True)
+
+
 class Linker:
     """把真倉的一項代入暫存樹。記下每個連結,清除時先拆連結。"""
 
@@ -148,7 +156,7 @@ def drill(c, linker: Linker = None) -> int:
         left = lk.unlink_all()
         if left == 0:
             shutil.rmtree(str(tmp), ignore_errors=True)
-    lamp = "RED" if any(x[0] == "RED" for x in res) or cgc_left else ("YELLOW" if any(x[0] != "GREEN" for x in res) else "GREEN")
+    lamp = "RED" if any(x[0] == "RED" for x in res) or cgc_left else ("YELLOW" if left or any(x[0] != "GREEN" for x in res) else "GREEN")
     print("[VTK drill] %s · 應演練 %d · 已演練 %d · 略過 0 · 暫存樹裡 VCGC CGC_*.py = %d" % (lamp, len(last), len(res), len(cgc_left)))
     print("  連結法:%s%s" % (lk.note(), "" if not left else " · [黃] %d 個連結拆不掉,暫存夾留著不刪:%s" % (left, tmp)))
     for x in res:
@@ -187,7 +195,7 @@ def selftest() -> int:
         (real / "f.txt").write_text("file", encoding="utf-8")
         out = tmp / "out"
         out.mkdir()
-        lk = Linker(symlink=no_symlink, junction=lambda s, d: os.symlink(str(s), str(d), target_is_directory=True))
+        lk = Linker(symlink=no_symlink, junction=_test_junction)
         lk.put(real / "d", out / "d")
         lk.put(real / "f.txt", out / "f.txt")
         chk("② 沒有符號連結權限(WinError 1314):夾改用 junction、檔改用硬連結", lk.count["junction"] == 1 and lk.count["硬連結"] == 1
@@ -239,7 +247,7 @@ def selftest() -> int:
         c = BASE.Ctx(home, v)
         with contextlib.redirect_stdout(io.StringIO()):
             PRIOR.sync(c, True)
-        lk = Linker(symlink=no_symlink, junction=lambda s, d: os.symlink(str(s), str(d), target_is_directory=True))
+        lk = Linker(symlink=no_symlink, junction=_test_junction)
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             r = drill(c, lk)
@@ -250,6 +258,72 @@ def selftest() -> int:
         shutil.rmtree(str(src), ignore_errors=True)
     finally:
         shutil.rmtree(str(t2), ignore_errors=True)
+    import types
+    tj = Path(tempfile.mkdtemp(prefix="vtk_junc_"))
+    keep_sym, keep_name, keep_win = os.symlink, os.name, sys.modules.get("_winapi")
+    made = []
+    try:
+        (tj / "real" / "d").mkdir(parents=True)
+        (tj / "real" / "d" / "k.txt").write_text("k", encoding="utf-8")
+        fake = types.ModuleType("_winapi")
+        fake.CreateJunction = lambda a, b: (made.append(b), keep_sym(a, b, target_is_directory=True))
+        sys.modules["_winapi"] = fake
+        os.name = "nt"
+
+        def denied(*a, **k):
+            raise OSError(1314, "用戶端沒有這項特殊權限")
+        os.symlink = denied
+        lk3 = Linker(symlink=denied, junction=_test_junction)
+        lk3.put(tj / "real" / "d", tj / "out_d")
+        got = (lk3.count["junction"], (tj / "out_d" / "k.txt").read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        got = ("err", repr(exc))
+    finally:
+        os.symlink, os.name = keep_sym, keep_name
+        if keep_win is None:
+            sys.modules.pop("_winapi", None)
+        else:
+            sys.modules["_winapi"] = keep_win
+    try:
+        os.unlink(str(tj / "out_d"))
+    except OSError:
+        pass
+    shutil.rmtree(str(tj), ignore_errors=True)
+    chk("⑨ Windows 一般帳號(os.symlink 全被拒):自測的 junction 替身走 _winapi.CreateJunction,不靠符號連結權限(PR #765 Codex P2)",
+        got == (1, "k") and len(made) == 1, got)
+
+    class StuckLinker(Linker):
+        def unlink_all(self):
+            super().unlink_all()
+            return 1
+    t3 = Path(tempfile.mkdtemp(prefix="vtk_stuck_"))
+    try:
+        src3 = Path(tempfile.mkdtemp(prefix="vtk_src3_"))
+        v3 = src3 / "VeritasIntelligenceAnalytics"
+        reg3 = v3 / "supportive modules" / "registry"
+        reg3.mkdir(parents=True)
+        for f in [via / "supportive modules" / "VIA_SuperAccel_Module.py"] + sorted((via / "supportive modules").glob("SUP_MDL737_SuperAccelModule_v*.py")):
+            shutil.copy2(str(f), str(v3 / "supportive modules"))
+        (reg3 / "AAA_Tool_v0100.py").write_text(hdr + "X = 1\n", encoding="utf-8")
+        (reg3 / "VIA_ToolVersion_Lock_v0100.json").write_text(json.dumps(
+            {"alpha": {"path": "VeritasIntelligenceAnalytics/supportive modules/registry/AAA_Tool_v0100.py"}}), encoding="utf-8")
+        h3 = v3 / "VTK"
+        h3.mkdir()
+        pb3 = json.loads(BASE.tail(HERE, "VTK_Params").read_text(encoding="utf-8"))
+        pb3["params"].update({"extra_sources": {}, "extra_files": {}, "adapt": {}})
+        BASE.write_json(h3 / "VTK_Params_v0101.json", pb3)
+        c3 = BASE.Ctx(h3, v3)
+        with contextlib.redirect_stdout(io.StringIO()):
+            PRIOR.sync(c3, True)
+        b3 = io.StringIO()
+        with contextlib.redirect_stdout(b3):
+            r3 = drill(c3, StuckLinker())
+        o3 = b3.getvalue()
+        shutil.rmtree(str(src3), ignore_errors=True)
+    finally:
+        shutil.rmtree(str(t3), ignore_errors=True)
+    chk("⑩ 連結拆不掉 → 總燈黃 · rc 2(跟「暫存夾留著不刪」的警告一致;PR #765 Codex P2)",
+        r3 == 2 and o3.startswith("[VTK drill] YELLOW") and "拆不掉" in o3, (r3, o3[:200]))
     chk("⑦ 加速器執行時真的載到", VIA_ACCEL is not None)
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
