@@ -22,6 +22,33 @@ MAX_VISIBLE_ROWS = 600
 
 import collections
 import json
+import re
+from pathlib import Path
+
+UI_BOOK_GLOB = "VIA_UI_Template_SSOT_v*.json"
+# 本頁用到的鎖定 token(名稱取自 VIA_UI_Template_SSOT 尾版的 tokens 節;值一律讀冊,本檔不放任何顏色 / 字體值)。
+UI_TOKEN_NAMES = ("bg", "panel", "line", "txt", "dim", "acc", "head", "head-txt", "zebra", "chip", "seal", "font", "fs",
+                  "fs-title", "fs-h", "fs-note", "lh", "w-bold", "radius", "lamp-green", "lamp-yellow", "lamp-red", "lamp-gray")
+_SAFE_TOKEN = re.compile(r"[#\w\s\",.()%\-]{1,200}")
+
+
+def load_ui_tokens(registry=None):
+    """讀視覺鎖定冊(registry 的 VIA_UI_Template_SSOT 尾版)→ (tokens, 冊名)。冊不在或讀不到 → ({}, None):頁面不上色、照實標 ABSENT。"""
+    folder = Path(registry) if registry else Path(__file__).resolve().parents[2] / "registry"
+    def vnum(q):
+        m = re.search(r"_v(\d+)\.json$", q.name)
+        return int(m.group(1)) if m else -1
+    try:
+        book = max(folder.glob(UI_BOOK_GLOB), key=vnum)
+        tokens = json.loads(book.read_text(encoding="utf-8")).get("tokens") or {}
+    except (ValueError, OSError):
+        return {}, None
+    picked = {k: str(tokens[k]) for k in UI_TOKEN_NAMES if isinstance(tokens.get(k), str) and _SAFE_TOKEN.fullmatch(str(tokens[k]))}
+    return picked, book.name
+
+
+def root_css(tokens):
+    return ":root{" + ";".join(f"--{k}:{v}" for k, v in tokens.items()) + "}" if tokens else ""
 
 
 def matrices(snapshot, tools, round_number, delta=None):
@@ -61,15 +88,17 @@ def render(snapshot, tools, round_number, delta=None):
     payload = {"round": round_number, "status": snapshot["status"], "quantity": snapshot["quantity"],
                "fingerprint": snapshot["input_fingerprint"], "matrices": [dict(m, total=len(m["rows"]), rows=m["rows"][:MAX_VISIBLE_ROWS]) for m in all_matrices]}
     serialized = json.dumps(payload, ensure_ascii=False).replace("<", "\\u003c").replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
-    return TEMPLATE.replace("__PAYLOAD__", serialized)
+    tokens, book = load_ui_tokens()
+    return (TEMPLATE.replace("__TOKENS__", root_css(tokens)).replace("__UIBOOK__", book or "ABSENT")
+            .replace("__PAYLOAD__", serialized))
 
 
 TEMPLATE = '''<!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="via-ui-tokens" content="__UIBOOK__">
 <title>VCGC · Tool Modules · Evidence Matrix</title>
 <style>
-:root{color-scheme:dark;--bg:#10171d;--panel:#19232b;--gold:#d4ba83;--text:#e8edf0;--muted:#a9b9c2;--border:#34434c}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px/1.45 system-ui,'Microsoft JhengHei',sans-serif}header{display:flex;gap:18px;align-items:center;padding:24px 3%;border-bottom:1px solid var(--border)}.logo{border:1px solid var(--gold);color:var(--gold);font:38px serif;padding:3px 14px}h1{font-size:19px;margin:0;letter-spacing:2px}header p{margin:3px 0;color:var(--muted)}main{padding:22px 3%}.eyebrow{font-size:11px;color:var(--gold);letter-spacing:2px}.notice{padding:12px 15px;border-left:3px solid #dfb560;background:#2a271e;margin-bottom:18px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}.stat{padding:15px;background:var(--panel);border:1px solid var(--border)}.stat strong{display:block;font-size:28px;font-weight:500;color:var(--gold)}.stat span{color:var(--muted)}nav{display:flex;flex-wrap:wrap;gap:7px;margin:20px 0}button,input{font:inherit;border:1px solid var(--border);border-radius:4px;color:var(--text);background:var(--panel);padding:8px 11px}button{cursor:pointer}button.active,button:hover{border-color:var(--gold);color:var(--gold)}input{width:min(420px,100%)}.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}.tablewrap{overflow:auto;max-height:65vh;border:1px solid var(--border);margin-top:13px}table{border-collapse:collapse;width:100%;min-width:750px}th{position:sticky;top:0;text-align:left;background:#24333c;color:var(--gold);font-weight:500}td,th{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}td{overflow-wrap:anywhere;max-width:440px}tr:hover td{background:#202c34}.red{color:#ff9494}.yellow{color:#e5c678}.green{color:#86c8a8}.muted{color:var(--muted)}footer{color:var(--muted);font-size:11px;margin-top:14px;overflow-wrap:anywhere}h2{font-size:17px;font-weight:500;margin:0}button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:3px}@media(max-width:650px){header{padding:18px 4%}h1{font-size:14px;letter-spacing:1px}.stats{grid-template-columns:repeat(2,1fr)}main{padding:17px 4%}.stat strong{font-size:24px}}
+__TOKENS__
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--font);font-size:var(--fs);line-height:var(--lh)}header{display:flex;gap:18px;align-items:center;padding:24px 3%;background:var(--head);color:var(--head-txt);border-bottom:1px solid var(--line)}.logo{border:1px solid var(--seal);color:var(--seal);font-size:38px;padding:3px 14px}h1{font-size:var(--fs-title);margin:0;letter-spacing:2px}header p{margin:3px 0;color:var(--dim)}main{padding:22px 3%}.eyebrow{font-size:var(--fs-note);color:var(--seal);letter-spacing:2px}.notice{padding:12px 15px;border-left:3px solid var(--lamp-yellow);background:var(--chip);margin-bottom:18px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}.stat{padding:15px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}.stat strong{display:block;font-size:28px;font-weight:var(--w-bold);color:var(--acc)}.stat span{color:var(--dim)}nav{display:flex;flex-wrap:wrap;gap:7px;margin:20px 0}button,input{font:inherit;border:1px solid var(--line);border-radius:var(--radius);color:var(--txt);background:var(--panel);padding:8px 11px}button{cursor:pointer}button.active,button:hover{border-color:var(--acc);font-weight:var(--w-bold)}input{width:min(420px,100%)}.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}.tablewrap{overflow:auto;max-height:65vh;border:1px solid var(--line);border-radius:var(--radius);margin-top:13px}table{border-collapse:collapse;width:100%;min-width:750px;background:var(--panel)}th{position:sticky;top:0;text-align:left;background:var(--head);color:var(--head-txt);font-weight:var(--w-bold)}td,th{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}td{overflow-wrap:anywhere;max-width:440px}tr:hover td{background:var(--zebra)}.red::before,.yellow::before,.green::before{content:"\\25CF\\00A0"}.red::before{color:var(--lamp-red)}.yellow::before{color:var(--lamp-yellow)}.green::before{color:var(--lamp-green)}.muted{color:var(--dim)}footer{color:var(--dim);font-size:var(--fs-note);margin-top:14px;overflow-wrap:anywhere}h2{font-size:var(--fs-h);font-weight:var(--w-bold);margin:0}button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:3px}@media(max-width:650px){header{padding:18px 4%}h1{letter-spacing:1px}.stats{grid-template-columns:repeat(2,1fr)}main{padding:17px 4%}.stat strong{font-size:24px}}
 </style></head><body><header><div class="logo" aria-label="理">理</div><div><h1>VERITAS INTELLIGENCE ANALYTICS</h1><p class="eyebrow">VCGC · MODULAR TOOL GOVERNANCE</p><p>AST 分類 · 穩定編號 · 動詞短卡 · 來源證據</p></div></header>
 <main><div class="notice"><strong id="lamp"></strong> · 已選來源靜態檢查。主機啟用、中央發號及外部工具接通均需實機收據。此頁可篩選與查看證據，沒有執行系統命令的按鈕。</div>
 <div class="stats" id="stats"></div><nav id="tabs" aria-label="矩陣選擇"></nav><div class="toolbar"><h2 id="title"></h2><input id="search" aria-label="搜尋矩陣" placeholder="輸入工具、編號、功能或狀態…"><button id="download">下載本頁證據 JSON</button></div><p class="muted" id="count"></p><div class="tablewrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div><footer id="foot"></footer></main>

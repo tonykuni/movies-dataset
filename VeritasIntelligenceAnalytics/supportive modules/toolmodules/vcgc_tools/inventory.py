@@ -18,7 +18,7 @@ except Exception:  # noqa: BLE001
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
-PARSER_REVISION = "vtm-ast-2"
+PARSER_REVISION = "vtm-ast-3"
 SECRET_WORDS = ("password", "secret", "api_key", "private_key", "credential", "access_token")
 
 import ast
@@ -132,6 +132,10 @@ def analyze_python(raw, label, relative):
                 for index, handler in enumerate(getattr(n, "handlers", [])):
                     tag = f".<except:{n.lineno}:{index}>"
                     visit_scope(handler.body, scope + tag, id_scope + tag)
+                # match 的分支放在 cases,不在 body / orelse:每個 case 各自一個分支身分。
+                for index, case in enumerate(getattr(n, "cases", [])):
+                    tag = f".<match:{n.lineno}:{index}>"
+                    visit_scope(case.body, scope + tag, id_scope + tag)
     visit_scope(tree.body)
     imports = sorted({n.module or "" for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)} | {a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names})
     for n in ast.walk(tree):

@@ -23,6 +23,7 @@ FIXTURE_MODULE = 'def describe():\n    return {}\ndef execute(request):\n    ret
 import contextlib
 import hashlib
 import io
+import re
 import json
 import os
 import tempfile
@@ -104,6 +105,13 @@ class ToolModuleTests(unittest.TestCase):
         self.assertEqual(len({n['node_id'] for n in result['nodes']}), 4)
         self.assertEqual(result['duplicate_node_ids'], [])
         self.assertNotEqual(result['status'], 'RED')
+
+    def test_match_case_definitions_are_indexed(self):
+        self.put('a.py', 'def pick(x):\n match x:\n  case 1:\n   def execute(request):\n    return 1\n  case _:\n   def execute(request):\n    return 2\n return execute\n')
+        result = self.snap()
+        names = [n['name'] for n in result['nodes']]
+        self.assertEqual(len([n for n in names if n.endswith('execute')]), 2)
+        self.assertEqual(result['duplicate_node_ids'], [])
 
     def test_conditional_definitions(self):
         self.put('a.py', 'if True:\n def f():\n  return 1\nelse:\n def f():\n  return 2\n')
@@ -235,6 +243,22 @@ class ToolModuleTests(unittest.TestCase):
         html = report.render(self.snap(), tools, 1)
         self.assertNotIn('</script><script>alert(1)', html)
         self.assertIn('\\u003c/script>', html)
+
+    def test_report_uses_locked_ui_tokens_only(self):
+        self.put('a.py', FIXTURE_MODULE)
+        html = report.render(self.snap(), [], 1)
+        tokens, book = report.load_ui_tokens()
+        self.assertEqual(re.findall(r'#[0-9a-fA-F]{6}\b', report.TEMPLATE), [])   # 模板本身不放任何顏色值
+        self.assertTrue(book and book.startswith('VIA_UI_Template_SSOT_v'), book)
+        self.assertIn('--bg:' + tokens['bg'], html)
+        self.assertIn('content="' + book + '"', html)
+        style = html[html.index('<style>'):html.index('</style>')]
+        self.assertTrue(set(re.findall(r'#[0-9a-fA-F]{6}\b', style)) <= {v for v in tokens.values() if v.startswith('#')})
+
+    def test_report_without_ui_book_has_no_colors(self):
+        with tempfile.TemporaryDirectory() as d:
+            tokens, book = report.load_ui_tokens(d)
+        self.assertEqual((tokens, book, report.root_css(tokens)), ({}, None, ''))
 
     def test_catalog_ids_unique(self):
         rows = actions.catalog(Path(__file__).resolve().parents[1])
