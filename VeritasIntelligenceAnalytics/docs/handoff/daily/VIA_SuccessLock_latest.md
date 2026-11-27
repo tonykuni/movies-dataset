@@ -197,3 +197,7 @@
 | 2026-11-27T02:45:00Z | VCGC_CommandHub_v0122.py | 0122 | VIA-CORE-MDL917 | 532eaff904b3 | via-graph 路由 · 舊名照原意 | 自測 7/7 |
 | 2026-11-27T07:45:00Z | VIA_HostBoot_v0107.py | 0107 | VIA-CORE-MDL918 | ef5fac720be7 | up 三步同時 | 自測 7/7 |
 | 2026-11-27T08:20:00Z | VIA_VCGC_ToolModules_v0100.py | 0100 | VIA-SUP-MDL1208 | 68d9623e3906 | 導入補強工具模組 | 自測 2/2 · 回歸 34 |
+| 2026-11-27T12:45:00Z | CGC_MDL245_SDDValidator_v0110.py | 0110 | VIA-VCGC-MDL1724 | f1f390716183 | 主機實跑步對事件帳(match_args) | 自測 12/12 |
+| 2026-11-27T12:45:00Z | VIA_Workflow_VCGC_SSOT_v0166.json | 0166 | — | 479f44b50d3b | WKF056 欄位 · 主機步用事件帳 | X-COL 綠 · STP003 NOT_RUN |
+| 2026-11-27T13:10:00Z | CGC_MDL245_SDDValidator_v0110.py | 0110 | VIA-VCGC-MDL1724 | b650660acd1f | 同版修正後重鎖:參數要連在一起 | 自測 14/14 |
+| 2026-11-27T13:10:00Z | VIA_Workflow_VCGC_SSOT_v0166.json | 0166 | — | fbe7f6ec0f3f | 同版修正後重鎖:STP003 要 --system VDF | X-COL 綠 |
