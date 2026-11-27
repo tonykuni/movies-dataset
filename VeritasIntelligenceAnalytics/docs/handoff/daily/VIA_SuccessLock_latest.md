@@ -210,3 +210,4 @@
 | 2026-11-27T14:45:00Z | CGC_MDL230_ToolCoverageProbe_v0108.py | 0108 | VIA-VCGC-MDL1726 | 3ba4ca34bb27 | 同版修正後重鎖:只認 --selftest 旗標 | 自測 13/13 |
 | 2026-11-27T15:13:50Z | CGC_MDL149_VeritasCentralGovernanceConsole_v0203.py | 0203 | VIA-VCGC-MDL1727 | a6f5337702e2 | 元件掃描同名兩份登正本 | 自測 16/16 |
 | 2026-11-27T15:13:50Z | CGC_MDL245_SDDValidator_v0111.py | 0111 | VIA-VCGC-MDL1728 | 2fae1238d0e3 | X-REG 分開步釘前版與註冊冊落後 | 自測 12/12 |
+| 2026-11-27T15:43:03Z | CGC_MDL245_SDDValidator_v0112.py | 0112 | VIA-VCGC-MDL1729 | 5835ae2e39f9 | X-REG:已退役的步不要求正主註冊 | 自測 11/11 |
