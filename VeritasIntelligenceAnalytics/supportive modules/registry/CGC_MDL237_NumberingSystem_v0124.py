@@ -200,12 +200,16 @@ def compare(before: dict, after: dict) -> dict:
     """前版的只增比對,再把「對齊帳准許的那一步」從改身分拿掉(另列 realigned)。遺失 · 重號原樣。
     准許的只有一種:這個號原本在帳上那一列(種類 · 鍵 · 舊號全對)手上,現在落在冊上代碼就是它的那一列手上。
     號在帳上但換給別的列、或原主不是帳上那一列,都照舊算改身分(PR #770 Codex P1:原判法只看號與鍵有沒有出現在帳上,
-    合併後把已對齊的號改給不相干的需求也會被放行)。"""
+    合併後把已對齊的號改給不相干的需求也會被放行)。
+    另外原主要真的出現在帳上寫的新號上:本體的遺失是照「號」算的,原主那一列整個不見時號還在(換了主人),照號看不出來
+    (Codex P1 第二輪:拿掉 VDF-REQ062 那一列,稽核仍報三個 0)。原主不在目的地 → 這個號照舊算改身分。"""
     rep = _PRIOR_COMPARE(before, after)
-    left = {(e.get("kind"), e.get("key"), e.get("from")) for e in load_ledger()}     # 帳上准許的「這一列離開這個號」
+    left = {(e.get("kind"), e.get("key"), e.get("from")): e.get("to") for e in load_ledger()}   # 帳上准許的「這一列由舊號搬到新號」
     b, a = before["codes"], after["codes"]
     sanctioned = [c for c in rep["changed_identity"]
-                  if (b[c][0], b[c][1], c) in left and a[c][0] == b[c][0] and _declared_of(a[c][1]) == c[len("VIA-"):]]
+                  if (b[c][0], b[c][1], c) in left                            # 原主是帳上那一列(種類 · 鍵 · 舊號全對)
+                  and a[c][0] == b[c][0] and _declared_of(a[c][1]) == c[len("VIA-"):]     # 這個號現在落在正主手上
+                  and tuple(a.get(left[(b[c][0], b[c][1], c)]) or ()) == (b[c][0], b[c][1])]   # 原主真的在帳上寫的新號上,沒有不見
     rep["changed_identity"] = [c for c in rep["changed_identity"] if c not in sanctioned]
     rep["realigned"] = len(sanctioned)
     return rep
@@ -408,13 +412,31 @@ def selftest() -> int:
         one = lambda key: {"codes": {"VIA-VCGC-REQ262": ("REQ", key)}, "dups": [], "rows": 1}
         u1 = compare(one("req|VCGC-REQ262@v0100"), one("req|UNAUTHORIZED@v0100"))
         u2 = compare(one("req|VCGC-REQ264@v0100"), one("req|VCGC-REQ999@v0100"))
-        u3 = compare(one("req|VCGC-REQ264@v0100"), one("req|VCGC-REQ262@v0100"))
+        u3 = compare(one("req|VCGC-REQ264@v0100"), {"codes": {"VIA-VCGC-REQ262": ("REQ", "req|VCGC-REQ262@v0100"),
+                                                              "VIA-VCGC-REQ264": ("REQ", "req|VCGC-REQ264@v0100")}, "dups": [], "rows": 2})
         u4 = compare({"codes": {"VIA-VCGC-REQ262": ("REQ", "req|VCGC-REQ264@v0100")}, "dups": [], "rows": 1},
                      {"codes": {"VIA-VCGC-REQ262": ("WKF", "req|VCGC-REQ262@v0100")}, "dups": [], "rows": 1})
     LEDGER = keep
     chk("⑪i audit 只放行帳上那一步:已對齊的號再改給別的列 → 照抓;原主是帳上那列但落點不是正主 → 照抓;種類不同 → 照抓;正確那一步才放行",
         u1["changed_identity"] == ["VIA-VCGC-REQ262"] and u1["realigned"] == 0 and u2["changed_identity"] == ["VIA-VCGC-REQ262"]
         and u3["changed_identity"] == [] and u3["realigned"] == 1 and u4["changed_identity"] == ["VIA-VCGC-REQ262"], (u1, u2, u3, u4))
+    with tempfile.TemporaryDirectory(prefix="mdl237_v0124d_") as td:
+        LEDGER = Path(td) / LEDGER_NAME
+        LEDGER.write_text("".join(json.dumps(e, ensure_ascii=False) + "\n" for e in led), encoding="utf-8")
+        inv_b2 = {"codes": {r["code"]: ("REQ", r["key"]) for r in base}, "dups": [], "rows": 6}
+        full = {"VIA-" + r["declared"]: ("REQ", r["key"]) for r in base}
+        full["VIA-VDF-REQ046"] = ("REQ", "req|VDF-REQ046@v0100")
+        v_ok = compare(inv_b2, {"codes": dict(full), "dups": [], "rows": 7})
+        gone = dict(full)
+        del gone["VIA-VDF-REQ057"]                       # 原本拿 VIA-VDF-REQ052 的那一列(需求 057)整個不見
+        v_gone = compare(inv_b2, {"codes": gone, "dups": [], "rows": 6})
+        moved = dict(full)
+        moved["VIA-VDF-REQ057"] = ("REQ", "req|VDF-REQ999@v0100")   # 目的地上是別的列
+        v_moved = compare(inv_b2, {"codes": moved, "dups": [], "rows": 7})
+    LEDGER = keep
+    chk("⑪j audit:原主要真的在帳上寫的新號上 —— 原主那一列不見、或目的地上是別的列,它讓出來的號照舊算改身分;都在才放行",
+        v_ok["changed_identity"] == [] and v_ok["realigned"] == 5
+        and v_gone["changed_identity"] == ["VIA-VDF-REQ052"] and v_moved["changed_identity"] == ["VIA-VDF-REQ052"], (v_ok, v_gone, v_moved))
     chk("⑫ 裝進本體:BASE.assign 與 audit 層的 compare 都是本版", BASE.assign is assign and AUDIT_HOME.compare is compare)
     chk("⑬ 加速器真的載到(VIA_ACCEL 非空)", VIA_ACCEL is not None)
     srcs = Path(__file__).read_text(encoding="utf-8")
