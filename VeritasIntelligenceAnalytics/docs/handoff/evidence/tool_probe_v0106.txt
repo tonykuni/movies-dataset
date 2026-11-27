@@ -28,29 +28,23 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 723 · import 0 · 提及 158 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 727 · import 0 · 提及 165 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL230_ToolCoverageProbe_v0107.py(家族 core)
-[計] CGC_MDL230_ToolCoverageProbe v0107 自測開始(本版 5 項 + 前版自測 · 暫存夾 · 零網路)
-  (前版 CGC_MDL230_ToolCoverageProbe_v0106.py 單跑 rc 1 · 判定 45 行;容器真樹檢查本來就有 FAIL,照實不改)
-  [OK] T1 換上本版後,前版鏈自測每一行判定與單跑前版相同(rc 相同)
-  [OK] T2 結果與原判法逐字相同(py_ast · describe;含剖析不過的檔)
-  [OK] T3 第二次全由快取取(命中 8)且結果相同
-  [OK] T4 設定一改鍵就變(不拿舊設定的結果)
-  [OK] T5 並行算的結果與逐檔算相同(48 檔)
-[計] CGC_MDL230_ToolCoverageProbe v0107 自測 5/5 PASS
-  [同步] SDD 驗證 RED:X-REG 未註冊 ['VDF_Engine_aaii_sentiment.py', 'VDF_Engine_cnn_fear_greed_proxy.py'] · 註冊冊 | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL158_VIAPanoramaAuditRepair_v0125.py', 'VIA_ | X-NUM 編號冊號碼 ≠ 冊上代碼:['VDF-REQ052', 'VDF-REQ053', 'VCGC-REQ264', 'VCGC-REQ262', 'VCGC-RE | X-REQ 需求代碼不合 ['VDF-REQ 跳號'] · 歸屬指到不存在 ['VCGC-REQ266→.mcp.json'] · 工作流引用不存在的需求 [] → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 603, 'changed': 2294, 'stale': 39, 'expected': 22219, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-<unknown>:11: SyntaxWarning: invalid escape sequence '\l'
-<unknown>:26: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:32: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:6: SyntaxWarning: invalid escape sequence '\C'
-<unknown>:11: SyntaxWarning: invalid escape sequence '\l'
-<unknown>:26: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:26: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:32: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:32: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:6: SyntaxWarning: invalid escape sequence '\C'
-<unknown>:6: SyntaxWarning: invalid escape sequence '\C'
-[監控] 背景全景監控中 pid 23938 · 觸碰 run CGC_MDL230_ToolCoverageProbe · 交接閘 RED · 落後 441 提交 · 快照 1308.2h · 未登 2434 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · CGC_MDL230_ToolCoverageProbe_v0108.py(家族 core)
+[計] CGC_MDL230_ToolCoverageProbe v0108 自測開始(暫存樹 · 不讀真樹 · 零網路;整鏈對照用 --selftest --full)
+  [OK] S1 暫存樹真的被掃到(列數 > 0 · 造了 8 檔)
+  [OK] S2 v0107 快取版 matrix 與原判法逐欄相同(只有計時 · 時間戳兩欄不比)
+  [OK] S2b 反控:把快取裡 6 筆的加速器判定反過來,同一個比對就不相同(比對不是擺著好看的)
+  [OK] S3 第一遍沒有命中、第二遍全由快取取,結果與第一遍相同
+  [OK] S4 逐檔判讀與原判法相同(py_ast · describe;含剖析不過的檔與 CRLF 檔)
+  [OK] S5 設定一改鍵就變(不拿舊設定的結果)
+  [OK] S6 並行算的結果與逐檔算相同(48 檔 · spawn 2 道)
+  [OK] S6b 本版當主程式時行程池起得來(v0107 的 warm 取到的是本版的判法)
+  [OK] S7 真的快取檔沒被這次自測動到(前後雜湊相同)
+  [OK] S8 分流:--selftest 走本版 · --selftest --full 走 v0107 整鏈(rc 原樣帶回)· 其餘轉交
+  [OK] S9 前版公開名稱都還拿得到(經本檔轉接)
+  [OK] S10 第 3 行加速器標記且載入生效(VIA_ACCEL 非空)· 零 TA-Lib · 不 import 他系統
+  [OK] S11 快自測在 120 秒內跑完(v0107 整鏈:容器 575 秒 · 主機逾時 1216 秒)
+[計] CGC_MDL230_ToolCoverageProbe v0108 自測 13/13 PASS · 0.3s
+[監控] 背景全景監控中 pid 703 · 觸碰 run CGC_MDL230_ToolCoverageProbe · 交接閘 RED · 落後 1116 提交 · 快照 1342.1h · 未登 2438 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
