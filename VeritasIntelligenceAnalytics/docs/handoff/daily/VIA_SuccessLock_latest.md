@@ -233,3 +233,4 @@
 | 2026-11-28T05:12:23Z | CGC_MDL253_ToolingInventory_v0106.py | 0106 | VIA-VCGC-MDL1741 | 3acf836d6f26 | 工具盤點自測只驗本版與直接前版 · 前版鏈照實寫未跑 | 自測 4/4 ×3 · handoff test rc 0 |
 | 2026-11-28T05:12:23Z | SUP_MDL866_VIAUnifiedNLPOrchestrator_v0110.py | 0110 | VIA-SUP-MDL1212 | e1772496e479 | SUP_MDL866 歸 VCGC 後補發中央編號(檔未改) | 尾版 v0111 自測 6/6(含本版 8/8)· handoff test nlp ×2 rc 0 |
 | 2026-11-28T06:39:02Z | CGC_MDL149_SourceLane_v0103.py | 0103 | VIA-VCGC-MDL1742 | 28fe5fb91139 | 貼回包不帶市場數值 | 自測 4/4 ×3 |
+| 2026-11-28T11:20:00Z | VDF_MDL008_FetchSystem_v0115.py | 0115 | VIA-VDF-MDL387 | b0e070aa9e82 | 擷取家改寫認得參數橋相對寫法 · 夾具不寫倉內 db/ | 自測 8/8 ×3 · fetch test 23/23 |
