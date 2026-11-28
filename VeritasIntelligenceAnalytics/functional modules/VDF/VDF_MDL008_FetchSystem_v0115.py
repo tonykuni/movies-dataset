@@ -220,7 +220,7 @@ def selftest() -> int:
         src = ("def _VDF_VIA_ROOT_REL(rel):\n    '''doc'''\n    return '/nowhere/' + rel\n"
                "A = _VDF_VIA_ROOT_REL('module/VDF/dict')\nB = _VDF_VIA_ROOT_REL('module\\\\VDF\\\\dict\\\\1-3-X')\n"
                "C = _VDF_VIA_ROOT_REL('supportive modules/x')\nD = _VDF_VIA_ROOT_REL('dict/0-1-L')\nE = _VDF_VIA_ROOT_REL('dictionary')\n"
-               "F = r'C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VDF\\dict\\1-4-S'\n"
+               f"F = {(P111.BASE.LEGACY_PREFIXES[0] + chr(92) + '1-4-S')!r}\n"          # 舊絕對常數取自 v0100 本身(本檔不寫本機路徑)
                "_hub = __import__('pathlib').Path('/elsewhere') / 'output_hub'\n")
         tree = ast.parse(src)
         n = V0105.rewrite_tree_v0105(tree, home)
