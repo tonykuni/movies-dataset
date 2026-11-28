@@ -229,3 +229,4 @@
 | 2026-11-28T01:56:42Z | VIA_WorkbenchLock_v0103.py | 0103 | VIA-CORE-MDL932 | 3d6beb7ae24b | WorkbenchLock 自測只驗本版與直接前版 | 自測 4/4 ×3 · handoff test rc 0 |
 | 2026-11-28T01:56:42Z | VIA_LakeMatrix_v0102.py | 0102 | VIA-CORE-MDL931 | eb693645be7f | LakeMatrix 自測時鐘凍在夾具時刻 | 自測 5/5 ×3 · handoff test rc 0 |
 | 2026-11-28T02:05:20Z | VIA_WorkbenchLock_v0103.py | 0103 | VIA-CORE-MDL938 | 3d6beb7ae24b | 改號(CORE-MDL932 讓給 main 的 GovernanceApply_v0102) | 重號 0 |
+| 2026-11-28T07:07:17Z | VDF_MDL004_TWFullMarketEngine_v0104.py | 0104 | VIA-VDF-MDL343 | bea70fb20eae | 前版自測要跑完才容忍舊 ⓪ | 自測 4/4 ×3 |
