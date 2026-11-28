@@ -188,6 +188,10 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
 8. (2026-11-25 · VCGC-REQ262 第 4 節)「偵測到依賴衝突立即銷毀整個受損環境重建」對上第 1 項「重建或刪除環境不在授權內」與 REQ258「重建保留舊境與 LKGC」:AI 能不能自己銷毀環境?(裁定前:不能;AI 只出 `via-envgov plan`,`via-envgov apply --approve` 由操作員下。)
 9. (2026-11-25 · VCGC-REQ265)附件提案「同一引擎最多留現行版 + 兩個備份(N-2),其餘刪除」對上「只增不減」「仍被引用的舊模組不搬走」:要不要把 N-2 定成規則?(裁定前:不刪,只標退役候選;刪除仍照第 2 項三條件。)
 10. (2026-11-25 · VCGC-REQ265)架構規劃要求 `via-vdf` / `via-vrn` 直指自己的啟動器、不經 VCGC 中樞,但要改既有 `.ps1` / `.cmd`,不在第 1 項授權內:授不授權?(裁定前:只出規格與演練,不改既有檔。)
+11. (2026-11-28 · GOVERNANCE-ADDENDUM §1)「例行分類、狀態彙整、靜態檢核與文件生成一律經 OmniRoute 分派到低成本路由」對上 2026-11-16「OmniRoute 不進任何引擎的執行路徑」與資料邊界:OmniRoute 只能在對話外的 AI 工具層分派,還是可以進 VCGC 的動作?(裁定前:只在 AI 工具層;不進任何引擎或 VCGC 動詞的執行路徑;送出去的只有程式碼結構與 schema。)
+12. (2026-11-28 · GOVERNANCE-ADDENDUM §2)「禁止 `eval` / `exec`」對上既有設計:VDF_MDL008 擷取子行程以 `exec` 跑 AST 改寫後的引擎本體(擷取家改寫靠它)。(裁定前:只套用在新檔與新函式;既有 `exec(compile(<已驗過的 AST>))` 照留,並列清單。)
+13. (2026-11-28 · GOVERNANCE-ADDENDUM §5)「缺漏即自動原子補裝並重驗,直到覆蓋 100%」對上第 1 項(安裝只走安裝閘、同意閘只在執行行程裡設)、REQ258「不邊裝邊測」與第 8 項(AI 不自己銷毀環境);另「OpenCV 違禁」對上 VRN 現役引擎(`VRN_ENG394_LayoutRestore` 尾版)與鎖定加速器 `VeritasCeleritas_v1141` 都匯入 `cv2`。(裁定前:補裝走 `via-health` → `via-install --plan-check` → `via-install --from-plan --yes`,一輪一裝、不在安裝中重試;違禁名單只對 VCGC / VDF 新增依賴生效,VRN 既有的 `cv2` 照留並列清單、交 VRN 自己裁量。)
+14. (2026-11-28 · GOVERNANCE-ADDENDUM §4 · §6)「啟動流程自動清孤兒程序、降優先權、自動拉起遠端控制並驗 `ONLINE`」:這些只能在操作員的 Windows 主機上做,容器起不了;遠端控制每次連線都要操作員在本機同意。(裁定前:Python 啟動器在主機上由操作員的手啟動;清程序只清本啟動器自己記錄過 PID 的孤兒,不殺別的行程;遠端控制只檢查並回報狀態,不代按同意。)
 
 **2026-11-18 補強三(操作員當晚訊息:「系統獨立主要是避免任一系統尤其是 VCGC 升級更動造成全面癱瘓」「加速器覆蓋每個動作 100%」「45 分鐘太慢」;待登需求,不是律)**
 
@@ -310,3 +314,27 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
   - 新增或改任何 SystemManager 動詞,先對它 §3 的標準契約(五系統同一份動詞表與 rc)。
 
 <!-- VIA:CLAUDE-VCGC-FIRST-20261125:END -->
+
+**2026-11-28 操作員附錄「GOVERNANCE-ADDENDUM:省 Token · 三道啟動 · 環境稽核 · 遠端控制」(待登需求 VCGC-REQ288 · 工作流 VCGC-WKF057;不是律。這裡只寫本檔原本沒有的部分,已有的只指出在哪一段;對不上的已列入「待操作員裁定」11–14)**
+
+- **§1 省 Token 與路由**(已有:「第一步」· 「工具優先」· 「省 Token 全程開著」· REQ265 選動作順序)
+  - 查依賴、模組邊界、呼叫鏈與註冊項,先用 Graphify(只跑本機 AST 模式,只讀本機產物),再用全文搜尋。
+  - 有 pytest 的地方,除錯輸出一律 `pytest --tb=line -q --no-header --disable-warnings`;本倉的 `--selftest` 照舊用 `digest` 只留判決行。
+  - OmniRoute 分派見待裁定 11。
+- **§2 全景掃描與修復迴圈**(已有:SDD 與 AST 節點手術 · 「動語法樹很小心」· 「成功只增不減」· 補強三「自測不吃本機狀態」)
+  - 迴圈:全景基線(`panorama.manifest.json` · git SHA)→ 靜態規範檢 → 修 → 重跑 → 紅燈數不得多於基線,多了就回滾那一批。
+  - 棘輪帳就是鎖定帳 `VIA_SuccessLock_Ledger_v0100.jsonl` 與交接冊的已鎖成功數,不另立 `universal_ledger.jsonl`。
+  - stdio 型 MCP 伺服器(`CGC_MDL279_MCPServer` 尾版)的 stdout 只給協定用;診斷輸出走 stderr。
+  - 新寫的程式不用 `.iterrows()` / 逐列 `.apply()`。`eval` / `exec` 見待裁定 12。
+- **§3 Python 為主 · 加速器 · 薄 PS**(已有:L117 · REQ266 · 「舊短指令改走 Python」· 「交給操作員的 PS 只有一支」)
+  - 統一入口的每個短指令(`boot` · `scan` · `fix` · `audit` · `backup` · `restore` · `remote` · `test` · `status`)第一步先確認加速器執行時載到(`VIA_ACCEL is not None`)。
+  - 長任務在 Windows 主機上可以要求不休眠(`SetThreadExecutionState`),結束時一定還原。
+- **§4 先降壓 → 三個獨立流程**(已有:2026-11-18「啟動順序」3~6 道 · `VDF_MDL022` / `VRN_MDL260` SafeParallelLaunch 尾版)
+  - 三道固定:① 快讀 / 備份 + 環境快檢;② 加速器 · 省 Token MCP · Graphify · 全景核心;③ 遠端控制狀態。
+  - 各道是獨立子行程,各有自己的 PID、日誌與健康收據;一道壞了不拖垮另兩道。
+  - 降壓只限本啟動器自己的子行程:執行緒上限環境變數(`OMP_NUM_THREADS` · `MKL_NUM_THREADS` · `OPENBLAS_NUM_THREADS` · `POLARS_MAX_THREADS`)、背景行程降成 below-normal。清孤兒與遠端控制見待裁定 14。
+- **§5 快讀快備份 · 環境 100% 由 VCGC 安裝**(已有:REQ258 環境安裝規範 · `via-health` · 每日備份 `VIA_DailyBackup` 尾版 · 第五章備份協議)
+  - 快讀:環境指紋(各境 `.dist-info` 清單的 SHA-256)沒變就直接用上一輪的結果,不重掃。
+  - 覆蓋率要寫出 `vcgc_env_coverage`(%)與 `missing_count`,兩個數都對得上才綠;缺漏與違禁名單的處理見待裁定 13。
+- **§6 遠端控制**(新增;只能在主機上驗)
+  - 啟動流程最後只檢查遠端控制的狀態,寫 `remote_control_status.json`,並印一行就緒摘要;容器裡跑出的結果一律標「容器」。
