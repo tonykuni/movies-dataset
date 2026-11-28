@@ -4838,11 +4838,20 @@
      "code": "VCGC-WKF057-STP005",
      "alias": "host_e2e",
      "name": "主機端對端實跑一次:降壓 → 三道 → 備份與環境快檢 → 遠端控制狀態;收據貼回",
-     "what": "操作員的手啟動",
+     "what": "操作員主機實跑(未在主機實跑)",
      "engine": "VCGC_StartupEngine_v*.py",
-     "verb": "launch",
-     "inside": "VCGC",
-     "evidence": "self:VCGC_StartupEngine"
+     "verb": "launch --jobs <boot 任務清單>",
+     "match": [
+      [
+       "VCGC_StartupEngine",
+       "launch"
+      ]
+     ],
+     "match_args": [
+      "launch",
+      "--jobs"
+     ],
+     "evidence_note": "host:pending(未在主機實跑)。主機打 via-vcgc run VCGC_StartupEngine launch --jobs <boot 任務清單>:事件帳記 target = VCGC_StartupEngine · act = launch · args 含「launch --jobs」。沒有這一筆就是 NOT_RUN,單元自測與容器演練都不能代替(PR #781 Codex P1)。"
     }
    ],
    "tests": {
