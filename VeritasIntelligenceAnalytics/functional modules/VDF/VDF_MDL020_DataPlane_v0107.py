@@ -74,7 +74,6 @@ HERE = Path(__file__).resolve().parent
 FAMILY = "VDF_MDL020_DataPlane"
 TAG = "VDF_MDL020_DataPlane v0107"
 SKIPPED = "[略] 裁定甲:v0103 以前的前版鏈不算進本版(未跑)"
-DEEP = ("VDF_MDL020_DataPlane_v0103.py", "VDF_MDL020_DataPlane_v0102.py")     # 本版不往下跑的兩支
 DEEP_CHECKS = ("T2 v0102 歸位", "T3 v0103 那一行")                            # v0106 裡看 v0102 子行程的兩檢
 
 
@@ -88,6 +87,8 @@ _spec = importlib.util.spec_from_file_location(PRIOR_PATH.stem + "_for_v0107", P
 PRIOR = importlib.util.module_from_spec(_spec)                                # v0106
 sys.modules[_spec.name] = PRIOR
 _spec.loader.exec_module(PRIOR)
+_V4 = PRIOR._v0104()                                                           # 功能本體(parquet align 六檢)
+DEEP = tuple(Path(p).name for p in (_V4.PRIOR_PATH, _V4.PRIOR.PRIOR_PATH))     # 本版不往下跑的兩支:v0104 的前版與它的前版(沿鏈取,不寫死)
 
 
 def __getattr__(name):  # 尾版律 TAILAPI:前版公開名稱經本檔轉接
@@ -124,7 +125,7 @@ def selftest() -> int:
             return subprocess.CompletedProcess(cmd, 0, stdout=SKIPPED + "\n", stderr="")
         return real_run(cmd, *a, **k)
 
-    v4 = PRIOR._v0104()
+    v4 = _V4
     sigs = tuple(v4.STALE_SIGS) if v4 is not None else None
     buf = io.StringIO()
     subprocess.run = run
