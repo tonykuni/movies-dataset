@@ -28,7 +28,7 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 727 · import 0 · 提及 164 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 727 · import 0 · 提及 169 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · CGC_MDL141_ClosingGate_v0112.py(家族 core)
@@ -38,7 +38,7 @@
   [OK] ③ VRN 三態誠實(無報告=YELLOW 候操作員;庫缺=GREY;全 DONE=GREEN) (YELLOW;GREY;GREEN)
   [OK] ④ VAP 逐圖驗(SVG 繪圖元素/空圖 FAIL;PNG 簽章+IHDR 640x480;HTML 含 CDN=FAIL、本地 svg OK;PDF 簽章;台帳末筆 RENDER OK;規格 2)+三態(壞圖=RED;全好=GREEN;夾缺=GREY;無圖=YELLOW;規格冊缺誠實註) (RED 壞 2;GREEN/GREY/YELLOW)
   [OK] ⑤ Markdown 匯出(總判/## VRN/## VAP/表頭分隔線/FAIL 清單/次步;'|' 逃逸) 
-  [OK] ⑥ --run 經 MDL139 run --item 同一啟動道(vrn 冊 chain_default 依序;--dir 只給有 dir 參數的段;rc≠0 即停=誠實;vap 有 config=vap_one_render)+ 批400 取道律(vap 無 config=vap_one_demo 並印明;vrn 報告夾空=[] 一行「報告夾空」不跑鏈、零 NEED_DIR)+ 報告夾律(絕對/母倉相對/user.vrn_dir/冊預設;incoming 併入) (['vrn_firstpage', 'vrn_structdb', 'vrn_finpages'];vap ['vap_one_demo']/['vap_one_render'];vrn 空夾 [];['/tmp/tmpr411cn69/reports', '/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/x', '/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/input_reports'])
+  [OK] ⑥ --run 經 MDL139 run --item 同一啟動道(vrn 冊 chain_default 依序;--dir 只給有 dir 參數的段;rc≠0 即停=誠實;vap 有 config=vap_one_render)+ 批400 取道律(vap 無 config=vap_one_demo 並印明;vrn 報告夾空=[] 一行「報告夾空」不跑鏈、零 NEED_DIR)+ 報告夾律(絕對/母倉相對/user.vrn_dir/冊預設;incoming 併入) (['vrn_firstpage', 'vrn_structdb', 'vrn_finpages'];vap ['vap_one_demo']/['vap_one_render'];vrn 空夾 [];['/tmp/tmpu2z85dja/reports', '/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/x', '/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/input_reports'])
   [OK] ⑦ 總閘 all(兩族併列;總判取最壞 RED;CLOSEOUT_latest.json/.md 落檔;log) (RED)
   [OK] ⑧ 紀律宣告(只增不減/正本零觸碰/誠實三態/零 CDN/零網路/尾版律/Zero-Hydra/ACCEL-BRIDGE) 
   [OK] ⑨ 三方對照認得(檔名×首頁×財報頁表格:逐份 AGREE/DIVERGE/ONLY_TABLE+ticker/date 態;總結統計;DIVERGE=資訊級不降 verdict(有無對照表 verdict 相同);次步點名;無對照=指路 --crosscheck) (有對照 YELLOW=無對照 YELLOW;DIVERGE 1)
@@ -48,4 +48,5 @@
   [OK] ⑬ 四點的 TP 合理性態也算數(批422 記的假綠,操作員 2026-09-12 明令修:ENG080 四點文摘自己有一道 TP 合理性閘(tp_state=TP_SUSPECT 表示目標價與現價比值荒謬),而 DONE_NS 的守衛**只讀 vrn_report_basic 的 upside_state,從來沒讀過它**。於是「四點說目標價有問題」抓到了、也寫進庫了,收尾閘卻看不到。TP_SUSPECT 的定義正是 _REAL_BAD_STATES 講的「數字抽出來了而且對不起來」,只是它住在另一張表——同一個判準兩個來源,不能只讀一個。這一修會讓燈變(DONE 少、FAIL 多),所以等操作員點頭才動) (四點 OK→DONE_NS · 四點 TP_SUSPECT→FAIL(舊碼會給 DONE_NS=假綠))
   [OK] ⑭ 報告夾律與主庫路徑律由**冊擁有者 MDL139 供應**,本檔只轉呼叫(批446:原本這裡自己抄了一份,docstring 還寫「同 MDL139 dir 參數」——**那句是假的**,本檔併 incoming、MDL139 不併;工作站 64 份報告全在 incoming,於是本檔看得見「夾✓ 64」而 MDL139 回 NEED_DIR 把鏈第一段停掉。「同某某」寫在註解裡不會讓它真的相同,要相同就得是同一支函式)。舊版 MDL139 掛上來時退本地實作並印因由 (正本在位={'vrn_report_dirs': True, 'mega_db': True} · 兩邊解出一致=True · 夾=['fx_d', 'fx_i'] · 舊版退路解出一致=True)
   [計] 十四檢(14 檢) OK 14 · FAIL 0
-[監控] 背景全景監控中 pid 703 · 觸碰 run --family · 交接閘 RED · 落後 1133 提交 · 快照 1343.6h · 未登 2438 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VDF_MDL020_DataPlane_v0107.py(冊上 VDF_ → via-vcgc sdd check
+[監控] 背景全景監控中 pid 8755 · 觸碰 run --family · 交接閘 RED · 落後 1243 提交 · 快照 1360.6h · 未登 2436 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
