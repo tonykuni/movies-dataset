@@ -221,3 +221,10 @@
 | 2026-11-27T21:54:32Z | VIA_HostBoot_v0108.py | 0108 | VIA-CORE-MDL928 | 25e159740b0c | 一支 PY 同時啟用 VCGC 與 VDF | 自測 12/12 |
 | 2026-11-27T22:07:42Z | VIA_HostBoot_v0109.py | 0109 | VIA-CORE-MDL929 | 54f07ee702d3 | 一鍵啟用也用網路模組 | 自測 11/11 |
 | 2026-11-27T22:24:15Z | VIA_HostBoot_v0110.py | 0110 | VIA-CORE-MDL930 | dd068af048fe | 監工不卡死 · 三數照三道 | 自測 9/9 |
+| 2026-11-28T01:56:42Z | CGC_MDL183_CeleritasPolicyGate_v0107.py | 0107 | VIA-VCGC-MDL1738 | 8ce0cc1c81b3 | 加速器政策閘照裁定甲:18 支既有 PS · 前版鏈 PY 2 支列帳,帳外照紅 | 自測 7/7 ×3 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | CGC_MDL058_Lessons_v0104.py | 0104 | VIA-VCGC-MDL1736 | 747fd0f1e281 | 教訓帳自測不吃本機帳(暫存合成帳)· 明寫轉出跨行程鎖 | 自測 5/5 ×3 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | CGC_MDL256_SubsystemBundle_v0102.py | 0102 | VIA-VCGC-MDL1739 | ae18154a4be8 | 下載包認退役清冊證明(retired 照列) | 自測 5/5 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | CGC_MDL170_VDFChainRunner_v0106.py | 0106 | VIA-VCGC-MDL1737 | dd8c336d7560 | VDF 鏈跑器自測只驗本版與直接前版 · 真樹未審 0 | 自測 6/6 ×3 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | via_bridge_sweeper_v0106.py | 0106 | VIA-VCGC-MDL1740 | 916ea11100a3 | 掃橋器:系統收件夾一律收容件 · 真樹加速缺 0 | 自測 7/7 ×3 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | VIA_WorkbenchLock_v0103.py | 0103 | VIA-CORE-MDL932 | 3d6beb7ae24b | WorkbenchLock 自測只驗本版與直接前版 | 自測 4/4 ×3 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | VIA_LakeMatrix_v0102.py | 0102 | VIA-CORE-MDL931 | eb693645be7f | LakeMatrix 自測時鐘凍在夾具時刻 | 自測 5/5 ×3 · handoff test rc 0 |
