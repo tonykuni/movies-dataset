@@ -1,0 +1,292 @@
+{
+  "source": "https://chatgpt.com/space/page_8c4b2563fcdc8191877babacc033babc",
+  "source_spec": "VCGC v0103, 2026/11/27",
+  "authority": "read-only capability snapshot; formal versions and registration remain VCGC SSOT",
+  "external": [
+    {
+      "id": "EXT01",
+      "name": "Claude Code Setup",
+      "upstream": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-code-setup",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "盤點專案；推薦 MCP、Skills、Hooks、專用覆核及快捷流程；檢查重複配置；產生設定差異"
+    },
+    {
+      "id": "EXT02",
+      "name": "ECC",
+      "upstream": "https://github.com/affaan-m/ECC",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "按專案選取技能；建立開發、測試、研究及安全設定；整合 Hooks；檢查代理能力；記錄有效規則"
+    },
+    {
+      "id": "EXT03",
+      "name": "claude-mem",
+      "upstream": "https://github.com/thedotmack/claude-mem",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "擷取工作事件；形成摘要；按專案搜尋歷史；注入相關記憶；回查原始證據；撤回過期記憶"
+    },
+    {
+      "id": "EXT04",
+      "name": "OmniRoute",
+      "upstream": "https://github.com/cheaper-inference/OmniRoute",
+      "status": "ADAPTER_IMPLEMENTED_NATIVE_PENDING",
+      "capability": "建立模型能力清冊；按任務與預算選路；檢查額度；有界備援；記錄模型、費用與失敗原因"
+    },
+    {
+      "id": "EXT05",
+      "name": "Headroom",
+      "upstream": "https://github.com/headroomlabs-ai/headroom",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "按內容類型壓縮；保留原文取回；保護關鍵欄位；量測節省；必要時回退原文"
+    },
+    {
+      "id": "EXT06",
+      "name": "Task Observer",
+      "upstream": "https://github.com/rebelytics/one-skill-to-rule-them-all",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "記錄糾正與重複工作；歸類失敗；提出技能候選；產生規則差異；追蹤改善效果"
+    },
+    {
+      "id": "EXT07",
+      "name": "Hallmark",
+      "upstream": "https://github.com/Nutlope/hallmark",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "頁面結構檢查；視覺一致性；制式樣式偵測；受限改版建議"
+    },
+    {
+      "id": "EXT08",
+      "name": "Anatomy",
+      "upstream": "https://github.com/wheresryan22/anatomy",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "產生系統運作解說；互動拆解圖；流程教學；圖上來源與說明"
+    },
+    {
+      "id": "EXT09",
+      "name": "Impeccable",
+      "upstream": "https://github.com/pbakaus/impeccable",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "排版、留白及對比檢查；無障礙；窄螢幕；元件一致性；操作回饋檢查"
+    },
+    {
+      "id": "EXT10",
+      "name": "Ponytail",
+      "upstream": "https://github.com/DietrichGebert/ponytail",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "限定最小修改；檢查既有功能可重用性；減少不必要抽象與依賴；精簡重複流程"
+    },
+    {
+      "id": "EXT11",
+      "name": "Matt Pocock Skills",
+      "upstream": "https://github.com/mattpocock/skills",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "需求澄清；共用術語；決策紀錄；任務拆分；工程交接與重構方法"
+    },
+    {
+      "id": "EXT12",
+      "name": "Cloudflare Security Audit",
+      "upstream": "https://github.com/cloudflare/security-audit-skill",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "架構與信任邊界盤點；覆蓋清冊；漏洞候選；獨立驗證；結構化發現與報告"
+    },
+    {
+      "id": "EXT13",
+      "name": "REA",
+      "upstream": "https://github.com/morluto/rea",
+      "status": "PLANNED_NOT_INSTALLED_BY_ENGINE",
+      "capability": "應用行為調查；模組及呼叫關係；執行時證據；必要的二進位分析；結果比對"
+    }
+  ],
+  "token_saving": [
+    {
+      "id": "TS01",
+      "name": "來源清冊與內容指紋",
+      "status": "IMPLEMENTED_FIXTURE_TESTED",
+      "contract": "路徑、版本、權限 → 來源 ID 與 SHA-256；檔名相同但內容改變必須失效"
+    },
+    {
+      "id": "TS02",
+      "name": "增量掃描與續跑",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "只解析新增或改變來源；掃描不完整不能把未讀到的來源當成刪除"
+    },
+    {
+      "id": "TS03",
+      "name": "read 與 ETag 重用",
+      "status": "IMPLEMENTED_FIXTURE_TESTED",
+      "contract": "已知版本重讀回傳未變；變更來源必須提供新內容或明確變更狀態"
+    },
+    {
+      "id": "TS04",
+      "name": "slice 與 AST 定位",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "以符號、行號、頁碼或資料欄位取必要區段，附基準指紋"
+    },
+    {
+      "id": "TS05",
+      "name": "本機中英文檢索",
+      "status": "NOT_IMPLEMENTED_OWNER_ADAPTER_REQUIRED",
+      "contract": "DuckDB 管理詞項與排序；中文分詞或 n-gram 與程式符號分開處理"
+    },
+    {
+      "id": "TS06",
+      "name": "Graphify 受影響範圍",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "由依賴圖選取相關模組與測試；保留圖譜版本和未覆蓋節點"
+    },
+    {
+      "id": "TS07",
+      "name": "精準 SQL 讀取",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "選必要欄、時間與資料集版本，利用 Parquet 欄位與條件裁剪；保留查詢參數"
+    },
+    {
+      "id": "TS08",
+      "name": "未命中與缺口摘要",
+      "status": "IMPLEMENTED_FIXTURE_TESTED",
+      "contract": "回傳已查範圍、缺少來源及下一個精準查詢，限制反覆全景重掃"
+    },
+    {
+      "id": "TS09",
+      "name": "FULL／DELTA 交接",
+      "status": "NOT_IMPLEMENTED_OWNER_ADAPTER_REQUIRED",
+      "contract": "只對確認持有基準的接收端送差異；缺基準改發完整包"
+    },
+    {
+      "id": "TS10",
+      "name": "證據卡與原文取回",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "先送證據 ID、摘要與定位；需要時按 ID 取完整片段"
+    },
+    {
+      "id": "TS11",
+      "name": "工具輸出摘要",
+      "status": "IMPLEMENTED_FIXTURE_TESTED",
+      "contract": "通過項回數量與收據；失敗保留錯誤、預期／實際值與原文入口"
+    },
+    {
+      "id": "TS12",
+      "name": "故障指紋去重",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "相同故障合併顯示次數，保留各次事件、首次和最近版本"
+    },
+    {
+      "id": "TS13",
+      "name": "Headroom 類內容壓縮",
+      "status": "NOT_IMPLEMENTED_OWNER_ADAPTER_REQUIRED",
+      "contract": "JSON、程式、日誌與文字分別處理；小內容或未節省時可透傳"
+    },
+    {
+      "id": "TS14",
+      "name": "必保欄位驗證",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "數字、負號、日期、股號、Adj 欄位、單位、公式、來源與 RC 不可遺失"
+    },
+    {
+      "id": "TS15",
+      "name": "表格共用結構",
+      "status": "NOT_IMPLEMENTED_OWNER_ADAPTER_REQUIRED",
+      "contract": "表頭與契約只交一次，列值保留主鍵、型別及缺值語意"
+    },
+    {
+      "id": "TS16",
+      "name": "相同內容重複傳送抑制",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "重用受權限約束的證據參照；接收端沒有內容時不能只給指紋"
+    },
+    {
+      "id": "TS17",
+      "name": "任務範圍裁剪",
+      "status": "IMPLEMENTED_FIXTURE_TESTED",
+      "contract": "載入目標、限制、所需系統與可用資料，排除無關歷史"
+    },
+    {
+      "id": "TS18",
+      "name": "Skills 按需載入",
+      "status": "NOT_IMPLEMENTED_OWNER_ADAPTER_REQUIRED",
+      "contract": "常駐僅保留最小目錄；完整規則在符合任務時載入"
+    },
+    {
+      "id": "TS19",
+      "name": "MCP 工具清單分組",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "按治理、資料、文件、計算與顯示選工具組，計入清單本身的 Token 成本"
+    },
+    {
+      "id": "TS20",
+      "name": "固定規則前綴",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "穩定規則與變動事件分開排序，保留供應商可利用的快取前綴"
+    },
+    {
+      "id": "TS21",
+      "name": "分層記憶",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "區分本輪任務、專案決策、長期教訓，依相關性與版本查詢"
+    },
+    {
+      "id": "TS22",
+      "name": "記憶失效與衝突",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "原始碼、政策或資料版本改變時重驗；互斥結論保留各自來源"
+    },
+    {
+      "id": "TS23",
+      "name": "跨 AI 接手摘要",
+      "status": "IMPLEMENTED_FIXTURE_TESTED",
+      "contract": "固定交付任務、基準、證據、結果、待辦與續跑點"
+    },
+    {
+      "id": "TS24",
+      "name": "共用術語與規則版本",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "沿用 VIA 命名與字典，減少重複解釋；同名異義按系統分開"
+    },
+    {
+      "id": "TS25",
+      "name": "按能力與預算選模型",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "分類、擷取、程式修改與裁定分開設定；品質門檻限制低價路由"
+    },
+    {
+      "id": "TS26",
+      "name": "模型結果快取",
+      "status": "NOT_IMPLEMENTED_OWNER_ADAPTER_REQUIRED",
+      "contract": "鍵含任務、來源、模型、參數、規則、權限及契約；有副作用的操作不快取重播"
+    },
+    {
+      "id": "TS27",
+      "name": "重試與循環偵測",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "同樣輸入與失敗反覆出現時停止，回傳診斷及可續跑點"
+    },
+    {
+      "id": "TS28",
+      "name": "有條件的獨立覆核",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "僅在契約變更、安全或互相矛盾時增加覆核；用量計入整個任務"
+    },
+    {
+      "id": "TS29",
+      "name": "有界任務與併行",
+      "status": "IMPLEMENTED_FIXTURE_TESTED",
+      "contract": "避免重複掃描與寫入碰撞；依 RAM、CPU 及資料庫所有權排程"
+    },
+    {
+      "id": "TS30",
+      "name": "Task Observer 改善回路",
+      "status": "NOT_IMPLEMENTED_OWNER_ADAPTER_REQUIRED",
+      "contract": "將有效糾正轉成精簡規則與回歸案例，量測後續重犯率"
+    },
+    {
+      "id": "TS31",
+      "name": "Token 與費用帳本",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "逐次記錄估算、實耗、快取、輸出、重試、觀察與取回成本"
+    },
+    {
+      "id": "TS32",
+      "name": "A/B 與發布決策",
+      "status": "PARTIAL_NATIVE_PENDING",
+      "contract": "同任務、同資料比較正確率、總用量、費用與時間；只有對應版本證據能啟用"
+    }
+  ]
+}

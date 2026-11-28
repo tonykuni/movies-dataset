@@ -1,0 +1,93 @@
+{
+  "schema": "VIA.PanoramaFusion.Integration.v3",
+  "adapters": {
+    "graphify": {
+      "slots": [
+        "query",
+        "manifest"
+      ],
+      "evidence": [
+        "source_manifest_sha256 exact",
+        "coverage_complete=true",
+        "uncovered=0"
+      ]
+    },
+    "registry_stage": {
+      "slots": [
+        "candidate",
+        "baseline",
+        "manifest_delta"
+      ],
+      "evidence": [
+        "numbering_audit lost=0 identity_changed=0 duplicate=0",
+        "generated registered_files covered",
+        "staged_files path/before_sha256/after_sha256",
+        "registered_aliases all required",
+        "commands_checked=true alias_collisions=0"
+      ]
+    },
+    "test_matrix": {
+      "slots": [
+        "candidate",
+        "baseline"
+      ],
+      "evidence": [
+        "nonempty expected_verbs=tested_verbs",
+        "all_verbs_pass=true",
+        "integer locked_success_before=after",
+        "native_pass/output_verified/ui_verified true",
+        "sdd/closeout_lamp GREEN",
+        "ssot_verified/source_egress_verified/connectors_scope_verified as applicable",
+        "network_routing_verified for HTTP sources"
+      ]
+    },
+    "context_gate": {
+      "evidence": [
+        "owner=VCGC",
+        "duckdb_verified=true",
+        "parquet_verified=true"
+      ]
+    },
+    "context_store": {
+      "slots": [
+        "receipt"
+      ],
+      "evidence": [
+        "owner=VCGC",
+        "duckdb_verified=true",
+        "parquet_verified=true",
+        "receipt_sha256 exact"
+      ]
+    },
+    "env_install": {
+      "slots": [
+        "env",
+        "requirements"
+      ],
+      "authority": "existing VIA installer, staged env only"
+    },
+    "retirement_audit": {
+      "slots": [
+        "candidate",
+        "baseline"
+      ],
+      "evidence": [
+        "chain_unused",
+        "all_tail_verbs_pass",
+        "locked_success_unchanged",
+        "owner_only",
+        "action_aliases_preserved"
+      ]
+    }
+  },
+  "command_format": {
+    "command": [
+      "exact existing executable",
+      "exact argv",
+      "{candidate}"
+    ],
+    "require_status": true
+  },
+  "secret_policy": "environment variables only; no real key values in files",
+  "native_status": "PENDING_OWNER_CONNECTION"
+}
