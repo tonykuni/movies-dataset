@@ -234,5 +234,5 @@
 | 2026-11-28T05:12:23Z | SUP_MDL866_VIAUnifiedNLPOrchestrator_v0110.py | 0110 | VIA-SUP-MDL1212 | e1772496e479 | SUP_MDL866 歸 VCGC 後補發中央編號(檔未改) | 尾版 v0111 自測 6/6(含本版 8/8)· handoff test nlp ×2 rc 0 |
 | 2026-11-28T06:39:02Z | CGC_MDL149_SourceLane_v0103.py | 0103 | VIA-VCGC-MDL1742 | 28fe5fb91139 | 貼回包不帶市場數值 | 自測 4/4 ×3 |
 | 2026-11-28T11:20:00Z | VDF_MDL008_FetchSystem_v0115.py | 0115 | VIA-VDF-MDL387 | 0f24af5b76f5 | 擷取家改寫認得參數橋相對寫法 · 夾具不寫倉內 db/ | 自測 8/8 ×3 · fetch test 23/23 |
-| 2026-11-28T11:55:00Z | VDF_MDL020_DataPlane_v0107.py | 0107 | VIA-VDF-MDL388 | 5c4b23677cb0 | 自測只驗本版與直接前版 v0106(裁定甲)· 功能本體 v0104 六檢照跑 | 自測 4/4 ×3 |
+| 2026-11-28T11:55:00Z | VDF_MDL020_DataPlane_v0107.py | 0107 | VIA-VDF-MDL388 | 1b9e2c4f0984 | 自測只驗本版與直接前版 v0106(裁定甲)· 功能本體 v0104 六檢照跑 | 自測 4/4 ×3 |
 | 2026-11-28T11:55:00Z | VDF_MDL022_SafeParallelLaunch_v0114.py | 0114 | VIA-VDF-MDL389 | 1a1d5bb60441 | 自測只驗本版與直接前版 v0113(裁定甲) | 自測 4/4 ×3 |
