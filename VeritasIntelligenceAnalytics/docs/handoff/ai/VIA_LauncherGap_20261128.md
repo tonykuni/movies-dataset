@@ -12,13 +12,15 @@
 | `scan` | `via-pano` / `via-panorama`(Hub)· `CGC_MDL158` `read` / `pack` | 綠 | — |
 | `fix` | `CGC_MDL158 fix`(先乾跑,再 `--apply`) | 綠 | — |
 | `audit` | `run CGC_MDL237_NumberingSystem audit` · `VIA_ReworkGuard_v0104 check --fetch-prs` | 綠 | — |
-| `backup` / `restore` | `via-bak`(`VIA_DailyBackup_v0105`:`full` · `latest` · `test`) | 黃 | 還原動詞沒找到明寫的 `restore`;輪替份數待對第五章「5 份」 |
+| `backup` / `restore` | `via-bak` · `via-bak restore / card / check`(Hub v0115 起 → `VIA_DailyBackup_v0105`) | 綠 | 輪替份數待對第五章「5 份」 |
 | `remote` | 無(`VIA_HostBoot_v0101` 只記「雲端連不到桌機 → 桌機跑、交收據」) | 紅 · 灰 | 只能在主機上做;照待裁定 14,先做「只檢查、寫 `remote_control_status.json`」 |
 | `test` | `via-vcgc test --quick` · `handoff test <case>` · 各檔 `--selftest` | 綠 | 沒有 pytest 套件可套 `--tb=line -q`;照舊用 `digest` |
 | `status` | `via`(Hub,取代舊 `via-status`)· `VCGC_StartupEngine_v0101 status` | 黃 | 兩個入口都叫 status;照「重複功能先併」先 `chain` 定本體 |
 
-統一入口候選兩支:`VCGC_CommandHub_v0122.py`(倉根 · via-* 短令)與 `supportive modules/registry/VCGC_StartupEngine_v0101.py`(start · launch · status · health · lock · plan · resume …)。
-附錄要「整合至既有 VCGC_StartupEngine 架構」;Hub 已是操作員在打的入口。動工前先 `chain` 兩家、定誰是本體,再掛動詞,不另做第三支。
+統一入口候選兩支(`chain` 已跑):
+- `VCGC_CommandHub`:22 版薄尾,本體 v0101(53 個定義),尾版 v0122;操作員在打的 via-* 短令都在這裡。
+- `VCGC_StartupEngine`:本體 v0100(60 個定義)自稱「啟動引擎正本,只此一份」,尾版 v0101;動詞 start · launch · status · health · lock · plan · resume。
+建議:`boot` 掛在 StartupEngine(附錄指定、它是啟動正本),Hub 加一條 `via-boot` 轉呼叫它;不另做第三支。
 
 ## 二、先降壓 → 三道(附錄 §4)
 
@@ -52,10 +54,10 @@
 
 ## 五、建議分批(每批照 SDD:需求冊 → 工作流冊 → 薄尾新版 → 實測 → 註冊 / 編號 → 收據)
 
-1. 先 `chain` `VCGC_CommandHub` 與 `VCGC_StartupEngine`,定本體(不另做第三支)。
+1. ✅ 已 `chain`:`boot` 掛 StartupEngine,Hub 加 `via-boot` 轉呼叫。
 2. 本體加 `boot`:降壓(本行程與子行程的執行緒上限 · below-normal)→ 三道子行程(各自 PID · 日誌 · 健康收據)→ 一行就緒摘要。遠端那一道先只回報狀態。
 3. `via-health` 收據加 `vcgc_env_coverage` / `missing_count` 與指紋快讀。
-4. `via-bak` 補 `restore` 動詞、輪替份數對第五章。
+4. `via-bak` 的輪替份數對第五章(restore 已有)。
 5. 主機實跑一次端對端,收據貼回;容器結果一律標「容器」。
 
 待裁定 11–14 定案前,第 2 批的遠端與清程序、第 3 批的自動補裝都照「裁定前」那一邊做。
