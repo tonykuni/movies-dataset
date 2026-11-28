@@ -229,3 +229,5 @@
 | 2026-11-28T01:56:42Z | VIA_WorkbenchLock_v0103.py | 0103 | VIA-CORE-MDL932 | 3d6beb7ae24b | WorkbenchLock 自測只驗本版與直接前版 | 自測 4/4 ×3 · handoff test rc 0 |
 | 2026-11-28T01:56:42Z | VIA_LakeMatrix_v0102.py | 0102 | VIA-CORE-MDL931 | eb693645be7f | LakeMatrix 自測時鐘凍在夾具時刻 | 自測 5/5 ×3 · handoff test rc 0 |
 | 2026-11-28T02:05:20Z | VIA_WorkbenchLock_v0103.py | 0103 | VIA-CORE-MDL938 | 3d6beb7ae24b | 改號(CORE-MDL932 讓給 main 的 GovernanceApply_v0102) | 重號 0 |
+| 2026-11-28T05:12:23Z | CGC_MDL253_ToolingInventory_v0106.py | 0106 | VIA-VCGC-MDL1741 | 3acf836d6f26 | 工具盤點自測只驗本版與直接前版 · 前版鏈照實寫未跑 | 自測 4/4 ×3 · handoff test rc 0 |
+| 2026-11-28T05:12:23Z | SUP_MDL866_VIAUnifiedNLPOrchestrator_v0110.py | 0110 | VIA-SUP-MDL1212 | e1772496e479 | SUP_MDL866 歸 VCGC 後補發中央編號(檔未改) | 尾版 v0111 自測 6/6(含本版 8/8)· handoff test nlp ×2 rc 0 |
