@@ -1,4 +1,4 @@
-[第一步 · 省Token] 已啟用 6/6(鎖版 v0121 · NLP v0108)· AI 先用:read → slice → digest · --if-etag 免重讀 · pack 整夾 · --brief 長文(via-vcgc token 看整張卡)
+[第一步 · 省Token] 已啟用 6/6(鎖版 v0125 · NLP v0108)· AI 先用:read → slice → digest · --if-etag 免重讀 · pack 整夾 · --brief 長文(via-vcgc token 看整張卡)
 [政策] 第二步 整冊已讀、不倒文 · 律 130 · lessons 362 · 節 9 · VIA_Policy_Laws_SSOT_v0125.json
   [分群] 69 群 · 130 律全入群
   治理8 環境8 架構6 紀律6 交接5 治理 / 入口4 測試4 資料4 SSOT3 指標3 整合3 治理 / 編號3
@@ -24,14 +24,39 @@
   [環境計畫] 自測通過才裝該裝的。刪除段只印命令,不自動砍境。
   [回覆] AI 用全景讀倉,不讀整檔。下一動只執行貼回裡 NEXT: 那一行。
   [衝突] L08 L12 L13 L19 L24 L32 L82 L84 L88 L107
-  [衝突] 現況 RED · 2026-11-18T12:11:20
+  [衝突] 現況 NODATA 先 via-envgov eight-hub
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
-  [還原] 候選不可鎖定 20261118_201113_270 · RED · 境 0 · 歷史 2
-[政策] L50 全景 · 尾版 703 · import 0 · 提及 151 · 已裝 False · GREEN
+  [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
+[政策] L50 全景 · 尾版 727 · import 0 · 提及 166 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL237_NumberingSystem_v0123.py(家族 core)
+  [via-vcgc run] [流程] 政策過 · CGC_MDL237_NumberingSystem_v0124.py(家族 core)
+[計] CGC_MDL237_NumberingSystem_v0124 自測開始(暫存資料 · 不碰真冊 · 零網路)
+  [OK] ① 帳上有的錯位全部對到冊上代碼(互相錯開的三條一次換位 · 往前移的回到原號)
+  [OK] ② 對齊後沒有重號 · 列數不變 · 舊號留在 realigned_from · 燈回到狀態燈
+  [OK] ③ 帳上沒有的錯位一列都不動(照舊 RED,要裁定才改)
+  [OK] ④ 帳上的舊號對不上現況 → 不動(鍵與舊號都要對得上)
+  [OK] ⑤ 目標號被不動的活列佔著 → 這一列不動、列進 blocked,不製造重號
+  [OK] ⑥ 新列第一次發號就用冊上代碼(跳號也對)· 新列不留 realigned_from
+  [OK] ⑦ 不是 WKF / STP / REQ 的種類不碰
+  [OK] ⑧ 已退役的列不碰
+  [OK] ⑨ audit:對齊帳上的號不算改身分(realigned 另報)· 遺失 0 · 重號 0
+  [OK] ⑩ audit 反控:帳外的改身分 · 遺失 · 重號照抓
+  [OK] ⑪ 沒有對齊帳時,同樣的改動照舊算改身分(不默默放行)
+  [OK] ⑪b realign_books:錯位列直接改寫 · 列數不變 · 無重號 · 照號排序 · 沒動的列逐位元不變 · 別種冊不碰
+  [OK] ⑪e 走真正的稽核路徑(定義 audit 的那一層):有對齊帳 → 改身分 0 · 已裁定 > 0;沒有帳 → 照舊報改身分
+  [OK] ⑪f 掛鉤掛在定義的那一層(不是轉手的那一層)
+  [OK] ⑪c realign_books:沒有對齊帳 → 內容逐位元不變
+  [OK] ⑪d 一般發號(assign)不動舊的錯位列 —— 舊列換號只走 realign --apply
+  [OK] ⑪g 被擋的列留在原號 → 想搬進那個號的列也擋(算到不再變才動)· 不製造重號
+  [OK] ⑪h 同一批裡沒被牽連的新列照樣對齊(只擋有相依的)
+  [OK] ⑪i audit 只放行帳上那一步:已對齊的號再改給別的列 → 照抓;原主是帳上那列但落點不是正主 → 照抓;種類不同 → 照抓;正確那一步才放行
+  [OK] ⑪j audit:原主要真的在帳上寫的新號上 —— 原主那一列不見、或目的地上是別的列,它讓出來的號照舊算改身分;都在才放行
+  [OK] ⑪k 已退役列的號照樣算有人佔著:新列不搬進去、列進 blocked、不製造重號(PR #770 Codex P2)
+  [OK] ⑫ 裝進本體:BASE.assign 與 audit 層的 compare 都是本版
+  [OK] ⑬ 加速器真的載到(VIA_ACCEL 非空)
+  [OK] ⑭ 加速器橋在語法樹匯入 · 不含本機路徑
 === CGC_MDL237_NumberingSystem_v0123 自測(薄尾 · 同儕工作流只發號不改冊;夾具 · 零網路 · 不碰真號冊)===
   [OK] ① 前版是 v0122 · 引擎名是本版
   [OK] ② 只找 VDF / VRN 兩個冊族的尾版(版號照數字比;VCGC 自己的冊不在內)
@@ -106,12 +131,12 @@
   [OK] ⑧ XCODE:共用 VIA-TOOL 空間同號兩主抓到 · ['VIA-TOOL-0001:b.py ↔ tool|a']
   [OK] ⑨ FPSTALE:指紋過期抓到;CRLF 工作複本照容忍 · ['S2 a.json']
   [OK] ⑩ UNCOMMITTED · TIMEFMT:未提交列與不帶時區的新時間抓到 · {'u': ['X1', 'X3'], 'tf': ['N3', 'N4']}
-  [OK] ⑪ 實樹唯讀:六項註冊完整性都量得出(引擎版本冊 · 元件冊 · 編號冊 · 架構冊都讀得到) · {'IMMUT': ('GREEN', 0), 'DUPREG': ('GREEN', 0), 'XCODE': ('GREEN', 0), 'FPSTALE': ('YELLOW', 544), 'UNCOMMITTED': ('YELLOW', 150), 'TIMEFMT': ('GREEN', 0)}
+  [OK] ⑪ 實樹唯讀:六項註冊完整性都量得出(引擎版本冊 · 元件冊 · 編號冊 · 架構冊都讀得到) · {'IMMUT': ('GREEN', 0), 'DUPREG': ('GREEN', 0), 'XCODE': ('GREEN', 0), 'FPSTALE': ('YELLOW', 551), 'UNCOMMITTED': ('YELLOW', 152), 'TIMEFMT': ('GREEN', 0)}
   [OK] ⑫ 檔頭 · 加速器橋 · 網路橋在;不碰 TA-Lib
 [編號 v0109] 本版 12/12
   [OK] ① 活檔只看目錄:檔名含隔離字樣不算隔離,目錄才算 · {'x_invalid_quarantine_gate_v02783.py': True, 'x_v0100.py': False, 'y_v0100.py': False, 'z.py': False, 'RUN_2026_note_v0100.py': True}
   [OK] ② 本版裝進本體(收集器呼叫的就是本版)
-  [OK] ③ 實樹:被檔名誤排的活檔現在收得到,其餘判定一支不少 · 舊 4374 → 新 4375
+  [OK] ③ 實樹:被檔名誤排的活檔現在收得到,其餘判定一支不少 · 舊 3235 → 新 3236
   [OK] ④ 只增:新增 1 · 遺失 0 · 改身分 0 · 重號 0 · {'before': 4, 'after': 5, 'added': 1, 'missing': [], 'changed_identity': [], 'duplicate_codes': 0, 'duplicate_sample': []}
   [OK] ⑤ 反控:遺失(MDL002 · SSOT001)· 改身分(MDL001 · FNC001)· 重號 都抓得到 · {'before': 4, 'after': 3, 'added': 0, 'missing': ['VIA-A-MDL002', 'VIA-A-SSOT001'], 'changed_identity': ['VIA-A-MDL001', 'VIA-A-MDL001-FNC001'], 'duplicate_codes': 1, 'duplicate_sample': ['VIA-A-MDL001']}
   [OK] ⑥ 冊內一致:乾淨冊 0 項
@@ -135,12 +160,12 @@
 [OK] Toolv0100.py → —
 [OK] 原中央 writer 使用同一個版本解析器
   [OK] 三類入類表(只增;K22 WKF · K23 STP · K24 REQ) · ['K22', 'K23', 'K24']
-  [OK] 工作流冊有料(組成冊 books 指名的冊) · WKF 100 · STP 367
-  [OK] 第一次發號就等於冊上代碼(VIA- 前綴 · 步掛在工作流下) · 467 列
+  [OK] 工作流冊有料(組成冊 books 指名的冊) · WKF 113 · STP 393
+  [OK] 第一次發號就等於冊上代碼(VIA- 前綴 · 步掛在工作流下) · 506 列
   [OK] 再跑一次同鍵同號(只增)
   [OK] 冊上代碼跳號 = 紅燈記下,不改任何一邊 · VIA-VCGC-WKF001
   [OK] Z282③ 編號系統自己的產出不帶 content_sha(寫完就對不上的那一列) · 1 列
-  [OK] 其他 SSOT 冊照舊帶內容指紋 · 1326 本
+  [OK] 其他 SSOT 冊照舊帶內容指紋 · 1499 本
   [OK] ① 下市:列留著、標 gone_since、號不動
   [OK] ① 代號被別家重用:新號 · 舊號原封(下市不蓋) · VIA-VDF-FM-TW-EQT-0003
   [OK] ① 重跑:別家重用的代號仍是同一個 #L2 號,不長 #L3
@@ -148,7 +173,7 @@
   [OK] ① 在市改名:沿用舊號,記 name_history
   [OK] ① 重跑:gone_history / name_history 跨次保留
   [OK] ② 同名不同來源 = 不同號
-  [OK] ③ SSOT 每列帶內容指紋;有宣告版號的帶 declared_version · 1327 冊 · 有宣告版號 826
+  [OK] ③ SSOT 每列帶內容指紋;有宣告版號的帶 declared_version · 1500 冊 · 有宣告版號 991
   [OK] ④ 凍結鎖編成 ENV 列 · 105 本
   CGC_MDL237_NumberingSystem_v0102 selftest 9/9 PASS
 [版本補強] 14 checks; inherited selftest rc=0; fail=0
@@ -173,12 +198,12 @@
 [編號 v0111 重號歸位] 自測 9/9 PASS
 === CGC_MDL237_NumberingSystem_v0116 · 薄尾自測(可選依賴缺件不崩)===
   [OK] ① v0111 核心鏈自測過(重號歸位 · 只增稽核 · 發號) · rc 0
-  [略過] v0112–v0115 自測要可選套件;本直譯器缺 13 件:re2 · pandera · ahocorasick · flashtext · rapidfuzz · fasttext · gensim · jellyfish · nltk · polyfuzz · recordlinkage · regex · spacy → 照實略過(不算過、不算錯)
+  [略過] v0112–v0115 自測要可選套件;本直譯器缺 11 件:re2 · pandera · ahocorasick · flashtext · rapidfuzz · fasttext · gensim · jellyfish · polyfuzz · recordlinkage · spacy → 照實略過(不算過、不算錯)
   [OK] ③ 缺 pydantic:標準庫同規則嚴格驗(合格照收;library / stable_id / 空值 / 缺鍵 / 非字串 五種全擋) · (True, 5)
   [OK] ③b pydantic 在時兩把尺判法一致
   [OK] ④ 缺 duckdb:Regex 候選回 REGEX_PROOF_ENGINE_ABSENT(留 REVIEW 不發號,不拿 re 冒充) · REGEX_PROOF_ENGINE_ABSENT
   [OK] ⑤ 缺 re2 等:L1 清洗回 ABSENT_PACKAGES 點名缺件(manager 印 BLOCKED,不崩) · ABSENT_PACKAGES: re2,pydantic,pandera,ahocorasick(L1 清洗要的套件不在本直譯器;不代裝)
-  [OK] ⑥ 真樹 collect():本直譯器照樣收齊(含 VQG 指標候選 · 不因可選套件停擺) · 列 150434 · 指標 14
+  [OK] ⑥ 真樹 collect():本直譯器照樣收齊(含 VQG 指標候選 · 不因可選套件停擺) · 列 122867 · 指標 14
   [OK] ⑦ 加速器橋 · 網路橋在 · 不碰 TA-Lib · 換裝在位
   [計] CGC_MDL237_NumberingSystem_v0116 本版 7/7 · v0111 PASS · v0112–v0115 略過(缺件) · 合計 PASS
 === CGC_MDL237_NumberingSystem_v0117 · 薄尾自測(未知動詞 / 旗標拒跑 · door 報尾版)===
@@ -187,7 +212,7 @@
   [OK] ③ 合法用法 14 種全放行(含 manager 交 argparse)
   [OK] ④ 拒跑:rc 2 · 前版一次都沒進(零寫入)· 印中文理由與用法 · ({2}, [['audit', '--json']])
   [OK] ⑤ door / SSOT engine 報實際尾版(BASE.ENGINE = 本檔名) · CGC_MDL237_NumberingSystem_v0117
-  [OK] ⑦ sparse 守門:需求檔 git 有列、磁碟沒有 → 照實跳過不崩;都在時與 v0100 結果相同 · 列 10 · 不在磁碟 0
+  [OK] ⑦ sparse 守門:需求檔 git 有列、磁碟沒有 → 照實跳過不崩;都在時與 v0100 結果相同 · 列 11 · 不在磁碟 0
   [OK] ⑥ 加速器橋 · 網路橋在 · 不碰 TA-Lib
   [計] CGC_MDL237_NumberingSystem_v0117 本版 7/7 · v0116 PASS · 合計 PASS
   [OK] ⑤ 前版鏈 v0117 → … 自測 rc 0;跑完 door 仍報本尾版
@@ -202,4 +227,6 @@
   [計] CGC_MDL237_NumberingSystem_v0122 本版 5/5 · 前版鏈 PASS · 合計 PASS
   [OK] ⑫ 前版 v0122 自測(含它的前版鏈)rc 0 · 跑完引擎名還原成本版
 [計] CGC_MDL237_NumberingSystem_v0123 本版 12/12 · PASS
-  [同步] SDD 驗證 RED:X-CODE 代碼不合格式 / 跳號 / 重複:alias safe_parallel_launch 重複 ['VDF-WKF028', 'VRN-WKF013'] · al | X-REG 未註冊 ['VDF_Engine_aaii_sentiment.py', 'VDF_Engine_cnn_fear_greed_proxy.py'] · 註冊冊 | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):37 個,例 ['VDF-WKF028', 'VDF-WKF029', → via-vcgc sdd check
+  [OK] ⑮ 前版 v0123 自測(含它的前版鏈)rc 0 · 跑完本版的掛鉤還在
+[計] CGC_MDL237_NumberingSystem_v0124 本版 25/25 · PASS
+[監控] 背景全景監控中 pid 4087 · 觸碰 run CGC_MDL237_NumberingSystem · 交接閘 RED · 落後 1149 提交 · 快照 1348.8h · 未推 5 · 未登 2436 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

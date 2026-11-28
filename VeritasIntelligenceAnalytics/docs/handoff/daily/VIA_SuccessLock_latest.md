@@ -211,3 +211,21 @@
 | 2026-11-27T15:13:50Z | CGC_MDL149_VeritasCentralGovernanceConsole_v0203.py | 0203 | VIA-VCGC-MDL1727 | a6f5337702e2 | 元件掃描同名兩份登正本 | 自測 16/16 |
 | 2026-11-27T15:13:50Z | CGC_MDL245_SDDValidator_v0111.py | 0111 | VIA-VCGC-MDL1728 | 2fae1238d0e3 | X-REG 分開步釘前版與註冊冊落後 | 自測 12/12 |
 | 2026-11-27T15:43:03Z | CGC_MDL245_SDDValidator_v0112.py | 0112 | VIA-VCGC-MDL1729 | 5835ae2e39f9 | X-REG:已退役的步不要求正主註冊 | 自測 11/11 |
+| 2026-11-27T16:52:36Z | CGC_MDL140_HandoverConsole_v0112.py | 0112 | VIA-VCGC-MDL1730 | 464fe45626a8 | 有退役清冊的搬移不算 FILE_REMOVED | 自測 12/12 |
+| 2026-11-27T18:15:27Z | CGC_SystemManager_v0122.py | 0122 | VIA-VCGC-MDL1731 | 3f8c1ed8379a | launch:VCGC 一鍵啟用 | 自測 19/19 |
+| 2026-11-27T18:15:27Z | Start-VCGC-v0101.ps1 | 0101 | VIA-CORE-MDL924 | e31eb06de447 | 一支 PS 啟用 VCGC(只認主工作倉) | 主機起跑 |
+| 2026-11-27T19:32:46Z | CGC_SystemManager_v0123.py | 0123 | VIA-VCGC-MDL1732 | a1fb3768d1f0 | launch 總燈與三數照實 | 自測 13/13 |
+| 2026-11-27T19:45:36Z | CGC_SystemManager_v0124.py | 0124 | VIA-VCGC-MDL1733 | 0514e62930e6 | 容器跑的 launch 最多黃 | 自測 10/10 |
+| 2026-11-27T19:58:19Z | CGC_SystemManager_v0125.py | 0125 | VIA-VCGC-MDL1734 | d358611cb50b | launch 的 NEXT 也看 overview | 自測 11/11 |
+| 2026-11-27T20:31:36Z | CGC_MDL140_HandoverConsole_v0113.py | 0113 | VIA-VCGC-MDL1735 | f281d6124a00 | 舊案不計入現況燈 · 兩系統範圍 | 自測 19/19 |
+| 2026-11-27T21:54:32Z | VIA_HostBoot_v0108.py | 0108 | VIA-CORE-MDL928 | 25e159740b0c | 一支 PY 同時啟用 VCGC 與 VDF | 自測 12/12 |
+| 2026-11-27T22:07:42Z | VIA_HostBoot_v0109.py | 0109 | VIA-CORE-MDL929 | 54f07ee702d3 | 一鍵啟用也用網路模組 | 自測 11/11 |
+| 2026-11-27T22:24:15Z | VIA_HostBoot_v0110.py | 0110 | VIA-CORE-MDL930 | dd068af048fe | 監工不卡死 · 三數照三道 | 自測 9/9 |
+| 2026-11-28T01:56:42Z | CGC_MDL183_CeleritasPolicyGate_v0107.py | 0107 | VIA-VCGC-MDL1738 | 8ce0cc1c81b3 | 加速器政策閘照裁定甲:18 支既有 PS · 前版鏈 PY 2 支列帳,帳外照紅 | 自測 7/7 ×3 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | CGC_MDL058_Lessons_v0104.py | 0104 | VIA-VCGC-MDL1736 | 747fd0f1e281 | 教訓帳自測不吃本機帳(暫存合成帳)· 明寫轉出跨行程鎖 | 自測 5/5 ×3 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | CGC_MDL256_SubsystemBundle_v0102.py | 0102 | VIA-VCGC-MDL1739 | ae18154a4be8 | 下載包認退役清冊證明(retired 照列) | 自測 5/5 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | CGC_MDL170_VDFChainRunner_v0106.py | 0106 | VIA-VCGC-MDL1737 | dd8c336d7560 | VDF 鏈跑器自測只驗本版與直接前版 · 真樹未審 0 | 自測 6/6 ×3 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | via_bridge_sweeper_v0106.py | 0106 | VIA-VCGC-MDL1740 | 916ea11100a3 | 掃橋器:系統收件夾一律收容件 · 真樹加速缺 0 | 自測 7/7 ×3 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | VIA_WorkbenchLock_v0103.py | 0103 | VIA-CORE-MDL932 | 3d6beb7ae24b | WorkbenchLock 自測只驗本版與直接前版 | 自測 4/4 ×3 · handoff test rc 0 |
+| 2026-11-28T01:56:42Z | VIA_LakeMatrix_v0102.py | 0102 | VIA-CORE-MDL931 | eb693645be7f | LakeMatrix 自測時鐘凍在夾具時刻 | 自測 5/5 ×3 · handoff test rc 0 |
+| 2026-11-28T02:05:20Z | VIA_WorkbenchLock_v0103.py | 0103 | VIA-CORE-MDL938 | 3d6beb7ae24b | 改號(CORE-MDL932 讓給 main 的 GovernanceApply_v0102) | 重號 0 |
