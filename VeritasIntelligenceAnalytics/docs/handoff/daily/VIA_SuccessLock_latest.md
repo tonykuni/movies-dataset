@@ -228,3 +228,4 @@
 | 2026-11-28T01:56:42Z | via_bridge_sweeper_v0106.py | 0106 | VIA-VCGC-MDL1740 | 916ea11100a3 | 掃橋器:系統收件夾一律收容件 · 真樹加速缺 0 | 自測 7/7 ×3 · handoff test rc 0 |
 | 2026-11-28T01:56:42Z | VIA_WorkbenchLock_v0103.py | 0103 | VIA-CORE-MDL932 | 3d6beb7ae24b | WorkbenchLock 自測只驗本版與直接前版 | 自測 4/4 ×3 · handoff test rc 0 |
 | 2026-11-28T01:56:42Z | VIA_LakeMatrix_v0102.py | 0102 | VIA-CORE-MDL931 | eb693645be7f | LakeMatrix 自測時鐘凍在夾具時刻 | 自測 5/5 ×3 · handoff test rc 0 |
+| 2026-11-28T02:05:20Z | VIA_WorkbenchLock_v0103.py | 0103 | VIA-CORE-MDL938 | 3d6beb7ae24b | 改號(CORE-MDL932 讓給 main 的 GovernanceApply_v0102) | 重號 0 |
