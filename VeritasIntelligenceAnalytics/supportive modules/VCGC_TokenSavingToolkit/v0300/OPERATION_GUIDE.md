@@ -15,10 +15,10 @@
 在倉內這個資料夾(`supportive modules\VCGC_TokenSavingToolkit\v0300`)開啟 PowerShell 7,叫**有防護的尾版** v0305(它沿薄尾鏈載入 v0300 本體;不要直接跑 v0300,也不要從 `VIA_PanoramaFusion_Complete_v0300.zip` 解壓出來跑——那是 v0300 凍結發行包,沒有 v0302 起的防護):
 
 ```powershell
-python .\VIA_PanoramaFusion_SuperEngine_v0308.py --root "$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics" both
+python .\VIA_PanoramaFusion_SuperEngine_v0309.py --root "$HOME\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics" both
 ```
 
-v0302 起 `--apply` 不寫回原檔(只出候選夾與收據,收據寫 `apply_refused`)、只修 VCGC 自己的檔、環境只稽核(重建由操作員 `via-envgov apply --approve`)、深修不外送原始碼。也可用 `.\VIA_PanoramaFusion_Start_v0308.ps1 both`。
+v0302 起 `--apply` 不寫回原檔(只出候選夾與收據,收據寫 `apply_refused`)、只修 VCGC 自己的檔、環境只稽核(重建由操作員 `via-envgov apply --approve`)、深修不外送原始碼。也可用 `.\VIA_PanoramaFusion_Start_v0309.ps1 both`。
 
 首次會建立 `%LOCALAPPDATA%\VIA\PanoramaFusion\engine_config_v0300.json`。未接入的管理器／來源會明確受阻。先依本文件與 `VIA_Integration_Contract_v0300.json` 補上現有 VCGC 的精確 argv、註冊清單、環境 SSOT、測試契約及端點。所有 `--root`、`--work`、`--config` 放在子指令之前。
 
@@ -86,11 +86,11 @@ AI 對話來源使用本機匯出／已授權 `source_adapters`；沒有權限�
 ## 清單與驗證
 
 ```powershell
-python .\VIA_PanoramaFusion_SuperEngine_v0308.py tools
-python .\VIA_PanoramaFusion_SuperEngine_v0308.py risks
-python .\VIA_PanoramaFusion_SuperEngine_v0308.py token tools
-python .\VIA_PanoramaFusion_SuperEngine_v0308.py token verbs
-python .\VIA_PanoramaFusion_SuperEngine_v0308.py test --selftest
+python .\VIA_PanoramaFusion_SuperEngine_v0309.py tools
+python .\VIA_PanoramaFusion_SuperEngine_v0309.py risks
+python .\VIA_PanoramaFusion_SuperEngine_v0309.py token tools
+python .\VIA_PanoramaFusion_SuperEngine_v0309.py token verbs
+python .\VIA_PanoramaFusion_SuperEngine_v0309.py test --selftest
 ```
 
 完整清單在 `VIA_Risk20_TokenTools_v0300.md`、CSV 與 `VIA_VCGC_Capabilities_v0300.json`。13 外部能力來自既有 v0103 規格；32 Token 功能逐項區分已實作／部分／待所屬 adapter，不將規劃當成啟用。
