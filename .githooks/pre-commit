@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""VIA 本機 pre-commit 鉤(薄殼):叫重工守門尾版 `check --hook`,只有紅才擋提交,黃照印。
+
+判斷全在 VIA_ReworkGuard 尾版(v0105 起有 XOWN / XIMP 與鉤模式);本檔只找尾版、轉呼叫、回它的燈。
+啟用(操作員一次):python "VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_ReworkGuard_v0105.py" hook install
+臨時略過(自己負責):git commit --no-verify
+"""
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+AI = ROOT / "VeritasIntelligenceAnalytics" / "docs" / "handoff" / "ai"
+tails = sorted(AI.glob("VIA_ReworkGuard_v[0-9][0-9][0-9][0-9].py"))
+if not tails:
+    sys.stderr.write("[pre-commit] 找不到 VIA_ReworkGuard 尾版:不擋提交(GRAY)\n")
+    raise SystemExit(0)
+rc = subprocess.run([sys.executable, str(tails[-1]), "check", "--hook", "--repo", str(ROOT), "--base", "origin/main", "--head", "HEAD"]).returncode
+if rc == 1:
+    sys.stderr.write("[pre-commit] 重工守門 RED:提交已擋。照上面的「解法 / 指令」修;確定要過才用 --no-verify。\n")
+raise SystemExit(1 if rc == 1 else 0)
