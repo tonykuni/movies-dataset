@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-28T05:17:37Z",
+ "updated_at": "2026-11-28T05:36:20Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -9730,6 +9730,26 @@
    "timeout_seconds": 900,
    "updated_at": "2026-11-28T04:58:58Z",
    "registered_at": "2026-11-28T04:58:58Z"
+  },
+  "C-viaunified-v0100": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/CGC_MDL264_ViaUnified_v0100.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL264_ViaUnified_v0100 自測 15/15 · PASS",
+   "scope": "CGC_MDL264_ViaUnified v0100:所有短令整合成一個入口 via(要 pwsh:沒有 pwsh = SKIP rc 2 不算過;容器沒有 pwsh,收據要在主機產生)(VCGC-REQ287)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL264_ViaUnified_v0100.py"
+   ],
+   "version": "v0100",
+   "timeout_seconds": 900,
+   "needs": [
+    "pwsh"
+   ],
+   "updated_at": "2026-11-28T05:36:20Z",
+   "registered_at": "2026-11-28T05:36:20Z"
   }
  },
  "work_items": [
@@ -19001,6 +19021,22 @@
    "verified_at": "2026-11-28T05:06:45+00:00",
    "verified_why": "handoff test C-sourcelane-v0102 rc 0 · 標記見到(容器)",
    "receipt": "docs/handoff/evidence/C-sourcelane-v0102.json"
+  },
+  {
+   "id": "VCGC-REQ287:C-viaunified-v0100",
+   "requirement": "VCGC-REQ287",
+   "case": "C-viaunified-v0100",
+   "state": "PENDING",
+   "owner": "operator",
+   "reason": "CHANGED_CODE_WITHOUT_TEST:沒有案涵蓋 CGC_MDL264。容器沒有 pwsh(SKIP rc 2);主機 2026-11-28 直接跑 --selftest = 15/15 PASS · rc 0(操作員貼回,倉 OneDrive\\Documents\\movies-dataset)。貼回不是收據,不轉 VERIFIED",
+   "host_paste": {
+    "at": "2026-11-28T05:36:20Z",
+    "line": "[計] CGC_MDL264_ViaUnified_v0100 自測 15/15 · PASS",
+    "rc": 0
+   },
+   "next": "主機在已同步 main 的倉跑 via-vcgc handoff test C-viaunified-v0100 產生收據",
+   "updated_at": "2026-11-28T05:36:20Z",
+   "registered_at": "2026-11-28T05:36:20Z"
   }
  ],
  "retired_files": {
