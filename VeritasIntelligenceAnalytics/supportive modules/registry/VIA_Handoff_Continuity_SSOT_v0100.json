@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-28T06:52:58Z",
+ "updated_at": "2026-11-28T14:10:00Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -9774,6 +9774,22 @@
    "timeout_seconds": 900,
    "updated_at": "2026-11-28T06:35:32Z",
    "registered_at": "2026-11-28T06:35:32Z"
+  },
+  "C-console-v0204": {
+   "argv": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0204.py",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL149_VeritasCentralGovernanceConsole v0204 自測 6/6 · PASS",
+   "scope": "CGC_MDL149 主控台 v0204(元件掃描認得任何名字的家族常數 + glob 取前版的薄尾;還在用的前版元件不再被誤判退役)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0204.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0203.py"
+   ],
+   "version": "v0204",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-28T13:20:00Z",
+   "registered_at": "2026-11-28T13:20:00Z"
   }
  },
  "work_items": [
@@ -11754,12 +11770,17 @@
   {
    "id": "VCGC-REQ148:celeritas_gate_v0103",
    "requirement": "VCGC-REQ148",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "owner": "AI",
    "reason": "Celeritas 產出契約閘 v0103:無版號舊 .ps1 有帶章版號尾版 = 版史(同掃橋器 v0110 · 探針 v0106);PS 基線外新缺 0(VCGC-REQ148) → 已驗:2026-10-04T03:07:52+00:00 rc 0 · 標記見到",
    "next": "handoff test celeritas_gate_v0103 實跑轉 VERIFIED",
    "case": "celeritas_gate_v0103",
-   "receipt": "docs/handoff/evidence/celeritas_gate_v0103.json"
+   "receipt": "docs/handoff/evidence/celeritas_gate_v0103.json",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ286:C-celeritas-gate-v0107",
+   "superseded_at": "2026-11-28T14:10:00Z",
+   "superseded_why": "CGC_MDL183 v0103 是舊版;它的自測往下跑整條前版鏈,主機 / 容器都紅在舊斷言。依裁定甲(2026-11-28「前版鏈比照裁定甲」)由尾版 v0107 的案 C-celeritas-gate-v0107 接手(那一案目前紅在 #777 合進來的三支 Invoke-VDF-HostRun .ps1 沒有模板章,另列)",
+   "updated_at": "2026-11-28T14:10:00Z"
   },
   {
    "id": "VCGC-REQ148:env_gov_v0118",
@@ -11794,12 +11815,17 @@
   {
    "id": "VCGC-REQ149:vdf_fetch_v0107",
    "requirement": "VCGC-REQ149",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "owner": "AI",
    "reason": "MDL008 v0107 live curl_cffi 改道進鎖版網路工具(akshare NBS)· 冊 v0106(MDL011 v0102 · +011d 深度宏觀)· 列上限 timeout_s(VCGC-REQ149) → 已驗:2026-10-04T04:11:22+00:00 rc 0 · 標記見到",
    "next": "handoff test vdf_fetch_v0107 實跑轉 VERIFIED",
    "case": "vdf_fetch_v0107",
-   "receipt": "docs/handoff/evidence/vdf_fetch_v0107.json"
+   "receipt": "docs/handoff/evidence/vdf_fetch_v0107.json",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ141:vdf_fetch_integration",
+   "superseded_at": "2026-11-28T14:10:00Z",
+   "superseded_why": "VDF_MDL008 v0107 是舊版;擷取系統尾版已到 v0115(交接閘 vdf_fetch_integration 驗整合測試)。v0107 的判決行在 v0115 補上擷取家改寫後不再印同一行(rc 0 · 標記沒見到)。依裁定甲由 vdf_fetch_integration 接手",
+   "updated_at": "2026-11-28T14:10:00Z"
   },
   {
    "id": "VCGC-REQ149:vdf_akshare_v0102",
@@ -12329,12 +12355,17 @@
   {
    "id": "VCGC-REQ167:celeritas_gate_intake",
    "requirement": "VCGC-REQ167",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "owner": "AI",
    "reason": "收尾 SDD 自測 CGC_MDL183 v0103 紅 2:⑭ 今日收容 AzureFlow_QA_v0120 的 5 支 .ps1 被當基線外新缺;⑦ 唯讀本 accelerator/VeritasCeleritas.py 被刪(已從 main 還原) → v0104 薄尾 → 已驗:None rc 0 · 標記見到",
    "next": "handoff test celeritas_gate_v0104 實跑轉 VERIFIED",
    "case": "celeritas_gate_v0104",
-   "receipt": "docs/handoff/evidence/celeritas_gate_v0104.json"
+   "receipt": "docs/handoff/evidence/celeritas_gate_v0104.json",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ286:C-celeritas-gate-v0107",
+   "superseded_at": "2026-11-28T14:10:00Z",
+   "superseded_why": "CGC_MDL183 v0103 是舊版;它的自測往下跑整條前版鏈,主機 / 容器都紅在舊斷言。依裁定甲(2026-11-28「前版鏈比照裁定甲」)由尾版 v0107 的案 C-celeritas-gate-v0107 接手(那一案目前紅在 #777 合進來的三支 Invoke-VDF-HostRun .ps1 沒有模板章,另列)",
+   "updated_at": "2026-11-28T14:10:00Z"
   },
   {
    "id": "VCGC-REQ169:via_unified",
@@ -13948,10 +13979,15 @@
    "receipt": "docs/handoff/evidence/celeritas_gate_v0104.json",
    "reason": "CGC_MDL183 v0106 薄尾:PY 缺橋照 MDL156 名冊豁免 + 版史 INFO 照列(操作員原件 nonstock_v0310/engine · VRN2_UIAction_v0100);案 repinned 認 v0106 判決行",
    "next": "桌機 handoff test celeritas_gate_v0104 同綠",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "verified_at": "2026-11-06T20:10:40+00:00",
    "verified_why": "handoff test celeritas_gate_v0104 rc 0 · 標記見到",
-   "registered_at": "2026-11-06T20:19:06+00:00"
+   "registered_at": "2026-11-06T20:19:06+00:00",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ286:C-celeritas-gate-v0107",
+   "superseded_at": "2026-11-28T14:10:00Z",
+   "superseded_why": "CGC_MDL183 v0103 是舊版;它的自測往下跑整條前版鏈,主機 / 容器都紅在舊斷言。依裁定甲(2026-11-28「前版鏈比照裁定甲」)由尾版 v0107 的案 C-celeritas-gate-v0107 接手(那一案目前紅在 #777 合進來的三支 Invoke-VDF-HostRun .ps1 沒有模板章,另列)",
+   "updated_at": "2026-11-28T14:10:00Z"
   },
   {
    "id": "VCGC-REQ187:celeritas_gate_v0103",
@@ -13961,10 +13997,15 @@
    "receipt": "docs/handoff/evidence/celeritas_gate_v0103.json",
    "reason": "v0106 尾版鏈照跑 v0103 自測(標記由鏈印出)",
    "next": "桌機同綠",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "verified_at": "2026-11-06T20:07:40+00:00",
    "verified_why": "handoff test celeritas_gate_v0103 rc 0 · 標記見到",
-   "registered_at": "2026-11-06T20:19:06+00:00"
+   "registered_at": "2026-11-06T20:19:06+00:00",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ286:C-celeritas-gate-v0107",
+   "superseded_at": "2026-11-28T14:10:00Z",
+   "superseded_why": "CGC_MDL183 v0103 是舊版;它的自測往下跑整條前版鏈,主機 / 容器都紅在舊斷言。依裁定甲(2026-11-28「前版鏈比照裁定甲」)由尾版 v0107 的案 C-celeritas-gate-v0107 接手(那一案目前紅在 #777 合進來的三支 Invoke-VDF-HostRun .ps1 沒有模板章,另列)",
+   "updated_at": "2026-11-28T14:10:00Z"
   },
   {
    "id": "VCGC-REQ187:ui_engine_v0101",
@@ -19079,6 +19120,18 @@
    "verified_at": "2026-11-28T06:36:19+00:00",
    "verified_why": "handoff test C-sourcelane-v0103 rc 0 · 標記見到(容器;同意閘只在行程內)",
    "receipt": "docs/handoff/evidence/C-sourcelane-v0103.json"
+  },
+  {
+   "id": "VCGC-REQ289:C-console-v0204",
+   "requirement": "VCGC-REQ289",
+   "case": "C-console-v0204",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "元件掃描認得 FAMILY + glob 的薄尾(ENG232 v0108 · ENG068 v0107 那一層不再斷鏈);console v0204 自測連過三次(容器)",
+   "next": "主機:via-vcgc registry-sync 看退役 0(未在主機實跑)",
+   "updated_at": "2026-11-28T13:30:00Z",
+   "registered_at": "2026-11-28T13:20:00Z",
+   "receipt": "docs/handoff/evidence/C-console-v0204.json"
   }
  ],
  "retired_files": {

@@ -236,3 +236,6 @@
 | 2026-11-28T11:20:00Z | VDF_MDL008_FetchSystem_v0115.py | 0115 | VIA-VDF-MDL387 | 0f24af5b76f5 | 擷取家改寫認得參數橋相對寫法 · 夾具不寫倉內 db/ | 自測 8/8 ×3 · fetch test 23/23 |
 | 2026-11-28T11:55:00Z | VDF_MDL020_DataPlane_v0107.py | 0107 | VIA-VDF-MDL388 | 9b74e4303231 | 自測只驗本版與直接前版 v0106(裁定甲)· 功能本體 v0104 六檢照跑 | 自測 4/4 ×3 |
 | 2026-11-28T11:55:00Z | VDF_MDL022_SafeParallelLaunch_v0114.py | 0114 | VIA-VDF-MDL389 | 1a1d5bb60441 | 自測只驗本版與直接前版 v0113(裁定甲) | 自測 4/4 ×3 |
+| 2026-11-28T13:30:00Z | CGC_MDL149_VeritasCentralGovernanceConsole_v0204.py | 0204 | VIA-VCGC-MDL1743 | 98394c53a4fd | 元件掃描認得 FAMILY + glob 的薄尾(前版元件不再誤判退役) | 自測 6/6 ×3 · handoff test C-console-v0204 rc 0 · registry-sync 退役 0 |
+| 2026-11-28T13:30:00Z | VDF_ENG232_TWIndexOfficial_v0109.py | 0109 | VIA-VDF-ENG415 | 09e6f41681e4 | 自測只驗本版與直接前版 v0108(裁定甲) | 自測 4/4 ×3 |
+| 2026-11-28T13:30:00Z | VDF_MDL013_ActivateVDF_v0123.py | 0123 | VIA-VDF-MDL392 | 3695b30b1b0f | 自測只驗本版與直接前版 v0122(裁定甲) | 自測 4/4 ×3 |
