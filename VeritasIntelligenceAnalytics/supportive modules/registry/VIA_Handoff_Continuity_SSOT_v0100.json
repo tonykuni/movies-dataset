@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-11-27T22:21:42Z",
+ "updated_at": "2026-11-28T01:41:29Z",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -739,7 +739,7 @@
     "CGC_MDL170_VDFChainRunner",
     "--selftest"
    ],
-   "success_marker": "[計] CGC_MDL170_VDFChainRunner v0105 薄尾 3/3 · v0104 PASS · 合計 PASS",
+   "success_marker": "[計] CGC_MDL170_VDFChainRunner v0106 本版 6/6 · 合計 PASS",
    "scope": "VDF 鏈跑器 0c 獨立性:沿薄尾鏈取文看依賴(薄尾繼承的依賴不再看不見)· 單向讀取豁免冊比對 · 真樹 ENG063 / ENG094 已審 · 未審 0(R39 · VCGC-REQ094)",
    "dependencies": [
     "supportive modules/registry/CGC_MDL170_VDFChainRunner_v*.py",
@@ -747,7 +747,14 @@
     "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v*.py",
     "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v*.py"
    ],
-   "timeout_seconds": 900
+   "timeout_seconds": 900,
+   "repinned": {
+    "from": "[計] CGC_MDL170_VDFChainRunner v0105 薄尾 3/3 · v0104 PASS · 合計 PASS",
+    "to": "[計] CGC_MDL170_VDFChainRunner v0106 本版 6/6 · 合計 PASS",
+    "at": "2026-11-28T01:29:03Z",
+    "why": "操作員 2026-11-28「前版鏈比照裁定甲」:尾版 v0106 自測只驗本版與直接前版 v0105,不再印 v0105 的整條鏈判決行;判法(真樹依賴未審 0)不放寬(VCGC-REQ286)"
+   },
+   "updated_at": "2026-11-28T01:29:03Z"
   },
   "vdf_local_db": {
    "argv": [
@@ -9552,6 +9559,125 @@
    "timeout_seconds": 2400,
    "updated_at": "2026-11-27T22:21:42Z",
    "registered_at": "2026-11-27T22:21:42Z"
+  },
+  "C-lessons-v0104": {
+   "argv": [
+    "CGC_MDL058_Lessons",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL058 v0104 4/4 · 前版 PASS · 合計 PASS",
+   "scope": "CGC_MDL058 v0104:前版自測在暫存合成帳上跑 · 真帳不動 · 本機帳根因規則數 INFO(VCGC-REQ286)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL058_Lessons_v0104.py",
+    "supportive modules/registry/CGC_MDL058_Lessons_v0103.py"
+   ],
+   "version": "v0104",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-28T01:29:03Z",
+   "registered_at": "2026-11-28T01:29:03Z"
+  },
+  "C-bundle-v0102": {
+   "argv": [
+    "CGC_MDL256_SubsystemBundle",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL256_SubsystemBundle_v0102 本版 5/5 · v0101 PASS · 合計 PASS",
+   "scope": "CGC_MDL256 v0102:包冊上已退役搬走的檔有清冊證明 → retired;沒證明照算缺(VCGC-REQ286)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL256_SubsystemBundle_v0102.py",
+    "supportive modules/registry/CGC_MDL256_SubsystemBundle_v0101.py"
+   ],
+   "version": "v0102",
+   "timeout_seconds": 1200,
+   "updated_at": "2026-11-28T01:29:03Z",
+   "registered_at": "2026-11-28T01:29:03Z"
+  },
+  "C-vdfchain-v0106": {
+   "argv": [
+    "CGC_MDL170_VDFChainRunner",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL170_VDFChainRunner v0106 本版 6/6 · 合計 PASS",
+   "scope": "CGC_MDL170 v0106(裁定甲):本版 + 直接前版 v0105;真樹依賴未審 0;ENG094 自 v0101 不再讀 VRN → 豁免冊多一列 INFO(VCGC-REQ286)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0106.py",
+    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0105.py"
+   ],
+   "version": "v0106",
+   "timeout_seconds": 900,
+   "updated_at": "2026-11-28T01:29:03Z",
+   "registered_at": "2026-11-28T01:29:03Z"
+  },
+  "C-workbench-lock-v0103": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_WorkbenchLock_v0103.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_WorkbenchLock_v0103 selftest · 本版 4/4 · 直接前版 v0102 PASS",
+   "scope": "VIA_WorkbenchLock v0103(裁定甲):本版 + 直接前版 v0102(+ v0101 本身);v0100 ⑰ 釘著三張舊紅收據不再算進本版(VCGC-REQ286)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_WorkbenchLock_v0103.py",
+    "docs/handoff/ai/VIA_WorkbenchLock_v0102.py"
+   ],
+   "version": "v0103",
+   "timeout_seconds": 1200,
+   "updated_at": "2026-11-28T01:29:03Z",
+   "registered_at": "2026-11-28T01:29:03Z"
+  },
+  "C-lake-matrix-v0102": {
+   "argv": [
+    "--family",
+    "core",
+    "docs/handoff/ai/VIA_LakeMatrix_v0102.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] VIA_LakeMatrix v0102 selftest · 本版 5/5 · 前版鏈 v0101 PASS",
+   "scope": "VIA_LakeMatrix v0102:自測時鐘凍在夾具那一刻(拆 v0100 ⓔ 定時炸彈)· 前版鏈照跑(VCGC-REQ286)",
+   "dependencies": [
+    "docs/handoff/ai/VIA_LakeMatrix_v0102.py",
+    "docs/handoff/ai/VIA_LakeMatrix_v0101.py"
+   ],
+   "version": "v0102",
+   "timeout_seconds": 1200,
+   "updated_at": "2026-11-28T01:29:03Z",
+   "registered_at": "2026-11-28T01:29:03Z"
+  },
+  "C-bridge-sweeper-v0106": {
+   "argv": [
+    "--family",
+    "core",
+    "supportive modules/registry/via_bridge_sweeper_v0106.py",
+    "--selftest"
+   ],
+   "success_marker": "[PASS] via_bridge_sweeper v0106 selftest · 本版 7/7",
+   "scope": "via_bridge_sweeper v0106:functional modules/<系統>/intake/ 一律收容件(VAP intake 9 支不注橋)· 真樹加速缺 0(裁定甲:本版 + 直接前版 v0105)(VCGC-REQ286)",
+   "dependencies": [
+    "supportive modules/registry/via_bridge_sweeper_v0106.py",
+    "supportive modules/registry/via_bridge_sweeper_v0105.py"
+   ],
+   "version": "v0106",
+   "timeout_seconds": 1500,
+   "updated_at": "2026-11-28T01:29:03Z",
+   "registered_at": "2026-11-28T01:29:03Z"
+  },
+  "C-celeritas-gate-v0107": {
+   "argv": [
+    "CGC_MDL183_CeleritasPolicyGate",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL183_CeleritasPolicyGate v0107 本版 7/7 · 前版 PASS · 合計 PASS",
+   "scope": "CGC_MDL183 v0107(VCGC-REQ286 操作員 2026-11-28 裁定甲):帳 VIA_CeleritasPolicy_AckDebt_v0100 上的 18 支既有 PS → ack_debt;前版鏈 PY 2 支(尾版先載橋)→ ack_prior;帳外照紅;基線資料檔一字不改",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0107.py",
+    "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0106.py",
+    "supportive modules/registry/VIA_CeleritasPolicy_AckDebt_v0100.json"
+   ],
+   "version": "v0107",
+   "timeout_seconds": 1500,
+   "updated_at": "2026-11-28T01:33:51Z",
+   "registered_at": "2026-11-28T01:03:18Z"
   }
  },
  "work_items": [
@@ -14793,12 +14919,16 @@
    "id": "VCGC-REQ212:workbench-responsive-v0102",
    "requirement": "VCGC-REQ212",
    "case": "C-workbench-lock-v0102",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "owner": "AI",
    "reason": "操作員 2026-11-09 晚:響應式 · 固定共用 header · Claude 字級 → v0102;等 handoff test 收據 → handoff test rc 0 · marker true",
    "next": "閘鏈(編號 · audit · registry-sync · test --quick)→ 推 → PR",
    "receipt": "docs/handoff/evidence/C-workbench-lock-v0102.json",
-   "updated_at": "2026-11-09T16:29:14Z"
+   "updated_at": "2026-11-28T01:33:51Z",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ286:C-workbench-lock-v0103",
+   "superseded_at": "2026-11-28T01:33:51Z",
+   "superseded_why": "操作員 2026-11-19 裁定甲、2026-11-28「前版鏈比照裁定甲」:尾版自測只驗本版與直接前版,舊案記成被尾版接手。C-workbench-lock-v0102 釘著舊版號,前版鏈的釘死判準在現在的樹上不成立;由 C-workbench-lock-v0103(測現在的尾版,此刻有效綠)接手。不改字樣、不改判法、不刪工作項(VCGC-REQ286)"
   },
   {
    "id": "VCGC-REQ213:C-vcgc-toolboard",
@@ -14859,12 +14989,16 @@
    "id": "VCGC-REQ214:C-lake-matrix-v0101",
    "requirement": "VCGC-REQ214",
    "case": "C-lake-matrix-v0101",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "owner": "AI",
    "reason": "Codex PR #623 P2 ×2:① 五系統 × 日 只算 first / last 兩點(中間日漏 · 單分片算兩次)→ 逐分片檔名戳;② 一表好一表壞仍 GREEN 且壞表不出現 → 任何壞表非綠(部分 YELLOW · 全壞 RED)+ 壞表列進資產明細。v0100 已在 main → 薄尾 v0101(add-only)。 等 handoff test 收據 → handoff test rc 0 · marker true",
    "next": "閘鏈 → 推 → 回 Codex",
    "receipt": "docs/handoff/evidence/C-lake-matrix-v0101.json",
-   "updated_at": "2026-11-10T03:04:57Z"
+   "updated_at": "2026-11-28T01:33:51Z",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ286:C-lake-matrix-v0102",
+   "superseded_at": "2026-11-28T01:33:51Z",
+   "superseded_why": "操作員 2026-11-19 裁定甲、2026-11-28「前版鏈比照裁定甲」:尾版自測只驗本版與直接前版,舊案記成被尾版接手。C-lake-matrix-v0101 釘著舊版號,前版鏈的釘死判準在現在的樹上不成立;由 C-lake-matrix-v0102(測現在的尾版,此刻有效綠)接手。不改字樣、不改判法、不刪工作項(VCGC-REQ286)"
   },
   {
    "id": "VCGC-REQ214:C-parquet-lake-v0101",
@@ -15024,12 +15158,16 @@
    "id": "VCGC-REQ220:C-bridge-sweeper-v0105",
    "requirement": "VCGC-REQ220",
    "case": "C-bridge-sweeper-v0105",
-   "state": "VERIFIED",
+   "state": "SUPERSEDED",
    "owner": "AI",
    "reason": "v0104 原封(SHA = 收據)· 標準加速器橋放 v0105(PR 647 Codex P1);handoff test rc 0 · marker true(2026-11-15T03:58:28Z · sha fb753f4d9bad)",
    "next": "VDF 對外擷取真抓驗證 = 操作員",
    "receipt": "docs/handoff/evidence/C-bridge-sweeper-v0105.json",
-   "updated_at": "2026-11-15T03:59:43Z"
+   "updated_at": "2026-11-28T01:33:51Z",
+   "superseded_from_state": "VERIFIED",
+   "superseded_by": "VCGC-REQ286:C-bridge-sweeper-v0106",
+   "superseded_at": "2026-11-28T01:33:51Z",
+   "superseded_why": "操作員 2026-11-19 裁定甲、2026-11-28「前版鏈比照裁定甲」:尾版自測只驗本版與直接前版,舊案記成被尾版接手。C-bridge-sweeper-v0105 釘著舊版號,前版鏈的釘死判準在現在的樹上不成立;由 C-bridge-sweeper-v0106(測現在的尾版,此刻有效綠)接手。不改字樣、不改判法、不刪工作項(VCGC-REQ286)"
   },
   {
    "id": "VDF-REQ018:V-vdf-workstation-sync-v0103",
@@ -18670,6 +18808,104 @@
    "updated_at": "2026-11-27T22:21:42Z",
    "registered_at": "2026-11-27T22:21:42Z",
    "receipt": "docs/handoff/evidence/C-hostboot-v0110.json"
+  },
+  {
+   "id": "VCGC-REQ286:C-celeritas-gate-v0107",
+   "requirement": "VCGC-REQ286",
+   "case": "C-celeritas-gate-v0107",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "加速器政策閘照裁定甲:PS 基線外新缺 18 → 帳上既有債;PY 版史仍被冊指名 2 → 前版鏈帳(尾版先載橋)",
+   "next": "主機未實跑",
+   "updated_at": "2026-11-28T01:41:29Z",
+   "registered_at": "2026-11-28T01:03:18Z",
+   "verified_at": "2026-11-28T01:41:14+00:00",
+   "verified_why": "handoff test C-celeritas-gate-v0107 rc 0 · 標記見到(容器)",
+   "receipt": "docs/handoff/evidence/C-celeritas-gate-v0107.json"
+  },
+  {
+   "id": "VCGC-REQ286:C-lessons-v0104",
+   "requirement": "VCGC-REQ286",
+   "case": "C-lessons-v0104",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "教訓帳自測讀本機 gitignored 帳(容器沒有根因規則)→ 改在暫存合成帳上跑",
+   "next": "主機未實跑",
+   "updated_at": "2026-11-28T01:33:51Z",
+   "registered_at": "2026-11-28T01:29:03Z",
+   "verified_at": "2026-11-28T01:29:27+00:00",
+   "verified_why": "handoff test C-lessons-v0104 rc 0 · 標記見到(容器)",
+   "receipt": "docs/handoff/evidence/C-lessons-v0104.json"
+  },
+  {
+   "id": "VCGC-REQ286:C-bundle-v0102",
+   "requirement": "VCGC-REQ286",
+   "case": "C-bundle-v0102",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "下載包第一包缺 161 支 = 全部有 RETIRE_MANIFEST 證明的退役件",
+   "next": "主機未實跑",
+   "updated_at": "2026-11-28T01:33:51Z",
+   "registered_at": "2026-11-28T01:29:03Z",
+   "verified_at": "2026-11-28T01:29:46+00:00",
+   "verified_why": "handoff test C-bundle-v0102 rc 0 · 標記見到(容器)",
+   "receipt": "docs/handoff/evidence/C-bundle-v0102.json"
+  },
+  {
+   "id": "VCGC-REQ286:C-vdfchain-v0106",
+   "requirement": "VCGC-REQ286",
+   "case": "C-vdfchain-v0106",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "v0103 ⑳ / v0104 ㉖ 釘著「兩處依賴」的舊世界",
+   "next": "主機未實跑",
+   "updated_at": "2026-11-28T01:33:51Z",
+   "registered_at": "2026-11-28T01:29:03Z",
+   "verified_at": "2026-11-28T01:30:06+00:00",
+   "verified_why": "handoff test C-vdfchain-v0106 rc 0 · 標記見到(容器)",
+   "receipt": "docs/handoff/evidence/C-vdfchain-v0106.json"
+  },
+  {
+   "id": "VCGC-REQ286:C-workbench-lock-v0103",
+   "requirement": "VCGC-REQ286",
+   "case": "C-workbench-lock-v0103",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "v0100 ⑰ 要真樹三張收據仍是紅,那幾案已補證據",
+   "next": "主機未實跑",
+   "updated_at": "2026-11-28T01:33:51Z",
+   "registered_at": "2026-11-28T01:29:03Z",
+   "verified_at": "2026-11-28T01:30:40+00:00",
+   "verified_why": "handoff test C-workbench-lock-v0103 rc 0 · 標記見到(容器)",
+   "receipt": "docs/handoff/evidence/C-workbench-lock-v0103.json"
+  },
+  {
+   "id": "VCGC-REQ286:C-lake-matrix-v0102",
+   "requirement": "VCGC-REQ286",
+   "case": "C-lake-matrix-v0102",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "夾具今天釘 2026-11-10,入湖戳用真時鐘 → 11-17 起必紅",
+   "next": "主機未實跑",
+   "updated_at": "2026-11-28T01:33:51Z",
+   "registered_at": "2026-11-28T01:29:03Z",
+   "verified_at": "2026-11-28T01:31:01+00:00",
+   "verified_why": "handoff test C-lake-matrix-v0102 rc 0 · 標記見到(容器)",
+   "receipt": "docs/handoff/evidence/C-lake-matrix-v0102.json"
+  },
+  {
+   "id": "VCGC-REQ286:C-bridge-sweeper-v0106",
+   "requirement": "VCGC-REQ286",
+   "case": "C-bridge-sweeper-v0106",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "加速 1197/1206:缺的 9 支全是 VAP 收件夾",
+   "next": "主機未實跑",
+   "updated_at": "2026-11-28T01:33:51Z",
+   "registered_at": "2026-11-28T01:29:03Z",
+   "verified_at": "2026-11-28T01:31:20+00:00",
+   "verified_why": "handoff test C-bridge-sweeper-v0106 rc 0 · 標記見到(容器)",
+   "receipt": "docs/handoff/evidence/C-bridge-sweeper-v0106.json"
   }
  ],
  "retired_files": {

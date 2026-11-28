@@ -28,89 +28,20 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 727 · import 0 · 提及 165 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 727 · import 0 · 提及 166 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL170_VDFChainRunner_v0105.py(家族 core)
-=== CGC_MDL170_VDFChainRunner v0105 · 薄尾自測(逐站進度行)===
-  [OK] ① 本體的站執行格換成本版;站數從本體 CHAIN 讀 · 7
-  [OK] ② 每站一行開始、一行完成;帶 k/N · 燈 · 秒;結果原樣回傳(判燈不動) · ['[進度] VDF 1/7 開始 1 參數', '[進度] VDF 1/7 完成 1 參數 · GREEN · 0.0s', '[進度] VDF 2/7 開始 2 邏輯', '[進度] VDF 2/7 完成 2 邏輯 · GREEN · 0.0s']
-  [OK] ③ 加速器橋在(同前版:本支不觸網,無網路橋);不碰 TA-Lib
-  [OK] 站齊且不重號 (['0a', '0b', '0c', '1', '2', '3a', '3b', '4a', '4b', '4c'])
-  [OK] 燈號只有六種(誠實態) (越界 [])
-  [OK] 非綠必附下一步 (缺 [])
-  [OK] 逐站有出處 (缺 [])
-  [OK] 合計=逐站 (10 vs 10)
-  [OK] 起始日預設 2023-07-01 且格式驗得住 (2023-07-01)
-  [OK] 同意閘永不代設(原始碼層咬死) (寫入點 0)
-  [OK] 加速器站+網路站在位 (加速器 GREEN · 網路 GATED)
-  [OK] 閘未開=GATED 不是 RED (GATED)
-  [OK] VDF 獨立性逐支量,且收容件路徑不算依賴 (85 個 ENG 家族 · **真依賴兄弟家族 0** —— **VDF 這一側是獨立的** · 單向讀取(已審,登在 VIA_VDF_On)
-  [OK] plan 零動作 (7 站)
-  [OK] 只調度不複製(鏈表只有 glob 與動詞) (7 站)
-  [OK] 尾版律 glob 
-  [OK] rc 與燈一致 (rc=4 應 4)
-╭──────────────── VERITAS INTELLIGENCE ANALYTICS · VDF ────────────────╮
-│ VDF 獨立鏈 · MATRIX SUMMARY · 批667 · v0102                          │
-│ 起始日 2023-07-01 · 模式 plan · 產生 2026-11-27 18:31:10Z            │
-│ 主機 vm · python 3.13.18 · 家族境 /usr/local/bin/python3             │
-│ 同意閘 VIA_NET_CONSENT=未開 · VIA_SCRAPE_CONSENT=未開  (AI 永不代設) │
-│ GREEN 2 · RED 0 · GATED 1 · NODATA 0 · ABSENT 0 · SKIP 7 → GATED     │
-╰──────────────────────────────────────────────────────────────────────╯
-                                                                                                                                                                                                                  
- 站   名稱                         態      秒   量到什麼 · 為什麼是這個燈                             下一步(修法)                                          出處                                                  
- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
- 0a   加速器掛載                   GREEN        可用道 accel_map·fetch·celeritas·activate · 快取                                                            supportive modules/VIA_SuperAccel_Module.py           
-                                                VIA_Reports/accel_cache                                                                                                                                           
- 0b   網路工具掛載                 GATED        SUP_MDL740_NetUnified_v0120.py · 後端 supportive      要觸網的站才需要:在你的視窗打                         supportive                                            
-                                                modules/network/VeritasAegisNexus_v1652.py ·          $env:VIA_NET_CONSENT='YES'(以及必要時                 modules/network/SUP_MDL740_NetUnified_v0120.py        
-                                                閘一=未開 閘二=未開 ——                                $env:VIA_SCRAPE_CONSENT);零網路的站照跑                                                                     
-                                                **同意閘未開=缺料不是壞掉**;AI 永不代設                                                                                                                           
- 0c   VDF 獨立性                   GREEN        85 個 ENG 家族 · **真依賴兄弟家族 0** —— **VDF                                                              functional modules/VDF/engine                         
-                                                這一側是獨立的** · 單向讀取(已審,登在                                                                                                                             
-                                                VIA_VDF_OneWayRead_Waivers_v0100.json)1:VDF_ENG063_                                                                                                               
-                                                MonthlyRevenue→functional modules/VRN                                                                                                                             
- 1    參數 · 輸入參數 x 引擎映射   SKIP         尾版 VDF_ENG053_ParamEngineMap_v0106.py · plan                                                              functional                                            
-                                                只攤開零動作                                                                                                modules/VDF/engine/VDF_ENG053_ParamEngineMap_v0106.py 
- 2    邏輯 · 資料架構對映          SKIP         尾版 VDF_ENG073_DataArchitecture_v0101.py · plan                                                            functional                                            
-                                                只攤開零動作                                                                                                modules/VDF/engine/VDF_ENG073_DataArchitecture_v0101. 
-                                                                                                                                                            py                                                    
- 3a   因子 · 特徵庫                SKIP         尾版 VDF_ENG061_FeatureStore_v0106.py · plan                                                                functional                                            
-                                                只攤開零動作                                                                                                modules/VDF/engine/VDF_ENG061_FeatureStore_v0106.py   
- 3b   因子 · 族群特徵層            SKIP         尾版 VDF_ENG062_GroupFeatureLayer_v0105.py · plan                                                           functional                                            
-                                                只攤開零動作                                                                                                modules/VDF/engine/VDF_ENG062_GroupFeatureLayer_v0105 
-                                                                                                                                                            .py                                                   
- 4a   引擎 · 資料涵蓋閘            SKIP         尾版 VDF_ENG090_DataCoverageGate_v0106.py · plan                                                            functional                                            
-                                                只攤開零動作                                                                                                modules/VDF/engine/VDF_ENG090_DataCoverageGate_v0106. 
-                                                                                                                                                            py                                                    
- 4b   引擎 · 增量擷取閘            SKIP         尾版 VDF_ENG089_IncrementalFetchGate_v0110.py ·                                                             functional                                            
-                                                plan 只攤開零動作                                                                                           modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0 
-                                                                                                                                                            110.py                                                
- 4c   引擎 · VDF 稽核閘            SKIP         尾版 VDF_ENG091_VdfAuditGate_v0100.py · plan                                                                functional                                            
-                                                只攤開零動作                                                                                                modules/VDF/engine/VDF_ENG091_VdfAuditGate_v0100.py   
-                                                                                                                                                                                                                  
-  [OK] HTML 零外連 · 逐站齊 · 三顆鍵在位 (rich=用了 · 19426 字 · 缺站 [] · 鍵 True)
-  [OK] 存證三件 + 台帳 append-only (台帳 2 行)
-  [OK] --resume 只跳過綠的 (1 跳過 · 2 真跑 rc 燈 GREEN)
-  [OK] 自我指涉閘:家族名可推導且引擎本體不讀格子存證 (自家族 CGC_MDL170_VDFChainRunner · 本體提及 0 次)
-[進度] VDF 7/7 開始 9a 合成缺件
-[進度] VDF 7/7 完成 9a 合成缺件 · ABSENT · 0.1s
-[進度] VDF 8/7 開始 9b 合成壞掉
-[進度] VDF 8/7 完成 9b 合成壞掉 · RED · 0.0s
-  [OK] ⑲ 缺件具名 ABSENT:import 不存在的套件 → ABSENT 且點名套件與家族境;普通炸 → RED(負控;缺件≠壞掉,壞掉≠缺件) (ABSENT · RED)
-  [計] 十九檢 OK 19 · FAIL 0 · 13.8s
-=== VDF 鏈跑器 v0103 薄尾加檢(0c 單向讀取豁免)===
-  [FAIL] ⑳ 真樹:ENG063 / ENG094 兩處命中都對上豁免冊,未審依賴 0 (已審 ['VDF_ENG063_MonthlyRevenue→functional modules/VRN'] · 未審 [])
-  [OK] ㉑ 負控:沒登記的依賴(ENG901→VAP)仍是未審依賴 (['VDF_ENG901_Other→functional modules/VAP/y'])
-  [OK] ㉒ 登記的單向讀取算已審 (['VDF_ENG900_Fake→functional modules/VRN'])
-  [OK] ㉓ 程式改了(豁免列的呼叫名不見了)→ 回未審,要重審 (['VDF_ENG900_Fake→functional modules/VRN', 'VDF_ENG901_Other→functional modules/VAP/y'])
-  [OK] ㉔ 0c 本站輸出仍帶「真依賴兄弟家族」字樣(v0102 ⑩ 契約)且狀態合法 (GREEN · 85 個 ENG 家族 · **真依賴兄弟家族 0** —— **VDF 這一側是獨立的** · 單向讀取(已審,登在 VIA_VDF_OneWayRead_Waivers_v01)
-  [計] v0103 薄尾 4/5 · v0102 本體 PASS · 合計 FAIL
-=== CGC_MDL170_VDFChainRunner v0104 薄尾加檢(沿薄尾鏈看依賴)===
-  [OK] ㉓ 薄尾繼承的依賴看得到:v0101 薄尾自己沒寫、v0100 本體有 → 仍列為依賴 (['VDF_ENG950_Chain→functional modules/VRN'])
-  [OK] ㉔ 豁免比對也沿鏈:登記的呼叫名在本體 → 算已審 ({'families': 2, 'filed': [], 'reviewed': ['VDF_ENG950_Chain→functional modules/VRN'], 'open': []})
-  [OK] ㉕ 不是薄尾的本體只讀自己(舊版的字不算進新版)
-  [FAIL] ㉖ 真樹:ENG063 · ENG094 兩處都看得到且都已審 · 未審 0 (已審 ['VDF_ENG063_MonthlyRevenue→functional modules/VRN'] · 未審 [])
-  [計] CGC_MDL170_VDFChainRunner v0104 薄尾 3/4 · v0103 FAIL · 合計 FAIL
-  [計] CGC_MDL170_VDFChainRunner v0105 薄尾 3/3 · v0104 FAIL · 合計 FAIL
-[監控] 背景全景監控中 pid 703 · 觸碰 run CGC_MDL170_VDFChainRunner · 交接閘 RED · 落後 1116 提交 · 快照 1341.3h · 未登 2438 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · CGC_MDL170_VDFChainRunner_v0106.py(家族 core)
+=== CGC_MDL170_VDFChainRunner v0106 · 薄尾自測(裁定甲:本版 + 直接前版 v0105)===
+  [OK] ① 前版 v0105:本體的站執行格是 v0105 的 run_one;站數從本體 CHAIN 讀 · 7
+  [OK] ② 前版 v0105:每站一行開始、一行完成(k/N · 燈 · 秒);結果原樣回傳(假站,不真跑) · ['[進度] VDF 1/7 開始 1 參數', '[進度] VDF 1/7 完成 1 參數 · GREEN · 0.0s']
+  [OK] ③ 負控:沒登豁免的跨系統讀取 → 未審 1;登了 → 已審;豁免冊有、樹上不命中 → stale(INFO) · ['VDF_ENG950_Chain→functional modules/VRN'] · {'families': 1, 'filed': [], 'reviewed': ['VDF_ENG950_Chain→functional modules/VRN'], 'open': [], 'stale_waivers': ['VDF_ENG951_Gone']}
+  [OK] ④ 真樹:未審依賴 0(已審照列) · 已審 ['VDF_ENG063_MonthlyRevenue→functional modules/VRN'] · 未審 []
+  [INFO] 豁免冊多一列(真樹已不再命中,冊照只增不刪):['VDF_ENG094_ActiveETFActivity']
+  [OK] ⑤ 加速器橋在且執行時載到(本支不觸網,無網路橋)· 不碰 TA-Lib
+  [OK] ⑥ 前版 v0105 的公開名稱從本版都拿得到(TAILAPI) · 5
+  [INFO] 前版鏈(v0104 以前)的自測不再算進本版(裁定甲);要看仍可各自 --selftest
+  [計] CGC_MDL170_VDFChainRunner v0106 本版 6/6 · 合計 PASS
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_LakeMatrix_v0102.py(冊上 VIA_LakeMa | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VIA_WorkbenchLock_v0103.py', 'via_bridge_sweeper_v | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):1 個,例 ['VCGC-REQ286'] → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 18, 'changed': 42, 'stale': 0, 'expected': 22559, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 4087 · 觸碰 run CGC_MDL170_VDFChainRunner · 交接閘 RED · 落後 1144 提交 · 快照 1348.3h · 未登 2436 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
