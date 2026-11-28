@@ -71,7 +71,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-FAMILY = "VDF_MDL020_DataPlane"
+STEM = "VDF_MDL020_DataPlane"
 TAG = "VDF_MDL020_DataPlane v0107"
 SKIPPED = "[略] 裁定甲:v0103 以前的前版鏈不算進本版(未跑)"
 DEEP_CHECKS = ("T2 v0102 歸位", "T3 v0103 那一行")                            # v0106 裡看 v0102 子行程的兩檢
@@ -82,7 +82,7 @@ def _vnum(p) -> int:
     return int(m.group(1)) if m else -1
 
 
-PRIOR_PATH = max((p for p in HERE.glob(FAMILY + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))), key=_vnum)
+PRIOR_PATH = max((p for p in HERE.glob(STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))), key=_vnum)
 _spec = importlib.util.spec_from_file_location(PRIOR_PATH.stem + "_for_v0107", PRIOR_PATH)
 PRIOR = importlib.util.module_from_spec(_spec)                                # v0106
 sys.modules[_spec.name] = PRIOR
