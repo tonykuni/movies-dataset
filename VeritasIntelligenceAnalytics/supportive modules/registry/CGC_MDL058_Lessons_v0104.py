@@ -11,7 +11,7 @@ CLAUDE.md 補強三:「自測一律在暫存夾造資料;這台剛好沒資料�
   ① 自測時把帳指到暫存夾一本合成帳(15 條合成根因規則 · 只增旗標),跑 v0103 整條前版自測;跑完還原,真帳一個位元不動。
   ② 本機帳另列一行 INFO:讀得懂 · 只增旗標 · 根因規則幾條(容器多半 0 → 照實印,不當綠、不當紅;主機另驗)。
   操作員 2026-11-28「前版鏈比照裁定甲」:本版自測驗本版與直接前版 v0103(v0103 再帶它自己的鏈)。
-其餘(簽名 · 重複出錯 · 鎖 · 原子寫入 · 報告)全照 v0103。零網路。
+其餘(簽名 · 重複出錯 · 鎖 · 原子寫入 · 報告)全照 v0103;ledger_lock · record_event 由本版明寫轉出(同一支)。零網路。
 """
 from __future__ import annotations
 
@@ -53,6 +53,8 @@ _PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = _PRIOR
 _spec.loader.exec_module(_PRIOR)
 _STORE = _PRIOR._STORE                     # v0101:LEDGER 住在這一層(v0103 的讀寫都看它)
+ledger_lock = _PRIOR.ledger_lock           # 跨行程鎖照 v0103(本版明寫轉出;CGC_MDL224 ⑥ 認尾版有這把鎖)
+record_event = _PRIOR.record_event
 N_SYNTH = 15
 
 
@@ -111,6 +113,8 @@ def selftest() -> int:
     ids = [e["id"] for e in s["entries"]]
     chk("③ 合成帳:15 條根因規則 · 不重號 · sig/cause/fix 全有", len(ids) == N_SYNTH == len(set(ids))
         and all(e["sig"] and e["cause"] and e["fix"] for e in s["entries"]))
+    chk("③ b 跨行程鎖與記錄照 v0103(ledger_lock · record_event 就是前版那兩支)",
+        ledger_lock is _PRIOR.ledger_lock and record_event is _PRIOR.record_event)
     info = real_ledger_info()
     print(f"  [INFO] 本機帳(gitignored 執行產物,不進自測判定):{info}")
     text = Path(__file__).read_text(encoding="utf-8")
